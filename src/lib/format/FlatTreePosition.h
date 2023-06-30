@@ -59,6 +59,12 @@ public:
     template <size_t N>
     Position(const std::array<const Node<CONTENT>, N> &tree) : mTree(tree.data()), mTreeSize(N) {}
 
+    // Move back to the top
+    void ResetToTop() {
+        mDescendDepth = 0;
+        mUnknownDescendDepth = 0;
+    }
+
     /// Attempt to find a child of the current position that matches
     /// the given matcher
     template <typename MATCHER>

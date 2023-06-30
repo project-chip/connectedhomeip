@@ -23,8 +23,8 @@
 #include <lib/support/UnitTestRegistration.h>
 
 #include "sample_data.h"
-#include <tlv/meta/protocols_meta.h>
 #include <tlv/meta/clusters_meta.h>
+#include <tlv/meta/protocols_meta.h>
 
 #include <vector>
 
@@ -35,39 +35,53 @@ namespace {
 using namespace chip::TestData;
 using namespace chip::TLV;
 
+using chip::StringBuilderBase;
 using chip::TLVMeta::AttributeTag;
 using chip::TLVMeta::ClusterTag;
+using chip::TLVMeta::CommandTag;
+using chip::TLVMeta::EventTag;
 using chip::TLVMeta::ItemType;
 
-class PayloadDecoder {
-  public:
+class PayloadDecoder
+{
+public:
     PayloadDecoder(chip::Protocols::Id protocol, uint8_t messageType);
 
-  private:
+    /// Outputs the decoded data for this protocol into [out]
+    void Decode(TLVReader & reader, StringBuilderBase & out);
+
+private:
     static constexpr size_t kMaxDecodeDepth = 16;
-    
+
     using DecodePosition = chip::FlatTree::Position<chip::TLVMeta::ItemInfo, kMaxDecodeDepth>;
 
+    const chip::Protocols::Id mProtocol;
+    const uint8_t mMessageType;
     DecodePosition mPayloadPosition;
+    DecodePosition mIMContentPosition;
 
-    // TODO: handle container entry/exit?
+    /// incremental state for parsing of paths
+    uint32_t mClusterId   = 0;
+    uint32_t mAttributeId = 0;
+    uint32_t mEventId     = 0;
+    uint32_t mCommandId   = 0;
 };
-
 
 class ByTag
 {
-  public:
+public:
     constexpr ByTag(Tag tag) : mTag(tag) {}
     bool operator()(const chip::TLVMeta::ItemInfo & item) { return item.tag == mTag; }
 
-  private:
+private:
     const Tag mTag;
 };
 
-PayloadDecoder::PayloadDecoder(chip::Protocols::Id protocol, uint8_t messageType)
-    : mPayloadPosition(chip::TLVMeta::protocols_meta)
+PayloadDecoder::PayloadDecoder(chip::Protocols::Id protocol, uint8_t messageType) :
+    mProtocol(protocol), mMessageType(messageType), mPayloadPosition(chip::TLVMeta::protocols_meta),
+    mIMContentPosition(chip::TLVMeta::clusters_meta)
 {
-    
+
     // Find the right protocol (fake cluster id)
     mPayloadPosition.Enter(ByTag(ClusterTag(0xFFFF0000 | protocol.ToFullyQualifiedSpecForm())));
     mPayloadPosition.Enter(ByTag(AttributeTag(messageType)));
@@ -188,34 +202,30 @@ void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
     }
 }
 
-using DecodePosition = chip::FlatTree::Position<chip::TLVMeta::ItemInfo, 16>;
-
-void NiceDecode(DecodePosition & position, TLVReader reader)
+void PayloadDecoder::Decode(TLVReader & reader, StringBuilderBase & out)
 {
-    auto data = position.Get();
-    if (data != nullptr)
+    auto data = mPayloadPosition.Get();
+    if (data == nullptr)
     {
-        printf("%s:\n", data->name);
-    }
-    else
-    {
-        printf("UNKNOWN DATA POSITION\n");
+        // do not try to decode unknown data. assume binary
+        out.AddFormat("UNKNOWN PROTOCOL: 0x%X, 0x%X\n", mProtocol.ToFullyQualifiedSpecForm(), mMessageType);
         return;
     }
+    out.AddFormat("%s:\n", data->name);
 
     if (reader.GetTotalLength() == 0)
     {
         return;
     }
-
-    if ((position.Get() != nullptr) && (position.Get()->type == ItemType::kProtocolBinaryData)) {
-        printf("BINARY DATA, not decoded\n");
+    if (data->type == ItemType::kProtocolBinaryData)
+    {
+        printf("  BINARY DATA\n");
         return;
     }
     CHIP_ERROR err = reader.Next(kTLVType_Structure, AnonymousTag());
     if (err != CHIP_NO_ERROR)
     {
-        printf("UNEXPECTED DATA: %" CHIP_ERROR_FORMAT "\n", err.Format());
+        printf("  ERROR getting Anonymous Structure TLV: %" CHIP_ERROR_FORMAT "\n", err.Format());
         return;
     }
 
@@ -230,7 +240,7 @@ void NiceDecode(DecodePosition & position, TLVReader reader)
         err = reader.Next();
         if (err == CHIP_END_OF_TLV)
         {
-            position.Exit();
+            mPayloadPosition.Exit();
             reader.ExitContainer(containers.back());
             containers.pop_back();
             if (containers.empty())
@@ -241,24 +251,22 @@ void NiceDecode(DecodePosition & position, TLVReader reader)
         }
 
         // we likely have a tag, try to find its data
-        position.Enter(ByTag(reader.GetTag()));
-
-        chip::StringBuilder<256> line;
+        mPayloadPosition.Enter(ByTag(reader.GetTag()));
 
         for (size_t i = 0; i < containers.size(); i++)
         {
-            line.Add("  ");
+            out.Add("  ");
         }
 
-        auto data = position.Get();
+        auto data = mPayloadPosition.Get();
         if (data != nullptr)
         {
-            line.AddFormat("%s: ", data->name);
+            out.AddFormat("%s: ", data->name);
         }
         else
         {
-            FormatCurrentTag(reader, line);
-            line.Add(": ");
+            FormatCurrentTag(reader, out);
+            out.Add(": ");
         }
 
         bool data_skip = false;
@@ -267,31 +275,31 @@ void NiceDecode(DecodePosition & position, TLVReader reader)
             switch (data->type)
             {
             case ItemType::kProtocolClusterId:
-                line.Add(" (cluster_id): ");
+                out.Add(" (cluster_id): ");
                 break;
             case ItemType::kProtocolAttributeId:
-                line.Add(" (attribute_id): ");
+                out.Add(" (attribute_id): ");
                 break;
             case ItemType::kProtocolCommandId:
-                line.Add(" (command_id): ");
+                out.Add(" (command_id): ");
                 break;
             case ItemType::kProtocolEventId:
-                line.Add(" (event_id): ");
+                out.Add(" (event_id): ");
                 break;
             case ItemType::kProtocolBinaryData:
-                line.Add(" (binary - not parsed)");
+                out.Add(" (binary - not parsed)");
                 data_skip = true;
                 break;
             case ItemType::kProtocolPayloadAttribute:
-                line.Add("TODO(ATTRIBUTE DECODE)");
+                out.Add("TODO(ATTRIBUTE DECODE)");
                 data_skip = true;
                 break;
             case ItemType::kProtocolPayloadCommand:
-                line.Add("TODO(COMMAND DECODE)");
+                out.Add("TODO(COMMAND DECODE)");
                 data_skip = true;
                 break;
             case ItemType::kProtocolPayloadEvent:
-                line.Add("TODO(EVENT DECODE)");
+                out.Add("TODO(EVENT DECODE)");
                 data_skip = true;
                 break;
             default:
@@ -299,9 +307,12 @@ void NiceDecode(DecodePosition & position, TLVReader reader)
             }
         }
 
-        if (data_skip) {
-            position.Exit();
-        } else {
+        if (data_skip)
+        {
+            mPayloadPosition.Exit();
+        }
+        else
+        {
             if (TLVTypeIsContainer(reader.GetType()))
             {
                 reader.EnterContainer(containerType);
@@ -310,11 +321,51 @@ void NiceDecode(DecodePosition & position, TLVReader reader)
             else
             {
                 // assume regular element, no entering
-                PrettyPrintCurrentValue(reader, line);
-                position.Exit();
+                PrettyPrintCurrentValue(reader, out);
+                mPayloadPosition.Exit();
             }
-        } 
-        printf("%s\n", line.c_str());
+        }
+        if (data != nullptr)
+        {
+            const chip::TLVMeta::ItemInfo * info = nullptr;
+            switch (data->type)
+            {
+            case ItemType::kProtocolClusterId:
+                reader.Get(mClusterId);
+                mIMContentPosition.ResetToTop();
+                mIMContentPosition.Enter(ByTag(ClusterTag(mClusterId)));
+                info = mIMContentPosition.Get();
+                break;
+            case ItemType::kProtocolAttributeId:
+                reader.Get(mAttributeId);
+                mIMContentPosition.ResetToTop();
+                mIMContentPosition.Enter(ByTag(ClusterTag(mClusterId)));
+                mIMContentPosition.Enter(ByTag(AttributeTag(mAttributeId)));
+                info = mIMContentPosition.Get();
+                break;
+            case ItemType::kProtocolCommandId:
+                reader.Get(mCommandId);
+                mIMContentPosition.ResetToTop();
+                mIMContentPosition.Enter(ByTag(ClusterTag(mClusterId)));
+                mIMContentPosition.Enter(ByTag(CommandTag(mCommandId)));
+                info = mIMContentPosition.Get();
+                break;
+            case ItemType::kProtocolEventId:
+                reader.Get(mEventId);
+                mIMContentPosition.ResetToTop();
+                mIMContentPosition.Enter(ByTag(ClusterTag(mClusterId)));
+                mIMContentPosition.Enter(ByTag(EventTag(mEventId)));
+                info = mIMContentPosition.Get();
+                break;
+            default:
+                break;
+            }
+            if (info != nullptr)
+            {
+                out.AddFormat(" == %s", info->name);
+            }
+        }
+        out.Add("\n");
     }
 }
 
@@ -326,16 +377,10 @@ void TestSampleData(nlTestSuite * inSuite, void * inContext, const SamplePayload
     reader.Init(data.payload);
 
     PayloadDecoder decoder(data.protocolId, data.messageType);
-    // FIXME: use decoder?
 
-    // test decode
-    DecodePosition position(chip::TLVMeta::protocols_meta.data(), chip::TLVMeta::protocols_meta.size());
-
-    // Find the right protocol (fake cluster id)
-    position.Enter(ByTag(ClusterTag(0xFFFF0000 | data.protocolId.ToFullyQualifiedSpecForm())));
-    position.Enter(ByTag(AttributeTag(data.messageType)));
-
-    NiceDecode(position, reader);
+    chip::StringBuilder<1024> output;
+    decoder.Decode(reader, output);
+    printf("%s", output.c_str());
 }
 
 void TestDecode(nlTestSuite * inSuite, void * inContext)
