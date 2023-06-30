@@ -19,7 +19,6 @@
 
 namespace chip {
 
-/// Write a formatted string to the stringbuilder
 StringBuilderBase & StringBuilderBase::AddFormat(const char * format, ...)
 {
     va_list args;
@@ -45,8 +44,6 @@ StringBuilderBase & StringBuilderBase::AddFormat(const char * format, ...)
     return *this;
 }
 
-/// For strings we often want to know when they were truncated. If the underlying writer did
-/// not fit, this replaces the last 3 characters with "."
 StringBuilderBase & StringBuilderBase::AddMarkerIfOverflow()
 {
     if (mWriter.Fit())
