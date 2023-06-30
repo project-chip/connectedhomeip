@@ -56,9 +56,9 @@ public:
     /// Was nothing written yet?
     bool Empty() const { return mWriter.Needed() == 0; }
 
-
     /// Write a formatted string to the stringbuilder
-    StringBuilderBase & AddFormat(const char *format, ...) ENFORCE_FORMAT(2,3) {
+    StringBuilderBase & AddFormat(const char * format, ...) ENFORCE_FORMAT(2, 3)
+    {
         va_list args;
         va_start(args, format);
 

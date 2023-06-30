@@ -87,7 +87,8 @@ public:
     uint8_t * Buffer() { return mBuf; }
     const uint8_t * Buffer() const { return mBuf; }
 
-    BufferWriter& Format(const char *format, ...) ENFORCE_FORMAT(2,3){
+    BufferWriter & Format(const char * format, ...) ENFORCE_FORMAT(2, 3)
+    {
         va_list args;
         va_start(args, format);
         VFormat(format, args);
@@ -98,13 +99,13 @@ public:
     /// Since this uses vsnprintf internally, on overflow
     /// this will write one less byte that strictly can be
     /// written (since null terminator will be in the binary data)
-    BufferWriter &VFormat(const char *format, va_list args) ENFORCE_FORMAT(2,0);
+    BufferWriter & VFormat(const char * format, va_list args) ENFORCE_FORMAT(2, 0);
 
     /// Assume a specific size for the buffer instead of mSize
     ///
     /// This is to allow avoiding off-by-one overflow truncation
     /// when we know the underlying buffer size is larger.
-    BufferWriter &VFormatWithSize(size_t size, const char *format, va_list args) ENFORCE_FORMAT(3,0);
+    BufferWriter & VFormatWithSize(size_t size, const char * format, va_list args) ENFORCE_FORMAT(3, 0);
 
 protected:
     uint8_t * mBuf;

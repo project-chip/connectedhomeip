@@ -26,14 +26,16 @@ BufferWriter & BufferWriter::Put(const char * s)
     return Put(s, strlen(s));
 }
 
-BufferWriter &BufferWriter::VFormat(const char *format, va_list args) {
+BufferWriter & BufferWriter::VFormat(const char * format, va_list args)
+{
     mNeeded += vsnprintf(reinterpret_cast<char *>(mBuf + mNeeded), Available(), format, args);
     return *this;
 }
 
-BufferWriter &BufferWriter::VFormatWithSize(size_t size, const char *format, va_list args) {
+BufferWriter & BufferWriter::VFormatWithSize(size_t size, const char * format, va_list args)
+{
     size_t oldsize = mSize;
-    mSize = size;
+    mSize          = size;
     mNeeded += vsnprintf(reinterpret_cast<char *>(mBuf + mNeeded), Available(), format, args);
     mSize = oldsize;
     return *this;

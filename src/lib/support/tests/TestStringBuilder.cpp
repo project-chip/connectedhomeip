@@ -147,12 +147,12 @@ void TestFormatOverflow(nlTestSuite * inSuite, void * inContext)
 }
 
 const nlTest sTests[] = {
-    NL_TEST_DEF("TestStringBuilder", TestStringBuilder), //
-    NL_TEST_DEF("TestIntegerAppend", TestIntegerAppend), //
-    NL_TEST_DEF("TestOverflow", TestOverflow),           //
-    NL_TEST_DEF("TestFormat", TestFormat),               //
-    NL_TEST_DEF("TestFormatOverflow", TestFormatOverflow),               //
-    NL_TEST_SENTINEL()                                   //
+    NL_TEST_DEF("TestStringBuilder", TestStringBuilder),   //
+    NL_TEST_DEF("TestIntegerAppend", TestIntegerAppend),   //
+    NL_TEST_DEF("TestOverflow", TestOverflow),             //
+    NL_TEST_DEF("TestFormat", TestFormat),                 //
+    NL_TEST_DEF("TestFormatOverflow", TestFormatOverflow), //
+    NL_TEST_SENTINEL()                                     //
 };
 
 } // namespace
