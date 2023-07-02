@@ -18,6 +18,7 @@
 package chip.onboardingpayload
 
 import java.lang.StringBuilder
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * A minimal QR code setup payload generator that omits any optional data,
@@ -27,7 +28,7 @@ class QRCodeBasicOnboardingPayloadGenerator(private val payload: OnboardingPaylo
 
   /**
    * This function is called to encode the binary data of a payload to a
-   * base38 null-terminated string.
+   * base38 string.
    *
    * The resulting size of the outBuffer span will be the size of data written.
    *
@@ -63,7 +64,9 @@ fun payloadBase38RepresentationWithTLV(
     throw OnboardingPayloadException("Buffer is too small")
   } else {
     val subBuffer = outBuffer.copyOfRange(prefixLen, outBuffer.size)
-    kQRCodePrefix.toCharArray(outBuffer, 0, prefixLen)
+    for (i in kQRCodePrefix.indices) {
+      outBuffer[i] = kQRCodePrefix[i]
+    }
 
     base38Encode(bits, subBuffer)
     
@@ -81,7 +84,7 @@ private fun generateBitSet(
   tlvDataStart: ByteArray?,
   tlvDataLengthInBytes: Int
 ) {
-  var offset = 0
+  var offset: AtomicInteger = AtomicInteger(0)
   val totalPayloadSizeInBits = kTotalPayloadDataSizeInBits + (tlvDataLengthInBytes * 8)
   if (bits.size * 8 < totalPayloadSizeInBits)
     throw OnboardingPayloadException("Buffer is too small")
@@ -100,18 +103,19 @@ private fun generateBitSet(
 // Populates numberOfBits starting from LSB of input into bits, which is assumed to be zero-initialized
 private fun populateBits(
   bits: ByteArray,
-  offset: Int,
+  offset: AtomicInteger,
   input: Long,
   numberOfBits: Int,
   totalPayloadDataSizeInBits: Int
 ) {
-  if (offset + numberOfBits > totalPayloadDataSizeInBits)
+  if (offset.get() + numberOfBits > totalPayloadDataSizeInBits)
     throw OnboardingPayloadException("Invalid argument")
 
   if (input >= (1L shl numberOfBits))
     throw OnboardingPayloadException("Invalid argument")
 
-  var index = offset
+  var index = offset.get()
+  offset.addAndGet(numberOfBits)
   var inputValue = input
   while (inputValue != 0L) {
     if (inputValue and 1L != 0L) {
@@ -125,7 +129,7 @@ private fun populateBits(
 
 private fun populateTLVBits(
   bits: ByteArray,
-  offset: Int,
+  offset: AtomicInteger,
   tlvBuf: ByteArray?,
   tlvBufSizeInBytes: Int,
   totalPayloadDataSizeInBits: Int
