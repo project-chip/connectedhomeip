@@ -43,11 +43,14 @@ Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &s
 } // namespace
 #endif
 
+static std::mutex light_set_mutex;
+
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
     if (attributePath.mClusterId == OnOff::Id && attributePath.mAttributeId == OnOff::Attributes::OnOff::Id)
     {
+        std::lock_guard<std::mutex> guard(light_set_mutex);
         LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
     }
 }
@@ -60,9 +63,7 @@ static peripheral_gpio_h blue_gpio;
 static peripheral_gpio_h green_gpio;
 static peripheral_gpio_h red_gpio;
 
-void gpio_turn_on();
-
-int gpio_init()
+static int gpio_init()
 {
     peripheral_gpio_open(blue_pin, &blue_gpio);
     peripheral_gpio_set_direction(blue_gpio, PERIPHERAL_GPIO_DIRECTION_OUT_INITIALLY_LOW);
@@ -72,18 +73,17 @@ int gpio_init()
 
     peripheral_gpio_open(red_pin, &red_gpio);
     peripheral_gpio_set_direction(red_gpio, PERIPHERAL_GPIO_DIRECTION_OUT_INITIALLY_LOW);
-    gpio_turn_on();
     return 0;
 }
 
-void gpio_turn_on()
+static void gpio_turn_on()
 {
     peripheral_gpio_write(green_gpio, 1);
     peripheral_gpio_write(blue_gpio, 1);
     peripheral_gpio_write(red_gpio, 1);
 }
 
-void gpio_turn_off()
+static void gpio_turn_off()
 {
     peripheral_gpio_write(green_gpio, 0);
     peripheral_gpio_write(blue_gpio, 0);
@@ -108,46 +108,18 @@ static void on_bus_lost(G_GNUC_UNUSED GDBusConnection * conn, const char * name,
     }
 }
 
-static gboolean on_turn_on(LightAppManager1 * lightAppManager, GDBusMethodInvocation * invocation, G_GNUC_UNUSED void * userdata)
+static gboolean on_on_changed(LightAppManager1 * lightAppManager, GDBusMethodInvocation * invocation, G_GNUC_UNUSED void * userdata)
 {
-
-    unsigned int available_rpm = 0;
-    unsigned int available_tpk = 0;
-    g_autoptr(GError) error    = NULL;
-
-    g_print("Check for update result: RPM=%u TPK=%u\n", available_rpm, available_tpk);
-
-    LightingMgr().InitiateAction(LightingManager::ON_ACTION);
-
-    light_app_manager1_set_on(lightAppManager, TRUE);
-    light_app_manager1_complete_turn_on(lightAppManager, invocation);
+    bool on = light_app_manager1_get_on(lightAppManager);
+    std::lock_guard<std::mutex> guard(light_set_mutex);
+    LightingMgr().InitiateAction(on ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
     return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
-static gboolean on_turn_off(LightAppManager1 * lightAppManager, GDBusMethodInvocation * invocation, G_GNUC_UNUSED void * userdata)
+static CHIP_ERROR dbusInit(gpointer)
 {
-
-    unsigned int available_rpm = 0;
-    unsigned int available_tpk = 0;
-    g_autoptr(GError) error    = NULL;
-
-    g_print("Check for update result: RPM=%u TPK=%u\n", available_rpm, available_tpk);
-
-    LightingMgr().InitiateAction(LightingManager::OFF_ACTION);
-
-    light_app_manager1_set_on(lightAppManager, FALSE);
-    light_app_manager1_complete_turn_off(lightAppManager, invocation);
-    return G_DBUS_METHOD_INVOCATION_HANDLED;
-}
-
-CHIP_ERROR dbusInit(gpointer)
-{
-    pid_t pid = gettid();
-    ChipLogProgress(DeviceLayer, "dbusInit: pid %d", pid);
-
     g_autoptr(GDBusConnection) bus = NULL;
     g_autoptr(GError) error        = NULL;
-    ChipLogProgress(NotSpecified, "XXX dbusInit");
 
     if ((bus = g_bus_get_sync(G_BUS_TYPE_SYSTEM, NULL, &error)) == NULL)
     {
@@ -159,8 +131,7 @@ CHIP_ERROR dbusInit(gpointer)
     LightAppObjectSkeleton * object = light_app_object_skeleton_new("/lightapp");
 
     LightAppManager1 * lightAppManager = light_app_manager1_skeleton_new();
-    g_signal_connect(lightAppManager, "handle-turn-on", G_CALLBACK(on_turn_on), NULL);
-    g_signal_connect(lightAppManager, "handle-turn-off", G_CALLBACK(on_turn_off), NULL);
+    g_signal_connect(lightAppManager, "notify::on", G_CALLBACK(on_on_changed), NULL);
     light_app_object_skeleton_set_manager1(object, lightAppManager);
     g_object_unref(lightAppManager);
 
@@ -170,7 +141,6 @@ CHIP_ERROR dbusInit(gpointer)
 
     g_bus_own_name_on_connection(bus, "org.tizen.matter.example.lighting", G_BUS_NAME_OWNER_FLAGS_NONE, on_bus_acquired,
                                  on_bus_lost, NULL, NULL);
-    ChipLogProgress(NotSpecified, "XXX dbusInit completed");
 
     return CHIP_NO_ERROR;
 }
@@ -178,6 +148,10 @@ CHIP_ERROR dbusInit(gpointer)
 void initCallback()
 {
     chip::DeviceLayer::PlatformMgrImpl().GLibMatterContextInvokeSync(dbusInit, static_cast<void *>(nullptr));
+    if (LightingMgr().IsTurnedOn())
+        gpio_turn_on();
+    else
+        gpio_turn_off();
 }
 
 void ApplicationInit()

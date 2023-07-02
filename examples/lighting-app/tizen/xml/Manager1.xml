@@ -1,7 +1,5 @@
 <node>
 	<interface name="org.tizen.matter.example.lighting.Manager1">
-		<method name="TurnOff" />
-		<method name="TurnOn" />
-		<property name="On" type="b" access="read" />
+		<property name="On" type="b" access="readwrite" />
 	</interface>
 </node>
