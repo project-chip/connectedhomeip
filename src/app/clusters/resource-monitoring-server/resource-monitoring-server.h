@@ -67,10 +67,10 @@ private:
     ClusterId mClusterId{};
 
     // attribute Data Store
-    chip::Percent mCondition;
-    const DegradationDirectionEnum mDegradationDirection;
-    ChangeIndicationEnum mChangeIndication;
-    bool mInPlaceIndicator;
+    chip::Percent mCondition = 100;
+    const DegradationDirectionEnum mDegradationDirection = DegradationDirectionEnum::kDown;
+    ChangeIndicationEnum mChangeIndication = ChangeIndicationEnum::kOk;
+    bool mInPlaceIndicator = true;
 
     uint32_t mFeature;
 
