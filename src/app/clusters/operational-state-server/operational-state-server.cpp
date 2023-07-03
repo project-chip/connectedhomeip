@@ -113,15 +113,11 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
     delegate->GetCurrentOperationalState(opState);
 
-    if (opState.operationalStateID == to_underlying(OperationalStateEnum::kPaused))
-    {
-        response.commandResponseState = err;
-    }
-    else
+    if (opState.operationalStateID != to_underlying(OperationalStateEnum::kPaused))
     {
         delegate->HandlePauseStateCallback(err);
-        response.commandResponseState = err;
     }
+    response.commandResponseState = err;
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -138,21 +134,16 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
 
     delegate->GetCurrentOperationalState(opState);
 
-    if (opState.operationalStateID == to_underlying(OperationalStateEnum::kRunning))
-    {
-        response.commandResponseState = err;
-    }
-    else if (opState.operationalStateID != to_underlying(OperationalStateEnum::kPaused) &&
+    if (opState.operationalStateID != to_underlying(OperationalStateEnum::kPaused) &&
              opState.operationalStateID != to_underlying(OperationalStateEnum::kRunning))
     {
         err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
-        response.commandResponseState = err;
     }
-    else
+    else if (opState.operationalStateID == to_underlying(OperationalStateEnum::kPaused))
     {
         delegate->HandleResumeStateCallback(err);
-        response.commandResponseState = err;
     }
+    response.commandResponseState = err;
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -194,15 +185,11 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
 
     delegate->GetCurrentOperationalState(opState);
 
-    if (opState.operationalStateID == to_underlying(OperationalStateEnum::kStopped))
-    {
-        response.commandResponseState = err;
-    }
-    else
+    if (opState.operationalStateID != to_underlying(OperationalStateEnum::kStopped))
     {
         delegate->HandleStopStateCallback(err);
-        response.commandResponseState = err;
     }
+    response.commandResponseState = err;
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
