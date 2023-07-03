@@ -19,8 +19,8 @@ package chip.devicecontroller;
 
 public final class ChipIdLookup {
   /**
-   * Translates cluster ID to a cluster name in upper camel case. If no matching
-   * ID is found, returns an empty string.
+   * Translates cluster ID to a cluster name in upper camel case. If no matching ID is found,
+   * returns an empty string.
    */
   public static String clusterIdToName(long clusterId) {
     ClusterIDMapping.BaseCluster cluster = ClusterIDMapping.getCluster(clusterId);
@@ -32,9 +32,8 @@ public final class ChipIdLookup {
   }
 
   /**
-   * Translates cluster ID and attribute ID to an attribute name in upper camel
-   * case.
-   * If no matching IDs are found, returns an empty string.
+   * Translates cluster ID and attribute ID to an attribute name in upper camel case. If no matching
+   * IDs are found, returns an empty string.
    */
   public static String attributeIdToName(long clusterId, long attributeId) {
     ClusterIDMapping.BaseCluster cluster = ClusterIDMapping.getCluster(clusterId);
@@ -50,8 +49,8 @@ public final class ChipIdLookup {
   }
 
   /**
-   * Translates cluster ID and event ID to an attribute name in upper camel case.
-   * If no matching IDs are found, returns an empty string.
+   * Translates cluster ID and event ID to an attribute name in upper camel case. If no matching IDs
+   * are found, returns an empty string.
    */
   public static String eventIdToName(long clusterId, long eventId) {
     ClusterIDMapping.BaseCluster cluster = ClusterIDMapping.getCluster(clusterId);
