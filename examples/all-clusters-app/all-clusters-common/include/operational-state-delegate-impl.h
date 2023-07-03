@@ -74,15 +74,13 @@ public:
 
     /**
      * Set operational error.
-     * @param opErrState The reference of operational error.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     * @param opErrState The new operational error.
      */
     CHIP_ERROR SetOperationalError(const GenericOperationalError & opErrState) override;
 
     /**
-     * Set operational state.
-     * @param opState The operational state for which to set.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     * Set current operational state.
+     * @param opState The operational state that should now be the current one.
      */
     CHIP_ERROR SetOperationalState(const GenericOperationalState & opState) override;
 

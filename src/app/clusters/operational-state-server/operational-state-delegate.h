@@ -216,7 +216,7 @@ struct GenericOperationCompletion : public app::Clusters::OperationalState::Even
  * A delegate to handle application logic of the Operational State aliased Cluster.
  * The delegate API assumes there will be separate delegate objects for each cluster instance.
  * (i.e. each separate operational state cluster derivation, on each separate endpoint),
- * since the delegate is not handed the cluster id or endpoint.
+ * since the delegate methods are not handed the cluster id or endpoint.
  */
 class Delegate
 {
@@ -253,16 +253,14 @@ public:
     virtual void GetCurrentOperationalError(GenericOperationalError & error) = 0;
 
     /**
-     * Set operational state.
-     * @param opState The operational state for which to set.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     * Set current operational state.
+     * @param opState The operational state that should now be the current one.
      */
     virtual CHIP_ERROR SetOperationalState(const GenericOperationalState & opState) = 0;
 
     /**
      * Set operational error.
-     * @param opErrState The reference of operational error.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     * @param opErrState The new operational error.
      */
     virtual CHIP_ERROR SetOperationalError(const GenericOperationalError & opErrState) = 0;
 
