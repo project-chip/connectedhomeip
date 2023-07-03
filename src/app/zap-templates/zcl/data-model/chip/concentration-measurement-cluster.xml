@@ -33,9 +33,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -57,9 +57,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -82,9 +82,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -107,9 +107,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -132,9 +132,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -157,9 +157,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -182,9 +182,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -207,9 +207,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -232,9 +232,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -257,9 +257,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -282,9 +282,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -307,9 +307,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -332,9 +332,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -357,9 +357,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -382,9 +382,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -407,9 +407,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -432,9 +432,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -457,9 +457,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -482,9 +482,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -507,9 +507,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -532,9 +532,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -557,9 +557,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -582,9 +582,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -607,9 +607,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -632,9 +632,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -657,9 +657,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -682,9 +682,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -707,9 +707,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -732,9 +732,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -757,9 +757,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -782,9 +782,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -807,9 +807,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -832,9 +832,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -857,9 +857,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -882,9 +882,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -907,9 +907,9 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
     <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
-    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
-    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
@@ -1091,8 +1091,8 @@ limitations under the License.
     <cluster code="0x042d" />
     <cluster code="0x042e" />
     <cluster code="0x042f" />
-    <item name="Gas" value="0x00"/>
-    <item name="Liquid" value="0x01"/>
+    <item name="Air" value="0x00"/>
+    <item name="Water" value="0x01"/>
     <item name="Soil" value="0x02"/>
   </enum>
 </configurator>
