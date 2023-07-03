@@ -57,7 +57,7 @@ StringBuilderBase & StringBuilderBase::AddMarkerIfOverflow()
 
     for (unsigned i = 0; i < 3; i++)
     {
-        if (mWriter.Size() >= i)
+        if (mWriter.Size() >= i + 1)
         {
             mWriter.Buffer()[mWriter.Size() - i - 1] = '.';
         }
