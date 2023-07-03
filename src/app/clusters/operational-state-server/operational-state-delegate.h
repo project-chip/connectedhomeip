@@ -38,7 +38,10 @@ constexpr size_t kOperationalPhaseNameMaxSize    = 64u;
  */
 struct GenericOperationalState : public app::Clusters::detail::Structs::OperationalStateStruct::Type
 {
-    GenericOperationalState(uint8_t state, Optional<CharSpan> label = NullOptional) { Set(state, label); }
+    GenericOperationalState(uint8_t state = to_underlying(OperationalStateEnum::kStopped), Optional<CharSpan> label = NullOptional)
+    {
+        Set(state, label);
+    }
 
     GenericOperationalState(const GenericOperationalState & op) { *this = op; }
 
