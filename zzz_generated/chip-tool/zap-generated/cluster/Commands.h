@@ -17626,28 +17626,28 @@ void registerClusterFanControl(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<chip::app::Clusters::FanControl::FanModeType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FanControl::FanModeEnum>>(
             Id, "fan-mode", 0, UINT8_MAX, Attributes::FanMode::Id, WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FanControl::FanModeSequenceType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FanControl::FanModeSequenceEnum>>(
             Id, "fan-mode-sequence", 0, UINT8_MAX, Attributes::FanModeSequence::Id, WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent>>>(
             Id, "percent-setting", 0, UINT8_MAX, Attributes::PercentSetting::Id, WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "percent-current", 0, UINT8_MAX, Attributes::PercentCurrent::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::Percent>>(Id, "percent-current", 0, UINT8_MAX, Attributes::PercentCurrent::Id,
+                                                   WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "speed-max", 0, UINT8_MAX, Attributes::SpeedMax::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(
             Id, "speed-setting", 0, UINT8_MAX, Attributes::SpeedSetting::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "speed-current", 0, UINT8_MAX, Attributes::SpeedCurrent::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "rock-support", 0, UINT8_MAX, Attributes::RockSupport::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "rock-setting", 0, UINT8_MAX, Attributes::RockSetting::Id,
-                                             WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "wind-support", 0, UINT8_MAX, Attributes::WindSupport::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "wind-setting", 0, UINT8_MAX, Attributes::WindSetting::Id,
-                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>>(
+            Id, "rock-support", 0, UINT8_MAX, Attributes::RockSupport::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>>(
+            Id, "rock-setting", 0, UINT8_MAX, Attributes::RockSetting::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>>(
+            Id, "wind-support", 0, UINT8_MAX, Attributes::WindSupport::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>>(
+            Id, "wind-setting", 0, UINT8_MAX, Attributes::WindSetting::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::Clusters::FanControl::AirflowDirectionEnum>>(
             Id, "airflow-direction", 0, UINT8_MAX, Attributes::AirflowDirection::Id, WriteCommandType::kWrite,
             credsIssuerConfig), //

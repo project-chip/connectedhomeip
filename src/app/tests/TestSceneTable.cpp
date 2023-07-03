@@ -494,29 +494,29 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     static const uint16_t LC_av_payload[2] = { 0x64, 0x01F0 };
     static const uint16_t CC_av_payload[8] = { 0 };
 
-    OOPairs[0].attributeID.SetValue(kOnOffAttId);
+    OOPairs[0].attributeID    = kOnOffAttId;
     OOPairs[0].attributeValue = OO_av_payload;
 
-    LCPairs[0].attributeID.SetValue(kCurrentLevelId);
+    LCPairs[0].attributeID    = kCurrentLevelId;
     LCPairs[0].attributeValue = LC_av_payload[0];
-    LCPairs[1].attributeID.SetValue(kCurrentFrequencyId);
+    LCPairs[1].attributeID    = kCurrentFrequencyId;
     LCPairs[1].attributeValue = LC_av_payload[1];
 
-    CCPairs[0].attributeID.SetValue(kCurrentSaturationId);
+    CCPairs[0].attributeID    = kCurrentSaturationId;
     CCPairs[0].attributeValue = CC_av_payload[0];
-    CCPairs[1].attributeID.SetValue(kCurrentXId);
+    CCPairs[1].attributeID    = kCurrentXId;
     CCPairs[1].attributeValue = CC_av_payload[1];
-    CCPairs[2].attributeID.SetValue(kCurrentYId);
+    CCPairs[2].attributeID    = kCurrentYId;
     CCPairs[2].attributeValue = CC_av_payload[2];
-    CCPairs[3].attributeID.SetValue(kColorTemperatureMiredsId);
+    CCPairs[3].attributeID    = kColorTemperatureMiredsId;
     CCPairs[3].attributeValue = CC_av_payload[3];
-    CCPairs[4].attributeID.SetValue(kEnhancedCurrentHueId);
+    CCPairs[4].attributeID    = kEnhancedCurrentHueId;
     CCPairs[4].attributeValue = CC_av_payload[4];
-    CCPairs[5].attributeID.SetValue(kColorLoopActiveId);
+    CCPairs[5].attributeID    = kColorLoopActiveId;
     CCPairs[5].attributeValue = CC_av_payload[5];
-    CCPairs[6].attributeID.SetValue(kColorLoopDirectionId);
+    CCPairs[6].attributeID    = kColorLoopDirectionId;
     CCPairs[6].attributeValue = CC_av_payload[6];
-    CCPairs[7].attributeID.SetValue(kColorLoopTimeId);
+    CCPairs[7].attributeID    = kColorLoopTimeId;
     CCPairs[7].attributeValue = CC_av_payload[7];
 
     // Initialize Extension Field sets as if they were received by add commands
@@ -637,7 +637,6 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     app::Clusters::Scenes::Structs::AttributeValuePair::Type TooManyPairs[16];
 
     uint8_t payloadOk = 0;
-
     for (uint8_t i = 0; i < 16; i++)
     {
         TooManyPairs[i].attributeValue = payloadOk;
@@ -646,7 +645,8 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     extensionFieldFailTestOut.clusterID          = kColorControlClusterId;
     extensionFieldFailTestOut.attributeValueList = TooManyPairs;
 
-    uint8_t failBuffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
+    // Give a bigger buffer given we are using too many pairs on purpose
+    uint8_t failBuffer[2 * scenes::kMaxFieldBytesPerCluster] = { 0 };
     ByteSpan fail_list(failBuffer);
 
     // Serialize Extension Field sets as if they were recovered from memory
