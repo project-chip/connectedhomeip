@@ -28,7 +28,7 @@ namespace Clusters {
 namespace OperationalState {
 
 /**
- * class to present Enquriy Table of Delegates
+ * class to present Enquiry Table of Delegates
  */
 struct DelegatesEnquiryTable
 {
@@ -56,7 +56,7 @@ struct DelegatesEnquiryTable
 constexpr EndpointId kDemoEndpointId = 1;
 
 /**
- * Enquriy Table of Operational State List
+ * Enquiry Table of Operational State List
  * Note: User Define
  */
 static const GenericOperationalState opStateList[] = {
@@ -67,7 +67,7 @@ static const GenericOperationalState opStateList[] = {
 };
 
 /**
- * Enquriy Table of Phase List
+ * Enquiry Table of Phase List
  * Note: User Define
  */
 static const GenericOperationalPhase opPhaseList[] = {
@@ -78,7 +78,7 @@ static const GenericOperationalPhase opPhaseList[] = {
 };
 
 /**
- * Enquriy Table of Operational State Delegate
+ * Enquiry Table of Operational State Delegate
  * Note: User Define
  */
 static OperationalStateDelegate opStateDelegate(Clusters::OperationalState::kDemoEndpointId, Clusters::OperationalState::Id,
@@ -88,7 +88,7 @@ static OperationalStateDelegate opStateDelegate(Clusters::OperationalState::kDem
                                                 Span<const GenericOperationalPhase>(opPhaseList));
 
 /**
- * Enquriy Table of Operational State Cluster and alias Cluter Delegate corresponding to endpointId and clusterId
+ * Enquiry Table of Operational State Cluster and alias Cluter Delegate corresponding to endpointId and clusterId
  * Note: User Define
  */
 constexpr DelegatesEnquiryTable kDelegatesEnquiryTable[] = {

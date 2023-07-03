@@ -34,7 +34,7 @@ void TestOperationalStateDelegatelGetAndSetOperationalState(nlTestSuite * inSuit
      */
     EndpointId kEndpointId = 1;
     /**
-     * Enquriy Table of Operational State List
+     * Enquiry Table of Operational State List
      * Note: User Define
      */
     const GenericOperationalState opStateList[] = {
@@ -45,7 +45,7 @@ void TestOperationalStateDelegatelGetAndSetOperationalState(nlTestSuite * inSuit
     };
 
     /**
-     * Enquriy Table of Operational Phase List
+     * Enquiry Table of Operational Phase List
      * Note: User Define
      */
     const GenericOperationalPhase opPhaseList[] = {
@@ -108,7 +108,7 @@ void TestOperationalStateDelegatelGetOperationalStateList(nlTestSuite * inSuite,
     char buffer[kOperationalStateLabelMaxSize] = "rebooting";
 
     /**
-     * Enquriy Table of Operational State List
+     * Enquiry Table of Operational State List
      * Note: User Define
      */
     const GenericOperationalState opStateList[] = { GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
@@ -173,7 +173,7 @@ void TestOperationalStateDelegatelGetAndSetOperationalError(nlTestSuite * inSuit
      */
     EndpointId kEndpointId = 1;
     /**
-     * Enquriy Table of Operational State List
+     * Enquiry Table of Operational State List
      * Note: User Define
      */
     const GenericOperationalState opStateList[] = {
@@ -257,7 +257,7 @@ void TestOperationalStateDelegatelGetOperationalPhaseListNull(nlTestSuite * inSu
     char buffer[kOperationalStateLabelMaxSize] = "rebooting";
 
     /**
-     * Enquriy Table of Operational State List
+     * Enquiry Table of Operational State List
      * Note: User Define
      */
     const GenericOperationalState opStateList[] = { GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
@@ -309,7 +309,7 @@ void TestOperationalStateDelegatelGetOperationalPhaseList(nlTestSuite * inSuite,
     char buffer[kOperationalStateLabelMaxSize] = "rebooting";
 
     /**
-     * Enquriy Table of Operational State List
+     * Enquiry Table of Operational State List
      * Note: User Define
      */
     const GenericOperationalState opStateList[] = { GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
@@ -321,7 +321,7 @@ void TestOperationalStateDelegatelGetOperationalPhaseList(nlTestSuite * inSuite,
                                                         Optional<CharSpan>(CharSpan::fromCharString(buffer))) };
 
     /**
-     * Enquriy Table of Operational Phase List
+     * Enquiry Table of Operational Phase List
      * Note: User Define
      */
 
