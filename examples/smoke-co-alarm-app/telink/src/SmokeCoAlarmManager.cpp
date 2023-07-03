@@ -43,17 +43,20 @@ CHIP_ERROR SmokeCoAlarmManager::Init()
 
 bool SmokeCoAlarmManager::StartSelfTesting()
 {
+    LOG_INF("Start self-testing!");
     bool success = SmokeCoAlarmServer::Instance().SetTestInProgress(1, true);
 
     if (success)
     {
-        LOG_INF("Start self-testing!");
-
-        LOG_INF("End self-testing!");
+        LOG_INF("Start self-testing success!");
+    } else
+    {
+        LOG_INF("Start self-testing fail!");        
     }
 
     SmokeCoAlarmServer::Instance().SetExpressedState(1, mExpressedState);
     SmokeCoAlarmServer::Instance().SetTestInProgress(1, false);
-
+    LOG_INF("End self-testing!");
+    
     return success;
 }
