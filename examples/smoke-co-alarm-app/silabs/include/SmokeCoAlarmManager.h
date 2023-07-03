@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <map>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -31,6 +32,8 @@
 class SmokeCoAlarmManager
 {
 public:
+    using ExpressedStateEnum = chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum;
+
     CHIP_ERROR Init();
 
     /**
@@ -39,10 +42,24 @@ public:
      */
     bool StartSelfTesting();
 
+    /**
+     * @brief Updates the expressed state with new value
+     *
+     * @param endpointId ID of the endpoint
+     * @param expressedState expressed state
+     * @param isSet true on set, false on unset
+     * @return true on success, false on failure
+     */
+    bool SetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum expressedState, bool isSet);
+
 private:
     friend SmokeCoAlarmManager & AlarmMgr(void);
 
-    chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum mExpressedState;
+    /**
+     * @brief Record expressed state in decreasing priority
+     *
+     */
+    std::map<ExpressedStateEnum, bool> mExpressedState;
 
     static SmokeCoAlarmManager sAlarm;
 };

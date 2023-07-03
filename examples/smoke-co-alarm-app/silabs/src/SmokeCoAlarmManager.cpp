@@ -31,13 +31,60 @@ SmokeCoAlarmManager SmokeCoAlarmManager::sAlarm;
 
 CHIP_ERROR SmokeCoAlarmManager::Init()
 {
-    ExpressedStateEnum currentExpressedState = ExpressedStateEnum::kNormal;
-    // read current ExpressedState on endpoint one
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    SmokeCoAlarmServer::Instance().GetExpressedState(1, currentExpressedState);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    mExpressedState = { { ExpressedStateEnum::kEndOfService, false },
+                        { ExpressedStateEnum::kSmokeAlarm, false },
+                        { ExpressedStateEnum::kCOAlarm, false },
+                        { ExpressedStateEnum::kTesting, false },
+                        { ExpressedStateEnum::kInterconnectSmoke, false },
+                        { ExpressedStateEnum::kInterconnectCO, false },
+                        { ExpressedStateEnum::kHardwareFault, false },
+                        { ExpressedStateEnum::kBatteryAlert, false },
+                        { ExpressedStateEnum::kNormal, true } };
 
-    mExpressedState = currentExpressedState;
+    // read current State on endpoint one
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    ExpressedStateEnum currentExpressedState;
+    bool success = SmokeCoAlarmServer::Instance().GetExpressedState(1, currentExpressedState);
+    if (success)
+    {
+        mExpressedState[currentExpressedState] = true;
+    }
+
+    AlarmStateEnum currentSmokeState;
+    success = SmokeCoAlarmServer::Instance().GetSmokeState(1, currentSmokeState);
+    if (success)
+    {
+        mExpressedState[ExpressedStateEnum::kSmokeAlarm] = !(currentSmokeState == AlarmStateEnum::kNormal);
+    }
+
+    AlarmStateEnum currentCOState;
+    success = SmokeCoAlarmServer::Instance().GetCOState(1, currentCOState);
+    if (success)
+    {
+        mExpressedState[ExpressedStateEnum::kCOAlarm] = !(currentCOState == AlarmStateEnum::kNormal);
+    }
+
+    AlarmStateEnum currentBatteryAlert;
+    success = SmokeCoAlarmServer::Instance().GetBatteryAlert(1, currentBatteryAlert);
+    if (success)
+    {
+        mExpressedState[ExpressedStateEnum::kBatteryAlert] = !(currentBatteryAlert == AlarmStateEnum::kNormal);
+    }
+
+    bool currentHardwareFaultAlert;
+    success = SmokeCoAlarmServer::Instance().GetHardwareFaultAlert(1, currentHardwareFaultAlert);
+    if (success)
+    {
+        mExpressedState[ExpressedStateEnum::kHardwareFault] = currentHardwareFaultAlert;
+    }
+
+    EndOfServiceEnum currentEndOfServiceAlert;
+    success = SmokeCoAlarmServer::Instance().GetEndOfServiceAlert(1, currentEndOfServiceAlert);
+    if (success)
+    {
+        mExpressedState[ExpressedStateEnum::kEndOfService] = !(currentEndOfServiceAlert == EndOfServiceEnum::kNormal);
+    }
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     return CHIP_NO_ERROR;
 }
@@ -53,8 +100,26 @@ bool SmokeCoAlarmManager::StartSelfTesting()
         SILABS_LOG("End self-testing!");
     }
 
-    SmokeCoAlarmServer::Instance().SetExpressedState(1, mExpressedState);
     SmokeCoAlarmServer::Instance().SetTestInProgress(1, false);
+    SetExpressedState(1, ExpressedStateEnum::kTesting, false);
+
+    return success;
+}
+
+bool SmokeCoAlarmManager::SetExpressedState(EndpointId endpointId, ExpressedStateEnum expressedState, bool isSet)
+{
+    bool success = false;
+
+    mExpressedState[expressedState] = isSet;
+
+    for (auto it : mExpressedState)
+    {
+        if (it.second)
+        {
+            success = SmokeCoAlarmServer::Instance().SetExpressedState(endpointId, it.first);
+            break;
+        }
+    }
 
     return success;
 }

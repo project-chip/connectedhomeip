@@ -74,56 +74,50 @@ bool emberAfHandleEventTrigger(uint64_t eventTrigger)
     switch (eventTrigger)
     {
     case 0xffffffff00000090:
-        success = SmokeCoAlarmServer::Instance().SetSmokeState(1, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum::kWarning);
+        success = SmokeCoAlarmServer::Instance().SetSmokeState(1, SmokeCoAlarm::AlarmStateEnum::kWarning);
         if (success)
         {
-            success = SmokeCoAlarmServer::Instance().SetExpressedState(
-                1, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum::kSmokeAlarm);
+            success = AlarmMgr().SetExpressedState(1, SmokeCoAlarm::ExpressedStateEnum::kSmokeAlarm, true);
         }
         break;
 
     case 0xffffffff000000a0:
-        success = SmokeCoAlarmServer::Instance().SetSmokeState(1, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum::kNormal);
+        success = SmokeCoAlarmServer::Instance().SetSmokeState(1, SmokeCoAlarm::AlarmStateEnum::kNormal);
         if (success)
         {
-            success =
-                SmokeCoAlarmServer::Instance().SetExpressedState(1, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum::kNormal);
+            success = AlarmMgr().SetExpressedState(1, SmokeCoAlarm::ExpressedStateEnum::kSmokeAlarm, false);
         }
         break;
 
     case 0xffffffff00000091:
-        success = SmokeCoAlarmServer::Instance().SetCOState(1, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum::kWarning);
+        success = SmokeCoAlarmServer::Instance().SetCOState(1, SmokeCoAlarm::AlarmStateEnum::kWarning);
         if (success)
         {
-            success = SmokeCoAlarmServer::Instance().SetExpressedState(
-                1, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum::kCOAlarm);
+            success = AlarmMgr().SetExpressedState(1, SmokeCoAlarm::ExpressedStateEnum::kCOAlarm, true);
         }
         break;
 
     case 0xffffffff000000a1:
-        success = SmokeCoAlarmServer::Instance().SetCOState(1, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum::kNormal);
+        success = SmokeCoAlarmServer::Instance().SetCOState(1, SmokeCoAlarm::AlarmStateEnum::kNormal);
         if (success)
         {
-            success =
-                SmokeCoAlarmServer::Instance().SetExpressedState(1, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum::kNormal);
+            success = AlarmMgr().SetExpressedState(1, SmokeCoAlarm::ExpressedStateEnum::kCOAlarm, false);
         }
         break;
 
     case 0xffffffff00000095:
-        success = SmokeCoAlarmServer::Instance().SetBatteryAlert(1, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum::kWarning);
+        success = SmokeCoAlarmServer::Instance().SetBatteryAlert(1, SmokeCoAlarm::AlarmStateEnum::kWarning);
         if (success)
         {
-            success = SmokeCoAlarmServer::Instance().SetExpressedState(
-                1, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum::kBatteryAlert);
+            success = AlarmMgr().SetExpressedState(1, SmokeCoAlarm::ExpressedStateEnum::kBatteryAlert, true);
         }
         break;
 
     case 0xffffffff000000a5:
-        success = SmokeCoAlarmServer::Instance().SetBatteryAlert(1, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum::kNormal);
+        success = SmokeCoAlarmServer::Instance().SetBatteryAlert(1, SmokeCoAlarm::AlarmStateEnum::kNormal);
         if (success)
         {
-            success =
-                SmokeCoAlarmServer::Instance().SetExpressedState(1, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum::kNormal);
+            success = AlarmMgr().SetExpressedState(1, SmokeCoAlarm::ExpressedStateEnum::kBatteryAlert, false);
         }
         break;
 
@@ -131,8 +125,7 @@ bool emberAfHandleEventTrigger(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, true);
         if (success)
         {
-            success = SmokeCoAlarmServer::Instance().SetExpressedState(
-                1, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum::kHardwareFault);
+            success = AlarmMgr().SetExpressedState(1, SmokeCoAlarm::ExpressedStateEnum::kHardwareFault, true);
         }
         break;
 
@@ -140,105 +133,88 @@ bool emberAfHandleEventTrigger(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, false);
         if (success)
         {
-            success =
-                SmokeCoAlarmServer::Instance().SetExpressedState(1, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum::kNormal);
+            success = AlarmMgr().SetExpressedState(1, SmokeCoAlarm::ExpressedStateEnum::kHardwareFault, false);
         }
         break;
 
     case 0xffffffff0000009a:
-        success =
-            SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum::kExpired);
+        success = SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, SmokeCoAlarm::EndOfServiceEnum::kExpired);
         if (success)
         {
-            success = SmokeCoAlarmServer::Instance().SetExpressedState(
-                1, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum::kEndOfService);
+            success = AlarmMgr().SetExpressedState(1, SmokeCoAlarm::ExpressedStateEnum::kEndOfService, true);
         }
         break;
 
     case 0xffffffff000000aa:
-        success =
-            SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum::kNormal);
+        success = SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, SmokeCoAlarm::EndOfServiceEnum::kNormal);
         if (success)
         {
-            success =
-                SmokeCoAlarmServer::Instance().SetExpressedState(1, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum::kNormal);
+            success = AlarmMgr().SetExpressedState(1, SmokeCoAlarm::ExpressedStateEnum::kEndOfService, false);
         }
         break;
 
     case 0xffffffff0000009b:
-        success = SmokeCoAlarmServer::Instance().SetDeviceMuted(1, chip::app::Clusters::SmokeCoAlarm::MuteStateEnum::kMuted);
+        success = SmokeCoAlarmServer::Instance().SetDeviceMuted(1, SmokeCoAlarm::MuteStateEnum::kMuted);
         break;
 
     case 0xffffffff000000ab:
-        success = SmokeCoAlarmServer::Instance().SetDeviceMuted(1, chip::app::Clusters::SmokeCoAlarm::MuteStateEnum::kNotMuted);
+        success = SmokeCoAlarmServer::Instance().SetDeviceMuted(1, SmokeCoAlarm::MuteStateEnum::kNotMuted);
         break;
 
     case 0xffffffff00000092:
-        success = SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(
-            1, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum::kWarning);
+        success = SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(1, SmokeCoAlarm::AlarmStateEnum::kWarning);
         if (success)
         {
-            success = SmokeCoAlarmServer::Instance().SetExpressedState(
-                1, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum::kInterconnectSmoke);
+            success = AlarmMgr().SetExpressedState(1, SmokeCoAlarm::ExpressedStateEnum::kInterconnectSmoke, true);
         }
         break;
 
     case 0xffffffff000000a2:
-        success =
-            SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(1, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum::kNormal);
+        success = SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(1, SmokeCoAlarm::AlarmStateEnum::kNormal);
         if (success)
         {
-            success =
-                SmokeCoAlarmServer::Instance().SetExpressedState(1, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum::kNormal);
+            success = AlarmMgr().SetExpressedState(1, SmokeCoAlarm::ExpressedStateEnum::kInterconnectSmoke, false);
         }
         break;
 
     case 0xffffffff00000094:
-        success =
-            SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(1, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum::kWarning);
+        success = SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(1, SmokeCoAlarm::AlarmStateEnum::kWarning);
         if (success)
         {
-            success = SmokeCoAlarmServer::Instance().SetExpressedState(
-                1, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum::kInterconnectCO);
+            success = AlarmMgr().SetExpressedState(1, SmokeCoAlarm::ExpressedStateEnum::kInterconnectCO, true);
         }
         break;
 
     case 0xffffffff000000a4:
-        success =
-            SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(1, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum::kNormal);
+        success = SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(1, SmokeCoAlarm::AlarmStateEnum::kNormal);
         if (success)
         {
-            success =
-                SmokeCoAlarmServer::Instance().SetExpressedState(1, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum::kNormal);
+            success = AlarmMgr().SetExpressedState(1, SmokeCoAlarm::ExpressedStateEnum::kInterconnectCO, false);
         }
         break;
 
     case 0xffffffff00000096:
-        success = SmokeCoAlarmServer::Instance().SetContaminationState(
-            1, chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum::kWarning);
+        success = SmokeCoAlarmServer::Instance().SetContaminationState(1, SmokeCoAlarm::ContaminationStateEnum::kWarning);
         break;
 
     case 0xffffffff00000097:
-        success = SmokeCoAlarmServer::Instance().SetContaminationState(
-            1, chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum::kLow);
+        success = SmokeCoAlarmServer::Instance().SetContaminationState(1, SmokeCoAlarm::ContaminationStateEnum::kLow);
         break;
 
     case 0xffffffff000000a6:
-        success = SmokeCoAlarmServer::Instance().SetContaminationState(
-            1, chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum::kNormal);
+        success = SmokeCoAlarmServer::Instance().SetContaminationState(1, SmokeCoAlarm::ContaminationStateEnum::kNormal);
         break;
 
     case 0xffffffff00000098:
-        success = SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum::kHigh);
+        success = SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, SmokeCoAlarm::SensitivityEnum::kHigh);
         break;
 
     case 0xffffffff00000099:
-        success = SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum::kLow);
+        success = SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, SmokeCoAlarm::SensitivityEnum::kLow);
         break;
 
     case 0xffffffff000000a8:
-        success =
-            SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum::kStandard);
+        success = SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, SmokeCoAlarm::SensitivityEnum::kStandard);
         break;
 
     default:
