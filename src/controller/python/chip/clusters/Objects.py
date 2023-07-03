@@ -17423,8 +17423,8 @@ class SmokeCoAlarm(Cluster):
             kUnknownEnumValue = 4,
 
         class EndOfServiceEnum(MatterIntEnum):
-            kExpired = 0x00
-            kNormal = 0x01
+            kNormal = 0x00
+            kExpired = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown

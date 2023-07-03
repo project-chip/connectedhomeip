@@ -143,6 +143,20 @@ class OnboardingPayload(
     setupPinCode
   )
 
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is OnboardingPayload) return false
+
+    return version == other.version &&
+            vendorId == other.vendorId &&
+            productId == other.productId &&
+            commissioningFlow == other.commissioningFlow &&
+            discoveryCapabilities == other.discoveryCapabilities &&
+            discriminator == other.discriminator &&
+            hasShortDiscriminator == other.hasShortDiscriminator &&
+            setupPinCode == other.setupPinCode
+  }
+
   fun addOptionalQRCodeInfo(info: OptionalQRCodeInfo) {
     optionalQRCodeInfo[info.tag] = info
   }
@@ -182,8 +196,8 @@ class OnboardingPayload(
       DiscoveryCapability.SOFT_AP
     )
 
-    // If discoveryCapabilities is empty or discoveryCapabilities contains values outside of allValid
-    if (discoveryCapabilities.isEmpty() || discoveryCapabilities.any { it !in allValid }) {
+    // If discoveryCapabilities is not empty and discoveryCapabilities contains values outside of allValid
+    if (!discoveryCapabilities.isEmpty() && discoveryCapabilities.any { it !in allValid }) {
       return false
     }
 
