@@ -298,6 +298,12 @@ protected:
     ClusterId mClusterId;
 };
 
+// @brief Instance getter for the default global delegate for operational state alias cluster
+// The delegate API assumes there will be separate delegate objects for each cluster instance.
+// (i.e. each separate operational state cluster derivation, on each separate endpoint)
+// @note This API should always be called prior to using the delegate and the return pointer should never be cached.
+//   This should be implemented by the application.
+// @return Default global delegate instance.
 Delegate * GetOperationalStateDelegate(EndpointId endpointId, ClusterId clusterId);
 
 } // namespace OperationalState
