@@ -56,17 +56,18 @@ public:
      * Read an attribute value from non-volatile memory.
      *
      * @param [in]     aPath the attribute path for the data being persisted.
-     * @param [in]     aMetadata the attribute metadata, as a convenience.
+     * @param [in]     aType the attribute type.
+     * @param [in]     aSize the attribute size.
      * @param [in,out] aValue where to place the data.  The size of the buffer
-     *                 will be equal to `size` member of aMetadata.
+     *                 will be equal to `size`.
      *
      *                 The data is expected to be in native endianness for
      *                 integers and floats.  For strings, see the string
      *                 representation description in the WriteValue
      *                 documentation.
      */
-    virtual CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata,
-                                 MutableByteSpan & aValue) = 0;
+    virtual CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType,
+                                 uint16_t aSize, MutableByteSpan & aValue) = 0;
 };
 
 /**
