@@ -303,18 +303,90 @@
         "Temperature Control": ["SupportedTemperatureLevels"],
         "Operational State": ["OperationalState", "OperationalError"],
         "RVC Operational State": ["OperationalState", "OperationalError"],
-        "Activated Carbon Filter Monitoring": ["Condition", "DegradationDirection", "ChangeIndication", "InPlaceIndicator"],
-        "HEPA Filter Monitoring": ["Condition", "DegradationDirection", "ChangeIndication", "InPlaceIndicator"],
-        "Ceramic Filter Monitoring": ["Condition", "DegradationDirection", "ChangeIndication", "InPlaceIndicator"],
-        "Electrostatic Filter Monitoring": ["Condition", "DegradationDirection", "ChangeIndication", "InPlaceIndicator"],
-        "UV Filter Monitoring": ["Condition", "DegradationDirection", "ChangeIndication", "InPlaceIndicator"],
-        "Ionizing Filter Monitoring": ["Condition", "DegradationDirection", "ChangeIndication", "InPlaceIndicator"],
-        "Zeolite Filter Monitoring": ["Condition", "DegradationDirection", "ChangeIndication", "InPlaceIndicator"],
-        "Ozone Filter Monitoring": ["Condition", "DegradationDirection", "ChangeIndication", "InPlaceIndicator"],
-        "Water Tank Monitoring": ["Condition", "DegradationDirection", "ChangeIndication", "InPlaceIndicator"],
-        "Fuel Tank Monitoring": ["Condition", "DegradationDirection", "ChangeIndication", "InPlaceIndicator"],
-        "Ink Cartridge Monitoring": ["Condition", "DegradationDirection", "ChangeIndication", "InPlaceIndicator"],
-        "Toner Cartridge Monitoring": ["Condition", "DegradationDirection", "ChangeIndication", "InPlaceIndicator"]
+        "Activated Carbon Filter Monitoring": [
+            "Condition", 
+            "DegradationDirection", 
+            "ChangeIndication", 
+            "InPlaceIndicator", 
+            "LastChangedTime"
+        ],
+        "HEPA Filter Monitoring": [
+            "Condition", 
+            "DegradationDirection", 
+            "ChangeIndication", 
+            "InPlaceIndicator", 
+            "LastChangedTime"
+        ],
+        "Ceramic Filter Monitoring": [
+            "Condition", 
+            "DegradationDirection", 
+            "ChangeIndication", 
+            "InPlaceIndicator", 
+            "LastChangedTime"
+        ],
+        "Electrostatic Filter Monitoring": [
+            "Condition", 
+            "DegradationDirection", 
+            "ChangeIndication", 
+            "InPlaceIndicator", 
+            "LastChangedTime"
+        ],
+        "UV Filter Monitoring": [
+            "Condition", 
+            "DegradationDirection", 
+            "ChangeIndication", 
+            "InPlaceIndicator", 
+            "LastChangedTime"
+        ],
+        "Ionizing Filter Monitoring": [
+            "Condition", 
+            "DegradationDirection", 
+            "ChangeIndication", 
+            "InPlaceIndicator", 
+            "LastChangedTime"
+        ],
+        "Zeolite Filter Monitoring":[
+            "Condition", 
+            "DegradationDirection", 
+            "ChangeIndication", 
+            "InPlaceIndicator", 
+            "LastChangedTime"
+        ],
+        "Ozone Filter Monitoring": [
+            "Condition", 
+            "DegradationDirection", 
+            "ChangeIndication", 
+            "InPlaceIndicator", 
+            "LastChangedTime"
+        ],
+        "Water Tank Monitoring": [
+            "Condition", 
+            "DegradationDirection", 
+            "ChangeIndication", 
+            "InPlaceIndicator", 
+            "LastChangedTime"
+        ],
+        "Fuel Tank Monitoring": [
+            "Condition", 
+            "DegradationDirection", 
+            "ChangeIndication", 
+            "InPlaceIndicator", 
+            "LastChangedTime"
+        ],
+        "Ink Cartridge Monitoring": [
+            "Condition", 
+            "DegradationDirection", 
+            "ChangeIndication", 
+            "InPlaceIndicator", 
+            "LastChangedTime"
+        ],
+        "Toner Cartridge Monitoring": [
+            "Condition", 
+            "DegradationDirection", 
+            "ChangeIndication", 
+            "InPlaceIndicator", 
+            "LastChangedTime"
+        ]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],
