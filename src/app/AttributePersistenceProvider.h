@@ -19,6 +19,10 @@
 #include <app/util/attribute-metadata.h>
 #include <lib/support/Span.h>
 #include <app/data-model/Nullable.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <lib/support/BufferReader.h>
+#include <lib/support/BufferWriter.h>
+#include <cstring>
 
 namespace chip {
 namespace app {
@@ -79,7 +83,15 @@ public:
      * @param [in] aPath the attribute path for the data being written.
      * @param [in] aValue the data to write.
      */
-    CHIP_ERROR WriteValueUint8(const ConcreteAttributePath & aPath, uint8_t & aValue);
+    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true >
+    CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, T & aValue)
+    {
+        uint8_t value[sizeof(T)];
+        auto w = Encoding::LittleEndian::BufferWriter(value, sizeof(T));
+        w.EndianPut(aValue, sizeof(T));
+
+        return WriteValue(aPath, ByteSpan(value));
+    }
 
     /**
      * Read an attribute of type uint8.
@@ -87,7 +99,24 @@ public:
      * @param [in]     aPath the attribute path for the data being persisted.
      * @param [in,out] aValue where to place the data.
      */
-    CHIP_ERROR ReadValueUint8(const ConcreteAttributePath & aPath, uint8_t & aValue);
+    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true >
+    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, T & aValue)
+    {
+        uint8_t attrData[sizeof(T)];
+        MutableByteSpan tempVal(attrData, sizeof(T));
+        // **Note** aType in the ReadValue function is only used to check if the value is of a string type. Since this template
+        // function is only enabled for integral values, we know that this case will not occur, so we can pass the enum of an
+        // arbitrary integral type.
+        auto err = ReadValue(aPath, ZCL_INT8U_ATTRIBUTE_TYPE, sizeof(T), tempVal);
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        chip::Encoding::LittleEndian::Reader r(tempVal.data(), tempVal.size());
+        r.RawRead(&aValue);
+        return r.StatusCode();
+    }
 
     /**
      * Write an attribute value of type nullable uint8 to non-volatile memory.
@@ -95,7 +124,22 @@ public:
      * @param [in] aPath the attribute path for the data being written.
      * @param [in] aValue the data to write.
      */
-    CHIP_ERROR WriteValueNullableUint8(const ConcreteAttributePath & aPath, DataModel::Nullable<uint8_t> & aValue);
+    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true >
+    CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
+    {
+        if (aValue.IsNull())
+        {
+            // Set to the highest possible value.
+            // todo can improve?
+            uint8_t writeBuffer[sizeof(T)] = {};
+            for (uint8_t i = 0; i < sizeof(T); i++)
+            {
+                writeBuffer[i] = 0xff;
+            }
+            return WriteValue(aPath, ByteSpan(writeBuffer));
+        }
+        return WriteValue(aPath, aValue.Value());
+    }
 
     /**
      * Read an attribute of type nullable uint8.
@@ -103,7 +147,29 @@ public:
      * @param [in]     aPath the attribute path for the data being persisted.
      * @param [in,out] aValue where to place the data.
      */
-    CHIP_ERROR ReadValueNullableUint8(const ConcreteAttributePath & aPath, DataModel::Nullable<uint8_t> & aValue);
+    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true >
+    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
+    {
+        T tempIntegral;
+        T highestVal = 0;
+        highestVal = ~highestVal;
+
+        CHIP_ERROR err = ReadValue(aPath, tempIntegral);
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        if (tempIntegral == highestVal)
+        {
+            aValue.SetNull();
+            return CHIP_NO_ERROR;
+        }
+
+        aValue.SetNonNull(tempIntegral);
+        return CHIP_NO_ERROR;
+    }
+
 };
 
 /**
