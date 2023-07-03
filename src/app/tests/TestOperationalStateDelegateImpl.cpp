@@ -64,7 +64,7 @@ void TestOperationalStateDelegatelGetAndSetOperationalState(nlTestSuite * inSuit
     GenericOperationalState opState(to_underlying(OperationalStateEnum::kRunning));
 
     // test 1: Get OperationalState
-    opStateDelegate.GetOperationalState(opState);
+    opStateDelegate.GetCurrentOperationalState(opState);
     NL_TEST_ASSERT(inSuite, opState.operationalStateID == to_underlying(OperationalStateEnum::kStopped));
     NL_TEST_ASSERT(inSuite, opState.operationalStateLabel.HasValue() == false);
 
@@ -72,7 +72,7 @@ void TestOperationalStateDelegatelGetAndSetOperationalState(nlTestSuite * inSuit
     opStateDelegate.SetOperationalState(GenericOperationalState(to_underlying(OperationalStateEnum::kError)));
 
     // Get OperationalState
-    opStateDelegate.GetOperationalState(opState);
+    opStateDelegate.GetCurrentOperationalState(opState);
     NL_TEST_ASSERT(inSuite, opState.operationalStateID == to_underlying(OperationalStateEnum::kError));
     NL_TEST_ASSERT(inSuite, opState.operationalStateLabel.HasValue() == false);
 
@@ -86,7 +86,7 @@ void TestOperationalStateDelegatelGetAndSetOperationalState(nlTestSuite * inSuit
                                                                 Optional<CharSpan>(CharSpan::fromCharString(buffer))));
 
     // Get OperationalState
-    opStateDelegate.GetOperationalState(opState);
+    opStateDelegate.GetCurrentOperationalState(opState);
     NL_TEST_ASSERT(inSuite, opState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kRebooting));
     NL_TEST_ASSERT(inSuite, opState.operationalStateLabel.HasValue() == true);
     NL_TEST_ASSERT(inSuite, memcmp(const_cast<char *>(opState.operationalStateLabel.Value().data()), buffer, strlen(buffer)) == 0);

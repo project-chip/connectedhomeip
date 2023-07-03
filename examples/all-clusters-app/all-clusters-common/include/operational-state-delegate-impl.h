@@ -46,7 +46,7 @@ public:
      * @param op Put a struct instance on the state, then call the delegate to fill it in.
      * @return void.
      */
-    void GetOperationalState(GenericOperationalState & op) override;
+    void GetCurrentOperationalState(GenericOperationalState & op) override;
 
     /**
      * Get the list of supported operational states.

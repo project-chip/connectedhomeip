@@ -32,7 +32,7 @@ CHIP_ERROR OperationalStateDelegate::SetOperationalState(const GenericOperationa
     return CHIP_NO_ERROR;
 }
 
-void OperationalStateDelegate::GetOperationalState(GenericOperationalState & op)
+void OperationalStateDelegate::GetCurrentOperationalState(GenericOperationalState & op)
 {
     op = mOperationalState;
 }

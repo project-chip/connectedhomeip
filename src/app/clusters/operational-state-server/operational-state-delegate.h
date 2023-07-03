@@ -226,7 +226,7 @@ public:
      * @param op Put a struct instance on the state, then call the delegate to fill it in.
      * @return void.
      */
-    virtual void GetOperationalState(GenericOperationalState & op) = 0;
+    virtual void GetCurrentOperationalState(GenericOperationalState & op) = 0;
 
     /**
      * Get the list of supported operational states.

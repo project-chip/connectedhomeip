@@ -111,7 +111,7 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
     GenericOperationalState opState(to_underlying(OperationalStateEnum::kStopped));
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
-    delegate->GetOperationalState(opState);
+    delegate->GetCurrentOperationalState(opState);
 
     if (opState.operationalStateID == to_underlying(OperationalStateEnum::kPaused))
     {
@@ -136,7 +136,7 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    delegate->GetOperationalState(opState);
+    delegate->GetCurrentOperationalState(opState);
 
     if (opState.operationalStateID == to_underlying(OperationalStateEnum::kRunning))
     {
@@ -167,7 +167,7 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    delegate->GetOperationalState(opState);
+    delegate->GetCurrentOperationalState(opState);
 
     if (opState.operationalStateID == to_underlying(OperationalStateEnum::kRunning))
     {
@@ -192,7 +192,7 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    delegate->GetOperationalState(opState);
+    delegate->GetCurrentOperationalState(opState);
 
     if (opState.operationalStateID == to_underlying(OperationalStateEnum::kStopped))
     {
@@ -274,7 +274,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
         Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
         GenericOperationalState opState(to_underlying(OperationalStateEnum::kStopped));
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        delegate->GetOperationalState(opState);
+        delegate->GetCurrentOperationalState(opState);
         return aEncoder.Encode(opState);
     }
     break;
