@@ -68,7 +68,7 @@ public:
 
     /**
      * Get current operational error.
-     * @param error.Put a struct instance on the state, then call the delegate to fill it in.
+     * @param error The GenericOperationalError to fill with the current operational error value
      */
     void GetOperationalError(GenericOperationalError & error) override;
 
