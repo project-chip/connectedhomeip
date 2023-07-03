@@ -22,6 +22,7 @@ import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
 
 public class ChipTLVValueDecoder {
-    public static native <T> T decodeAttributeValue(ChipAttributePath attributePath, byte[] tlv);
-    public static native <T> T decodeEventValue(ChipEventPath eventPath, byte[] tlv);
+  public static native <T> T decodeAttributeValue(ChipAttributePath attributePath, byte[] tlv);
+
+  public static native <T> T decodeEventValue(ChipEventPath eventPath, byte[] tlv);
 }
