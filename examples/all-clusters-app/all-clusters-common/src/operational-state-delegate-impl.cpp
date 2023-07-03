@@ -56,7 +56,7 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalStateAtIndex(size_t index, Ge
     }
     else
     {
-        operationalState = mOperationalStateList.data()[index];
+        operationalState = mOperationalStateList[index];
     }
     return CHIP_NO_ERROR;
 }
@@ -69,7 +69,7 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, Ge
     }
     else
     {
-        operationalPhase = mOperationalPhaseList.data()[index];
+        operationalPhase = mOperationalPhaseList[index];
     }
     return CHIP_NO_ERROR;
 }
