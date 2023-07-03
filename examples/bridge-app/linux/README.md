@@ -108,25 +108,25 @@ is simulated with the value/label pair `"room"`/`[light name]`.
 
 -   Install tool chain
 
-    ```
-    $ sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
+    ```sh
+    sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
     ```
 
 -   Build the example application:
 
-    ```
-    $ cd ~/connectedhomeip/examples/bridge-app/linux
-    $ git submodule update --init
-    $ source third_party/connectedhomeip/scripts/activate.sh
-    $ gn gen out/debug
-    $ ninja -C out/debug
+    ```sh
+    cd ~/connectedhomeip/examples/bridge-app/linux
+    git submodule update --init
+    source third_party/connectedhomeip/scripts/activate.sh
+    gn gen out/debug
+    ninja -C out/debug
     ```
 
 -   To delete generated executable, libraries and object files use:
 
-    ```
-    $ cd ~/connectedhomeip/examples/bridge-app/linux
-    $ rm -rf out/
+    ```sh
+    cd ~/connectedhomeip/examples/bridge-app/linux
+    rm -rf out/
     ```
 
 ## Running the Complete Example on Raspberry Pi 4
@@ -151,7 +151,7 @@ is simulated with the value/label pair `"room"`/`[light name]`.
             number after `hci` is the bluetooth device number, `1` in this
             example.
 
-            ```
+            ```sh
             $ hciconfig
             hci1:	Type: Primary  Bus: USB
                 BD Address: 00:1A:7D:AA:BB:CC  ACL MTU: 310:10  SCO MTU: 64:8
@@ -168,11 +168,11 @@ is simulated with the value/label pair `"room"`/`[light name]`.
 
         -   Run Linux Bridge Example App
 
-            ```
-            $ cd ~/connectedhomeip/examples/bridge-app/linux
-            $ sudo out/debug/chip-bridge-app --ble-device [bluetooth device number]
+            ```sh
+            cd ~/connectedhomeip/examples/bridge-app/linux
+            sudo out/debug/chip-bridge-app --ble-device [bluetooth device number]
             # In this example, the device we want to use is hci1
-            $ sudo out/debug/chip-bridge-app --ble-device 1
+            sudo out/debug/chip-bridge-app --ble-device 1
             ```
 
         -   Test the device using ChipDeviceController on your laptop /
