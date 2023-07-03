@@ -128,8 +128,8 @@ limitations under the License.
 
   <enum name="EndOfServiceEnum" type="ENUM8">
     <cluster code="0x005C" />
-    <item value="0" name="Expired" />
-    <item value="1" name="Normal" />
+    <item value="0" name="Normal" />
+    <item value="1" name="Expired" />
   </enum>
 
   <enum name="ContaminationStateEnum" type="ENUM8">

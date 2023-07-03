@@ -58,17 +58,13 @@ using TestContext = Test::LoopbackMessagingContext;
 
 const char PAYLOAD[] = "Hello!";
 
-#ifdef CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
-// When the CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST is set, the stack
-// operates under the assumption of a high latency network (like Thread),
-// so it adds extra delays to avoid spurious retransmits.
+// The CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST can be set to non-zero value
+// to boost the retransmission timeout for a high latency network like Thread to
+// avoid spurious retransmits.
 //
 // This adds extra I/O time to account for this. See the documentation for
 // CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST for more details.
 constexpr auto retryBoosterTimeout = CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS * CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
-#else
-constexpr auto retryBoosterTimeout = System::Clock::Milliseconds32(0);
-#endif
 
 class MockAppDelegate : public UnsolicitedMessageHandler, public ExchangeDelegate
 {

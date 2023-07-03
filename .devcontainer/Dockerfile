@@ -37,6 +37,7 @@ RUN apt-get update \
     docker.io \
     iputils-ping net-tools \
     libncurses5 \
+    libncursesw5 \
     libpython2.7 \
     && :
 
