@@ -25,7 +25,7 @@ public final class ChipIdLookup {
   public static String clusterIdToName(long clusterId) {
     ClusterIDMapping.BaseCluster cluster = ClusterIDMapping.getCluster(clusterId);
     if (cluster == null) {
-      return "";
+      return String.format("UNKNOWN_CLUSTER(%d)", clusterId);
     }
 
     return cluster.getClass().getSimpleName();
@@ -38,13 +38,13 @@ public final class ChipIdLookup {
   public static String attributeIdToName(long clusterId, long attributeId) {
     ClusterIDMapping.BaseCluster cluster = ClusterIDMapping.getCluster(clusterId);
     if (cluster == null) {
-      return "";
+      return String.format("UNKNOWN_CLUSTER(%d)", clusterId);
     }
 
     try {
       return cluster.getAttributeName(attributeId);
     } catch (NoSuchFieldError e) {
-      return "";
+      return String.format("UNKNOWN_ATTRIBUTE(%d, %d)", clusterId, attributeId);
     }
   }
 
@@ -55,13 +55,13 @@ public final class ChipIdLookup {
   public static String eventIdToName(long clusterId, long eventId) {
     ClusterIDMapping.BaseCluster cluster = ClusterIDMapping.getCluster(clusterId);
     if (cluster == null) {
-      return "";
+      return String.format("UNKNOWN_CLUSTER(%d)", clusterId);
     }
 
     try {
       return cluster.getEventName(eventId);
     } catch (NoSuchFieldError e) {
-      return "";
+      return String.format("UNKNOWN_EVENT(%d, %d)", clusterId, eventId);
     }
   }
 }
