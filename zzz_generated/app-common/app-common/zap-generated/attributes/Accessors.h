@@ -1585,28 +1585,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace HepaFilterMonitoring {
 namespace Attributes {
 
-namespace Condition {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
-EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
-} // namespace Condition
-
-namespace DegradationDirection {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum * value); // DegradationDirectionEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum value);
-} // namespace DegradationDirection
-
-namespace ChangeIndication {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum * value); // ChangeIndicationEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum value);
-} // namespace ChangeIndication
-
-namespace InPlaceIndicator {
-EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
-EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace InPlaceIndicator
-
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -1622,29 +1600,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace ActivatedCarbonFilterMonitoring {
 namespace Attributes {
-
-namespace Condition {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
-EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
-} // namespace Condition
-
-namespace DegradationDirection {
-EmberAfStatus
-Get(chip::EndpointId endpoint,
-    chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum * value); // DegradationDirectionEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum value);
-} // namespace DegradationDirection
-
-namespace ChangeIndication {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum * value); // ChangeIndicationEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum value);
-} // namespace ChangeIndication
-
-namespace InPlaceIndicator {
-EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
-EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace InPlaceIndicator
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
@@ -1662,28 +1617,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace CeramicFilterMonitoring {
 namespace Attributes {
 
-namespace Condition {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
-EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
-} // namespace Condition
-
-namespace DegradationDirection {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::CeramicFilterMonitoring::DegradationDirectionEnum * value); // DegradationDirectionEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CeramicFilterMonitoring::DegradationDirectionEnum value);
-} // namespace DegradationDirection
-
-namespace ChangeIndication {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::CeramicFilterMonitoring::ChangeIndicationEnum * value); // ChangeIndicationEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CeramicFilterMonitoring::ChangeIndicationEnum value);
-} // namespace ChangeIndication
-
-namespace InPlaceIndicator {
-EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
-EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace InPlaceIndicator
-
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -1699,28 +1632,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace ElectrostaticFilterMonitoring {
 namespace Attributes {
-
-namespace Condition {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
-EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
-} // namespace Condition
-
-namespace DegradationDirection {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ElectrostaticFilterMonitoring::DegradationDirectionEnum * value); // DegradationDirectionEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ElectrostaticFilterMonitoring::DegradationDirectionEnum value);
-} // namespace DegradationDirection
-
-namespace ChangeIndication {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ElectrostaticFilterMonitoring::ChangeIndicationEnum * value); // ChangeIndicationEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ElectrostaticFilterMonitoring::ChangeIndicationEnum value);
-} // namespace ChangeIndication
-
-namespace InPlaceIndicator {
-EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
-EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace InPlaceIndicator
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
@@ -1738,28 +1649,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace UvFilterMonitoring {
 namespace Attributes {
 
-namespace Condition {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
-EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
-} // namespace Condition
-
-namespace DegradationDirection {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::UvFilterMonitoring::DegradationDirectionEnum * value); // DegradationDirectionEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::UvFilterMonitoring::DegradationDirectionEnum value);
-} // namespace DegradationDirection
-
-namespace ChangeIndication {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::UvFilterMonitoring::ChangeIndicationEnum * value); // ChangeIndicationEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::UvFilterMonitoring::ChangeIndicationEnum value);
-} // namespace ChangeIndication
-
-namespace InPlaceIndicator {
-EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
-EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace InPlaceIndicator
-
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -1775,28 +1664,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace IonizingFilterMonitoring {
 namespace Attributes {
-
-namespace Condition {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
-EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
-} // namespace Condition
-
-namespace DegradationDirection {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::IonizingFilterMonitoring::DegradationDirectionEnum * value); // DegradationDirectionEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::IonizingFilterMonitoring::DegradationDirectionEnum value);
-} // namespace DegradationDirection
-
-namespace ChangeIndication {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::IonizingFilterMonitoring::ChangeIndicationEnum * value); // ChangeIndicationEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::IonizingFilterMonitoring::ChangeIndicationEnum value);
-} // namespace ChangeIndication
-
-namespace InPlaceIndicator {
-EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
-EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace InPlaceIndicator
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
@@ -1814,28 +1681,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace ZeoliteFilterMonitoring {
 namespace Attributes {
 
-namespace Condition {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
-EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
-} // namespace Condition
-
-namespace DegradationDirection {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ZeoliteFilterMonitoring::DegradationDirectionEnum * value); // DegradationDirectionEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ZeoliteFilterMonitoring::DegradationDirectionEnum value);
-} // namespace DegradationDirection
-
-namespace ChangeIndication {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ZeoliteFilterMonitoring::ChangeIndicationEnum * value); // ChangeIndicationEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ZeoliteFilterMonitoring::ChangeIndicationEnum value);
-} // namespace ChangeIndication
-
-namespace InPlaceIndicator {
-EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
-EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace InPlaceIndicator
-
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -1851,28 +1696,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace OzoneFilterMonitoring {
 namespace Attributes {
-
-namespace Condition {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
-EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
-} // namespace Condition
-
-namespace DegradationDirection {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::OzoneFilterMonitoring::DegradationDirectionEnum * value); // DegradationDirectionEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneFilterMonitoring::DegradationDirectionEnum value);
-} // namespace DegradationDirection
-
-namespace ChangeIndication {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::OzoneFilterMonitoring::ChangeIndicationEnum * value); // ChangeIndicationEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneFilterMonitoring::ChangeIndicationEnum value);
-} // namespace ChangeIndication
-
-namespace InPlaceIndicator {
-EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
-EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace InPlaceIndicator
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
@@ -1890,28 +1713,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace WaterTankMonitoring {
 namespace Attributes {
 
-namespace Condition {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
-EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
-} // namespace Condition
-
-namespace DegradationDirection {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::WaterTankMonitoring::DegradationDirectionEnum * value); // DegradationDirectionEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::WaterTankMonitoring::DegradationDirectionEnum value);
-} // namespace DegradationDirection
-
-namespace ChangeIndication {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::WaterTankMonitoring::ChangeIndicationEnum * value); // ChangeIndicationEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::WaterTankMonitoring::ChangeIndicationEnum value);
-} // namespace ChangeIndication
-
-namespace InPlaceIndicator {
-EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
-EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace InPlaceIndicator
-
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -1927,28 +1728,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace FuelTankMonitoring {
 namespace Attributes {
-
-namespace Condition {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
-EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
-} // namespace Condition
-
-namespace DegradationDirection {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::FuelTankMonitoring::DegradationDirectionEnum * value); // DegradationDirectionEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FuelTankMonitoring::DegradationDirectionEnum value);
-} // namespace DegradationDirection
-
-namespace ChangeIndication {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::FuelTankMonitoring::ChangeIndicationEnum * value); // ChangeIndicationEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FuelTankMonitoring::ChangeIndicationEnum value);
-} // namespace ChangeIndication
-
-namespace InPlaceIndicator {
-EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
-EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace InPlaceIndicator
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
@@ -1966,28 +1745,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace InkCartridgeMonitoring {
 namespace Attributes {
 
-namespace Condition {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
-EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
-} // namespace Condition
-
-namespace DegradationDirection {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::InkCartridgeMonitoring::DegradationDirectionEnum * value); // DegradationDirectionEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::InkCartridgeMonitoring::DegradationDirectionEnum value);
-} // namespace DegradationDirection
-
-namespace ChangeIndication {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::InkCartridgeMonitoring::ChangeIndicationEnum * value); // ChangeIndicationEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::InkCartridgeMonitoring::ChangeIndicationEnum value);
-} // namespace ChangeIndication
-
-namespace InPlaceIndicator {
-EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
-EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace InPlaceIndicator
-
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -2003,28 +1760,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace TonerCartridgeMonitoring {
 namespace Attributes {
-
-namespace Condition {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
-EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
-} // namespace Condition
-
-namespace DegradationDirection {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::TonerCartridgeMonitoring::DegradationDirectionEnum * value); // DegradationDirectionEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TonerCartridgeMonitoring::DegradationDirectionEnum value);
-} // namespace DegradationDirection
-
-namespace ChangeIndication {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::TonerCartridgeMonitoring::ChangeIndicationEnum * value); // ChangeIndicationEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TonerCartridgeMonitoring::ChangeIndicationEnum value);
-} // namespace ChangeIndication
-
-namespace InPlaceIndicator {
-EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
-EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace InPlaceIndicator
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32

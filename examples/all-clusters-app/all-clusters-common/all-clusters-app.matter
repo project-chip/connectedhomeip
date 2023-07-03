@@ -6092,10 +6092,10 @@ endpoint 1 {
   }
 
   server cluster HepaFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication default = 0;
+    callback attribute inPlaceIndicator;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6105,10 +6105,10 @@ endpoint 1 {
   }
 
   server cluster ActivatedCarbonFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication default = 0;
+    callback attribute inPlaceIndicator;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6118,10 +6118,10 @@ endpoint 1 {
   }
 
   server cluster CeramicFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication default = 0;
+    callback attribute inPlaceIndicator;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6131,10 +6131,10 @@ endpoint 1 {
   }
 
   server cluster ElectrostaticFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication default = 0;
+    callback attribute inPlaceIndicator;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6144,10 +6144,10 @@ endpoint 1 {
   }
 
   server cluster UvFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication default = 0;
+    callback attribute inPlaceIndicator;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6157,10 +6157,10 @@ endpoint 1 {
   }
 
   server cluster IonizingFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication default = 0;
+    callback attribute inPlaceIndicator;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6170,10 +6170,10 @@ endpoint 1 {
   }
 
   server cluster ZeoliteFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication default = 0;
+    callback attribute inPlaceIndicator;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6183,10 +6183,10 @@ endpoint 1 {
   }
 
   server cluster OzoneFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication default = 0;
+    callback attribute inPlaceIndicator;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6196,10 +6196,10 @@ endpoint 1 {
   }
 
   server cluster WaterTankMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication default = 0;
+    callback attribute inPlaceIndicator;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6209,10 +6209,10 @@ endpoint 1 {
   }
 
   server cluster FuelTankMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication default = 0;
+    callback attribute inPlaceIndicator;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6222,10 +6222,10 @@ endpoint 1 {
   }
 
   server cluster InkCartridgeMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication default = 0;
+    callback attribute inPlaceIndicator;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6235,10 +6235,10 @@ endpoint 1 {
   }
 
   server cluster TonerCartridgeMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication default = 0;
+    callback attribute inPlaceIndicator;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

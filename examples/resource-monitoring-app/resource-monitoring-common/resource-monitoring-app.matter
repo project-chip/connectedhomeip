@@ -1938,10 +1938,10 @@ endpoint 1 {
   }
 
   server cluster HepaFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication default = 0;
+    callback attribute inPlaceIndicator;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -1951,10 +1951,10 @@ endpoint 1 {
   }
 
   server cluster ActivatedCarbonFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication default = 0;
+    callback attribute inPlaceIndicator;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
