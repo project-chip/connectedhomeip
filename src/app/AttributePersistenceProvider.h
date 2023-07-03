@@ -18,6 +18,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/util/attribute-metadata.h>
 #include <lib/support/Span.h>
+#include <app/data-model/Nullable.h>
 
 namespace chip {
 namespace app {
@@ -68,6 +69,41 @@ public:
      */
     virtual CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType,
                                  uint16_t aSize, MutableByteSpan & aValue) = 0;
+
+    // The following API provides helper functions to simplify the access of commonly used types.
+    // The API may not be complete.
+
+    /**
+     * Write an attribute value of type uint8 to non-volatile memory.
+     *
+     * @param [in] aPath the attribute path for the data being written.
+     * @param [in] aValue the data to write.
+     */
+    CHIP_ERROR WriteValueUint8(const ConcreteAttributePath & aPath, uint8_t & aValue);
+
+    /**
+     * Read an attribute of type uint8.
+     *
+     * @param [in]     aPath the attribute path for the data being persisted.
+     * @param [in,out] aValue where to place the data.
+     */
+    CHIP_ERROR ReadValueUint8(const ConcreteAttributePath & aPath, uint8_t & aValue);
+
+    /**
+     * Write an attribute value of type nullable uint8 to non-volatile memory.
+     *
+     * @param [in] aPath the attribute path for the data being written.
+     * @param [in] aValue the data to write.
+     */
+    CHIP_ERROR WriteValueNullableUint8(const ConcreteAttributePath & aPath, DataModel::Nullable<uint8_t> & aValue);
+
+    /**
+     * Read an attribute of type nullable uint8.
+     *
+     * @param [in]     aPath the attribute path for the data being persisted.
+     * @param [in,out] aValue where to place the data.
+     */
+    CHIP_ERROR ReadValueNullableUint8(const ConcreteAttributePath & aPath, DataModel::Nullable<uint8_t> & aValue);
 };
 
 /**
