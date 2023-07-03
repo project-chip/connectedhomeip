@@ -71,12 +71,10 @@ private:
     const DegradationDirectionEnum mDegradationDirection = DegradationDirectionEnum::kDown;
     ChangeIndicationEnum mChangeIndication = ChangeIndicationEnum::kOk;
     bool mInPlaceIndicator = true;
+    DataModel::Nullable<uint32_t> mLastChangedTime;
 
     uint32_t mFeature;
 
-// todo check if optional attributes are handled by zap or if we need to implem,ent something for that.
-
-    // todo check if there is a option to see if the command was selected in zap
     const bool mResetCondtitionCommandSupported = false;
 
     // todo description

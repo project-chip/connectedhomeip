@@ -105,7 +105,6 @@ struct TypeInfo
 
 namespace ChangeIndication {
 static constexpr AttributeId Id = 0x00000002;
-
 struct TypeInfo
 {
     using Type             = ChangeIndicationEnum;
@@ -119,7 +118,6 @@ struct TypeInfo
 
 namespace InPlaceIndicator {
 static constexpr AttributeId Id = 0x00000003;
-
 struct TypeInfo
 {
     using Type             = bool;
@@ -130,6 +128,19 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace InPlaceIndicator
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000004;
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr AttributeId GetAttributeId() { return Attributes::LastChangedTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LastChangedTime
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

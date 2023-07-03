@@ -123,6 +123,10 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(mInPlaceIndicator));
         break;
     }
+    case Attributes::LastChangedTime::Id: {
+        ReturnErrorOnFailure(aEncoder.Encode(mLastChangedTime));
+        break;
+    }
     }
     return CHIP_NO_ERROR;
 }
