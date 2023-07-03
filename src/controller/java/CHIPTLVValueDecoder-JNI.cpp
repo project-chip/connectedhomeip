@@ -27,7 +27,8 @@ JNI_METHOD(jobject, decodeAttributeValue)(JNIEnv * env, jclass clazz, jobject at
     ClusterId clusterId;
     AttributeId attributeId;
     CHIP_ERROR err = ParseAttributePath(attributePath, endpointId, clusterId, attributeId);
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         ChipLogProgress(Controller, "decode error attributePath");
         return nullptr;
     }
@@ -42,7 +43,8 @@ JNI_METHOD(jobject, decodeAttributeValue)(JNIEnv * env, jclass clazz, jobject at
 
     jobject ret = DecodeAttributeValue(path, reader, &err);
 
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         ChipLogProgress(Controller, "decode error attributeValue");
         return nullptr;
     }
@@ -57,7 +59,8 @@ JNI_METHOD(jobject, decodeEventValue)(JNIEnv * env, jclass clazz, jobject eventP
     EventId eventId;
     bool isUrgent;
     CHIP_ERROR err = ParseEventPath(eventPath, endpointId, clusterId, eventId, isUrgent);
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         return nullptr;
     }
 
@@ -71,7 +74,8 @@ JNI_METHOD(jobject, decodeEventValue)(JNIEnv * env, jclass clazz, jobject eventP
 
     jobject ret = DecodeEventValue(path, reader, &err);
 
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         return nullptr;
     }
 
