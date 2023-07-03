@@ -79,7 +79,7 @@ tests:
           constraints:
               type: elapsed_s
               minValue: 0
-              maxValue: 259200
+              maxValue: 604800
 
     - label: "TH reads from the DUT the AverageMeasuredValue attribute."
       PICS: FLDCONC.S.A0005
@@ -99,7 +99,7 @@ tests:
           constraints:
               type: elapsed_s
               minValue: 0
-              maxValue: 259200
+              maxValue: 604800
 
     - label: "TH reads from the DUT the MeasurementUnit attribute."
       PICS: FLDCONC.S.A0008
