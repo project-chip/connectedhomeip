@@ -2222,7 +2222,7 @@ endpoint 1 {
     persist  attribute deviceMuted default = 0;
     ram      attribute testInProgress default = 0;
     persist  attribute hardwareFaultAlert default = 0;
-    persist  attribute endOfServiceAlert default = 1;
+    persist  attribute endOfServiceAlert default = 0;
     ram      attribute interconnectSmokeAlarm default = 0;
     ram      attribute interconnectCOAlarm default = 0;
     ram      attribute contaminationState default = 0;
