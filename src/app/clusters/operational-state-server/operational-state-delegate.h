@@ -232,7 +232,7 @@ public:
      * Get the list of supported operational states.
      * Fills in the provided GenericOperationalState with the state at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
-     * @param index The state of index starts at 0.
+     * @param index The index of the state, with 0 representing the first state.
      * @param operationalState  The GenericOperationalState is filled.
      */
     virtual CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) = 0;
@@ -241,7 +241,7 @@ public:
      * Get the list of supported operational phase.
      * Fills in the provided GenericOperationalPhase with the state at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
-     * @param index The state of index starts at 0.
+     * @param index The index of the state, with 0 representing the first state.
      * @param operationalPhase  The GenericOperationalPhase is filled.
      */
     virtual CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase) = 0;
