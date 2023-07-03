@@ -223,7 +223,7 @@ class Delegate
 public:
     /**
      * Get the current operational state.
-     * @param op Put a struct instance on the state, then call the delegate to fill it in.
+     * @param op The GenericOperationalState to fill with the current operational state value.
      * @return void.
      */
     virtual void GetCurrentOperationalState(GenericOperationalState & op) = 0;
@@ -250,7 +250,7 @@ public:
      * Get current operational error.
      * @param error The GenericOperationalError to fill with the current operational error value
      */
-    virtual void GetOperationalError(GenericOperationalError & error) = 0;
+    virtual void GetCurrentOperationalError(GenericOperationalError & error) = 0;
 
     /**
      * Set operational state.

@@ -43,7 +43,7 @@ CHIP_ERROR OperationalStateDelegate::SetOperationalError(const GenericOperationa
     return CHIP_NO_ERROR;
 }
 
-void OperationalStateDelegate::GetOperationalError(GenericOperationalError & error)
+void OperationalStateDelegate::GetCurrentOperationalError(GenericOperationalError & error)
 {
     error = mOperationalError;
 }

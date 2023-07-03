@@ -199,14 +199,14 @@ void TestOperationalStateDelegatelGetAndSetOperationalError(nlTestSuite * inSuit
     GenericOperationalError err(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
 
     // test 1: Get OperationalError
-    opStateDelegate.GetOperationalError(err);
+    opStateDelegate.GetCurrentOperationalError(err);
     NL_TEST_ASSERT(inSuite, err.errorStateID == to_underlying(ErrorStateEnum::kNoError));
     NL_TEST_ASSERT(inSuite, err.errorStateDetails.HasValue() == false);
 
     // test 2: Set OperationalError without label
     opStateDelegate.SetOperationalError(GenericOperationalError(to_underlying(ErrorStateEnum::kUnableToStartOrResume)));
     // Get OperationalError
-    opStateDelegate.GetOperationalError(err);
+    opStateDelegate.GetCurrentOperationalError(err);
     NL_TEST_ASSERT(inSuite, err.errorStateID == to_underlying(ErrorStateEnum::kUnableToStartOrResume));
     NL_TEST_ASSERT(inSuite, err.errorStateDetails.HasValue() == false);
 
@@ -225,7 +225,7 @@ void TestOperationalStateDelegatelGetAndSetOperationalError(nlTestSuite * inSuit
                                                                 Optional<CharSpan>(CharSpan::fromCharString(detailBuffer))));
 
     // Get OperationalError
-    opStateDelegate.GetOperationalError(err);
+    opStateDelegate.GetCurrentOperationalError(err);
 
     NL_TEST_ASSERT(inSuite, err.errorStateID == to_underlying(ManufactureOperationalErrorEnum::kLowBattery));
     NL_TEST_ASSERT(inSuite, err.errorStateLabel.HasValue() == true);

@@ -43,7 +43,7 @@ class OperationalStateDelegate : public Delegate
 public:
     /**
      * Get current operational state.
-     * @param op Put a struct instance on the state, then call the delegate to fill it in.
+     * @param op The GenericOperationalState to fill with the current operational state value.
      * @return void.
      */
     void GetCurrentOperationalState(GenericOperationalState & op) override;
@@ -70,7 +70,7 @@ public:
      * Get current operational error.
      * @param error The GenericOperationalError to fill with the current operational error value
      */
-    void GetOperationalError(GenericOperationalError & error) override;
+    void GetCurrentOperationalError(GenericOperationalError & error) override;
 
     /**
      * Set operational error.
