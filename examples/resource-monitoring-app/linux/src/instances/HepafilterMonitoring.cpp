@@ -19,6 +19,16 @@ CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
 
 Status HepaFilterMonitoringInstance::OnResetCondition()
 {
-    ChipLogError(Zcl, "HepaFilterMonitoringInstance::OnResetCondition()");
+    ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::OnResetCondition()");
+
+    if ( GetDegradationDirection() == DegradationDirectionEnum::kDown)
+    {
+        UpdateCondition(100);
+    }
+    else if ( GetDegradationDirection() == DegradationDirectionEnum::kUp)
+    {
+        UpdateCondition(0);
+    }
+
     return Status::Success;
 }

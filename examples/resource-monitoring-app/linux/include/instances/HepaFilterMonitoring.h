@@ -36,8 +36,8 @@ private:
 
 public:
     HepaFilterMonitoringInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature,
-                                 ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection) :
-        Instance(aEndpointId, aClusterId, aFeature, aDegradationDirection){};
+                                 ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection, bool aResetConditionCommandSupported) :
+    Instance(aEndpointId, aClusterId, aFeature, aDegradationDirection, aResetConditionCommandSupported){};
 
     ~HepaFilterMonitoringInstance() override = default;
 };

@@ -85,12 +85,14 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 }
 
 // List the commands supported by this instance.
-// TODO do we need this? should a sdk developer override this if the command is not supported?
 CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
                                                CommandHandlerInterface::CommandIdCallback callback, void * context)
 {
     ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");
-    callback(ResourceMonitoring::Commands::ResetCondition::Id, context);
+    if ( mResetCondtitionCommandSupported)
+    {
+        callback(ResourceMonitoring::Commands::ResetCondition::Id, context);
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -219,13 +221,13 @@ void Instance::HandleResetCondition(HandlerContext & ctx,
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
-    ChipLogProgress(Zcl, "ResourceMonitor: HandleResetCondition reset done");
+    ChipLogProgress(Zcl, "ResourceMonitoring: HandleResetCondition reset done");
 }
 
 template <typename RequestT, typename FuncT>
 void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
 {
-    ChipLogError(Zcl, "resourcemonitoring: HandleCommand");
+    ChipLogDetail(Zcl, "ResourceMonitoring: HandleCommand");
     if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
     {
         RequestT requestPayload;
@@ -250,6 +252,15 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
 chip::Protocols::InteractionModel::Status Instance::OnResetCondition()
 {
     ChipLogError(Zcl, "Instance::OnResetCondition()");
+
+    if ( GetDegradationDirection() == DegradationDirectionEnum::kDown)
+    {
+        UpdateCondition(100);
+    }
+    else if ( GetDegradationDirection() == DegradationDirectionEnum::kUp)
+    {
+        UpdateCondition(0);
+    }
     return Status::Success;
 }
 

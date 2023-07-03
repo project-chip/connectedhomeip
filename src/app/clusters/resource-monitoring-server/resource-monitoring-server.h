@@ -74,6 +74,11 @@ private:
 
     uint32_t mFeature;
 
+// todo check if optional attributes are handled by zap or if we need to implem,ent something for that.
+
+    // todo check if there is a option to see if the command was selected in zap
+    const bool mResetCondtitionCommandSupported = false;
+
     // todo description
     bool IsAliascluster() const;
 
@@ -90,9 +95,12 @@ public:
      * @param aDelegate A pointer to a delegate that will handle application layer logic.
      */
     Instance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature,
-             ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection) :
+             ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
+             bool aResetConditionCommandSupported) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDegradationDirection(aDegradationDirection)
+        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), 
+        mDegradationDirection(aDegradationDirection),
+        mResetCondtitionCommandSupported(aResetConditionCommandSupported)
     {
         mEndpointId = aEndpointId;
         mClusterId  = aClusterId;
