@@ -25,9 +25,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    # XXX: Workaround for https://github.com/actions/cache/issues/1141
-    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
-
+    
 jobs:
     chef_linux:
         name: Chef - Linux CI Examples
@@ -35,31 +33,16 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.7.3
+            image: connectedhomeip/chip-build:0.7.16
             options: --user root
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
-              with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
+                platform: linux
             - name: CI Examples Linux
               shell: bash
               run: |
@@ -71,31 +54,16 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.7.3
+            image: connectedhomeip/chip-build-esp32:0.7.16
             options: --user root
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - name: Checkout
+              uses: actions/checkout@v3
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform esp32
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
+                platform: esp32
             - name: CI Examples ESP32
               shell: bash
               run: |
@@ -107,31 +75,16 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.7.3
+            image: connectedhomeip/chip-build-nrf-platform:0.7.16
             options: --user root
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform nrfconnect
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
-              with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
+                platform: nrfconnect
             - name: CI Examples NRFConnect
               shell: bash
               run: |

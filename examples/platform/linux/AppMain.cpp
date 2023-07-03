@@ -65,6 +65,10 @@
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
+#if ENABLE_TRACING
+#include <TracingCommandLineArgument.h> // nogncheck
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #endif
@@ -360,6 +364,15 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     initParams.userDirectedCommissioningPort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+#if ENABLE_TRACING
+    chip::CommandLineApp::TracingSetup tracing_setup;
+
+    for (const auto & trace_destination : LinuxDeviceOptions::GetInstance().traceTo)
+    {
+        tracing_setup.EnableTracingFor(trace_destination.c_str());
+    }
+#endif
+
     initParams.interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
 
     if (LinuxDeviceOptions::GetInstance().mCSRResponseOptions.csrExistingKeyPair)
@@ -438,6 +451,10 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #endif
 
     Server::GetInstance().Shutdown();
+
+#if ENABLE_TRACING
+    tracing_setup.StopTracing();
+#endif
 
     DeviceLayer::PlatformMgr().Shutdown();
 

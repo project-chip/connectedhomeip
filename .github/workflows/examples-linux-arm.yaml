@@ -25,13 +25,10 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    # XXX: Workaround for https://github.com/actions/cache/issues/1141
-    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
-
+    
 jobs:
     arm_crosscompile:
         name: Linux ARM Cross compile
-        timeout-minutes: 70
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -42,45 +39,20 @@ jobs:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
+                platform: linux
 
             - name: Set up environment for size reports
+              uses: ./.github/actions/setup-size-reports
               if: ${{ !env.ACT }}
-              env:
-                  GH_CONTEXT: ${{ toJson(github) }}
-              run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
-
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v3
-              if: ${{ always() && !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+                gh-context: ${{ toJson(github) }}
 
             - name: Build Some samples
-              timeout-minutes: 45
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -94,23 +66,19 @@ jobs:
                         build \
                      "
             - name: Bloat report - chip-tool
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux arm64 chip-tool-ipv6only \
                     out/linux-arm64-chip-tool-ipv6only-clang/chip-tool \
                     /tmp/bloat_reports/
             - name: Bloat report - thermostat
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux arm64 thermostat-no-ble \
                     out/linux-arm64-thermostat-no-ble-clang/thermostat-app \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
-              uses: actions/upload-artifact@v3
+              uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
               with:
-                  name: Size,Linux-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
-                  path: |
-                      /tmp/bloat_reports/
+                platform-name: Linux

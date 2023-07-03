@@ -90,7 +90,6 @@ limitations under the License.
 
     <command source="client" code="0x04" name="KeySetReadAllIndices" response="KeySetReadAllIndicesResponse" isFabricScoped="true" optional="false" cli="zcl GroupKeyManagement KeySetReadAllIndices">
       <description>Return the list of Group Key Sets associated with the accessing fabric</description>
-      <arg name="GroupKeySetIDs" type="INT16U" array="true"/>
       <access op="invoke" privilege="administer"/>
     </command>
 

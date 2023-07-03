@@ -133,7 +133,7 @@ class TestRunner(TestRunnerBase):
     async def stop(self):
         return
 
-    def run(self, parser_builder_config: TestParserBuilderConfig, runner_config: TestRunnerConfig):
+    async def run(self, parser_builder_config: TestParserBuilderConfig, runner_config: TestRunnerConfig):
         if runner_config and runner_config.hooks:
             start = time.time()
             runner_config.hooks.start(len(parser_builder_config.tests))
@@ -143,9 +143,7 @@ class TestRunner(TestRunnerBase):
             if not parser or not runner_config:
                 continue
 
-            loop = asyncio.get_event_loop()
-            result = loop.run_until_complete(
-                self._run_with_timeout(parser, runner_config))
+            result = await self._run_with_timeout(parser, runner_config)
             if isinstance(result, Exception):
                 raise (result)
             elif not result:
@@ -180,11 +178,11 @@ class TestRunner(TestRunnerBase):
                     hooks.step_skipped(request.label, request.pics)
                     continue
                 elif not config.adapter:
-                    hooks.step_start(request.label)
+                    hooks.step_start(request)
                     hooks.step_unknown()
                     continue
                 else:
-                    hooks.step_start(request.label)
+                    hooks.step_start(request)
 
                 start = time.time()
                 if config.pseudo_clusters.supports(request):

@@ -22,6 +22,85 @@
 namespace chip {
 namespace scenes {
 
+CHIP_ERROR
+DefaultSceneHandlerImpl::EncodeAttributeValueList(
+    const app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> & aVlist,
+    MutableByteSpan & serializedBytes)
+{
+    TLV::TLVWriter writer;
+    writer.Init(serializedBytes);
+    ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), aVlist));
+    serializedBytes.reduce_size(writer.GetLengthWritten());
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DefaultSceneHandlerImpl::DecodeAttributeValueList(
+    const ByteSpan & serializedBytes,
+    app::DataModel::DecodableList<app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType> & aVlist)
+{
+    TLV::TLVReader reader;
+
+    reader.Init(serializedBytes);
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
+    ReturnErrorOnFailure(aVlist.Decode(reader));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DefaultSceneHandlerImpl::SerializeAdd(EndpointId endpoint,
+                                      const app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
+                                      MutableByteSpan & serializedBytes)
+{
+    app::Clusters::Scenes::Structs::AttributeValuePair::Type aVPairs[kMaxAvPair];
+
+    size_t pairTotal = 0;
+    // Verify size of list
+    ReturnErrorOnFailure(extensionFieldSet.attributeValueList.ComputeSize(&pairTotal));
+    VerifyOrReturnError(pairTotal <= ArraySize(aVPairs), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    uint8_t pairCount  = 0;
+    auto pair_iterator = extensionFieldSet.attributeValueList.begin();
+    while (pair_iterator.Next())
+    {
+        aVPairs[pairCount] = pair_iterator.GetValue();
+        pairCount++;
+    }
+    ReturnErrorOnFailure(pair_iterator.GetStatus());
+    app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> attributeValueList(aVPairs, pairCount);
+
+    return EncodeAttributeValueList(attributeValueList, serializedBytes);
+}
+
+CHIP_ERROR DefaultSceneHandlerImpl::Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
+                                                app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & extensionFieldSet)
+{
+    app::DataModel::DecodableList<app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType> attributeValueList;
+
+    ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
+
+    // Verify size of list
+    size_t pairTotal = 0;
+    ReturnErrorOnFailure(attributeValueList.ComputeSize(&pairTotal));
+    VerifyOrReturnError(pairTotal <= ArraySize(mAVPairs), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    uint8_t pairCount  = 0;
+    auto pair_iterator = attributeValueList.begin();
+    while (pair_iterator.Next())
+    {
+        mAVPairs[pairCount] = pair_iterator.GetValue();
+        pairCount++;
+    };
+    ReturnErrorOnFailure(pair_iterator.GetStatus());
+
+    extensionFieldSet.clusterID          = cluster;
+    extensionFieldSet.attributeValueList = mAVPairs;
+    extensionFieldSet.attributeValueList.reduce_size(pairCount);
+
+    return CHIP_NO_ERROR;
+}
+
 /// @brief Tags Used to serialize Scenes so they can be stored in flash memory.
 /// kSceneCount: Number of scenes in a Fabric
 /// kStorageIDArray: Array of StorageID struct
@@ -737,11 +816,14 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 {
     if (!HandlerListEmpty())
     {
-        uint8_t clusterCount = 0;
-        clusterId cArray[kMaxClustersPerScene];
-        Span<clusterId> cSpan(cArray);
-        clusterCount = GetClustersFromEndpoint(cArray, kMaxClustersPerScene);
-        cSpan.reduce_size(clusterCount);
+        // TODO : Once zap supports the scenable quality, implement a GetSceneableClusterCountFromEndpointType function to avoid
+        // over-allocation
+        uint8_t clusterCount = GetClusterCountFromEndpoint();
+        chip::Platform::ScopedMemoryBuffer<clusterId> cBuffer;
+        VerifyOrReturnError(cBuffer.Calloc(clusterCount), CHIP_ERROR_NO_MEMORY);
+        clusterCount = GetClustersFromEndpoint(cBuffer.Get(), clusterCount);
+
+        Span<clusterId> cSpan(cBuffer.Get(), clusterCount);
         for (clusterId cluster : cSpan)
         {
             ExtensionFieldSet EFS;
@@ -834,6 +916,14 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 uint8_t DefaultSceneTableImpl::GetClustersFromEndpoint(ClusterId * clusterList, uint8_t listLen)
 {
     return emberAfGetClustersFromEndpoint(mEndpointId, clusterList, listLen, true);
+}
+
+/// @brief wrapper function around emberAfGetClusterCountForEndpoint to allow testing enforcing a specific count, shimmed in test
+/// configuration because emberAfGetClusterCountForEndpoint relies on <app/util/attribute-storage.h>, which relies on zap generated
+/// files
+uint8_t DefaultSceneTableImpl::GetClusterCountFromEndpoint()
+{
+    return emberAfGetClusterCountForEndpoint(mEndpointId);
 }
 
 void DefaultSceneTableImpl::SetEndpoint(EndpointId endpoint)

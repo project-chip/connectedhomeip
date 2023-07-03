@@ -1,0 +1,326 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 145.1.1. [TC-PMKCONC-1.1] Global Attributes with DUT as Server
+
+PICS:
+    - PMKCONC.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "PM10 Concentration Measurement"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read the global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      PICS: PMKCONC.S.Afffd
+      response:
+          value: 3
+          constraints:
+              type: int16u
+
+    # TODO: Re-enable when #27248 is fixed
+    - label:
+          "Read the global attribute: FeatureMap and check for either bit 0 or 1
+          set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: PMKCONC.S.Afffc
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x03]
+      disabled: true
+
+    - label:
+          "Given PMKCONC.S.F00(MEA) ensure featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: PMKCONC.S.Afffc && PMKCONC.S.F00
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label:
+          "Given PMKCONC.S.F00(MEA) is not set, ensure featuremap has the
+          correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: PMKCONC.S.Afffc && !PMKCONC.S.F00
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x1]
+
+    - label:
+          "Given PMKCONC.S.F01(LEV) ensure featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: PMKCONC.S.Afffc && PMKCONC.S.F01
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label:
+          "Given PMKCONC.S.F01(LEV) is not set, ensure featuremap has the
+          correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: PMKCONC.S.Afffc && !PMKCONC.S.F01
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x2]
+
+    - label:
+          "Given PMKCONC.S.F02(MED) ensure featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: PMKCONC.S.Afffc && PMKCONC.S.F02
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4, 0x2]
+
+    - label:
+          "Given PMKCONC.S.F02(MED) is not set, ensure featuremap has the
+          correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: PMKCONC.S.Afffc && !PMKCONC.S.F02
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x4]
+
+    - label:
+          "Given PMKCONC.S.F03(CRI) ensure featuremap has the correct bits set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: PMKCONC.S.Afffc && PMKCONC.S.F03
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x8, 0x2]
+
+    - label:
+          "Given PMKCONC.S.F03(CRI) is not set, ensure featuremap has the
+          correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: PMKCONC.S.Afffc && !PMKCONC.S.F03
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x8]
+
+    - label:
+          "Given PMKCONC.S.F04(PEA) ensure featuremap has the correct bits set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: PMKCONC.S.Afffc && PMKCONC.S.F04
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x10, 0x1]
+
+    - label:
+          "Given PMKCONC.S.F04(PEA) is not set, ensure featuremap has the
+          correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: PMKCONC.S.Afffc && !PMKCONC.S.F04
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x10]
+
+    - label:
+          "Given PMKCONC.S.F05(AVG) ensure featuremap has the correct bits set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: PMKCONC.S.Afffc && PMKCONC.S.F05
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x20, 0x1]
+
+    - label:
+          "Given PMKCONC.S.F05(AVG) is not set, ensure featuremap has the
+          correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: PMKCONC.S.Afffc && !PMKCONC.S.F05
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x20]
+
+    - label: "Read the global attribute: AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: PMKCONC.S.Afffb
+      response:
+          constraints:
+              type: list
+              contains: [9, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Read the optional attribute Uncertainty in AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: PMKCONC.S.Afffb && PMKCONC.S.A0007 && PMKCONC.S.F00
+      response:
+          constraints:
+              type: list
+              contains: [7]
+
+    - label:
+          "Check the optional attribute Uncertainty is excluded from
+          AttributeList when PMKCONC.S.A0007 is not set"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: PMKCONC.S.Afffb && !PMKCONC.S.A0007
+      response:
+          constraints:
+              type: list
+              excludes: [7]
+
+    - label:
+          "Read the optional, feature dependent attributes MeasuredValue,
+          MinMeasuredValue, MaxMeasuredValue and Measurement Unit in
+          AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: PMKCONC.S.Afffb && PMKCONC.S.F00
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 8]
+
+    - label:
+          "Check that MeasuredValue, MinMeasuredValue, MaxMeasuredValue,
+          Measurement Unit and Uncertainty are excluded from AttributeList when
+          PMKCONC.S.F00 (MEA) is not set"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: PMKCONC.S.Afffb && !PMKCONC.S.F00
+      response:
+          constraints:
+              type: list
+              excludes: [0, 1, 2, 7, 8]
+
+    - label:
+          "Read the optional, feature dependent attributes PeakMeasuredValue &
+          PeakMeasuredValueWindow in AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: PMKCONC.S.Afffb && PMKCONC.S.F04
+      response:
+          constraints:
+              type: list
+              contains: [3, 4]
+
+    - label:
+          "Check that PeakMeasuredValue & PeakMeasuredValueWindow are excluded
+          from AttributeList when PMKCONC.S.F04 (PEA) is not set"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: PMKCONC.S.Afffb && !PMKCONC.S.F04
+      response:
+          constraints:
+              type: list
+              excludes: [3, 4]
+
+    - label:
+          "Read the optional, feature dependent attributes AverageMeasuredValue
+          AverageMeasuredValueWindow in AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: PMKCONC.S.Afffb && PMKCONC.S.F05
+      response:
+          constraints:
+              type: list
+              contains: [5, 6]
+
+    - label:
+          "Check that AverageMeasuredValue and AverageMeasuredValueWindow are
+          excluded from AttributeList when PMKCONC.S.F05 (AVG) is not set"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: PMKCONC.S.Afffb && !PMKCONC.S.F05
+      response:
+          constraints:
+              type: list
+              excludes: [5, 6]
+
+    - label:
+          "Read the optional, feature dependent attribute LevelValue in
+          AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: PMKCONC.S.Afffb && PMKCONC.S.F01
+      response:
+          constraints:
+              type: list
+              contains: [10]
+
+    - label:
+          "Check that LevelValue is excluded from AttributeList when
+          PMKCONC.S.F01 (LEV) is not set"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: PMKCONC.S.Afffb && !PMKCONC.S.F01
+      response:
+          constraints:
+              type: list
+              excludes: [10]
+
+    - label: "Read the global attribute: EventList"
+      command: "readAttribute"
+      attribute: "EventList"
+      PICS: PMKCONC.S.Afffa
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      PICS: PMKCONC.S.Afff9
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      PICS: PMKCONC.S.Afff8
+      response:
+          value: []
+          constraints:
+              type: list

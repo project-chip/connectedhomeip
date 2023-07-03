@@ -132,6 +132,7 @@ static_library("support") {
     "SetupDiscriminator.h",
     "SortUtils.h",
     "StateMachine.h",
+    "StringSplitter.h",
     "ThreadOperationalDataset.cpp",
     "ThreadOperationalDataset.h",
     "TimeUtils.cpp",

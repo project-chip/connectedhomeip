@@ -22,6 +22,8 @@
 #include <controller/CHIPCluster.h>
 #include <functional>
 
+#include <app-common/zap-generated/cluster-objects.h>
+
 // COMMAND CLASSES
 class NavigateTargetCommand
     : public MediaCommandBase<chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type,

@@ -23,6 +23,7 @@ from .hooks import WebSocketRunnerHooks
 from .runner import TestRunner
 
 _KEEP_ALIVE_TIMEOUT_IN_SECONDS = 40
+_MAX_MESSAGE_SIZE_IN_BYTES = 10485760  # 10 MB
 
 
 @dataclass
@@ -67,7 +68,7 @@ class WebSocketRunner(TestRunner):
             start = time.time()
             try:
                 self._hooks.connecting(url)
-                connection = await websockets.connect(url, ping_timeout=_KEEP_ALIVE_TIMEOUT_IN_SECONDS)
+                connection = await websockets.connect(url, ping_timeout=_KEEP_ALIVE_TIMEOUT_IN_SECONDS, max_size=_MAX_MESSAGE_SIZE_IN_BYTES)
                 duration = round((time.time() - start) * 1000, 0)
                 self._hooks.success(duration)
                 return connection

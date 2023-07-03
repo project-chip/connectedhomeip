@@ -21,8 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterAttributeValuePair : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable attributeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-@property (nonatomic, copy) NSNumber * _Nullable attributeId MTR_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull attributeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (nonatomic, copy) NSNumber * _Nonnull attributeId MTR_DEPRECATED(
     "Please use attributeID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @property (nonatomic, copy) NSNumber * _Nonnull attributeValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
@@ -705,12 +705,6 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRTemperatureControlClusterTemperatureLevelStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull temperatureLevel MTR_NEWLY_AVAILABLE;
-@end
-
-MTR_NEWLY_AVAILABLE
 @interface MTRRefrigeratorAlarmClusterNotifyEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull active MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull inactive MTR_NEWLY_AVAILABLE;
@@ -772,7 +766,7 @@ MTR_NEWLY_AVAILABLE
 MTR_NEWLY_AVAILABLE
 @interface MTROperationalStateClusterOperationalStateStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nonnull operationalStateLabel MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable operationalStateLabel MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE

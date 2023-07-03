@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _attributeID = nil;
+        _attributeID = @(0);
 
         _attributeValue = @(0);
     }
@@ -48,12 +48,12 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
-- (void)setAttributeId:(NSNumber * _Nullable)attributeId
+- (void)setAttributeId:(NSNumber * _Nonnull)attributeId
 {
     self.attributeID = attributeId;
 }
 
-- (NSNumber * _Nullable)attributeId
+- (NSNumber * _Nonnull)attributeId
 {
     return self.attributeID;
 }
@@ -2686,37 +2686,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTemperatureControlClusterTemperatureLevelStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _label = @"";
-
-        _temperatureLevel = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRTemperatureControlClusterTemperatureLevelStruct alloc] init];
-
-    other.label = self.label;
-    other.temperatureLevel = self.temperatureLevel;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: label:%@; temperatureLevel:%@; >", NSStringFromClass([self class]), _label, _temperatureLevel];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRRefrigeratorAlarmClusterNotifyEvent
 - (instancetype)init
 {
@@ -3048,7 +3017,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _operationalStateID = @(0);
 
-        _operationalStateLabel = @"";
+        _operationalStateLabel = nil;
     }
     return self;
 }

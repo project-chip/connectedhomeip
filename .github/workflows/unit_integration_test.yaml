@@ -26,7 +26,6 @@ concurrency:
 jobs:
     unit_tests:
         name: Unit / Integration Tests
-        timeout-minutes: 60
         if: github.actor != 'restyled-io[bot]'
 
         strategy:
@@ -44,29 +43,12 @@ jobs:
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: |
-                  mkdir -p /tmp/log_output ;
-                  bash scripts/bootstrap.sh ;
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v3
-              if: ${{ always() && !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+                platform: linux
             - name: Artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1
@@ -88,10 +70,8 @@ jobs:
 
                   scripts/build/gn_gen.sh --args="$GN_ARGS"
             - name: Run Build
-              timeout-minutes: 30
               run: scripts/run_in_build_env.sh "ninja -C out/$BUILD_TYPE"
             - name: Run Tests
-              timeout-minutes: 30
               run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512

@@ -25,13 +25,10 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    # XXX: Workaround for https://github.com/actions/cache/issues/1141
-    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
-
+    
 jobs:
     android:
         name: Smoke Run - Android
-        timeout-minutes: 60
 
         env:
             JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
@@ -45,36 +42,12 @@ jobs:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform android
-
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
-              with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v3
-              if: ${{ always() && !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+                platform: android
 
             - name: Build Android CHIPTool and CHIPTest (ARM64)
               run: |
@@ -84,6 +57,8 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test"
+            - name: Clean out build output
+              run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             - name: Build Android arm64-tv-casting-app
               run: |
                   ./scripts/run_in_build_env.sh \

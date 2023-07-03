@@ -26,13 +26,10 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    # XXX: Workaround for https://github.com/actions/cache/issues/1141
-    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
-
+    
 jobs:
     openiotsdk:
         name: Open IoT SDK examples building
-        timeout-minutes: 90
 
         env:
             TEST_NETWORK_NAME: OIStest
@@ -47,43 +44,27 @@ jobs:
             options: --privileged
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --recursive --platform openiotsdk
+                platform: openiotsdk
+                extra-submodule-parameters: " --recursive"
 
             - name: Set up environment for size reports
+              uses: ./.github/actions/setup-size-reports
               if: ${{ !env.ACT }}
-              env:
-                  GH_CONTEXT: ${{ toJson(github) }}
-              run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
-
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
+                gh-context: ${{ toJson(github) }}
 
             - name: Build and install Python controller
-              timeout-minutes: 10
               run: |
-                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
+                  scripts/run_in_python_env.sh out/venv 'pip install -r scripts/setup/requirements.openiotsdk.txt'
 
             - name: Build shell example
               id: build_shell
-              timeout-minutes: 10
               run: |
                   scripts/examples/openiotsdk_example.sh shell
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -91,38 +72,64 @@ jobs:
                     examples/shell/openiotsdk/build/chip-openiotsdk-shell-example.elf \
                     /tmp/bloat_reports/
 
-            - name: Build lock-app example
-              id: build_lock_app
-              timeout-minutes: 10
+            - name: Build lock-app example (mbedtls)
+              id: build_lock_app_mbedtls
               run: |
-                  scripts/examples/openiotsdk_example.sh lock-app
+                  scripts/examples/openiotsdk_example.sh -b mbedtls lock-app
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    openiotsdk release lock-app \
+                    openiotsdk release lock-app-mbedtls \
                     examples/lock-app/openiotsdk/build/chip-openiotsdk-lock-app-example.elf \
                     /tmp/bloat_reports/
 
-            - name: Build unit tests
-              id: build_unit_tests
-              timeout-minutes: 10
+            - name: Build unit tests (mbedtls)
+              id: build_unit_tests_mbedtls
               run: |
-                  scripts/examples/openiotsdk_example.sh unit-tests
+                  scripts/examples/openiotsdk_example.sh -b mbedtls unit-tests
 
             - name: "Test: shell example"
               if: steps.build_shell.outcome == 'success'
-              timeout-minutes: 5
               run: |
-                  scripts/examples/openiotsdk_example.sh -C test shell
+                  scripts/run_in_python_env.sh out/venv \
+                    'scripts/examples/openiotsdk_example.sh --no-activate -C test shell'
 
-            - name: "Test: lock-app example"
-              if: steps.build_lock_app.outcome == 'success'
-              timeout-minutes: 5
+            - name: "Test: lock-app example (mbedtls)"
+              if: steps.build_lock_app_mbedtls.outcome == 'success'
               run: |
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
-                  scripts/run_in_ns.sh ${TEST_NETWORK_NAME}ns scripts/examples/openiotsdk_example.sh -C test -n ${TEST_NETWORK_NAME}tap lock-app
+                  scripts/run_in_python_env.sh out/venv \
+                    'scripts/run_in_ns.sh ${TEST_NETWORK_NAME}ns scripts/examples/openiotsdk_example.sh --no-activate -C test -n ${TEST_NETWORK_NAME}tap lock-app'
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME down
 
-            - name: "Test: unit-tests"
-              if: steps.build_unit_tests.outcome == 'success'
-              timeout-minutes: 40
+            - name: "Test: unit-tests (mbedtls)"
+              if: steps.build_unit_tests_mbedtls.outcome == 'success'
               run: |
-                  scripts/examples/openiotsdk_example.sh -C test unit-tests
+                  scripts/run_in_python_env.sh out/venv \
+                    'scripts/examples/openiotsdk_example.sh --no-activate -C test unit-tests'
+
+            - name: Build lock-app example (psa)
+              id: build_lock_app_psa
+              run: |
+                  scripts/examples/openiotsdk_example.sh -c -b psa lock-app
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    openiotsdk release lock-app-psa \
+                    examples/lock-app/openiotsdk/build/chip-openiotsdk-lock-app-example.elf \
+                    /tmp/bloat_reports/
+
+            - name: Build unit tests (psa)
+              id: build_unit_tests_psa
+              run: |
+                  scripts/examples/openiotsdk_example.sh -b psa unit-tests
+
+            - name: "Test: lock-app example (psa)"
+              if: steps.build_lock_app_psa.outcome == 'success'
+              run: |
+                  scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
+                  scripts/run_in_python_env.sh out/venv \
+                    'scripts/run_in_ns.sh ${TEST_NETWORK_NAME}ns scripts/examples/openiotsdk_example.sh --no-activate -C test -n ${TEST_NETWORK_NAME}tap lock-app'
+                  scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME down
+
+            - name: "Test: unit-tests (psa)"
+              if: steps.build_unit_tests_psa.outcome == 'success'
+              run: |
+                  scripts/run_in_python_env.sh out/venv \
+                    'scripts/examples/openiotsdk_example.sh --no-activate -C test unit-tests'

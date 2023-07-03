@@ -122,7 +122,7 @@ class PICSChecker():
         token = self.__normalize(token)
         self.__expression_index += 1
 
-        if pics.get(token) == None:
+        if pics.get(token) is None:
             # By default, let's consider that if a PICS item is not defined, it is |false|.
             # It allows to create a file that only contains enabled features.
             return False

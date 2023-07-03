@@ -16,6 +16,7 @@
  */
 
 #import "MTRCommandPayloadsObjc.h"
+#import "MTRBackwardsCompatShims.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommandPayloads_Internal.h"
 #import "MTRError_Internal.h"
@@ -1120,11 +1121,7 @@ NS_ASSUME_NONNULL_BEGIN
                             auto & entry_3 = iter_3.GetValue();
                             MTRScenesClusterAttributeValuePair * newElement_3;
                             newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            if (entry_3.attributeID.HasValue()) {
-                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
-                            } else {
-                                newElement_3.attributeID = nil;
-                            }
+                            newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
                             newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
                             [array_3 addObject:newElement_3];
                         }
@@ -2273,11 +2270,7 @@ NS_ASSUME_NONNULL_BEGIN
                             auto & entry_3 = iter_3.GetValue();
                             MTRScenesClusterAttributeValuePair * newElement_3;
                             newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            if (entry_3.attributeID.HasValue()) {
-                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
-                            } else {
-                                newElement_3.attributeID = nil;
-                            }
+                            newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
                             newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
                             [array_3 addObject:newElement_3];
                         }
@@ -6297,8 +6290,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
-
-        _groupKeySetIDs = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -6309,7 +6300,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRGroupKeyManagementClusterKeySetReadAllIndicesParams alloc] init];
 
-    other.groupKeySetIDs = self.groupKeySetIDs;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -6318,8 +6308,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupKeySetIDs:%@; >", NSStringFromClass([self class]), _groupKeySetIDs];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
     return descriptionString;
 }
 
@@ -6479,40 +6468,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: targetTemperature:%@; targetTemperatureLevel:%@; >",
                                              NSStringFromClass([self class]), _targetTemperature, _targetTemperatureLevel];
-    return descriptionString;
-}
-
-@end
-@implementation MTRRefrigeratorAlarmClusterResetParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _alarms = @(0);
-
-        _mask = nil;
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRRefrigeratorAlarmClusterResetParams alloc] init];
-
-    other.alarms = self.alarms;
-    other.mask = self.mask;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: alarms:%@; mask:%@; >", NSStringFromClass([self class]), _alarms, _mask];
     return descriptionString;
 }
 
@@ -6728,15 +6683,15 @@ NS_ASSUME_NONNULL_BEGIN
     {
         self.commandResponseState = [MTROperationalStateClusterErrorStateStruct new];
         self.commandResponseState.errorStateID =
-            [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.commandResponseState.errorStateID)];
-        if (decodableStruct.commandResponseState.errorStateLabel.IsNull()) {
-            self.commandResponseState.errorStateLabel = nil;
-        } else {
+            [NSNumber numberWithUnsignedChar:decodableStruct.commandResponseState.errorStateID];
+        if (decodableStruct.commandResponseState.errorStateLabel.HasValue()) {
             self.commandResponseState.errorStateLabel = AsString(decodableStruct.commandResponseState.errorStateLabel.Value());
             if (self.commandResponseState.errorStateLabel == nil) {
                 CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                 return err;
             }
+        } else {
+            self.commandResponseState.errorStateLabel = nil;
         }
         if (decodableStruct.commandResponseState.errorStateDetails.HasValue()) {
             self.commandResponseState.errorStateDetails = AsString(decodableStruct.commandResponseState.errorStateDetails.Value());
@@ -6791,276 +6746,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRActivatedCarbonFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRCeramicFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRCeramicFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRElectrostaticFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRElectrostaticFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRUVFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRUVFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRIonizingFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRIonizingFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRZeoliteFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRZeoliteFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTROzoneFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTROzoneFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRWaterTankMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRWaterTankMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRFuelTankMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRFuelTankMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRInkCartridgeMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRInkCartridgeMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRTonerCartridgeMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRTonerCartridgeMonitoringClusterResetConditionParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;

@@ -19,15 +19,13 @@ ninja -C {out}/android-arm64-chip-tool
 # Prepare Native libs android-arm64-chip-tool
 mkdir -p {root}/examples/android/CHIPTool/app/libs/jniLibs/arm64-v8a
 
-cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libSetupPayloadParser.so {root}/examples/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libSetupPayloadParser.so
-
 cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libCHIPController.so {root}/examples/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libCHIPController.so
 
 cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libc++_shared.so {root}/examples/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libc++_shared.so
 
 cp {out}/android-arm64-chip-tool/lib/src/controller/java/CHIPController.jar {root}/examples/android/CHIPTool/app/libs/CHIPController.jar
 
-cp {out}/android-arm64-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/android/CHIPTool/app/libs/SetupPayloadParser.jar
+cp {out}/android-arm64-chip-tool/lib/src/controller/java/OnboardingPayload.jar {root}/examples/android/CHIPTool/app/libs/OnboardingPayload.jar
 
 cp {out}/android-arm64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/examples/android/CHIPTool/app/libs/AndroidPlatform.jar
 

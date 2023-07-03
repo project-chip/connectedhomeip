@@ -1,6 +1,7 @@
 name: "\U0001F5BA Documentation Issue"
 description: Create an issue to improve documentation
 title: "[Documentation] "
+labels: ["documentation", "needs triage"]
 body:
     - type: markdown
       attributes:

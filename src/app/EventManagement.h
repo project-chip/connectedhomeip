@@ -399,9 +399,9 @@ private:
         int mFieldsToRead = 0;
         /* PriorityLevel and DeltaTime are there if that is not first event when putting events in report*/
 #if CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
-        Timestamp mCurrentTime = Timestamp::System(System::Clock::kZero);
-#else  // CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
         Timestamp mCurrentTime = Timestamp::Epoch(System::Clock::kZero);
+#else  // CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
+        Timestamp mCurrentTime = Timestamp::System(System::Clock::kZero);
 #endif // CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
         PriorityLevel mPriority  = PriorityLevel::First;
         ClusterId mClusterId     = 0;

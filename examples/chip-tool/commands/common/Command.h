@@ -72,6 +72,7 @@ enum ArgumentType
     Vector16,
     Vector32,
     VectorCustom,
+    VectorString, // comma separated string items
 };
 
 struct Argument
@@ -253,6 +254,9 @@ public:
     {
         return AddArgument(name, min, max, reinterpret_cast<double *>(value), desc, flags | Argument::kNullable);
     }
+
+    size_t AddArgument(const char * name, std::vector<std::string> * value, const char * desc);
+    size_t AddArgument(const char * name, chip::Optional<std::vector<std::string>> * value, const char * desc);
 
     void ResetArguments();
 

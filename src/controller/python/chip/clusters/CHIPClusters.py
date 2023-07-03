@@ -3814,7 +3814,6 @@ class ChipClusters:
                 "commandId": 0x00000004,
                 "commandName": "KeySetReadAllIndices",
                 "args": {
-                    "groupKeySetIDs": "int",
                 },
             },
         },
@@ -4358,6 +4357,384 @@ class ChipClusters:
             },
         },
     }
+    _LAUNDRY_WASHER_MODE_CLUSTER_INFO = {
+        "clusterName": "LaundryWasherMode",
+        "clusterId": 0x00000051,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ChangeToMode",
+                "args": {
+                    "newMode": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedModes",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentMode",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "StartUpMode",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000003: {
+                "attributeName": "OnMode",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO = {
+        "clusterName": "RefrigeratorAndTemperatureControlledCabinetMode",
+        "clusterId": 0x00000052,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ChangeToMode",
+                "args": {
+                    "newMode": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedModes",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentMode",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "StartUpMode",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000003: {
+                "attributeName": "OnMode",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _LAUNDRY_WASHER_CONTROLS_CLUSTER_INFO = {
+        "clusterName": "LaundryWasherControls",
+        "clusterId": 0x00000053,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SpinSpeeds",
+                "attributeId": 0x00000000,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "SpinSpeedCurrent",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000002: {
+                "attributeName": "NumberOfRinses",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000003: {
+                "attributeName": "SupportedRinses",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _RVC_RUN_MODE_CLUSTER_INFO = {
+        "clusterName": "RvcRunMode",
+        "clusterId": 0x00000054,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ChangeToMode",
+                "args": {
+                    "newMode": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedModes",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentMode",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "StartUpMode",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000003: {
+                "attributeName": "OnMode",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _RVC_CLEAN_MODE_CLUSTER_INFO = {
+        "clusterName": "RvcCleanMode",
+        "clusterId": 0x00000055,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ChangeToMode",
+                "args": {
+                    "newMode": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedModes",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentMode",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "StartUpMode",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000003: {
+                "attributeName": "OnMode",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _TEMPERATURE_CONTROL_CLUSTER_INFO = {
         "clusterName": "TemperatureControl",
         "clusterId": 0x00000056,
@@ -4397,7 +4774,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "CurrentTemperatureLevelIndex",
+                "attributeName": "SelectedTemperatureLevel",
                 "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
@@ -4405,7 +4782,7 @@ class ChipClusters:
             0x00000005: {
                 "attributeName": "SupportedTemperatureLevels",
                 "attributeId": 0x00000005,
-                "type": "",
+                "type": "str",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -4450,26 +4827,11 @@ class ChipClusters:
         "clusterName": "RefrigeratorAlarm",
         "clusterId": 0x00000057,
         "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "Reset",
-                "args": {
-                    "alarms": "int",
-                    "mask": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
                 "attributeName": "Mask",
                 "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
-            },
-            0x00000001: {
-                "attributeName": "Latch",
-                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
@@ -4478,6 +4840,89 @@ class ChipClusters:
                 "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "Supported",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _DISHWASHER_MODE_CLUSTER_INFO = {
+        "clusterName": "DishwasherMode",
+        "clusterId": 0x00000059,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ChangeToMode",
+                "args": {
+                    "newMode": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedModes",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentMode",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "StartUpMode",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000003: {
+                "attributeName": "OnMode",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -4652,6 +5097,94 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x0000000C: {
+                "attributeName": "ExpiryDate",
+                "attributeId": 0x0000000C,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _DISHWASHER_ALARM_CLUSTER_INFO = {
+        "clusterName": "DishwasherAlarm",
+        "clusterId": 0x0000005D,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "Reset",
+                "args": {
+                    "alarms": "int",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "ModifyEnabledAlarms",
+                "args": {
+                    "mask": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "Mask",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "Latch",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "State",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "Supported",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -4693,6 +5226,110 @@ class ChipClusters:
     _OPERATIONAL_STATE_CLUSTER_INFO = {
         "clusterName": "OperationalState",
         "clusterId": 0x00000060,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "Pause",
+                "args": {
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "Stop",
+                "args": {
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "Start",
+                "args": {
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "Resume",
+                "args": {
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "PhaseList",
+                "attributeId": 0x00000000,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentPhase",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "CountdownTime",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "OperationalStateList",
+                "attributeId": 0x00000003,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "OperationalState",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "OperationalError",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _RVC_OPERATIONAL_STATE_CLUSTER_INFO = {
+        "clusterName": "RvcOperationalState",
+        "clusterId": 0x00000061,
         "commands": {
             0x00000000: {
                 "commandId": 0x00000000,
@@ -15069,11 +15706,19 @@ class ChipClusters:
         0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
         0x00000046: _ICD_MANAGEMENT_CLUSTER_INFO,
         0x00000050: _MODE_SELECT_CLUSTER_INFO,
+        0x00000051: _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
+        0x00000052: _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,
+        0x00000053: _LAUNDRY_WASHER_CONTROLS_CLUSTER_INFO,
+        0x00000054: _RVC_RUN_MODE_CLUSTER_INFO,
+        0x00000055: _RVC_CLEAN_MODE_CLUSTER_INFO,
         0x00000056: _TEMPERATURE_CONTROL_CLUSTER_INFO,
         0x00000057: _REFRIGERATOR_ALARM_CLUSTER_INFO,
+        0x00000059: _DISHWASHER_MODE_CLUSTER_INFO,
         0x0000005B: _AIR_QUALITY_CLUSTER_INFO,
         0x0000005C: _SMOKE_CO_ALARM_CLUSTER_INFO,
+        0x0000005D: _DISHWASHER_ALARM_CLUSTER_INFO,
         0x00000060: _OPERATIONAL_STATE_CLUSTER_INFO,
+        0x00000061: _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000071: _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         0x00000072: _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
         0x00000073: _CERAMIC_FILTER_MONITORING_CLUSTER_INFO,
@@ -15197,11 +15842,19 @@ class ChipClusters:
         "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
         "IcdManagement": _ICD_MANAGEMENT_CLUSTER_INFO,
         "ModeSelect": _MODE_SELECT_CLUSTER_INFO,
+        "LaundryWasherMode": _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
+        "RefrigeratorAndTemperatureControlledCabinetMode": _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,
+        "LaundryWasherControls": _LAUNDRY_WASHER_CONTROLS_CLUSTER_INFO,
+        "RvcRunMode": _RVC_RUN_MODE_CLUSTER_INFO,
+        "RvcCleanMode": _RVC_CLEAN_MODE_CLUSTER_INFO,
         "TemperatureControl": _TEMPERATURE_CONTROL_CLUSTER_INFO,
         "RefrigeratorAlarm": _REFRIGERATOR_ALARM_CLUSTER_INFO,
+        "DishwasherMode": _DISHWASHER_MODE_CLUSTER_INFO,
         "AirQuality": _AIR_QUALITY_CLUSTER_INFO,
         "SmokeCoAlarm": _SMOKE_CO_ALARM_CLUSTER_INFO,
+        "DishwasherAlarm": _DISHWASHER_ALARM_CLUSTER_INFO,
         "OperationalState": _OPERATIONAL_STATE_CLUSTER_INFO,
+        "RvcOperationalState": _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         "HepaFilterMonitoring": _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         "ActivatedCarbonFilterMonitoring": _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
         "CeramicFilterMonitoring": _CERAMIC_FILTER_MONITORING_CLUSTER_INFO,

@@ -52,7 +52,7 @@ tests:
       command: "readAttribute"
       attribute: "Lineup"
 
-    - label: "Reads the ChannelList attribute from the DUT"
+    - label: "TH reads the ChannelList attribute from the DUT"
       PICS: CHANNEL.S.A0000
       command: "readAttribute"
       attribute: "ChannelList"
@@ -60,14 +60,14 @@ tests:
           constraints:
               type: list
 
-    - label: "Reads the CurrentChannel attribute from the DUT"
+    - label: "TH reads the CurrentChannel attribute from the DUT"
       PICS: CHANNEL.S.A0002
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
           value: { MajorNumber: majornumber, MinorNumber: minornumber }
 
-    - label: "Sends a SkipChannel command to the DUT"
+    - label: "TH sends a SkipChannel command to the DUT with a value of 1"
       PICS: CHANNEL.S.C03.Rsp
       command: "SkipChannel"
       arguments:
@@ -86,7 +86,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the CurrentChannel attribute from the DUT"
+    - label: "TH reads the CurrentChannel attribute from the DUT"
       PICS: CHANNEL.S.A0002 && CHANNEL.S.C03.Rsp
       command: "readAttribute"
       attribute: "CurrentChannel"

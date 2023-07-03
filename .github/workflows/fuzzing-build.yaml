@@ -24,13 +24,10 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    # XXX: Workaround for https://github.com/actions/cache/issues/1141
-    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
-
+    
 jobs:
     build_linux_fuzzing:
         name: Build on Linux
-        timeout-minutes: 90
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -41,43 +38,22 @@ jobs:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      submodules: true
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - name: Checkout
+              uses: actions/checkout@v3
             - run: apt-get update
             - run: apt-get install --fix-missing llvm-10 clang-10
             - name: Try to ensure the objdir-clone dir exists
               run: |
                   mkdir objdir-clone || true
 
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
-              with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
+            - name: Bootstrap Cache
+              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v3
-              if: ${{ always() && !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+              uses: ./.github/actions/bootstrap
+            - name: Upload Bootstrap Logs
+              uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Build all-clusters-app
-              timeout-minutes: 20
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -96,48 +72,26 @@ jobs:
 
     build_darwin_fuzzing:
         name: Build on Darwin
-        timeout-minutes: 90
         runs-on: macos-latest
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      submodules: true
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - name: Checkout
+              uses: actions/checkout@v3
             - name: Setup Environment
               run: brew install llvm
             - name: Try to ensure the objdir-clone dir exists
               run: |
                   mkdir objdir-clone || true
 
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
-              with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
+            - name: Bootstrap Cache
+              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
-              timeout-minutes: 25
-              run: bash scripts/bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v3
-              if: ${{ always() && !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+              uses: ./.github/actions/bootstrap
+            - name: Upload Bootstrap Logs
+              uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Build all-clusters-app
-              timeout-minutes: 20
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \

@@ -1251,6 +1251,45 @@ public static class SmokeCoAlarmClusterAllClearEvent {
   }
 }
 
+public static class DishwasherAlarmClusterNotifyEvent {
+public Long active;
+public Long inactive;
+public Long state;
+public Long mask;
+
+  public DishwasherAlarmClusterNotifyEvent(
+    Long active
+      , Long inactive
+      , Long state
+      , Long mask
+  ) {
+    this.active = active;
+    this.inactive = inactive;
+    this.state = state;
+    this.mask = mask;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DishwasherAlarmClusterNotifyEvent {\n");
+    output.append("\tactive: ");
+    output.append(active);
+        output.append("\n");
+    output.append("\tinactive: ");
+    output.append(inactive);
+        output.append("\n");
+    output.append("\tstate: ");
+    output.append(state);
+        output.append("\n");
+    output.append("\tmask: ");
+    output.append(mask);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
 public static class OperationalStateClusterOperationalErrorEvent {
 public ChipStructs.OperationalStateClusterErrorStateStruct errorState;
 
@@ -1291,6 +1330,60 @@ public @Nullable Optional<Long> pausedTime;
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("OperationalStateClusterOperationCompletionEvent {\n");
+    output.append("\tcompletionErrorCode: ");
+    output.append(completionErrorCode);
+        output.append("\n");
+    output.append("\ttotalOperationalTime: ");
+    output.append(totalOperationalTime);
+        output.append("\n");
+    output.append("\tpausedTime: ");
+    output.append(pausedTime);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class RvcOperationalStateClusterOperationalErrorEvent {
+public ChipStructs.RvcOperationalStateClusterErrorStateStruct errorState;
+
+  public RvcOperationalStateClusterOperationalErrorEvent(
+    ChipStructs.RvcOperationalStateClusterErrorStateStruct errorState
+  ) {
+    this.errorState = errorState;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("RvcOperationalStateClusterOperationalErrorEvent {\n");
+    output.append("\terrorState: ");
+    output.append(errorState);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class RvcOperationalStateClusterOperationCompletionEvent {
+public Integer completionErrorCode;
+public @Nullable Optional<Long> totalOperationalTime;
+public @Nullable Optional<Long> pausedTime;
+
+  public RvcOperationalStateClusterOperationCompletionEvent(
+    Integer completionErrorCode
+      , @Nullable Optional<Long> totalOperationalTime
+      , @Nullable Optional<Long> pausedTime
+  ) {
+    this.completionErrorCode = completionErrorCode;
+    this.totalOperationalTime = totalOperationalTime;
+    this.pausedTime = pausedTime;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("RvcOperationalStateClusterOperationCompletionEvent {\n");
     output.append("\tcompletionErrorCode: ");
     output.append(completionErrorCode);
         output.append("\n");

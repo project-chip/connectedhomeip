@@ -30,3 +30,8 @@ lwip_platform = "bl702"
 
 chip_enable_ota_requestor = true
 chip_detail_logging = false
+
+pw_build_LINK_DEPS = [
+  "$dir_pw_assert:impl",
+  "$dir_pw_log:impl",
+]
