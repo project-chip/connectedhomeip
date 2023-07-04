@@ -31,6 +31,7 @@ namespace Decoders {
 class PayloadEntry
 {
 public:
+    static constexpr uint32_t kInvalidId = 0xFFFFFFFF;
     enum class IMPayloadType
     {
         kNone = 0, // generally should not be used except initial init
@@ -60,21 +61,21 @@ public:
     /// valid only if payload as an Attribute ID
     uint32_t GetAttributeId() const
     {
-        VerifyOrReturnValue(mType == IMPayloadType::kAttribute, 0xFFFFFFFF);
+        VerifyOrReturnValue(mType == IMPayloadType::kAttribute, kInvalidId);
         return mSubId;
     }
 
     /// valid only if payload as a Command ID
     uint32_t GetCommandId() const
     {
-        VerifyOrReturnValue(mType == IMPayloadType::kCommand, 0xFFFFFFFF);
+        VerifyOrReturnValue(mType == IMPayloadType::kCommand, kInvalidId);
         return mSubId;
     }
 
     /// valid only if payload as a Command ID
     uint32_t GetEventId() const
     {
-        VerifyOrReturnValue(mType == IMPayloadType::kEvent, 0xFFFFFFFF);
+        VerifyOrReturnValue(mType == IMPayloadType::kEvent, kInvalidId);
         return mSubId;
     }
 
@@ -206,7 +207,10 @@ public:
 
     /// Get the next decoded entry from the underlying TLV
     ///
-    /// Returns false when decoding finished
+    /// If a cluster decoder is set, then kAttribute/kCommand/kEvent are ALWAYS decoded
+    /// (even if unknown tags), otherwise they will be returned as separate PayloadEntry values.
+    ///
+    /// Returns false when decoding finished.
     bool Next(PayloadEntry & entry);
 
     const TLV::TLVReader & ReadState() const { return mReader; }
@@ -218,12 +222,29 @@ private:
     enum class State
     {
         kStarting,
-        kValueRead,
+        kValueRead,   // reading value for Payload
+        kContentRead, // reading value for IMContent (i.e. decoded attr/cmd/event)
         kDone,
     };
 
+    /// Move to the given attribute/event/command entry.
+    ///
+    /// [entry] MUST be of type command/attribute/event.
+    ///
+    /// This call either moves to "ContentDecoding mode" if content tree is available
+    /// or leaves entry unchanged if content decoding tree is not available.
+    void MoveToContent(PayloadEntry & entry);
+
     void NextFromStarting(PayloadEntry & entry);
     void NextFromValueRead(PayloadEntry & entry);
+    void NextFromContentRead(PayloadEntry & entry);
+
+    /// Enter the container in mReader.
+    ///
+    /// May change entry/state in case of errors.
+    ///
+    /// Returns false on error (and entry is changed in that case)
+    bool ReaderEnterContainer(PayloadEntry & entry);
 
     /// Returns a "nesting enter" value, making sure that
     /// nesting depth is sufficient.

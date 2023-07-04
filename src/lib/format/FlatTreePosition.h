@@ -88,6 +88,10 @@ public:
     /// and as long as the Position is valid (points inside the object).
     chip::Span<const Entry<CONTENT> *> CurrentPath();
 
+    bool HasValidTree() const { return mTree != nullptr; }
+
+    size_t DescendDepth() const { return mDescendDepth + mUnknownDescendDepth; }
+
 private:
     // actual tree that we visit
     const Node<CONTENT> * mTree = nullptr;
