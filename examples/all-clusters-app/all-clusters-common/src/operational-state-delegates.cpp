@@ -52,7 +52,7 @@ struct DelegatesEnquiryTable
 constexpr EndpointId kDemoEndpointId = 1;
 
 /**
- * Enquiry Table of Operational State List
+ * Operational State List
  * Note: User Define
  */
 static const GenericOperationalState opStateList[] = {
@@ -63,7 +63,7 @@ static const GenericOperationalState opStateList[] = {
 };
 
 /**
- * Enquiry Table of Phase List
+ * Phase List
  * Note: User Define
  */
 static const GenericOperationalPhase opPhaseList[] = {
@@ -74,7 +74,7 @@ static const GenericOperationalPhase opPhaseList[] = {
 };
 
 /**
- * Enquiry Table of Operational State Delegate
+ * Operational State Delegate
  * Note: User Define
  */
 static OperationalStateDelegate opStateDelegate(GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
