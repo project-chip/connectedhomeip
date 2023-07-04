@@ -108,11 +108,11 @@ void DecodePayloadData(Json::Value & value, chip::ByteSpan payload)
     //
     // Hex encoding is possible, however it is quite crude
     //
-    // char hex_buffer[1024];
-    // if (chip::Encoding::BytesToUppercaseHexString(payload.data(), payload.size(), hex_buffer, sizeof(hex_buffer)) ==
-    // CHIP_NO_ERROR) {
-    //     value["payloadHex"] = hex_buffer;
-    // }
+    char hex_buffer[1024];
+    if (chip::Encoding::BytesToUppercaseHexString(payload.data(), payload.size(), hex_buffer, sizeof(hex_buffer)) == CHIP_NO_ERROR)
+    {
+        value["payloadHex"] = hex_buffer;
+    }
 }
 
 } // namespace
