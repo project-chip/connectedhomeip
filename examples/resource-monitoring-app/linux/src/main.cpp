@@ -53,7 +53,7 @@ Clusters::ResourceMonitoring::HepaFilterMonitoringInstance HepafilterInstance(0x
 
 Clusters::ResourceMonitoring::ActivatedCarbonFilterMonitoringInstance
     ActivatedCarbonFilterInstance(0x1, Clusters::ActivatedCarbonFilterMonitoring::Id, 1,
-                                  ResourceMonitoring::DegradationDirectionEnum::kDown , false);
+                                  ResourceMonitoring::DegradationDirectionEnum::kDown , true);
 
 void ApplicationInit()
 {

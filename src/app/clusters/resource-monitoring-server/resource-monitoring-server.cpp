@@ -278,21 +278,6 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
     }
 }
 
-chip::Protocols::InteractionModel::Status Instance::OnResetCondition()
-{
-    ChipLogError(Zcl, "Instance::OnResetCondition()");
-
-    if (GetDegradationDirection() == DegradationDirectionEnum::kDown)
-    {
-        UpdateCondition(100);
-    }
-    else if (GetDegradationDirection() == DegradationDirectionEnum::kUp)
-    {
-        UpdateCondition(0);
-    }
-    return Status::Success;
-}
-
 } // namespace ResourceMonitoring
 } // namespace Clusters
 } // namespace app

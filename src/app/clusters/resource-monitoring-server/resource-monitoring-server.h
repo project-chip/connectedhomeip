@@ -140,7 +140,7 @@ public:
      * This function is to be overridden by a user implemented method to handle the application specifics of the ResetCondition
      * command.
      */
-    virtual chip::Protocols::InteractionModel::Status OnResetCondition();
+    virtual chip::Protocols::InteractionModel::Status OnResetCondition() = 0;
 };
 
 } // namespace ResourceMonitoring
