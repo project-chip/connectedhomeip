@@ -20,13 +20,27 @@ CHIP_ERROR ActivatedCarbonFilterMonitoringInstance::AppInit()
 Status ActivatedCarbonFilterMonitoringInstance::OnResetCondition()
 {
     ChipLogError(Zcl, "ActivatedCarbonFilterMonitoringDelegate::OnResetCondition()");
-    if ( GetDegradationDirection() == DegradationDirectionEnum::kDown)
+
+    if (GetDegradationDirection() == DegradationDirectionEnum::kDown)
     {
         UpdateCondition(100);
     }
-    else if ( GetDegradationDirection() == DegradationDirectionEnum::kUp)
+    else if (GetDegradationDirection() == DegradationDirectionEnum::kUp)
     {
         UpdateCondition(0);
+    }
+    if (emberAfContainsAttribute(0x1, Clusters::ActivatedCarbonFilterMonitoring::Id, Attributes::LastChangedTime::Id))
+    {
+        System::Clock::Milliseconds64 currentUnixTimeMS;
+        System::Clock::ClockImpl clock;
+        CHIP_ERROR err = clock.GetClock_RealTimeMS(currentUnixTimeMS);
+        if (err == CHIP_NO_ERROR)
+        {
+            // If the system has given us a wall clock time, we must use it or
+            // fail.  Conversion failures here are therefore always an error.
+            System::Clock::Seconds32 currentUnixTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentUnixTimeMS);
+            UpdateLastChangedTime(DataModel::MakeNullable(currentUnixTime.count()));
+        }
     }
 
     return Status::Success;
