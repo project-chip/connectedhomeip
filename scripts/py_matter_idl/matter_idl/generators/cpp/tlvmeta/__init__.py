@@ -103,12 +103,20 @@ class ClusterTablesGenerator:
         for c in self.cluster.commands:
             if c.input_param:
                 yield TableEntry(
-                    name=c.input_param,
+                    name=c.name,
                     code=f'CommandTag({c.code})',
                     reference="%s_%s" % (
                         self.cluster.name, c.input_param),
                     real_type="%s::%s::%s" % (
                         self.cluster.name, c.name, c.input_param)
+                )
+            else:
+                yield TableEntry(
+                    name=c.name,
+                    code=f'CommandTag({c.code})',
+                    reference=None,
+                    real_type="%s::%s::DefaultSuccess" % (
+                        self.cluster.name, c.name)
                 )
 
         # yield entries for every command output. We use "respons struct"

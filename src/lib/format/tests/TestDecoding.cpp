@@ -301,7 +301,7 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "      path\n"
                    "        endpoint_id: 1\n"
                    "        cluster_id: 6 == 'OnOff'\n"
-                   "        command_id: 2\n"
+                   "        command_id: 2 == 'Toggle'\n"
                    "      ContextSpecific(0x1)\n"
                    "  interaction_model_revison: 1\n");
 
@@ -314,7 +314,7 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "        path\n"
                    "          endpoint_id: 1\n"
                    "          cluster_id: 6 == 'OnOff'\n"
-                   "          command_id: 2\n"
+                   "          command_id: 2 == 'Toggle'\n"
                    "        status\n"
                    "          status: 0\n"
                    "  interaction_model_revison: 1\n");
