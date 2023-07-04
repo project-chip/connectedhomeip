@@ -90,7 +90,6 @@ be used to specify the the effect. It is able to be in following effects:
 | Blinks (950 ms on/50 ms off)    | Finish ( `Clusters::Identify::EffectIdentifierEnum::kFinishEffect`)          |
 | LED off                         | Stop (`Clusters::Identify::EffectIdentifierEnum::kStopEffect`)               |
 
-
 ### CHIP tool commands
 
 1. Build
@@ -107,6 +106,7 @@ be used to specify the the effect. It is able to be in following effects:
     ```
     ./chip-tool pairing ble-thread 1234 hex:0e080000000000010000000300000f35060004001fffe0020811111111222222220708fd61f77bd3df233e051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f010212340410445f2b5ca6f2a93a55ce570a70efeecb0c0402a0fff8 20202021 3840
     ```
+
 3. Request Self-Test
 
     ```
