@@ -12,7 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/lib/core/core.gni")
+
 declare_args() {
+  # Build controller library.
+  chip_build_controller = chip_target_style != "embedded"
+
   # Enable libshell support.
   chip_build_libshell = false
 

@@ -63,8 +63,17 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # Indication that the CHIP data model is included
     chip_enable_data_model = false
 
-    # The string of device software version was built.
+    # Device software version as an integer.  e.g. chip_device_config_device_software_version=7
+    chip_device_config_device_software_version = ""
+
+    # Device software version string as a string having the format "x.y"  e.g. chip_device_config_device_software_version="7.0" (but make sure to escape it from the shell!)
     chip_device_config_device_software_version_string = ""
+
+    # Device vendor id as a decimal integer. Configurable vendor ids allowed are 65521 (0xFFF1), 65522 (0xFFF2), 655223 (0xFFF3).
+    chip_device_config_device_vendor_id = ""
+
+    # Device product id as a decimal integer. Configurable product ids allowed are in the range 32768 (0x8000) - 32867 (0x8063)
+    chip_device_config_device_product_id = ""
 
     # Define the default number of ip addresses to discover
     chip_max_discovered_ip_addresses = 5
@@ -229,13 +238,19 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     } else if (chip_device_platform == "bl602") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_BL602=1",
-        "CHIP_DEVICE_LAYER_TARGET=bouffalolab/BL602",
+        "CHIP_DEVICE_LAYER_TARGET=bouffalolab/common",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
     } else if (chip_device_platform == "bl702") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_BL702=1",
-        "CHIP_DEVICE_LAYER_TARGET=bouffalolab/BL702",
+        "CHIP_DEVICE_LAYER_TARGET=bouffalolab/common",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+    } else if (chip_device_platform == "bl702l") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_BL702L=1",
+        "CHIP_DEVICE_LAYER_TARGET=bouffalolab/common",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
     } else if (chip_device_platform == "fake") {
@@ -301,8 +316,20 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ]
     }
 
+    if (chip_device_config_device_software_version != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_device_config_device_software_version}" ]
+    }
+
     if (chip_device_config_device_software_version_string != "") {
       defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${chip_device_config_device_software_version_string}\"" ]
+    }
+
+    if (chip_device_config_device_vendor_id != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${chip_device_config_device_vendor_id}" ]
+    }
+
+    if (chip_device_config_device_product_id != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${chip_device_config_device_product_id}" ]
     }
 
     defines += [ "CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES=${chip_max_discovered_ip_addresses}" ]
@@ -467,6 +494,8 @@ if (chip_device_platform != "none") {
       _platform_target = "bouffalolab/BL602"
     } else if (chip_device_platform == "bl702") {
       _platform_target = "bouffalolab/BL702"
+    } else if (chip_device_platform == "bl702l") {
+      _platform_target = "bouffalolab/BL702L"
     } else if (chip_device_platform == "fake") {
       _platform_target = "fake"
     } else if (chip_device_platform == "cyw30739") {

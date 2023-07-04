@@ -48,12 +48,25 @@ class OnboardingPayloadParser {
 
   /** Get QR code string from [OnboardingPayload].  */
   @Throws(OnboardingPayloadException::class)
-  external fun getQrCodeFromPayload(payload: OnboardingPayload): String
+  fun getQrCodeFromPayload(payload: OnboardingPayload): String
+  {
+    return QRCodeOnboardingPayloadGenerator(payload).payloadBase38Representation();
+  }
 
   @Throws(UnrecognizedQrCodeException::class, OnboardingPayloadException::class)
-  private external fun fetchPayloadFromQrCode(
+  private fun fetchPayloadFromQrCode(
     qrCodeString: String, skipPayloadValidation: Boolean
-  ): OnboardingPayload
+  ): OnboardingPayload {
+    val payload = OnboardingPayload()
+
+    QRCodeOnboardingPayloadParser(qrCodeString).populatePayload(payload)
+
+    if (skipPayloadValidation == false && !payload.isValidQRCodePayload()) {
+      throw OnboardingPayloadException("Invalid payload")
+    }
+
+    return payload
+  }
 
   /** Get Manual Pairing Code string from [OnboardingPayload].  */
   @Throws(OnboardingPayloadException::class)

@@ -25,8 +25,7 @@
 #pragma once
 
 #include <platform/internal/GenericConfigurationManagerImpl.h>
-
-#include CHIP_OPEN_IOT_SDK_KV_STORE_CONFIG_INCLUDE
+#include <platform/openiotsdk/KVPsaPsStore.h>
 
 namespace chip {
 namespace DeviceLayer {

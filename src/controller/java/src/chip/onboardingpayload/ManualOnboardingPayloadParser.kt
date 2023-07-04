@@ -101,7 +101,19 @@ class ManualOnboardingPayloadParser(decimalRepresentation: String) {
   }
 
   companion object {
-    private fun checkDecimalStringValidity(decimalString: String): String {
+    fun toNumber(decimalString: String): UInt {
+      var number: UInt = 0u
+      for (c in decimalString) {
+        if (!c.isDigit()) {
+          throw InvalidManualPairingCodeFormatException("Failed decoding base10. Character was invalid $c")
+        }
+        number *= 10u
+        number += (c - '0').toUInt()
+      }
+      return number
+    }
+
+    fun checkDecimalStringValidity(decimalString: String): String {
       if (decimalString.length < 2) {
         throw InvalidManualPairingCodeFormatException("Failed decoding base10. Input was empty. ${decimalString.length}")
       }
@@ -116,23 +128,11 @@ class ManualOnboardingPayloadParser(decimalRepresentation: String) {
       return repWithoutCheckChar
     }
 
-    private fun checkCodeLengthValidity(decimalString: String, isLongCode: Boolean): Unit {
+    fun checkCodeLengthValidity(decimalString: String, isLongCode: Boolean): Unit {
       val expectedCharLength = if (isLongCode) kManualSetupLongCodeCharLength else kManualSetupShortCodeCharLength
       if (decimalString.length != expectedCharLength) {
         throw InvalidManualPairingCodeFormatException("Failed decoding base10. Input length ${decimalString.length} was not expected length $expectedCharLength")
       }
-    }
-
-    private fun toNumber(decimalString: String): UInt {
-      var number: UInt = 0u
-      for (c in decimalString) {
-        if (!c.isDigit()) {
-          throw InvalidManualPairingCodeFormatException("Failed decoding base10. Character was invalid $c")
-        }
-        number *= 10u
-        number += (c - '0').toUInt()
-      }
-      return number
     }
 
     // Populate numberOfChars into dest from decimalString starting at startIndex (least significant digit = left-most digit)

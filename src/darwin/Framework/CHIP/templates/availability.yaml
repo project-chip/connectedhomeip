@@ -5316,6 +5316,8 @@
               - ThreadMetricsStruct
           GeneralDiagnostics:
               - NetworkInterface
+          ModeSelect:
+              - SemanticTagStruct
           OperationalCredentials:
               - FabricDescriptorStruct
           DoorLock:
@@ -5432,6 +5434,10 @@
                   - iPv4Addresses
                   - iPv6Addresses
                   - type
+          ModeSelect:
+              SemanticTagStruct:
+                  - mfgCode
+                  - value
           OperationalCredentials:
               FabricDescriptorStruct:
                   - rootPublicKey
@@ -6528,6 +6534,8 @@
               ThreadMetricsStruct: ThreadMetrics
           GeneralDiagnostics:
               NetworkInterface: NetworkInterfaceType
+          ModeSelect:
+              SemanticTagStruct: SemanticTag
           OperationalCredentials:
               FabricDescriptorStruct: FabricDescriptor
           DoorLock:
@@ -7435,6 +7443,7 @@
           RefrigeratorAlarm:
               - Mask
               - State
+              - Supported
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -7467,6 +7476,7 @@
               - InterconnectCOAlarm
               - ContaminationState
               - SensitivityLevel
+              - ExpiryDate
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -7515,8 +7525,6 @@
               - ProductAppearanceStruct
           BridgedDeviceBasicInformation:
               - ProductAppearanceStruct
-          ModeSelect:
-              - ModeTagStruct
           NetworkCommissioning:
               - WiFiInterfaceScanResultStruct
               - ThreadInterfaceScanResultStruct
@@ -7541,12 +7549,6 @@
               ProductAppearanceStruct:
                   - finish
                   - primaryColor
-          ModeSelect:
-              ModeTagStruct:
-                  - mfgCode
-                  - value
-              ModeOptionStruct:
-                  - modeTags
           NetworkCommissioning:
               WiFiInterfaceScanResultStruct:
                   - security
@@ -7818,8 +7820,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           CarbonMonoxideConcentrationMeasurement:
               LevelValueEnum:
@@ -7838,8 +7840,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           FormaldehydeConcentrationMeasurement:
               LevelValueEnum:
@@ -7858,8 +7860,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           NitrogenDioxideConcentrationMeasurement:
               LevelValueEnum:
@@ -7878,8 +7880,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           OzoneConcentrationMeasurement:
               LevelValueEnum:
@@ -7898,8 +7900,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           PM10ConcentrationMeasurement:
               LevelValueEnum:
@@ -7918,8 +7920,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           PM1ConcentrationMeasurement:
               LevelValueEnum:
@@ -7938,8 +7940,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           PM25ConcentrationMeasurement:
               LevelValueEnum:
@@ -7958,8 +7960,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           RadonConcentrationMeasurement:
               LevelValueEnum:
@@ -7978,8 +7980,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           TotalVolatileOrganicCompoundsConcentrationMeasurement:
               LevelValueEnum:
@@ -7998,8 +8000,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           DoorLock:
               DlLockState:
@@ -8278,10 +8280,6 @@
           ThreadNetworkDiagnostics:
               - NeighborTable
               - RouteTable
-      struct fields:
-          ModeSelect:
-              ModeOptionStruct:
-                  - semanticTags
       bitmaps:
           Groups:
               - GroupClusterFeature
@@ -8307,8 +8305,6 @@
       structs:
           AccessControl:
               AccessControlTargetStruct: Target
-          ModeSelect:
-              ModeTagStruct: SemanticTag
           NetworkCommissioning:
               WiFiInterfaceScanResultStruct: WiFiInterfaceScanResult
               ThreadInterfaceScanResultStruct: ThreadInterfaceScanResult
@@ -8316,10 +8312,6 @@
           ThreadNetworkDiagnostics:
               NeighborTableStruct: NeighborTable
               RouteTableStruct: RouteTable
-      struct fields:
-          ModeSelect:
-              ModeOptionStruct:
-                  modeTags: semanticTags
       enum values:
           TimeSynchronization:
               TimeSourceEnum:
@@ -8394,29 +8386,14 @@
           - TonerCartridgeMonitoring
           # Not ready to be public API yet.
           - ICDManagement
-          - LaundryWasherModeSelect
-          - RefrigeratorAndTemperatureControlledCabinetModeSelect
-          - RVCRunModeSelect
-          - RVCCleanModeSelect
-          - DishwasherModeSelect
-      commands:
-          ModeSelect:
-              # Still very in-flux.
-              - ChangeToModeWithStatus
-              - ChangeToModeResponse
-      struct fields:
-          ModeSelect:
-              ModeTagStruct:
-                  - tagName
-      enums:
-          ModeSelect:
-              # Still very in-flux.
-              - ModeTag
-              - StatusCode
-      bitmap values:
-          ModeSelect:
-              Feature:
-                  - ExtendedStatus
+          - LaundryWasherMode
+          - RefrigeratorAndTemperatureControlledCabinetMode
+          - RVCRunMode
+          - RVCCleanMode
+          - DishwasherMode
+          - LaundryWasherControls
+          - RVCOperationalState
+          - DishwasherAlarm
       # Once we actually unmark TimeSynchronization as provisional, all these bits should go away too, and we should instead
       # mark things as introduced/deprecated as needed.  The "ids" entries should go away, in particular.
       ids:

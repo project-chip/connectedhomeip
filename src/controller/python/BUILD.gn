@@ -360,6 +360,7 @@ chip_python_wheel_action("chip-clusters") {
         "chip/clusters/Types.py",
         "chip/clusters/enum.py",
         "chip/tlv/__init__.py",
+        "chip/tlv/tlvlist.py",
       ]
     },
     {

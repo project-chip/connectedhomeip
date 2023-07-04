@@ -44,6 +44,7 @@
 #include "rsi_wlan_config.h"
 
 #include "dhcp_client.h"
+#include "lwip/nd6.h"
 #include "wfx_rsi.h"
 
 /* Rsi driver Task will use as its stack */
@@ -354,11 +355,11 @@ static void wfx_rsi_save_ap_info()
         /*
          * Scan is done - failed
          */
-#if WIFI_ENABLE_SECURITY_WPA3
+#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         wfx_rsi.sec.security = WFX_SEC_WPA3;
-#else  /* !WIFI_ENABLE_SECURITY_WPA3 */
+#else  /* !WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         wfx_rsi.sec.security = WFX_SEC_WPA2;
-#endif /* WIFI_ENABLE_SECURITY_WPA3 */
+#endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         SILABS_LOG("%s: warn: failed with status: %02x", __func__, status);
         return;
     }
@@ -385,9 +386,13 @@ static void wfx_rsi_save_ap_info()
     case SME_WEP:
         wfx_rsi.sec.security = WFX_SEC_WEP;
         break;
-    case SME_WPA3:
     case SME_WPA3_TRANSITION:
-        wfx_rsi.sec.security = WFX_SEC_WPA3;
+#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
+    case SME_WPA3:
+        wfx_rsi.sec.security = RSI_WPA3;
+#else
+        wfx_rsi.sec.security = WFX_SEC_WPA2;
+#endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         break;
     default:
         wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
@@ -424,9 +429,11 @@ static void wfx_rsi_do_join(void)
         case WFX_SEC_WPA2:
             connect_security_mode = RSI_WPA_WPA2_MIXED;
             break;
+#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         case WFX_SEC_WPA3:
-            connect_security_mode = RSI_WPA3;
+            connect_security_mode = RSI_WPA3_TRANSITION;
             break;
+#endif /* WIFI_ENABLE_SECURITY_WPA3_TRANS */
         case WFX_SEC_NONE:
             connect_security_mode = RSI_OPEN;
             break;
@@ -558,7 +565,16 @@ void wfx_rsi_task(void * arg)
                     hasNotifiedIPV4 = false;
                 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-                /* Checks if the assigned IPv6 address is preferred by evaluating
+                /*
+                 * Checks if the IPv6 event has been notified, if not invoke the nd6_tmr,
+                 * which starts the duplicate address detectation.
+                 */
+                if (!hasNotifiedIPV6)
+                {
+                    nd6_tmr();
+                }
+                /*
+                 * Checks if the assigned IPv6 address is preferred by evaluating
                  * the first block of IPv6 address ( block 0)
                  */
                 if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)

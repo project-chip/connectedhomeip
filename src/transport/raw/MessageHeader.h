@@ -511,7 +511,7 @@ public:
     uint8_t GetMessageType() const { return mMessageType; }
 
     /** Get the raw exchange flags from this header. */
-    uint8_t GetExhangeFlags() const { return mExchangeFlags.Raw(); }
+    uint8_t GetExchangeFlags() const { return mExchangeFlags.Raw(); }
 
     /** Check whether the header has a given secure message type */
     bool HasMessageType(uint8_t type) const { return mMessageType == type; }
