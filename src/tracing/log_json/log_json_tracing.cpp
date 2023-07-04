@@ -54,40 +54,40 @@ using namespace chip::Decoders;
 
 using PayloadDecoderType = chip::Decoders::PayloadDecoder<64, 256>;
 
-
 // Gets the current value of the decoder until a NEST exit is returned
-Json::Value GetPayload(PayloadDecoderType &decoder)
+Json::Value GetPayload(PayloadDecoderType & decoder)
 {
     Json::Value value;
     PayloadEntry entry;
     StringBuilder<128> formatter;
 
-    while (decoder.Next(entry)) {
+    while (decoder.Next(entry))
+    {
         switch (entry.GetType())
         {
-            case PayloadEntry::IMPayloadType::kNestingEnter:
-                formatter.Reset().Add(entry.GetName()); // name gets destroyed by decoding
-                value[formatter.c_str()] = GetPayload(decoder);
-                break;
-            case PayloadEntry::IMPayloadType::kNestingExit:
-                return value;
-            case PayloadEntry::IMPayloadType::kAttribute:
-                value[formatter.Reset().AddFormat("ATTR(%u/%u)", entry.GetClusterId(), entry.GetAttributeId()).c_str()] = "<NOT_DECODED>";
-                break;
-            case PayloadEntry::IMPayloadType::kCommand:
-                value[formatter.Reset().AddFormat("CMD(%u/%u)", entry.GetClusterId(), entry.GetCommandId()).c_str()] = "<NOT_DECODED>";
-                continue;
-            case PayloadEntry::IMPayloadType::kEvent:
-                value[formatter.Reset().AddFormat("EVNT(%u/%u)", entry.GetClusterId(), entry.GetEventId()).c_str()] = "<NOT_DECODED>";
-                continue;
-            default:
-                value[entry.GetName()] = entry.GetValueText();
-                break;
+        case PayloadEntry::IMPayloadType::kNestingEnter:
+            formatter.Reset().Add(entry.GetName()); // name gets destroyed by decoding
+            value[formatter.c_str()] = GetPayload(decoder);
+            break;
+        case PayloadEntry::IMPayloadType::kNestingExit:
+            return value;
+        case PayloadEntry::IMPayloadType::kAttribute:
+            value[formatter.Reset().AddFormat("ATTR(%u/%u)", entry.GetClusterId(), entry.GetAttributeId()).c_str()] =
+                "<NOT_DECODED>";
+            break;
+        case PayloadEntry::IMPayloadType::kCommand:
+            value[formatter.Reset().AddFormat("CMD(%u/%u)", entry.GetClusterId(), entry.GetCommandId()).c_str()] = "<NOT_DECODED>";
+            continue;
+        case PayloadEntry::IMPayloadType::kEvent:
+            value[formatter.Reset().AddFormat("EVNT(%u/%u)", entry.GetClusterId(), entry.GetEventId()).c_str()] = "<NOT_DECODED>";
+            continue;
+        default:
+            value[entry.GetName()] = entry.GetValueText();
+            break;
         }
     }
     return value;
 }
-
 
 #endif
 
@@ -153,8 +153,7 @@ void DecodePacketHeader(Json::Value & value, const PacketHeader * packetHeader)
     }
 }
 
-void DecodePayloadData(Json::Value & value, chip::ByteSpan payload,
-                       Protocols::Id protocolId, uint8_t messageType)
+void DecodePayloadData(Json::Value & value, chip::ByteSpan payload, Protocols::Id protocolId, uint8_t messageType)
 {
     value["payloadSize"] = static_cast<Json::Value::UInt>(payload.size());
 
@@ -168,12 +167,11 @@ void DecodePayloadData(Json::Value & value, chip::ByteSpan payload,
 
 #if MATTER_LOG_JSON_DECODE_FULL
 
-    PayloadDecoderType decoder(
-        PayloadDecoderInitParams()
-           .SetProtocolDecodeTree(chip::TLVMeta::protocols_meta)
-           .SetClusterDecodeTree(chip::TLVMeta::clusters_meta)
-           .SetProtocol(protocolId)
-           .SetMessageType(messageType));
+    PayloadDecoderType decoder(PayloadDecoderInitParams()
+                                   .SetProtocolDecodeTree(chip::TLVMeta::protocols_meta)
+                                   .SetClusterDecodeTree(chip::TLVMeta::clusters_meta)
+                                   .SetProtocol(protocolId)
+                                   .SetMessageType(messageType));
 
     decoder.StartDecoding(payload);
 
@@ -231,9 +229,7 @@ void LogJsonBackend::LogMessageSend(MessageSendInfo & info)
 
     DecodePayloadHeader(value["payloadHeader"], info.payloadHeader);
     DecodePacketHeader(value["packetHeader"], info.packetHeader);
-    DecodePayloadData(value["payload"], info.payload,
-                      info.payloadHeader->GetProtocolID(),
-                      info.payloadHeader->GetMessageType());
+    DecodePayloadData(value["payload"], info.payload, info.payloadHeader->GetProtocolID(), info.payloadHeader->GetMessageType());
 
     LogJsonValue(value);
 }
@@ -259,9 +255,7 @@ void LogJsonBackend::LogMessageReceived(MessageReceivedInfo & info)
 
     DecodePayloadHeader(value["payloadHeader"], info.payloadHeader);
     DecodePacketHeader(value["packetHeader"], info.packetHeader);
-    DecodePayloadData(value["payload"], info.payload,
-                      info.payloadHeader->GetProtocolID(),
-                      info.payloadHeader->GetMessageType());
+    DecodePayloadData(value["payload"], info.payload, info.payloadHeader->GetProtocolID(), info.payloadHeader->GetMessageType());
 
     LogJsonValue(value);
 }

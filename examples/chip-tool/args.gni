@@ -27,5 +27,5 @@ matter_enable_tracing_support = true
 
 # Perfetto requires C++17
 cpp_standard = "gnu++17"
-#matter_log_json_payload_decode = "full"
-matter_log_json_payload_decode = "hex"
+
+matter_log_json_payload_decode = "full"

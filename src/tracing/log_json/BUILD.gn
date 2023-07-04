@@ -32,22 +32,19 @@ buildconfig_header("log-json-buildconfig") {
   header = "log_json_build_config.h"
   header_dir = "log_json"
 
-  assert(
-      matter_log_json_payload_decode == "none" ||
-      matter_log_json_payload_decode == "hex" ||
-      matter_log_json_payload_decode == "full",
-      "Unsupported decode type: ${matter_log_json_payload_decode}"
-  )
+  assert(matter_log_json_payload_decode == "none" ||
+             matter_log_json_payload_decode == "hex" ||
+             matter_log_json_payload_decode == "full",
+         "Unsupported decode type: ${matter_log_json_payload_decode}")
 
-  _log_json_decode_hex=(matter_log_json_payload_decode == "hex")
-  _log_json_decode_full=(matter_log_json_payload_decode == "full")
+  _log_json_decode_hex = matter_log_json_payload_decode == "hex"
+  _log_json_decode_full = matter_log_json_payload_decode == "full"
 
   defines = [
     "MATTER_LOG_JSON_DECODE_HEX=${_log_json_decode_hex}",
-    "MATTER_LOG_JSON_DECODE_FULL=${_log_json_decode_full}"
+    "MATTER_LOG_JSON_DECODE_FULL=${_log_json_decode_full}",
   ]
 }
-
 
 # As this uses std::string, this library is NOT for use
 # for embedded devices.
@@ -67,9 +64,9 @@ static_library("log_json") {
 
   if (matter_log_json_payload_decode == "full") {
     public_deps += [
+      "${chip_root}/src/controller/data_model:cluster-tlv-metadata",
       "${chip_root}/src/lib/format:protocol-decoder",
       "${chip_root}/src/lib/format:protocol-tlv-metadata",
-      "${chip_root}/src/controller/data_model:cluster-tlv-metadata",
     ]
   }
 }
