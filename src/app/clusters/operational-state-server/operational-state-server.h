@@ -43,7 +43,6 @@ private:
  */
 class OperationalStateServer : public CommandHandlerInterface, public AttributeAccessInterface, public Uncopyable
 {
-
 public:
     /**
      * Init the operational state server.
@@ -60,6 +59,28 @@ public:
      */
     void Shutdown();
 
+    /**
+     * Creates an operational state cluster instance. The Init() function needs to be called for this instance to be registered and
+     * called by the interaction model at the appropriate times.
+     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param aClusterId The ID of the ModeSelect aliased cluster to be instantiated.
+     * @param aDelegate A pointer to a delegate that will handle application layer logic.
+     */
+    OperationalStateServer(EndpointId aEndpointId, ClusterId aClusterId) :
+        CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
+        AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId)
+    {
+
+        mEndpointId = aEndpointId;
+        mClusterId  = aClusterId;
+    }
+
+    ~OperationalStateServer() override {}
+private:
+    // Inherited from CommandHandlerInterface
+    template <typename RequestT, typename FuncT>
+    void HandleCommand(HandlerContext & handlerContext, FuncT func);
+
     // Inherited from CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
 
@@ -67,10 +88,6 @@ public:
     ///
     /// Returns appropriately mapped CHIP_ERROR if applicable (may return CHIP_IM_GLOBAL_STATUS errors)
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-private:
-    EndpointId mEndpointId;
-    ClusterId mClusterId;
 
     /**
      * Handle Command: Pause.
@@ -92,28 +109,8 @@ private:
      */
     void HandleStopState(HandlerContext & ctx, const Commands::Stop::DecodableType & req);
 
-public:
-    /**
-     * Creates an operational state cluster instance. The Init() function needs to be called for this instance to be registered and
-     * called by the interaction model at the appropriate times.
-     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aClusterId The ID of the ModeSelect aliased cluster to be instantiated.
-     * @param aDelegate A pointer to a delegate that will handle application layer logic.
-     */
-    OperationalStateServer(EndpointId aEndpointId, ClusterId aClusterId) :
-        CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
-        AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId)
-    {
-
-        mEndpointId = aEndpointId;
-        mClusterId  = aClusterId;
-    }
-
-    // Inherited from CommandHandlerInterface
-    template <typename RequestT, typename FuncT>
-    void HandleCommand(HandlerContext & handlerContext, FuncT func);
-
-    ~OperationalStateServer() override {}
+    EndpointId mEndpointId;
+    ClusterId mClusterId;
 };
 
 } // namespace OperationalState
