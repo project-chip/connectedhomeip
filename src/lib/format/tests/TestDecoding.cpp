@@ -62,12 +62,15 @@ void TestSampleData(nlTestSuite * inSuite, void * inContext, const PayloadDecode
             break;
         }
 
-        printf("%*s%s: %s\n", nesting * 2, "", entry.GetName(), entry.GetValueText());
+        printf("%*s%s", nesting * 2, "", entry.GetName());
 
         if (entry.GetType() == PayloadEntry::IMPayloadType::kNestingEnter)
         {
             nesting++;
+        } else {
+          printf(": %s", entry.GetValueText());
         }
+        printf("\n");
     }
 }
 

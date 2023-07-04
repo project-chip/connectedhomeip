@@ -15,6 +15,8 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/build/chip/chip_codegen.gni")
+
 source_set("flat-tree") {
   sources = [
     "FlatTree.h",
@@ -26,6 +28,36 @@ source_set("flat-tree") {
   public_configs = [ "${chip_root}/src:includes" ]
 }
 
+
+source_set("tlv-metadata-headers") {
+  sources = [
+     "tlv_meta.h",  # TODO: move in separate source set
+  ]
+}
+
+chip_codegen("protocol-metadata") {
+   input = "protocol_messages.matter"
+   generator = "cpp-tlvmeta"
+
+
+   options = [
+      "table_name:protocols_meta"
+   ]
+
+   outputs = [
+     "tlv/meta/protocols_meta.cpp",
+     "tlv/meta/protocols_meta.h",
+   ]
+
+  deps = [
+    ":tlv-metadata-headers"
+  ]
+
+  public_configs = [
+    "${chip_root}/src:includes",
+  ]
+}
+
 config("temporary_test_config") {
   include_dirs = [ "." ]
 }
@@ -34,17 +66,15 @@ source_set("protocol-decoder") {
   sources = [
     "protocol_decoder.cpp",
     "protocol_decoder.h",
-    "tlv_meta.h",  # TODO: move in separate source set
 
     # TODO: codegen this and extra dep logic
     "tlv/meta/clusters_meta.cpp",
     "tlv/meta/clusters_meta.h",
-    "tlv/meta/protocols_meta.cpp",
-    "tlv/meta/protocols_meta.h",
   ]
 
   public_deps = [
     ":flat-tree",
+    ":tlv-metadata-headers",
     "${chip_root}/src/lib/core",
   ]
 
