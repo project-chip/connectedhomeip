@@ -280,9 +280,9 @@ client cluster IMProtocol = 0xFFFF0001 {
   }
 
   struct CommandPathIB {
-    optional int16u endpoint_id = 1;
-    optional protocol_cluster_id cluster_id = 2;
-    optional protocol_command_id command_id = 3;
+    optional int16u endpoint_id = 0;
+    optional protocol_cluster_id cluster_id = 1;
+    optional protocol_command_id command_id = 2;
   }
 
   struct CommandDataIB {
@@ -311,7 +311,7 @@ client cluster IMProtocol = 0xFFFF0001 {
 
   struct InvokeResponseMessage {
     boolean suppress_response = 0;
-    InvokeResponseIB invoke_responses = 1;
+    InvokeResponseIB invoke_responses[] = 1;
 
     // 10.2.2.2. Context Tag Encoded Action Information
     int8u interaction_model_revison = 0xFF;

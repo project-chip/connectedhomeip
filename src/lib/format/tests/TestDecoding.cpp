@@ -18,7 +18,6 @@
 #include <lib/format/protocol_decoder.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/UnitTestRegistration.h>
-#include <tlv/meta/clusters_meta.h>
 
 #include <tlv/meta/clusters_meta.h>
 #include <tlv/meta/protocols_meta.h>
@@ -291,6 +290,33 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "            targets: NULL\n"
                    "            fabricIndex: 1\n"
                    "  suppress_response: true\n"
+                   "  interaction_model_revison: 1\n");
+
+    TestSampleData(inSuite, params, im_protocol_invoke_request,
+                   "invoke_request\n"
+                   "  suppress_response: false\n"
+                   "  timed_request: false\n"
+                   "  invoke_requests\n"
+                   "    []\n"
+                   "      path\n"
+                   "        endpoint_id: 1\n"
+                   "        cluster_id: 6 == 'OnOff'\n"
+                   "        command_id: 2\n"
+                   "      ContextSpecific(0x1)\n"
+                   "  interaction_model_revison: 1\n");
+
+    TestSampleData(inSuite, params, im_protocol_invoke_response,
+                   "invoke_response\n"
+                   "  suppress_response: false\n"
+                   "  invoke_responses\n"
+                   "    []\n"
+                   "      status\n"
+                   "        path\n"
+                   "          endpoint_id: 1\n"
+                   "          cluster_id: 6 == 'OnOff'\n"
+                   "          command_id: 2\n"
+                   "        status\n"
+                   "          status: 0\n"
                    "  interaction_model_revison: 1\n");
 }
 

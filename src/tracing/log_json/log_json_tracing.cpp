@@ -19,15 +19,26 @@
 #include <tracing/log_json/log_json_tracing.h>
 
 #include <lib/address_resolve/TracingStructs.h>
-#include <lib/support/BytesToHex.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/StringBuilder.h>
 #include <transport/TracingStructs.h>
+
+#include <log_json/log_json_build_config.h>
 
 #include <json/json.h>
 
 #include <sstream>
 #include <string>
+
+#if MATTER_LOG_JSON_DECODE_HEX
+#include <lib/support/BytesToHex.h> // nogncheck
+#endif
+
+#if MATTER_LOG_JSON_DECODE_FULL
+#include <lib/format/protocol_decoder.h> // nogncheck
+#include <tlv/meta/clusters_meta.h>      // nogncheck
+#include <tlv/meta/protocols_meta.h>     // nogncheck
+#endif
 
 namespace chip {
 namespace Tracing {
@@ -36,6 +47,49 @@ namespace LogJson {
 namespace {
 
 using chip::StringBuilder;
+
+#if MATTER_LOG_JSON_DECODE_FULL
+
+using namespace chip::Decoders;
+
+using PayloadDecoderType = chip::Decoders::PayloadDecoder<64, 256>;
+
+
+// Gets the current value of the decoder until a NEST exit is returned
+Json::Value GetPayload(PayloadDecoderType &decoder)
+{
+    Json::Value value;
+    PayloadEntry entry;
+    StringBuilder<128> formatter;
+
+    while (decoder.Next(entry)) {
+        switch (entry.GetType())
+        {
+            case PayloadEntry::IMPayloadType::kNestingEnter:
+                formatter.Reset().Add(entry.GetName()); // name gets destroyed by decoding
+                value[formatter.c_str()] = GetPayload(decoder);
+                break;
+            case PayloadEntry::IMPayloadType::kNestingExit:
+                return value;
+            case PayloadEntry::IMPayloadType::kAttribute:
+                value[formatter.Reset().AddFormat("ATTR(%u/%u)", entry.GetClusterId(), entry.GetAttributeId()).c_str()] = "<NOT_DECODED>";
+                break;
+            case PayloadEntry::IMPayloadType::kCommand:
+                value[formatter.Reset().AddFormat("CMD(%u/%u)", entry.GetClusterId(), entry.GetCommandId()).c_str()] = "<NOT_DECODED>";
+                continue;
+            case PayloadEntry::IMPayloadType::kEvent:
+                value[formatter.Reset().AddFormat("EVNT(%u/%u)", entry.GetClusterId(), entry.GetEventId()).c_str()] = "<NOT_DECODED>";
+                continue;
+            default:
+                value[entry.GetName()] = entry.GetValueText();
+                break;
+        }
+    }
+    return value;
+}
+
+
+#endif
 
 /// Writes the given value to chip log
 void LogJsonValue(Json::Value const & value)
@@ -99,20 +153,32 @@ void DecodePacketHeader(Json::Value & value, const PacketHeader * packetHeader)
     }
 }
 
-void DecodePayloadData(Json::Value & value, chip::ByteSpan payload)
+void DecodePayloadData(Json::Value & value, chip::ByteSpan payload,
+                       Protocols::Id protocolId, uint8_t messageType)
 {
     value["payloadSize"] = static_cast<Json::Value::UInt>(payload.size());
 
-    // TODO: a decode would be useful however it likely requires more decode
-    //       metadata
-    //
-    // Hex encoding is possible, however it is quite crude
-    //
+#if MATTER_LOG_JSON_DECODE_HEX
     char hex_buffer[1024];
     if (chip::Encoding::BytesToUppercaseHexString(payload.data(), payload.size(), hex_buffer, sizeof(hex_buffer)) == CHIP_NO_ERROR)
     {
         value["payloadHex"] = hex_buffer;
     }
+#endif // MATTER_LOG_JSON_DECODE_HEX
+
+#if MATTER_LOG_JSON_DECODE_FULL
+
+    PayloadDecoderType decoder(
+        PayloadDecoderInitParams()
+           .SetProtocolDecodeTree(chip::TLVMeta::protocols_meta)
+           .SetClusterDecodeTree(chip::TLVMeta::clusters_meta)
+           .SetProtocol(protocolId)
+           .SetMessageType(messageType));
+
+    decoder.StartDecoding(payload);
+
+    value["payload"] = GetPayload(decoder);
+#endif // MATTER_LOG_JSON_DECODE_FULL
 }
 
 } // namespace
@@ -165,7 +231,9 @@ void LogJsonBackend::LogMessageSend(MessageSendInfo & info)
 
     DecodePayloadHeader(value["payloadHeader"], info.payloadHeader);
     DecodePacketHeader(value["packetHeader"], info.packetHeader);
-    DecodePayloadData(value["payload"], info.payload);
+    DecodePayloadData(value["payload"], info.payload,
+                      info.payloadHeader->GetProtocolID(),
+                      info.payloadHeader->GetMessageType());
 
     LogJsonValue(value);
 }
@@ -191,7 +259,9 @@ void LogJsonBackend::LogMessageReceived(MessageReceivedInfo & info)
 
     DecodePayloadHeader(value["payloadHeader"], info.payloadHeader);
     DecodePacketHeader(value["packetHeader"], info.packetHeader);
-    DecodePayloadData(value["payload"], info.payload);
+    DecodePayloadData(value["payload"], info.payload,
+                      info.payloadHeader->GetProtocolID(),
+                      info.payloadHeader->GetMessageType());
 
     LogJsonValue(value);
 }

@@ -38,6 +38,8 @@ extern const SamplePayload secure_channel_status_report;
 
 extern const SamplePayload im_protocol_read_request;
 extern const SamplePayload im_protocol_report_data;
+extern const SamplePayload im_protocol_invoke_request;
+extern const SamplePayload im_protocol_invoke_response;
 
 // different data reports for content tests
 extern const SamplePayload im_protocol_report_data_acl;

@@ -15,6 +15,40 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/build/chip/buildconfig_header.gni")
+
+declare_args() {
+  # Possible values for decoding json payload:
+  #   - none: no decoding
+  #   - hex: dump a hex string of values (no actual decoding)
+  #   - full: full decoding of tlv data, including payload and content
+  # NOTE:
+  #   payload decoding will contain full data information, including things that
+  #   may be private like WiFi passwords or Lock PIN codes.
+  matter_log_json_payload_decode = "none"
+}
+
+buildconfig_header("log-json-buildconfig") {
+  header = "log_json_build_config.h"
+  header_dir = "log_json"
+
+  assert(
+      matter_log_json_payload_decode == "none" ||
+      matter_log_json_payload_decode == "hex" ||
+      matter_log_json_payload_decode == "full",
+      "Unsupported decode type: ${matter_log_json_payload_decode}"
+  )
+
+  _log_json_decode_hex=(matter_log_json_payload_decode == "hex")
+  _log_json_decode_full=(matter_log_json_payload_decode == "full")
+
+  defines = [
+    "MATTER_LOG_JSON_DECODE_HEX=${_log_json_decode_hex}",
+    "MATTER_LOG_JSON_DECODE_FULL=${_log_json_decode_full}"
+  ]
+}
+
+
 # As this uses std::string, this library is NOT for use
 # for embedded devices.
 static_library("log_json") {
@@ -24,9 +58,18 @@ static_library("log_json") {
   ]
 
   public_deps = [
+    ":log-json-buildconfig",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/tracing",
     "${chip_root}/src/transport",
     "${chip_root}/third_party/jsoncpp",
   ]
+
+  if (matter_log_json_payload_decode == "full") {
+    public_deps += [
+      "${chip_root}/src/lib/format:protocol-decoder",
+      "${chip_root}/src/lib/format:protocol-tlv-metadata",
+      "${chip_root}/src/controller/data_model:cluster-tlv-metadata",
+    ]
+  }
 }
