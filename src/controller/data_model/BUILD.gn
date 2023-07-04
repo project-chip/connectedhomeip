@@ -25,22 +25,16 @@ chip_codegen("cluster-tlv-metadata") {
   input = "controller-clusters.matter"
   generator = "cpp-tlvmeta"
 
-  options = [
-    "table_name:clusters_meta"
-  ]
+  options = [ "table_name:clusters_meta" ]
 
   outputs = [
     "tlv/meta/clusters_meta.cpp",
     "tlv/meta/clusters_meta.h",
   ]
 
-  deps = [
-    "${chip_root}/src/lib/format:tlv-metadata-headers"
-  ]
+  deps = [ "${chip_root}/src/lib/format:tlv-metadata-headers" ]
 
-  public_configs = [
-    "${chip_root}/src:includes",
-  ]
+  public_configs = [ "${chip_root}/src:includes" ]
 }
 
 chip_data_model("data_model") {

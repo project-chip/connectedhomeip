@@ -27,7 +27,7 @@ CODEGEN_PY_PATH = os.path.abspath(os.path.join(
 class CodegenTarget:
     """A target that uses `scripts/codegen.py` to generate files."""
 
-    def __init__(self, idl: InputIdlFile, generator: str, sdk_root: str, runner, options = []):
+    def __init__(self, idl: InputIdlFile, generator: str, sdk_root: str, runner, options=[]):
         self.idl = idl
         self.generator = generator
         self.sdk_root = sdk_root
@@ -114,6 +114,7 @@ class CodegenCppAppPregenerator:
     def CreateTarget(self, idl: InputIdlFile, runner):
         return CodegenTarget(sdk_root=self.sdk_root, idl=idl, generator="cpp-app", runner=runner)
 
+
 class CodegenCppProtocolsTLVMetaPregenerator:
     """Pregeneration logic for "cpp-app" codegen.py outputs"""
 
@@ -125,6 +126,7 @@ class CodegenCppProtocolsTLVMetaPregenerator:
 
     def CreateTarget(self, idl: InputIdlFile, runner):
         return CodegenTarget(sdk_root=self.sdk_root, idl=idl, generator="cpp-tlvmeta", options=["table_name:protocols_meta"], runner=runner)
+
 
 class CodegenCppClustersTLVMetaPregenerator:
     """Pregeneration logic for "cpp-app" codegen.py outputs"""

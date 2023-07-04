@@ -67,8 +67,10 @@ void TestSampleData(nlTestSuite * inSuite, void * inContext, const PayloadDecode
         if (entry.GetType() == PayloadEntry::IMPayloadType::kNestingEnter)
         {
             nesting++;
-        } else {
-          printf(": %s", entry.GetValueText());
+        }
+        else
+        {
+            printf(": %s", entry.GetValueText());
         }
         printf("\n");
     }

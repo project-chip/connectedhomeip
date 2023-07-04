@@ -20,7 +20,8 @@ from dataclasses import dataclass, field
 from typing import Iterator, List, Optional
 
 from .types import IdlFileType, InputIdlFile
-from .using_codegen import CodegenCppAppPregenerator, CodegenJavaClassPregenerator, CodegenJavaJNIPregenerator, CodegenCppClustersTLVMetaPregenerator, CodegenCppProtocolsTLVMetaPregenerator
+from .using_codegen import (CodegenCppAppPregenerator, CodegenCppClustersTLVMetaPregenerator,
+                            CodegenCppProtocolsTLVMetaPregenerator, CodegenJavaClassPregenerator, CodegenJavaJNIPregenerator)
 from .using_zap import ZapApplicationPregenerator
 
 
