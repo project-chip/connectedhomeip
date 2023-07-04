@@ -302,10 +302,10 @@ void ExchangeContext::DoClose(bool clearRetransTable)
         CancelResponseTimer();
 #if CONFIG_DEVICE_LAYER
         DeviceLayer::ChipDeviceEvent event;
-        event.Type                               = DeviceLayer::DeviceEventType::kChipMsgHandledEvent;
-        event.MessageReceived.isReceived         = false;
-        event.MessageReceived.isExpectedResponse = true;
-        CHIP_ERROR status                        = DeviceLayer::PlatformMgr().PostEvent(&event);
+        event.Type                                  = DeviceLayer::DeviceEventType::kChipMsgRxEventHandled;
+        event.RxEventContext.wasReceived            = false;
+        event.RxEventContext.clearsExpectedResponse = true;
+        CHIP_ERROR status                           = DeviceLayer::PlatformMgr().PostEvent(&event);
         if (status != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "Failed to post Msg Handled event at ExchangeContext closure %" CHIP_ERROR_FORMAT,
@@ -524,10 +524,10 @@ void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
 {
 #if CONFIG_DEVICE_LAYER
     DeviceLayer::ChipDeviceEvent event;
-    event.Type                               = DeviceLayer::DeviceEventType::kChipMsgHandledEvent;
-    event.MessageReceived.isReceived         = false;
-    event.MessageReceived.isExpectedResponse = true;
-    CHIP_ERROR status                        = DeviceLayer::PlatformMgr().PostEvent(&event);
+    event.Type                                  = DeviceLayer::DeviceEventType::kChipMsgRxEventHandled;
+    event.RxEventContext.wasReceived            = false;
+    event.RxEventContext.clearsExpectedResponse = true;
+    CHIP_ERROR status                           = DeviceLayer::PlatformMgr().PostEvent(&event);
     if (status != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to post Message Response Timeout event %" CHIP_ERROR_FORMAT, status.Format());
@@ -648,10 +648,10 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
 
 #if CONFIG_DEVICE_LAYER
     DeviceLayer::ChipDeviceEvent event;
-    event.Type                               = DeviceLayer::DeviceEventType::kChipMsgHandledEvent;
-    event.MessageReceived.isReceived         = true;
-    event.MessageReceived.isExpectedResponse = IsResponseExpected();
-    CHIP_ERROR status                        = DeviceLayer::PlatformMgr().PostEvent(&event);
+    event.Type                                  = DeviceLayer::DeviceEventType::kChipMsgRxEventHandled;
+    event.RxEventContext.wasReceived            = true;
+    event.RxEventContext.clearsExpectedResponse = IsResponseExpected();
+    CHIP_ERROR status                           = DeviceLayer::PlatformMgr().PostEvent(&event);
     if (status != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to post Message received event %" CHIP_ERROR_FORMAT, status.Format());

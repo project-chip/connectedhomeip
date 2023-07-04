@@ -249,6 +249,35 @@ enum PublicEventTypes
      * sending messages to other nodes.
      */
     kServerReady,
+
+    /**
+     * TODO ICD: kChipMsgSentEvent and kChipMsgRxEventHandled should be InternalEventTypes.
+     * However the ICD manager leverages those events and its event handler is registered as an application
+     * event handler.
+     * ICDEventManager will have to expose 'ICDEventHandler' publicly to 'DispatchEventToDeviceLayer'.
+     */
+
+    /**
+     * An Exchange Context sent a message.
+     * This event is coupled with MessageSent structure.
+     */
+    kChipMsgSentEvent,
+
+    /**
+     * An Exchange Context handled a reception transaction.
+     * This event can occur by one of the 3 following scenarios:
+     *  - A message was received.
+     *  - An expected reception has timed out.
+     *  - The exchange context was closed while an reception was expected.
+     *
+     * This event is coupled with RxEventContext structure.
+     */
+    kChipMsgRxEventHandled,
+
+    /**
+     * An application event occurent that should wake up the system/device
+     */
+    kAppWakeUpEvent,
 };
 
 /**
@@ -269,10 +298,7 @@ enum InternalEventTypes
     kCHIPoBLEWriteReceived,
     kCHIPoBLEIndicateConfirm,
     kCHIPoBLEConnectionError,
-    kCHIPoBLENotifyConfirm,
-    kChipMsgSentEvent,
-    kChipMsgHandledEvent,
-    kAppWakeUpEvent,
+    kCHIPoBLENotifyConfirm
 };
 
 static_assert(kEventTypeNotSet == 0, "kEventTypeNotSet must be defined as 0");
@@ -547,9 +573,9 @@ struct ChipDeviceEvent final
 
         struct
         {
-            bool isReceived;
-            bool isExpectedResponse;
-        } MessageReceived;
+            bool wasReceived;
+            bool clearsExpectedResponse;
+        } RxEventContext;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }

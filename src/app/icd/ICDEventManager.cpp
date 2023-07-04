@@ -73,8 +73,8 @@ void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t ar
             pIcdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
         }
         break;
-    case DeviceEventType::kChipMsgHandledEvent:
-        if (event->MessageReceived.isExpectedResponse)
+    case DeviceEventType::kChipMsgRxEventHandled:
+        if (event->RxEventContext.clearsExpectedResponse)
         {
             if (expectedMsgCount > 0)
             {
@@ -82,7 +82,7 @@ void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t ar
             }
             else
             {
-                // SHOULD we assert
+                // Should we assert
                 ChipLogError(DeviceLayer, "No response was expected by the ICD Manager");
             }
 
@@ -91,7 +91,7 @@ void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t ar
                 pIcdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kExpectingMsgResponse, false);
             }
         }
-        else if (event->MessageReceived.isReceived)
+        else if (event->RxEventContext.wasReceived)
         {
             pIcdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
         }
