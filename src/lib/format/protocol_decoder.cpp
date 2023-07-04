@@ -410,24 +410,24 @@ void PayloadDecoderBase::MoveToContent(PayloadEntry & entry)
         mNameBuilder.AddFormat("0x%" PRIx32 "::", entry.GetClusterId());
     }
 
-    uint32_t id = 0;
-    const char *id_type = "UNKNOWN";
+    uint32_t id          = 0;
+    const char * id_type = "UNKNOWN";
 
     switch (entry.GetType())
     {
     case PayloadEntry::IMPayloadType::kAttribute:
         mIMContentPosition.Enter(ByTag(AttributeTag(entry.GetAttributeId())));
-        id = entry.GetAttributeId();
+        id      = entry.GetAttributeId();
         id_type = "ATTR";
         break;
     case PayloadEntry::IMPayloadType::kCommand:
         mIMContentPosition.Enter(ByTag(CommandTag(entry.GetCommandId())));
-        id = entry.GetCommandId();
+        id      = entry.GetCommandId();
         id_type = "CMD";
         break;
     case PayloadEntry::IMPayloadType::kEvent:
         mIMContentPosition.Enter(ByTag(EventTag(entry.GetEventId())));
-        id = entry.GetEventId();
+        id      = entry.GetEventId();
         id_type = "EV";
         break;
     default:

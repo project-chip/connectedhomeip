@@ -432,7 +432,7 @@ void TestEmptyClusterMetaDataDecode(nlTestSuite * inSuite, void * inContext)
                    "          endpoint_id: 0\n"
                    "          cluster_id: 31\n"
                    "          attribute_id: 0\n"
-                   "        0x1f::ATTR(0x0)\n"               // Cluster 31, attribute 0
+                   "        0x1f::ATTR(0x0)\n"                 // Cluster 31, attribute 0
                    "          UnknownTag(0x100)\n"             // List entry (acl is a list)
                    "            ContextSpecific(0x1): 5\n"     // privilege
                    "            ContextSpecific(0x2): 2\n"     // authMode
