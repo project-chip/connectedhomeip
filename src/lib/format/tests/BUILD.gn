@@ -28,7 +28,8 @@ source_set("temporary_test") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/format:flat-tree",
     "${chip_root}/src/lib/format:protocol-decoder",
-    "${chip_root}/src/lib/format:protocol-metadata",
+    "${chip_root}/src/lib/format:protocol-tlv-metadata",
+    "${chip_root}/src/controller/data_model:cluster-tlv-metadata",
   ]
 }
 

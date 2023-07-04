@@ -35,7 +35,7 @@ source_set("tlv-metadata-headers") {
   ]
 }
 
-chip_codegen("protocol-metadata") {
+chip_codegen("protocol-tlv-metadata") {
    input = "protocol_messages.matter"
    generator = "cpp-tlvmeta"
 
@@ -58,18 +58,10 @@ chip_codegen("protocol-metadata") {
   ]
 }
 
-config("temporary_test_config") {
-  include_dirs = [ "." ]
-}
-
 source_set("protocol-decoder") {
   sources = [
     "protocol_decoder.cpp",
     "protocol_decoder.h",
-
-    # TODO: codegen this and extra dep logic
-    "tlv/meta/clusters_meta.cpp",
-    "tlv/meta/clusters_meta.h",
   ]
 
   public_deps = [
@@ -80,6 +72,5 @@ source_set("protocol-decoder") {
 
   public_configs = [
     "${chip_root}/src:includes",
-    ":temporary_test_config",
   ]
 }
