@@ -241,7 +241,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
         if (err == CHIP_NO_ERROR)
         {
-#if CONFIG_DEVICE_LAYER
+#if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
             DeviceLayer::ChipDeviceEvent event;
             event.Type                       = DeviceLayer::DeviceEventType::kChipMsgSentEvent;
             event.MessageSent.ExpectResponse = IsResponseExpected();
@@ -300,7 +300,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     {
         // Cancel the response timer.
         CancelResponseTimer();
-#if CONFIG_DEVICE_LAYER
+#if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
         DeviceLayer::ChipDeviceEvent event;
         event.Type                                  = DeviceLayer::DeviceEventType::kChipMsgRxEventHandled;
         event.RxEventContext.wasReceived            = false;
@@ -311,7 +311,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
             ChipLogError(DeviceLayer, "Failed to post Msg Handled event at ExchangeContext closure %" CHIP_ERROR_FORMAT,
                          status.Format());
         }
-#endif // CONFIG_DEVICE_LAYER
+#endif // CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
     }
 }
 
@@ -522,7 +522,7 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
 
 void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
 {
-#if CONFIG_DEVICE_LAYER
+#if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
     DeviceLayer::ChipDeviceEvent event;
     event.Type                                  = DeviceLayer::DeviceEventType::kChipMsgRxEventHandled;
     event.RxEventContext.wasReceived            = false;
@@ -532,7 +532,7 @@ void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
     {
         ChipLogError(DeviceLayer, "Failed to post Message Response Timeout event %" CHIP_ERROR_FORMAT, status.Format());
     }
-#endif // CONFIG_DEVICE_LAYER
+#endif // CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
 
     SetResponseExpected(false);
 
@@ -646,7 +646,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-#if CONFIG_DEVICE_LAYER
+#if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
     DeviceLayer::ChipDeviceEvent event;
     event.Type                                  = DeviceLayer::DeviceEventType::kChipMsgRxEventHandled;
     event.RxEventContext.wasReceived            = true;
@@ -656,7 +656,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     {
         ChipLogError(DeviceLayer, "Failed to post Message received event %" CHIP_ERROR_FORMAT, status.Format());
     }
-#endif // CONFIG_DEVICE_LAYER
+#endif // CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
 
     if (IsResponseExpected())
     {

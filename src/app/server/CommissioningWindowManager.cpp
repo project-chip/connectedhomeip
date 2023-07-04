@@ -567,7 +567,7 @@ void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnu
     if (mWindowStatus != aNewStatus)
     {
         mWindowStatus = aNewStatus;
-
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
         DeviceLayer::ChipDeviceEvent event;
         event.Type                           = DeviceLayer::DeviceEventType::kCommissioningWindowStatusChanged;
         event.CommissioningWindowStatus.open = (mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen);
@@ -576,6 +576,7 @@ void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnu
         {
             ChipLogError(AppServer, "Failed to post kCommissioningWindowStatusChanged event %" CHIP_ERROR_FORMAT, err.Format());
         }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     }
 
     if (CommissioningWindowStatusForCluster() != oldClusterStatus)
