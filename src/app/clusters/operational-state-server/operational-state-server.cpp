@@ -296,18 +296,16 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     case OperationalState::Attributes::CurrentPhase::Id: {
         DataModel::Nullable<uint8_t> currentPhase;
         Delegate * delegate           = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
-        GenericOperationalPhase phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
-        size_t index                  = 0;
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        err = delegate->GetOperationalPhaseAtIndex(index, phase);
-        if (err == CHIP_ERROR_NOT_FOUND || phase.isNullable())
+        delegate->GetCurrentPhase(currentPhase);
+
+        if (currentPhase.IsNull())
         {
             err = aEncoder.EncodeNull();
         }
         else
         {
-            CurrentPhase::Get(mEndpointId, currentPhase);
             err = aEncoder.Encode(currentPhase);
         }
     }

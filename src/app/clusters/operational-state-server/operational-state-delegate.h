@@ -256,6 +256,12 @@ public:
     virtual void GetCurrentOperationalError(GenericOperationalError & error) = 0;
 
     /**
+     * Get current phase
+     * @param phase The app::DataModel::Nullable<uint8_t> to fill with the current phase value
+     */
+    virtual void GetCurrentPhase(app::DataModel::Nullable<uint8_t> & phase) = 0;
+
+    /**
      * Set current operational state.
      * @param opState The operational state that should now be the current one.
      */
@@ -266,6 +272,12 @@ public:
      * @param opErrState The new operational error.
      */
     virtual CHIP_ERROR SetOperationalError(const GenericOperationalError & opErrState) = 0;
+
+    /**
+     * Set operational phase.
+     * @param phase The operational phase that should now be the current one.
+     */
+    virtual CHIP_ERROR SetPhase(const app::DataModel::Nullable<uint8_t> & phase) = 0;
 
     // command callback
     /**

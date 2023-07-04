@@ -32,6 +32,12 @@ CHIP_ERROR OperationalStateDelegate::SetOperationalState(const GenericOperationa
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR OperationalStateDelegate::SetPhase(const app::DataModel::Nullable<uint8_t> & phase)
+{
+    mOperationalPhase = phase;
+    return CHIP_NO_ERROR;
+}
+
 void OperationalStateDelegate::GetCurrentOperationalState(GenericOperationalState & op)
 {
     op = mOperationalState;
@@ -46,6 +52,11 @@ CHIP_ERROR OperationalStateDelegate::SetOperationalError(const GenericOperationa
 void OperationalStateDelegate::GetCurrentOperationalError(GenericOperationalError & error)
 {
     error = mOperationalError;
+}
+
+void OperationalStateDelegate::GetCurrentPhase(app::DataModel::Nullable<uint8_t> & phase)
+{
+    phase = mOperationalPhase;
 }
 
 CHIP_ERROR OperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)

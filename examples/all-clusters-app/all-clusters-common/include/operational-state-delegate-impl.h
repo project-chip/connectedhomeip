@@ -73,6 +73,12 @@ public:
     void GetCurrentOperationalError(GenericOperationalError & error) override;
 
     /**
+     * Get current phase
+     * @param phase The app::DataModel::Nullable<uint8_t> to fill with the current phase value
+     */
+    void GetCurrentPhase(app::DataModel::Nullable<uint8_t> & phase) override;
+
+    /**
      * Set operational error.
      * @param opErrState The new operational error.
      */
@@ -83,6 +89,12 @@ public:
      * @param opState The operational state that should now be the current one.
      */
     CHIP_ERROR SetOperationalState(const GenericOperationalState & opState) override;
+
+    /**
+     * Set operational phase.
+     * @param phase The operational phase that should now be the current one.
+     */
+    CHIP_ERROR SetPhase(const app::DataModel::Nullable<uint8_t> & phase) override;
 
     // command callback
     /**
@@ -111,9 +123,10 @@ public:
 
     OperationalStateDelegate(GenericOperationalState aOperationalState,
                              GenericOperationalError aOperationalError, Span<const GenericOperationalState> aOperationalStateList,
-                             Span<const GenericOperationalPhase> aOperationalPhaseList) :
+                             Span<const GenericOperationalPhase> aOperationalPhaseList,
+                             app::DataModel::Nullable<uint8_t> aPhase = DataModel::Nullable<uint8_t>()) :
         mOperationalState(aOperationalState), mOperationalError(aOperationalError), mOperationalStateList(aOperationalStateList),
-        mOperationalPhaseList(aOperationalPhaseList)
+        mOperationalPhaseList(aOperationalPhaseList), mOperationalPhase(aPhase)
     {}
     ~OperationalStateDelegate() = default;
 
@@ -122,6 +135,7 @@ private:
     GenericOperationalError mOperationalError;
     app::DataModel::List<const GenericOperationalState> mOperationalStateList;
     app::DataModel::List<const GenericOperationalPhase> mOperationalPhaseList;
+    app::DataModel::Nullable<uint8_t> mOperationalPhase;
 };
 
 } // namespace OperationalState
