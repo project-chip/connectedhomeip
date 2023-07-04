@@ -305,6 +305,9 @@ void PayloadDecoderBase::EnterContainer(PayloadEntry & entry)
     // must be done BEFORE entering container
     // to preserve the value and not get a 'container tag'
     // below when data is not valid
+    //
+    // TODO: this formatting is wasteful, should really be done only
+    //       if data is NULLPTR.
     FormatCurrentTag(mReader, mNameBuilder.Reset());
 
     VerifyOrReturn(ReaderEnterContainer(entry));
