@@ -115,7 +115,7 @@ class ClusterTablesGenerator:
                     name=c.name,
                     code=f'CommandTag({c.code})',
                     reference=None,
-                    real_type="%s::%s::DefaultSuccess" % (
+                    real_type="%s::%s::()" % (
                         self.cluster.name, c.name)
                 )
 
