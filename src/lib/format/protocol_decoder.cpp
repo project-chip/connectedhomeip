@@ -213,8 +213,8 @@ void PayloadDecoderBase::NextFromStarting(PayloadEntry & entry)
     if (data == nullptr)
     {
         // do not try to decode unknown data. assume binary
-        mNameBuilder.Reset().AddFormat("0x%X, 0x%X\n", mProtocol.ToFullyQualifiedSpecForm(), mMessageType);
-        mValueBuilder.Reset().Add("UNKNOWN PROTOCOL");
+        mNameBuilder.Reset().AddFormat("PROTO(0x%X, 0x%X)", mProtocol.ToFullyQualifiedSpecForm(), mMessageType);
+        mValueBuilder.Reset().Add("UNKNOWN");
         entry  = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
         mState = State::kDone;
         return;

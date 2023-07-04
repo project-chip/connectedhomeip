@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/core/TLVReader.h>
+#include <lib/core/TLVWriter.h>
 #include <lib/format/protocol_decoder.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -29,14 +29,29 @@
 
 namespace {
 
-using namespace chip::TestData;
 using namespace chip::Decoders;
 using namespace chip::FlatTree;
-
-using chip::TLVMeta::ItemInfo;
+using namespace chip::TLV;
+using namespace chip::TLVMeta;
+using namespace chip::TestData;
 
 const Entry<ItemInfo> _empty_item[0]                         = {};
 const std::array<const Node<ItemInfo>, 1> fake_clusters_meta = { { 0, _empty_item } };
+
+const Entry<ItemInfo> _FakeProtocolData[] = {
+    { { AttributeTag(5), "proto5", ItemType::kDefault }, kInvalidNodeIndex },
+    { { AttributeTag(16), "proto16", ItemType::kDefault }, kInvalidNodeIndex },
+};
+
+const Entry<ItemInfo> _FakeProtocols[] = {
+    { { ClusterTag(0xFFFF0000), "FakeSC", ItemType::kDefault }, 1 },
+    { { ClusterTag(0xFFFF0001), "FakeIM", ItemType::kDefault }, 1 },
+};
+
+const std::array<const Node<ItemInfo>, 53 + 2> fake_protocols_meta = { {
+    { 2, _FakeProtocols },
+    { 2, _FakeProtocolData },
+} };
 
 void TestSampleData(nlTestSuite * inSuite, const PayloadDecoderInitParams & params, const SamplePayload & data,
                     const char * expectation)
@@ -444,10 +459,148 @@ void TestEmptyClusterMetaDataDecode(nlTestSuite * inSuite, void * inContext)
                    "  interaction_model_revison: 1\n");
 }
 
+void TestMissingDecodeData(nlTestSuite * inSuite, void * inContext)
+{
+    PayloadDecoderInitParams params;
+
+    params.SetProtocolDecodeTree(fake_clusters_meta).SetClusterDecodeTree(fake_clusters_meta);
+
+    TestSampleData(inSuite, params, secure_channel_mrp_ack, "PROTO(0x0, 0x10): UNKNOWN\n");
+    TestSampleData(inSuite, params, im_protocol_report_data_acl, "PROTO(0x1, 0x5): UNKNOWN\n");
+}
+
+void TestWrongDecodeData(nlTestSuite * inSuite, void * inContext)
+{
+    PayloadDecoderInitParams params;
+
+    params.SetProtocolDecodeTree(fake_protocols_meta).SetClusterDecodeTree(fake_clusters_meta);
+
+    TestSampleData(inSuite, params, secure_channel_mrp_ack, "proto16: EMPTY\n");
+    TestSampleData(inSuite, params, im_protocol_report_data_acl,
+                   "proto5\n"
+                   "  ContextSpecific(0x1)\n"
+                   "    UnknownTag(0x100)\n"
+                   "      ContextSpecific(0x1)\n"
+                   "        ContextSpecific(0x0): 3420147058\n"
+                   "        ContextSpecific(0x1)\n"
+                   "          ContextSpecific(0x2): 0\n"
+                   "          ContextSpecific(0x3): 31\n"
+                   "          ContextSpecific(0x4): 0\n"
+                   "        ContextSpecific(0x2)\n"
+                   "          UnknownTag(0x100)\n"
+                   "            ContextSpecific(0x1): 5\n"
+                   "            ContextSpecific(0x2): 2\n"
+                   "            ContextSpecific(0x3)\n"
+                   "              UnknownTag(0x100): 112233\n"
+                   "            ContextSpecific(0x4): NULL\n"
+                   "            ContextSpecific(0xfe): 1\n"
+                   "  ContextSpecific(0x4): true\n"
+                   "  ContextSpecific(0xff): 1\n");
+}
+
+void TestNestingOverflow(nlTestSuite * inSuite, void * inContext)
+{
+    PayloadDecoderInitParams params;
+    params.SetProtocolDecodeTree(fake_protocols_meta).SetClusterDecodeTree(fake_clusters_meta);
+
+    uint8_t data_buffer[1024];
+    chip::TLV::TLVWriter writer;
+
+    writer.Init(data_buffer, sizeof(data_buffer));
+
+    chip::TLV::TLVType unusedType;
+
+    // Protocols start with an anonymous tagged structure, after which lists can be of any tags
+    NL_TEST_ASSERT(inSuite, writer.StartContainer(AnonymousTag(), kTLVType_Structure, unusedType) == CHIP_NO_ERROR);
+
+    // nesting overflow here
+    for (uint8_t i = 0; i < 32; i++)
+    {
+        NL_TEST_ASSERT(inSuite, writer.StartContainer(ContextTag(i), kTLVType_List, unusedType) == CHIP_NO_ERROR);
+    }
+    // Go back to 24 (still too much nesting)
+    for (uint8_t i = 0; i < 8; i++)
+    {
+        NL_TEST_ASSERT(inSuite, writer.EndContainer(kTLVType_List) == CHIP_NO_ERROR);
+    }
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        NL_TEST_ASSERT(inSuite, writer.StartContainer(ContextTag(i), kTLVType_List, unusedType) == CHIP_NO_ERROR);
+    }
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        NL_TEST_ASSERT(inSuite, writer.EndContainer(kTLVType_List) == CHIP_NO_ERROR);
+    }
+    // Go back to 8
+    for (uint8_t i = 0; i < 16; i++)
+    {
+        NL_TEST_ASSERT(inSuite, writer.EndContainer(kTLVType_List) == CHIP_NO_ERROR);
+    }
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        NL_TEST_ASSERT(inSuite, writer.StartContainer(ContextTag(i), kTLVType_List, unusedType) == CHIP_NO_ERROR);
+    }
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        NL_TEST_ASSERT(inSuite, writer.EndContainer(kTLVType_List) == CHIP_NO_ERROR);
+    }
+    // Go back to 4
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        NL_TEST_ASSERT(inSuite, writer.EndContainer(kTLVType_List) == CHIP_NO_ERROR);
+    }
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        NL_TEST_ASSERT(inSuite, writer.StartContainer(ContextTag(i), kTLVType_List, unusedType) == CHIP_NO_ERROR);
+    }
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        NL_TEST_ASSERT(inSuite, writer.EndContainer(kTLVType_List) == CHIP_NO_ERROR);
+    }
+    // close everything
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        NL_TEST_ASSERT(inSuite, writer.EndContainer(kTLVType_List) == CHIP_NO_ERROR);
+    }
+    NL_TEST_ASSERT(inSuite, writer.EndContainer(kTLVType_Structure) == CHIP_NO_ERROR);
+
+    SamplePayload fake_payload{ chip::Protocols::InteractionModel::Id, 5, chip::ByteSpan(data_buffer, writer.GetLengthWritten()) };
+
+    TestSampleData(inSuite, params, fake_payload,
+                   "proto5\n"
+                   "  ContextSpecific(0x0)\n"
+                   "    ContextSpecific(0x1)\n"
+                   "      ContextSpecific(0x2)\n"
+                   "        ContextSpecific(0x3)\n"
+                   "          ContextSpecific(0x4)\n"
+                   "            ContextSpecific(0x5)\n"
+                   "              ContextSpecific(0x6)\n"
+                   "                ContextSpecific(0x7)\n"
+                   "                  ContextSpecific(0x8)\n"
+                   "                    ContextSpecific(0x9)\n"
+                   "                      ContextSpecific(0xa)\n"
+                   "                        ContextSpecific(0xb)\n"
+                   "                          ContextSpecific(0xc)\n"
+                   "                            ContextSpecific(0xd)\n"
+                   "                              ContextSpecific(0xe)\n"
+                   "                                ContextSpecific(0xf): NESTING DEPTH REACHED\n"
+                   "                  ContextSpecific(0x0)\n"
+                   "                    ContextSpecific(0x1)\n"
+                   "                      ContextSpecific(0x2)\n"
+                   "                        ContextSpecific(0x3)\n"
+                   "          ContextSpecific(0x0)\n"
+                   "            ContextSpecific(0x1)\n"
+                   "              ContextSpecific(0x2)\n"
+                   "                ContextSpecific(0x3)\n");
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("TestFullDataDecoding", TestFullDataDecoding),                     //
     NL_TEST_DEF("TestMetaDataOnlyDecoding", TestMetaDataOnlyDecoding),             //
     NL_TEST_DEF("TestEmptyClusterMetaDataDecode", TestEmptyClusterMetaDataDecode), //
+    NL_TEST_DEF("TestMissingDecodeData", TestMissingDecodeData),                   //
+    NL_TEST_DEF("TestWrongDecodeData", TestWrongDecodeData),                       //
+    NL_TEST_DEF("TestNestingOverflow", TestNestingOverflow),                       //
     NL_TEST_SENTINEL()                                                             //
 };
 
