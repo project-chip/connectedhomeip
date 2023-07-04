@@ -714,14 +714,17 @@ MTR_NEWLY_AVAILABLE
 
 MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterSmokeAlarmEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull alarmSeverityLevel MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterCOAlarmEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull alarmSeverityLevel MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterLowBatteryEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull alarmSeverityLevel MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
@@ -746,10 +749,12 @@ MTR_NEWLY_AVAILABLE
 
 MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterInterconnectSmokeAlarmEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull alarmSeverityLevel MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterInterconnectCOAlarmEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull alarmSeverityLevel MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE

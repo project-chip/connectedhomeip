@@ -1635,6 +1635,12 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         __auto_type * value = [MTRSmokeCOAlarmClusterSmokeAlarmEvent new];
 
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.alarmSeverityLevel)];
+            value.alarmSeverityLevel = memberValue;
+        } while (0);
+
         return value;
     }
     case Events::COAlarm::Id: {
@@ -1646,6 +1652,12 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         __auto_type * value = [MTRSmokeCOAlarmClusterCOAlarmEvent new];
 
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.alarmSeverityLevel)];
+            value.alarmSeverityLevel = memberValue;
+        } while (0);
+
         return value;
     }
     case Events::LowBattery::Id: {
@@ -1656,6 +1668,12 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
         }
 
         __auto_type * value = [MTRSmokeCOAlarmClusterLowBatteryEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.alarmSeverityLevel)];
+            value.alarmSeverityLevel = memberValue;
+        } while (0);
 
         return value;
     }
@@ -1723,6 +1741,12 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         __auto_type * value = [MTRSmokeCOAlarmClusterInterconnectSmokeAlarmEvent new];
 
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.alarmSeverityLevel)];
+            value.alarmSeverityLevel = memberValue;
+        } while (0);
+
         return value;
     }
     case Events::InterconnectCOAlarm::Id: {
@@ -1733,6 +1757,12 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
         }
 
         __auto_type * value = [MTRSmokeCOAlarmClusterInterconnectCOAlarmEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.alarmSeverityLevel)];
+            value.alarmSeverityLevel = memberValue;
+        } while (0);
 
         return value;
     }

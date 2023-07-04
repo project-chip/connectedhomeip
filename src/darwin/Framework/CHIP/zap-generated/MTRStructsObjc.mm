@@ -2727,6 +2727,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _alarmSeverityLevel = @(0);
     }
     return self;
 }
@@ -2735,12 +2737,15 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRSmokeCOAlarmClusterSmokeAlarmEvent alloc] init];
 
+    other.alarmSeverityLevel = self.alarmSeverityLevel;
+
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: alarmSeverityLevel:%@; >", NSStringFromClass([self class]), _alarmSeverityLevel];
     return descriptionString;
 }
 
@@ -2750,6 +2755,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _alarmSeverityLevel = @(0);
     }
     return self;
 }
@@ -2758,12 +2765,15 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRSmokeCOAlarmClusterCOAlarmEvent alloc] init];
 
+    other.alarmSeverityLevel = self.alarmSeverityLevel;
+
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: alarmSeverityLevel:%@; >", NSStringFromClass([self class]), _alarmSeverityLevel];
     return descriptionString;
 }
 
@@ -2773,6 +2783,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _alarmSeverityLevel = @(0);
     }
     return self;
 }
@@ -2781,12 +2793,15 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRSmokeCOAlarmClusterLowBatteryEvent alloc] init];
 
+    other.alarmSeverityLevel = self.alarmSeverityLevel;
+
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: alarmSeverityLevel:%@; >", NSStringFromClass([self class]), _alarmSeverityLevel];
     return descriptionString;
 }
 
@@ -2911,6 +2926,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _alarmSeverityLevel = @(0);
     }
     return self;
 }
@@ -2919,12 +2936,15 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRSmokeCOAlarmClusterInterconnectSmokeAlarmEvent alloc] init];
 
+    other.alarmSeverityLevel = self.alarmSeverityLevel;
+
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: alarmSeverityLevel:%@; >", NSStringFromClass([self class]), _alarmSeverityLevel];
     return descriptionString;
 }
 
@@ -2934,6 +2954,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _alarmSeverityLevel = @(0);
     }
     return self;
 }
@@ -2942,12 +2964,15 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRSmokeCOAlarmClusterInterconnectCOAlarmEvent alloc] init];
 
+    other.alarmSeverityLevel = self.alarmSeverityLevel;
+
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: alarmSeverityLevel:%@; >", NSStringFromClass([self class]), _alarmSeverityLevel];
     return descriptionString;
 }
 
