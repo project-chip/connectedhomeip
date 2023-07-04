@@ -81,8 +81,7 @@ static const GenericOperationalPhase opPhaseList[] = {
  * Enquiry Table of Operational State Delegate
  * Note: User Define
  */
-static OperationalStateDelegate opStateDelegate(Clusters::OperationalState::kDemoEndpointId, Clusters::OperationalState::Id,
-                                                GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+static OperationalStateDelegate opStateDelegate(GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
                                                 GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)),
                                                 Span<const GenericOperationalState>(opStateList),
                                                 Span<const GenericOperationalPhase>(opPhaseList));

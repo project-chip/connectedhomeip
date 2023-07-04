@@ -292,13 +292,9 @@ public:
      */
     virtual void HandleStopStateCallback(GenericOperationalError & err) = 0;
 
-    Delegate(EndpointId aEndpointId, ClusterId aClusterId) : mEndpointId(aEndpointId), mClusterId(aClusterId) {}
+    Delegate() = default;
 
     virtual ~Delegate() = default;
-
-protected:
-    EndpointId mEndpointId;
-    ClusterId mClusterId;
 };
 
 // @brief Instance getter for the default global delegate for operational state alias cluster

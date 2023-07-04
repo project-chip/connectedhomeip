@@ -109,10 +109,9 @@ public:
      */
     void HandleStopStateCallback(GenericOperationalError & err) override;
 
-    OperationalStateDelegate(EndpointId aEndpointId, ClusterId aClusterId, GenericOperationalState aOperationalState,
+    OperationalStateDelegate(GenericOperationalState aOperationalState,
                              GenericOperationalError aOperationalError, Span<const GenericOperationalState> aOperationalStateList,
                              Span<const GenericOperationalPhase> aOperationalPhaseList) :
-        Delegate(aEndpointId, aClusterId),
         mOperationalState(aOperationalState), mOperationalError(aOperationalError), mOperationalStateList(aOperationalStateList),
         mOperationalPhaseList(aOperationalPhaseList)
     {}

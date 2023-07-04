@@ -29,10 +29,6 @@ void TestOperationalStateDelegatelGetAndSetOperationalState(nlTestSuite * inSuit
 {
     using namespace chip::app;
     using namespace chip::app::Clusters::OperationalState;
-    /*
-     * An example to present device's endpointId
-     */
-    EndpointId kEndpointId = 1;
     /**
      * Enquiry Table of Operational State List
      * Note: User Define
@@ -57,7 +53,7 @@ void TestOperationalStateDelegatelGetAndSetOperationalState(nlTestSuite * inSuit
 
     // create a delegate
     OperationalStateDelegate opStateDelegate(
-        kEndpointId, Clusters::OperationalState::Id, GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
         GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)), Span<const GenericOperationalState>(opStateList),
         Span<const GenericOperationalPhase>(opPhaseList));
 
@@ -96,10 +92,6 @@ void TestOperationalStateDelegatelGetOperationalStateList(nlTestSuite * inSuite,
 {
     using namespace chip::app;
     using namespace chip::app::Clusters::OperationalState;
-    /*
-     * An example to present device's endpointId
-     */
-    EndpointId kEndpointId = 1;
 
     enum class ManufactureOperationalStateEnum : uint8_t
     {
@@ -128,7 +120,7 @@ void TestOperationalStateDelegatelGetOperationalStateList(nlTestSuite * inSuite,
 
     // create a delegate
     OperationalStateDelegate opStateDelegate(
-        kEndpointId, Clusters::OperationalState::Id, GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
         GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)), Span<const GenericOperationalState>(opStateList),
         Span<const GenericOperationalPhase>(opPhaseList));
 
@@ -168,10 +160,6 @@ void TestOperationalStateDelegatelGetAndSetOperationalError(nlTestSuite * inSuit
 {
     using namespace chip::app;
     using namespace chip::app::Clusters::OperationalState;
-    /*
-     * An example to present device's endpointId
-     */
-    EndpointId kEndpointId = 1;
     /**
      * Enquiry Table of Operational State List
      * Note: User Define
@@ -192,7 +180,7 @@ void TestOperationalStateDelegatelGetAndSetOperationalError(nlTestSuite * inSuit
 
     // create a delegate
     OperationalStateDelegate opStateDelegate(
-        kEndpointId, Clusters::OperationalState::Id, GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
         GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)), Span<const GenericOperationalState>(opStateList),
         Span<const GenericOperationalPhase>(opPhaseList));
 
@@ -245,10 +233,6 @@ void TestOperationalStateDelegatelGetOperationalPhaseListNull(nlTestSuite * inSu
 {
     using namespace chip::app;
     using namespace chip::app::Clusters::OperationalState;
-    /*
-     * An example to present device's endpointId
-     */
-    EndpointId kEndpointId = 1;
 
     enum class ManufactureOperationalStateEnum : uint8_t
     {
@@ -277,7 +261,7 @@ void TestOperationalStateDelegatelGetOperationalPhaseListNull(nlTestSuite * inSu
 
     // create a delegate
     OperationalStateDelegate opStateDelegate(
-        kEndpointId, Clusters::OperationalState::Id, GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
         GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)), Span<const GenericOperationalState>(opStateList),
         Span<const GenericOperationalPhase>(opPhaseList));
 
@@ -297,10 +281,6 @@ void TestOperationalStateDelegatelGetOperationalPhaseList(nlTestSuite * inSuite,
 {
     using namespace chip::app;
     using namespace chip::app::Clusters::OperationalState;
-    /*
-     * An example to present device's endpointId
-     */
-    EndpointId kEndpointId = 1;
 
     enum class ManufactureOperationalStateEnum : uint8_t
     {
@@ -340,7 +320,7 @@ void TestOperationalStateDelegatelGetOperationalPhaseList(nlTestSuite * inSuite,
 
     // create a delegate
     OperationalStateDelegate opStateDelegate(
-        kEndpointId, Clusters::OperationalState::Id, GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
         GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)), Span<const GenericOperationalState>(opStateList),
         Span<const GenericOperationalPhase>(opPhaseList));
 
