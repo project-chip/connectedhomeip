@@ -58,7 +58,7 @@ The following buttons are available on **tlsr9518adk80d** board:
 | Name     | Function               | Description                                                                                            |
 | :------- | :--------------------- | :----------------------------------------------------------------------------------------------------- |
 | Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
-| Button 2 | SelfTest               | Start self testing                                                                                     |
+| Button 2 | Self test              | Start self testing                                                                                     |
 | Button 3 | NA                     | NA                                                                                                     |
 | Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                           |
 
