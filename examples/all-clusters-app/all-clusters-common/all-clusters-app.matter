@@ -6236,7 +6236,7 @@ endpoint 1 {
     emits event OperationalError;
     emits event OperationCompletion;
     callback attribute phaseList;
-    ram      attribute currentPhase;
+    callback attribute currentPhase;
     callback attribute operationalStateList;
     callback attribute operationalState;
     callback attribute operationalError;
