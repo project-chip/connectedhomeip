@@ -89,13 +89,14 @@ void TestSampleData(nlTestSuite * inSuite, const PayloadDecoderInitParams & para
         printf("%s\n", output_builder.c_str());
 
         unsigned idx = 0;
-        while(expectation[idx] == output_builder.c_str()[idx]) {
+        while (expectation[idx] == output_builder.c_str()[idx])
+        {
             idx++;
         }
         printf("!!!!!!!!!!!!!!!!!!! DIFF LOCATION !!!!!!!!!!!!!!!!!\n");
         printf("First diff at index %u\n", idx);
 
-        chip::StringBuilder<17> partial;
+        chip::StringBuilder<31> partial;
         printf("EXPECT: '%s'\n", partial.Reset().Add(expectation + idx).AddMarkerIfOverflow().c_str());
         printf("ACTUAL: '%s'\n", partial.Reset().Add(output_builder.c_str() + idx).AddMarkerIfOverflow().c_str());
     }
@@ -272,9 +273,146 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "  interaction_model_revison: 1\n");
 }
 
+void TestMetaDataOnlyDecoding(nlTestSuite * inSuite, void * inContext)
+{
+    PayloadDecoderInitParams params;
+
+    // NO CLUSTER DECODE TREE
+    params.SetProtocolDecodeTree(chip::TLVMeta::protocols_meta);
+
+    TestSampleData(inSuite, params, secure_channel_mrp_ack, "mrp_ack: EMPTY\n");
+    TestSampleData(inSuite, params, secure_channel_pkbdf_param_request,
+                   "pbkdf_param_request\n"
+                   "  initiator_random: hex:7C8698755B8E9866BB4FFDC27B733F3B6EF7F83D43FBE0CA6AD2B8C52C8F4236\n"
+                   "  initiator_session_id: 37677\n"
+                   "  passcode_id: 0\n"
+                   "  has_pbkdf_parameters: false\n");
+
+    TestSampleData(inSuite, params, im_protocol_read_request,
+                   "read_request\n"
+                   "  attribute_requests\n"
+                   "    []\n"
+                   "      cluster_id: 49\n"
+                   "      attribute_id: 65532\n"
+                   "    []\n"
+                   "      endpoint_id: 0\n"
+                   "      cluster_id: 48\n"
+                   "      attribute_id: 0\n"
+                   "    []\n"
+                   "      endpoint_id: 0\n"
+                   "      cluster_id: 48\n"
+                   "      attribute_id: 1\n"
+                   "    []\n"
+                   "      endpoint_id: 0\n"
+                   "      cluster_id: 48\n"
+                   "      attribute_id: 2\n"
+                   "    []\n"
+                   "      endpoint_id: 0\n"
+                   "      cluster_id: 48\n"
+                   "      attribute_id: 3\n"
+                   "    []\n"
+                   "      endpoint_id: 0\n"
+                   "      cluster_id: 40\n"
+                   "      attribute_id: 2\n"
+                   "    []\n"
+                   "      endpoint_id: 0\n"
+                   "      cluster_id: 40\n"
+                   "      attribute_id: 4\n"
+                   "    []\n"
+                   "      cluster_id: 49\n"
+                   "      attribute_id: 3\n"
+                   "  fabric_filtered: false\n"
+                   "  interaction_model_revison: 1\n");
+    TestSampleData(inSuite, params, im_protocol_report_data,
+                   "report_data\n"
+                   "  attribute_reports\n"
+                   "    []\n"
+                   "      attribute_data\n"
+                   "        data_version: 28559721\n"
+                   "        path\n"
+                   "          endpoint_id: 0\n"
+                   "          cluster_id: 49\n"
+                   "          attribute_id: 3\n"
+                   "        ATTRIBUTE: 49/3\n"
+                   "    []\n"
+                   "      attribute_data\n"
+                   "        data_version: 664978787\n"
+                   "        path\n"
+                   "          endpoint_id: 0\n"
+                   "          cluster_id: 40\n"
+                   "          attribute_id: 4\n"
+                   "        ATTRIBUTE: 40/4\n"
+                   "    []\n"
+                   "      attribute_data\n"
+                   "        data_version: 664978787\n"
+                   "        path\n"
+                   "          endpoint_id: 0\n"
+                   "          cluster_id: 40\n"
+                   "          attribute_id: 2\n"
+                   "        ATTRIBUTE: 40/2\n"
+                   "    []\n"
+                   "      attribute_data\n"
+                   "        data_version: 1414030794\n"
+                   "        path\n"
+                   "          endpoint_id: 0\n"
+                   "          cluster_id: 48\n"
+                   "          attribute_id: 3\n"
+                   "        ATTRIBUTE: 48/3\n"
+                   "    []\n"
+                   "      attribute_data\n"
+                   "        data_version: 1414030794\n"
+                   "        path\n"
+                   "          endpoint_id: 0\n"
+                   "          cluster_id: 48\n"
+                   "          attribute_id: 2\n"
+                   "        ATTRIBUTE: 48/2\n"
+                   "    []\n"
+                   "      attribute_data\n"
+                   "        data_version: 1414030794\n"
+                   "        path\n"
+                   "          endpoint_id: 0\n"
+                   "          cluster_id: 48\n"
+                   "          attribute_id: 1\n"
+                   "        ATTRIBUTE: 48/1\n"
+                   "    []\n"
+                   "      attribute_data\n"
+                   "        data_version: 1414030794\n"
+                   "        path\n"
+                   "          endpoint_id: 0\n"
+                   "          cluster_id: 48\n"
+                   "          attribute_id: 0\n"
+                   "        ATTRIBUTE: 48/0\n"
+                   "    []\n"
+                   "      attribute_data\n"
+                   "        data_version: 28559721\n"
+                   "        path\n"
+                   "          endpoint_id: 0\n"
+                   "          cluster_id: 49\n"
+                   "          attribute_id: 65532\n"
+                   "        ATTRIBUTE: 49/65532\n"
+                   "  suppress_response: true\n"
+                   "  interaction_model_revison: 1\n");
+
+    // Different content
+    TestSampleData(inSuite, params, im_protocol_report_data_acl,
+                   "report_data\n"
+                   "  attribute_reports\n"
+                   "    []\n"
+                   "      attribute_data\n"
+                   "        data_version: 3420147058\n"
+                   "        path\n"
+                   "          endpoint_id: 0\n"
+                   "          cluster_id: 31\n"
+                   "          attribute_id: 0\n"
+                   "        ATTRIBUTE: 31/0\n"
+                   "  suppress_response: true\n"
+                   "  interaction_model_revison: 1\n");
+}
+
 const nlTest sTests[] = {
-    NL_TEST_DEF("TestFullDataDecoding", TestFullDataDecoding), //
-    NL_TEST_SENTINEL()                                         //
+    NL_TEST_DEF("TestFullDataDecoding", TestFullDataDecoding),         //
+    NL_TEST_DEF("TestMetaDataOnlyDecoding", TestMetaDataOnlyDecoding), //
+    NL_TEST_SENTINEL()                                                 //
 };
 
 } // namespace
