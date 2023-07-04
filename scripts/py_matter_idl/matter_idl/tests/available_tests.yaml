@@ -71,8 +71,11 @@ cpp-app:
 
 cpp-tlvmeta:
     inputs/cluster_with_commands.matter:
-        tlv/meta/clusters_meta.cpp: outputs/cpp-tlvmeta/clusters_meta.cpp
-        tlv/meta/clusters_meta.h: outputs/cpp-tlvmeta/clusters_meta.h
+        tlv/meta/clusters_meta.cpp: outputs/cluster_with_commands/cpp-tlvmeta/clusters_meta.cpp
+        tlv/meta/clusters_meta.h: outputs/cluster_with_commands/cpp-tlvmeta/clusters_meta.h
+    inputs/cluster_struct_attribute.matter:
+        tlv/meta/clusters_meta.cpp: outputs/cluster_struct_attribute/cpp-tlvmeta/clusters_meta.cpp
+        tlv/meta/clusters_meta.h: outputs/cluster_struct_attribute/cpp-tlvmeta/clusters_meta.h
 
 custom-example-proto:
     inputs/several_clusters.matter:
