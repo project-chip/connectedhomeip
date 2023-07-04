@@ -293,6 +293,8 @@ jobs:
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             TSAN_OPTIONS: "halt_on_error=1"
             LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
+            # Workaround for malloc: nano zone abandoned due to inability to preallocate reserved vm space
+            MallocNanoZone: 0
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
