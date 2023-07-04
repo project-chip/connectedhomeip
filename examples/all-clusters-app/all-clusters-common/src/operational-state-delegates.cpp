@@ -41,13 +41,9 @@ struct DelegatesEnquiryTable
      */
     ClusterId mClusterId;
     /**
-     * point of Array(Items)
+     * point of Item
      */
-    Delegate * pItems;
-    /**
-     * ArraySize of Array(Items)
-     */
-    size_t numOfItems;
+    Delegate * pItem;
 };
 
 /*
@@ -107,7 +103,7 @@ Delegate * getGenericDelegateTable(EndpointId aEndpointId, ClusterId aClusterId)
     {
         if (kDelegatesEnquiryTable[i].mEndpointId == aEndpointId && kDelegatesEnquiryTable[i].mClusterId == aClusterId)
         {
-            return kDelegatesEnquiryTable[i].pItems;
+            return kDelegatesEnquiryTable[i].pItem;
         }
     }
     return nullptr;
