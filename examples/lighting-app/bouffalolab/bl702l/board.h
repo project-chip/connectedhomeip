@@ -75,10 +75,6 @@
 
 #endif
 
-#if defined(BOARD_BTN_BOOT_PIN)
-#define LED_BTN_RESET 16
-#endif
-
 #define SPI_WIFI_MISO_PIN 4
 #define SPI_WIFI_MOSI_PIN 5
 #define SPI_WIFI_CLK_PIN 3

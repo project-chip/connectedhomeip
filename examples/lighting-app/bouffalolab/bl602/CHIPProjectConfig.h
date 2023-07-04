@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -106,13 +105,6 @@
  * This value is generally *not* incremented for device software revisions.
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION 1
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
- *
- * Enable support for Chip-over-BLE (CHIPoBLE).
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 
 /**
  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER

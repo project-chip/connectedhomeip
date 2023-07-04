@@ -20,12 +20,8 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include "BLEManagerImpl.h"
-
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/CHIPMemString.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
@@ -41,6 +37,8 @@ extern "C" {
 
 #include <bluetooth/addr.h>
 #include <hci_driver.h>
+
+#include "BLEManagerImpl.h"
 
 using namespace ::chip;
 using namespace ::chip::Ble;

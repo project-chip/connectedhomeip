@@ -24,6 +24,10 @@
 #include "FreeRTOS.h"
 #include <lwip/tcpip.h>
 
+extern "C" {
+#include <bl_sys.h>
+}
+
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
 namespace chip {
@@ -31,63 +35,29 @@ namespace DeviceLayer {
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
-    // BL_RST_REASON_E bootCause = bl_sys_rstinfo_get();
+    BL_RST_REASON_E bootCause = bl_sys_rstinfo_get();
 
-    // if (BL_RST_POR == bootCause)
-    // {
-    //     bootReason = BootReasonType::kPowerOnReboot;
-    // }
-    // else if (BL_RST_BOR == bootCause)
-    // {
-    //     bootReason = BootReasonType::kBrownOutReset;
-    // }
-    // else if (BL_RST_WDT == bootCause)
-    // {
-    //     bootReason = BootReasonType::kHardwareWatchdogReset;
-    // }
-    // else if (BL_RST_SOFTWARE == bootCause)
-    // {
-    //     bootReason = BootReasonType::kSoftwareReset;
-    // }
-    // else
-    // {
-    //     bootReason = BootReasonType::kUnspecified;
-    // }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
-{
-    NetworkInterface * ifp = new NetworkInterface();
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-    const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
-    ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
-    ifp->isOperational             = true;
-    ifp->offPremiseServicesReachableIPv4.SetNull();
-    ifp->offPremiseServicesReachableIPv6.SetNull();
-    ifp->type = InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
-    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
-    ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
-    ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
-
-#else
-    /* TODO */
-#endif
-
-    *netifpp = ifp;
-    return CHIP_NO_ERROR;
-}
-
-void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * netifp)
-{
-    while (netifp)
+    if (BL_RST_POR == bootCause)
     {
-        NetworkInterface * del = netifp;
-        netifp                 = netifp->Next;
-        delete del;
+        bootReason = BootReasonType::kPowerOnReboot;
     }
+    else if (BL_RST_BOR == bootCause)
+    {
+        bootReason = BootReasonType::kBrownOutReset;
+    }
+    else if (BL_RST_WDT == bootCause)
+    {
+        bootReason = BootReasonType::kHardwareWatchdogReset;
+    }
+    else if (BL_RST_SOFTWARE == bootCause)
+    {
+        bootReason = BootReasonType::kSoftwareReset;
+    }
+    else
+    {
+        bootReason = BootReasonType::kUnspecified;
+    }
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer

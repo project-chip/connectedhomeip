@@ -1,10 +1,10 @@
-#include "bl_route_table.h"
 #include <stdbool.h>
 #include <string.h>
 
 #include "lwip/ip6_addr.h"
 #include "lwip/netif.h"
 #include "lwip/timeouts.h"
+#include "bl_route_table.h"
 
 #define MAX_RIO_ROUTE 20
 #define MAX_RIO_TIMEOUT UINT32_MAX / (1000 * 4) // lwIP defined reasonable timeout value

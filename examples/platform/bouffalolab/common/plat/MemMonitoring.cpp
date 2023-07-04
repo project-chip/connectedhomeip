@@ -18,8 +18,6 @@
 
 #include <FreeRTOS.h>
 #include <MemMonitoring.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <plat.h>
 #include <platform/CHIPDeviceLayer.h>
 
