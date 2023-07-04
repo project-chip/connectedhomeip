@@ -126,19 +126,18 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "    iterations: 1000\n"
                    "    salt: hex:E8FC1E6FD0023422B3CA7ECEDD344444551C814D3D0B0EB9C096F00E8A8051B2\n");
     TestSampleData(inSuite, params, secure_channel_pase_pake1,
+                   // clang-format off
                    "pase_pake1\n"
-                   "  pA: "
-                   "hex:"
-                   "0422ABC7A84352850456BD4A510905FE6BB782A0863A9382550E1228020801B22EEC4102C60F80082842B9739705FCD37F134651442A41E"
-                   "3723DFFE0278\n");
+                   "  pA: hex:0422ABC7A84352850456BD4A510905FE6BB782A0863A9382550E1228020801B22EEC4102C60F80082842B9739705FCD37F134651442A41E3723DFFE0278\n"
+                   // clang-format on
+    );
     TestSampleData(inSuite, params, secure_channel_pase_pake2,
+                   // clang-format off
                    "pase_pake2\n"
-                   "  pB: "
-                   "hex:"
-                   "04B6A44A3347C6B77900A3674CA19F40F25F056F8CB344EC1B4FA7888B9E6B570B7010431C5D0BE4021FE74A96C40721765FDA6802BE8DF"
-
-                   "DF5624332275\n"
-                   "  cB: hex:40E7452275E38AEBAF0E0F6FAB33A1B0CB5AEB5E824230DD40D0071DC7E55C87\n");
+                   "  pB: hex:04B6A44A3347C6B77900A3674CA19F40F25F056F8CB344EC1B4FA7888B9E6B570B7010431C5D0BE4021FE74A96C40721765FDA6802BE8DFDF5624332275\n"
+                   "  cB: hex:40E7452275E38AEBAF0E0F6FAB33A1B0CB5AEB5E824230DD40D0071DC7E55C87\n"
+                   // clang-format on
+    );
     TestSampleData(inSuite, params, secure_channel_pase_pake3,
                    "pase_pake3\n"
                    "  cA: hex:6008C72EDEC9D25D4A36522F0BF23058F9378EFE38CBBCCE8C6853900169BC38\n");
