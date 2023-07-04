@@ -85,7 +85,7 @@ void FormatCurrentTag(const TLVReader & reader, chip::StringBuilderBase & out)
     }
     else
     {
-        out.AddFormat("tag[unknown]: 0x%" PRIx64, tag.RawValue());
+        out.AddFormat("UnknownTag(0x%" PRIx64 ")", tag.RawValue());
     }
 }
 
@@ -302,6 +302,11 @@ bool PayloadDecoderBase::ReaderEnterContainer(PayloadEntry & entry)
 
 void PayloadDecoderBase::EnterContainer(PayloadEntry & entry)
 {
+    // must be done BEFORE entering container
+    // to preserve the value and not get a 'container tag'
+    // below when data is not valid
+    FormatCurrentTag(mReader, mNameBuilder.Reset());
+
     VerifyOrReturn(ReaderEnterContainer(entry));
 
     const chip::TLVMeta::ItemInfo * data = nullptr;
@@ -318,7 +323,6 @@ void PayloadDecoderBase::EnterContainer(PayloadEntry & entry)
 
     if (data == nullptr)
     {
-        FormatCurrentTag(mReader, mNameBuilder.Reset());
         entry = PayloadEntry::NestingEnter(mNameBuilder.c_str());
     }
     else
@@ -403,16 +407,25 @@ void PayloadDecoderBase::MoveToContent(PayloadEntry & entry)
         mNameBuilder.AddFormat("0x%" PRIx32 "::", entry.GetClusterId());
     }
 
+    uint32_t id = 0;
+    const char *id_type = "UNKNOWN";
+
     switch (entry.GetType())
     {
     case PayloadEntry::IMPayloadType::kAttribute:
         mIMContentPosition.Enter(ByTag(AttributeTag(entry.GetAttributeId())));
+        id = entry.GetAttributeId();
+        id_type = "ATTR";
         break;
     case PayloadEntry::IMPayloadType::kCommand:
         mIMContentPosition.Enter(ByTag(CommandTag(entry.GetCommandId())));
+        id = entry.GetCommandId();
+        id_type = "CMD";
         break;
     case PayloadEntry::IMPayloadType::kEvent:
         mIMContentPosition.Enter(ByTag(EventTag(entry.GetEventId())));
+        id = entry.GetEventId();
+        id_type = "EV";
         break;
     default:
         // never happens: verified all case above covered.
@@ -426,7 +439,7 @@ void PayloadDecoderBase::MoveToContent(PayloadEntry & entry)
     }
     else
     {
-        mNameBuilder.AddFormat("0x%" PRIx32 "::", entry.GetClusterId());
+        mNameBuilder.AddFormat("%s(0x%" PRIx32 ")", id_type, id);
     }
 
     if (TLVTypeIsContainer(mReader.GetType()))

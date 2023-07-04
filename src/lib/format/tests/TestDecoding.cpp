@@ -432,14 +432,14 @@ void TestEmptyClusterMetaDataDecode(nlTestSuite * inSuite, void * inContext)
                    "          endpoint_id: 0\n"
                    "          cluster_id: 31\n"
                    "          attribute_id: 0\n"
-                   "        0x1f::0x1f::\n"                      // TODO: 31/0
-                   "          tag[unknown]: 0x100\n"             // List entry (acl is a list)
-                   "            ContextSpecific(0x1): 5\n"       // privilege
-                   "            ContextSpecific(0x2): 2\n"       // authMode
-                   "            tag[unknown]: 0x100\n"           // subjects: TODO: idx seems off ???
-                   "              tag[unknown]: 0x100: 112233\n" // List entry (subjects is a list)
-                   "            ContextSpecific(0x4): NULL\n"    // targets
-                   "            ContextSpecific(0xfe): 1\n"      // fabricIndex
+                   "        0x1f::ATTR(0x0)\n"               // Cluster 31, attribute 0
+                   "          UnknownTag(0x100)\n"             // List entry (acl is a list)
+                   "            ContextSpecific(0x1): 5\n"     // privilege
+                   "            ContextSpecific(0x2): 2\n"     // authMode
+                   "            ContextSpecific(0x3)\n"        // subjects
+                   "              UnknownTag(0x100): 112233\n" // List entry (subjects is a list)
+                   "            ContextSpecific(0x4): NULL\n"  // targets
+                   "            ContextSpecific(0xfe): 1\n"    // fabricIndex
                    "  suppress_response: true\n"
                    "  interaction_model_revison: 1\n");
 }
