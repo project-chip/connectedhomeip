@@ -64,7 +64,6 @@ public:
      * called by the interaction model at the appropriate times.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aClusterId The ID of the ModeSelect aliased cluster to be instantiated.
-     * @param aDelegate A pointer to a delegate that will handle application layer logic.
      */
     OperationalStateServer(EndpointId aEndpointId, ClusterId aClusterId) :
         CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
