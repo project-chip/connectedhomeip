@@ -261,9 +261,7 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     }
 #endif
 
-#ifdef CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
     mrpBackoffTime += CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
-#endif
 
     return mrpBackoffTime;
 }
