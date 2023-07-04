@@ -15,14 +15,14 @@
  */
 #pragma once
 
-#include <app/ConcreteAttributePath.h>
-#include <app/util/attribute-metadata.h>
-#include <lib/support/Span.h>
-#include <app/data-model/Nullable.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/data-model/Nullable.h>
+#include <app/util/attribute-metadata.h>
+#include <cstring>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
-#include <cstring>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace app {
@@ -71,8 +71,8 @@ public:
      *                 representation description in the WriteValue
      *                 documentation.
      */
-    virtual CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType,
-                                 uint16_t aSize, MutableByteSpan & aValue) = 0;
+    virtual CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, uint16_t aSize,
+                                 MutableByteSpan & aValue) = 0;
 
     // The following API provides helper functions to simplify the access of commonly used types.
     // The API may not be complete.
@@ -85,7 +85,7 @@ public:
      * @param [in] aPath the attribute path for the data being written.
      * @param [in] aValue the data to write.
      */
-    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true >
+    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
     CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, T & aValue)
     {
         uint8_t value[sizeof(T)];
@@ -101,7 +101,7 @@ public:
      * @param [in]     aPath the attribute path for the data being persisted.
      * @param [in,out] aValue where to place the data.
      */
-    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true >
+    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
     CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, T & aValue)
     {
         uint8_t attrData[sizeof(T)];
@@ -126,13 +126,13 @@ public:
      * @param [in] aPath the attribute path for the data being written.
      * @param [in] aValue the data to write.
      */
-    template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true >
+    template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true>
     CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
         if (aValue.IsNull())
         {
             T nullValue = 0;
-            nullValue = ~nullValue;
+            nullValue   = ~nullValue;
             return WriteValue(aPath, nullValue);
         }
         return WriteValue(aPath, aValue.Value());
@@ -144,12 +144,12 @@ public:
      * @param [in]     aPath the attribute path for the data being persisted.
      * @param [in,out] aValue where to place the data.
      */
-    template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true >
+    template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true>
     CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
         T tempIntegral;
         T nullValue = 0;
-        nullValue = ~nullValue;
+        nullValue   = ~nullValue;
 
         CHIP_ERROR err = ReadValue(aPath, tempIntegral);
         if (err != CHIP_NO_ERROR)
@@ -166,7 +166,6 @@ public:
         aValue.SetNonNull(tempIntegral);
         return CHIP_NO_ERROR;
     }
-
 };
 
 /**
