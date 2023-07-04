@@ -4283,8 +4283,8 @@ server cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4338,8 +4338,8 @@ server cluster CarbonDioxideConcentrationMeasurement = 1037 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4393,8 +4393,8 @@ server cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4448,8 +4448,8 @@ server cluster OzoneConcentrationMeasurement = 1045 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4503,8 +4503,8 @@ server cluster Pm25ConcentrationMeasurement = 1066 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4558,8 +4558,8 @@ server cluster FormaldehydeConcentrationMeasurement = 1067 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4613,8 +4613,8 @@ server cluster Pm1ConcentrationMeasurement = 1068 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4668,8 +4668,8 @@ server cluster Pm10ConcentrationMeasurement = 1069 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4723,8 +4723,8 @@ server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4778,8 +4778,8 @@ server cluster RadonConcentrationMeasurement = 1071 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -7127,6 +7127,15 @@ endpoint 2 {
 }
 endpoint 65534 {
   device type anonymousEndpointType = 61442, version 1;
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    ram      attribute featureMap default = 0;
+    callback attribute clusterRevision default = 1;
+  }
 
   server cluster NetworkCommissioning {
     callback attribute maxNetworks;
