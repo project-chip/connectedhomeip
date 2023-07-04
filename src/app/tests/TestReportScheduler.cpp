@@ -96,20 +96,20 @@ public:
         ReadHandlerNode * node = static_cast<ReadHandlerNode *>(aAppState);
         node->RunCallback();
     }
-    virtual CHIP_ERROR StartTimer(ReadHandlerNode * node, System::Clock::Timeout aTimeout) override
+    virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) override
     {
         return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-            aTimeout, TimerCallbackInterface, node);
+            aTimeout, TimerCallbackInterface, context);
     }
-    virtual void CancelTimer(ReadHandlerNode * node) override
+    virtual void CancelTimer(void * context) override
     {
         InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-            TimerCallbackInterface, node);
+            TimerCallbackInterface, context);
     }
-    virtual bool IsTimerActive(ReadHandlerNode * node) override
+    virtual bool IsTimerActive(void * context) override
     {
         return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->IsTimerActive(
-            TimerCallbackInterface, node);
+            TimerCallbackInterface, context);
     }
 };
 

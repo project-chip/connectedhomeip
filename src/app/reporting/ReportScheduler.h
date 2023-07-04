@@ -82,9 +82,9 @@ public:
     {
     public:
         virtual ~TimerDelegate() {}
-        virtual CHIP_ERROR StartTimer(ReadHandlerNode * node, System::Clock::Timeout aTimeout) = 0;
-        virtual void CancelTimer(ReadHandlerNode * node)                                       = 0;
-        virtual bool IsTimerActive(ReadHandlerNode * node)                                     = 0;
+        virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) = 0;
+        virtual void CancelTimer(void * context)                                       = 0;
+        virtual bool IsTimerActive(void * context)                                     = 0;
     };
 
     ReportScheduler(TimerDelegate * aTimerDelegate) : mTimerDelegate(aTimerDelegate) {}
