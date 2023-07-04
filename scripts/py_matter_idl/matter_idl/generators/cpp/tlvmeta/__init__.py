@@ -77,6 +77,8 @@ class ClusterTablesGenerator:
             if type_reference:
                 self.list_types.add(type_reference)
                 type_reference = type_reference + "_list_"
+            else:
+                type_reference = "primitive_type_list_"
 
         return TableEntry(
             code=f'{tag_type}({field.code})',
@@ -198,9 +200,13 @@ def IndexInTable(name: Optional[str], table: List[Table]) -> str:
     if not name:
         return "kInvalidNodeIndex"
 
+    if name == "primitive_type_list_":
+        return "1"
+
     for idx, t in enumerate(table):
         if t.full_name == name:
-            return idx + 1
+            # Index skipping hard-coded items
+            return idx + 2
 
     raise Exception("Name %r not found in table" % name)
 
