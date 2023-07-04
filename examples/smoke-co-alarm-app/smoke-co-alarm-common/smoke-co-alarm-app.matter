@@ -1634,8 +1634,8 @@ server cluster SmokeCoAlarm = 92 {
   }
 
   enum EndOfServiceEnum : ENUM8 {
-    kExpired = 0;
-    kNormal = 1;
+    kNormal = 0;
+    kExpired = 1;
   }
 
   enum ExpressedStateEnum : ENUM8 {
