@@ -24,13 +24,10 @@ concurrency:
     cancel-in-progress: true
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    # XXX: Workaround for https://github.com/actions/cache/issues/1141
-    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
-
+    
 jobs:
     cc26x2x7:
         name: cc26x2x7
-        timeout-minutes: 120
 
         env:
             BUILD_TYPE: gn_cc26x2x7
@@ -46,44 +43,19 @@ jobs:
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform cc13xx_26xx
+                platform: cc13xx_26xx
             - name: Set up environment for size reports
+              uses: ./.github/actions/setup-size-reports
               if: ${{ !env.ACT }}
-              env:
-                  GH_CONTEXT: ${{ toJson(github) }}
-              run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
-
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              timeout-minutes: 25
-              run: bash scripts/bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v3
-              if: ${{ always() && !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
-
+                gh-context: ${{ toJson(github) }}
+        
             - name: Build examples
-              timeout-minutes: 100
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
@@ -102,72 +74,60 @@ jobs:
                       --copy-artifacts-to out/artifacts \
                   "
             - name: Get lock MTD size stats
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x2_26x2 LP_CC2652R7 lock-mtd \
                     out/artifacts/ti-cc13x2x7_26x2x7-lock-mtd/chip-LP_CC2652R7-lock-example.out \
                     /tmp/bloat_reports/
             - name: Get Pump App size stats
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x2_26x2 LP_CC2652R7 pump-app \
                     out/artifacts/ti-cc13x2x7_26x2x7-pump-mtd/chip-LP_CC2652R7-pump-example.out \
                     /tmp/bloat_reports/
             - name: Get Pump Controller App size stats
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x2_26x2 LP_CC2652R7 pump-controller-app \
                     out/artifacts/ti-cc13x2x7_26x2x7-pump-controller-mtd/chip-LP_CC2652R7-pump-controller-example.out \
                     /tmp/bloat_reports/
             - name: Get lock FTD size stats
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x4_26x4 LP_EM_CC1354P10_6 lock-ftd \
                     out/artifacts/ti-cc13x4_26x4-lock-ftd/chip-LP_EM_CC1354P10_6-lock-example.out \
                     /tmp/bloat_reports/
             - name: Get lock MTD size stats
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x4_26x4 LP_EM_CC1354P10_6 lock-mtd \
                     out/artifacts/ti-cc13x4_26x4-lock-mtd/chip-LP_EM_CC1354P10_6-lock-example.out \
                     /tmp/bloat_reports/
             - name: Get Pump App size stats
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x4_26x4 LP_EM_CC1354P10_6 pump-app \
                     out/artifacts/ti-cc13x4_26x4-pump-mtd/chip-LP_EM_CC1354P10_6-pump-example.out \
                     /tmp/bloat_reports/
             - name: Get Pump Controller App size stats
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x4_26x4 LP_EM_CC1354P10_6 pump-controller-app \
                     out/artifacts/ti-cc13x4_26x4-pump-controller-mtd/chip-LP_EM_CC1354P10_6-pump-controller-example.out \
                     /tmp/bloat_reports/
             - name: Get Lighting App size stats
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x4_26x4 LP_EM_CC1354P10_6 lighting-app \
                     out/artifacts/ti-cc13x4_26x4-lighting/chip-LP_EM_CC1354P10_6-lighting-example.out \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
-              uses: actions/upload-artifact@v2
+              uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
               with:
-                  name: Size,cc13x2x7_26x2x7-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
-                  path: |
-                      /tmp/bloat_reports/
+                platform-name: cc13x2x7_26x2x7
             - name: Uploading Size Reports
-              uses: actions/upload-artifact@v2
+              uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
               with:
-                  name: Size,cc13x4_26x4-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
-                  path: |
-                      /tmp/bloat_reports/
+                platform-name: cc13x4_26x4

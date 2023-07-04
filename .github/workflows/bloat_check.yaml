@@ -36,15 +36,8 @@ jobs:
             image: connectedhomeip/chip-build:0.7.3
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-
+            - name: Checkout
+              uses: actions/checkout@v3
             - name: Report
               run: |
                   scripts/tools/memory/gh_report.py \

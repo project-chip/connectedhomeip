@@ -80,6 +80,7 @@ exclude:
     - "zzz_generated/**/*" # already clang-formatted by our zap tooling
     - "src/controller/java/generated/java/**/*" # not formatted: generated files
     - "src/controller/java/zap-generated/**/*" # not formatted: generated files
+    - "scripts/setup/bootstrap.sh" # tries to quote loop variable
 
 
 changed_paths:
@@ -190,6 +191,9 @@ restylers:
     - name: prettier-yaml
       image: restyled/restyler-prettier:v1.19.1-2
       enabled: true
+      command:
+          - prettier
+          - "--write"
       include:
           - "**/*.yml"
           - "**/*.yaml"

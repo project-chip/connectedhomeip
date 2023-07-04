@@ -116,8 +116,8 @@ tests:
                 value: 1
               - name: "StepSize"
                 value:
-                    ( ColorTempPhysicalMinMiredsValue +
-                    ColorTempPhysicalMaxMiredsValue ) / 2
+                    ( ColorTempPhysicalMaxMiredsValue -
+                    ColorTempPhysicalMinMiredsValue ) / 2
               - name: "ColorTemperatureMinimumMireds"
                 value: ColorTempPhysicalMinMiredsValue
               - name: "ColorTemperatureMaximumMireds"

@@ -1,0 +1,188 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 263.1.1. [TC-FAN-1.1] Global attributes with DUT as Server
+
+PICS:
+    - FAN.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Fan Control"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    #Issue : https://github.com/project-chip/connectedhomeip/issues/27320
+    - label: "Read the global attribute: ClusterRevision"
+      verification: |
+          ./chip-tool fancontrol read cluster-revision 1 1
+
+          On TH(chip-tool), Verify the ClusterRevision attribute value as 3:
+
+          [1685097285.665923][29977:29979] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0202 Attribute 0x0000_FFFD DataVersion: 2714837972
+          [1685097285.666069][29977:29979] CHIP:TOO:   ClusterRevision: 2
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Read the global attribute: FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS:
+          " !FAN.S.F00 && !FAN.S.F01 && !FAN.S.F02 && !FAN.S.F03 && !FAN.S.F04
+          && !FAN.S.F05 "
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label:
+          "Given FAN.S.F00(Condition) ensure featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: FAN.S.F00
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label:
+          "Given FAN.S.F01(Warning) ensure featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: FAN.S.F01
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label:
+          "Given FAN.S.F02(Condition) ensure featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: FAN.S.F02
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
+
+    - label:
+          "Given FAN.S.F03(Warning) ensure featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: FAN.S.F03
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x8]
+
+    - label:
+          "Given FAN.S.F04(Warning) ensure featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: FAN.S.F04
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x10]
+
+    - label:
+          "Given FAN.S.F05(Warning) ensure featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: FAN.S.F05
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x20]
+
+    - label: "Read the global attribute: AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 3, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label:
+          "Read the feature dependent FAN.S.F00 (SPD) attribute in AttributeList"
+      PICS: FAN.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [4, 5, 6]
+
+    - label:
+          "Read the feature dependent FAN.S.F02(RCK) attribute in AttributeList"
+      PICS: FAN.S.F02
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [7, 8]
+
+    - label:
+          "Read the feature dependent FAN.S.F03(WND) attribute in AttributeList"
+      PICS: FAN.S.F03
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [9, 10]
+
+    - label:
+          "Read the feature dependent FAN.S.F05(DIR) attribute in AttributeList"
+      PICS: FAN.S.F05
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [11]
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      PICS: " !FAN.S.C00.Rsp "
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Read the optional command (ResetCondition) in AcceptedCommandList"
+      PICS: FAN.S.C00.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]

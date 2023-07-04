@@ -17,17 +17,67 @@
  */
 #pragma once
 
-#ifndef MATTER_TRACING_ENABLED
+#include <matter/tracing/build_config.h>
 
-#define _MATTER_TRACE_DISABLE                                                                                                      \
+#if MATTER_TRACING_ENABLED
+
+// Expected macros provided by implementations:
+//    MATTER_TRACE_BEGIN(label, group)
+//    MATTER_TRACE_END(label, group)
+//    MATTER_TRACE_INSTANT(label, group)
+//    MATTER_TRACE_SCOPE(label, group)
+#include <matter/tracing/macros_impl.h>
+#include <tracing/log_declares.h>
+#include <tracing/registry.h>
+
+////////////////////// DATA LOGGING
+
+#define MATTER_LOG_MESSAGE_SEND(...)                                                                                               \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        ::chip::Tracing::MessageSendInfo _trace_data{ __VA_ARGS__ };                                                               \
+        ::chip::Tracing::Internal::LogMessageSend(_trace_data);                                                                    \
+    } while (false)
+
+#define MATTER_LOG_MESSAGE_RECEIVED(...)                                                                                           \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        ::chip::Tracing::MessageReceivedInfo _trace_data{ __VA_ARGS__ };                                                           \
+        ::chip::Tracing::Internal::LogMessageReceived(_trace_data);                                                                \
+    } while (false)
+
+#define MATTER_LOG_NODE_LOOKUP(...)                                                                                                \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        ::chip::Tracing::NodeLookupInfo _trace_data{ __VA_ARGS__ };                                                                \
+        ::chip::Tracing::Internal::LogNodeLookup(_trace_data);                                                                     \
+    } while (false)
+
+#define MATTER_LOG_NODE_DISCOVERED(...)                                                                                            \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        ::chip::Tracing::NodeDiscoveredInfo _trace_data{ __VA_ARGS__ };                                                            \
+        ::chip::Tracing::Internal::LogNodeDiscovered(_trace_data);                                                                 \
+    } while (false)
+
+#define MATTER_LOG_NODE_DISCOVERY_FAILED(...)                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        ::chip::Tracing::NodeDiscoveryFailedInfo _trace_data{ __VA_ARGS__ };                                                       \
+        ::chip::Tracing::Internal::LogNodeDiscoveryFailed(_trace_data);                                                            \
+    } while (false)
+
+#else // MATTER_TRACING_ENABLED
+
+#define _MATTER_TRACE_DISABLE(...)                                                                                                 \
     do                                                                                                                             \
     {                                                                                                                              \
     } while (false)
 
 #define MATTER_TRACE_BEGIN(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_TRACE_END(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-
 #define MATTER_TRACE_INSTANT(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+#define MATTER_TRACE_SCOPE(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 
 #define MATTER_LOG_MESSAGE_SEND(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_MESSAGE_RECEIVED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
@@ -36,49 +86,4 @@
 #define MATTER_LOG_NODE_DISCOVERED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_NODE_DISCOVERY_FAILED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 
-#else // MATTER_TRACING_ENABLED
-
-#include <tracing/log_declares.h>
-#include <tracing/registry.h>
-#include <tracing/scopes.h>
-
-#define MATTER_TRACE_BEGIN(scope) ::chip::Tracing::Internal::Begin(scope)
-#define MATTER_TRACE_END(scope) ::chip::Tracing::Internal::End(scope)
-#define MATTER_TRACE_INSTANT(scope) ::chip::Tracing::Internal::Instant(scope)
-
-#define MATTER_LOG_MESSAGE_SEND(...)                                                                                               \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        ::chip::Tracing::MessageSendInfo _trace_data(__VA_ARGS__);                                                                 \
-        ::chip::Tracing::Internal::LogMessageSend(_trace_data);                                                                    \
-    } while (false)
-
-#define MATTER_LOG_MESSAGE_RECEIVED(...)                                                                                           \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        ::chip::Tracing::MessageReceivedInfo _trace_data(__VA_ARGS__);                                                             \
-        ::chip::Tracing::Internal::LogMessageReceived(_trace_data);                                                                \
-    } while (false)
-
-#define MATTER_LOG_NODE_LOOKUP(...)                                                                                                \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        ::chip::Tracing::NodeLookupInfo _trace_data(__VA_ARGS__);                                                                  \
-        ::chip::Tracing::Internal::LogNodeLookup(_trace_data);                                                                     \
-    } while (false)
-
-#define MATTER_LOG_NODE_DISCOVERED(...)                                                                                            \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        ::chip::Tracing::NodeDiscoveredInfo _trace_data(__VA_ARGS__);                                                              \
-        ::chip::Tracing::Internal::LogNodeDiscovered(_trace_data);                                                                 \
-    } while (false)
-
-#define MATTER_LOG_NODE_DISCOVERY_FAILED(...)                                                                                      \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        ::chip::Tracing::NodeDiscoveryFailedInfo _trace_data(__VA_ARGS__);                                                         \
-        ::chip::Tracing::Internal::LogNodeDiscoveryFailed(_trace_data);                                                            \
-    } while (false)
-
-#endif
+#endif // MATTER_TRACING_ENABLED

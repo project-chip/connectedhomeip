@@ -8,7 +8,7 @@
     "virtualenv": {
         "gn_root": ".",
         "gn_targets": [":python_packages.install"],
-        "requirements": ["scripts/setup/requirements.txt"],
+        "requirements": ["scripts/setup/requirements.build.txt"],
         "constraints": ["scripts/setup/constraints.txt"],
         "gn_args": ["chip_crypto=\"boringssl\""]
     },

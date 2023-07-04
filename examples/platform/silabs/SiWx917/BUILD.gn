@@ -33,7 +33,7 @@ declare_args() {
   sl_wfx_config_scan = true
 
   # Argument to force enable WPA3 security on rs91x
-  rs91x_wpa3_only = false
+  rs91x_wpa3_transition = false
 
   # use commissionable data for SiWx917
   siwx917_commissionable_data = false
@@ -43,6 +43,13 @@ declare_args() {
 
   #default Wifi Password
   chip_default_wifi_psk = ""
+
+  # Enable TestEventTrigger in GeneralDiagnostics cluster
+  silabs_test_event_trigger_enabled = false
+
+  # The EnableKey in hex string format used by TestEventTrigger command in
+  # GeneralDiagnostics cluster. The length of the string should be 32.
+  silabs_test_event_trigger_enable_key = "00112233445566778899aabbccddeeff"
 }
 
 import("${chip_root}/src/platform/silabs/wifi_args.gni")
@@ -219,13 +226,14 @@ config("silabs-wifi-config") {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
   }
 
-  if (rs91x_wpa3_only) {
-    defines += [ "WIFI_ENABLE_SECURITY_WPA3=1" ]
+  if (rs91x_wpa3_transition) {
+    defines += [ "WIFI_ENABLE_SECURITY_WPA3_TRANSITION=1" ]
   }
 }
 
 source_set("siwx917-common") {
   deps = []
+  defines = []
   public_deps = []
   public_configs = [
     ":siwx917-common-config",
@@ -247,15 +255,12 @@ source_set("siwx917-common") {
     "${wifi_sdk_dir}/ethernetif.cpp",
     "${wifi_sdk_dir}/lwip_netif.cpp",
     "${wifi_sdk_dir}/wfx_notify.cpp",
+    "BaseApplication.cpp",
     "SiWx917/rsi_if.c",
     "SiWx917/wfx_rsi_host.c",
     "init_ccpPlatform.cpp",
     "matter_config.cpp",
   ]
-
-  if (use_base_app) {
-    sources += [ "BaseApplication.cpp" ]
-  }
 
   if (chip_enable_pw_rpc || chip_build_libshell) {
     sources += [ "uart.cpp" ]
@@ -295,6 +300,12 @@ source_set("siwx917-common") {
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {
     public_deps += [ ":silabs-factory-data-provider" ]
+  }
+
+  if (silabs_test_event_trigger_enabled) {
+    sources +=
+        [ "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.cpp" ]
+    defines += [ "SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY=\"${silabs_test_event_trigger_enable_key}\"" ]
   }
 
   public_deps += [

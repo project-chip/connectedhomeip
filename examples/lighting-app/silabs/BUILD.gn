@@ -59,6 +59,7 @@ if (slc_generate) {
                       "${use_wstk_buttons}",
                       "${use_wstk_leds}",
                       "${use_external_flash}",
+                      "${silabs_mcu}",
                     ],
                     "list lines"))
 }

@@ -1802,45 +1802,6 @@ static BOOL AttributeIsSpecifiedInModeSelectCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL AttributeIsSpecifiedInWasherControlsCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::WasherControls;
-    switch (aAttributeId) {
-    case Attributes::SpinSpeeds::Id: {
-        return YES;
-    }
-    case Attributes::SpinSpeedCurrent::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfRinses::Id: {
-        return YES;
-    }
-    case Attributes::MaxRinses::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL AttributeIsSpecifiedInTemperatureControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::TemperatureControl;
@@ -1894,6 +1855,9 @@ static BOOL AttributeIsSpecifiedInRefrigeratorAlarmCluster(AttributeId aAttribut
         return YES;
     }
     case Attributes::State::Id: {
+        return YES;
+    }
+    case Attributes::Supported::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -1987,6 +1951,9 @@ static BOOL AttributeIsSpecifiedInSmokeCOAlarmCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::SensitivityLevel::Id: {
+        return YES;
+    }
+    case Attributes::ExpiryDate::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5123,9 +5090,6 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ModeSelect::Id: {
         return AttributeIsSpecifiedInModeSelectCluster(aAttributeId);
-    }
-    case Clusters::WasherControls::Id: {
-        return AttributeIsSpecifiedInWasherControlsCluster(aAttributeId);
     }
     case Clusters::TemperatureControl::Id: {
         return AttributeIsSpecifiedInTemperatureControlCluster(aAttributeId);

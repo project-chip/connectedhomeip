@@ -27,9 +27,9 @@ tests:
     #  cluster: "DelayCommands"
     #  command: "WaitForCommissioning"
 
-    - label: "DUT reads TxUnicastCount attribute value from TH"
+    - label: "DUT reads TxTotalCount attribute value from TH"
       wait: "readAttribute"
-      attribute: "TxUnicastCount"
+      attribute: "TxTotalCount"
       PICS: DGTHREAD.C.A0016
 
     - label: "DUT reads TxUnicastCount attribute value from TH"

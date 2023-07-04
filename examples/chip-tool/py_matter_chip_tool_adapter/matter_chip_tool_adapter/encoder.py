@@ -34,8 +34,7 @@ _ANY_COMMANDS_LIST_ARGUMENTS_WITH_WILDCARDS = [
 
 
 _ALIASES = {
-    'AnyCommands': {
-        'alias': 'any',
+    '*': {
         'commands': {
             'CommandById': {
                 'alias': 'command-by-id',
@@ -97,6 +96,9 @@ _ALIASES = {
                 },
             },
         }
+    },
+    'AnyCommands': {
+        'alias': 'any',
     },
     'CommissionerCommands': {
         'alias': 'pairing',
@@ -232,10 +234,36 @@ class Encoder:
         return command_name, command_specifier
 
     def __get_arguments(self, request):
+        # chip-tool expects a json encoded string that contains both mandatory and optional arguments for the target command.
+        #
+        # Those arguments are either top level properties of the request object or under the 'arguments' property.
+        #
+        # Usually if an argument is used by multiple commands (e.g: 'endpoint', 'min-interval', 'commissioner-name') it is represented as
+        # a top level property of the request.
+        # Otherwise if the argument is a command specific argument, it can be retrieved as a member of the 'arguments' property.
+        #
+        # As an example, the following test step:
+        #
+        # - label: "Send Test Add Arguments Command"
+        #   nodeId: 0x12344321
+        #   endpoint: 1
+        #   cluster: Unit Testing
+        #   command: TestAddArguments
+        #   identity: beta
+        #   arguments:
+        #       values:
+        #           - name: arg1
+        #             value: 3
+        #           - name: arg2
+        #             value: 4
+        #
+        # Will be translated to:
+        #   destination-id": "0x12344321", "endpoint-id-ignored-for-group-commands": "1", "arg1":"3", "arg2":"17", "commissioner-name": "beta"
         arguments = ''
         arguments = self.__maybe_add_destination(arguments, request)
         arguments = self.__maybe_add_endpoint(arguments, request)
         arguments = self.__maybe_add_command_arguments(arguments, request)
+        arguments = self.__maybe_add_data_version(arguments, request)
         arguments = self.__maybe_add(
             arguments, request.min_interval, "min-interval")
         arguments = self.__maybe_add(
@@ -302,6 +330,25 @@ class Encoder:
 
         return rv
 
+    def __maybe_add_data_version(self, rv, request):
+        if request.data_version is None:
+            return rv
+
+        value = ''
+        if type(request.data_version) is list:
+            for index, version in enumerate(request.data_version):
+                value += str(version)
+                if index != len(request.data_version) - 1:
+                    value += ','
+        else:
+            value = request.data_version
+
+        if rv:
+            rv += ', '
+        rv += f'"data-version":"{value}"'
+
+        return rv
+
     def __get_argument_name(self, request, entry):
         cluster_name = request.cluster
         command_name = request.command
@@ -313,7 +360,7 @@ class Encoder:
             else:
                 argument_name = 'value'
 
-        return self.__get_alias(cluster_name, command_name, argument_name) or argument_name
+        return self.__get_alias('*', command_name, argument_name) or self.__get_alias(cluster_name, command_name, argument_name) or argument_name
 
     def __maybe_add(self, rv, value, name):
         if value is None:
@@ -374,7 +421,7 @@ class Encoder:
         return name[:1].lower() + name[1:]
 
     def __format_cluster_name(self, name):
-        return name.lower().replace(' ', '').replace('/', '').lower()
+        return name.lower().replace(' ', '').replace('/', '').replace('.', '').lower()
 
     def __format_command_name(self, name):
         if name is None:

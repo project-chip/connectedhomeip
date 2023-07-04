@@ -276,7 +276,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeProxyValidID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000044,
     MTRClusterIDTypeBooleanStateID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000045,
     MTRClusterIDTypeModeSelectID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000050,
-    MTRClusterIDTypeWasherControlsID MTR_NEWLY_AVAILABLE = 0x00000053,
     MTRClusterIDTypeTemperatureControlID MTR_NEWLY_AVAILABLE = 0x00000056,
     MTRClusterIDTypeRefrigeratorAlarmID MTR_NEWLY_AVAILABLE = 0x00000057,
     MTRClusterIDTypeAirQualityID MTR_NEWLY_AVAILABLE = 0x0000005B,
@@ -3733,23 +3732,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterModeSelectAttributeClusterRevisionID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
-    // Cluster WasherControls attributes
-    MTRAttributeIDTypeClusterWasherControlsAttributeSpinSpeedsID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterWasherControlsAttributeSpinSpeedCurrentID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterWasherControlsAttributeNumberOfRinsesID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterWasherControlsAttributeMaxRinsesID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterWasherControlsAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterWasherControlsAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterWasherControlsAttributeEventListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
-    MTRAttributeIDTypeClusterWasherControlsAttributeAttributeListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterWasherControlsAttributeFeatureMapID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterWasherControlsAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-
     // Cluster TemperatureControl attributes
     MTRAttributeIDTypeClusterTemperatureControlAttributeTemperatureSetpointID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterTemperatureControlAttributeMinTemperatureID MTR_NEWLY_AVAILABLE = 0x00000001,
@@ -3773,6 +3755,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster RefrigeratorAlarm attributes
     MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeMaskID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeStateID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeSupportedID MTR_NEWLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
@@ -3812,6 +3795,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeInterconnectCOAlarmID MTR_NEWLY_AVAILABLE = 0x00000009,
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeContaminationStateID MTR_NEWLY_AVAILABLE = 0x0000000A,
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeSensitivityLevelID MTR_NEWLY_AVAILABLE = 0x0000000B,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpiryDateID MTR_NEWLY_AVAILABLE = 0x0000000C,
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE

@@ -46,6 +46,7 @@
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/DataVersionFilter.h>
 #include <app/EventPathParams.h>
 #include <app/ObjectList.h>
@@ -399,6 +400,19 @@ private:
                                           size_t & aRequestedAttributePathCount);
 
     /**
+     * This parses the event path list to ensure it is well formed. If so, for each path in the list, it will expand to a list
+     * of concrete paths and walk each path to check if it has privileges to read that event.
+     *
+     * If there is AT LEAST one "existent path" (as the spec calls it) that has sufficient privilege, aHasValidEventPath
+     * will be set to true. Otherwise, it will be set to false.
+     *
+     * aRequestedEventPathCount will be updated to reflect the number of event paths in the request.
+     */
+    static CHIP_ERROR ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
+                                      EventPathIBs::Parser & aEventPathListParser, bool & aHasValidEventPath,
+                                      size_t & aRequestedEventPathCount);
+
+    /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
      * the Read Request are handled entirely within this function.  If the
      * status returned is not Status::Success, the caller will send a status
@@ -677,7 +691,12 @@ bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint);
  *
  * @retval The metadata of the attribute, will return null if the given attribute does not exists.
  */
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath);
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aPath);
+
+/**
+ * Returns the event support status for the given event, as an interaction model status.
+ */
+Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath);
 
 } // namespace app
 } // namespace chip

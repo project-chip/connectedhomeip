@@ -22,6 +22,3 @@
  * This file defines implementations of manual backwards-compat shims of various sorts to handle
  * API changes that happened.
  */
-
-@implementation MTRModeSelectClusterSemanticTagStruct
-@end

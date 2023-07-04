@@ -36,6 +36,7 @@ tests:
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
+          saveAs: MinMeasuredValue
           constraints:
               type: int16s
               minValue: -27315
@@ -46,6 +47,7 @@ tests:
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
+          saveAs: MaxMeasuredValue
           constraints:
               type: int16s
               minValue: -27314
@@ -58,8 +60,8 @@ tests:
       response:
           constraints:
               type: int16s
-              minValue: -27315
-              maxValue: 32767
+              minValue: MinMeasuredValue
+              maxValue: MaxMeasuredValue
 
     - label: "Read the optional attribute: Tolerance"
       PICS: TMP.S.A0003

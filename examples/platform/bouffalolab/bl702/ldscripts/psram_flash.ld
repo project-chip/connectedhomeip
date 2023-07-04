@@ -275,8 +275,6 @@ SECTIONS
     . = ALIGN(8);
     /* KEEP(*shell_common.globals.cpp.o(.bss.*))               */
 
-    PROVIDE ( __psram_bss_init_end = . );
-    
     . = ALIGN(8);
     KEEP(*lwip.memp.c.o(.bss.lwip_PBUF_POOL))
     . = ALIGN(8);
@@ -285,8 +283,10 @@ SECTIONS
     . = ALIGN(8);
     KEEP(*virt_net_spi.c.o(.bss.tx_buffer))
 
-    *(.wifi_ram*)
+    PROVIDE ( __psram_bss_init_end = . );
     . = ALIGN(16);
+
+    *(.wifi_ram*)
   } >psram
 
   . = ALIGN(8);

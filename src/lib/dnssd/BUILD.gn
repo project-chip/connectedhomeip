@@ -58,7 +58,8 @@ static_library("dnssd") {
     ]
     public_deps += [
       "${chip_root}/src/lib/dnssd/minimal_mdns",
-      "${chip_root}/src/trace",
+      "${chip_root}/src/tracing",
+      "${chip_root}/src/tracing:macros",
     ]
   } else if (chip_mdns == "platform") {
     sources += [

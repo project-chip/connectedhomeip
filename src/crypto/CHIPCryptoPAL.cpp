@@ -197,11 +197,7 @@ CHIP_ERROR ConvertIntegerRawToDerInternal(const ByteSpan & raw_integer, MutableB
 namespace chip {
 namespace Crypto {
 
-#ifdef ENABLE_HSM_HKDF
-using HKDF_sha_crypto = HKDF_shaHSM;
-#else
 using HKDF_sha_crypto = HKDF_sha;
-#endif
 
 CHIP_ERROR Spake2p::InternalHash(const uint8_t * in, size_t in_len)
 {
@@ -549,11 +545,7 @@ CHIP_ERROR Spake2pVerifier::Generate(uint32_t pbkdf2IterCount, const ByteSpan & 
     size_t len;
 
     // Create local Spake2+ object for w0 and L computations.
-#ifdef ENABLE_HSM_SPAKE
-    Spake2pHSM_P256_SHA256_HKDF_HMAC spake2p;
-#else
     Spake2p_P256_SHA256_HKDF_HMAC spake2p;
-#endif
     uint8_t context[kSHA256_Hash_Length] = { 0 };
     SuccessOrExit(err = spake2p.Init(context, sizeof(context)));
 
@@ -575,11 +567,7 @@ exit:
 CHIP_ERROR Spake2pVerifier::ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t setupPin, uint8_t * ws,
                                       uint32_t ws_len)
 {
-#ifdef ENABLE_HSM_PBKDF2
-    PBKDF2_sha256HSM pbkdf2;
-#else
     PBKDF2_sha256 pbkdf2;
-#endif
     uint8_t littleEndianSetupPINCode[sizeof(uint32_t)];
     Encoding::LittleEndian::Put32(littleEndianSetupPINCode, setupPin);
 

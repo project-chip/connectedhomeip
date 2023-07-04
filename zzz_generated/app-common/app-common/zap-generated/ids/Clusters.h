@@ -151,39 +151,45 @@ static constexpr ClusterId Id = 0x00000046;
 namespace ModeSelect {
 static constexpr ClusterId Id = 0x00000050;
 } // namespace ModeSelect
-namespace LaundryWasherModeSelect {
+namespace LaundryWasherMode {
 static constexpr ClusterId Id = 0x00000051;
-} // namespace LaundryWasherModeSelect
-namespace RefrigeratorAndTemperatureControlledCabinetModeSelect {
+} // namespace LaundryWasherMode
+namespace RefrigeratorAndTemperatureControlledCabinetMode {
 static constexpr ClusterId Id = 0x00000052;
-} // namespace RefrigeratorAndTemperatureControlledCabinetModeSelect
-namespace WasherControls {
+} // namespace RefrigeratorAndTemperatureControlledCabinetMode
+namespace LaundryWasherControls {
 static constexpr ClusterId Id = 0x00000053;
-} // namespace WasherControls
-namespace RvcRunModeSelect {
+} // namespace LaundryWasherControls
+namespace RvcRunMode {
 static constexpr ClusterId Id = 0x00000054;
-} // namespace RvcRunModeSelect
-namespace RvcCleanModeSelect {
+} // namespace RvcRunMode
+namespace RvcCleanMode {
 static constexpr ClusterId Id = 0x00000055;
-} // namespace RvcCleanModeSelect
+} // namespace RvcCleanMode
 namespace TemperatureControl {
 static constexpr ClusterId Id = 0x00000056;
 } // namespace TemperatureControl
 namespace RefrigeratorAlarm {
 static constexpr ClusterId Id = 0x00000057;
 } // namespace RefrigeratorAlarm
-namespace DishwasherModeSelect {
+namespace DishwasherMode {
 static constexpr ClusterId Id = 0x00000059;
-} // namespace DishwasherModeSelect
+} // namespace DishwasherMode
 namespace AirQuality {
 static constexpr ClusterId Id = 0x0000005B;
 } // namespace AirQuality
 namespace SmokeCoAlarm {
 static constexpr ClusterId Id = 0x0000005C;
 } // namespace SmokeCoAlarm
+namespace DishwasherAlarm {
+static constexpr ClusterId Id = 0x0000005D;
+} // namespace DishwasherAlarm
 namespace OperationalState {
 static constexpr ClusterId Id = 0x00000060;
 } // namespace OperationalState
+namespace RvcOperationalState {
+static constexpr ClusterId Id = 0x00000061;
+} // namespace RvcOperationalState
 namespace HepaFilterMonitoring {
 static constexpr ClusterId Id = 0x00000071;
 } // namespace HepaFilterMonitoring

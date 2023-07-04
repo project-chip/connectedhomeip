@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _attributeID = nil;
+        _attributeID = @(0);
 
         _attributeValue = @(0);
     }
@@ -48,12 +48,12 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
-- (void)setAttributeId:(NSNumber * _Nullable)attributeId
+- (void)setAttributeId:(NSNumber * _Nonnull)attributeId
 {
     self.attributeID = attributeId;
 }
 
-- (NSNumber * _Nullable)attributeId
+- (NSNumber * _Nonnull)attributeId
 {
     return self.attributeID;
 }
@@ -2618,12 +2618,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRModeSelectClusterModeTagStruct
+@implementation MTRModeSelectClusterSemanticTagStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _mfgCode = nil;
+        _mfgCode = @(0);
 
         _value = @(0);
     }
@@ -2632,7 +2632,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRModeSelectClusterModeTagStruct alloc] init];
+    auto other = [[MTRModeSelectClusterSemanticTagStruct alloc] init];
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
@@ -2649,7 +2649,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRModeSelectClusterSemanticTag : MTRModeSelectClusterModeTagStruct
+@implementation MTRModeSelectClusterSemanticTag : MTRModeSelectClusterSemanticTagStruct
 @end
 
 @implementation MTRModeSelectClusterModeOptionStruct
@@ -2661,7 +2661,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _mode = @(0);
 
-        _modeTags = [NSArray array];
+        _semanticTags = [NSArray array];
     }
     return self;
 }
@@ -2672,26 +2672,16 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.label = self.label;
     other.mode = self.mode;
-    other.modeTags = self.modeTags;
+    other.semanticTags = self.semanticTags;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: label:%@; mode:%@; modeTags:%@; >", NSStringFromClass([self class]), _label, _mode, _modeTags];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: label:%@; mode:%@; semanticTags:%@; >",
+                                             NSStringFromClass([self class]), _label, _mode, _semanticTags];
     return descriptionString;
-}
-
-- (void)setSemanticTags:(NSArray * _Nonnull)semanticTags
-{
-    self.modeTags = semanticTags;
-}
-
-- (NSArray * _Nonnull)semanticTags
-{
-    return self.modeTags;
 }
 
 @end
@@ -3027,7 +3017,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _operationalStateID = @(0);
 
-        _operationalStateLabel = @"";
+        _operationalStateLabel = nil;
     }
     return self;
 }

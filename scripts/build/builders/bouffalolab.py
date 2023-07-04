@@ -49,6 +49,7 @@ class BouffalolabBoard(Enum):
     XT_ZB6_DevKit = auto()
     BL706_IoT_DVK = auto()
     BL706_NIGHT_LIGHT = auto()
+    BL704L_DVK = auto()
 
     def GnArgName(self):
         if self == BouffalolabBoard.BL602_IoT_Matter_V1:
@@ -63,6 +64,8 @@ class BouffalolabBoard(Enum):
             return 'BL706-IoT-DVK'
         elif self == BouffalolabBoard.BL706_NIGHT_LIGHT:
             return 'BL706-NIGHT-LIGHT'
+        elif self == BouffalolabBoard.BL704L_DVK:
+            return 'BL704L-DVK'
         else:
             raise Exception('Unknown board #: %r' % self)
 
@@ -81,7 +84,15 @@ class BouffalolabBuilder(GnBuilder):
                  enable_cdc: bool = False
                  ):
 
-        bouffalo_chip = "bl702" if "BL70" in module_type else "bl602"
+        if 'BL602' == module_type:
+            bouffalo_chip = 'bl602'
+        elif 'BL704L' == module_type:
+            bouffalo_chip = 'bl702l'
+        elif "BL70" in module_type:
+            bouffalo_chip = 'bl702'
+        else:
+            raise Exception("module_type %s is not supported" % module_type)
+
         super(BouffalolabBuilder, self).__init__(
             root=os.path.join(root, 'examples',
                               app.ExampleName(), 'bouffalolab', bouffalo_chip),
@@ -141,3 +152,30 @@ class BouffalolabBuilder(GnBuilder):
         }
 
         return items
+
+    def PostBuildCommand(self):
+
+        # Generate Bouffalo Lab format OTA image for development purpose.
+
+        ota_images_folder_path = self.output_dir + "/ota_images"
+        ota_images_dev_image = self.output_dir + "/" + self.app.AppNamePrefix(self.chip_name) + ".bin.xz.hash"
+        ota_images_image = self.output_dir + "/ota_images/FW_OTA.bin.xz.hash"
+        ota_images_firmware = self.output_dir + "/" + self.app.AppNamePrefix(self.chip_name) + ".bin"
+
+        ota_images_flash_tool = self.output_dir + "/" + self.app.AppNamePrefix(self.chip_name) + ".flash.py"
+
+        os.system("rm -rf " + ota_images_folder_path)
+        os.system("rm -rf " + ota_images_dev_image)
+
+        if not os.path.isfile(ota_images_firmware):
+            return
+
+        os.system("python " + ota_images_flash_tool + " --build > /dev/null")
+
+        if not os.path.isfile(ota_images_image):
+            return
+
+        os.system("cp " + ota_images_image + " " + ota_images_dev_image)
+
+        logging.info("PostBuild:")
+        logging.info("Bouffalo Lab OTA format image: " + self.app.AppNamePrefix(self.chip_name) + ".bin.xz.hash is generated.")
