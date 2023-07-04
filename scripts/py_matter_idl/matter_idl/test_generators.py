@@ -123,7 +123,7 @@ class GeneratorTest:
         if self.generator_name.lower() == 'cpp-app':
             return CppApplicationGenerator(storage, idl)
         if self.generator_name.lower() == 'cpp-tlvmeta':
-            return TLVMetaDataGenerator(storage, idl)
+            return TLVMetaDataGenerator(storage, idl, table_name="clusters_meta")
         if self.generator_name.lower() == 'custom-example-proto':
             sys.path.append(os.path.abspath(
                 os.path.join(os.path.dirname(__file__), '../examples')))
