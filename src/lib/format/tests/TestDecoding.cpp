@@ -86,6 +86,9 @@ void TestDecode(nlTestSuite * inSuite, void * inContext)
     TestSampleData(inSuite, inContext, params, secure_channel_status_report);
     TestSampleData(inSuite, inContext, params, im_protocol_read_request);
     TestSampleData(inSuite, inContext, params, im_protocol_report_data);
+
+    // Different content
+    TestSampleData(inSuite, inContext, params, im_protocol_report_data_acl);
 }
 
 const nlTest sTests[] = {

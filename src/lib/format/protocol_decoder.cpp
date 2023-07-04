@@ -199,6 +199,8 @@ bool PayloadDecoderBase::Next(PayloadEntry & entry)
     case State::kDone:
         return false;
     }
+    // should never happen
+    return false;
 }
 
 void PayloadDecoderBase::NextFromStarting(PayloadEntry & entry)
@@ -350,13 +352,20 @@ void PayloadDecoderBase::NextFromContentRead(PayloadEntry & entry)
     if (TLVTypeIsContainer(mReader.GetType()))
     {
         EnterContainer(entry);
+        return;
     }
-    else
+
+    PrettyPrintCurrentValue(mReader, mValueBuilder.Reset());
+    mIMContentPosition.Exit();
+
+    if (data == nullptr)
     {
-        PrettyPrintCurrentValue(mReader, mValueBuilder.Reset());
-        mIMContentPosition.Exit();
-        entry = PayloadEntry::SimpleValue(data->name, mValueBuilder.c_str());
+        FormatCurrentTag(mReader, mNameBuilder.Reset());
+        entry = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
+        return;
     }
+
+    entry = PayloadEntry::SimpleValue(data->name, mValueBuilder.c_str());
 }
 
 void PayloadDecoderBase::MoveToContent(PayloadEntry & entry)

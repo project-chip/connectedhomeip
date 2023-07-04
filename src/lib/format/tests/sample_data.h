@@ -39,5 +39,8 @@ extern const SamplePayload secure_channel_status_report;
 extern const SamplePayload im_protocol_read_request;
 extern const SamplePayload im_protocol_report_data;
 
+// different data reports for content tests
+extern const SamplePayload im_protocol_report_data_acl;
+
 } // namespace TestData
 } // namespace chip
