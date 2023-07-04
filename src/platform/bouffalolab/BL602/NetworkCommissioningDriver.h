@@ -98,7 +98,6 @@ public:
     uint8_t GetConnectNetworkTimeoutSeconds() override { return kWiFiConnectNetworkTimeoutSeconds; }
 
     CHIP_ERROR CommitConfiguration() override;
-    CHIP_ERROR SaveConfiguration();
     CHIP_ERROR RevertConfiguration() override;
 
     Status RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
@@ -111,8 +110,7 @@ public:
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
-    CHIP_ERROR ReConnectWiFiNetwork(void);
-    void OnConnectWiFiNetwork();
+    void OnConnectWiFiNetwork(bool isConnected);
     void OnScanWiFiNetworkDone();
     void OnNetworkStatusChange();
 

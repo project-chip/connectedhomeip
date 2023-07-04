@@ -25,8 +25,6 @@
 
 #include <openthread/platform/entropy.h>
 
-#include <lib/support/CHIPPlatformMemory.h>
-
 #include <mbedtls/platform.h>
 
 #include <openthread_port.h>

@@ -15,43 +15,30 @@
  *    limitations under the License.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
+
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-extern "C" {
-#include <bl_sys.h>
-}
+#include <platform/ConnectivityManager.h>
+
+#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
+
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <eth_bd.h>
+#include <platform/bouffalolab/BL702/EthernetInterface.h>
+#endif
+
+using namespace ::chip;
 
 namespace chip {
 namespace DeviceLayer {
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WIFI
+extern "C" void ethernetInterface_eventGotIP(struct netif * interface) 
 {
-    BL_RST_REASON_E bootCause = bl_sys_rstinfo_get();
-
-    if (BL_RST_POR == bootCause)
-    {
-        bootReason = BootReasonType::kPowerOnReboot;
-    }
-    else if (BL_RST_BOR == bootCause)
-    {
-        bootReason = BootReasonType::kBrownOutReset;
-    }
-    else if (BL_RST_WDT == bootCause)
-    {
-        bootReason = BootReasonType::kHardwareWatchdogReset;
-    }
-    else if (BL_RST_SOFTWARE == bootCause)
-    {
-        bootReason = BootReasonType::kSoftwareReset;
-    }
-    else
-    {
-        bootReason = BootReasonType::kUnspecified;
-    }
-    return CHIP_NO_ERROR;
+    ChipLogProgress(DeviceLayer, "ethernetInterface_eventGotIP");
+    ConnectivityMgrImpl().OnConnectivityChanged(interface);
 }
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

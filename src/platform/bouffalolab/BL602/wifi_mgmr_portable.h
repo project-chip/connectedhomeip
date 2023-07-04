@@ -16,6 +16,7 @@ bool wifi_mgmr_security_type_is_open(void);
 bool wifi_mgmr_security_type_is_wpa(void);
 bool wifi_mgmr_security_type_is_wpa2(void);
 bool wifi_mgmr_security_type_is_wpa3(void);
+struct netif * deviceInterface_getNetif(void);
 
 #ifdef __cplusplus
 }
