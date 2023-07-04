@@ -60,7 +60,7 @@ void AppTask::SelfTestEventHandler(AppEvent * aEvent)
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
         event.ButtonEvent.Action = kButtonPushEvent;
-        event.Handler            = SelfTestHandler;        
+        event.Handler            = SelfTestHandler;
         GetAppTask().PostEvent(&event);
     }
 }

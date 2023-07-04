@@ -51,12 +51,12 @@ bool SmokeCoAlarmManager::StartSelfTesting()
         LOG_INF("Start self-testing success!");
     } else
     {
-        LOG_INF("Start self-testing fail!");        
+        LOG_INF("Start self-testing fail!");
     }
 
     SmokeCoAlarmServer::Instance().SetExpressedState(1, mExpressedState);
     SmokeCoAlarmServer::Instance().SetTestInProgress(1, false);
     LOG_INF("End self-testing!");
-    
+
     return success;
 }
