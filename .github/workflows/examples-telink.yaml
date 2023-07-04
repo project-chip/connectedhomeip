@@ -212,6 +212,7 @@ jobs:
 
             - name: clean out build output
               run: rm -rf ./out
+
             - name: Build example Telink Smoke CO Alarm App
               run: |
                   ./scripts/run_in_build_env.sh \
