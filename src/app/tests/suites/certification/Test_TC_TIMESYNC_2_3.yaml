@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: <todo:addnumber> [TC-TIMESYNC-2.3] SetTrustedTimeSource command with DUT as Server
+name:
+    <todo:addnumber> [TC-TIMESYNC-2.3] SetTrustedTimeSource command with DUT as
+    Server
 PICS:
     - TIMESYNC.S
     - TIMESYNC.S.F03
@@ -48,7 +50,7 @@ tests:
       arguments:
           values:
               - name: "TrustedTimeSource"
-                value: {NodeID: commissionerNodeId, Endpoint: 0}
+                value: { NodeID: commissionerNodeId, Endpoint: 0 }
 
     - label: "TS2: TH reads CurrentFabricIndex attribute"
       command: "readAttribute"
@@ -62,7 +64,11 @@ tests:
       attribute: "TrustedTimeSource"
       response:
           value:
-              { FabricIndex: th_fabric_idx, NodeID: commissionerNodeId, Endpoint: 0}
+              {
+                  FabricIndex: th_fabric_idx,
+                  NodeID: commissionerNodeId,
+                  Endpoint: 0,
+              }
 
     - label: "TS4: TH sends the SetTrustedTimeSource command with null"
       command: "SetTrustedTimeSource"
