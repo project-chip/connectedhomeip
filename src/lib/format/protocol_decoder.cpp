@@ -360,7 +360,16 @@ void PayloadDecoderBase::NextFromContentRead(PayloadEntry & entry)
 
     if (data == nullptr)
     {
-        FormatCurrentTag(mReader, mNameBuilder.Reset());
+        auto parentData = mIMContentPosition.Get();
+        if (parentData->type == ItemType::kList)
+        {
+            // This is a simple-value list, like uint64[]. Ignore the unknown tag
+            mNameBuilder.Reset().Add("[]");
+        }
+        else
+        {
+            FormatCurrentTag(mReader, mNameBuilder.Reset());
+        }
         entry = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
         return;
     }
