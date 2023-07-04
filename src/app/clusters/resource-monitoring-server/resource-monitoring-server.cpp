@@ -34,7 +34,6 @@ using chip::Protocols::InteractionModel::Status;
 
 using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 
-// todo set ram to callback, see thread from william
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -89,7 +88,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
                                                CommandHandlerInterface::CommandIdCallback callback, void * context)
 {
     ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");
-    if ( mResetCondtitionCommandSupported)
+    if (mResetCondtitionCommandSupported)
     {
         callback(ResourceMonitoring::Commands::ResetCondition::Id, context);
     }
@@ -97,9 +96,9 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     return CHIP_NO_ERROR;
 }
 
-bool Instance::HasFeature(ResourceMonitoring::Feature feature) const
+bool Instance::HasFeature(ResourceMonitoring::Feature aFeature) const
 {
-    return ((mFeature & to_underlying(feature)) != 0);
+    return ((mFeature & to_underlying(aFeature)) != 0);
 }
 
 // Implements the read functionality for non-standard attributes.
@@ -132,9 +131,18 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 }
 
 // Implements checking before attribute writes.
-CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    // no writeable attributes supported
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::LastChangedTime::Id: {
+        DataModel::Nullable<uint32_t> newLastChangedTime;
+        ReturnErrorOnFailure(aDecoder.Decode(newLastChangedTime));
+        // Todo write the attribute to persistant storage
+        UpdateLastChangedTime(newLastChangedTime);
+        break;
+    }
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -171,6 +179,7 @@ Instance::UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::Change
     }
     return Protocols::InteractionModel::Status::Success;
 }
+
 chip::Protocols::InteractionModel::Status Instance::UpdateInPlaceIndicator(bool aNewInPlaceIndicator)
 {
     auto oldInPlaceIndicator = mInPlaceIndicator;
@@ -178,6 +187,17 @@ chip::Protocols::InteractionModel::Status Instance::UpdateInPlaceIndicator(bool 
     if (mInPlaceIndicator != oldInPlaceIndicator)
     {
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::InPlaceIndicator::Id);
+    }
+    return Protocols::InteractionModel::Status::Success;
+}
+
+chip::Protocols::InteractionModel::Status Instance::UpdateLastChangedTime(DataModel::Nullable<uint32_t> aNewLastChangedTime)
+{
+    auto oldLastchangedTime = mLastChangedTime;
+    mLastChangedTime        = aNewLastChangedTime;
+    if (mLastChangedTime != oldLastchangedTime)
+    {
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::LastChangedTime::Id);
     }
     return Protocols::InteractionModel::Status::Success;
 }
@@ -199,6 +219,11 @@ chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum Instance::GetD
 bool Instance::GetInPlaceIndicator() const
 {
     return mInPlaceIndicator;
+}
+
+DataModel::Nullable<uint32_t> Instance::GetLastChangedTime() const
+{
+    return mLastChangedTime;
 }
 
 bool Instance::IsAliascluster() const
@@ -257,11 +282,11 @@ chip::Protocols::InteractionModel::Status Instance::OnResetCondition()
 {
     ChipLogError(Zcl, "Instance::OnResetCondition()");
 
-    if ( GetDegradationDirection() == DegradationDirectionEnum::kDown)
+    if (GetDegradationDirection() == DegradationDirectionEnum::kDown)
     {
         UpdateCondition(100);
     }
-    else if ( GetDegradationDirection() == DegradationDirectionEnum::kUp)
+    else if (GetDegradationDirection() == DegradationDirectionEnum::kUp)
     {
         UpdateCondition(0);
     }
