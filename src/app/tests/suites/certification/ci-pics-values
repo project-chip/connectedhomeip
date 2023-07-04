@@ -2608,3 +2608,19 @@ FAN.S.A000B=1
 
 #Server commands
 FAN.S.C00.Rsp=1
+
+#ICD Management
+
+#Server Attribute
+ICDM.S.A0000=1
+ICDM.S.A0001=1
+ICDM.S.A0002=1
+ICDM.S.A0003=1
+ICDM.S.A0004=1
+ICDM.S.A0005=1
+
+#Features
+ICDM.S.F00=1
+
+#Commands
+ICDM.S.C03.Rsp=1

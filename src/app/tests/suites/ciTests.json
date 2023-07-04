@@ -71,6 +71,7 @@
     ],
     "GeneralCommissioning": ["Test_TC_CGEN_1_1", "Test_TC_CGEN_2_1"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_1_1", "Test_TC_DGGEN_2_1"],
+    "IcdManagement": ["Test_TC_ICDM_1_1", "Test_TC_ICDM_2_1"],
     "Identify": [
         "Test_TC_I_1_1",
         "Test_TC_I_2_1",
@@ -355,6 +356,7 @@
         "FanControl",
         "GeneralCommissioning",
         "GeneralDiagnostics",
+        "IcdManagement",
         "Identify",
         "IlluminanceMeasurement",
         "LevelControl",
