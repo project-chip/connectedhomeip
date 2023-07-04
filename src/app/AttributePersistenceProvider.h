@@ -76,14 +76,16 @@ public:
 
     // The following API provides helper functions to simplify the access of commonly used types.
     // The API may not be complete.
+    // Currently implemented write and read types are: uint8_t, uint16_t, uint32_t, unit64_t and
+    // their nullable varieties, and bool.
 
     /**
-     * Write an attribute value of type uint8 to non-volatile memory.
+     * Write an attribute value of type unsigned intX or bool to non-volatile memory.
      *
      * @param [in] aPath the attribute path for the data being written.
      * @param [in] aValue the data to write.
      */
-    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true >
+    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true >
     CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, T & aValue)
     {
         uint8_t value[sizeof(T)];
@@ -94,12 +96,12 @@ public:
     }
 
     /**
-     * Read an attribute of type uint8.
+     * Read an attribute of type unsigned intX or bool from non-volatile memory.
      *
      * @param [in]     aPath the attribute path for the data being persisted.
      * @param [in,out] aValue where to place the data.
      */
-    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true >
+    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true >
     CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, T & aValue)
     {
         uint8_t attrData[sizeof(T)];
@@ -119,40 +121,35 @@ public:
     }
 
     /**
-     * Write an attribute value of type nullable uint8 to non-volatile memory.
+     * Write an attribute value of type nullable unsigned intX to non-volatile memory.
      *
      * @param [in] aPath the attribute path for the data being written.
      * @param [in] aValue the data to write.
      */
-    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true >
+    template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true >
     CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
         if (aValue.IsNull())
         {
-            // Set to the highest possible value.
-            // todo can improve?
-            uint8_t writeBuffer[sizeof(T)] = {};
-            for (uint8_t i = 0; i < sizeof(T); i++)
-            {
-                writeBuffer[i] = 0xff;
-            }
-            return WriteValue(aPath, ByteSpan(writeBuffer));
+            T nullValue = 0;
+            nullValue = ~nullValue;
+            return WriteValue(aPath, nullValue);
         }
         return WriteValue(aPath, aValue.Value());
     }
 
     /**
-     * Read an attribute of type nullable uint8.
+     * Read an attribute of type nullable unsigned intX from non-volatile memory.
      *
      * @param [in]     aPath the attribute path for the data being persisted.
      * @param [in,out] aValue where to place the data.
      */
-    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true >
+    template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true >
     CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
         T tempIntegral;
-        T highestVal = 0;
-        highestVal = ~highestVal;
+        T nullValue = 0;
+        nullValue = ~nullValue;
 
         CHIP_ERROR err = ReadValue(aPath, tempIntegral);
         if (err != CHIP_NO_ERROR)
@@ -160,7 +157,7 @@ public:
             return err;
         }
 
-        if (tempIntegral == highestVal)
+        if (tempIntegral == nullValue)
         {
             aValue.SetNull();
             return CHIP_NO_ERROR;
