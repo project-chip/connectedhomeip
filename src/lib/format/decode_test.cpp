@@ -1,6 +1,0 @@
-
-
-int main()
-{
-    printf("TESTING...");
-}
