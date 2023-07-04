@@ -160,15 +160,11 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
 
     delegate->GetCurrentOperationalState(opState);
 
-    if (opState.operationalStateID == to_underlying(OperationalStateEnum::kRunning))
-    {
-        response.commandResponseState = err;
-    }
-    else
+    if (opState.operationalStateID != to_underlying(OperationalStateEnum::kRunning))
     {
         delegate->HandleStartStateCallback(err);
-        response.commandResponseState = err;
     }
+    response.commandResponseState = err;
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -243,11 +239,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
             return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
                 while (delegate->GetOperationalStateAtIndex(index, opState) != CHIP_ERROR_NOT_FOUND)
                 {
-                    err = encoder.Encode(opState);
-                    if (err != CHIP_NO_ERROR)
-                    {
-                        return err;
-                    }
+                    ReturnErrorOnFailure(encoder.Encode(opState));
                     index++;
                 }
                 return CHIP_NO_ERROR;
@@ -292,11 +284,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
             return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
                 while (delegate->GetOperationalPhaseAtIndex(index, phase) != CHIP_ERROR_NOT_FOUND)
                 {
-                    err = encoder.Encode(phase.mPhaseName);
-                    if (err != CHIP_NO_ERROR)
-                    {
-                        return err;
-                    }
+                    ReturnErrorOnFailure(encoder.Encode(phase.mPhaseName));
                     index++;
                 }
                 return CHIP_NO_ERROR;
