@@ -38,9 +38,8 @@ private:
 };
 
 /**
- * OperationalStateServer is a class to manager the opertional state cluster.
- * In order to impl class can be used for all operational state aliases so inherit the CommandHandlerInterface
- * In order to overide the Read interface so inherit the AttributeAccessInterface
+ * OperationalStateServer is a class that represents an instance of a derivation of the operational state cluster.
+ * It implements CommandHandlerInterface so it can generically handle commands for any derivation cluster id.
  */
 class OperationalStateServer : public CommandHandlerInterface, public AttributeAccessInterface, public Uncopyable
 {
@@ -48,7 +47,7 @@ class OperationalStateServer : public CommandHandlerInterface, public AttributeA
 public:
     /**
      * Init the operational state server.
-     * This function must be called after define a OperationalStateServer class object.
+     * This function must be called after defining a OperationalStateServer class object.
      * @param void
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
@@ -56,7 +55,7 @@ public:
 
     /**
      * Shut down the operational state server.
-     * This function must be called before destory a OperationalStateServer class object.
+     * This function must be called before destorying a OperationalStateServer class object.
      * @param void
      */
     void Shutdown();
