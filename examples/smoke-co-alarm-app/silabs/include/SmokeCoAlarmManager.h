@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <map>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -43,6 +42,12 @@ public:
     bool StartSelfTesting();
 
     /**
+     * @brief Execute the HandleEventTrigger process
+     *
+     */
+    bool StartHandleEventTrigger(uint64_t eventTrigger);
+
+    /**
      * @brief Updates the expressed state with new value
      *
      * @param endpointId ID of the endpoint
@@ -59,7 +64,24 @@ private:
      * @brief Record expressed state in decreasing priority
      *
      */
-    std::map<ExpressedStateEnum, bool> mExpressedState;
+    std::array<ExpressedStateEnum, 9> mExpressedStatePriority;
+
+    /**
+     * @brief Expression status record values
+     *
+     */
+    int mExpressedStateMask = 1;
+
+    bool mSelfTesting;
+    bool mHandleEventTrigger;
+    uint64_t mEventTrigger;
+
+    void CancelTimer(void);
+    void StartTimer(uint32_t aTimeoutMs);
+
+    static void TimerEventHandler(TimerHandle_t xTimer);
+    static void SelfTestingTimerEventHandler(AppEvent * aEvent);
+    static void EventTriggerTimerEventHandler(AppEvent * aEvent);
 
     static SmokeCoAlarmManager sAlarm;
 };
