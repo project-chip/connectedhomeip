@@ -18,6 +18,7 @@
 #include <lib/format/protocol_decoder.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <tlv/meta/clusters_meta.h>
 
 #include <tlv/meta/clusters_meta.h>
 #include <tlv/meta/protocols_meta.h>
@@ -30,6 +31,12 @@ namespace {
 
 using namespace chip::TestData;
 using namespace chip::Decoders;
+using namespace chip::FlatTree;
+
+using chip::TLVMeta::ItemInfo;
+
+const Entry<ItemInfo> _empty_item[0]                         = {};
+const std::array<const Node<ItemInfo>, 1> fake_clusters_meta = { { 0, _empty_item } };
 
 void TestSampleData(nlTestSuite * inSuite, const PayloadDecoderInitParams & params, const SamplePayload & data,
                     const char * expectation)
@@ -408,10 +415,40 @@ void TestMetaDataOnlyDecoding(nlTestSuite * inSuite, void * inContext)
                    "  interaction_model_revison: 1\n");
 }
 
+void TestEmptyClusterMetaDataDecode(nlTestSuite * inSuite, void * inContext)
+{
+    PayloadDecoderInitParams params;
+
+    params.SetProtocolDecodeTree(chip::TLVMeta::protocols_meta).SetClusterDecodeTree(fake_clusters_meta);
+
+    TestSampleData(inSuite, params, secure_channel_mrp_ack, "mrp_ack: EMPTY\n");
+    TestSampleData(inSuite, params, im_protocol_report_data_acl,
+                   "report_data\n"
+                   "  attribute_reports\n"
+                   "    []\n"
+                   "      attribute_data\n"
+                   "        data_version: 3420147058\n"
+                   "        path\n"
+                   "          endpoint_id: 0\n"
+                   "          cluster_id: 31\n"
+                   "          attribute_id: 0\n"
+                   "        0x1f::0x1f::\n"                      // TODO: 31/0
+                   "          tag[unknown]: 0x100\n"             // List entry (acl is a list)
+                   "            ContextSpecific(0x1): 5\n"       // privilege
+                   "            ContextSpecific(0x2): 2\n"       // authMode
+                   "            tag[unknown]: 0x100\n"           // subjects: TODO: idx seems off ???
+                   "              tag[unknown]: 0x100: 112233\n" // List entry (subjects is a list)
+                   "            ContextSpecific(0x4): NULL\n"    // targets
+                   "            ContextSpecific(0xfe): 1\n"      // fabricIndex
+                   "  suppress_response: true\n"
+                   "  interaction_model_revison: 1\n");
+}
+
 const nlTest sTests[] = {
-    NL_TEST_DEF("TestFullDataDecoding", TestFullDataDecoding),         //
-    NL_TEST_DEF("TestMetaDataOnlyDecoding", TestMetaDataOnlyDecoding), //
-    NL_TEST_SENTINEL()                                                 //
+    NL_TEST_DEF("TestFullDataDecoding", TestFullDataDecoding),                     //
+    NL_TEST_DEF("TestMetaDataOnlyDecoding", TestMetaDataOnlyDecoding),             //
+    NL_TEST_DEF("TestEmptyClusterMetaDataDecode", TestEmptyClusterMetaDataDecode), //
+    NL_TEST_SENTINEL()                                                             //
 };
 
 } // namespace
