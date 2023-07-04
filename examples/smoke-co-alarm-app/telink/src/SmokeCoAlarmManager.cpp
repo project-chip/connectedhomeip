@@ -16,9 +16,8 @@
  */
 
 #include "SmokeCoAlarmManager.h"
-#include <platform/CHIPDeviceLayer.h>
 #include "AppConfig.h"
-
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 using namespace ::chip::app::Clusters::SmokeCoAlarm;
@@ -49,7 +48,8 @@ bool SmokeCoAlarmManager::StartSelfTesting()
     if (success)
     {
         LOG_INF("Start self-testing success!");
-    } else
+    }
+    else
     {
         LOG_INF("Start self-testing fail!");
     }

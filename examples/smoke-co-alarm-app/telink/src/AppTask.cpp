@@ -26,9 +26,9 @@ AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
-    #if APP_USE_EXAMPLE_START_BUTTON
+#if APP_USE_EXAMPLE_START_BUTTON
     SetExampleButtonCallbacks(SelfTestEventHandler);
-    #endif
+#endif
     InitCommonParts();
 
     CHIP_ERROR err = AlarmMgr().Init();
@@ -52,7 +52,6 @@ void AppTask::SelfTestHandler(AppEvent * aEvent)
 {
     AlarmMgr().StartSelfTesting();
 }
-
 
 void AppTask::SelfTestEventHandler(AppEvent * aEvent)
 {
