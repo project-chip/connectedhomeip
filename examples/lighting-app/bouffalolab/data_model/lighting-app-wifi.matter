@@ -2001,17 +2001,17 @@ endpoint 1 {
   }
 
   server cluster OnOff {
-    persist  attribute onOff default = 0x00;
+    persist  attribute onOff default = 0x1;
     ram      attribute globalSceneControl default = 0x01;
     ram      attribute onTime default = 0x0000;
     ram      attribute offWaitTime default = 0x0000;
-    persist  attribute startUpOnOff default = 0xFF;
+    persist  attribute startUpOnOff;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster LevelControl {
-    persist  attribute currentLevel default = 0x01;
+    persist  attribute currentLevel default = 0x254;
     ram      attribute remainingTime default = 0x0000;
     ram      attribute minLevel default = 0x01;
     ram      attribute maxLevel default = 0xFE;
@@ -2020,11 +2020,11 @@ endpoint 1 {
     ram      attribute maxFrequency default = 0x0000;
     ram      attribute options default = 0x00;
     ram      attribute onOffTransitionTime default = 0x0000;
-    ram      attribute onLevel default = 0xFF;
+    ram      attribute onLevel;
     ram      attribute onTransitionTime;
     ram      attribute offTransitionTime;
     ram      attribute defaultMoveRate default = 50;
-    persist  attribute startUpCurrentLevel default = 255;
+    persist  attribute startUpCurrentLevel;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 5;
   }
