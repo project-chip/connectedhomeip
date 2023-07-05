@@ -249,6 +249,7 @@ public:
         sScheduler.UnregisterAllHandlers();
         readHandlerPool.ReleaseAll();
         exchangeCtx->Close();
+        NL_TEST_ASSERT(aSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
     }
 
     static void TestObserverCallbacks(nlTestSuite * aSuite, void * aContext)
@@ -313,6 +314,7 @@ public:
         sScheduler.UnregisterReadHandler(readHandler);
         readHandlerPool.ReleaseAll();
         exchangeCtx->Close();
+        NL_TEST_ASSERT(aSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
     }
 };
 
