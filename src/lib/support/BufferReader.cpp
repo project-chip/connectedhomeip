@@ -27,6 +27,10 @@ namespace {
 // These helper methods return void and put the value being read into an
 // outparam because that allows us to easily overload on the type of the
 // thing being read.
+void ReadHelper(const uint8_t *& p, bool * dest)
+{
+    *dest = !!Read8(p);
+}
 void ReadHelper(const uint8_t *& p, uint8_t * dest)
 {
     *dest = Read8(p);
@@ -84,6 +88,7 @@ Reader & Reader::ReadBytes(uint8_t * dest, size_t size)
 }
 
 // Explicit Read instantiations for the data types we want to support.
+template void Reader::RawRead(bool *);
 template void Reader::RawRead(uint8_t *);
 template void Reader::RawRead(uint16_t *);
 template void Reader::RawRead(uint32_t *);

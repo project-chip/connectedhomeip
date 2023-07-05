@@ -15,8 +15,13 @@
  */
 #pragma once
 
+#include <app-common/zap-generated/attribute-type.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/data-model/Nullable.h>
 #include <app/util/attribute-metadata.h>
+#include <cstring>
+#include <lib/support/BufferReader.h>
+#include <lib/support/BufferWriter.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -56,17 +61,111 @@ public:
      * Read an attribute value from non-volatile memory.
      *
      * @param [in]     aPath the attribute path for the data being persisted.
-     * @param [in]     aMetadata the attribute metadata, as a convenience.
+     * @param [in]     aType the attribute type.
+     * @param [in]     aSize the attribute size.
      * @param [in,out] aValue where to place the data.  The size of the buffer
-     *                 will be equal to `size` member of aMetadata.
+     *                 will be equal to `size`.
      *
      *                 The data is expected to be in native endianness for
      *                 integers and floats.  For strings, see the string
      *                 representation description in the WriteValue
      *                 documentation.
      */
-    virtual CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata,
+    virtual CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, uint16_t aSize,
                                  MutableByteSpan & aValue) = 0;
+
+    // The following API provides helper functions to simplify the access of commonly used types.
+    // The API may not be complete.
+    // Currently implemented write and read types are: uint8_t, uint16_t, uint32_t, unit64_t and
+    // their nullable varieties, and bool.
+
+    /**
+     * Write an attribute value of type unsigned intX or bool to non-volatile memory.
+     *
+     * @param [in] aPath the attribute path for the data being written.
+     * @param [in] aValue the data to write.
+     */
+    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
+    CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, T & aValue)
+    {
+        uint8_t value[sizeof(T)];
+        auto w = Encoding::LittleEndian::BufferWriter(value, sizeof(T));
+        w.EndianPut(aValue, sizeof(T));
+
+        return WriteValue(aPath, ByteSpan(value));
+    }
+
+    /**
+     * Read an attribute of type unsigned intX or bool from non-volatile memory.
+     *
+     * @param [in]     aPath the attribute path for the data being persisted.
+     * @param [in,out] aValue where to place the data.
+     */
+    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
+    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, T & aValue)
+    {
+        uint8_t attrData[sizeof(T)];
+        MutableByteSpan tempVal(attrData, sizeof(T));
+        // **Note** aType in the ReadValue function is only used to check if the value is of a string type. Since this template
+        // function is only enabled for integral values, we know that this case will not occur, so we can pass the enum of an
+        // arbitrary integral type.
+        auto err = ReadValue(aPath, ZCL_INT8U_ATTRIBUTE_TYPE, sizeof(T), tempVal);
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        chip::Encoding::LittleEndian::Reader r(tempVal.data(), tempVal.size());
+        r.RawRead(&aValue);
+        return r.StatusCode();
+    }
+
+    /**
+     * Write an attribute value of type nullable unsigned intX to non-volatile memory.
+     *
+     * @param [in] aPath the attribute path for the data being written.
+     * @param [in] aValue the data to write.
+     */
+    template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true>
+    CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
+    {
+        if (aValue.IsNull())
+        {
+            T nullValue = 0;
+            nullValue   = ~nullValue;
+            return WriteValue(aPath, nullValue);
+        }
+        return WriteValue(aPath, aValue.Value());
+    }
+
+    /**
+     * Read an attribute of type nullable unsigned intX from non-volatile memory.
+     *
+     * @param [in]     aPath the attribute path for the data being persisted.
+     * @param [in,out] aValue where to place the data.
+     */
+    template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true>
+    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
+    {
+        T tempIntegral;
+        T nullValue = 0;
+        nullValue   = ~nullValue;
+
+        CHIP_ERROR err = ReadValue(aPath, tempIntegral);
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        if (tempIntegral == nullValue)
+        {
+            aValue.SetNull();
+            return CHIP_NO_ERROR;
+        }
+
+        aValue.SetNonNull(tempIntegral);
+        return CHIP_NO_ERROR;
+    }
 };
 
 /**
