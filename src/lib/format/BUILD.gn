@@ -60,6 +60,7 @@ source_set("protocol-decoder") {
     ":flat-tree",
     ":tlv-metadata-headers",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]

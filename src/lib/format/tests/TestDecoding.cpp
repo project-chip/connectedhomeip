@@ -34,8 +34,8 @@ using namespace chip::TLV;
 using namespace chip::TLVMeta;
 using namespace chip::TestData;
 
-const Entry<ItemInfo> _empty_item[0]                         = {};
-const std::array<const Node<ItemInfo>, 1> fake_clusters_meta = { { 0, _empty_item } };
+const Entry<ItemInfo> _empty_item[0]                 = {};
+const std::array<const Node<ItemInfo>, 1> empty_meta = { { 0, _empty_item } };
 
 const Entry<ItemInfo> _FakeProtocolData[] = {
     { { AttributeTag(5), "proto5", ItemType::kDefault }, kInvalidNodeIndex },
@@ -489,7 +489,7 @@ void TestEmptyClusterMetaDataDecode(nlTestSuite * inSuite, void * inContext)
 {
     PayloadDecoderInitParams params;
 
-    params.SetProtocolDecodeTree(chip::TLVMeta::protocols_meta).SetClusterDecodeTree(fake_clusters_meta);
+    params.SetProtocolDecodeTree(chip::TLVMeta::protocols_meta).SetClusterDecodeTree(empty_meta);
 
     TestSampleData(inSuite, params, secure_channel_mrp_ack, "mrp_ack: EMPTY\n");
     TestSampleData(inSuite, params, im_protocol_report_data_acl,
@@ -518,7 +518,7 @@ void TestMissingDecodeData(nlTestSuite * inSuite, void * inContext)
 {
     PayloadDecoderInitParams params;
 
-    params.SetProtocolDecodeTree(fake_clusters_meta).SetClusterDecodeTree(fake_clusters_meta);
+    params.SetProtocolDecodeTree(empty_meta).SetClusterDecodeTree(empty_meta);
 
     TestSampleData(inSuite, params, secure_channel_mrp_ack, "PROTO(0x0, 0x10): UNKNOWN\n");
     TestSampleData(inSuite, params, im_protocol_report_data_acl, "PROTO(0x1, 0x5): UNKNOWN\n");
@@ -528,7 +528,7 @@ void TestWrongDecodeData(nlTestSuite * inSuite, void * inContext)
 {
     PayloadDecoderInitParams params;
 
-    params.SetProtocolDecodeTree(fake_protocols_meta).SetClusterDecodeTree(fake_clusters_meta);
+    params.SetProtocolDecodeTree(fake_protocols_meta).SetClusterDecodeTree(empty_meta);
 
     TestSampleData(inSuite, params, secure_channel_mrp_ack, "proto16: EMPTY\n");
     TestSampleData(inSuite, params, im_protocol_report_data_acl,
@@ -556,7 +556,7 @@ void TestWrongDecodeData(nlTestSuite * inSuite, void * inContext)
 void TestNestingOverflow(nlTestSuite * inSuite, void * inContext)
 {
     PayloadDecoderInitParams params;
-    params.SetProtocolDecodeTree(fake_protocols_meta).SetClusterDecodeTree(fake_clusters_meta);
+    params.SetProtocolDecodeTree(fake_protocols_meta).SetClusterDecodeTree(empty_meta);
 
     uint8_t data_buffer[1024];
     chip::TLV::TLVWriter writer;
