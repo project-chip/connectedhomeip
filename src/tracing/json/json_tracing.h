@@ -55,6 +55,7 @@ public:
     void LogNodeDiscovered(NodeDiscoveredInfo &) override;
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
     void Close() override { CloseFile(); }
+
 private:
     /// Does the actual write of the value
     void OutputValue(::Json::Value & value);
