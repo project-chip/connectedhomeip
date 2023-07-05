@@ -18,7 +18,7 @@ import("${chip_root}/src/app/chip_data_model.gni")
 config("config") {
   include_dirs = [ "include" ]
 }
-print("Hello resource monitoring common")
+
 chip_data_model("resource-monitoring-common") {
   zap_file = "resource-monitoring-app.zap"
 

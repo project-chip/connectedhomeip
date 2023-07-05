@@ -21,7 +21,6 @@ assert(chip_build_tools)
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
-print("Hello world fsfd")
 config("includes") {
   include_dirs = [
     ".",
@@ -34,12 +33,21 @@ executable("chip-resource-monitoring-app") {
     "include/CHIPProjectAppConfig.h",
     "src/main.cpp",
     "src/instances/ActivatedCarbonFilterMonitoring.cpp",
-    "src/instances/HepafilterMonitoring.cpp"
+    "src/instances/HepafilterMonitoring.cpp",
+    "src/instances/CeramicFilterMonitoring.cpp",
+    "src/instances/ElectrostaticFilterMonitoring.cpp",
+    "src/instances/FuelTankMonitoring.cpp",
+    "src/instances/InkCartridgeMonitoring.cpp",
+    "src/instances/IonizingFilterMonitoring.cpp",
+    "src/instances/OzoneFilterMonitoring.cpp",
+    "src/instances/TonerCartridgeMonitoring.cpp",
+    "src/instances/UVFilterMonitoring.cpp",
+    "src/instances/WaterTankMonitoring.cpp",
+    "src/instances/ZeoliteFilterMonitoring.cpp"
   ]
 
   deps = [
     "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common",
-    # "${chip_root}/examples/resource-monitoring-app/lighting-common:lighting-manager",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
   ]

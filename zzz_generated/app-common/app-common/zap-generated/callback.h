@@ -11904,66 +11904,6 @@ bool emberAfRvcOperationalStateClusterResumeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::RvcOperationalState::Commands::Resume::DecodableType & commandData);
 /**
- * @brief Ceramic Filter Monitoring Cluster ResetCondition Command callback (from client)
- */
-bool emberAfCeramicFilterMonitoringClusterResetConditionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CeramicFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
-/**
- * @brief Electrostatic Filter Monitoring Cluster ResetCondition Command callback (from client)
- */
-bool emberAfElectrostaticFilterMonitoringClusterResetConditionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ElectrostaticFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
-/**
- * @brief UV Filter Monitoring Cluster ResetCondition Command callback (from client)
- */
-bool emberAfUvFilterMonitoringClusterResetConditionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::UvFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
-/**
- * @brief Ionizing Filter Monitoring Cluster ResetCondition Command callback (from client)
- */
-bool emberAfIonizingFilterMonitoringClusterResetConditionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::IonizingFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
-/**
- * @brief Zeolite Filter Monitoring Cluster ResetCondition Command callback (from client)
- */
-bool emberAfZeoliteFilterMonitoringClusterResetConditionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ZeoliteFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
-/**
- * @brief Ozone Filter Monitoring Cluster ResetCondition Command callback (from client)
- */
-bool emberAfOzoneFilterMonitoringClusterResetConditionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OzoneFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
-/**
- * @brief Water Tank Monitoring Cluster ResetCondition Command callback (from client)
- */
-bool emberAfWaterTankMonitoringClusterResetConditionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WaterTankMonitoring::Commands::ResetCondition::DecodableType & commandData);
-/**
- * @brief Fuel Tank Monitoring Cluster ResetCondition Command callback (from client)
- */
-bool emberAfFuelTankMonitoringClusterResetConditionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::FuelTankMonitoring::Commands::ResetCondition::DecodableType & commandData);
-/**
- * @brief Ink Cartridge Monitoring Cluster ResetCondition Command callback (from client)
- */
-bool emberAfInkCartridgeMonitoringClusterResetConditionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::InkCartridgeMonitoring::Commands::ResetCondition::DecodableType & commandData);
-/**
- * @brief Toner Cartridge Monitoring Cluster ResetCondition Command callback (from client)
- */
-bool emberAfTonerCartridgeMonitoringClusterResetConditionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TonerCartridgeMonitoring::Commands::ResetCondition::DecodableType & commandData);
-/**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */
 bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj,
