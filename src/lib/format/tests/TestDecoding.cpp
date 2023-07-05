@@ -566,7 +566,8 @@ void TestNestingOverflow(nlTestSuite * inSuite, void * inContext)
     }
     for (uint8_t i = 0; i < 4; i++)
     {
-        NL_TEST_ASSERT(inSuite, writer.StartContainer(ContextTag(static_cast<uint8_t>(i+0x10)), kTLVType_List, unusedType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(
+            inSuite, writer.StartContainer(ContextTag(static_cast<uint8_t>(i + 0x10)), kTLVType_List, unusedType) == CHIP_NO_ERROR);
     }
     for (uint8_t i = 0; i < 4; i++)
     {
@@ -579,7 +580,8 @@ void TestNestingOverflow(nlTestSuite * inSuite, void * inContext)
     }
     for (uint8_t i = 0; i < 4; i++)
     {
-        NL_TEST_ASSERT(inSuite, writer.StartContainer(ContextTag(static_cast<uint8_t>(i+0x20)), kTLVType_List, unusedType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(
+            inSuite, writer.StartContainer(ContextTag(static_cast<uint8_t>(i + 0x20)), kTLVType_List, unusedType) == CHIP_NO_ERROR);
     }
     for (uint8_t i = 0; i < 4; i++)
     {
@@ -592,7 +594,8 @@ void TestNestingOverflow(nlTestSuite * inSuite, void * inContext)
     }
     for (uint8_t i = 0; i < 4; i++)
     {
-        NL_TEST_ASSERT(inSuite, writer.StartContainer(ContextTag(static_cast<uint8_t>(i+0x30)), kTLVType_List, unusedType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(
+            inSuite, writer.StartContainer(ContextTag(static_cast<uint8_t>(i + 0x30)), kTLVType_List, unusedType) == CHIP_NO_ERROR);
     }
     for (uint8_t i = 0; i < 4; i++)
     {
