@@ -550,25 +550,27 @@ void TestStructGenericOperationalCompletionConstructor(nlTestSuite * inSuite, vo
     // completion with only CompletionErrorCode
     GenericOperationCompletion genericOperationCompletion(to_underlying(OperationalStateEnum::kError));
     NL_TEST_ASSERT(inSuite, genericOperationCompletion.completionErrorCode == to_underlying(OperationalStateEnum::kError));
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion.totalOperationalTime.Value().IsNull() == true);
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion.pausedTime.Value().IsNull() == true);
+    NL_TEST_ASSERT(inSuite, genericOperationCompletion.totalOperationalTime.HasValue() == false);
+    NL_TEST_ASSERT(inSuite, genericOperationCompletion.pausedTime.HasValue() == false);
 
     // completion with errorCode and TotalOperationalTime
     uint32_t kTotalOperationalTime = 500;
-    GenericOperationCompletion genericOperationCompletion2(to_underlying(OperationalStateEnum::kError), kTotalOperationalTime);
+    GenericOperationCompletion genericOperationCompletion2(to_underlying(OperationalStateEnum::kError), Optional<DataModel::Nullable<uint32_t>>(DataModel::Nullable<uint32_t>(kTotalOperationalTime)));
     NL_TEST_ASSERT(inSuite, genericOperationCompletion2.completionErrorCode == to_underlying(OperationalStateEnum::kError));
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion2.totalOperationalTime.Value().IsNull() == false);
+
+    NL_TEST_ASSERT(inSuite, genericOperationCompletion2.totalOperationalTime.HasValue() == true);
     NL_TEST_ASSERT(inSuite, genericOperationCompletion2.totalOperationalTime.Value().Value() == kTotalOperationalTime);
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion2.pausedTime.Value().IsNull() == true);
+    NL_TEST_ASSERT(inSuite, genericOperationCompletion2.pausedTime.HasValue() == false);
 
     // completion with errorCode, TotalOperationalTime and PausedTime
     uint32_t kPausedTime = 2000;
-    GenericOperationCompletion genericOperationCompletion3(to_underlying(OperationalStateEnum::kError), kTotalOperationalTime,
-                                                           kPausedTime);
+    GenericOperationCompletion genericOperationCompletion3(to_underlying(OperationalStateEnum::kError), Optional<DataModel::Nullable<uint32_t>>(DataModel::Nullable<uint32_t>(kTotalOperationalTime)),
+                                                           Optional<DataModel::Nullable<uint32_t>>(DataModel::Nullable<uint32_t>(kPausedTime)));
     NL_TEST_ASSERT(inSuite, genericOperationCompletion3.completionErrorCode == to_underlying(OperationalStateEnum::kError));
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion3.totalOperationalTime.Value().IsNull() == false);
+
+    NL_TEST_ASSERT(inSuite, genericOperationCompletion3.totalOperationalTime.HasValue() == true);
     NL_TEST_ASSERT(inSuite, genericOperationCompletion3.totalOperationalTime.Value().Value() == kTotalOperationalTime);
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion3.pausedTime.Value().IsNull() == false);
+    NL_TEST_ASSERT(inSuite, genericOperationCompletion3.pausedTime.HasValue() == true);
     NL_TEST_ASSERT(inSuite, genericOperationCompletion3.pausedTime.Value().Value() == kPausedTime);
 }
 
