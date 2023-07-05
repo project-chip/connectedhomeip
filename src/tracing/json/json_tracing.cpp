@@ -253,7 +253,7 @@ void JsonBackend::Close()
         return;
     }
 
-    mOutputFile <<"]\n";
+    mOutputFile << "]\n";
 
     mOutputFile.close();
 }
@@ -268,7 +268,7 @@ CHIP_ERROR JsonBackend::Open(const char * path)
         return CHIP_ERROR_POSIX(errno);
     }
 
-    mOutputFile <<"[\n";
+    mOutputFile << "[\n";
     mFirstRecord = true;
 
     return CHIP_NO_ERROR;
@@ -281,9 +281,12 @@ void JsonBackend::OutputValue(::Json::Value & value)
 
     if (mOutputFile.is_open())
     {
-        if (!mFirstRecord) {
-            mOutputFile <<",\n";
-        } else {
+        if (!mFirstRecord)
+        {
+            mOutputFile << ",\n";
+        }
+        else
+        {
             mFirstRecord = false;
         }
         value["time_ms"] = chip::System::SystemClock().GetMonotonicTimestamp().count();
