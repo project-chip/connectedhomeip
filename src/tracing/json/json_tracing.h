@@ -19,6 +19,10 @@
 
 #include <tracing/backend.h>
 
+#include <json/json.h>
+
+#include <fstream>
+
 namespace chip {
 namespace Tracing {
 namespace Json {
@@ -34,6 +38,10 @@ class JsonBackend : public ::chip::Tracing::Backend
 {
 public:
     JsonBackend() = default;
+    ~JsonBackend();
+
+    // Start tracing output to the given file
+    CHIP_ERROR Open(const char * path);
 
     void TraceBegin(const char * label, const char * group) override;
     void TraceEnd(const char * label, const char * group) override;
@@ -43,6 +51,14 @@ public:
     void LogNodeLookup(NodeLookupInfo &) override;
     void LogNodeDiscovered(NodeDiscoveredInfo &) override;
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
+
+private:
+    /// Does the actual write of the value
+    void OutputValue(::Json::Value & value);
+
+    // Output file if writing to a file. If closed, writing
+    // to ChipLog*
+    std::fstream mOutputFile;
 };
 
 } // namespace Json

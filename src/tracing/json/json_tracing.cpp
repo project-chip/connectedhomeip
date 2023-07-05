@@ -25,6 +25,8 @@
 
 #include <json/json.h>
 
+#include <errno.h>
+
 #include <sstream>
 #include <string>
 
@@ -35,19 +37,6 @@ namespace Json {
 namespace {
 
 using chip::StringBuilder;
-
-/// Writes the given value to chip log
-void LogJsonValue(::Json::Value const & value)
-{
-    ::Json::StreamWriterBuilder builder;
-
-    std::unique_ptr<::Json::StreamWriter> writer(builder.newStreamWriter());
-    std::stringstream output;
-
-    writer->write(value, &output);
-
-    ChipLogProgress(Automation, "%s", output.str().c_str());
-}
 
 void DecodePayloadHeader(::Json::Value & value, const PayloadHeader * payloadHeader)
 {
@@ -108,13 +97,22 @@ void DecodePayloadData(::Json::Value & value, chip::ByteSpan payload)
 
 } // namespace
 
+JsonBackend::~JsonBackend()
+{
+    if (mOutputFile.is_open())
+    {
+        mOutputFile.close();
+    }
+}
+
 void JsonBackend::TraceBegin(const char * label, const char * group)
 {
     ::Json::Value value;
+
     value["event"] = "TraceBegin";
     value["label"] = label;
     value["group"] = group;
-    LogJsonValue(value);
+    OutputValue(value);
 }
 
 void JsonBackend::TraceEnd(const char * label, const char * group)
@@ -123,7 +121,7 @@ void JsonBackend::TraceEnd(const char * label, const char * group)
     value["event"] = "TraceEnd";
     value["label"] = label;
     value["group"] = group;
-    LogJsonValue(value);
+    OutputValue(value);
 }
 
 void JsonBackend::TraceInstant(const char * label, const char * group)
@@ -132,7 +130,7 @@ void JsonBackend::TraceInstant(const char * label, const char * group)
     value["event"] = "TraceInstant";
     value["label"] = label;
     value["group"] = group;
-    LogJsonValue(value);
+    OutputValue(value);
 }
 
 void JsonBackend::LogMessageSend(MessageSendInfo & info)
@@ -157,7 +155,7 @@ void JsonBackend::LogMessageSend(MessageSendInfo & info)
     DecodePacketHeader(value["packetHeader"], info.packetHeader);
     DecodePayloadData(value["payload"], info.payload);
 
-    LogJsonValue(value);
+    OutputValue(value);
 }
 
 void JsonBackend::LogMessageReceived(MessageReceivedInfo & info)
@@ -183,7 +181,7 @@ void JsonBackend::LogMessageReceived(MessageReceivedInfo & info)
     DecodePacketHeader(value["packetHeader"], info.packetHeader);
     DecodePayloadData(value["payload"], info.payload);
 
-    LogJsonValue(value);
+    OutputValue(value);
 }
 
 void JsonBackend::LogNodeLookup(NodeLookupInfo & info)
@@ -196,7 +194,7 @@ void JsonBackend::LogNodeLookup(NodeLookupInfo & info)
     value["min_lookup_time_ms"]   = info.request->GetMinLookupTime().count();
     value["max_lookup_time_ms"]   = info.request->GetMaxLookupTime().count();
 
-    LogJsonValue(value);
+    OutputValue(value);
 }
 
 void JsonBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
@@ -236,7 +234,7 @@ void JsonBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
         value["result"] = result;
     }
 
-    LogJsonValue(value);
+    OutputValue(value);
 }
 
 void JsonBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info)
@@ -248,7 +246,43 @@ void JsonBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info)
     value["compressed_fabric_id"] = info.peerId->GetCompressedFabricId();
     value["error"]                = chip::ErrorStr(info.error);
 
-    LogJsonValue(value);
+    OutputValue(value);
+}
+
+CHIP_ERROR JsonBackend::Open(const char * path)
+{
+    if (mOutputFile.is_open())
+    {
+        mOutputFile.close();
+    }
+
+    mOutputFile.open(path, std::ios_base::out);
+
+    if (!mOutputFile)
+    {
+        return CHIP_ERROR_POSIX(errno);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void JsonBackend::OutputValue(::Json::Value & value)
+{
+    ::Json::StreamWriterBuilder builder;
+    std::unique_ptr<::Json::StreamWriter> writer(builder.newStreamWriter());
+
+    if (mOutputFile.is_open())
+    {
+        value["time_ms"] = chip::System::SystemClock().GetMonotonicTimestamp().count();
+        writer->write(value, &mOutputFile);
+        mOutputFile.flush();
+    }
+    else
+    {
+        std::stringstream output;
+        writer->write(value, &output);
+        ChipLogProgress(Automation, "%s", output.str().c_str());
+    }
 }
 
 } // namespace Json
