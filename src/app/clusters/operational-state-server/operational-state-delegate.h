@@ -193,13 +193,14 @@ private:
  */
 struct GenericOperationCompletion : public app::Clusters::OperationalState::Events::OperationCompletion::Type
 {
-    GenericOperationCompletion(uint8_t aCompletionErrorCode,
-            const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = Optional<DataModel::Nullable<uint32_t>>::Missing(),
-            const Optional<DataModel::Nullable<uint32_t>> & aPausedTime = Optional<DataModel::Nullable<uint32_t>>::Missing())
+    GenericOperationCompletion(
+        uint8_t aCompletionErrorCode,
+        const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = Optional<DataModel::Nullable<uint32_t>>::Missing(),
+        const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = Optional<DataModel::Nullable<uint32_t>>::Missing())
     {
-        completionErrorCode = aCompletionErrorCode;
+        completionErrorCode  = aCompletionErrorCode;
         totalOperationalTime = aTotalOperationalTime;
-        pausedTime = aPausedTime;
+        pausedTime           = aPausedTime;
     }
 };
 

@@ -52,10 +52,10 @@ void TestOperationalStateDelegatelGetAndSetOperationalState(nlTestSuite * inSuit
     };
 
     // create a delegate
-    OperationalStateDelegate opStateDelegate(
-        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
-        GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)), Span<const GenericOperationalState>(opStateList),
-        Span<const GenericOperationalPhase>(opPhaseList));
+    OperationalStateDelegate opStateDelegate(GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+                                             GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)),
+                                             Span<const GenericOperationalState>(opStateList),
+                                             Span<const GenericOperationalPhase>(opPhaseList));
 
     GenericOperationalState opState(to_underlying(OperationalStateEnum::kRunning));
 
@@ -119,10 +119,10 @@ void TestOperationalStateDelegatelGetOperationalStateList(nlTestSuite * inSuite,
     };
 
     // create a delegate
-    OperationalStateDelegate opStateDelegate(
-        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
-        GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)), Span<const GenericOperationalState>(opStateList),
-        Span<const GenericOperationalPhase>(opPhaseList));
+    OperationalStateDelegate opStateDelegate(GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+                                             GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)),
+                                             Span<const GenericOperationalState>(opStateList),
+                                             Span<const GenericOperationalPhase>(opPhaseList));
 
     GenericOperationalState opState(to_underlying(OperationalStateEnum::kRunning));
     // Get operational state list
@@ -179,10 +179,10 @@ void TestOperationalStateDelegatelGetAndSetOperationalError(nlTestSuite * inSuit
     };
 
     // create a delegate
-    OperationalStateDelegate opStateDelegate(
-        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
-        GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)), Span<const GenericOperationalState>(opStateList),
-        Span<const GenericOperationalPhase>(opPhaseList));
+    OperationalStateDelegate opStateDelegate(GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+                                             GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)),
+                                             Span<const GenericOperationalState>(opStateList),
+                                             Span<const GenericOperationalPhase>(opPhaseList));
 
     GenericOperationalError err(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
 
@@ -260,10 +260,10 @@ void TestOperationalStateDelegatelGetOperationalPhaseListNull(nlTestSuite * inSu
     };
 
     // create a delegate
-    OperationalStateDelegate opStateDelegate(
-        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
-        GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)), Span<const GenericOperationalState>(opStateList),
-        Span<const GenericOperationalPhase>(opPhaseList));
+    OperationalStateDelegate opStateDelegate(GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+                                             GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)),
+                                             Span<const GenericOperationalState>(opStateList),
+                                             Span<const GenericOperationalPhase>(opPhaseList));
 
     GenericOperationalPhase opPhase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
 
@@ -319,10 +319,10 @@ void TestOperationalStateDelegatelGetOperationalPhaseList(nlTestSuite * inSuite,
     };
 
     // create a delegate
-    OperationalStateDelegate opStateDelegate(
-        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
-        GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)), Span<const GenericOperationalState>(opStateList),
-        Span<const GenericOperationalPhase>(opPhaseList));
+    OperationalStateDelegate opStateDelegate(GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+                                             GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)),
+                                             Span<const GenericOperationalState>(opStateList),
+                                             Span<const GenericOperationalPhase>(opPhaseList));
 
     GenericOperationalPhase opPhase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
 

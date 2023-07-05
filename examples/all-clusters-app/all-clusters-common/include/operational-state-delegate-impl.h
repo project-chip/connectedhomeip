@@ -125,12 +125,13 @@ public:
      */
     void HandleStopStateCallback(GenericOperationalError & err) override;
 
-    OperationalStateDelegate(GenericOperationalState aOperationalState,
-                             GenericOperationalError aOperationalError, Span<const GenericOperationalState> aOperationalStateList,
+    OperationalStateDelegate(GenericOperationalState aOperationalState, GenericOperationalError aOperationalError,
+                             Span<const GenericOperationalState> aOperationalStateList,
                              Span<const GenericOperationalPhase> aOperationalPhaseList,
-                             app::DataModel::Nullable<uint8_t> aPhase = DataModel::Nullable<uint8_t>(),
+                             app::DataModel::Nullable<uint8_t> aPhase          = DataModel::Nullable<uint8_t>(),
                              app::DataModel::Nullable<uint32_t> aCountdownTime = DataModel::Nullable<uint32_t>()) :
-        mOperationalState(aOperationalState), mOperationalError(aOperationalError), mOperationalStateList(aOperationalStateList),
+        mOperationalState(aOperationalState),
+        mOperationalError(aOperationalError), mOperationalStateList(aOperationalStateList),
         mOperationalPhaseList(aOperationalPhaseList), mOperationalPhase(aPhase), mCountdownTime(aCountdownTime)
     {}
     ~OperationalStateDelegate() = default;

@@ -135,7 +135,7 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
     delegate->GetCurrentOperationalState(opState);
 
     if (opState.operationalStateID != to_underlying(OperationalStateEnum::kPaused) &&
-             opState.operationalStateID != to_underlying(OperationalStateEnum::kRunning))
+        opState.operationalStateID != to_underlying(OperationalStateEnum::kRunning))
     {
         err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     }
@@ -295,7 +295,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
     case OperationalState::Attributes::CurrentPhase::Id: {
         DataModel::Nullable<uint8_t> currentPhase;
-        Delegate * delegate           = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+        Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
 
         VerifyOrReturnError(delegate != nullptr, CHIP_NO_ERROR, ChipLogError(NotSpecified, "Delegate is nullptr"));
         delegate->GetCurrentPhase(currentPhase);
@@ -305,19 +305,15 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
     case OperationalState::Attributes::CountdownTime::Id: {
         DataModel::Nullable<uint32_t> countdownTime;
-        Delegate * delegate           = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+        Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
 
         VerifyOrReturnError(delegate != nullptr, CHIP_NO_ERROR, ChipLogError(NotSpecified, "Delegate is nullptr"));
         delegate->GetCountdownTime(countdownTime);
         err = aEncoder.Encode(countdownTime);
     }
     break;
-
     }
     return err;
 }
 
-void MatterOperationalStatePluginServerInitCallback()
-{
-
-}
+void MatterOperationalStatePluginServerInitCallback() {}

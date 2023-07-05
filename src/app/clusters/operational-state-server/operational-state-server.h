@@ -75,6 +75,7 @@ public:
     }
 
     ~OperationalStateServer() override {}
+
 private:
     // Inherited from CommandHandlerInterface
     template <typename RequestT, typename FuncT>
