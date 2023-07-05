@@ -194,8 +194,38 @@ client cluster IMProtocol = 0xFFFF0001 {
     int8u interaction_model_revison = 0xFF;
   }
 
+  enum StatusCodeEnum : ENUM8 {
+    kSuccess = 0x0;
+    kFailure = 0x01;
+    kInvalidSubscription = 0x7d;
+    kUnsupportedAccess = 0x7e;
+    kUnsupportedEndpoint = 0x7f;
+    kInvalidAction = 0x80;
+    kUnsupportedCommand = 0x81;
+    kInvalidCommand = 0x85;
+    kUnsupportedAttribute = 0x86;
+    kConstraintError = 0x87;
+    kUnsupportedWrite = 0x88;
+    kResourceExhausted = 0x89;
+    kNotFound = 0x8b;
+    kUnreportableAttribute = 0x8c;
+    kInvalidDataType = 0x8d;
+    kUnsupportedRead = 0x8f;
+    kDataVersionMismatch = 0x92;
+    kTimeout = 0x94;
+    kBusy = 0x9c;
+    kUnsupportedCluster = 0xc3;
+    kNoUpstreamSubscription = 0xc5;
+    kNeedsTimedInteraction = 0xc6;
+    kUnsupportedEvent = 0xc7;
+    kPathsExhausted = 0xc8;
+    kTimedRequestMismatch = 0xc9;
+    kFailsafeRequired = 0xca;
+    kWriteIgnored = 0xF0;
+  }
+
   struct StatusIB {
-    int8u status = 0;
+    StatusCodeEnum status = 0;
     int8u cluster_status = 1;
   }
 

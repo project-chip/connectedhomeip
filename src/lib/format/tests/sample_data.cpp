@@ -92,10 +92,16 @@ const uint8_t payload_1_9[] = {
     0x02, 0x02, 0x18, 0x35, 0x01, 0x24, 0x00, 0x00, 0x18, 0x18, 0x18, 0x18, 0x24, 0xFF, 0x01, 0x18,
 };
 
+// Response for window_covering::config_status
+// Response contains a bitmap value;
+const uint8_t payload_1_5_window_covering[] = { 0x15, 0x36, 0x01, 0x15, 0x35, 0x01, 0x26, 0x00, 0xEA, 0x99, 0x7C, 0x7A, 0x37,
+                                                0x01, 0x24, 0x02, 0x01, 0x25, 0x03, 0x02, 0x01, 0x24, 0x04, 0x07, 0x18, 0x24,
+                                                0x02, 0x1B, 0x18, 0x18, 0x18, 0x29, 0x04, 0x24, 0xFF, 0x01, 0x18 };
+
 } // namespace
 
 const SamplePayload secure_channel_mrp_ack              = { chip::Protocols::Id(VendorId::Common, 0), 16,
-                                               ByteSpan(payload_0_16, sizeof(payload_0_16)) };
+                                                            ByteSpan(payload_0_16, sizeof(payload_0_16)) };
 const SamplePayload secure_channel_pkbdf_param_request  = { chip::Protocols::Id(VendorId::Common, 0), 32, ByteSpan(payload_0_32) };
 const SamplePayload secure_channel_pkbdf_param_response = { chip::Protocols::Id(VendorId::Common, 0), 33, ByteSpan(payload_0_33) };
 const SamplePayload secure_channel_pase_pake1           = { chip::Protocols::Id(VendorId::Common, 0), 34, ByteSpan(payload_0_34) };
@@ -109,6 +115,8 @@ const SamplePayload im_protocol_invoke_request  = { chip::Protocols::Id(VendorId
 const SamplePayload im_protocol_invoke_response = { chip::Protocols::Id(VendorId::Common, 1), 9, ByteSpan(payload_1_9) };
 
 const SamplePayload im_protocol_report_data_acl = { chip::Protocols::Id(VendorId::Common, 1), 5, ByteSpan(payload_1_5_acl) };
+const SamplePayload im_protocol_report_data_window_covering = { chip::Protocols::Id(VendorId::Common, 1), 5,
+                                                                ByteSpan(payload_1_5_window_covering) };
 
 } // namespace TestData
 } // namespace chip

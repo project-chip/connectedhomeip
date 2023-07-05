@@ -188,14 +188,14 @@ void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out, 
 
         uint64_t bit = 0x01;
         bool first   = true;
-        for (unsigned i = 0; i < 64; i++)
+        for (unsigned i = 0; i < 64; i++, bit <<= 1)
         {
             if ((value & bit) == 0)
             {
                 continue;
             }
-            // NOTE: this only can select individual bits;
 
+            // NOTE: this only can select individual bits;
             position.Enter(ByTag(ConstantValueTag(bit)));
             auto bitmap_data = position.Get();
             if (bitmap_data == nullptr)
@@ -217,7 +217,6 @@ void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out, 
 
             out.Add(bitmap_data->name);
             value = value & (~bit);
-            bit <<= 1;
 
             position.Exit();
         }
@@ -225,7 +224,7 @@ void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out, 
         if (!first && value)
         {
             // Only append if some constants were found.
-            out.AddFormat(" | 0x%" PRIX64, value);
+            out.AddFormat(" | 0x%08" PRIX64, value);
         }
     }
 }
