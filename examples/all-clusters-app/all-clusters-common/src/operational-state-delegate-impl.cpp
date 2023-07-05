@@ -98,66 +98,30 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, Ge
 
 void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
-    /*
-     * An example state to present a device that is unable to honour the Pause command
-     */
-    if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
-    {
-        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
-    }
-    else
-    {
-        mOperationalState.Set(to_underlying(OperationalStateEnum::kPaused));
-        err.Set(to_underlying(ErrorStateEnum::kNoError));
-    }
+    // placeholder implementation
+    mOperationalState.Set(to_underlying(OperationalStateEnum::kPaused));
+    err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
 
 void OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
 {
-    /*
-     * An example state to present a device that is unable to honour the Resume command
-     */
-    if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
-    {
-        err.Set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
-    }
-    else
-    {
-        mOperationalState.Set(to_underlying(OperationalStateEnum::kRunning));
-        err.Set(to_underlying(ErrorStateEnum::kNoError));
-    }
+    // placeholder implementation
+    mOperationalState.Set(to_underlying(OperationalStateEnum::kRunning));
+    err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
 
 void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
 {
-    /*
-     * An example state to present a device that is unable to honour the Start command
-     */
-    if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
-    {
-        err.Set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
-    }
-    else
-    {
-        mOperationalState.Set(to_underlying(OperationalStateEnum::kRunning));
-        err.Set(to_underlying(ErrorStateEnum::kNoError));
-    }
+    // placeholder implementation
+    mOperationalState.Set(to_underlying(OperationalStateEnum::kRunning));
+    err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
 
 void OperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
 {
-    /*
-     * An example state to present a device that is unable to honour the Stop command
-     */
-    if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
-    {
-        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
-    }
-    else
-    {
-        mOperationalState.Set(to_underlying(OperationalStateEnum::kStopped));
-        err.Set(to_underlying(ErrorStateEnum::kNoError));
-    }
+    // placeholder implementation
+    mOperationalState.Set(to_underlying(OperationalStateEnum::kStopped));
+    err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
 
 } // namespace OperationalState

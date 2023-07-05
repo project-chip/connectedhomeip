@@ -28,14 +28,6 @@ namespace app {
 namespace Clusters {
 namespace OperationalState {
 
-/*
- * An example state (not in spec) to present a device that is unable to honour the Pause/Resume/Start/Stop command
- */
-enum class ManufactureOperationalStateEnum : uint8_t
-{
-    kChildSafetyLock = 0x80,
-};
-
 // This is an application level delegate to handle operational state commands according to the specific business logic.
 class OperationalStateDelegate : public Delegate
 {
