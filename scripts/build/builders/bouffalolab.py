@@ -79,7 +79,7 @@ class BouffalolabBuilder(GnBuilder):
                  baudrate=2000000,
                  enable_shell: bool = False,
                  enable_cdc: bool = False,
-                 enable_resetCnt : bool = False
+                 enable_resetCnt: bool = False
                  ):
 
         if 'BL602' == module_type:

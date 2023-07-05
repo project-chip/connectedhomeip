@@ -67,7 +67,7 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
-    friend void netif_status_callback(struct netif *netif);
+    friend void netif_status_callback(struct netif * netif);
 
 public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

@@ -24,7 +24,6 @@
 #include <wifi_mgmr_ext.h>
 #include <wifi_mgmr_portable.h>
 
-
 #define WIFI_STA_DISCONNECT_DELAY (pdMS_TO_TICKS(200))
 
 using namespace ::chip;
@@ -48,7 +47,8 @@ CHIP_ERROR BLWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, mSavedNetwork.credentials,
                                                    sizeof(mSavedNetwork.credentials), &credentialsLen);
     SuccessOrExit(err);
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid), &ssidLen);
+    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, mSavedNetwork.ssid,
+                                                   sizeof(mSavedNetwork.ssid), &ssidLen);
     SuccessOrExit(err);
 
     mSavedNetwork.credentialsLen = credentialsLen;
@@ -77,7 +77,8 @@ void BLWiFiDriver::Shutdown()
 CHIP_ERROR BLWiFiDriver::CommitConfiguration()
 {
     ChipLogProgress(NetworkProvisioning, "BLWiFiDriver::CommitConfiguration");
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(BLConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid, mStagingNetwork.ssidLen));
+    ReturnErrorOnFailure(
+        PersistedStorage::KeyValueStoreMgr().Put(BLConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid, mStagingNetwork.ssidLen));
     ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(BLConfig::kConfigKey_WiFiPassword, mStagingNetwork.credentials,
                                                                   mStagingNetwork.credentialsLen));
     mSavedNetwork = mStagingNetwork;
@@ -168,10 +169,12 @@ void BLWiFiDriver::OnConnectWiFiNetwork(bool isConnected)
 {
     if (mpConnectCallback)
     {
-        if (isConnected) {
+        if (isConnected)
+        {
             mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
         }
-        else {
+        else
+        {
             mpConnectCallback->OnResult(Status::kUnknownError, CharSpan(), 0);
         }
         mpConnectCallback = nullptr;

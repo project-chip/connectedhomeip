@@ -28,7 +28,6 @@
 #include <hal_wifi.h>
 #include <wifi_mgmr_ext.h>
 
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -109,7 +108,7 @@ void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TaskHandle_t backup_eventLoopTask;
 
     // Initialize LwIP.

@@ -63,8 +63,8 @@ if (lwip_platform == "cc13xx_26xx") {
 } else if (lwip_platform == "bl602") {
   import("//build_overrides/bouffalolab_iot_sdk.gni")
 } else if (lwip_platform == "bl702") {
-  import("${chip_root}/src/platform/device.gni")
   import("//build_overrides/bouffalolab_iot_sdk.gni")
+  import("${chip_root}/src/platform/device.gni")
 } else if (lwip_platform == "bl702l") {
   import("//build_overrides/bouffalolab_iot_sdk.gni")
 } else if (lwip_platform == "mw320") {
@@ -143,11 +143,10 @@ if (current_os == "zephyr" || current_os == "mbed") {
   group("all") {
     deps = [ ":lwip" ]
   }
-} else if (lwip_platform == "bl702" && defined(chip_enable_openthread) && chip_enable_openthread == false) {
-
+} else if (lwip_platform == "bl702" && defined(chip_enable_openthread) &&
+           chip_enable_openthread == false) {
   # bl702 platform will use ethernet or SPI Wi-Fi for connectivity, if openthread is not enabled
   import("${bouffalolab_iot_sdk_build_root}/bl702/bl_iot_sdk.gni")
-
   group("lwip") {
     public_deps = [ ":lwip_buildconfig" ]
     public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk" ]

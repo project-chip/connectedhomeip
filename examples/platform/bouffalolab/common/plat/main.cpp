@@ -63,8 +63,8 @@ extern "C" {
 #include <rom_lmac154_ext.h>
 #endif
 
-#include <uart.h>
 #include "board.h"
+#include <uart.h>
 }
 
 using namespace ::chip;
@@ -142,10 +142,10 @@ extern "C" void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuff
 
     /* Pass out a pointer to the StaticTask_t structure in which the Idle task's
     state will be stored. */
-    *ppxIdleTaskTCBBuffer = (StaticTask_t *)pvPortMalloc(sizeof(StaticTask_t));
+    *ppxIdleTaskTCBBuffer = (StaticTask_t *) pvPortMalloc(sizeof(StaticTask_t));
 
     /* Pass out the array that will be used as the Idle task's stack. */
-    *ppxIdleTaskStackBuffer = (StackType_t *)pvPortMalloc(sizeof(StackType_t) * configMINIMAL_STACK_SIZE);
+    *ppxIdleTaskStackBuffer = (StackType_t *) pvPortMalloc(sizeof(StackType_t) * configMINIMAL_STACK_SIZE);
 
     /* Pass out the size of the array pointed to by *ppxIdleTaskStackBuffer.
     Note that, as the array is necessarily of type StackType_t,
@@ -165,10 +165,10 @@ extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBu
 
     /* Pass out a pointer to the StaticTask_t structure in which the Timer
     task's state will be stored. */
-    *ppxTimerTaskTCBBuffer = (StaticTask_t *)pvPortMalloc(sizeof(StaticTask_t));
+    *ppxTimerTaskTCBBuffer = (StaticTask_t *) pvPortMalloc(sizeof(StaticTask_t));
 
     /* Pass out the array that will be used as the Timer task's stack. */
-    *ppxTimerTaskStackBuffer = (StackType_t *)pvPortMalloc(sizeof(StackType_t) * configTIMER_TASK_STACK_DEPTH);
+    *ppxTimerTaskStackBuffer = (StackType_t *) pvPortMalloc(sizeof(StackType_t) * configTIMER_TASK_STACK_DEPTH);
 
     /* Pass out the size of the array pointed to by *ppxTimerTaskStackBuffer.
     Note that, as the array is necessarily of type StackType_t,
@@ -193,14 +193,17 @@ extern "C" void vAssertCalled(void)
     void * ra = (void *) __builtin_return_address(0);
 
     taskDISABLE_INTERRUPTS();
-    if (xPortIsInsideInterrupt()) {
-        printf("vAssertCalled, ra = %p in ISR\r\n", (void *)ra);
+    if (xPortIsInsideInterrupt())
+    {
+        printf("vAssertCalled, ra = %p in ISR\r\n", (void *) ra);
     }
-    else {
-        printf("vAssertCalled, ra = %p in task %s\r\n", (void *)ra, pcTaskGetName(NULL));
+    else
+    {
+        printf("vAssertCalled, ra = %p in task %s\r\n", (void *) ra, pcTaskGetName(NULL));
     }
 
-    while (true);
+    while (true)
+        ;
 }
 #endif
 
@@ -210,14 +213,17 @@ extern "C" void __attribute__((weak)) user_vAssertCalled(void)
     void * ra = (void *) __builtin_return_address(0);
 
     taskDISABLE_INTERRUPTS();
-    if (xPortIsInsideInterrupt()) {
-        printf("vAssertCalled, ra = %p in ISR\r\n", (void *)ra);
+    if (xPortIsInsideInterrupt())
+    {
+        printf("vAssertCalled, ra = %p in ISR\r\n", (void *) ra);
     }
-    else {
-        printf("vAssertCalled, ra = %p in task %s\r\n", (void *)ra, pcTaskGetName(NULL));
+    else
+    {
+        printf("vAssertCalled, ra = %p in task %s\r\n", (void *) ra, pcTaskGetName(NULL));
     }
-    
-    while (true);
+
+    while (true)
+        ;
 }
 
 extern "C" void __attribute__((weak)) user_vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
@@ -407,7 +413,7 @@ extern "C" void app_init(void)
     /* board config is set after system is init*/
     hal_board_cfg(0);
 
-#if defined(BL702L_ENABLE) || defined (BL706_WIFI)
+#if defined(BL702L_ENABLE) || defined(BL706_WIFI)
     hosal_dma_init();
 #endif
 #ifdef BL602_ENABLE

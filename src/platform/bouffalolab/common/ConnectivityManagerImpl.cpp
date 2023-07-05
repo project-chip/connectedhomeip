@@ -20,10 +20,10 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
-#include <platform/internal/BLEManager.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <platform/bouffalolab/common/BLConfig.h>
+#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
+#include <platform/internal/BLEManager.h>
 
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
 
@@ -151,14 +151,14 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
     err = PersistedStorage::KeyValueStoreMgr().Delete(BLConfig::kConfigKey_WiFiSSID);
     SuccessOrExit(err);
 
-    err =PersistedStorage::KeyValueStoreMgr().Delete(BLConfig::kConfigKey_WiFiPassword);
+    err = PersistedStorage::KeyValueStoreMgr().Delete(BLConfig::kConfigKey_WiFiPassword);
     SuccessOrExit(err);
-    
+
 exit:
     return;
 }
 
-void ConnectivityManagerImpl::_OnWiFiStationProvisionChange(void) 
+void ConnectivityManagerImpl::_OnWiFiStationProvisionChange(void)
 {
     DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
@@ -170,10 +170,8 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectProvisionedWiFiNetwork(void)
     size_t ssidLen = 0;
     size_t pskLen  = 0;
 
-    ReturnErrorOnFailure(
-        PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, (void *) ssid, 64, &ssidLen, 0));
-    ReturnErrorOnFailure(
-        PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, (void *) psk, 64, &pskLen, 0));
+    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, (void *) ssid, 64, &ssidLen, 0));
+    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, (void *) psk, 64, &pskLen, 0));
 
     NetworkCommissioning::BLWiFiDriver::GetInstance().ConnectWiFiNetwork(ssid, ssidLen, psk, pskLen);
 
@@ -195,55 +193,50 @@ void ConnectivityManagerImpl::OnWiFiStationConnected()
     }
 }
 
-void ConnectivityManagerImpl::DriveStationState() 
+void ConnectivityManagerImpl::DriveStationState()
 {
     ChipLogProgress(DeviceLayer, "DriveStationState: mWiFiStationState=%s", WiFiStationStateToStr(mWiFiStationState));
-    switch(mWiFiStationState)
+    switch (mWiFiStationState)
     {
-        case ConnectivityManager::kWiFiStationState_NotConnected:
+    case ConnectivityManager::kWiFiStationState_NotConnected: {
+        if (GetWiFiStationMode() == ConnectivityManager::kWiFiStationMode_Enabled && IsWiFiStationProvisioned())
         {
-            if (GetWiFiStationMode() == ConnectivityManager::kWiFiStationMode_Enabled && IsWiFiStationProvisioned())
-            {
-                ConnectProvisionedWiFiNetwork();
-            }
+            ConnectProvisionedWiFiNetwork();
         }
-        break;
-        case ConnectivityManager::kWiFiStationState_Connecting:
+    }
+    break;
+    case ConnectivityManager::kWiFiStationState_Connecting: {
+        ChipLogProgress(DeviceLayer, "Wi-Fi station is connecting to AP");
+    }
+    break;
+    case ConnectivityManager::kWiFiStationState_Connecting_Succeeded: {
+        ChipLogProgress(DeviceLayer, "Wi-Fi station successfully connects to AP");
+        mConnectivityFlag.ClearAll();
+        mConnectivityFlag.Set(ConnectivityFlags::kAwaitingConnectivity);
+    }
+    break;
+    case ConnectivityManager::kWiFiStationState_Connecting_Failed: {
+        ChipLogProgress(DeviceLayer, "Wi-Fi station connecting failed");
+        mConnectivityFlag.ClearAll();
+        OnWiFiStationDisconnected();
+        if (ConnectivityManager::kWiFiStationState_Connecting == mWiFiStationState)
         {
-            ChipLogProgress(DeviceLayer, "Wi-Fi station is connecting to AP");
+            SystemLayer().ScheduleLambda([]() { NetworkCommissioning::BLWiFiDriver::GetInstance().OnConnectWiFiNetwork(false); });
         }
-        break;
-        case ConnectivityManager::kWiFiStationState_Connecting_Succeeded:
-        {
-            ChipLogProgress(DeviceLayer, "Wi-Fi station successfully connects to AP");
-            mConnectivityFlag.ClearAll();
-            mConnectivityFlag.Set(ConnectivityFlags::kAwaitingConnectivity);
-        }
-        break;
-        case ConnectivityManager::kWiFiStationState_Connecting_Failed:
-        {
-            ChipLogProgress(DeviceLayer, "Wi-Fi station connecting failed");
-            mConnectivityFlag.ClearAll();
-            OnWiFiStationDisconnected();
-            if (ConnectivityManager::kWiFiStationState_Connecting == mWiFiStationState) {
-                SystemLayer().ScheduleLambda([]() { NetworkCommissioning::BLWiFiDriver::GetInstance().OnConnectWiFiNetwork(false); });
-            }
-        }
-        break;
-        case ConnectivityManager::kWiFiStationState_Connected:
-        {
-            ChipLogProgress(DeviceLayer, "Wi-Fi stattion connected.");
-            OnWiFiStationConnected();
-            SystemLayer().ScheduleLambda([]() { NetworkCommissioning::BLWiFiDriver::GetInstance().OnConnectWiFiNetwork(true); });
-        }
-        break;
-        case ConnectivityManager::kWiFiStationState_Disconnecting:
-        {
-            ChipLogProgress(DeviceLayer, "Wi-Fi station is disconnecting to AP");
-            mConnectivityFlag.ClearAll();
-        }
-        break;
-        default:
+    }
+    break;
+    case ConnectivityManager::kWiFiStationState_Connected: {
+        ChipLogProgress(DeviceLayer, "Wi-Fi stattion connected.");
+        OnWiFiStationConnected();
+        SystemLayer().ScheduleLambda([]() { NetworkCommissioning::BLWiFiDriver::GetInstance().OnConnectWiFiNetwork(true); });
+    }
+    break;
+    case ConnectivityManager::kWiFiStationState_Disconnecting: {
+        ChipLogProgress(DeviceLayer, "Wi-Fi station is disconnecting to AP");
+        mConnectivityFlag.ClearAll();
+    }
+    break;
+    default:
         break;
     }
 }
@@ -257,10 +250,10 @@ void ConnectivityManagerImpl::DriveStationState(::chip::System::Layer * aLayer, 
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
 void ConnectivityManagerImpl::OnConnectivityChanged(struct netif * interface)
 {
-    bool haveIPv4Conn = false;
-    bool haveIPv6Conn = false;
-    const bool hadIPv4Conn  = mConnectivityFlag.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
-    const bool hadIPv6Conn  = mConnectivityFlag.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
+    bool haveIPv4Conn      = false;
+    bool haveIPv6Conn      = false;
+    const bool hadIPv4Conn = mConnectivityFlag.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
+    const bool hadIPv6Conn = mConnectivityFlag.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
     IPAddress addr;
 
     if (interface != NULL && netif_is_up(interface) && netif_is_link_up(interface))
@@ -273,7 +266,8 @@ void ConnectivityManagerImpl::OnConnectivityChanged(struct netif * interface)
             char addrStr[INET_ADDRSTRLEN];
             ip4addr_ntoa_r(netif_ip4_addr(interface), addrStr, sizeof(addrStr));
             IPAddress::FromString(addrStr, addr);
-            if (0 != memcmp(netif_ip4_addr(interface), &m_ip4addr, sizeof(ip4_addr_t))) {
+            if (0 != memcmp(netif_ip4_addr(interface), &m_ip4addr, sizeof(ip4_addr_t)))
+            {
                 ChipLogProgress(DeviceLayer, "IPv4 Address Assigned, %s", ip4addr_ntoa(netif_ip4_addr(interface)));
                 memcpy(&m_ip4addr, netif_ip4_addr(interface), sizeof(ip4_addr_t));
                 ConnectivityMgrImpl().OnIPv4AddressAvailable();
@@ -284,11 +278,11 @@ void ConnectivityManagerImpl::OnConnectivityChanged(struct netif * interface)
         // address (2000::/3) that is in the valid state.  If such an address is found...
         for (uint32_t i = 0; i < LWIP_IPV6_NUM_ADDRESSES; i++)
         {
-            if (!ip6_addr_islinklocal(netif_ip6_addr(interface, i)) &&
-                ip6_addr_isvalid(netif_ip6_addr_state(interface, i)))
+            if (!ip6_addr_islinklocal(netif_ip6_addr(interface, i)) && ip6_addr_isvalid(netif_ip6_addr_state(interface, i)))
             {
                 haveIPv6Conn = true;
-                if (0 != memcmp(netif_ip6_addr(interface, i), m_ip6addr + i, sizeof(ip6_addr_t))) {
+                if (0 != memcmp(netif_ip6_addr(interface, i), m_ip6addr + i, sizeof(ip6_addr_t)))
+                {
                     ChipLogProgress(DeviceLayer, "IPv6 Address Assigned, %s", ip6addr_ntoa(netif_ip6_addr(interface, i)));
                     memcpy(m_ip6addr + i, netif_ip6_addr(interface, i), sizeof(ip6_addr_t));
                     ConnectivityMgrImpl().OnIPv6AddressAvailable();

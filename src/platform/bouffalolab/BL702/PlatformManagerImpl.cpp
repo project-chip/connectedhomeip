@@ -26,8 +26,8 @@
 #include <lwip/tcpip.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <utils_list.h>
 #include <openthread_port.h>
+#include <utils_list.h>
 #else
 #include <platform/bouffalolab/BL702/EthernetInterface.h>
 #endif
@@ -59,7 +59,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
-    
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     otRadio_opt_t opt;
     opt.byte            = 0;
