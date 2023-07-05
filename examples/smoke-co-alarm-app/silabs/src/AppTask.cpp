@@ -140,7 +140,11 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonActionEventHandler(AppEvent * aEvent)
 {
-    SILABS_LOG("Button pressed!");
+    bool success = AlarmMgr().ManualSelfTesting();
+    if (!success)
+    {
+        SILABS_LOG("Manual self-test failed");
+    }
 }
 
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)

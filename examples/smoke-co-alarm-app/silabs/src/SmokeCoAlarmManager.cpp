@@ -34,8 +34,8 @@ TimerHandle_t sAlarmTimer;
 CHIP_ERROR SmokeCoAlarmManager::Init()
 {
     mExpressedStatePriority = {
-        ExpressedStateEnum::kEndOfService,  ExpressedStateEnum::kSmokeAlarm,        ExpressedStateEnum::kCOAlarm,
-        ExpressedStateEnum::kTesting,       ExpressedStateEnum::kInterconnectSmoke, ExpressedStateEnum::kInterconnectCO,
+        ExpressedStateEnum::kTesting,       ExpressedStateEnum::kEndOfService,      ExpressedStateEnum::kSmokeAlarm,
+        ExpressedStateEnum::kCOAlarm,       ExpressedStateEnum::kInterconnectSmoke, ExpressedStateEnum::kInterconnectCO,
         ExpressedStateEnum::kHardwareFault, ExpressedStateEnum::kBatteryAlert,      ExpressedStateEnum::kNormal
     };
 
@@ -98,6 +98,8 @@ CHIP_ERROR SmokeCoAlarmManager::Init()
     }
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
+    mEndSelfTesting = false;
+
     return CHIP_NO_ERROR;
 }
 
@@ -139,45 +141,80 @@ void SmokeCoAlarmManager::TimerEventHandler(TimerHandle_t xTimer)
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;
     event.TimerEvent.Context = alarm;
-    if (alarm->mSelfTesting)
+    if (alarm->mEndSelfTesting)
     {
-        event.Handler = SelfTestingTimerEventHandler;
-    }
-    else if (alarm->mHandleEventTrigger)
-    {
-        event.Handler = EventTriggerTimerEventHandler;
+        event.Handler = EndSelfTestingEventHandler;
     }
     AppTask::GetAppTask().PostEvent(&event);
 }
 
-void SmokeCoAlarmManager::SelfTestingTimerEventHandler(AppEvent * aEvent)
+void SmokeCoAlarmManager::SelfTestingEventHandler(AppEvent * aEvent)
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-
     bool success = SmokeCoAlarmServer::Instance().SetTestInProgress(1, true);
-    if (success)
-    {
-        SILABS_LOG("Start self-testing!");
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-        SILABS_LOG("End self-testing!");
+    if (!success)
+    {
+        SILABS_LOG("Start self-testing failed");
+        return;
     }
 
-    SmokeCoAlarmServer::Instance().SetTestInProgress(1, false);
-    AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kTesting, false);
+    SILABS_LOG("Start self-testing!");
 
+    AlarmMgr().mEndSelfTesting = true;
+    AlarmMgr().StartTimer(10000); // Self-test simulation in progress
+}
+
+void SmokeCoAlarmManager::EndSelfTestingEventHandler(AppEvent * aEvent)
+{
+    AlarmMgr().mEndSelfTesting = false;
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    bool success = SmokeCoAlarmServer::Instance().SetTestInProgress(1, false);
+    if (success)
+    {
+        AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kTesting, false);
+        SILABS_LOG("End self-testing!");
+    }
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
-void SmokeCoAlarmManager::EventTriggerTimerEventHandler(AppEvent * aEvent)
+bool SmokeCoAlarmManager::OnSelfTesting()
 {
-    SmokeCoAlarmManager * alarm = static_cast<SmokeCoAlarmManager *>(aEvent->TimerEvent.Context);
-    bool success                = true;
+    AppEvent event;
+    event.Handler = SelfTestingEventHandler;
+    AppTask::GetAppTask().PostEvent(&event);
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    return true;
+}
 
-    switch (alarm->mEventTrigger)
+bool SmokeCoAlarmManager::ManualSelfTesting()
+{
+    bool success = false;
+
+    if ((mExpressedStateMask & 0b110010110) == 0)
     {
-    case 0xffffffff00000090:
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kTesting, true);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+        if (success)
+        {
+            success = OnSelfTesting();
+        }
+    }
+
+    return success;
+}
+
+bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
+{
+    bool success = false;
+
+    switch (eventTrigger)
+    {
+    case kTriggeredEvent_SmokeAlarm:
         success = SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kWarning);
         if (success)
         {
@@ -185,7 +222,7 @@ void SmokeCoAlarmManager::EventTriggerTimerEventHandler(AppEvent * aEvent)
         }
         break;
 
-    case 0xffffffff000000a0:
+    case kTriggeredEvent_SmokeAlarmClear:
         success = SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kNormal);
         if (success)
         {
@@ -193,7 +230,7 @@ void SmokeCoAlarmManager::EventTriggerTimerEventHandler(AppEvent * aEvent)
         }
         break;
 
-    case 0xffffffff00000091:
+    case kTriggeredEvent_COAlarm:
         success = SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kWarning);
         if (success)
         {
@@ -201,7 +238,7 @@ void SmokeCoAlarmManager::EventTriggerTimerEventHandler(AppEvent * aEvent)
         }
         break;
 
-    case 0xffffffff000000a1:
+    case kTriggeredEvent_COAlarmClear:
         success = SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kNormal);
         if (success)
         {
@@ -209,7 +246,7 @@ void SmokeCoAlarmManager::EventTriggerTimerEventHandler(AppEvent * aEvent)
         }
         break;
 
-    case 0xffffffff00000095:
+    case kTriggeredEvent_BatteryAlert:
         success = SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kWarning);
         if (success)
         {
@@ -217,7 +254,7 @@ void SmokeCoAlarmManager::EventTriggerTimerEventHandler(AppEvent * aEvent)
         }
         break;
 
-    case 0xffffffff000000a5:
+    case kTriggeredEvent_BatteryAlertClear:
         success = SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kNormal);
         if (success)
         {
@@ -225,7 +262,7 @@ void SmokeCoAlarmManager::EventTriggerTimerEventHandler(AppEvent * aEvent)
         }
         break;
 
-    case 0xffffffff00000093:
+    case kTriggeredEvent_HardwareFaultAlert:
         success = SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, true);
         if (success)
         {
@@ -233,7 +270,7 @@ void SmokeCoAlarmManager::EventTriggerTimerEventHandler(AppEvent * aEvent)
         }
         break;
 
-    case 0xffffffff000000a3:
+    case kTriggeredEvent_HardwareFaultAlertClear:
         success = SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, false);
         if (success)
         {
@@ -241,7 +278,7 @@ void SmokeCoAlarmManager::EventTriggerTimerEventHandler(AppEvent * aEvent)
         }
         break;
 
-    case 0xffffffff0000009a:
+    case kTriggeredEvent_EndofServiceAlert:
         success = SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, EndOfServiceEnum::kExpired);
         if (success)
         {
@@ -249,7 +286,7 @@ void SmokeCoAlarmManager::EventTriggerTimerEventHandler(AppEvent * aEvent)
         }
         break;
 
-    case 0xffffffff000000aa:
+    case kTriggeredEvent_EndofServiceAlertClear:
         success = SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, EndOfServiceEnum::kNormal);
         if (success)
         {
@@ -257,15 +294,15 @@ void SmokeCoAlarmManager::EventTriggerTimerEventHandler(AppEvent * aEvent)
         }
         break;
 
-    case 0xffffffff0000009b:
+    case kTriggeredEvent_DeviceMute:
         success = SmokeCoAlarmServer::Instance().SetDeviceMuted(1, MuteStateEnum::kMuted);
         break;
 
-    case 0xffffffff000000ab:
+    case kTriggeredEvent_DeviceMuteClear:
         success = SmokeCoAlarmServer::Instance().SetDeviceMuted(1, MuteStateEnum::kNotMuted);
         break;
 
-    case 0xffffffff00000092:
+    case kTriggeredEvent_InterconnectSmokeAlarm:
         success = SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(1, AlarmStateEnum::kWarning);
         if (success)
         {
@@ -273,7 +310,7 @@ void SmokeCoAlarmManager::EventTriggerTimerEventHandler(AppEvent * aEvent)
         }
         break;
 
-    case 0xffffffff000000a2:
+    case kTriggeredEvent_InterconnectSmokeAlarmClear:
         success = SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(1, AlarmStateEnum::kNormal);
         if (success)
         {
@@ -281,7 +318,7 @@ void SmokeCoAlarmManager::EventTriggerTimerEventHandler(AppEvent * aEvent)
         }
         break;
 
-    case 0xffffffff00000094:
+    case kTriggeredEvent_InterconnectCOAlarm:
         success = SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(1, AlarmStateEnum::kWarning);
         if (success)
         {
@@ -289,7 +326,7 @@ void SmokeCoAlarmManager::EventTriggerTimerEventHandler(AppEvent * aEvent)
         }
         break;
 
-    case 0xffffffff000000a4:
+    case kTriggeredEvent_InterconnectCOAlarmClear:
         success = SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(1, AlarmStateEnum::kNormal);
         if (success)
         {
@@ -297,27 +334,27 @@ void SmokeCoAlarmManager::EventTriggerTimerEventHandler(AppEvent * aEvent)
         }
         break;
 
-    case 0xffffffff00000096:
+    case kTriggeredEvent_ContaminationStateHigh:
         success = SmokeCoAlarmServer::Instance().SetContaminationState(1, ContaminationStateEnum::kWarning);
         break;
 
-    case 0xffffffff00000097:
+    case kTriggeredEvent_ContaminationStateLow:
         success = SmokeCoAlarmServer::Instance().SetContaminationState(1, ContaminationStateEnum::kLow);
         break;
 
-    case 0xffffffff000000a6:
+    case kTriggeredEvent_ContaminationStateClear:
         success = SmokeCoAlarmServer::Instance().SetContaminationState(1, ContaminationStateEnum::kNormal);
         break;
 
-    case 0xffffffff00000098:
+    case kTriggeredEvent_SensitivityLevelHigh:
         success = SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, SensitivityEnum::kHigh);
         break;
 
-    case 0xffffffff00000099:
+    case kTriggeredEvent_SensitivityLevelLow:
         success = SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, SensitivityEnum::kLow);
         break;
 
-    case 0xffffffff000000a8:
+    case kTriggeredEvent_SensitivityLevelClear:
         success = SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, SensitivityEnum::kStandard);
         break;
 
@@ -325,24 +362,7 @@ void SmokeCoAlarmManager::EventTriggerTimerEventHandler(AppEvent * aEvent)
         break;
     }
 
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-}
-
-bool SmokeCoAlarmManager::StartSelfTesting()
-{
-    AlarmMgr().mSelfTesting = true;
-    AlarmMgr().StartTimer(10);
-
-    return true;
-}
-
-bool SmokeCoAlarmManager::StartHandleEventTrigger(uint64_t eventTrigger)
-{
-    AlarmMgr().mHandleEventTrigger = true;
-    AlarmMgr().mEventTrigger       = eventTrigger;
-    AlarmMgr().StartTimer(1000);
-
-    return true;
+    return success;
 }
 
 bool SmokeCoAlarmManager::SetExpressedState(EndpointId endpointId, ExpressedStateEnum expressedState, bool isSet)

@@ -33,19 +33,51 @@ class SmokeCoAlarmManager
 public:
     using ExpressedStateEnum = chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum;
 
+    enum TriggeredEvent_t
+    {
+        kTriggeredEvent_SmokeAlarm                  = 0xffffffff00000090,
+        kTriggeredEvent_SmokeAlarmClear             = 0xffffffff000000a0,
+        kTriggeredEvent_COAlarm                     = 0xffffffff00000091,
+        kTriggeredEvent_COAlarmClear                = 0xffffffff000000a1,
+        kTriggeredEvent_BatteryAlert                = 0xffffffff00000095,
+        kTriggeredEvent_BatteryAlertClear           = 0xffffffff000000a5,
+        kTriggeredEvent_HardwareFaultAlert          = 0xffffffff00000093,
+        kTriggeredEvent_HardwareFaultAlertClear     = 0xffffffff000000a3,
+        kTriggeredEvent_EndofServiceAlert           = 0xffffffff0000009a,
+        kTriggeredEvent_EndofServiceAlertClear      = 0xffffffff000000aa,
+        kTriggeredEvent_DeviceMute                  = 0xffffffff0000009b,
+        kTriggeredEvent_DeviceMuteClear             = 0xffffffff000000ab,
+        kTriggeredEvent_InterconnectSmokeAlarm      = 0xffffffff00000092,
+        kTriggeredEvent_InterconnectSmokeAlarmClear = 0xffffffff000000a2,
+        kTriggeredEvent_InterconnectCOAlarm         = 0xffffffff00000094,
+        kTriggeredEvent_InterconnectCOAlarmClear    = 0xffffffff000000a4,
+        kTriggeredEvent_ContaminationStateHigh      = 0xffffffff00000096,
+        kTriggeredEvent_ContaminationStateLow       = 0xffffffff00000097,
+        kTriggeredEvent_ContaminationStateClear     = 0xffffffff000000a6,
+        kTriggeredEvent_SensitivityLevelHigh        = 0xffffffff00000098,
+        kTriggeredEvent_SensitivityLevelLow         = 0xffffffff00000099,
+        kTriggeredEvent_SensitivityLevelClear       = 0xffffffff000000a8,
+    } TriggeredEvent;
+
     CHIP_ERROR Init();
 
     /**
      * @brief Execute the self-test process and attribute changes
      *
      */
-    bool StartSelfTesting();
+    bool OnSelfTesting();
+
+    /**
+     * @brief Execute the self-test process manually
+     *
+     */
+    bool ManualSelfTesting();
 
     /**
      * @brief Execute the HandleEventTrigger process
      *
      */
-    bool StartHandleEventTrigger(uint64_t eventTrigger);
+    bool OnEventTriggerHandle(uint64_t eventTrigger);
 
     /**
      * @brief Updates the expressed state with new value
@@ -72,16 +104,14 @@ private:
      */
     int mExpressedStateMask = 1;
 
-    bool mSelfTesting;
-    bool mHandleEventTrigger;
-    uint64_t mEventTrigger;
+    bool mEndSelfTesting;
 
     void CancelTimer(void);
     void StartTimer(uint32_t aTimeoutMs);
 
     static void TimerEventHandler(TimerHandle_t xTimer);
-    static void SelfTestingTimerEventHandler(AppEvent * aEvent);
-    static void EventTriggerTimerEventHandler(AppEvent * aEvent);
+    static void SelfTestingEventHandler(AppEvent * aEvent);
+    static void EndSelfTestingEventHandler(AppEvent * aEvent);
 
     static SmokeCoAlarmManager sAlarm;
 };

@@ -64,10 +64,10 @@ void emberAfSmokeCoAlarmClusterInitCallback(EndpointId endpoint)
 
 bool emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId)
 {
-    return AlarmMgr().StartSelfTesting();
+    return AlarmMgr().OnSelfTesting();
 }
 
 bool emberAfHandleEventTrigger(uint64_t eventTrigger)
 {
-    return AlarmMgr().StartHandleEventTrigger(eventTrigger);
+    return AlarmMgr().OnEventTriggerHandle(eventTrigger);
 }
