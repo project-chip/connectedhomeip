@@ -24,7 +24,7 @@
 
 from __future__ import absolute_import, print_function
 
-from ctypes import *
+from ctypes import Structure, c_bool, c_int32, c_uint16, c_void_p
 
 from .ChipUtility import ChipUtility
 
@@ -62,7 +62,7 @@ def VoidPtrToUUIDString(ptr, len):
             + ptr[20:]
         )
         ptr = str(ptr)
-    except Exception as ex:
+    except Exception:
         print("ERROR: failed to convert void * to UUID")
         ptr = None
 
@@ -319,7 +319,7 @@ class BleRxEventStruct(Structure):
         bleRxEventStruct.Buffer = ChipUtility.ByteArrayToVoidPtr(
             bleRxEvent.Buffer)
         bleRxEventStruct.Length = (
-            len(bleRxEvent.Buffer) if (bleRxEvent.Buffer != None) else 0
+            len(bleRxEvent.Buffer) if (bleRxEvent.Buffer is not None) else 0
         )
         return bleRxEventStruct
 

@@ -25,16 +25,18 @@ import chip.interaction_model
 import chip.yaml.format_converter as Converter
 import stringcase
 from chip.ChipDeviceCtrl import ChipDeviceController, discovery
+from chip.clusters import ClusterObjects
 from chip.clusters.Attribute import (AttributeStatus, EventReadResult, SubscriptionTransaction, TypedAttributePath,
                                      ValueDecodeFailure)
 from chip.exceptions import ChipStackError
+from chip.yaml.data_model_lookup import DataModelLookup
 from chip.yaml.errors import ActionCreationError, UnexpectedActionCreationError
 from matter_yamltests.pseudo_clusters.clusters.delay_commands import DelayCommands
 from matter_yamltests.pseudo_clusters.clusters.log_commands import LogCommands
 from matter_yamltests.pseudo_clusters.clusters.system_commands import SystemCommands
 from matter_yamltests.pseudo_clusters.pseudo_clusters import PseudoClusters
 
-from .data_model_lookup import *
+from .data_model_lookup import PreDefinedDataModelLookup
 
 _PSEUDO_CLUSTERS = PseudoClusters([DelayCommands(), LogCommands(), SystemCommands()])
 logger = logging.getLogger('YamlParser')
@@ -369,7 +371,7 @@ class WaitForCommissioneeAction(BaseAction):
 
 
 class AttributeChangeAccumulator:
-    def __init__(self, name: str, expected_attribute: Clusters.ClusterAttributeDescriptor,
+    def __init__(self, name: str, expected_attribute: ClusterObjects.ClusterAttributeDescriptor,
                  output_queue: queue.SimpleQueue):
         self._name = name
         self._expected_attribute = expected_attribute
@@ -556,7 +558,7 @@ class WriteAttributeAction(BaseAction):
 
         args = test_step.arguments['values']
         if len(args) != 1:
-            raise UnexpectedActionCreationError(f'WriteAttribute is trying to write multiple values')
+            raise UnexpectedActionCreationError('WriteAttribute is trying to write multiple values')
         request_data_as_dict = args[0]
         try:
             # TODO this is an ugly hack
@@ -614,11 +616,11 @@ class WaitForReportAction(BaseAction):
             queue_name = stringcase.pascalcase(test_step.event)
         else:
             raise UnexpectedActionCreationError(
-                f'WaitForReport needs to wait on either attribute or event, neither were provided')
+                'WaitForReport needs to wait on either attribute or event, neither were provided')
 
         self._output_queue = context.subscription_callback_result_queue.get(queue_name, None)
         if self._output_queue is None:
-            raise UnexpectedActionCreationError(f'Could not find output queue')
+            raise UnexpectedActionCreationError('Could not find output queue')
 
     async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
