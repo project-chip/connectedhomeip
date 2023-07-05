@@ -16,8 +16,9 @@
  */
 
 #include <easyflash.h>
-#include <platform/bouffalolab/common/BLConfig.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
+#include <platform/bouffalolab/common/BLConfig.h>
 
 namespace chip {
 namespace DeviceLayer {
