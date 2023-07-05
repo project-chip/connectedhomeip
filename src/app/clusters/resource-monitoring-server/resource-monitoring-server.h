@@ -40,10 +40,12 @@ public:
     /**
      * Initialise the Resource Monitoring cluster.
      *
-     * @return CHIP_ERROR   If the cluster ID given ist not a valid Resource Monitoring cluster ID.
-     * @return CHIP_ERROR   If the endpoint and cluster ID have not been enabled in zap.
-     * @return CHIP_ERROR   If the CommandHandler or Attribute Handler could not be registered.
-     * @return CHIP_ERROR   If the AppInit() function returned an error.
+     * @return CHIP_ERROR       If the cluster ID given ist not a valid Resource Monitoring cluster ID.
+     * @return CHIP_ERROR       If the endpoint and cluster ID have not been enabled in zap.
+     * @return CHIP_ERROR       If the CommandHandler or Attribute Handler could not be registered.
+     * @return CHIP_ERROR       If the AppInit() function returned an error.
+     *
+     * @return CHIP_NO_ERROR    If the cluster was initialised successfully.
      */
     CHIP_ERROR Init();
 
