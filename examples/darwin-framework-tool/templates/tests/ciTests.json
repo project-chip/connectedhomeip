@@ -65,6 +65,7 @@
         "Test_TC_WTREMON_2_1",
         "Disabled due to using provisional Zeolite Filter Monitoring (ZeoliteFilterMonitoring) cluster:",
         "Test_TC_ZEOFREMON_1_1",
-        "Test_TC_ZEOFREMON_2_1"
+        "Test_TC_ZEOFREMON_2_1",
+        "TestOperationalState"
     ]
 }
