@@ -2440,6 +2440,7 @@ server cluster OperationalState = 96 {
 
   readonly attribute nullable CHAR_STRING phaseList[] = 0;
   readonly attribute nullable int8u currentPhase = 1;
+  readonly attribute nullable elapsed_s countdownTime = 2;
   readonly attribute OperationalStateStruct operationalStateList[] = 3;
   readonly attribute OperationalStateStruct operationalState = 4;
   readonly attribute ErrorStateStruct operationalError = 5;
@@ -6237,6 +6238,7 @@ endpoint 1 {
     emits event OperationCompletion;
     callback attribute phaseList;
     callback attribute currentPhase;
+    callback attribute countdownTime;
     callback attribute operationalStateList;
     callback attribute operationalState;
     callback attribute operationalError;
