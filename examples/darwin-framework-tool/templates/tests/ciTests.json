@@ -35,6 +35,7 @@
         "TestIcdManagementCluster",
         "Disabled due to using Time Synchronization (TimeSynchronization) cluster, which is provisional on Darwin for now:",
         "Test_TC_TIMESYNC_1_1",
+        "TestTimeSynchronization",
         "Disabled due to using provisional Ceramic Filter Monitoring (CeramicFilterMonitoring) cluster:",
         "Test_TC_CFREMON_1_1",
         "Test_TC_CFREMON_2_1",
