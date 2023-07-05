@@ -44,7 +44,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeap
 #ifdef CFG_USE_PSRAM
     size_t freeHeapSize = xPortGetFreeHeapSize() + xPortGetFreeHeapSizePsram();
 #else
-    size_t freeHeapSize = xPortGetFreeHeapSize();
+    size_t freeHeapSize      = xPortGetFreeHeapSize();
 #endif
 
     currentHeapFree = static_cast<uint64_t>(freeHeapSize);
@@ -56,7 +56,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 #ifdef CFG_USE_PSRAM
     currentHeapUsed = (get_heap_size() + get_heap3_size() - xPortGetFreeHeapSize() - xPortGetFreeHeapSizePsram());
 #else
-    currentHeapUsed = (get_heap_size() - xPortGetFreeHeapSize());
+    currentHeapUsed          = (get_heap_size() - xPortGetFreeHeapSize());
 #endif
 
     return CHIP_NO_ERROR;
@@ -233,7 +233,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ifp->type          = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
 #else
-    ifp->type          = EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
+    ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
 #endif
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();

@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConnectivityManager.h>
@@ -33,7 +32,7 @@ namespace chip {
 namespace DeviceLayer {
 
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WIFI
-extern "C" void ethernetInterface_eventGotIP(struct netif * interface) 
+extern "C" void ethernetInterface_eventGotIP(struct netif * interface)
 {
     ChipLogProgress(DeviceLayer, "ethernetInterface_eventGotIP");
     ConnectivityMgrImpl().OnConnectivityChanged(interface);

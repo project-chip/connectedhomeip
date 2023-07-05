@@ -231,7 +231,10 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_hosal") {
-    defines = [ "CFG_USE_XTAL32K=1", "DISABLE_PRINT=1" ]
+    defines = [
+      "CFG_USE_XTAL32K=1",
+      "DISABLE_PRINT=1",
+    ]
 
     sources = [
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_adc.c",
@@ -723,12 +726,8 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_ethernet") {
-    defines = [
-      "DISABLE_PRINT=1",
-    ]
-    sources = [
-      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_ethernet/Src/eth_bd.c",
-    ]
+    defines = [ "DISABLE_PRINT=1" ]
+    sources = [ "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_ethernet/Src/eth_bd.c" ]
 
     configs += [
       ":${sdk_target_name}_config_BSP_Driver",
@@ -845,7 +844,7 @@ template("bl_iot_sdk") {
     cflags = [
       "-Wno-incompatible-pointer-types",
       "-Wno-unused-variable",
-      "-Wno-sign-compare"
+      "-Wno-sign-compare",
     ]
   }
 
@@ -854,22 +853,22 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_BSP_Driver",
       ":${sdk_target_name}_bl702_freertos",
       ":${sdk_target_name}_ble",
+      ":${sdk_target_name}_ethernet",
       ":${sdk_target_name}_fs",
       ":${sdk_target_name}_hosal",
       ":${sdk_target_name}_libc",
       ":${sdk_target_name}_mbedtls",
       ":${sdk_target_name}_soc",
-      ":${sdk_target_name}_ethernet",
       ":${sdk_target_name}_stage",
       ":${sdk_target_name}_sys",
       ":${sdk_target_name}_utils",
     ]
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
-    } else if (defined(invoker.chip_enable_openthread) && invoker.chip_enable_openthread) {
+    } else if (defined(invoker.chip_enable_openthread) &&
+               invoker.chip_enable_openthread) {
       public_deps += [ ":${sdk_target_name}_openthread_port" ]
-    }
-    else {
+    } else {
       public_deps += [ ":${sdk_target_name}_ethernet" ]
       public_deps += [ ":${sdk_target_name}_lwip" ]
     }

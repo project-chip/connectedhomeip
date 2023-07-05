@@ -155,9 +155,9 @@ static uint8_t icmp6_raw_recv_handler(void * arg, struct raw_pcb * pcb, struct p
 
 int8_t bl_route_hook_init(void)
 {
-    ip_addr_t router_group = IPADDR6_INIT_HOST(0xFF020000, 0, 0, 0x02);
-    bl_route_hook_t * hook = NULL;
-    uint8_t ret            = 0;
+    ip_addr_t router_group    = IPADDR6_INIT_HOST(0xFF020000, 0, 0, 0x02);
+    bl_route_hook_t * hook    = NULL;
+    uint8_t ret               = 0;
     struct netif * lwip_netif = deviceInterface_getNetif();
 
     if (lwip_netif == NULL)

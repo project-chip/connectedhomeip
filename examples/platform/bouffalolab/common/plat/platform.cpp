@@ -15,15 +15,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <DeviceInfoProviderImpl.h>
+#include <OTAConfig.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <system/SystemClock.h>
-#include <DeviceInfoProviderImpl.h>
 #include <platform/bouffalolab/common/PlatformManagerImpl.h>
-#include <OTAConfig.h>
+#include <system/SystemClock.h>
 
 #if HEAP_MONITORING
 #include <MemMonitoring.h>
@@ -63,7 +63,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if defined(BL602_ENABLE)
 #include <wifi_mgmr_ext.h>
-#else 
+#else
 #include <platform/bouffalolab/BL702/WiFiInterface.h>
 #endif
 #else
@@ -120,11 +120,11 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
             // will not trigger a 'internet connectivity change' as there is no internet
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
-            
+
             chip::app::DnssdServer::Instance().StartServer();
 
             bl_route_hook_init();
-            
+
             chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
                                                         OTAConfig::InitOTARequestorHandler, nullptr);
         }

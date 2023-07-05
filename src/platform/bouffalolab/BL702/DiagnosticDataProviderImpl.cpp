@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 

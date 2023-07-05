@@ -51,7 +51,7 @@ declare_args() {
   enable_heap_monitoring = false
   enable_reset_counter = false
   enable_cdc_module = false
-  
+
   setupPinCode = 20202021
   setupDiscriminator = 3840
 
@@ -80,9 +80,7 @@ bl_iot_sdk("sdk") {
   ]
 
   if (chip_enable_openthread) {
-    defines += [
-      "OPENTHREAD_CONFIG_PLATFORM_XTAL_ACCURACY=40",
-    ]
+    defines += [ "OPENTHREAD_CONFIG_PLATFORM_XTAL_ACCURACY=40" ]
   }
 
   if ("BL706C-22" == module_type) {
@@ -127,7 +125,7 @@ bouffalolab_executable("lighting_app") {
   if (false == enable_reset_counter) {
     defines += [ "BOOT_PIN_RESET=31" ]
   }
-  
+
   if (enable_psram) {
     defines += [ "CFG_USE_PSRAM=1" ]
   }
@@ -148,11 +146,11 @@ bouffalolab_executable("lighting_app") {
     "${example_common_dir}/AppTask.cpp",
     "${example_common_dir}/ZclCallbacks.cpp",
     "${examples_plat_common_dir}/plat/LEDWidget.cpp",
+    "${examples_plat_common_dir}/plat/OTAConfig.cpp",
     "${examples_plat_common_dir}/plat/demo_pwm.c",
     "${examples_plat_common_dir}/plat/main.cpp",
     "${examples_plat_common_dir}/plat/platform.cpp",
     "${examples_plat_common_dir}/plat/uart.c",
-    "${examples_plat_common_dir}/plat/OTAConfig.cpp"
   ]
 
   deps = [
@@ -182,8 +180,7 @@ bouffalolab_executable("lighting_app") {
         "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
       ]
     }
-  }
-  else {
+  } else {
     sources += [
       "${examples_plat_common_dir}/route_hook/bl_route_hook.c",
       "${examples_plat_common_dir}/route_hook/bl_route_table.c",
