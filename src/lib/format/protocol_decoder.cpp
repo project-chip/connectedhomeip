@@ -308,7 +308,7 @@ void PayloadDecoderBase::NextFromStarting(PayloadEntry & entry)
     CHIP_ERROR err = mReader.Next(kTLVType_Structure, AnonymousTag());
     if (err != CHIP_NO_ERROR)
     {
-        mValueBuilder.Reset().AddFormat("ERROR getting Anonymous Structure TLV: %" CHIP_ERROR_FORMAT "\n", err.Format());
+        mValueBuilder.Reset().AddFormat("ERROR getting Anonymous Structure TLV: %" CHIP_ERROR_FORMAT, err.Format());
         mState = State::kDone;
         entry  = PayloadEntry::SimpleValue(data->name, mValueBuilder.c_str());
         return;
@@ -359,7 +359,7 @@ bool PayloadDecoderBase::ReaderEnterContainer(PayloadEntry & entry)
     CHIP_ERROR err = mReader.EnterContainer(containerType);
     if (err != CHIP_NO_ERROR)
     {
-        mValueBuilder.AddFormat("ERROR entering container: %" CHIP_ERROR_FORMAT "\n", err.Format());
+        mValueBuilder.AddFormat("ERROR entering container: %" CHIP_ERROR_FORMAT, err.Format());
         entry  = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
         mState = State::kDone;
         return false;
@@ -410,6 +410,11 @@ void PayloadDecoderBase::NextFromContentRead(PayloadEntry & entry)
     if (err == CHIP_END_OF_TLV)
     {
         ExitContainer(entry);
+        return;
+    } else if (err != CHIP_NO_ERROR) {
+        mValueBuilder.Reset().AddFormat("ERROR on TLV Next: %" CHIP_ERROR_FORMAT, err.Format());
+        entry = PayloadEntry::SimpleValue("TLV_ERR", mValueBuilder.c_str());
+        mState = State::kDone;
         return;
     }
 
