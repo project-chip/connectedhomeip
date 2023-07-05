@@ -43,6 +43,9 @@ public:
     // Start tracing output to the given file
     CHIP_ERROR Open(const char * path);
 
+    // Close if an output file is open
+    void Close();
+
     void TraceBegin(const char * label, const char * group) override;
     void TraceEnd(const char * label, const char * group) override;
     void TraceInstant(const char * label, const char * group) override;
@@ -59,6 +62,7 @@ private:
     // Output file if writing to a file. If closed, writing
     // to ChipLog*
     std::fstream mOutputFile;
+    bool mFirstRecord = true;
 };
 
 } // namespace Json

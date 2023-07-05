@@ -99,10 +99,7 @@ void DecodePayloadData(::Json::Value & value, chip::ByteSpan payload)
 
 JsonBackend::~JsonBackend()
 {
-    if (mOutputFile.is_open())
-    {
-        mOutputFile.close();
-    }
+    Close();
 }
 
 void JsonBackend::TraceBegin(const char * label, const char * group)
@@ -249,19 +246,30 @@ void JsonBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info)
     OutputValue(value);
 }
 
-CHIP_ERROR JsonBackend::Open(const char * path)
+void JsonBackend::Close()
 {
-    if (mOutputFile.is_open())
+    if (!mOutputFile.is_open())
     {
-        mOutputFile.close();
+        return;
     }
 
+    mOutputFile <<"]\n";
+
+    mOutputFile.close();
+}
+
+CHIP_ERROR JsonBackend::Open(const char * path)
+{
+    Close();
     mOutputFile.open(path, std::ios_base::out);
 
     if (!mOutputFile)
     {
         return CHIP_ERROR_POSIX(errno);
     }
+
+    mOutputFile <<"[\n";
+    mFirstRecord = true;
 
     return CHIP_NO_ERROR;
 }
@@ -273,6 +281,11 @@ void JsonBackend::OutputValue(::Json::Value & value)
 
     if (mOutputFile.is_open())
     {
+        if (!mFirstRecord) {
+            mOutputFile <<",\n";
+        } else {
+            mFirstRecord = false;
+        }
         value["time_ms"] = chip::System::SystemClock().GetMonotonicTimestamp().count();
         writer->write(value, &mOutputFile);
         mOutputFile.flush();
