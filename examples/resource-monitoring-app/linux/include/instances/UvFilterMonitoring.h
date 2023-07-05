@@ -27,19 +27,19 @@ namespace Clusters {
 
 namespace ResourceMonitoring {
 
-/// This is an application level instance to handle UVFilterMonitoringInstance commands according to the specific business logic.
-class UVFilterMonitoringInstance : public ResourceMonitoring::Instance
+/// This is an application level instance to handle UvFilterMonitoringInstance commands according to the specific business logic.
+class UvFilterMonitoringInstance : public ResourceMonitoring::Instance
 {
 private:
     CHIP_ERROR AppInit() override;
     chip::Protocols::InteractionModel::Status OnResetCondition() override;
 
 public:
-    UVFilterMonitoringInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature,
+    UvFilterMonitoringInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature,
                                  ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection, bool aResetConditionCommandSupported) :
     Instance(aEndpointId, aClusterId, aFeature, aDegradationDirection, aResetConditionCommandSupported){};
 
-    ~UVFilterMonitoringInstance() override = default;
+    ~UvFilterMonitoringInstance() override = default;
 };
 
 } // namespace ResourceMonitoring

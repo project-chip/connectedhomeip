@@ -23,7 +23,7 @@
 #include <instances/IonizingFilterMonitoring.h>
 #include <instances/OzoneFilterMonitoring.h>
 #include <instances/CeramicFilterMonitoring.h>
-#include <instances/UVFilterMonitoring.h>
+#include <instances/UvFilterMonitoring.h>
 #include <instances/ZeoliteFilterMonitoring.h>
 #include <instances/ElectrostaticFilterMonitoring.h>
 #include <instances/WaterTankMonitoring.h>

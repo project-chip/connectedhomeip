@@ -1,6 +1,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
-#include <instances/UVFilterMonitoring.h>
+#include <instances/UvFilterMonitoring.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UvFilterMonitoring;
@@ -11,15 +11,15 @@ using namespace chip::app::Clusters::ResourceMonitoring;
 using chip::Protocols::InteractionModel::Status;
 
 //-- UV filter Monitoring instance functions
-CHIP_ERROR UVFilterMonitoringInstance::AppInit()
+CHIP_ERROR UvFilterMonitoringInstance::AppInit()
 {
-    ChipLogDetail(Zcl, "UVFilterMonitoringInstance::Init()");
+    ChipLogDetail(Zcl, "UvFilterMonitoringInstance::Init()");
     return CHIP_NO_ERROR;
 }
 
-Status UVFilterMonitoringInstance::OnResetCondition()
+Status UvFilterMonitoringInstance::OnResetCondition()
 {
-    ChipLogDetail(Zcl, "UVFilterMonitoringInstance::OnResetCondition()");
+    ChipLogDetail(Zcl, "UvFilterMonitoringInstance::OnResetCondition()");
 
     if ( GetDegradationDirection() == DegradationDirectionEnum::kDown)
     {
