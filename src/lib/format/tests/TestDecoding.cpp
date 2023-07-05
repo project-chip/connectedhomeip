@@ -72,13 +72,16 @@ void TestSampleData(nlTestSuite * inSuite, const PayloadDecoderInitParams & para
             nesting--;
             continue;
         case PayloadEntry::IMPayloadType::kAttribute:
-            output_builder.AddFormat("%*sATTRIBUTE: %d/%d\n", nesting * 2, "", entry.GetClusterId(), entry.GetAttributeId());
+            output_builder.AddFormat("%*sATTRIBUTE: %" PRIi32 "/%" PRIi32 "\n", nesting * 2, "", entry.GetClusterId(),
+                                     entry.GetAttributeId());
             continue;
         case PayloadEntry::IMPayloadType::kCommand:
-            output_builder.AddFormat("%*sCOMMAND: %d/%d\n", nesting * 2, "", entry.GetClusterId(), entry.GetCommandId());
+            output_builder.AddFormat("%*sCOMMAND: %" PRIi32 "/%" PRIi32 "\n", nesting * 2, "", entry.GetClusterId(),
+                                     entry.GetCommandId());
             continue;
         case PayloadEntry::IMPayloadType::kEvent:
-            output_builder.AddFormat("%*sEVENT: %d/%d\n", nesting * 2, "", entry.GetClusterId(), entry.GetEventId());
+            output_builder.AddFormat("%*sEVENT: %" PRIi32 "/%" PRIi32 "\n", nesting * 2, "", entry.GetClusterId(),
+                                     entry.GetEventId());
             continue;
         default:
             break;

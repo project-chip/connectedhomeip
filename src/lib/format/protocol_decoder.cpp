@@ -77,16 +77,16 @@ void FormatCurrentTag(const TLVReader & reader, chip::StringBuilderBase & out)
 
     if (IsProfileTag(tag))
     {
-        out.AddFormat("%s(0x%x::0x%x::0x%x)", DecodeTagControl(tagControl), VendorIdFromTag(tag), ProfileNumFromTag(tag),
-                      TagNumFromTag(tag));
+        out.AddFormat("%s(0x%X::0x%X::0x%" PRIX32 ")", DecodeTagControl(tagControl), VendorIdFromTag(tag),
+                      ProfileNumFromTag(tag), TagNumFromTag(tag));
     }
     else if (IsContextTag(tag))
     {
-        out.AddFormat("%s(0x%x)", DecodeTagControl(tagControl), TagNumFromTag(tag));
+        out.AddFormat("%s(0x%" PRIX32 ")", DecodeTagControl(tagControl), TagNumFromTag(tag));
     }
     else
     {
-        out.AddFormat("UnknownTag(0x%" PRIx64 ")", tag.RawValue());
+        out.AddFormat("UnknownTag(0x%" PRIX64 ")", tag.RawValue());
     }
 }
 
@@ -283,7 +283,7 @@ void PayloadDecoderBase::NextFromStarting(PayloadEntry & entry)
     if (data == nullptr)
     {
         // do not try to decode unknown data. assume binary
-        mNameBuilder.Reset().AddFormat("PROTO(0x%X, 0x%X)", mProtocol.ToFullyQualifiedSpecForm(), mMessageType);
+        mNameBuilder.Reset().AddFormat("PROTO(0x%" PRIX32 ", 0x%X)", mProtocol.ToFullyQualifiedSpecForm(), mMessageType);
         mValueBuilder.Reset().Add("UNKNOWN");
         entry  = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
         mState = State::kDone;

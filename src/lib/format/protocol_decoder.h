@@ -229,7 +229,7 @@ private:
 
     /// Move to the given attribute/event/command entry.
     ///
-    /// [entry] MUST be of type command/attribute/event.
+    //X [entry] MUST be of type command/attribute/event.
     ///
     /// This call either moves to "ContentDecoding mode" if content tree is available
     /// or leaves entry unchanged if content decoding tree is not available.
