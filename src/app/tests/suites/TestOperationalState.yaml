@@ -50,68 +50,74 @@ tests:
       command: "readAttribute"
       attribute: "OperationalStateList"
       response:
-          value: [{ OperationalStateID: 0}, { OperationalStateID: 1}, { OperationalStateID: 2}, { OperationalStateID: 3}]
+          value:
+              [
+                  { OperationalStateID: 0 },
+                  { OperationalStateID: 1 },
+                  { OperationalStateID: 2 },
+                  { OperationalStateID: 3 },
+              ]
 
     - label: "Read current Operational Error"
       command: "readAttribute"
       attribute: "OperationalError"
       response:
-          value: [{ ErrorStateID : 0}]
+          value: [{ ErrorStateID: 0 }]
 
     - label: "Read current Operational State"
       command: "readAttribute"
       attribute: "OperationalState"
       response:
-          value: [{ OperationalStateID : 0}]
+          value: [{ OperationalStateID: 0 }]
 
     - label: "Start Command"
       command: "Start"
       response:
           values:
               - name: "commandResponseState"
-                value: [{ErrorStateID: 0}]
+                value: [{ ErrorStateID: 0 }]
 
     - label: "Read current Operational State"
       command: "readAttribute"
       attribute: "OperationalState"
       response:
-          value: [{ OperationalStateID : 1}]
+          value: [{ OperationalStateID: 1 }]
 
     - label: "Pause Command"
       command: "Pause"
       response:
           values:
               - name: "commandResponseState"
-                value: [{ErrorStateID: 0}]
+                value: [{ ErrorStateID: 0 }]
 
     - label: "Read current Operational State"
       command: "readAttribute"
       attribute: "OperationalState"
       response:
-          value: [{ OperationalStateID : 2}]
+          value: [{ OperationalStateID: 2 }]
 
     - label: "Resume Command"
       command: "Resume"
       response:
           values:
               - name: "commandResponseState"
-                value: [{ErrorStateID: 0}]
+                value: [{ ErrorStateID: 0 }]
 
     - label: "Read current Operational State"
       command: "readAttribute"
       attribute: "OperationalState"
       response:
-          value: [{ OperationalStateID : 1}]
+          value: [{ OperationalStateID: 1 }]
 
     - label: "Stop Command"
       command: "Stop"
       response:
           values:
               - name: "commandResponseState"
-                value: [{ErrorStateID: 0}]
+                value: [{ ErrorStateID: 0 }]
 
     - label: "Read current Operational State"
       command: "readAttribute"
       attribute: "OperationalState"
       response:
-          value: [{ OperationalStateID : 0}]
+          value: [{ OperationalStateID: 0 }]
