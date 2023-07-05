@@ -292,19 +292,20 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "  suppress_response: true\n"
                    "  interaction_model_revison: 1\n");
 
-    TestSampleData(inSuite, params, im_protocol_report_data_window_covering,
-                   "report_data\n"
-                   "  attribute_reports\n"
-                   "    []\n"
-                   "      attribute_data\n"
-                   "        data_version: 2054986218\n"
-                   "        path\n"
-                   "          endpoint_id: 1\n"
-                   "          cluster_id: 258 == 'WindowCovering'\n"
-                   "          attribute_id: 7 == 'configStatus'\n"
-                   "        WindowCovering::configStatus: 27 == kOperational | kOnlineReserved | kLiftPositionAware | kTiltPositionAware\n"
-                   "  suppress_response: true\n"
-                   "  interaction_model_revison: 1\n");
+    TestSampleData(
+        inSuite, params, im_protocol_report_data_window_covering,
+        "report_data\n"
+        "  attribute_reports\n"
+        "    []\n"
+        "      attribute_data\n"
+        "        data_version: 2054986218\n"
+        "        path\n"
+        "          endpoint_id: 1\n"
+        "          cluster_id: 258 == 'WindowCovering'\n"
+        "          attribute_id: 7 == 'configStatus'\n"
+        "        WindowCovering::configStatus: 27 == kOperational | kOnlineReserved | kLiftPositionAware | kTiltPositionAware\n"
+        "  suppress_response: true\n"
+        "  interaction_model_revison: 1\n");
 
     TestSampleData(inSuite, params, im_protocol_invoke_request,
                    "invoke_request\n"
