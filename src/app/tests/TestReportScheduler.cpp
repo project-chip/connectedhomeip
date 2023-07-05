@@ -18,6 +18,7 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/ReportSchedulerImpl.h>
+#include <app/reporting/SynchronizedReportSchedulerImpl.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -71,11 +72,10 @@ namespace chip {
 namespace app {
 namespace reporting {
 
-using InteractionModelEngine = InteractionModelEngine;
-using ReportScheduler        = reporting::ReportScheduler;
-using ReportSchedulerImpl    = reporting::ReportSchedulerImpl;
-using ReadHandlerNode        = reporting::ReportScheduler::ReadHandlerNode;
-using Milliseconds64         = System::Clock::Milliseconds64;
+using ReportScheduler     = reporting::ReportScheduler;
+using ReportSchedulerImpl = reporting::ReportSchedulerImpl;
+using ReadHandlerNode     = reporting::ReportScheduler::ReadHandlerNode;
+using Milliseconds64      = System::Clock::Milliseconds64;
 
 static const size_t kNumMaxReadHandlers = 16;
 
@@ -174,8 +174,68 @@ public:
     }
 };
 
+/// @brief TestTimerSynchronizedDelegate is a mock of the TimerDelegate interface that allows to control the time without dependency
+/// on the system layer. This also simulates the system timer by verifying if the timeout expired when incrementing the mock
+/// timestamp. only one timer can be active at a time, which is the one has the earliest timeout.
+/// It is used to test the SynchronizedReportSchedulerImpl.
+class TestTimerSynchronizedDelegate : public ReportScheduler::TimerDelegate
+{
+public:
+    static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
+    {
+        SynchronizedReportSchedulerImpl * scheduler = static_cast<SynchronizedReportSchedulerImpl *>(aAppState);
+        scheduler->ReportTimerCallback();
+    }
+    virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) override
+    {
+        SynchronizedReportSchedulerImpl * scheduler = static_cast<SynchronizedReportSchedulerImpl *>(context);
+        if (nullptr == scheduler)
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        mSyncScheduler = scheduler;
+        mTimerTimeout  = mMockSystemTimestamp + aTimeout;
+        return CHIP_NO_ERROR;
+    }
+    virtual void CancelTimer(void * context) override
+    {
+        VerifyOrReturn(nullptr != mSyncScheduler);
+        mSyncScheduler = nullptr;
+        mTimerTimeout  = System::Clock::Milliseconds64(0x7FFFFFFFFFFFFFFF);
+    }
+    virtual bool IsTimerActive(void * context) override
+    {
+        return (nullptr != mSyncScheduler) && (mTimerTimeout > mMockSystemTimestamp);
+    }
+
+    virtual System::Clock::Timestamp GetCurrentMonotonicTimestamp() override { return mMockSystemTimestamp; }
+
+    void SetMockSystemTimestamp(System::Clock::Timestamp aMockTimestamp) { mMockSystemTimestamp = aMockTimestamp; }
+
+    // Increment the mock timestamp one milisecond at a time for a total of aTime miliseconds. Checks if
+    void IncrementMockTimestamp(System::Clock::Milliseconds64 aTime)
+    {
+        for (System::Clock::Milliseconds64 i = System::Clock::Milliseconds64(0); i < aTime; i++)
+        {
+            mMockSystemTimestamp++;
+            if (mMockSystemTimestamp == mTimerTimeout)
+            {
+                TimerCallbackInterface(nullptr, mSyncScheduler);
+            }
+        }
+    }
+
+    SynchronizedReportSchedulerImpl * mSyncScheduler = nullptr;
+    System::Clock::Timeout mTimerTimeout             = System::Clock::Milliseconds64(0x7FFFFFFFFFFFFFFF);
+    System::Clock::Timestamp mMockSystemTimestamp    = System::Clock::Milliseconds64(0);
+};
+
 TestTimerDelegate sTestTimerDelegate;
 ReportSchedulerImpl sScheduler(&sTestTimerDelegate);
+
+TestTimerSynchronizedDelegate sTestTimerSynchronizedDelegate;
+SynchronizedReportSchedulerImpl syncScheduler(&sTestTimerSynchronizedDelegate);
 
 class TestReportScheduler
 {
@@ -392,6 +452,267 @@ public:
         exchangeCtx->Close();
         NL_TEST_ASSERT(aSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
     }
+
+    static void TestSynchronizedScheduler(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext & ctx = *static_cast<TestContext *>(aContext);
+        NullReadHandlerCallback nullCallback;
+        // exchange context
+        Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr, false);
+
+        // First test: ReadHandler 2 merge on ReadHandler 1 max interval
+        // Read handler pool
+        ObjectPool<ReadHandler, kNumMaxReadHandlers> readHandlerPool;
+
+        // Initilaize the mock system time
+        sTestTimerSynchronizedDelegate.SetMockSystemTimestamp(System::Clock::Milliseconds64(0));
+
+        ReadHandler * readHandler1 =
+            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe);
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMaxReportingInterval(2));
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMinReportingIntervalForTests(0));
+        readHandler1->MoveToState(ReadHandler::HandlerState::GeneratingReports);
+        readHandler1->SetObserver(&syncScheduler);
+        readHandler1->mObserver->OnReadHandlerCreated(readHandler1);
+
+        ReadHandler * readHandler2 =
+            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe);
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler2->SetMaxReportingInterval(3));
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler2->SetMinReportingIntervalForTests(1));
+        readHandler2->MoveToState(ReadHandler::HandlerState::GeneratingReports);
+        readHandler2->SetObserver(&syncScheduler);
+        readHandler2->mObserver->OnReadHandlerCreated(readHandler2);
+
+        // Confirm all handler are currently registered in the scheduler
+        NL_TEST_ASSERT(aSuite, syncScheduler.GetNumReadHandlers() == 2);
+
+        ReadHandlerNode * node1 = syncScheduler.FindReadHandlerNode(readHandler1);
+        ReadHandlerNode * node2 = syncScheduler.FindReadHandlerNode(readHandler2);
+
+        // Confirm that a report emission is scheduled and that it will happen on readHandler1 max timestamp
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportScheduled(readHandler1));
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportScheduled(readHandler2));
+
+        // Validates that the lowest max is selected as the common max timestamp
+        NL_TEST_ASSERT(aSuite, syncScheduler.mNextMaxTimestamp == node1->GetMaxTimestamp());
+        // Validates that the highest min is selected as the common min interval
+        NL_TEST_ASSERT(aSuite, syncScheduler.mNextMinTimestamp == node2->GetMinTimestamp());
+        // Validates that the next report emission is scheduled on the common max timestamp
+        NL_TEST_ASSERT(aSuite, syncScheduler.mNextReportTimestamp == syncScheduler.mNextMaxTimestamp);
+
+        // Simulate waiting for the max interval to expire (2s)
+        // Increment the mock system time to the max to the time waited
+        sTestTimerSynchronizedDelegate.IncrementMockTimestamp(System::Clock::Milliseconds64(2000));
+
+        // Confirm that both handlers are now reportable since the timer has expired
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler1));
+        // Confirm timeout has expired and no report is scheduled, an engine run would typically happen here
+        NL_TEST_ASSERT(aSuite, !sScheduler.IsReportScheduled(readHandler1));
+        NL_TEST_ASSERT(aSuite, !sScheduler.IsReportScheduled(readHandler1));
+
+        // Simulate that the OnBecameReportable callback was called on readHandler1
+        readHandler1->mObserver->OnBecameReportable(readHandler1);
+        // Confirm that the read handler is now reportable due to the sync mechanism that forced a dirty flag
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler2));
+
+        // Simulate a report emission for readHandler1
+        readHandler1->mObserver->OnSubscriptionAction(readHandler1);
+        // Simulate a report emission for readHandler2
+        readHandler2->mObserver->OnSubscriptionAction(readHandler2);
+
+        // Validate that the max timestamp for both readhandlers got updated and that the next report emission is scheduled on
+        //  the new max timestamp for readhandler1
+        NL_TEST_ASSERT(aSuite, node1->GetMaxTimestamp() > sTestTimerSynchronizedDelegate.GetCurrentMonotonicTimestamp());
+        NL_TEST_ASSERT(aSuite, syncScheduler.mNextReportTimestamp == node1->GetMaxTimestamp());
+
+        // Confirm behavior when a read handler becomes dirty
+        readHandler1->ForceDirtyState();
+        // since the min interval on readHandler1 is 0, it should be reportable now
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler1));
+        readHandler1->mObserver->OnBecameReportable(readHandler1);
+        // Confirm that the next report emission is scheduled on the min timestamp of readHandler2 as it is the highest
+        NL_TEST_ASSERT(aSuite, syncScheduler.mNextReportTimestamp == node2->GetMinTimestamp());
+        // Simulate wait enough for min timestamp of readHandler2 to be reached (1s)
+        // Increment the mock system time to the max to the time waited
+        sTestTimerSynchronizedDelegate.IncrementMockTimestamp(System::Clock::Milliseconds64(1000));
+
+        // Confirm that readHandler2 is now reportable
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler2));
+        readHandler2->mObserver->OnBecameReportable(readHandler2);
+
+        readHandler1->ClearForceDirtyFlag();
+        // Simulate a report emission for readHandler1
+        readHandler1->mObserver->OnSubscriptionAction(readHandler1);
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler1));
+
+        // ReadHandler 2 should still be reportable from the sync mechanism
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler2));
+        readHandler1->mObserver->OnSubscriptionAction(readHandler2);
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler2));
+
+        // Validate next report scheduled on the max timestamp of readHandler1
+        NL_TEST_ASSERT(aSuite, node1->GetMaxTimestamp() > sTestTimerSynchronizedDelegate.GetCurrentMonotonicTimestamp());
+        NL_TEST_ASSERT(aSuite, syncScheduler.mNextReportTimestamp == node1->GetMaxTimestamp());
+
+        // Simulate a new ReadHandler being added with a min forcing a conflict
+
+        // Wait for 1 second, nothing should happen here
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1000),
+                                        [&]() -> bool { return syncScheduler.IsReportableNow(readHandler1); });
+        // Increment the mock system time to the max to the time waited
+        sTestTimerSynchronizedDelegate.IncrementMockTimestamp(System::Clock::Milliseconds64(1000));
+
+        ReadHandler * readHandler3 =
+            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe);
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler3->SetMaxReportingInterval(3));
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler3->SetMinReportingIntervalForTests(2));
+        readHandler3->MoveToState(ReadHandler::HandlerState::GeneratingReports);
+        readHandler3->SetObserver(&syncScheduler);
+        readHandler3->mObserver->OnReadHandlerCreated(readHandler3);
+
+        // Confirm all handler are currently registered in the scheduler
+        NL_TEST_ASSERT(aSuite, syncScheduler.GetNumReadHandlers() == 3);
+        ReadHandlerNode * node3 = syncScheduler.FindReadHandlerNode(readHandler3);
+
+        // Since the min interval on readHandler3 is 2, it should be above the current max timestamp, therefore the next report
+        // should still happen on the max timestamp of readHandler1 and the sync should be done on future reports
+        NL_TEST_ASSERT(aSuite, syncScheduler.mNextReportTimestamp == node1->GetMaxTimestamp());
+        // The min timestamp should also not have changed since the min of readhandler3 is higher than the current max
+        NL_TEST_ASSERT(aSuite, syncScheduler.mNextMinTimestamp == node2->GetMinTimestamp());
+
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1100),
+                                        [&]() -> bool { return syncScheduler.IsReportableNow(readHandler1); });
+        // Increment the mock system time to the max to the time waited
+        sTestTimerSynchronizedDelegate.IncrementMockTimestamp(System::Clock::Milliseconds64(1000));
+
+        // Confirm that readHandler1 and readHandler 2 are now reportable, whilst readHandler3 is not
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler1));
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler2));
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler3));
+        readHandler1->mObserver->OnBecameReportable(readHandler1);
+        readHandler2->mObserver->OnBecameReportable(readHandler2);
+
+        // Simulate a report emission for readHandler1 and readHandler2
+        readHandler1->mObserver->OnSubscriptionAction(readHandler1);
+        readHandler1->mObserver->OnSubscriptionAction(readHandler2);
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler1));
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler2));
+
+        // Confirm that next report is scheduled on the max timestamp of readHandler3 and other 2 readHandlers are synced
+        NL_TEST_ASSERT(aSuite, syncScheduler.mNextReportTimestamp == node3->GetMaxTimestamp());
+        NL_TEST_ASSERT(aSuite, syncScheduler.mNextMinTimestamp == node3->GetMinTimestamp());
+        NL_TEST_ASSERT(aSuite, node1->GetSyncTimestamp() == node3->GetMaxTimestamp());
+        NL_TEST_ASSERT(aSuite, node2->GetSyncTimestamp() == node3->GetMaxTimestamp());
+
+        // Simulate a report emission for all readHandlers on the max timestamp of readHandler3 on confirm everything is synced
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                        [&]() -> bool { return syncScheduler.IsReportableNow(readHandler3); });
+        // Increment the mock system time to the max to the time waited
+        sTestTimerSynchronizedDelegate.IncrementMockTimestamp(System::Clock::Milliseconds64(2000));
+
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler1));
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler2));
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler3));
+        readHandler1->mObserver->OnBecameReportable(readHandler1);
+        readHandler2->mObserver->OnBecameReportable(readHandler2);
+        readHandler3->mObserver->OnBecameReportable(readHandler3);
+        // Engine run should happen here and send all reports
+        readHandler1->mObserver->OnSubscriptionAction(readHandler1);
+        readHandler2->mObserver->OnSubscriptionAction(readHandler2);
+        readHandler3->mObserver->OnSubscriptionAction(readHandler3);
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler1));
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler2));
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler3));
+        NL_TEST_ASSERT(aSuite, syncScheduler.mNextReportTimestamp == node1->GetMaxTimestamp());
+        NL_TEST_ASSERT(aSuite, syncScheduler.mNextMinTimestamp == node3->GetMinTimestamp());
+        NL_TEST_ASSERT(aSuite, node1->GetSyncTimestamp() == node1->GetMaxTimestamp());
+        NL_TEST_ASSERT(aSuite, node2->GetSyncTimestamp() == node1->GetMaxTimestamp());
+
+        // Now simulate a new readHandler being added with a max forcing a conflict
+        ReadHandler * readHandler4 =
+            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe);
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler4->SetMaxReportingInterval(1));
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler4->SetMinReportingIntervalForTests(0));
+        readHandler4->MoveToState(ReadHandler::HandlerState::GeneratingReports);
+        readHandler4->SetObserver(&syncScheduler);
+        readHandler4->mObserver->OnReadHandlerCreated(readHandler4);
+
+        // Confirm all handler are currently registered in the scheduler
+        NL_TEST_ASSERT(aSuite, syncScheduler.GetNumReadHandlers() == 4);
+        ReadHandlerNode * node4 = syncScheduler.FindReadHandlerNode(readHandler4);
+
+        // Confirm next report is scheduled on the max timestamp of readHandler4 and other handlers be synced
+        NL_TEST_ASSERT(aSuite, syncScheduler.mNextReportTimestamp == node4->GetMaxTimestamp());
+        NL_TEST_ASSERT(aSuite, node1->GetSyncTimestamp() == node4->GetMaxTimestamp());
+        NL_TEST_ASSERT(aSuite, node2->GetSyncTimestamp() == node4->GetMaxTimestamp());
+        NL_TEST_ASSERT(aSuite, node3->GetSyncTimestamp() == node1->GetMaxTimestamp());
+
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1100),
+                                        [&]() -> bool { return syncScheduler.IsReportableNow(readHandler4); });
+        // Increment the mock system time to the max to the time waited
+        sTestTimerSynchronizedDelegate.IncrementMockTimestamp(System::Clock::Milliseconds64(1100));
+
+        // Confirm readHandler4, 1 and 1 are reportable
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler1));
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler2));
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler3));
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler4));
+        readHandler4->mObserver->OnBecameReportable(readHandler1);
+        readHandler4->mObserver->OnBecameReportable(readHandler2);
+        readHandler4->mObserver->OnBecameReportable(readHandler4);
+        readHandler4->mObserver->OnSubscriptionAction(readHandler1);
+        readHandler4->mObserver->OnSubscriptionAction(readHandler2);
+        readHandler4->mObserver->OnSubscriptionAction(readHandler4);
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler1));
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler2));
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler4));
+
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1000),
+                                        [&]() -> bool { return syncScheduler.IsReportableNow(readHandler3); });
+        // Increment the mock system time to the max to the time waited
+        sTestTimerSynchronizedDelegate.IncrementMockTimestamp(System::Clock::Milliseconds64(1000));
+
+        // Confirm  readHandler3 is reportable and other handlers are synced
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler1));
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler2));
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler3));
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler4));
+        readHandler4->mObserver->OnBecameReportable(readHandler1);
+        readHandler4->mObserver->OnBecameReportable(readHandler2);
+        readHandler4->mObserver->OnBecameReportable(readHandler3);
+        readHandler4->mObserver->OnBecameReportable(readHandler4);
+        readHandler4->mObserver->OnSubscriptionAction(readHandler1);
+        readHandler4->mObserver->OnSubscriptionAction(readHandler2);
+        readHandler4->mObserver->OnSubscriptionAction(readHandler3);
+        readHandler4->mObserver->OnSubscriptionAction(readHandler4);
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler1));
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler2));
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler3));
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler4));
+
+        // Next emission should be scheduled on the max timestamp of readHandler4 as it is the most restrictive, and other handlers
+        // should get synced except handler 3 as its min is higher
+        NL_TEST_ASSERT(aSuite, syncScheduler.mNextReportTimestamp == node4->GetMaxTimestamp());
+        NL_TEST_ASSERT(aSuite, node1->GetSyncTimestamp() == node4->GetMaxTimestamp());
+        NL_TEST_ASSERT(aSuite, node2->GetSyncTimestamp() == node4->GetMaxTimestamp());
+        NL_TEST_ASSERT(aSuite, node3->GetSyncTimestamp() == node1->GetMaxTimestamp());
+
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1000),
+                                        [&]() -> bool { return syncScheduler.IsReportableNow(readHandler4); });
+        // Increment the mock system time to the max to the time waited
+        sTestTimerSynchronizedDelegate.IncrementMockTimestamp(System::Clock::Milliseconds64(1000));
+
+        // Confirm  readHandler 1-2-4 are reportable and handler 3 is not because of it min interval
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler1));
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler2));
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler3));
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler4));
+
+        syncScheduler.UnregisterAllHandlers();
+        readHandlerPool.ReleaseAll();
+        exchangeCtx->Close();
+        NL_TEST_ASSERT(aSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    }
 };
 
 } // namespace reporting
@@ -408,6 +729,7 @@ static nlTest sTests[] = {
     NL_TEST_DEF("TestReadHandlerList", chip::app::reporting::TestReportScheduler::TestReadHandlerList),
     NL_TEST_DEF("TestReportTiming", chip::app::reporting::TestReportScheduler::TestReportTiming),
     NL_TEST_DEF("TestObserverCallbacks", chip::app::reporting::TestReportScheduler::TestObserverCallbacks),
+    NL_TEST_DEF("TestSynchronizedScheduler", chip::app::reporting::TestReportScheduler::TestSynchronizedScheduler),
     NL_TEST_SENTINEL(),
 };
 

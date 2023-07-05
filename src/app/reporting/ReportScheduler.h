@@ -56,7 +56,7 @@ public:
     class ReadHandlerNode : public IntrusiveListNodeBase<>
     {
     public:
-        using TimerCompleteCallback = void (*)();
+        using TimerCompleteCallback = std::function<void()>;
 
         ReadHandlerNode(ReadHandler * aReadHandler, TimerDelegate * aTimerDelegate, TimerCompleteCallback aCallback) :
             mTimerDelegate(aTimerDelegate), mCallback(aCallback)
@@ -78,22 +78,31 @@ public:
             // the scheduler in the ReadHandler
             Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
             return (mReadHandler->IsGeneratingReports() &&
-                    ((now >= mMinTimestamp && mReadHandler->IsDirty()) || now >= mMaxTimestamp));
+                    (now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || now >= mSyncTimestamp)));
         }
 
         void SetIntervalTimeStamps(ReadHandler * aReadHandler)
         {
             uint16_t minInterval, maxInterval;
             aReadHandler->GetReportingIntervals(minInterval, maxInterval);
-            Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
-            mMinTimestamp = now + System::Clock::Seconds16(minInterval);
-            mMaxTimestamp = now + System::Clock::Seconds16(maxInterval);
+            Timestamp now  = mTimerDelegate->GetCurrentMonotonicTimestamp();
+            mMinTimestamp  = now + System::Clock::Seconds16(minInterval);
+            mMaxTimestamp  = now + System::Clock::Seconds16(maxInterval);
+            mSyncTimestamp = mMaxTimestamp;
         }
 
         void RunCallback() { mCallback(); }
 
-        Timestamp GetMinTimestamp() const { return mMinTimestamp; }
-        Timestamp GetMaxTimestamp() const { return mMaxTimestamp; }
+        void SetSyncTimestamp(System::Clock::Timestamp aSyncTimestamp)
+        {
+            // Prevents the sync timestamp to be set to a value lower than the min timestamp
+            VerifyOrReturn(aSyncTimestamp >= mMinTimestamp);
+            mSyncTimestamp = aSyncTimestamp;
+        }
+
+        System::Clock::Timestamp GetMinTimestamp() const { return mMinTimestamp; }
+        System::Clock::Timestamp GetMaxTimestamp() const { return mMaxTimestamp; }
+        System::Clock::Timestamp GetSyncTimestamp() const { return mSyncTimestamp; }
 
     private:
         TimerDelegate * mTimerDelegate;
@@ -101,6 +110,7 @@ public:
         ReadHandler * mReadHandler;
         Timestamp mMinTimestamp;
         Timestamp mMaxTimestamp;
+        Timestamp mSyncTimestamp;
     };
 
     ReportScheduler(TimerDelegate * aTimerDelegate) : mTimerDelegate(aTimerDelegate) {}
@@ -113,7 +123,10 @@ public:
     virtual bool IsReportScheduled(ReadHandler * aReadHandler) = 0;
     /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
     /// @param aReadHandler read handler to check
-    bool IsReportableNow(ReadHandler * aReadHandler) { return FindReadHandlerNode(aReadHandler)->IsReportableNow(); };
+    bool IsReportableNow(ReadHandler * aReadHandler)
+    {
+        return FindReadHandlerNode(aReadHandler)->IsReportableNow();
+    }; // TODO: Change the IsReportableNow to IsReportable() for readHandlers
     /// @brief Check if a ReadHandler is reportable without considering the timing
     bool IsReadHandlerReportable(ReadHandler * aReadHandler) const
     {
@@ -122,6 +135,8 @@ public:
 
     /// @brief Get the number of ReadHandlers registered in the scheduler's node pool
     size_t GetNumReadHandlers() const { return mNodesPool.Allocated(); }
+
+    virtual void ReportTimerCallback() = 0;
 
 protected:
     friend class chip::app::reporting::TestReportScheduler;

@@ -36,6 +36,10 @@ public:
     void OnSubscriptionAction(ReadHandler * aReadHandler) override;
     void OnReadHandlerDestroyed(ReadHandler * aReadHandler) override;
 
+    bool IsReportScheduled(ReadHandler * aReadHandler) override;
+
+    void ReportTimerCallback() override;
+
 protected:
     virtual CHIP_ERROR RegisterReadHandler(ReadHandler * aReadHandler);
     virtual CHIP_ERROR ScheduleReport(System::Clock::Timeout timeout, ReadHandlerNode * node);
@@ -45,8 +49,6 @@ protected:
 
 private:
     friend class chip::app::reporting::TestReportScheduler;
-
-    bool IsReportScheduled(ReadHandler * aReadHandler) override;
 
     /// @brief Start a timer for a given ReadHandlerNode, ensures that if a timer is already running for this node, it is cancelled
     /// @param node Node of the ReadHandler list to start a timer for

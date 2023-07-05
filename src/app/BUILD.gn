@@ -196,6 +196,8 @@ static_library("app") {
     "reporting/ReportScheduler.h",
     "reporting/ReportSchedulerImpl.cpp",
     "reporting/ReportSchedulerImpl.h",
+    "reporting/SynchronizedReportSchedulerImpl.cpp",
+    "reporting/SynchronizedReportSchedulerImpl.h",
     "reporting/reporting.h",
   ]
 

@@ -30,9 +30,11 @@ using ReadHandlerNode = ReportScheduler::ReadHandlerNode;
 
 /// @brief Callback called when the report timer expires to schedule an engine run regardless of the state of the ReadHandlers, as
 /// the engine already verifies that read handlers are reportable before sending a report
-static void ReportTimerCallback()
+void ReportSchedulerImpl::ReportTimerCallback()
 {
+#ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+#endif
 }
 
 ReportSchedulerImpl::ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : ReportScheduler(aTimerDelegate)
@@ -91,7 +93,7 @@ CHIP_ERROR ReportSchedulerImpl::RegisterReadHandler(ReadHandler * aReadHandler)
     VerifyOrDie(nullptr == newNode);
     // The NodePool is the same size as the ReadHandler pool from the IM Engine, so we don't need a check for size here since if a
     // ReadHandler was created, space should be available.
-    newNode = mNodesPool.CreateObject(aReadHandler, mTimerDelegate, ReportTimerCallback);
+    newNode = mNodesPool.CreateObject(aReadHandler, mTimerDelegate, [this]() { this->ReportTimerCallback(); });
     mReadHandlerList.PushBack(newNode);
 
     ChipLogProgress(DataManagement,
