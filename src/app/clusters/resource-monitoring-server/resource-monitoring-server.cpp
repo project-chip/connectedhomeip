@@ -24,6 +24,7 @@
 #include <app/util/util.h>
 #include <map>
 #include <platform/DiagnosticDataProvider.h>
+#include <app/AttributePersistenceProvider.h>
 
 // using namespace std;
 using namespace chip;
@@ -41,6 +42,27 @@ namespace ResourceMonitoring {
 
 std::map<uint32_t, Instance *> Instance::ResourceMonitoringAliasesInstanceMap;
 
+void Instance::LoadPersistentAttributes()
+{
+    CHIP_ERROR err = chip::app::GetAttributePersistenceProvider()->ReadValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id),mLastChangedTime);
+    if (err == CHIP_NO_ERROR)
+    {
+        if (mLastChangedTime.IsNull())
+        {
+                ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as null");
+        }
+        else {
+
+            ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as %u", mLastChangedTime.Value());
+        }
+    }
+    else
+    {
+        // If we cannot find the previous LastChangedTime, we will assume it to be null.
+        ChipLogDetail(Zcl, "ResourceMonitoring: Unable to load the LastChangedTime from the KVS. Assuming null");
+    }
+}
+
 CHIP_ERROR Instance::Init()
 {
     ChipLogError(Zcl, "ResourceMonitoring: Init");
@@ -57,6 +79,8 @@ CHIP_ERROR Instance::Init()
         ChipLogError(Zcl, "ResourceMonitoring: The cluster with ID %lu was not enabled in zap.", long(mClusterId));
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    LoadPersistentAttributes();
 
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
@@ -197,6 +221,7 @@ chip::Protocols::InteractionModel::Status Instance::UpdateLastChangedTime(DataMo
     mLastChangedTime        = aNewLastChangedTime;
     if (mLastChangedTime != oldLastchangedTime)
     {
+        chip::app::GetAttributePersistenceProvider()->WriteValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id),mLastChangedTime);
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::LastChangedTime::Id);
     }
     return Protocols::InteractionModel::Status::Success;

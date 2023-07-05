@@ -38,6 +38,8 @@ public:
     // clusters.
     static std::map<uint32_t, Instance *> ResourceMonitoringAliasesInstanceMap;
 
+    void LoadPersistentAttributes();
+
     /**
      * Initialise the Resource Monitoring cluster.
      *
