@@ -1,0 +1,228 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Time Synchronization Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Time Synchronization"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read Time Zone"
+      command: "readAttribute"
+      attribute: "TimeZone"
+      response:
+          value: [{ Offset: 0, ValidAt: 0 }]
+
+    - label: "Set Time Zone list"
+      command: "SetTimeZone"
+      arguments:
+          values:
+              - name: "TimeZone"
+                value: [{ Offset: 100, ValidAt: 0, Name: "CET" }]
+      response:
+          values:
+              - name: "DSTOffsetRequired"
+                value: true
+
+    - label: "Read Time Zone"
+      command: "readAttribute"
+      attribute: "TimeZone"
+      response:
+          value: [{ Offset: 100, ValidAt: 0, Name: "CET" }]
+
+    - label: "Set Time Zone with missing optional name field"
+      command: "SetTimeZone"
+      arguments:
+          values:
+              - name: "TimeZone"
+                value: [{ Offset: 100, ValidAt: 0 }]
+      response:
+          values:
+              - name: "DSTOffsetRequired"
+                value: true
+
+    - label: "Read Time Zone"
+      command: "readAttribute"
+      attribute: "TimeZone"
+      response:
+          value: [{ Offset: 100, ValidAt: 0 }]
+
+    - label: "Set Time Zone with very long name"
+      command: "SetTimeZone"
+      arguments:
+          values:
+              - name: "TimeZone"
+                value:
+                    [
+                        {
+                            Offset: 100,
+                            ValidAt: 0,
+                            Name: "MunichOnTheLongRiverOfIsarInNiceSummerWeatherWithAugustinerBeerss",
+                        },
+                    ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Set Time Zone with first item validAt not zero"
+      command: "SetTimeZone"
+      arguments:
+          values:
+              - name: "TimeZone"
+                value: [{ Offset: 100, ValidAt: 1, Name: "CDT" }]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Set Time Zone with second item validAt zero"
+      command: "SetTimeZone"
+      arguments:
+          values:
+              - name: "TimeZone"
+                value:
+                    [
+                        { Offset: 100, ValidAt: 0, Name: "CST" },
+                        { Offset: 200, ValidAt: 0, Name: "CDT" },
+                    ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Set Time Zone with more than supported list count"
+      command: "SetTimeZone"
+      arguments:
+          values:
+              - name: "TimeZone"
+                value:
+                    [
+                        { Offset: 100, ValidAt: 0, Name: "CST" },
+                        { Offset: 200, ValidAt: 1, Name: "CDT" },
+                        { Offset: 200, ValidAt: 2, Name: "CET" },
+                    ]
+      response:
+          error: RESOURCE_EXHAUSTED
+
+    - label: "Set Time Zone empty"
+      command: "SetTimeZone"
+      arguments:
+          values:
+              - name: "TimeZone"
+                value: []
+      response:
+          values:
+              - name: "DSTOffsetRequired"
+                value: true
+
+    - label: "Read Time Zone"
+      command: "readAttribute"
+      attribute: "TimeZone"
+      response:
+          value: [{ Offset: 0, ValidAt: 0 }]
+
+    - label: "Read DSTOffset"
+      command: "readAttribute"
+      attribute: "DSTOffset"
+      response:
+          value: []
+
+    - label: "Set DSTOffset single item"
+      command: "SetDSTOffset"
+      arguments:
+          values:
+              - name: "DSTOffset"
+                value: [{ Offset: 1, ValidStarting: 1, ValidUntil: 2 }]
+
+    - label: "Set DSTOffset empty"
+      command: "SetDSTOffset"
+      arguments:
+          values:
+              - name: "DSTOffset"
+                value: []
+
+    - label: "Set DSTOffset with more than 1 null value"
+      command: "SetDSTOffset"
+      arguments:
+          values:
+              - name: "DSTOffset"
+                value:
+                    [
+                        { Offset: 1, ValidStarting: 1, ValidUntil: null },
+                        { Offset: 0, ValidStarting: 2, ValidUntil: null },
+                    ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Set unsorted DSTOffset entries"
+      command: "SetDSTOffset"
+      arguments:
+          values:
+              - name: "DSTOffset"
+                value:
+                    [
+                        { Offset: 1, ValidStarting: 2, ValidUntil: 3 },
+                        { Offset: 0, ValidStarting: 1, ValidUntil: null },
+                    ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Set DSTOffset with multiple entries"
+      command: "SetDSTOffset"
+      arguments:
+          values:
+              - name: "DSTOffset"
+                value:
+                    [
+                        { Offset: 1, ValidStarting: 1, ValidUntil: 2 },
+                        { Offset: 0, ValidStarting: 3, ValidUntil: null },
+                    ]
+
+    - label: "Read DSTOffset"
+      command: "readAttribute"
+      attribute: "DSTOffset"
+      response:
+          value:
+              [
+                  { Offset: 1, ValidStarting: 1, ValidUntil: 2 },
+                  { Offset: 0, ValidStarting: 3, ValidUntil: null },
+              ]
+
+    - label: "Set DSTOffset with same validStarting and validUntil"
+      command: "SetDSTOffset"
+      arguments:
+          values:
+              - name: "DSTOffset"
+                value: [{ Offset: 0, ValidStarting: 1, ValidUntil: 1 }]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Set DSTOffset with more than supported list count"
+      command: "SetDSTOffset"
+      arguments:
+          values:
+              - name: "DSTOffset"
+                value:
+                    [
+                        { Offset: 1, ValidStarting: 1, ValidUntil: 2 },
+                        { Offset: 0, ValidStarting: 3, ValidUntil: 5 },
+                        { Offset: 0, ValidStarting: 6, ValidUntil: null },
+                    ]
+      response:
+          error: RESOURCE_EXHAUSTED

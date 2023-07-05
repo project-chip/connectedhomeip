@@ -76,7 +76,7 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 struct BLEConnection
 {
     char * peerAddr;
-    uint16_t mtu;
+    unsigned int mtu;
     bool subscribed;
     bt_gatt_h gattCharC1Handle;
     bt_gatt_h gattCharC2Handle;
@@ -798,6 +798,13 @@ void BLEManagerImpl::AddConnectionData(const char * remoteAddr)
         conn           = static_cast<BLEConnection *>(g_malloc0(sizeof(BLEConnection)));
         conn->peerAddr = g_strdup(remoteAddr);
 
+        int ret;
+        if ((ret = bt_gatt_server_get_device_mtu(remoteAddr, &conn->mtu) != BT_ERROR_NONE))
+        {
+            ChipLogError(DeviceLayer, "Failed to get MTU for [%s]. ret: %s", StringOrNullMarker(remoteAddr),
+                         get_error_message(ret));
+        }
+
         if (sInstance.mIsCentral)
         {
             /* Local Device is BLE Central Role */
@@ -1185,7 +1192,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
     auto conn = static_cast<BLEConnection *>(conId);
-    return (conn != nullptr) ? conn->mtu : 0;
+    return (conn != nullptr) ? static_cast<uint16_t>(conn->mtu) : 0;
 }
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
