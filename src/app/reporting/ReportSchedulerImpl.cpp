@@ -59,23 +59,33 @@ void ReportSchedulerImpl::OnReadHandlerCreated(ReadHandler * aReadHandler)
     ScheduleReport(newTimeout, newNode);
 }
 
-/// @brief When a ReadHandler becomes reportable, schedule, verifies if the min interval of a handleris elapsed. If not,
-/// reschedule the report to happen when the min interval is elapsed. If it is, schedule an engine run.
-void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
+/// @brief When a ReadHandler's interval get changed after creation, update the min and max timestamps and reschedule the
+/// next timer callback.
+void ReportSchedulerImpl::OnReportingIntervalsChanged(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
     VerifyOrReturn(nullptr != node);
-
+    node->SetIntervalTimeStamps(aReadHandler);
     Milliseconds32 newTimeout;
     CalculateNextReportTimeout(newTimeout, node);
     ScheduleReport(newTimeout, node);
 }
 
-void ReportSchedulerImpl::OnSubscriptionAction(ReadHandler * apReadHandler)
+/// @brief When a ReadHandler becomes reportable, schedule, recalculate and reschedule the report.
+void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
 {
-    ReadHandlerNode * node = FindReadHandlerNode(apReadHandler);
+    ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
     VerifyOrReturn(nullptr != node);
-    node->SetIntervalTimeStamps(apReadHandler);
+    Milliseconds32 newTimeout;
+    CalculateNextReportTimeout(newTimeout, node);
+    ScheduleReport(newTimeout, node);
+}
+
+void ReportSchedulerImpl::OnSubscriptionAction(ReadHandler * aReadHandler)
+{
+    ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
+    VerifyOrReturn(nullptr != node);
+    node->SetIntervalTimeStamps(aReadHandler);
     Milliseconds32 newTimeout;
     CalculateNextReportTimeout(newTimeout, node);
     ScheduleReport(newTimeout, node);
@@ -99,6 +109,11 @@ CHIP_ERROR ReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode 
 {
     // Cancel Report if it is currently scheduled
     mTimerDelegate->CancelTimer(node);
+    if (timeout == Milliseconds32(0))
+    {
+        ReportTimerCallback();
+        return CHIP_NO_ERROR;
+    }
     ReturnErrorOnFailure(mTimerDelegate->StartTimer(node, timeout));
 
     return CHIP_NO_ERROR;

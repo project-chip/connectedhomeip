@@ -24,6 +24,7 @@ executable("chip-im-initiator") {
     "RequiredPrivilegeStubs.cpp",
     "chip_im_initiator.cpp",
     "common.cpp",
+    "${chip_root}/src/app/reporting/tests/MockReportScheduler.cpp",
   ]
 
   deps = [
@@ -45,6 +46,7 @@ executable("chip-im-responder") {
     "RequiredPrivilegeStubs.cpp",
     "chip_im_responder.cpp",
     "common.cpp",
+    "${chip_root}/src/app/reporting/tests/MockReportScheduler.cpp",
   ]
 
   deps = [

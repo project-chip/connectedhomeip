@@ -25,12 +25,14 @@
 #include "Command.h"
 
 #include <TracingCommandLineArgument.h>
+#include <app/reporting/ReportSchedulerImpl.h>
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <crypto/RawKeySessionKeystore.h>
+#include <lib/support/TimerDelegates.h>
 
 #pragma once
 
@@ -126,7 +128,10 @@ protected:
 
     // Shut down the command.  After a Shutdown call the command object is ready
     // to be used for another command invocation.
-    virtual void Shutdown() { ResetArguments(); }
+    virtual void Shutdown()
+    {
+        ResetArguments();
+    }
 
     // Clean up any resources allocated by the command.  Some commands may hold
     // on to resources after Shutdown(), but Cleanup() will guarantee those are
@@ -137,12 +142,18 @@ protected:
     // can keep doing work as needed.  Cleanup() will be called when quitting
     // interactive mode.  This method will be called before Shutdown, so it can
     // use member values that Shutdown will normally reset.
-    virtual bool DeferInteractiveCleanup() { return false; }
+    virtual bool DeferInteractiveCleanup()
+    {
+        return false;
+    }
 
     // If true, the controller will be created with server capabilities enabled,
     // such as advertising operational nodes over DNS-SD and accepting incoming
     // CASE sessions.
-    virtual bool NeedsOperationalAdvertising() { return false; }
+    virtual bool NeedsOperationalAdvertising()
+    {
+        return false;
+    }
 
     // Execute any deferred cleanups.  Used when exiting interactive mode.
     static void ExecuteDeferredCleanups(intptr_t ignored);
@@ -158,6 +169,8 @@ protected:
     chip::Crypto::RawKeySessionKeystore mSessionKeystore;
 
     static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
+    static chip::DefaultTimerDelegate sTimerDelegate;
+    static chip::app::reporting::ReportSchedulerImpl sReportScheduler;
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();

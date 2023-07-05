@@ -170,6 +170,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.exchangeMgr               = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager     = chip::Platform::New<secure_channel::MessageCounterManager>();
     stateParams.groupDataProvider         = params.groupDataProvider;
+    stateParams.reportScheduler           = params.reportScheduler;
     stateParams.sessionKeystore           = params.sessionKeystore;
 
     // if no fabricTable was provided, create one and track it in stateParams for cleanup
@@ -270,8 +271,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.caseSessionManager = Platform::New<CASESessionManager>();
     ReturnErrorOnFailure(stateParams.caseSessionManager->Init(stateParams.systemLayer, sessionManagerConfig));
 
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr, stateParams.fabricTable,
-                                                                                stateParams.caseSessionManager));
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(
+        stateParams.exchangeMgr, stateParams.fabricTable, stateParams.reportScheduler, stateParams.caseSessionManager));
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(std::move(stateParams));

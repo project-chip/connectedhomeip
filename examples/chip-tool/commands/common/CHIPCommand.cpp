@@ -46,6 +46,8 @@ constexpr const char * kCDTrustStorePathVariable  = "CHIPTOOL_CD_TRUST_STORE_PAT
 
 const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = nullptr;
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
+chip::DefaultTimerDelegate CHIPCommand::sTimerDelegate;
+chip::app::reporting::ReportSchedulerImpl CHIPCommand::sReportScheduler(&sTimerDelegate);
 
 namespace {
 

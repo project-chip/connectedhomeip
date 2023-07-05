@@ -49,6 +49,11 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::ScheduleReport(Timeout timeout, Read
 {
     // Cancel Report if it is currently scheduled
     mTimerDelegate->CancelTimer(this);
+    if (timeout == Milliseconds32(0))
+    {
+        ReportTimerCallback();
+        return CHIP_NO_ERROR;
+    }
     ReturnErrorOnFailure(mTimerDelegate->StartTimer(this, timeout));
     mTestNextReportTimestamp = mTimerDelegate->GetCurrentMonotonicTimestamp() + timeout;
 

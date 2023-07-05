@@ -1556,5 +1556,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS
 
 /**
- *  @}
+ * @def CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+ *
+ * @brief Controls whether the synchronized report scheduler is used.
+ *
+ * The use of the syncrhonous reports feature aims to reduce the number of times an ICD needs to wake up to emit repots to its
+ * various subscribers.
+ */
+#ifndef CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+#define CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED 0
+#endif
+
+/**
+ * @}
  */

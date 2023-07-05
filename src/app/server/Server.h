@@ -63,7 +63,13 @@
 #if CONFIG_NETWORK_LAYER_BLE
 #include <transport/raw/BLE.h>
 #endif
+#include <lib/support/TimerDelegates.h>
 #include <transport/raw/UDP.h>
+#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+#include <app/reporting/SynchronizedReportSchedulerImpl.h>
+#else
+#include <app/reporting/ReportSchedulerImpl.h>
+#endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/ICDEventManager.h> // nogncheck
@@ -94,7 +100,7 @@ struct ServerInitParams
     ServerInitParams() = default;
 
     // Not copyable
-    ServerInitParams(const ServerInitParams &) = delete;
+    ServerInitParams(const ServerInitParams &)             = delete;
     ServerInitParams & operator=(const ServerInitParams &) = delete;
 
     // Application delegate to handle some commissioning lifecycle events
@@ -140,6 +146,8 @@ struct ServerInitParams
     // Operational certificate store with access to the operational certs in persisted storage:
     // must not be null at timne of Server::Init().
     Credentials::OperationalCertificateStore * opCertStore = nullptr;
+    // Must be injected. Used to time the reporting intervals.
+    app::reporting::ReportScheduler * reportScheduler = nullptr;
 };
 
 /**
@@ -174,7 +182,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     CommonCaseDeviceServerInitParams() = default;
 
     // Not copyable
-    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &) = delete;
+    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &)             = delete;
     CommonCaseDeviceServerInitParams & operator=(const CommonCaseDeviceServerInitParams &) = delete;
 
     /**
@@ -225,6 +233,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         ReturnErrorOnFailure(sGroupDataProvider.Init());
         this->groupDataProvider = &sGroupDataProvider;
 
+        this->reportScheduler = &sReportScheduler;
+
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
         ReturnErrorOnFailure(sSessionResumptionStorage.Init(this->persistentStorageDelegate));
         this->sessionResumptionStorage = &sSessionResumptionStorage;
@@ -254,6 +264,13 @@ private:
     static PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
     static Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
     static Credentials::GroupDataProviderImpl sGroupDataProvider;
+#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+    static chip::SynchronizedTimerDelegate sTimerDelegate;
+    static app::reporting::SynchronizedReportSchedulerImpl sReportScheduler;
+#else
+    static chip::DefaultTimerDelegate sTimerDelegate;
+    static app::reporting::ReportSchedulerImpl sReportScheduler;
+#endif
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
     static SimpleSessionResumptionStorage sSessionResumptionStorage;
 #endif
@@ -297,41 +314,97 @@ public:
      */
     void RejoinExistingMulticastGroups();
 
-    FabricTable & GetFabricTable() { return mFabrics; }
+    FabricTable & GetFabricTable()
+    {
+        return mFabrics;
+    }
 
-    CASESessionManager * GetCASESessionManager() { return &mCASESessionManager; }
+    CASESessionManager * GetCASESessionManager()
+    {
+        return &mCASESessionManager;
+    }
 
-    Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
+    Messaging::ExchangeManager & GetExchangeManager()
+    {
+        return mExchangeMgr;
+    }
 
-    SessionManager & GetSecureSessionManager() { return mSessions; }
+    SessionManager & GetSecureSessionManager()
+    {
+        return mSessions;
+    }
 
-    SessionResumptionStorage * GetSessionResumptionStorage() { return mSessionResumptionStorage; }
+    SessionResumptionStorage * GetSessionResumptionStorage()
+    {
+        return mSessionResumptionStorage;
+    }
 
-    app::SubscriptionResumptionStorage * GetSubscriptionResumptionStorage() { return mSubscriptionResumptionStorage; }
+    app::SubscriptionResumptionStorage * GetSubscriptionResumptionStorage()
+    {
+        return mSubscriptionResumptionStorage;
+    }
 
-    TransportMgrBase & GetTransportManager() { return mTransports; }
+    TransportMgrBase & GetTransportManager()
+    {
+        return mTransports;
+    }
 
-    Credentials::GroupDataProvider * GetGroupDataProvider() { return mGroupsProvider; }
+    Credentials::GroupDataProvider * GetGroupDataProvider()
+    {
+        return mGroupsProvider;
+    }
 
-    Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
+    Crypto::SessionKeystore * GetSessionKeystore() const
+    {
+        return mSessionKeystore;
+    }
 
 #if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * GetBleLayerObject() { return mBleLayer; }
+    Ble::BleLayer * GetBleLayerObject()
+    {
+        return mBleLayer;
+    }
 #endif
 
-    CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
+    CommissioningWindowManager & GetCommissioningWindowManager()
+    {
+        return mCommissioningWindowManager;
+    }
 
-    PersistentStorageDelegate & GetPersistentStorage() { return *mDeviceStorage; }
+    PersistentStorageDelegate & GetPersistentStorage()
+    {
+        return *mDeviceStorage;
+    }
 
-    app::FailSafeContext & GetFailSafeContext() { return mFailSafeContext; }
+    app::FailSafeContext & GetFailSafeContext()
+    {
+        return mFailSafeContext;
+    }
 
-    TestEventTriggerDelegate * GetTestEventTriggerDelegate() { return mTestEventTriggerDelegate; }
+    TestEventTriggerDelegate * GetTestEventTriggerDelegate()
+    {
+        return mTestEventTriggerDelegate;
+    }
 
-    Crypto::OperationalKeystore * GetOperationalKeystore() { return mOperationalKeystore; }
+    Crypto::OperationalKeystore * GetOperationalKeystore()
+    {
+        return mOperationalKeystore;
+    }
 
-    Credentials::OperationalCertificateStore * GetOpCertStore() { return mOpCertStore; }
+    Credentials::OperationalCertificateStore * GetOpCertStore()
+    {
+        return mOpCertStore;
+    }
 
-    app::DefaultAttributePersistenceProvider & GetDefaultAttributePersister() { return mAttributePersister; }
+    app::DefaultAttributePersistenceProvider & GetDefaultAttributePersister()
+    {
+        return mAttributePersister;
+    }
+
+    app::reporting::ReportScheduler * GetReportScheduler()
+    {
+        return mReportScheduler;
+    }
 
     /**
      * This function causes the ShutDown event to be generated async on the
@@ -348,7 +421,10 @@ public:
         return System::SystemClock().GetMonotonicMicroseconds64() - mInitTimestamp;
     }
 
-    static Server & GetInstance() { return sServer; }
+    static Server & GetInstance()
+    {
+        return sServer;
+    }
 
 private:
     Server() = default;
@@ -585,6 +661,7 @@ private:
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;
     ServerFabricDelegate mFabricDelegate;
+    app::reporting::ReportScheduler * mReportScheduler;
 
     Access::AccessControl mAccessControl;
     app::AclStorage * mAclStorage;

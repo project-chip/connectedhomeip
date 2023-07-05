@@ -56,6 +56,17 @@ public:
     class ReadHandlerNode : public IntrusiveListNodeBase<>
     {
     public:
+#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        /// Test flags to allow TestReadInteraction to simulate expiration of the minimal and maximal intervals without
+        /// waiting
+        enum class TestFlags : uint8_t{
+            MinIntervalElapsed = (1 << 0),
+            MaxIntervalElapsed = (1 << 1),
+        };
+        void SetTestFlags(TestFlags aFlag, bool aValue) { mFlags.Set(aFlag, aValue); }
+        bool GetTestFlags(TestFlags aFlag) const { return mFlags.Has(aFlag); }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
         ReadHandlerNode(ReadHandler * aReadHandler, TimerDelegate * aTimerDelegate, ReportScheduler * aScheduler) :
             mTimerDelegate(aTimerDelegate), mScheduler(aScheduler)
         {
@@ -67,20 +78,38 @@ public:
             SetIntervalTimeStamps(aReadHandler);
         }
         ReadHandler * GetReadHandler() const { return mReadHandler; }
+
         /// @brief Check if the Node is reportable now, meaning its readhandler was made reportable by attribute dirtying and
         /// handler state, and minimal time interval since last report has elapsed, or the maximal time interval since last
         /// report has elapsed
         bool IsReportableNow() const
         {
-            // TODO: Add flags to allow for test to simulate waiting for the min interval or max intrval to elapse when integrating
-            // the scheduler in the ReadHandler
+#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+            Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+
+            return (mReadHandler->IsGeneratingReports() && (now >= mMinTimestamp || mFlags.Has(TestFlags::MinIntervalElapsed)) &&
+                    (mReadHandler->IsDirty() || (now >= mMaxTimestamp || mFlags.Has(TestFlags::MaxIntervalElapsed)) ||
+                     now >= mSyncTimestamp));
+#else
             Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
             return (mReadHandler->IsGeneratingReports() &&
                     (now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || now >= mSyncTimestamp)));
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
         }
 
         bool IsEngineRunScheduled() const { return mEngineRunScheduled; }
-        void SetEngineRunScheduled(bool aEnginRunScheduled) { mEngineRunScheduled = aEnginRunScheduled; }
+        void SetEngineRunScheduled(bool aEngineRunScheduled)
+        {
+            mEngineRunScheduled = aEngineRunScheduled;
+#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+            // If the engine becomes unscheduled, this means a run just took place so we reset the test flags
+            if (!mEngineRunScheduled)
+            {
+                mFlags.Set(TestFlags::MinIntervalElapsed, false);
+                mFlags.Set(TestFlags::MaxIntervalElapsed, false);
+            }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        }
 
         void SetIntervalTimeStamps(ReadHandler * aReadHandler)
         {
@@ -111,6 +140,9 @@ public:
         System::Clock::Timestamp GetSyncTimestamp() const { return mSyncTimestamp; }
 
     private:
+#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        BitFlags<TestFlags> mFlags;
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
         TimerDelegate * mTimerDelegate;
         ReadHandler * mReadHandler;
         ReportScheduler * mScheduler;
@@ -132,21 +164,16 @@ public:
 
     /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
     /// @param aReadHandler read handler to check
-    bool IsReportableNow(ReadHandler * aReadHandler)
-    {
-        return FindReadHandlerNode(aReadHandler)->IsReportableNow();
-    } // TODO: Change the IsReportableNow to IsReportable() for readHandlers
+    bool IsReportableNow(ReadHandler * aReadHandler) { return FindReadHandlerNode(aReadHandler)->IsReportableNow(); }
     /// @brief Check if a ReadHandler is reportable without considering the timing
-    bool IsReadHandlerReportable(ReadHandler * aReadHandler) const
-    {
-        return aReadHandler->IsGeneratingReports() && aReadHandler->IsDirty();
-    }
+    bool IsReadHandlerReportable(ReadHandler * aReadHandler) const { return aReadHandler->IsReportable(); }
 
     /// @brief Get the number of ReadHandlers registered in the scheduler's node pool
     size_t GetNumReadHandlers() const { return mNodesPool.Allocated(); }
 
 protected:
     friend class chip::app::reporting::TestReportScheduler;
+    friend class chip::app::TestReadInteraction;
 
     /// @brief Find the ReadHandlerNode for a given ReadHandler pointer
     /// @param [in] aReadHandler ReadHandler pointer to look for in the ReadHandler nodes list

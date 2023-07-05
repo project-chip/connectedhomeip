@@ -170,6 +170,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mGroupsProvider = initParams.groupDataProvider;
     SetGroupDataProvider(mGroupsProvider);
 
+    mReportScheduler = initParams.reportScheduler;
+
     mTestEventTriggerDelegate = initParams.testEventTriggerDelegate;
 
     deviceInfoprovider = DeviceLayer::GetDeviceInfoProvider();
@@ -316,8 +318,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                     &mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), &mCASESessionManager,
-                                                                 mSubscriptionResumptionStorage);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), mReportScheduler,
+                                                                 &mCASESessionManager, mSubscriptionResumptionStorage);
     SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot
@@ -554,6 +556,9 @@ KvsPersistentStorageDelegate CommonCaseDeviceServerInitParams::sKvsPersistenStor
 PersistentStorageOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
 Credentials::PersistentStorageOpCertStore CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
 Credentials::GroupDataProviderImpl CommonCaseDeviceServerInitParams::sGroupDataProvider;
+chip::DefaultTimerDelegate CommonCaseDeviceServerInitParams::sTimerDelegate;
+app::reporting::ReportSchedulerImpl
+    CommonCaseDeviceServerInitParams::sReportScheduler(&CommonCaseDeviceServerInitParams::sTimerDelegate);
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
 SimpleSessionResumptionStorage CommonCaseDeviceServerInitParams::sSessionResumptionStorage;
 #endif

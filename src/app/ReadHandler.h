@@ -170,6 +170,11 @@ public:
         /// @param[in] apReadHandler  ReadHandler getting added
         virtual void OnReadHandlerCreated(ReadHandler * apReadHandler) = 0;
 
+        /// @brief Callback invoked when a ReadHandler's reporting intervals is changed through SetMaxReportingInterval or
+        /// SetMinReportingIntervalForTests
+        /// @param[in] apReadHandler  ReadHandler that change its read intervals
+        virtual void OnReportingIntervalsChanged(ReadHandler * apReadHandler) = 0;
+
         /// @brief Callback invoked when a ReadHandler went from a non reportable state to a reportable state so a report can be
         /// sent immediately if the minimal interval allows it. Otherwise the report should be rescheduled to the earliest time
         /// allowed.
@@ -202,7 +207,7 @@ public:
      *
      */
     ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType,
-                Observer * observer = nullptr);
+                Observer * observer);
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
@@ -212,12 +217,21 @@ public:
      *  The callback passed in has to outlive this handler object.
      *
      */
-    ReadHandler(ManagementCallback & apCallback, Observer * observer = nullptr);
+    ReadHandler(ManagementCallback & apCallback, Observer * observer);
 #endif
 
-    const ObjectList<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
-    const ObjectList<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
-    const ObjectList<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
+    const ObjectList<AttributePathParams> * GetAttributePathList() const
+    {
+        return mpAttributePathList;
+    }
+    const ObjectList<EventPathParams> * GetEventPathList() const
+    {
+        return mpEventPathList;
+    }
+    const ObjectList<DataVersionFilter> * GetDataVersionFilterList() const
+    {
+        return mpDataVersionFilterList;
+    }
 
     void GetReportingIntervals(uint16_t & aMinInterval, uint16_t & aMaxInterval) const
     {
@@ -231,6 +245,7 @@ public:
         VerifyOrReturnError(aMinInterval <= mMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
         // Ensures the new min interval is higher than the subscriber established one.
         mMinIntervalFloorSeconds = std::max(mMinIntervalFloorSeconds, aMinInterval);
+        mObserver->OnReportingIntervalsChanged(this);
         return CHIP_NO_ERROR;
     }
 
@@ -247,6 +262,7 @@ public:
         VerifyOrReturnError(aMaxInterval <= std::max(GetPublisherSelectedIntervalLimit(), mMaxInterval),
                             CHIP_ERROR_INVALID_ARGUMENT);
         mMaxInterval = aMaxInterval;
+        mObserver->OnReportingIntervalsChanged(this);
         return CHIP_NO_ERROR;
     }
 
@@ -263,8 +279,14 @@ public:
     }
 
 private:
-    PriorityLevel GetCurrentPriority() const { return mCurrentPriority; }
-    EventNumber & GetEventMin() { return mEventMin; }
+    PriorityLevel GetCurrentPriority() const
+    {
+        return mCurrentPriority;
+    }
+    EventNumber & GetEventMin()
+    {
+        return mEventMin;
+    }
 
     /**
      * Returns SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT
@@ -275,26 +297,16 @@ private:
 
     enum class ReadHandlerFlags : uint8_t
     {
-        // WaitingUntilMinInterval is used to prevent subscription data delivery while we are
-        // waiting for the min reporting interval to elapse.
-        WaitingUntilMinInterval = (1 << 0), // TODO (#27672): Remove once ReportScheduler is implemented or change to test flag
-
-        // WaitingUntilMaxInterval is used to prevent subscription empty report delivery while we
-        // are waiting for the max reporting interval to elaps.  When WaitingUntilMaxInterval
-        // becomes false, we are allowed to send an empty report to keep the
-        // subscription alive on the client.
-        WaitingUntilMaxInterval = (1 << 1), // TODO (#27672): Remove once ReportScheduler is implemented
-
         // The flag indicating we are in the middle of a series of chunked report messages, this flag will be cleared during
         // sending last chunked message.
-        ChunkedReport = (1 << 2),
+        ChunkedReport = (1 << 0),
 
         // Tracks whether we're in the initial phase of receiving priming
         // reports, which is always true for reads and true for subscriptions
         // prior to receiving a subscribe response.
-        PrimingReports     = (1 << 3),
-        ActiveSubscription = (1 << 4),
-        FabricFiltered     = (1 << 5),
+        PrimingReports     = (1 << 1),
+        ActiveSubscription = (1 << 2),
+        FabricFiltered     = (1 << 3),
         // For subscriptions, we record the dirty set generation when we started to generate the last report.
         // The mCurrentReportsBeginGeneration records the generation at the start of the current report.  This only/
         // has a meaningful value while IsReporting() is true.
@@ -304,10 +316,10 @@ private:
         // mPreviousReportsBeginGeneration has had its value sent to the client.
         // when receiving initial request, it needs mark current handler as dirty.
         // when there is urgent event, it needs mark current handler as dirty.
-        ForceDirty = (1 << 6),
+        ForceDirty = (1 << 4),
 
         // Don't need the response for report data if true
-        SuppressResponse = (1 << 7),
+        SuppressResponse = (1 << 5),
     };
 
     /**
@@ -352,22 +364,28 @@ private:
      */
     bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext) const;
 
-    bool IsIdle() const { return mState == HandlerState::Idle; }
-
-    // TODO (#27672): Change back to IsReportable once ReportScheduler is implemented so this can assess reportability without
-    // considering timing. The ReporScheduler will handle timing.
-    /// @brief Returns whether the ReadHandler is in a state where it can immediately send a report. This function
-    /// is used to determine whether a report generation should be scheduled for the handler.
-    bool IsReportableNow() const
+    bool IsIdle() const
     {
-        // Important: Anything that changes the state IsReportableNow depends on in
-        // a way that causes IsReportableNow to become true must call ScheduleRun
-        // on the reporting engine.
-        return mState == HandlerState::GeneratingReports && !mFlags.Has(ReadHandlerFlags::WaitingUntilMinInterval) &&
-            (IsDirty() || !mFlags.Has(ReadHandlerFlags::WaitingUntilMaxInterval));
+        return mState == HandlerState::Idle;
     }
-    bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
-    bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
+
+    /// @brief Returns whether the ReadHandler is in a state where it can send a report. This function
+    /// is used to determine whether a report generation should be scheduled for the handler.
+    bool IsReportable() const
+    {
+        // Important: Anything that changes the state IsReportable depends on in
+        // a way that causes IsReportable to become true must call ScheduleRun
+        // on the reporting engine.
+        return mState == HandlerState::GeneratingReports && IsDirty();
+    }
+    bool IsGeneratingReports() const
+    {
+        return mState == HandlerState::GeneratingReports;
+    }
+    bool IsAwaitingReportResponse() const
+    {
+        return mState == HandlerState::AwaitingReportResponse;
+    }
 
     // Resets the path iterator to the beginning of the whole report for generating a series of new reports.
     void ResetPathIterator();
@@ -379,17 +397,41 @@ private:
     // sanpshotted last event, check with latest last event number, re-setup snapshoted checkpoint, and compare again.
     bool CheckEventClean(EventManagement & aEventManager);
 
-    bool IsType(InteractionType type) const { return (mInteractionType == type); }
-    bool IsChunkedReport() const { return mFlags.Has(ReadHandlerFlags::ChunkedReport); }
+    bool IsType(InteractionType type) const
+    {
+        return (mInteractionType == type);
+    }
+    bool IsChunkedReport() const
+    {
+        return mFlags.Has(ReadHandlerFlags::ChunkedReport);
+    }
     // Is reporting indicates whether we are in the middle of a series chunks. As we will set mIsChunkedReport on the first chunk
     // and clear that flag on the last chunk, we can use mIsChunkedReport to indicate this state.
-    bool IsReporting() const { return mFlags.Has(ReadHandlerFlags::ChunkedReport); }
-    bool IsPriming() const { return mFlags.Has(ReadHandlerFlags::PrimingReports); }
-    bool IsActiveSubscription() const { return mFlags.Has(ReadHandlerFlags::ActiveSubscription); }
-    bool IsFabricFiltered() const { return mFlags.Has(ReadHandlerFlags::FabricFiltered); }
+    bool IsReporting() const
+    {
+        return mFlags.Has(ReadHandlerFlags::ChunkedReport);
+    }
+    bool IsPriming() const
+    {
+        return mFlags.Has(ReadHandlerFlags::PrimingReports);
+    }
+    bool IsActiveSubscription() const
+    {
+        return mFlags.Has(ReadHandlerFlags::ActiveSubscription);
+    }
+    bool IsFabricFiltered() const
+    {
+        return mFlags.Has(ReadHandlerFlags::FabricFiltered);
+    }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
-    void GetSubscriptionId(SubscriptionId & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
-    AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
+    void GetSubscriptionId(SubscriptionId & aSubscriptionId) const
+    {
+        aSubscriptionId = mSubscriptionId;
+    }
+    AttributePathExpandIterator * GetAttributePathExpandIterator()
+    {
+        return &mAttributePathExpandIterator;
+    }
 
     /// @brief Notifies the read handler that a set of attribute paths has been marked dirty. This will schedule a reporting engine
     /// run if the change to the attribute path makes the ReadHandler reportable.
@@ -399,7 +441,10 @@ private:
     {
         return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
     }
-    void ClearForceDirtyFlag() { ClearStateFlag(ReadHandlerFlags::ForceDirty); }
+    void ClearForceDirtyFlag()
+    {
+        ClearStateFlag(ReadHandlerFlags::ForceDirty);
+    }
     NodeId GetInitiatorNodeId() const
     {
         auto session = GetSession();
@@ -413,23 +458,47 @@ private:
     }
 
     Transport::SecureSession * GetSession() const;
-    SubjectDescriptor GetSubjectDescriptor() const { return GetSession()->GetSubjectDescriptor(); }
+    SubjectDescriptor GetSubjectDescriptor() const
+    {
+        return GetSession()->GetSubjectDescriptor();
+    }
 
-    auto GetTransactionStartGeneration() const { return mTransactionStartGeneration; }
+    auto GetTransactionStartGeneration() const
+    {
+        return mTransactionStartGeneration;
+    }
 
     /// @brief Forces the read handler into a dirty state, regardless of what's going on with attributes.
     /// This can lead to scheduling of a reporting run immediately, if the min interval has been reached,
     /// or after the min interval is reached if it has not yet been reached.
     void ForceDirtyState();
 
-    const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
-    void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
-    uint32_t GetLastWrittenEventsBytes() const { return mLastWrittenEventsBytes; }
+    const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const
+    {
+        return mAttributeEncoderState;
+    }
+    void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState)
+    {
+        mAttributeEncoderState = aState;
+    }
+    uint32_t GetLastWrittenEventsBytes() const
+    {
+        return mLastWrittenEventsBytes;
+    }
 
     // Returns the number of interested paths, including wildcard and concrete paths.
-    size_t GetAttributePathCount() const { return mpAttributePathList == nullptr ? 0 : mpAttributePathList->Count(); };
-    size_t GetEventPathCount() const { return mpEventPathList == nullptr ? 0 : mpEventPathList->Count(); };
-    size_t GetDataVersionFilterCount() const { return mpDataVersionFilterList == nullptr ? 0 : mpDataVersionFilterList->Count(); };
+    size_t GetAttributePathCount() const
+    {
+        return mpAttributePathList == nullptr ? 0 : mpAttributePathList->Count();
+    };
+    size_t GetEventPathCount() const
+    {
+        return mpEventPathList == nullptr ? 0 : mpEventPathList->Count();
+    };
+    size_t GetDataVersionFilterCount() const
+    {
+        return mpDataVersionFilterList == nullptr ? 0 : mpDataVersionFilterList->Count();
+    };
 
     CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
@@ -445,8 +514,8 @@ private:
     friend class chip::app::reporting::Engine;
     friend class chip::app::InteractionModelEngine;
 
-    // The report scheduler needs to be able to access StateFlag private functions IsGeneratingReports() and IsDirty() to
-    // know when to schedule a run so it is declared as a friend class.
+    // The report scheduler needs to be able to access StateFlag private functions IsReportable(), IsGeneratingReports() and
+    // IsDirty() to know when to schedule a run so it is declared as a friend class.
     friend class chip::app::reporting::ReportScheduler;
 
     enum class HandlerState : uint8_t
@@ -471,15 +540,6 @@ private:
      *
      */
     void Close(CloseOptions options = CloseOptions::kDropPersistedSubscription);
-
-    /// @brief This function is called when the min interval timer has expired, it restarts the timer on a timeout equal to the
-    /// difference between the max interval and the min interval.
-    static void MinIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState); // TODO (#27672): Remove once
-                                                                                              // ReportScheduler is implemented.
-    static void MaxIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState); // TODO (#27672): Remove once
-                                                                                              // ReportScheduler is implemented.
-    /// @brief This function is called when a report is sent and it restarts the min interval timer.
-    CHIP_ERROR UpdateReportTimer(); // TODO (#27672) : Remove once ReportScheduler is implemented.
 
     CHIP_ERROR SendSubscribeResponse();
     CHIP_ERROR ProcessSubscribeRequest(System::PacketBufferHandle && aPayload);

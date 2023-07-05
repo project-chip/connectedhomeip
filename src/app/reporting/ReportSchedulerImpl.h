@@ -34,6 +34,7 @@ public:
 
     // ReadHandlerObserver
     void OnReadHandlerCreated(ReadHandler * aReadHandler) final;
+    void OnReportingIntervalsChanged(ReadHandler * aReadHandler) final;
     void OnBecameReportable(ReadHandler * aReadHandler) final;
     void OnSubscriptionAction(ReadHandler * aReadHandler) final;
     void OnReadHandlerDestroyed(ReadHandler * aReadHandler) override;
@@ -41,6 +42,12 @@ public:
     bool IsReportScheduled(ReadHandler * aReadHandler);
 
     void ReportTimerCallback() override;
+
+    ReportSchedulerImpl & operator=(const ReportSchedulerImpl & other)
+    {
+        this->mTimerDelegate = other.mTimerDelegate;
+        return *this;
+    }
 
 protected:
     virtual CHIP_ERROR ScheduleReport(Timeout timeout, ReadHandlerNode * node);

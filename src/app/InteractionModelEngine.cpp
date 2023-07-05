@@ -51,16 +51,18 @@ InteractionModelEngine * InteractionModelEngine::GetInstance()
 }
 
 CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
-                                        CASESessionManager * apCASESessionMgr,
+                                        reporting::ReportScheduler * reportScheduler, CASESessionManager * apCASESessionMgr,
                                         SubscriptionResumptionStorage * subscriptionResumptionStorage)
 {
     VerifyOrReturnError(apFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(apExchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(reportScheduler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mpExchangeMgr                   = apExchangeMgr;
     mpFabricTable                   = apFabricTable;
     mpCASESessionMgr                = apCASESessionMgr;
     mpSubscriptionResumptionStorage = subscriptionResumptionStorage;
+    mReportScheduler                = reportScheduler;
 
     ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
@@ -635,7 +637,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             {
                 auto subjectDescriptor = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetSubjectDescriptor();
                 err                    = ParseAttributePaths(subjectDescriptor, attributePathListParser, hasValidAttributePath,
-                                          requestedAttributePathCount);
+                                                             requestedAttributePathCount);
                 if (err != CHIP_NO_ERROR)
                 {
                     return Status::InvalidAction;
@@ -741,7 +743,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
 
     // We have already reserved enough resources for read requests, and have granted enough resources for current subscriptions, so
     // we should be able to allocate resources requested by this request.
-    ReadHandler * handler = mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType);
+    ReadHandler * handler = mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType, mReportScheduler);
     if (handler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for %s interaction",
@@ -1845,7 +1847,7 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
             return;
         }
 
-        ReadHandler * handler = imEngine->mReadHandlers.CreateObject(*imEngine);
+        ReadHandler * handler = imEngine->mReadHandlers.CreateObject(*imEngine, imEngine->GetReportScheduler());
         if (handler == nullptr)
         {
             ChipLogProgress(InteractionModel, "no resource for ReadHandler creation");
