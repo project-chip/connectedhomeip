@@ -18,10 +18,11 @@
 #pragma once
 
 #include <tracing/backend.h>
-
-#include <json/json.h>
-
 #include <fstream>
+
+namespace Json {
+class Value;
+}
 
 namespace chip {
 namespace Tracing {
