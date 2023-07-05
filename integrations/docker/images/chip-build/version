@@ -1,1 +1,1 @@
-0.7.23 Version bump reason: make slc-cli not use requirements.txt for efr32
+0.7.24 Version bump reason: [Telink] Update Docker image (Zephyr update)

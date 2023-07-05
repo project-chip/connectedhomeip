@@ -19,7 +19,7 @@
 
 #include <lib/support/StringSplitter.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <tracing/log_json/log_json_tracing.h>
+#include <tracing/json/json_tracing.h>
 #include <tracing/registry.h>
 
 #if ENABLE_PERFETTO_TRACING
@@ -59,9 +59,23 @@ void TracingSetup::EnableTracingFor(const char * cliArg)
 
     while (splitter.Next(value))
     {
-        if (value.data_equal(CharSpan::fromCharString("log")))
+        if (StartsWith(value, "json:"))
         {
-            chip::Tracing::Register(mLogJsonBackend);
+            std::string fileName(value.data() + 5, value.size() - 5);
+
+            if (fileName != "log")
+            {
+                CHIP_ERROR err = mJsonBackend.Open(fileName.c_str());
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer, "Failed to open json trace output: %" CHIP_ERROR_FORMAT, err.Format());
+                }
+            }
+            else
+            {
+                mJsonBackend.Close(); // just in case, ensure no file output
+            }
+            chip::Tracing::Register(mJsonBackend);
         }
 #if ENABLE_PERFETTO_TRACING
         else if (value.data_equal(CharSpan::fromCharString("perfetto")))
@@ -101,7 +115,7 @@ void TracingSetup::StopTracing()
 
 #endif
 
-    chip::Tracing::Unregister(mLogJsonBackend);
+    chip::Tracing::Unregister(mJsonBackend);
 }
 
 } // namespace CommandLineApp
