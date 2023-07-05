@@ -16,7 +16,7 @@
 
 #
 #   @file
-#     CMake file that allows collecting C/C++ compiler flags passed to 
+#     CMake file that allows collecting C/C++ compiler flags passed to
 #     the Matter build system.
 #
 
@@ -165,11 +165,11 @@ endmacro()
 macro(matter_common_gn_args)
     set(options)
     set(oneValueArgs
-        DEBUG 
-        LIB_TESTS 
-        LIB_SHELL 
+        DEBUG
+        LIB_TESTS
+        LIB_SHELL
         LIB_PW_RPC
-        DEVICE_INFO_EXAMPLE_PROVIDER 
+        DEVICE_INFO_EXAMPLE_PROVIDER
         PROJECT_CONFIG
         
     )
@@ -196,7 +196,7 @@ macro(matter_common_gn_args)
     matter_add_gn_arg_bool          ("is_debug"                 ${ARG_DEBUG})
     matter_add_gn_arg_bool          ("chip_build_tests"         ${ARG_LIB_TESTS})
     matter_add_gn_arg_bool          ("chip_build_libshell"      ${ARG_LIB_SHELL})
-    
+
     if (ARG_LIB_PW_RPC)
         matter_add_gn_arg_bool      ("chip_build_pw_rpc_lib"    ${ARG_LIB_PW_RPC})
     endif() # ARG_LIB_PW_RPC
