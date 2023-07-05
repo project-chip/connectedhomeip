@@ -22,7 +22,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_NEWLY_AVAILABLE
+API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
 @protocol MTRCommissionableBrowserDelegate <NSObject>
 /**
  * Tells the delegate the commissionable manager discovered a device while scanning for devices.
