@@ -115,5 +115,3 @@ tests:
       attribute: "OperationalState"
       response:
           value: [{ OperationalStateID : 0}]
-
-
