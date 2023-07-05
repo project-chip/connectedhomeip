@@ -59,19 +59,18 @@ void TracingSetup::EnableTracingFor(const char * cliArg)
 
     while (splitter.Next(value))
     {
-        if (value.data_equal(CharSpan::fromCharString("json")))
-        {
-            // Will default to log as no file is open
-            chip::Tracing::Register(mJsonBackend);
-        }
-        else if (StartsWith(value, "json:"))
+        if (StartsWith(value, "json:"))
         {
             std::string fileName(value.data() + 5, value.size() - 5);
 
+            if (fileName != "log") {
             CHIP_ERROR err = mJsonBackend.Open(fileName.c_str());
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "Failed to open json trace output: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+            } else {
+                mJsonBackend.Close(); // just in case, ensure no file output
             }
             chip::Tracing::Register(mJsonBackend);
         }
