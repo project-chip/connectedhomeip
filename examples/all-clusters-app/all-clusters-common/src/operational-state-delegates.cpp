@@ -170,7 +170,7 @@ bool LogOperationCompletion(EndpointId aEndpointId, const GenericOperationComple
 } // namespace app
 } // namespace chip
 
-void MatterOperationalStatePluginServerInitCallback()
+void MatterOperationalStateServerInit()
 {
     using namespace chip::app;
     static Clusters::OperationalState::OperationalStateServer operationalstateServer(Clusters::OperationalState::kDemoEndpointId,
