@@ -193,25 +193,13 @@ private:
  */
 struct GenericOperationCompletion : public app::Clusters::OperationalState::Events::OperationCompletion::Type
 {
-    GenericOperationCompletion(uint8_t aCompletionErrorCode)
+    GenericOperationCompletion(uint8_t aCompletionErrorCode,
+            Optional<DataModel::Nullable<uint32_t>> aTotalOperationalTime = Optional<DataModel::Nullable<uint32_t>>::Missing(),
+            Optional<DataModel::Nullable<uint32_t>> aPausedTime = Optional<DataModel::Nullable<uint32_t>>::Missing())
     {
         completionErrorCode = aCompletionErrorCode;
-        totalOperationalTime.SetValue(app::DataModel::Nullable<uint32_t>());
-        pausedTime.SetValue(app::DataModel::Nullable<uint32_t>());
-    }
-
-    GenericOperationCompletion(uint8_t aCompletionErrorCode, uint32_t aTotalOperationalTime)
-    {
-        completionErrorCode = aCompletionErrorCode;
-        totalOperationalTime.SetValue(app::DataModel::Nullable<uint32_t>(aTotalOperationalTime));
-        pausedTime.SetValue(app::DataModel::Nullable<uint32_t>());
-    }
-
-    GenericOperationCompletion(uint8_t aCompletionErrorCode, uint32_t aTotalOperationalTime, uint32_t aPausedTime)
-    {
-        completionErrorCode = aCompletionErrorCode;
-        totalOperationalTime.SetValue(app::DataModel::Nullable<uint32_t>(aTotalOperationalTime));
-        pausedTime.SetValue(app::DataModel::Nullable<uint32_t>(aPausedTime));
+        totalOperationalTime = aTotalOperationalTime;
+        pausedTime = aPausedTime;
     }
 };
 
