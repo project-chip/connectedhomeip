@@ -31,6 +31,7 @@ using chip::StringBuilderBase;
 using chip::TLVMeta::AttributeTag;
 using chip::TLVMeta::ClusterTag;
 using chip::TLVMeta::CommandTag;
+using chip::TLVMeta::ConstantValueTag;
 using chip::TLVMeta::EventTag;
 using chip::TLVMeta::ItemType;
 
@@ -149,13 +150,76 @@ CHIP_ERROR FormatCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
 }
 
 // Returns a null terminated string containing the current reader value
-void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
+void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out, PayloadDecoderBase::DecodePosition & position)
 {
     CHIP_ERROR err = FormatCurrentValue(reader, out);
 
     if (err != CHIP_NO_ERROR)
     {
         out.AddFormat("ERR: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
+
+    auto data = position.Get();
+    if (data == nullptr)
+    {
+        return;
+    }
+
+    // Report enum values in human readable form
+    if (data->type == ItemType::kEnum && (reader.GetType() == kTLVType_UnsignedInteger))
+    {
+        uint64_t value = 0;
+        VerifyOrReturn(reader.Get(value) == CHIP_NO_ERROR);
+
+        position.Enter(ByTag(ConstantValueTag(value)));
+        auto enum_data = position.Get();
+        if (enum_data != nullptr)
+        {
+            out.Add(" == ").Add(enum_data->name);
+        }
+        position.Exit();
+    }
+
+    if (data->type == ItemType::kBitmap && (reader.GetType() == kTLVType_UnsignedInteger))
+    {
+        uint64_t value = 0;
+        VerifyOrReturn(reader.Get(value) == CHIP_NO_ERROR);
+
+        uint64_t bit = 0x01;
+        bool first = true;
+        for (unsigned i = 0; i < 64; i++) {
+            if ((value & bit) == 0) {
+                continue;
+            }
+            // NOTE: this only can select individual bits;
+
+            position.Enter(ByTag(ConstantValueTag(bit)));
+            auto bitmap_data = position.Get();
+            if (bitmap_data == nullptr) {
+                position.Exit();
+                continue;
+            }
+
+            // Try to pretty print the value
+            if (first) {
+                out.Add(" == ");
+                first = false;
+            } else {
+                out.Add(" | ");
+            }
+
+            out.Add(bitmap_data->name);
+            value = value & (~bit);
+            bit <<= 1;
+
+            position.Exit();
+        }
+
+        if (!first && value) {
+            // Only append if some constants were found.
+            out.AddFormat(" | 0x%" PRIX64, value);
+        }
     }
 }
 
@@ -371,7 +435,7 @@ void PayloadDecoderBase::NextFromContentRead(PayloadEntry & entry)
         return;
     }
 
-    PrettyPrintCurrentValue(mReader, mValueBuilder.Reset());
+    PrettyPrintCurrentValue(mReader, mValueBuilder.Reset(), mIMContentPosition);
     mIMContentPosition.Exit();
 
     if (data == nullptr)
@@ -453,7 +517,7 @@ void PayloadDecoderBase::MoveToContent(PayloadEntry & entry)
     }
     else
     {
-        PrettyPrintCurrentValue(mReader, mValueBuilder.Reset());
+        PrettyPrintCurrentValue(mReader, mValueBuilder.Reset(), mIMContentPosition);
         entry = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
 
         // Can simply exit, only one value to return
@@ -515,7 +579,7 @@ void PayloadDecoderBase::NextFromValueRead(PayloadEntry & entry)
     if (data == nullptr)
     {
         FormatCurrentTag(mReader, mNameBuilder.Reset());
-        PrettyPrintCurrentValue(mReader, mValueBuilder.Reset());
+        PrettyPrintCurrentValue(mReader, mValueBuilder.Reset(), mPayloadPosition);
         entry = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
         mPayloadPosition.Exit();
         return;
@@ -557,7 +621,7 @@ void PayloadDecoderBase::NextFromValueRead(PayloadEntry & entry)
         break;
     }
 
-    PrettyPrintCurrentValue(mReader, mValueBuilder.Reset());
+    PrettyPrintCurrentValue(mReader, mValueBuilder.Reset(), mPayloadPosition);
     if (info != nullptr)
     {
         mValueBuilder.Add(" == '").Add(info->name).Add("'");

@@ -191,6 +191,9 @@ private:
 class PayloadDecoderBase
 {
 public:
+    static constexpr size_t kMaxDecodeDepth = 16;
+    using DecodePosition                    = chip::FlatTree::Position<chip::TLVMeta::ItemInfo, kMaxDecodeDepth>;
+
     PayloadDecoderBase(const PayloadDecoderInitParams & params, StringBuilderBase & nameBuilder, StringBuilderBase & valueBuilder);
 
     /// Initialize decoding from the given reader
@@ -216,8 +219,6 @@ public:
     const TLV::TLVReader & ReadState() const { return mReader; }
 
 private:
-    static constexpr size_t kMaxDecodeDepth = 16;
-    using DecodePosition                    = chip::FlatTree::Position<chip::TLVMeta::ItemInfo, kMaxDecodeDepth>;
 
     enum class State
     {

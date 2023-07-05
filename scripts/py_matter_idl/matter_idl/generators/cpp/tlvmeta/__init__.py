@@ -15,6 +15,7 @@
 import os
 from dataclasses import dataclass
 from typing import Generator, List, Optional, Set
+from stringcase import capitalcase
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.matter_idl_types import Cluster, ClusterSide, Field, Idl, StructTag
@@ -97,6 +98,12 @@ class ClusterTablesGenerator:
         # Events are structures
         for e in self.cluster.events:
             self.known_types.add("%s_%s" % (self.cluster.name, e.name))
+
+        for e in self.cluster.enums:
+            self.known_types.add("%s_%s" % (self.cluster.name, e.name))
+
+        for b in self.cluster.bitmaps:
+            self.known_types.add("%s_%s" % (self.cluster.name, b.name))
 
     def CommandEntries(self) -> Generator[TableEntry, None, None]:
         # yield entries for every command input
@@ -186,8 +193,33 @@ class ClusterTablesGenerator:
                 ]
             )
 
-        # TODO:
-        #  - enums and bitmaps could be decoded with their value (by abusing tags a bit)
+        for e in self.cluster.enums:
+            yield Table(
+                full_name="%s_%s" % (self.cluster.name, e.name),
+                entries=[
+                    TableEntry(
+                        code="ConstantValueTag(0x%X)" % entry.code,
+                        name = entry.name,
+                        reference = None,
+                        real_type = "%s::%s::%s" % (self.cluster.name, e.name, entry.name)
+                    )
+                    for entry in e.entries
+                ]
+            )
+
+        for e in self.cluster.bitmaps:
+            yield Table(
+                full_name="%s_%s" % (self.cluster.name, e.name),
+                entries=[
+                    TableEntry(
+                        code="ConstantValueTag(0x%X)" % entry.code,
+                        name = entry.name,
+                        reference = None,
+                        real_type = "%s::%s::%s" % (self.cluster.name, e.name, entry.name)
+                    )
+                    for entry in e.entries
+                ]
+            )
 
 
 def CreateTables(idl: Idl) -> List[Table]:
