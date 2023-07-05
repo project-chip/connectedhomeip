@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 
 @class MTRCommissionableBrowserResult;
+@class MTRDeviceController;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -26,12 +27,12 @@ MTR_NEWLY_AVAILABLE
 /**
  * Tells the delegate the commissionable manager discovered a device while scanning for devices.
  */
-- (void)didDiscoverCommissionable:(MTRCommissionableBrowserResult *)device;
+- (void)controller:(MTRDeviceController *)controller didFindCommissionableDevice:(MTRCommissionableBrowserResult *)device;
 
 /**
  * Tells the delegate a previously discovered device is is no longer available.
  */
-- (void)commissionableUnavailable:(MTRCommissionableBrowserResult *)device;
+- (void)controller:(MTRDeviceController *)controller didRemoveCommissionableDevice:(MTRCommissionableBrowserResult *)device;
 @end
 
 NS_ASSUME_NONNULL_END
