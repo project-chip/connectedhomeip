@@ -566,7 +566,7 @@ void TestNestingOverflow(nlTestSuite * inSuite, void * inContext)
     }
     for (uint8_t i = 0; i < 4; i++)
     {
-        NL_TEST_ASSERT(inSuite, writer.StartContainer(ContextTag(i), kTLVType_List, unusedType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, writer.StartContainer(ContextTag(static_cast<uint8_t>(i+0x10)), kTLVType_List, unusedType) == CHIP_NO_ERROR);
     }
     for (uint8_t i = 0; i < 4; i++)
     {
@@ -579,7 +579,7 @@ void TestNestingOverflow(nlTestSuite * inSuite, void * inContext)
     }
     for (uint8_t i = 0; i < 4; i++)
     {
-        NL_TEST_ASSERT(inSuite, writer.StartContainer(ContextTag(i), kTLVType_List, unusedType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, writer.StartContainer(ContextTag(static_cast<uint8_t>(i+0x20)), kTLVType_List, unusedType) == CHIP_NO_ERROR);
     }
     for (uint8_t i = 0; i < 4; i++)
     {
@@ -592,7 +592,7 @@ void TestNestingOverflow(nlTestSuite * inSuite, void * inContext)
     }
     for (uint8_t i = 0; i < 4; i++)
     {
-        NL_TEST_ASSERT(inSuite, writer.StartContainer(ContextTag(i), kTLVType_List, unusedType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, writer.StartContainer(ContextTag(static_cast<uint8_t>(i+0x30)), kTLVType_List, unusedType) == CHIP_NO_ERROR);
     }
     for (uint8_t i = 0; i < 4; i++)
     {
@@ -625,14 +625,14 @@ void TestNestingOverflow(nlTestSuite * inSuite, void * inContext)
                    "                            ContextSpecific(0xd)\n"
                    "                              ContextSpecific(0xe)\n"
                    "                                ContextSpecific(0xf): NESTING DEPTH REACHED\n"
-                   "                  ContextSpecific(0x0)\n"
-                   "                    ContextSpecific(0x1)\n"
-                   "                      ContextSpecific(0x2)\n"
-                   "                        ContextSpecific(0x3)\n"
-                   "          ContextSpecific(0x0)\n"
-                   "            ContextSpecific(0x1)\n"
-                   "              ContextSpecific(0x2)\n"
-                   "                ContextSpecific(0x3)\n");
+                   "                  ContextSpecific(0x20)\n"
+                   "                    ContextSpecific(0x21)\n"
+                   "                      ContextSpecific(0x22)\n"
+                   "                        ContextSpecific(0x23)\n"
+                   "          ContextSpecific(0x30)\n"
+                   "            ContextSpecific(0x31)\n"
+                   "              ContextSpecific(0x32)\n"
+                   "                ContextSpecific(0x33)\n");
 }
 
 const nlTest sTests[] = {
