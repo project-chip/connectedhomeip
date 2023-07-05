@@ -77,8 +77,8 @@ void FormatCurrentTag(const TLVReader & reader, chip::StringBuilderBase & out)
 
     if (IsProfileTag(tag))
     {
-        out.AddFormat("%s(0x%X::0x%X::0x%" PRIX32 ")", DecodeTagControl(tagControl), VendorIdFromTag(tag),
-                      ProfileNumFromTag(tag), TagNumFromTag(tag));
+        out.AddFormat("%s(0x%X::0x%X::0x%" PRIX32 ")", DecodeTagControl(tagControl), VendorIdFromTag(tag), ProfileNumFromTag(tag),
+                      TagNumFromTag(tag));
     }
     else if (IsContextTag(tag))
     {
