@@ -44,6 +44,7 @@ extern const SamplePayload im_protocol_invoke_response;
 // different data reports for content tests
 extern const SamplePayload im_protocol_report_data_acl;
 extern const SamplePayload im_protocol_report_data_window_covering;
+extern const SamplePayload im_protocol_invoke_request_change_channel;
 
 } // namespace TestData
 } // namespace chip

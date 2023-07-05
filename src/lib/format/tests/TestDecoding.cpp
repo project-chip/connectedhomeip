@@ -317,7 +317,7 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "        endpoint_id: 1\n"
                    "        cluster_id: 6 == 'OnOff'\n"
                    "        command_id: 2 == 'Toggle'\n"
-                   "      ContextSpecific(0x1)\n"
+                   "      OnOff::Toggle\n"
                    "  interaction_model_revison: 1\n");
 
     TestSampleData(inSuite, params, im_protocol_invoke_response,
@@ -332,6 +332,20 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "          command_id: 2 == 'Toggle'\n"
                    "        status\n"
                    "          status: 0 == kSuccess\n"
+                   "  interaction_model_revison: 1\n");
+
+    TestSampleData(inSuite, params, im_protocol_invoke_request_change_channel,
+                   "invoke_request\n"
+                   "  suppress_response: false\n"
+                   "  timed_request: false\n"
+                   "  invoke_requests\n"
+                   "    []\n"
+                   "      path\n"
+                   "        endpoint_id: 1\n"
+                   "        cluster_id: 1284 == 'Channel'\n"
+                   "        command_id: 0 == 'ChangeChannel'\n"
+                   "      Channel::ChangeChannel\n"
+                   "        match: \"channel name\"\n"
                    "  interaction_model_revison: 1\n");
 }
 

@@ -317,7 +317,7 @@ client cluster IMProtocol = 0xFFFF0001 {
 
   struct CommandDataIB {
     CommandPathIB path = 0;
-    cluster_command_payload data = 2;
+    cluster_command_payload data = 1;
   }
 
   struct InvokeRequestMessage {

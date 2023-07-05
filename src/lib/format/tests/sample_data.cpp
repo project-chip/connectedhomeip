@@ -98,10 +98,16 @@ const uint8_t payload_1_5_window_covering[] = { 0x15, 0x36, 0x01, 0x15, 0x35, 0x
                                                 0x01, 0x24, 0x02, 0x01, 0x25, 0x03, 0x02, 0x01, 0x24, 0x04, 0x07, 0x18, 0x24,
                                                 0x02, 0x1B, 0x18, 0x18, 0x18, 0x29, 0x04, 0x24, 0xFF, 0x01, 0x18 };
 
+// Change channel invoke. This has a command input (channel name)
+const uint8_t payload_1_8_change_channel[] = { 0x15, 0x28, 0x00, 0x28, 0x01, 0x36, 0x02, 0x15, 0x37, 0x00, 0x24, 0x00,
+                                               0x01, 0x25, 0x01, 0x04, 0x05, 0x24, 0x02, 0x00, 0x18, 0x35, 0x01, 0x2C,
+                                               0x00, 0x0C, 0x63, 0x68, 0x61, 0x6E, 0x6E, 0x65, 0x6C, 0x20, 0x6E, 0x61,
+                                               0x6D, 0x65, 0x18, 0x18, 0x18, 0x24, 0xFF, 0x01, 0x18 };
+
 } // namespace
 
 const SamplePayload secure_channel_mrp_ack              = { chip::Protocols::Id(VendorId::Common, 0), 16,
-                                               ByteSpan(payload_0_16, sizeof(payload_0_16)) };
+                                                            ByteSpan(payload_0_16, sizeof(payload_0_16)) };
 const SamplePayload secure_channel_pkbdf_param_request  = { chip::Protocols::Id(VendorId::Common, 0), 32, ByteSpan(payload_0_32) };
 const SamplePayload secure_channel_pkbdf_param_response = { chip::Protocols::Id(VendorId::Common, 0), 33, ByteSpan(payload_0_33) };
 const SamplePayload secure_channel_pase_pake1           = { chip::Protocols::Id(VendorId::Common, 0), 34, ByteSpan(payload_0_34) };
@@ -113,6 +119,8 @@ const SamplePayload im_protocol_read_request    = { chip::Protocols::Id(VendorId
 const SamplePayload im_protocol_report_data     = { chip::Protocols::Id(VendorId::Common, 1), 5, ByteSpan(payload_1_5) };
 const SamplePayload im_protocol_invoke_request  = { chip::Protocols::Id(VendorId::Common, 1), 8, ByteSpan(payload_1_8) };
 const SamplePayload im_protocol_invoke_response = { chip::Protocols::Id(VendorId::Common, 1), 9, ByteSpan(payload_1_9) };
+
+const SamplePayload im_protocol_invoke_request_change_channel  = { chip::Protocols::Id(VendorId::Common, 1), 8, ByteSpan(payload_1_8_change_channel) };
 
 const SamplePayload im_protocol_report_data_acl = { chip::Protocols::Id(VendorId::Common, 1), 5, ByteSpan(payload_1_5_acl) };
 const SamplePayload im_protocol_report_data_window_covering = { chip::Protocols::Id(VendorId::Common, 1), 5,
