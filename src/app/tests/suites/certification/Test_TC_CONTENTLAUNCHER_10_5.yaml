@@ -55,6 +55,8 @@ tests:
           values:
               - name: "ContentURL"
                 value: GoodURL
+              - name: "BrandingInformation"
+                value: { ProviderName: providerNameString }
       response:
           values:
               - name: "Status"
@@ -84,6 +86,8 @@ tests:
                 value: GoodURL
               - name: "DisplayString"
                 value: DisplayContent
+              - name: "BrandingInformation"
+                value: { ProviderName: providerNameString }
       response:
           values:
               - name: "Data"
@@ -148,6 +152,8 @@ tests:
           values:
               - name: "ContentURL"
                 value: BadURL
+              - name: "BrandingInformation"
+                value: { ProviderName: providerNameString }
       response:
           values:
               - name: "Status"
@@ -162,6 +168,8 @@ tests:
           values:
               - name: "ContentURL"
                 value: UnauthorizedURL
+              - name: "BrandingInformation"
+                value: { ProviderName: providerNameString }
       response:
           values:
               - name: "Status"
