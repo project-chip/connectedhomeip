@@ -79,6 +79,12 @@ public:
     void GetCurrentPhase(app::DataModel::Nullable<uint8_t> & phase) override;
 
     /**
+     * Get countdown time
+     * @param time The app::DataModel::Nullable<uint32_t> to fill with the coutdown time value
+     */
+    void GetCountdownTime(app::DataModel::Nullable<uint32_t> & time) override;
+
+    /**
      * Set operational error.
      * @param opErrState The new operational error.
      */
@@ -95,6 +101,12 @@ public:
      * @param phase The operational phase that should now be the current one.
      */
     CHIP_ERROR SetPhase(const app::DataModel::Nullable<uint8_t> & phase) override;
+
+    /**
+     * Set coutdown time.
+     * @param time The coutdown time that should now be the current one.
+     */
+    CHIP_ERROR SetCountdownTime(const app::DataModel::Nullable<uint32_t> & time) override;
 
     // command callback
     /**
@@ -124,9 +136,10 @@ public:
     OperationalStateDelegate(GenericOperationalState aOperationalState,
                              GenericOperationalError aOperationalError, Span<const GenericOperationalState> aOperationalStateList,
                              Span<const GenericOperationalPhase> aOperationalPhaseList,
-                             app::DataModel::Nullable<uint8_t> aPhase = DataModel::Nullable<uint8_t>()) :
+                             app::DataModel::Nullable<uint8_t> aPhase = DataModel::Nullable<uint8_t>(),
+                             app::DataModel::Nullable<uint32_t> aCountdownTime = DataModel::Nullable<uint32_t>()) :
         mOperationalState(aOperationalState), mOperationalError(aOperationalError), mOperationalStateList(aOperationalStateList),
-        mOperationalPhaseList(aOperationalPhaseList), mOperationalPhase(aPhase)
+        mOperationalPhaseList(aOperationalPhaseList), mOperationalPhase(aPhase), mCountdownTime(aCountdownTime)
     {}
     ~OperationalStateDelegate() = default;
 
@@ -136,6 +149,7 @@ private:
     app::DataModel::List<const GenericOperationalState> mOperationalStateList;
     app::DataModel::List<const GenericOperationalPhase> mOperationalPhaseList;
     app::DataModel::Nullable<uint8_t> mOperationalPhase;
+    app::DataModel::Nullable<uint32_t> mCountdownTime;
 };
 
 } // namespace OperationalState

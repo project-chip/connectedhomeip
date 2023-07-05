@@ -262,6 +262,12 @@ public:
     virtual void GetCurrentPhase(app::DataModel::Nullable<uint8_t> & phase) = 0;
 
     /**
+     * Get countdown time
+     * @param time The app::DataModel::Nullable<uint32_t> to fill with the coutdown time value
+     */
+    virtual void GetCountdownTime(app::DataModel::Nullable<uint32_t> & time) = 0;
+
+    /**
      * Set current operational state.
      * @param opState The operational state that should now be the current one.
      */
@@ -278,6 +284,12 @@ public:
      * @param phase The operational phase that should now be the current one.
      */
     virtual CHIP_ERROR SetPhase(const app::DataModel::Nullable<uint8_t> & phase) = 0;
+
+    /**
+     * Set coutdown time.
+     * @param time The coutdown time that should now be the current one.
+     */
+    virtual CHIP_ERROR SetCountdownTime(const app::DataModel::Nullable<uint32_t> & time) = 0;
 
     // command callback
     /**

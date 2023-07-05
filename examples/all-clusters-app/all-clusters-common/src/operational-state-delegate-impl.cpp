@@ -38,6 +38,12 @@ CHIP_ERROR OperationalStateDelegate::SetPhase(const app::DataModel::Nullable<uin
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR OperationalStateDelegate::SetCountdownTime(const app::DataModel::Nullable<uint32_t> & time)
+{
+    mCountdownTime = time;
+    return CHIP_NO_ERROR;
+}
+
 void OperationalStateDelegate::GetCurrentOperationalState(GenericOperationalState & op)
 {
     op = mOperationalState;
@@ -57,6 +63,11 @@ void OperationalStateDelegate::GetCurrentOperationalError(GenericOperationalErro
 void OperationalStateDelegate::GetCurrentPhase(app::DataModel::Nullable<uint8_t> & phase)
 {
     phase = mOperationalPhase;
+}
+
+void OperationalStateDelegate::GetCountdownTime(app::DataModel::Nullable<uint32_t> & time)
+{
+    time = mCountdownTime;
 }
 
 CHIP_ERROR OperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)

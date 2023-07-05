@@ -299,17 +299,20 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         delegate->GetCurrentPhase(currentPhase);
-
-        if (currentPhase.IsNull())
-        {
-            err = aEncoder.EncodeNull();
-        }
-        else
-        {
-            err = aEncoder.Encode(currentPhase);
-        }
+        err = aEncoder.Encode(currentPhase);
     }
     break;
+
+    case OperationalState::Attributes::CountdownTime::Id: {
+        DataModel::Nullable<uint32_t> countdownTime;
+        Delegate * delegate           = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        delegate->GetCountdownTime(countdownTime);
+        err = aEncoder.Encode(countdownTime);
+    }
+    break;
+
     }
     return err;
 }
