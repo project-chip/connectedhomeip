@@ -57,9 +57,9 @@ using namespace chip::Decoders;
 using PayloadDecoderType = chip::Decoders::PayloadDecoder<64, 256>;
 
 // Gets the current value of the decoder until a NEST exit is returned
-Json::Value GetPayload(PayloadDecoderType & decoder)
+::Json::Value GetPayload(PayloadDecoderType & decoder)
 {
-    Json::Value value;
+    ::Json::Value value;
     PayloadEntry entry;
     StringBuilder<128> formatter;
 
@@ -144,7 +144,7 @@ void DecodePacketHeader(::Json::Value & value, const PacketHeader * packetHeader
 
 void DecodePayloadData(::Json::Value & value, chip::ByteSpan payload, Protocols::Id protocolId, uint8_t messageType)
 {
-    value["size"] = static_cast<Json::Value::UInt>(payload.size());
+    value["size"] = static_cast<::Json::Value::UInt>(payload.size());
 
 #if MATTER_LOG_JSON_DECODE_HEX
     char hex_buffer[1024];
