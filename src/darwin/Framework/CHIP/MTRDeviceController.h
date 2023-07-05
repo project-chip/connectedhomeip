@@ -97,7 +97,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * @error error indication if the commissioning session establishment can't start at all.
  *
  * The connection information for the device will be retrieved from the discovered device.
- * A device discovered over MDNS will use the discovered IPs/ports, while a device discovered
+ * A device discovered over DNS-SD will use the discovered IPs/ports, while a device discovered
  * over BLE will use the underlying CBPeripheral.
  *
  * Then a PASE session will be established with the device, unless an error
@@ -177,16 +177,17 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 /**
  * Start scanning for commissionable devices.
  *
- * This method will fail if the controller factory is not running.
+ * This method will fail if the controller factory is not running or the browse has already been started.
  */
-- (BOOL)startScan:(id<MTRCommissionableBrowserDelegate>)delegate queue:(dispatch_queue_t)queue MTR_NEWLY_AVAILABLE;
+- (BOOL)startBrowseForCommissionables:(id<MTRCommissionableBrowserDelegate>)delegate
+                                queue:(dispatch_queue_t)queue MTR_NEWLY_AVAILABLE;
 
 /**
  * Stop scanning for commissionable devices.
  *
- * This method will fail if the controller factory is not running or the scan has not been started.
+ * This method will fail if the controller factory is not running or the browse has not been started.
  */
-- (BOOL)stopScan MTR_NEWLY_AVAILABLE;
+- (BOOL)stopBrowseForCommissionables MTR_NEWLY_AVAILABLE;
 
 /**
  * Return the attestation challenge for the secure session of the device being commissioned.
