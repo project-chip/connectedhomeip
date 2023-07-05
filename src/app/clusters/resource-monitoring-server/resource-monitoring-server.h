@@ -34,9 +34,6 @@ class Instance : public CommandHandlerInterface, public AttributeAccessInterface
 {
 
 public:
-    // This map holds pointers to all initialised Resource Monitoring instances. It provides a way to access all Resource Monitoring
-    // clusters.
-    static std::map<uint32_t, Instance *> ResourceMonitoringAliasesInstanceMap;
 
     void LoadPersistentAttributes();
 
@@ -124,7 +121,7 @@ public:
         mFeature    = aFeature;
     }
 
-    ~Instance() override { ResourceMonitoringAliasesInstanceMap.erase(mClusterId); }
+    ~Instance() { }
 
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);

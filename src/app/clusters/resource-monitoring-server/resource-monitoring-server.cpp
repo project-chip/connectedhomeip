@@ -40,8 +40,6 @@ namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
 
-std::map<uint32_t, Instance *> Instance::ResourceMonitoringAliasesInstanceMap;
-
 void Instance::LoadPersistentAttributes()
 {
     CHIP_ERROR err = chip::app::GetAttributePersistenceProvider()->ReadValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id),mLastChangedTime);
@@ -86,8 +84,6 @@ CHIP_ERROR Instance::Init()
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     ChipLogError(Zcl, "ResourceMonitoring: calling AppInit()");
     ReturnErrorOnFailure(AppInit());
-
-    ResourceMonitoringAliasesInstanceMap[mClusterId] = this;
 
     return CHIP_NO_ERROR;
 }
