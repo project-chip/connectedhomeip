@@ -14,11 +14,10 @@
 # limitations under the License.
 import os
 from dataclasses import dataclass
-from typing import Generator, List, Optional, Set
+from typing import Generator, List, Optional
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.matter_idl_types import Cluster, ClusterSide, Field, Idl, StructTag
-from stringcase import capitalcase
 
 
 @dataclass
