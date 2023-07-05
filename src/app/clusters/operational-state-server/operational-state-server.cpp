@@ -110,7 +110,7 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
     GenericOperationalState opState;
 
-    VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
+    VerifyOrReturn(delegate != nullptr, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure));
     delegate->GetCurrentOperationalState(opState);
 
     if (opState.operationalStateID != to_underlying(OperationalStateEnum::kPaused))
@@ -130,7 +130,7 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
     GenericOperationalState opState;
 
-    VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
+    VerifyOrReturn(delegate != nullptr, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure));
 
     delegate->GetCurrentOperationalState(opState);
 
@@ -156,7 +156,7 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
     GenericOperationalState opState;
 
-    VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
+    VerifyOrReturn(delegate != nullptr, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure));
 
     delegate->GetCurrentOperationalState(opState);
 
@@ -177,7 +177,7 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
     GenericOperationalState opState;
 
-    VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
+    VerifyOrReturn(delegate != nullptr, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure));
 
     delegate->GetCurrentOperationalState(opState);
 
