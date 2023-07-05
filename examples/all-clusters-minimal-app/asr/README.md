@@ -9,7 +9,6 @@ control on ASR platform.
     -   [Supported Chips](#supported-chips)
     -   [Building and Commissioning](#building-and-commissioning)
     -   [Cluster Control](#cluster-control)
-    -   [Light switch press button and light status LED](#light-switch-press-button-and-light-status-led)
 
 ---
 
@@ -42,13 +41,3 @@ For example,control the OnOff Cluster attribute:
 ./chip-tool onoff off <NODE ID> 1
 ./chip-tool onoff toggle <NODE ID> 1
 ```
-
-## Light switch press button and light status LED
-
-This demo uses button to test changing the light states and LED to show the
-state of these changes.
-
-|  Name  |  Pin  |
-| :----: | :---: |
-|  LED   | PAD6  |
-| BUTTON | PAD12 |

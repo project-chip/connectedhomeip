@@ -47,6 +47,6 @@ guides to get started
 
     This demo uses button to test changing the state of lighting:
 
-    |  Name  | Pin  |
-    | :----: | :--: |
-    | BUTTON | PAD6 |
+    |  Name  |  Pin  |
+    | :----: | :---: |
+    | BUTTON | PAD12 |

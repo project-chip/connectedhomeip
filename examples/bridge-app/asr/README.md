@@ -62,6 +62,6 @@ guides to get started
     This demo uses button to test changing the `Light1`, and the bridge device
     will output log information:
 
-    |  Name  | Pin  |
-    | :----: | :--: |
-    | BUTTON | PAD6 |
+    |  Name  |  Pin  |
+    | :----: | :---: |
+    | BUTTON | PAD12 |

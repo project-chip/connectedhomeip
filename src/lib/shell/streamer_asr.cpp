@@ -26,9 +26,15 @@
 #include "asr_uart.h"
 #define duet_uart_set_callback asr_uart_set_callback
 #define duet_uart_callback_func asr_uart_callback_func_t
-#else
+#elif defined CFG_PLF_DUET
 #include "duet_uart.h"
+#else
+#include "lega_uart.h"
+#define duet_uart_set_callback lega_uart_set_callback
+#define duet_uart_callback_func lega_uart_callback_func
+#define UART1_INDEX LEGA_UART1_INDEX
 #endif
+
 namespace chip {
 namespace Shell {
 namespace {

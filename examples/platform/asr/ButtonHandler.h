@@ -24,29 +24,25 @@
 #include <stdint.h>
 #ifdef CFG_PLF_RV32
 #include "asr_gpio.h"
-#else
+#elif defined CFG_PLF_DUET
 #include "duet_gpio.h"
+#else
+#include "lega_gpio.h"
 #endif
+
+#define SWITCH1_BUTTON GPIO12_INDEX
+#define SWITCH2_BUTTON GPIO13_INDEX
+
+#define BUTTON_PRESSED 0
+#define BUTTON_RELEASED 1
+
+#define GPIO_TASK_NAME "gpio"
+#define GPIO_TASK_STACK_SIZE 1024
 
 class ButtonHandler
 {
 public:
     static void Init(void);
-
-    struct KeyInformation
-    {
-        uint8_t keyDown;
-        uint8_t keyImPulse;
-        uint8_t keyReleasePulse;
-    };
-
-    static KeyInformation keyInfo;
-
-    static ButtonHandler & GetInstance()
-    {
-        static ButtonHandler sButtonHandler;
-        return sButtonHandler;
-    }
 
 private:
     static void GpioInit(void);

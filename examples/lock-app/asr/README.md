@@ -52,5 +52,5 @@ show the state of these changes.
 
 |    Name     |  Pin  |
 | :---------: | :---: |
-| LOCK-STATE  | PAD13 |
-| LOCK-BUTTON | PAD6  |
+| LOCK-STATE  | PAD7  |
+| LOCK-BUTTON | PAD12 |

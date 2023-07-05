@@ -25,8 +25,6 @@
 #define APP_TASK_NAME "APP"
 #define APP_TASK_STACK_SIZE (1024 * 4)
 
-#define LIGHT_LED PWM_OUTPUT_CH3
-
 // ASR Logging
 #ifdef __cplusplus
 extern "C" {
