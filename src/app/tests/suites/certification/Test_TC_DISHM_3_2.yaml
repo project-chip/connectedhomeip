@@ -1,0 +1,77 @@
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 263.1.5. [TC-DISHM-3.2] OnMode Verification with DUT as Server
+
+PICS:
+    - DISHM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Dishwasher Mode Select"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH reads from the StartUpMode attribute from DUT"
+      PICS: DISHM.S.A0004
+      command: "readAttribute"
+      attribute: "StartUpMode"
+      response:
+          saveAs: "startup_mode_dut"
+          constraints:
+              type: int16u
+
+    - label: "TH reads the CurrentMode attribute from the DUT"
+      PICS: DISHM.S.A0003
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          saveAs: "old_current_mode_dut"
+          constraints:
+              type: int16u
+
+    - label: "TH reads the SupportedModes attribute from DUT"
+      PICS: DISHM.S.A0002
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          saveAs: "supported_modes_dut"
+          new_mode_th: 16385
+          constraints:
+              type: list
+              
+
+    - label: "TH send a ChangeToMode command to the DUT with NewMode set to new_mode_th"
+      PICS: DISHM.S.C00.Rsp && DISHM.S.F00
+      command: "changeToMode"
+      attribute: new_mode_th
+      response:
+          constraints:
+              type: int16u
+              value: 0
+
+# Physically power cycle the device
+
+    - label: "TH reads the CurrentMode attribute from the DUT"
+      PICS: DISHM.S.A0003
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          constraints:
+              type: int16u
+              value: startup_mode_dut
