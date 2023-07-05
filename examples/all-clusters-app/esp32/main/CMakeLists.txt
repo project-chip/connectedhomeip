@@ -95,10 +95,7 @@ set(SRC_DIRS_LIST
 )
 
 
-set(EXCLUDE_SRCS "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp"
-                 "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/src/operational-state-delegates.cpp"
-                 "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp"
-)
+set(EXCLUDE_SRCS "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp")
 
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
