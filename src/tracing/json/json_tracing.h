@@ -17,8 +17,8 @@
  */
 #pragma once
 
-#include <tracing/backend.h>
 #include <fstream>
+#include <tracing/backend.h>
 
 namespace Json {
 class Value;
