@@ -471,11 +471,11 @@ void TestStructGenericOperationalPhaseConstructor(nlTestSuite * inSuite, void * 
     using namespace chip::app::Clusters::OperationalState;
 
     GenericOperationalPhase phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
-    NL_TEST_ASSERT(inSuite, phase.isNullable() == true);
+    NL_TEST_ASSERT(inSuite, phase.IsMissing() == true);
 
     char phaseBuffer[kOperationalPhaseNameMaxSize] = "start";
     GenericOperationalPhase phase2(DataModel::Nullable<CharSpan>(CharSpan::fromCharString(phaseBuffer)));
-    NL_TEST_ASSERT(inSuite, phase2.isNullable() == false);
+    NL_TEST_ASSERT(inSuite, phase2.IsMissing() == false);
     NL_TEST_ASSERT(inSuite, phase2.mPhaseName.Value().size() == strlen(phaseBuffer));
     NL_TEST_ASSERT(inSuite, memcmp(const_cast<char *>(phase2.mPhaseName.Value().data()), phaseBuffer, strlen(phaseBuffer)) == 0);
 }
@@ -490,7 +490,7 @@ void TestStructGenericOperationalPhaseCopyConstructor(nlTestSuite * inSuite, voi
 
     GenericOperationalPhase phase2(phase);
 
-    NL_TEST_ASSERT(inSuite, phase2.isNullable() == false);
+    NL_TEST_ASSERT(inSuite, phase2.IsMissing() == false);
     NL_TEST_ASSERT(inSuite, phase2.mPhaseName.Value().size() == phase.mPhaseName.Value().size());
     NL_TEST_ASSERT(inSuite,
                    memcmp(const_cast<char *>(phase2.mPhaseName.Value().data()), const_cast<char *>(phase.mPhaseName.Value().data()),
@@ -504,14 +504,14 @@ void TestStructGenericOperationalPhaseCopyAssignment(nlTestSuite * inSuite, void
 
     // copy assignment with null-name
     GenericOperationalPhase phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
-    NL_TEST_ASSERT(inSuite, phase.isNullable() == true);
+    NL_TEST_ASSERT(inSuite, phase.IsMissing() == true);
 
     // copy assignment with name
     char phaseBuffer[kOperationalPhaseNameMaxSize] = "start";
     GenericOperationalPhase phase2(DataModel::Nullable<CharSpan>(CharSpan::fromCharString(phaseBuffer)));
     phase = phase2;
 
-    NL_TEST_ASSERT(inSuite, phase.isNullable() == false);
+    NL_TEST_ASSERT(inSuite, phase.IsMissing() == false);
     NL_TEST_ASSERT(inSuite, phase.mPhaseName.Value().size() == phase2.mPhaseName.Value().size());
     NL_TEST_ASSERT(inSuite,
                    memcmp(const_cast<char *>(phase.mPhaseName.Value().data()), const_cast<char *>(phase2.mPhaseName.Value().data()),
@@ -524,7 +524,7 @@ void TestStructGenericOperationalPhaseCopyAssignment(nlTestSuite * inSuite, void
     }
     phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>(CharSpan(phaseBuffer, sizeof(phaseBuffer))));
 
-    NL_TEST_ASSERT(inSuite, phase.isNullable() == false);
+    NL_TEST_ASSERT(inSuite, phase.IsMissing() == false);
     NL_TEST_ASSERT(inSuite, phase.mPhaseName.Value().size() == sizeof(phaseBuffer));
     NL_TEST_ASSERT(inSuite, memcmp(const_cast<char *>(phase.mPhaseName.Value().data()), phaseBuffer, sizeof(phaseBuffer)) == 0);
 
@@ -536,7 +536,7 @@ void TestStructGenericOperationalPhaseCopyAssignment(nlTestSuite * inSuite, void
     }
     phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>(CharSpan(phaseBuffer2, sizeof(phaseBuffer2))));
 
-    NL_TEST_ASSERT(inSuite, phase.isNullable() == false);
+    NL_TEST_ASSERT(inSuite, phase.IsMissing() == false);
     NL_TEST_ASSERT(inSuite, phase.mPhaseName.Value().size() == kOperationalPhaseNameMaxSize);
     NL_TEST_ASSERT(inSuite,
                    memcmp(const_cast<char *>(phase.mPhaseName.Value().data()), phaseBuffer2, kOperationalPhaseNameMaxSize) == 0);

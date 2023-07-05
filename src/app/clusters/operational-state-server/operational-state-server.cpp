@@ -275,7 +275,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
         VerifyOrReturnError(delegate != nullptr, CHIP_NO_ERROR, ChipLogError(NotSpecified, "Delegate is nullptr"));
         err = delegate->GetOperationalPhaseAtIndex(index, phase);
-        if (err == CHIP_ERROR_NOT_FOUND || phase.isNullable())
+        if (err == CHIP_ERROR_NOT_FOUND || phase.IsMissing())
         {
             err = aEncoder.EncodeNull();
         }

@@ -159,7 +159,7 @@ struct GenericOperationalPhase
         return *this;
     }
 
-    bool isNullable() const { return mPhaseName.IsNull(); }
+    bool IsMissing() const { return mPhaseName.IsNull(); }
     app::DataModel::Nullable<CharSpan> mPhaseName;
 
 private:

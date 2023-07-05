@@ -271,7 +271,7 @@ void TestOperationalStateDelegatelGetOperationalPhaseListNull(nlTestSuite * inSu
     size_t index = 0;
     NL_TEST_ASSERT(inSuite, opStateDelegate.GetOperationalPhaseAtIndex(index, opPhase) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, opPhase.isNullable() == true);
+    NL_TEST_ASSERT(inSuite, opPhase.IsMissing() == true);
 
     index++;
     NL_TEST_ASSERT(inSuite, opStateDelegate.GetOperationalPhaseAtIndex(index, opPhase) == CHIP_ERROR_NOT_FOUND);
@@ -330,20 +330,20 @@ void TestOperationalStateDelegatelGetOperationalPhaseList(nlTestSuite * inSuite,
     size_t index = 0;
 
     NL_TEST_ASSERT(inSuite, opStateDelegate.GetOperationalPhaseAtIndex(index, opPhase) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, opPhase.isNullable() == false);
+    NL_TEST_ASSERT(inSuite, opPhase.IsMissing() == false);
     NL_TEST_ASSERT(inSuite, opPhase.mPhaseName.Value().size() == strlen(kWasherPreSoak));
     NL_TEST_ASSERT(inSuite,
                    memcmp(const_cast<char *>(opPhase.mPhaseName.Value().data()), kWasherPreSoak, strlen(kWasherPreSoak)) == 0);
 
     index++;
     NL_TEST_ASSERT(inSuite, opStateDelegate.GetOperationalPhaseAtIndex(index, opPhase) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, opPhase.isNullable() == false);
+    NL_TEST_ASSERT(inSuite, opPhase.IsMissing() == false);
     NL_TEST_ASSERT(inSuite, opPhase.mPhaseName.Value().size() == strlen(kWasherRinse));
     NL_TEST_ASSERT(inSuite, memcmp(const_cast<char *>(opPhase.mPhaseName.Value().data()), kWasherRinse, strlen(kWasherRinse)) == 0);
 
     index++;
     NL_TEST_ASSERT(inSuite, opStateDelegate.GetOperationalPhaseAtIndex(index, opPhase) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, opPhase.isNullable() == false);
+    NL_TEST_ASSERT(inSuite, opPhase.IsMissing() == false);
     NL_TEST_ASSERT(inSuite, opPhase.mPhaseName.Value().size() == strlen(kWasherSpin));
     NL_TEST_ASSERT(inSuite, memcmp(const_cast<char *>(opPhase.mPhaseName.Value().data()), kWasherSpin, strlen(kWasherSpin)) == 0);
 
