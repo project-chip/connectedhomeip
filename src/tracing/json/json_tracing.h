@@ -21,7 +21,7 @@
 
 namespace chip {
 namespace Tracing {
-namespace LogJson {
+namespace Json {
 
 /// A Backend that outputs data to chip logging.
 ///
@@ -30,10 +30,10 @@ namespace LogJson {
 /// THREAD SAFETY:
 ///    class assumes that ChipLog* is thread_safe (generally
 ///    we ChipLog* everywhere, so that condition seems to be met).
-class LogJsonBackend : public ::chip::Tracing::Backend
+class JsonBackend : public ::chip::Tracing::Backend
 {
 public:
-    LogJsonBackend() = default;
+    JsonBackend() = default;
 
     void TraceBegin(const char * label, const char * group) override;
     void TraceEnd(const char * label, const char * group) override;
@@ -45,6 +45,6 @@ public:
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
 };
 
-} // namespace LogJson
+} // namespace Json
 } // namespace Tracing
 } // namespace chip

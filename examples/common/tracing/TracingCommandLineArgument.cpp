@@ -19,7 +19,7 @@
 
 #include <lib/support/StringSplitter.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <tracing/log_json/log_json_tracing.h>
+#include <tracing/json/json_tracing.h>
 #include <tracing/registry.h>
 
 #if ENABLE_PERFETTO_TRACING
@@ -61,7 +61,7 @@ void TracingSetup::EnableTracingFor(const char * cliArg)
     {
         if (value.data_equal(CharSpan::fromCharString("log")))
         {
-            chip::Tracing::Register(mLogJsonBackend);
+            chip::Tracing::Register(mJsonBackend);
         }
 #if ENABLE_PERFETTO_TRACING
         else if (value.data_equal(CharSpan::fromCharString("perfetto")))
@@ -101,7 +101,7 @@ void TracingSetup::StopTracing()
 
 #endif
 
-    chip::Tracing::Unregister(mLogJsonBackend);
+    chip::Tracing::Unregister(mJsonBackend);
 }
 
 } // namespace CommandLineApp

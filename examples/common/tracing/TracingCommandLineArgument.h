@@ -19,7 +19,7 @@
 
 #include "tracing/enabled_features.h"
 
-#include <tracing/log_json/log_json_tracing.h>
+#include <tracing/json/json_tracing.h>
 
 #if ENABLE_PERFETTO_TRACING
 #include <tracing/perfetto/file_output.h>      // nogncheck
@@ -57,7 +57,7 @@ public:
     void StopTracing();
 
 private:
-    ::chip::Tracing::LogJson::LogJsonBackend mLogJsonBackend;
+    ::chip::Tracing::Json::JsonBackend mJsonBackend;
 
 #if ENABLE_PERFETTO_TRACING
     chip::Tracing::Perfetto::FileTraceOutput mPerfettoFileOutput;
