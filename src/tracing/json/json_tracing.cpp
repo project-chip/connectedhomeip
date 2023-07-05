@@ -99,7 +99,7 @@ void DecodePayloadData(::Json::Value & value, chip::ByteSpan payload)
 
 JsonBackend::~JsonBackend()
 {
-    Close();
+    CloseFile();
 }
 
 void JsonBackend::TraceBegin(const char * label, const char * group)
@@ -246,7 +246,7 @@ void JsonBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info)
     OutputValue(value);
 }
 
-void JsonBackend::Close()
+void JsonBackend::CloseFile()
 {
     if (!mOutputFile.is_open())
     {
@@ -258,9 +258,9 @@ void JsonBackend::Close()
     mOutputFile.close();
 }
 
-CHIP_ERROR JsonBackend::Open(const char * path)
+CHIP_ERROR JsonBackend::OpenFile(const char * path)
 {
-    Close();
+    CloseFile();
     mOutputFile.open(path, std::ios_base::out);
 
     if (!mOutputFile)
