@@ -191,8 +191,6 @@ public:
      **/
     void Clear();
 
-private:
-    friend class TestCASESession;
     enum class State : uint8_t
     {
         kInitialized         = 0,
@@ -206,6 +204,15 @@ private:
         kSendSigma3Pending   = 8,
         kHandleSigma3Pending = 9,
     };
+
+    State GetState() { return mState; }
+
+    // Returns true if the CASE session handshake was stuck due to failing to schedule work on the Matter thread.
+    // If this function returns true, the CASE session has been reset and is ready for a new session establishment.
+    bool InvokeBackgroundWorkWatchdog();
+
+private:
+    friend class TestCASESession;
 
     /*
      * Initialize the object given a reference to the SessionManager, certificate validity policy and a delegate which will be
