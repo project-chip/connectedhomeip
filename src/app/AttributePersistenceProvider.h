@@ -86,7 +86,7 @@ public:
      * @param [in] aValue the data to write.
      */
     template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
-    CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, T & aValue)
+    CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, T & aValue)
     {
         uint8_t value[sizeof(T)];
         auto w = Encoding::LittleEndian::BufferWriter(value, sizeof(T));
@@ -102,7 +102,7 @@ public:
      * @param [in,out] aValue where to place the data.
      */
     template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
-    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, T & aValue)
+    CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, T & aValue)
     {
         uint8_t attrData[sizeof(T)];
         MutableByteSpan tempVal(attrData, sizeof(T));
@@ -127,15 +127,15 @@ public:
      * @param [in] aValue the data to write.
      */
     template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true>
-    CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
+    CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
         if (aValue.IsNull())
         {
             T nullValue = 0;
-            nullValue   = ~nullValue;
-            return WriteValue(aPath, nullValue);
+            nullValue   = T(~nullValue);
+            return WriteScalarValue(aPath, nullValue);
         }
-        return WriteValue(aPath, aValue.Value());
+        return WriteScalarValue(aPath, aValue.Value());
     }
 
     /**
@@ -145,13 +145,13 @@ public:
      * @param [in,out] aValue where to place the data.
      */
     template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true>
-    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
+    CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
         T tempIntegral;
         T nullValue = 0;
-        nullValue   = ~nullValue;
+        nullValue   = T(~nullValue);
 
-        CHIP_ERROR err = ReadValue(aPath, tempIntegral);
+        CHIP_ERROR err = ReadScalarValue(aPath, tempIntegral);
         if (err != CHIP_NO_ERROR)
         {
             return err;
