@@ -41,10 +41,10 @@ public:
     ~JsonBackend();
 
     // Start tracing output to the given file
-    CHIP_ERROR Open(const char * path);
+    CHIP_ERROR OpenFile(const char * path);
 
     // Close if an output file is open
-    void Close();
+    void CloseFile();
 
     void TraceBegin(const char * label, const char * group) override;
     void TraceEnd(const char * label, const char * group) override;
@@ -54,7 +54,7 @@ public:
     void LogNodeLookup(NodeLookupInfo &) override;
     void LogNodeDiscovered(NodeDiscoveredInfo &) override;
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
-
+    void Close() override { CloseFile(); }
 private:
     /// Does the actual write of the value
     void OutputValue(::Json::Value & value);

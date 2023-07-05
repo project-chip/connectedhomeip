@@ -65,7 +65,7 @@ void TracingSetup::EnableTracingFor(const char * cliArg)
 
             if (fileName != "log")
             {
-                CHIP_ERROR err = mJsonBackend.Open(fileName.c_str());
+                CHIP_ERROR err = mJsonBackend.OpenFile(fileName.c_str());
                 if (err != CHIP_NO_ERROR)
                 {
                     ChipLogError(AppServer, "Failed to open json trace output: %" CHIP_ERROR_FORMAT, err.Format());
@@ -73,7 +73,7 @@ void TracingSetup::EnableTracingFor(const char * cliArg)
             }
             else
             {
-                mJsonBackend.Close(); // just in case, ensure no file output
+                mJsonBackend.CloseFile(); // just in case, ensure no file output
             }
             chip::Tracing::Register(mJsonBackend);
         }
