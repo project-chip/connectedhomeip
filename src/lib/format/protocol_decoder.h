@@ -219,7 +219,6 @@ public:
     const TLV::TLVReader & ReadState() const { return mReader; }
 
 private:
-
     enum class State
     {
         kStarting,

@@ -50,8 +50,7 @@ constexpr TLV::Tag ConstantValueTag(uint64_t value)
 {
     // Re-use common tag for a constant value
     // Will make "RawValue be equal to value"
-    return TLV::ProfileTag(static_cast<uint32_t>(value >> 32),
-                           static_cast<uint32_t>(value & 0xFFFFFFFF));
+    return TLV::ProfileTag(static_cast<uint32_t>(value >> 32), static_cast<uint32_t>(value & 0xFFFFFFFF));
 }
 
 enum class ItemType : uint8_t

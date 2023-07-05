@@ -15,10 +15,10 @@
 import os
 from dataclasses import dataclass
 from typing import Generator, List, Optional, Set
-from stringcase import capitalcase
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.matter_idl_types import Cluster, ClusterSide, Field, Idl, StructTag
+from stringcase import capitalcase
 
 
 @dataclass
@@ -199,9 +199,9 @@ class ClusterTablesGenerator:
                 entries=[
                     TableEntry(
                         code="ConstantValueTag(0x%X)" % entry.code,
-                        name = entry.name,
-                        reference = None,
-                        real_type = "%s::%s::%s" % (self.cluster.name, e.name, entry.name)
+                        name=entry.name,
+                        reference=None,
+                        real_type="%s::%s::%s" % (self.cluster.name, e.name, entry.name)
                     )
                     for entry in e.entries
                 ]
@@ -213,9 +213,9 @@ class ClusterTablesGenerator:
                 entries=[
                     TableEntry(
                         code="ConstantValueTag(0x%X)" % entry.code,
-                        name = entry.name,
-                        reference = None,
-                        real_type = "%s::%s::%s" % (self.cluster.name, e.name, entry.name)
+                        name=entry.name,
+                        reference=None,
+                        real_type="%s::%s::%s" % (self.cluster.name, e.name, entry.name)
                     )
                     for entry in e.entries
                 ]
