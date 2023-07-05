@@ -34,7 +34,6 @@ namespace chip {
 namespace CommandLineApp {
 
 namespace {
-#if ENABLE_PERFETTO_TRACING
 
 bool StartsWith(CharSpan argument, const char * prefix)
 {
@@ -47,8 +46,6 @@ bool StartsWith(CharSpan argument, const char * prefix)
     argument.reduce_size(prefix_len);
     return argument.data_equal(CharSpan(prefix, prefix_len));
 }
-
-#endif
 
 } // namespace
 
