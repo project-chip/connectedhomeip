@@ -411,9 +411,11 @@ void PayloadDecoderBase::NextFromContentRead(PayloadEntry & entry)
     {
         ExitContainer(entry);
         return;
-    } else if (err != CHIP_NO_ERROR) {
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
         mValueBuilder.Reset().AddFormat("ERROR on TLV Next: %" CHIP_ERROR_FORMAT, err.Format());
-        entry = PayloadEntry::SimpleValue("TLV_ERR", mValueBuilder.c_str());
+        entry  = PayloadEntry::SimpleValue("TLV_ERR", mValueBuilder.c_str());
         mState = State::kDone;
         return;
     }
@@ -542,6 +544,13 @@ void PayloadDecoderBase::NextFromValueRead(PayloadEntry & entry)
     if (err == CHIP_END_OF_TLV)
     {
         ExitContainer(entry);
+        return;
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        mValueBuilder.Reset().AddFormat("ERROR on TLV Next: %" CHIP_ERROR_FORMAT, err.Format());
+        entry  = PayloadEntry::SimpleValue("TLV_ERR", mValueBuilder.c_str());
+        mState = State::kDone;
         return;
     }
 
