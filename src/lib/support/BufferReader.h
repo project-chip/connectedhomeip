@@ -93,9 +93,7 @@ public:
     /**
      * @return false if the reader is in error, true if the reader is OK.
      */
-    bool IsSuccess() const {
-      return StatusCode() == CHIP_NO_ERROR;
-    }
+    bool IsSuccess() const { return StatusCode() == CHIP_NO_ERROR; }
 
     /**
      * Read a bool, assuming single byte storage.

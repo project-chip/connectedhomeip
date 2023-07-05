@@ -135,11 +135,11 @@ static void TestBufferReader_Skip(nlTestSuite * inSuite, void * inContext)
 
 static void TestBufferReader_LittleEndianScalars(nlTestSuite * inSuite, void * inContext)
 {
-    const uint8_t test_buf1[10] = {0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01};
+    const uint8_t test_buf1[10] = { 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01 };
 
     // Unsigned 8 bits reads
     {
-        chip::Encoding::LittleEndian::Reader reader{ByteSpan{test_buf1}};
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf1 } };
         uint8_t val1 = 0;
         uint8_t val2 = 0;
         NL_TEST_ASSERT(inSuite, reader.Read8(&val1).Read8(&val2).IsSuccess());
@@ -149,7 +149,7 @@ static void TestBufferReader_LittleEndianScalars(nlTestSuite * inSuite, void * i
 
     // Unsigned 16 bits reads
     {
-        chip::Encoding::LittleEndian::Reader reader{ByteSpan{test_buf1}};
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf1 } };
         uint16_t val1 = 0;
         uint16_t val2 = 0;
         NL_TEST_ASSERT(inSuite, reader.Read16(&val1).Read16(&val2).IsSuccess());
@@ -159,7 +159,7 @@ static void TestBufferReader_LittleEndianScalars(nlTestSuite * inSuite, void * i
 
     // Unsigned 32 bits reads
     {
-        chip::Encoding::LittleEndian::Reader reader{ByteSpan{test_buf1}};
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf1 } };
         uint32_t val1 = 0;
         uint32_t val2 = 0;
         NL_TEST_ASSERT(inSuite, reader.Read32(&val1).Read32(&val2).IsSuccess());
@@ -169,8 +169,8 @@ static void TestBufferReader_LittleEndianScalars(nlTestSuite * inSuite, void * i
 
     // Unsigned 32 bits reads, unaligned
     {
-        uint8_t test_buf2[10] = {0x00, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01};
-        chip::Encoding::LittleEndian::Reader reader{ByteSpan{test_buf2}};
+        uint8_t test_buf2[10] = { 0x00, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01 };
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf2 } };
 
         uint32_t val1 = 0;
         uint32_t val2 = 0;
@@ -182,7 +182,7 @@ static void TestBufferReader_LittleEndianScalars(nlTestSuite * inSuite, void * i
 
     // Unsigned 64 bits read
     {
-        chip::Encoding::LittleEndian::Reader reader{ByteSpan{test_buf1}};
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf1 } };
         uint64_t val = 0;
         NL_TEST_ASSERT(inSuite, reader.Read64(&val).IsSuccess());
         NL_TEST_ASSERT(inSuite, reader.Remaining() == 2);
@@ -191,7 +191,7 @@ static void TestBufferReader_LittleEndianScalars(nlTestSuite * inSuite, void * i
 
     // Signed 8 bits reads
     {
-        chip::Encoding::LittleEndian::Reader reader{ByteSpan{test_buf1}};
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf1 } };
         int8_t val1 = 0;
         int8_t val2 = 0;
         NL_TEST_ASSERT(inSuite, reader.ReadSigned8(&val1).ReadSigned8(&val2).IsSuccess());
@@ -201,7 +201,7 @@ static void TestBufferReader_LittleEndianScalars(nlTestSuite * inSuite, void * i
 
     // Signed 16 bits reads
     {
-        chip::Encoding::LittleEndian::Reader reader{ByteSpan{test_buf1}};
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf1 } };
         int16_t val1 = 0;
         int16_t val2 = 0;
         NL_TEST_ASSERT(inSuite, reader.ReadSigned16(&val1).ReadSigned16(&val2).IsSuccess());
@@ -211,7 +211,7 @@ static void TestBufferReader_LittleEndianScalars(nlTestSuite * inSuite, void * i
 
     // Signed 32 bits reads
     {
-        chip::Encoding::LittleEndian::Reader reader{ByteSpan{test_buf1}};
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf1 } };
         int32_t val1 = 0;
         int32_t val2 = 0;
         NL_TEST_ASSERT(inSuite, reader.ReadSigned32(&val1).ReadSigned32(&val2).IsSuccess());
@@ -221,8 +221,8 @@ static void TestBufferReader_LittleEndianScalars(nlTestSuite * inSuite, void * i
 
     // Signed 32 bits reads, unaligned
     {
-        uint8_t test_buf2[10] = {0x00, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01};
-        chip::Encoding::LittleEndian::Reader reader{ByteSpan{test_buf2}};
+        uint8_t test_buf2[10] = { 0x00, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01 };
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf2 } };
 
         int32_t val1 = 0;
         int32_t val2 = 0;
@@ -234,7 +234,7 @@ static void TestBufferReader_LittleEndianScalars(nlTestSuite * inSuite, void * i
 
     // Signed 64 bits read
     {
-        chip::Encoding::LittleEndian::Reader reader{ByteSpan{test_buf1}};
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf1 } };
         int64_t val = 0;
         NL_TEST_ASSERT(inSuite, reader.ReadSigned64(&val).IsSuccess());
         NL_TEST_ASSERT(inSuite, reader.Remaining() == 2);
@@ -243,8 +243,8 @@ static void TestBufferReader_LittleEndianScalars(nlTestSuite * inSuite, void * i
 
     // Bools
     {
-        uint8_t test_buf2[5] = {0x00, 0xff, 0x01, 0x04, 0x07};
-        chip::Encoding::LittleEndian::Reader reader{ByteSpan{test_buf2}};
+        uint8_t test_buf2[5] = { 0x00, 0xff, 0x01, 0x04, 0x07 };
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf2 } };
         bool val1 = true;
         bool val2 = false;
         bool val3 = false;
@@ -261,8 +261,10 @@ static void TestBufferReader_LittleEndianScalars(nlTestSuite * inSuite, void * i
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestBufferReader_Basic), NL_TEST_DEF_FN(TestBufferReader_BasicSpan),
-                                 NL_TEST_DEF_FN(TestBufferReader_Saturation), NL_TEST_DEF_FN(TestBufferReader_Skip),
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestBufferReader_Basic),
+                                 NL_TEST_DEF_FN(TestBufferReader_BasicSpan),
+                                 NL_TEST_DEF_FN(TestBufferReader_Saturation),
+                                 NL_TEST_DEF_FN(TestBufferReader_Skip),
                                  NL_TEST_DEF("Test Little-endian buffer Reader scalar reads", TestBufferReader_LittleEndianScalars),
                                  NL_TEST_SENTINEL() };
 

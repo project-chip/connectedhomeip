@@ -130,7 +130,7 @@ class BufferWriter : public EndianBufferWriterBase<BufferWriter>
 public:
     BufferWriter(uint8_t * buf, size_t len) : EndianBufferWriterBase<BufferWriter>(buf, len)
     {
-      static_assert((-1 & 3) == 3, "LittleEndian::BufferWriter only works with 2's complement architectures.");
+        static_assert((-1 & 3) == 3, "LittleEndian::BufferWriter only works with 2's complement architectures.");
     }
     BufferWriter(MutableByteSpan buf) : EndianBufferWriterBase<BufferWriter>(buf) {}
     BufferWriter(const BufferWriter & other) = default;
@@ -148,7 +148,7 @@ class BufferWriter : public EndianBufferWriterBase<BufferWriter>
 public:
     BufferWriter(uint8_t * buf, size_t len) : EndianBufferWriterBase<BufferWriter>(buf, len)
     {
-      static_assert((-1 & 3) == 3, "BigEndian::BufferWriter only works with 2's complement architectures.");
+        static_assert((-1 & 3) == 3, "BigEndian::BufferWriter only works with 2's complement architectures.");
     }
     BufferWriter(MutableByteSpan buf) : EndianBufferWriterBase<BufferWriter>(buf) {}
     BufferWriter(const BufferWriter & other) = default;

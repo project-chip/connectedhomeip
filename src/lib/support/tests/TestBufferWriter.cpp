@@ -260,7 +260,6 @@ void TestPutBigEndian(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, bb.expect("\x06\x07\x08", 3, 0));
     }
 
-
     {
         BWTest<BigEndian::BufferWriter> bb(4);
         bb.PutSigned8(static_cast<int8_t>(-6));
@@ -296,7 +295,6 @@ void TestPutBigEndian(nlTestSuite * inSuite, void * inContext)
         bb.PutSigned64(static_cast<int64_t>(9223372036854775807LL));
         NL_TEST_ASSERT(inSuite, bb.expect("\x7f\xff\xff\xff\xff\xff\xff\xff", 8, 1));
     }
-
 }
 
 const nlTest sTests[] = {

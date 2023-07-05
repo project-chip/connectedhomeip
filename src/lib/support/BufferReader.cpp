@@ -19,8 +19,8 @@
 
 #include <lib/core/CHIPEncoding.h>
 
-#include <type_traits>
 #include <string.h>
+#include <type_traits>
 
 namespace chip {
 namespace Encoding {
@@ -33,10 +33,10 @@ namespace {
 // thing being read.
 void ReadHelper(const uint8_t * p, bool * dest)
 {
-    *dest =  (*p != 0);
+    *dest = (*p != 0);
 }
 
-template<typename T>
+template <typename T>
 void ReadHelper(const uint8_t * p, T * dest)
 {
     std::make_unsigned_t<T> result;
