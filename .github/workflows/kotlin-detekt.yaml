@@ -16,3 +16,5 @@ on:
 
        - name: "detekt"
          uses: natiginfo/action-detekt-all@1.23.0
+         with:
+           args: --parallel --input examples/android/CHIPTest/,examples/android/CHIPTool,examples/java-matter-controller/java,src/controller/java
