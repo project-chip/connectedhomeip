@@ -45,7 +45,10 @@ chip_codegen("protocol-tlv-metadata") {
     "tlv/meta/protocols_meta.h",
   ]
 
-  deps = [ ":tlv-metadata-headers" ]
+  deps = [
+    ":flat-tree",
+    ":tlv-metadata-headers",
+  ]
 
   public_configs = [ "${chip_root}/src:includes" ]
 }
