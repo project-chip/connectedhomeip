@@ -19,6 +19,10 @@ config("config") {
   include_dirs = [ "include" ]
 }
 
+source_set("instances") {
+  public_configs = [ ":config" ]
+}
+
 chip_data_model("resource-monitoring-common") {
   zap_file = "resource-monitoring-app.zap"
 
