@@ -40,13 +40,13 @@ ReportSchedulerImpl::ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : Repor
     VerifyOrDie(nullptr != mTimerDelegate);
 }
 
-/// @brief When a ReadHandler is added, register it, which will schedule an engine run on the max interval
+/// @brief When a ReadHandler is added, register it, which will schedule an engine run
 void ReportSchedulerImpl::OnReadHandlerAdded(ReadHandler * aReadHandler)
 {
     RegisterReadHandler(aReadHandler);
 }
 
-/// @brief When a ReadHandler becomes reportable, schedule, verifies if the handler is the min interval is elapsed. If not,
+/// @brief When a ReadHandler becomes reportable, schedule, verifies if the min interval of a handleris elapsed. If not,
 /// reschedule the report to happen when the min interval is elapsed. If it is, schedule an engine run.
 void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
 {
@@ -72,7 +72,7 @@ void ReportSchedulerImpl::OnReportSent(ReadHandler * apReadHandler)
 {
     ReadHandlerNode * node = FindReadHandlerNode(apReadHandler);
     VerifyOrReturn(nullptr != node);
-    // Schedule callback for max interval
+    // Schedule callback for max interval by computing the difference between the max timestamp and the current timestamp
     node->SetIntervalsTimeStamp(apReadHandler);
     Milliseconds32 newTimeout =
         Milliseconds32(node->GetMaxTimestamp().count() - System::SystemClock().GetMonotonicTimestamp().count());
@@ -100,7 +100,7 @@ CHIP_ERROR ReportSchedulerImpl::RegisterReadHandler(ReadHandler * aReadHandler)
 
     Timestamp now = System::SystemClock().GetMonotonicTimestamp();
     Milliseconds32 newTimeout;
-    // If the handler is reportable, schedule a report for the min interval, otherwise schdule a report for the max interval
+    // If the handler is reportable, schedule a report for the min interval, otherwise schedule a report for the max interval
     if ((newNode->IsReportableNow()))
     {
         // If the handler is reportable now, just schedule a report immediately
@@ -108,7 +108,8 @@ CHIP_ERROR ReportSchedulerImpl::RegisterReadHandler(ReadHandler * aReadHandler)
     }
     else if (IsReadHandlerReportable(aReadHandler) && (newNode->GetMinTimestamp() > now))
     {
-        // If the handler is reportable now, but the min interval is not elapsed, schedule a report for the min interval
+        // If the handler is reportable now, but the min interval is not elapsed, schedule a report for the moment the min interval
+        // has elapsed
         newTimeout = Milliseconds32(newNode->GetMinTimestamp().count() - now.count());
 
         ReturnErrorOnFailure(ScheduleReport(newTimeout, aReadHandler));
