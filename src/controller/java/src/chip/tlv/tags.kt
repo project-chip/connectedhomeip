@@ -158,7 +158,7 @@ object AnonymousTag : Tag() {
 
 /** A context-specific tag including a tag number within a structure. */
 data class ContextSpecificTag(val tagNumber: Int) : Tag() {
-    override val size: Int = 1
+  override val size: Int = 1
 }
 
 /** A common-profile tag including a tag number within a structure. */
