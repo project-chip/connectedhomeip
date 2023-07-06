@@ -633,7 +633,7 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
     if (aTargetState == HandlerState::GeneratingReports && IsReportableNow())
     {
 // TODO (#27672): Enable when the ReportScheduler is implemented and remove the call to ScheduleRun()
-#if 0 
+#if 0
          if(nullptr != mObserver)
         {
             mObserver->OnBecameReportable(this);
@@ -922,7 +922,7 @@ void ReadHandler::SetStateFlag(ReadHandlerFlags aFlag, bool aValue)
     if (!oldReportable && IsReportableNow())
     {
 // TODO (#27672): Enable when the ReportScheduler is implemented and remove the call to ScheduleRun()
-#if 0 
+#if 0
         if(nullptr != mObserver)
         {
             mObserver->OnBecameReportable(this);
