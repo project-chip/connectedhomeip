@@ -308,14 +308,13 @@ class QRCodeTest {
     assertEquals("ABC", QRCodeOnboardingPayloadParser.extractPayload("MT:ABC%DDD"))
     assertEquals("ABC", QRCodeOnboardingPayloadParser.extractPayload("MT:ABC%"))
     assertEquals("", QRCodeOnboardingPayloadParser.extractPayload("ABC"))
-    // TODO: support more match pattern
-    //assertEquals("ABC", QRCodeOnboardingPayloadParser.extractPayload("Z%MT:ABC"))
-    //assertEquals("ABC", QRCodeOnboardingPayloadParser.extractPayload("%Z%MT:ABC"))
-    //assertEquals("", QRCodeOnboardingPayloadParser.extractPayload("%MT:"))
-    //assertEquals("", QRCodeOnboardingPayloadParser.extractPayload("%MT:%"))
-    //assertEquals("", QRCodeOnboardingPayloadParser.extractPayload("A%"))
-    //assertEquals("", QRCodeOnboardingPayloadParser.extractPayload("MT:%"))
-    //assertEquals("ABC", QRCodeOnboardingPayloadParser.extractPayload("%MT:ABC"))
+    assertEquals("ABC", QRCodeOnboardingPayloadParser.extractPayload("Z%MT:ABC"))
+    assertEquals("ABC", QRCodeOnboardingPayloadParser.extractPayload("%Z%MT:ABC"))
+    assertEquals("", QRCodeOnboardingPayloadParser.extractPayload("%MT:"))
+    assertEquals("", QRCodeOnboardingPayloadParser.extractPayload("%MT:%"))
+    assertEquals("", QRCodeOnboardingPayloadParser.extractPayload("A%"))
+    assertEquals("", QRCodeOnboardingPayloadParser.extractPayload("MT:%"))
+    assertEquals("ABC", QRCodeOnboardingPayloadParser.extractPayload("%MT:ABC"))
   } 
 
   companion object {
