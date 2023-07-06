@@ -15,22 +15,29 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/tizen.gni")
 
+import("${chip_root}/build/chip/linux/gdbus_library.gni")
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${tizen_sdk_build_root}/tizen_sdk.gni")
 
 assert(chip_build_tools)
 
+gdbus_library("chip-lighting-app-manager") {
+  sources = [ "xml/DBusLightApp.xml" ]
+  interface_prefix = "org.tizen.matter.example.lighting"
+  c_namespace = "LightApp"
+  c_generate_object_manager = true
+  dbus_out_dir = "dbus"
+}
+
 executable("chip-lighting-app") {
   sources = [
-    "${root_out_dir}/lightapp-iface.c",
-    "${root_out_dir}/lightapp-iface.h",
     "include/CHIPProjectAppConfig.h",
     "src/main.cpp",
   ]
 
   deps = [
-    "//:iface",
+    ":chip-lighting-app-manager",
     "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/examples/lighting-app/lighting-common:lighting-manager",
     "${chip_root}/examples/platform/tizen:app-main",
@@ -62,24 +69,3 @@ group("tizen:tpk") {
 group("default") {
   deps = [ ":tizen" ]
 }
-
-# group("iface") {
-action("iface") {
-  script = "${build_root}/gn_run_binary.py"
-  args = [
-    "gdbus-codegen",
-    "--interface-prefix=org.tizen.communication",
-    "--pragma-once",
-    "--c-namespace",
-    "LightApp",
-    "--c-generate-object-manager",
-    "--generate-c-code",
-    "lightapp-iface",
-    "../../examples/lighting-app/tizen/xml/Manager1.xml",
-  ]
-  outputs = [
-    "${root_out_dir}/lightapp-iface.h",
-    "${root_out_dir}/lightapp-iface.c",
-  ]
-}
-# }

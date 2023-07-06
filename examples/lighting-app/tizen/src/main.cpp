@@ -16,6 +16,11 @@
  *    limitations under the License.
  */
 
+#include <gio/gio.h>
+#include <sys/types.h>
+
+#include <peripheral_io.h>
+
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
@@ -25,12 +30,7 @@
 #include <LightingManager.h>
 #include <TizenServiceAppMain.h>
 
-#include <peripheral_io.h>
-
-#include <gio/gio.h>
-#include <sys/types.h>
-
-#include <lightapp-iface.h>
+#include "dbus/DBusLightApp.h"
 
 using namespace chip;
 using namespace chip::app;
