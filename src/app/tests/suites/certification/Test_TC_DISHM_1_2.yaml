@@ -19,8 +19,8 @@ PICS:
     - DISHM.S
 
 config:
-    nodeId: 0x12344321
-    cluster: "Dishwasher Mode Select"
+    nodeId: 0x0059
+    cluster: "Dishwasher Mode"
     endpoint: 1
 
 tests:
@@ -37,7 +37,10 @@ tests:
       command: "readAttribute"
       attribute: "SupportedModes"
       response:
-          saveAs: "supported_modes_dut"
+          values:
+             - name: "Mode"
+               saveAs: supported_modes_dut
+               value: [0, 1, 2]
           constraints:
               type: list
 
@@ -46,32 +49,36 @@ tests:
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
+          value: 0
           constraints:
               type: int16u
-              value: supported_modes_dut
+              
 
     - label: "TH reads the OnMode attribute from the DUT"
       PICS: DISHM.S.A0005
       command: "readAttribute"
       attribute: "OnMode"
       response:
+          value: supported_modes_dut
           constraints:
               type: int16u
-              value: supported_modes_dut
+              
 
     - label: "TH reads the StartUpMode attribute from the DUT"
       PICS: DISHM.S.A0004
       command: "readAttribute"
       attribute: "StartUpMode"
       response:
+          value: supported_modes_dut
           constraints:
               type: int16u
-              value: supported_modes_dut
+              
 
     - label: "TH reads the Description attribute from the DUT"
       PICS: DISHM.S.A0000
       command: "readAttribute"
       attribute: "Description"
       response:
+          value: ""
           constraints:
-              type: string
+              type: char_string

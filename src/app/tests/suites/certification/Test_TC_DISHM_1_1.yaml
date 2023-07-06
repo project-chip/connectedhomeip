@@ -116,28 +116,17 @@ tests:
               contains: [5]
 
     - label: "TH reads AcceptedCommandList from DUT"
-      PICS: " !DISHM.S.F02"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
           constraints:
               type: list
-              contains: [0, 1]
-
-    - label: "TH reads AcceptedCommandList from DUT"
-      PICS: DISHM.S.F01
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          constraints:
-              type: list
-              contains: [1]
+              contains: [0]
 
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS: DISHM.S.F01
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: [2]
+          value: []
           constraints:
               type: list

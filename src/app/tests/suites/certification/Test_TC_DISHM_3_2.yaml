@@ -14,9 +14,12 @@ PICS:
     - DISHM.S
 
 config:
-    nodeId: 0x12344321
-    cluster: "Dishwasher Mode Select"
+    nodeId: 0x0059
+    cluster: "Dishwasher Mode"
     endpoint: 1
+    new_mode_th:
+        type: INT16U
+        defaultValue: 0
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -32,7 +35,10 @@ tests:
       command: "readAttribute"
       attribute: "StartUpMode"
       response:
-          saveAs: "startup_mode_dut"
+          values:
+              - name: "startup_mode_dut"
+                saveAs: startup_mode_dut
+                value: 0
           constraints:
               type: int16u
 
@@ -41,7 +47,10 @@ tests:
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
-          saveAs: "old_current_mode_dut"
+          values:
+              - name: "old_current_mode_dut"
+                saveAs: old_current_mode_dut
+                value: 2
           constraints:
               type: int16u
 
@@ -50,28 +59,40 @@ tests:
       command: "readAttribute"
       attribute: "SupportedModes"
       response:
-          saveAs: "supported_modes_dut"
-          new_mode_th: 16385
+          values:
+             - name: "Mode"
+               saveAs: supported_modes_dut
+               value: [0, 1, 2]
           constraints:
               type: list
               
 
     - label: "TH send a ChangeToMode command to the DUT with NewMode set to new_mode_th"
       PICS: DISHM.S.C00.Rsp && DISHM.S.F00
-      command: "changeToMode"
-      attribute: new_mode_th
-      response:
-          constraints:
-              type: int16u
-              value: 0
+      command: "writeAttribute"
+      attribute: "ChangeToMode"
+      arguments:
+          values:
+              - name: "arg1"
+                value: new_mode_th
 
-# Physically power cycle the device
+    - label: "Powercycle on device to set OnOff attribute manually to on"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads the CurrentMode attribute from the DUT"
       PICS: DISHM.S.A0003
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
+          value: startup_mode_dut
           constraints:
               type: int16u
-              value: startup_mode_dut
+              
