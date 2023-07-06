@@ -65,19 +65,11 @@ CHIP_ERROR Instance::Init()
 {
     ChipLogError(Zcl, "ResourceMonitoring: Init");
     // Check that the cluster ID given is a valid mode select alias cluster ID.
-    if (!IsAliascluster())
-    {
-        ChipLogError(Zcl, "ResourceMonitoring: The cluster with ID %lu is not a mode select alias.", long(mClusterId));
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
+    VerifyOrDie(IsAliascluster());
+    
     // Check if the cluster has been selected in zap
-    if (!emberAfContainsServer(mEndpointId, mClusterId))
-    {
-        ChipLogError(Zcl, "ResourceMonitoring: The cluster with ID %lu was not enabled in zap.", long(mClusterId));
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
+    VerifyOrDie(emberAfContainsServer(mEndpointId, mClusterId));
+    
     LoadPersistentAttributes();
 
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
@@ -278,25 +270,28 @@ template <typename RequestT, typename FuncT>
 void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
 {
     ChipLogDetail(Zcl, "ResourceMonitoring: HandleCommand");
-    if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
+    if (handlerContext.mCommandHandled || (handlerContext.mRequestPath.mCommandId != RequestT::GetCommandId()))
     {
-        RequestT requestPayload;
-
-        // If the command matches what the caller is looking for, let's mark this as being handled
-        // even if errors happen after this. This ensures that we don't execute any fall-back strategies
-        // to handle this command since at this point, the caller is taking responsibility for handling
-        // the command in its entirety, warts and all.
-        handlerContext.SetCommandHandled();
-
-        if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
-                                                     Protocols::InteractionModel::Status::InvalidCommand);
-            return;
-        }
-
-        func(handlerContext, requestPayload);
+        return;
     }
+
+    RequestT requestPayload;
+
+    // If the command matches what the caller is looking for, let's mark this as being handled
+    // even if errors happen after this. This ensures that we don't execute any fall-back strategies
+    // to handle this command since at this point, the caller is taking responsibility for handling
+    // the command in its entirety, warts and all.
+    handlerContext.SetCommandHandled();
+
+    if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
+    {
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
+                                                Protocols::InteractionModel::Status::InvalidCommand);
+        return;
+    }
+
+    func(handlerContext, requestPayload);
+    
 }
 
 } // namespace ResourceMonitoring
