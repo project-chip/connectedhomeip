@@ -21,6 +21,9 @@
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 
 #include <controller/CHIPDeviceController.h>
+#include <system/SystemClock.h>
+
+constexpr uint32_t kDeviceDiscoveredTimeout = CHIP_CONFIG_ON_NETWORK_PAIRER_DISCOVERY_TIMEOUT_SECS * chip::kMillisecondsPerSecond;
 
 namespace chip {
 namespace Controller {
@@ -28,18 +31,34 @@ namespace Controller {
 class ScriptPairingDeviceDiscoveryDelegate : public DeviceDiscoveryDelegate
 {
 public:
-    void Init(NodeId nodeId, uint32_t setupPasscode, CommissioningParameters commissioningParams,
-              ScriptDevicePairingDelegate * pairingDelegate, DeviceCommissioner * activeDeviceCommissioner)
+    CHIP_ERROR Init(NodeId nodeId, uint32_t setupPasscode, CommissioningParameters commissioningParams,
+                    ScriptDevicePairingDelegate * pairingDelegate, DeviceCommissioner * activeDeviceCommissioner)
     {
         mNodeId                   = nodeId;
         mSetupPasscode            = setupPasscode;
         mParams                   = commissioningParams;
         mPairingDelegate          = pairingDelegate;
         mActiveDeviceCommissioner = activeDeviceCommissioner;
+        VerifyOrReturnError(mActiveDeviceCommissioner != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mActiveDeviceCommissioner->GetSystemLayer() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        return mActiveDeviceCommissioner->GetSystemLayer()->StartTimer(System::Clock::Milliseconds32(kDeviceDiscoveredTimeout),
+                                                                       OnDiscoveredTimeout, this);
     }
     void OnDiscoveredDevice(const Dnssd::DiscoveredNodeData & nodeData);
 
 private:
+    static void OnDiscoveredTimeout(System::Layer * layer, void * context)
+    {
+        ChipLogError(Controller, "Mdns discovery timed out");
+        auto * self = static_cast<ScriptPairingDeviceDiscoveryDelegate *>(context);
+
+        // Stop Mdns discovery.
+        self->mActiveDeviceCommissioner->RegisterDeviceDiscoveryDelegate(nullptr);
+
+        if (self->mPairingDelegate != nullptr)
+            self->mPairingDelegate->OnPairingComplete(CHIP_ERROR_TIMEOUT);
+    }
+
     ScriptDevicePairingDelegate * mPairingDelegate;
     DeviceCommissioner * mActiveDeviceCommissioner = nullptr;
 

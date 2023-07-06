@@ -467,7 +467,10 @@ PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::Device
         return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    sPairingDeviceDiscoveryDelegate.Init(nodeId, setupPasscode, sCommissioningParameters, &sPairingDelegate, devCtrl);
+    sPairingDelegate.SetExpectingPairingComplete(true);
+    CHIP_ERROR err =
+        sPairingDeviceDiscoveryDelegate.Init(nodeId, setupPasscode, sCommissioningParameters, &sPairingDelegate, devCtrl);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
     devCtrl->RegisterDeviceDiscoveryDelegate(&sPairingDeviceDiscoveryDelegate);
     return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
 }
