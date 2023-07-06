@@ -217,13 +217,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTROperationalStateClusterOperationalCommandResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct;
-
-@end
-
 @interface MTRDoorLockClusterGetWeekDayScheduleResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
