@@ -5,19 +5,11 @@ This example demonstrates the Matter Bridge application on ASR platform.
 ---
 
 -   [Matter ASR Bridge Example](#matter-asr-bridge-example)
-    -   [Supported Chips](#supported-chips)
     -   [Introduction](#introduction)
     -   [Building and Commissioning](#building-and-commissioning)
     -   [Testing the example](#testing-the-example)
 
 ---
-
-## Supported Chips
-
-The Matter demo application is supported on:
-
--   ASR582X
--   ASR595X
 
 ## Introduction
 

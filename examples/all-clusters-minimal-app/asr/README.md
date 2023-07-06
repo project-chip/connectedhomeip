@@ -6,18 +6,10 @@ control on ASR platform.
 ---
 
 -   [Matter ASR All Clusters Example](#matter-asr-all-clusters-example)
-    -   [Supported Chips](#supported-chips)
     -   [Building and Commissioning](#building-and-commissioning)
     -   [Cluster Control](#cluster-control)
 
 ---
-
-## Supported Chips
-
-The Matter demo application is supported on:
-
--   ASR582X
--   ASR595X
 
 ## Building and Commissioning
 
