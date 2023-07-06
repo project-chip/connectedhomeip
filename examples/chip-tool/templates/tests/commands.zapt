@@ -58,5 +58,5 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
 #endif // CONFIG_ENABLE_YAML_TESTS
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for running YAML tests.");
 }

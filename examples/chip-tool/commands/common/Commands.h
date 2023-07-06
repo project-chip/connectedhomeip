@@ -30,12 +30,30 @@ class Commands
 public:
     using CommandsVector = ::std::vector<std::unique_ptr<Command>>;
 
-    void Register(const char * clusterName, commands_list commandsList, const char * helpText = nullptr);
+    void RegisterCluster(const char * clusterName, commands_list commandsList)
+    {
+        Register(clusterName, commandsList, nullptr, false);
+    }
+    // Command sets represent chip-tool functionality that is not actually
+    // XML-defined clusters.  All command sets should have help text explaining
+    // what sort of commands one should expect to find in the set.
+    void RegisterCommandSet(const char * clusterName, commands_list commandsList, const char * helpText)
+    {
+        Register(clusterName, commandsList, helpText, true);
+    }
     int Run(int argc, char ** argv);
     int RunInteractive(const char * command, const chip::Optional<char *> & storageDirectory = chip::NullOptional);
 
 private:
-    using ClusterMap = std::map<std::string, std::pair<CommandsVector, const char *>>;
+    struct ClusterData
+    {
+        CommandsVector commands;
+        bool isSynthetic      = false;
+        const char * helpText = nullptr;
+    };
+    // The tuple contains the commands, whether it's a synthetic cluster, and
+    // the help text for the cluster (which may be null).
+    using ClusterMap = std::map<std::string, ClusterData>;
 
     CHIP_ERROR RunCommand(int argc, char ** argv, bool interactive = false,
                           const chip::Optional<char *> & interactiveStorageDirectory = chip::NullOptional);
@@ -48,6 +66,7 @@ private:
     bool IsGlobalCommand(std::string commandName) const;
 
     void ShowClusters(std::string executable);
+    static void ShowClusterOverview(std::string clusterName, const ClusterData & clusterData);
     void ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands, const char * helpText);
     void ShowClusterAttributes(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
     void ShowClusterEvents(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
@@ -59,6 +78,8 @@ private:
 
     // helpText may be null, in which case it's not shown.
     static void ShowHelpText(const char * helpText);
+
+    void Register(const char * clusterName, commands_list commandsList, const char * helpText, bool isSynthetic);
 
     ClusterMap mClusters;
 #ifdef CONFIG_USE_LOCAL_STORAGE
