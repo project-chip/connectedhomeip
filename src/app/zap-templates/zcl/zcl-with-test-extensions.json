@@ -300,7 +300,10 @@
             "TimeZone",
             "DSTOffset",
             "UTCTime",
-            "LocalTime"
+            "LocalTime",
+            "Granularity",
+            "TimeZoneListMaxSize",
+            "DSTOffsetListMaxSize"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
         "Operational State": ["OperationalState", "OperationalError"],
