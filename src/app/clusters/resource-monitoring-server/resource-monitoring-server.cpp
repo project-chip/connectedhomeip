@@ -42,7 +42,7 @@ namespace ResourceMonitoring {
 
 void Instance::LoadPersistentAttributes()
 {
-    CHIP_ERROR err = chip::app::GetAttributePersistenceProvider()->ReadValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id),mLastChangedTime);
+    CHIP_ERROR err = chip::app::GetAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id),mLastChangedTime);
     if (err == CHIP_NO_ERROR)
     {
         if (mLastChangedTime.IsNull())
@@ -217,7 +217,7 @@ chip::Protocols::InteractionModel::Status Instance::UpdateLastChangedTime(DataMo
     mLastChangedTime        = aNewLastChangedTime;
     if (mLastChangedTime != oldLastchangedTime)
     {
-        chip::app::GetAttributePersistenceProvider()->WriteValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id),mLastChangedTime);
+        chip::app::GetAttributePersistenceProvider()->WriteScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id),mLastChangedTime);
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::LastChangedTime::Id);
     }
     return Protocols::InteractionModel::Status::Success;
