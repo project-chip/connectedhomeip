@@ -32,9 +32,7 @@ using ReadHandlerNode = ReportScheduler::ReadHandlerNode;
 /// the engine already verifies that read handlers are reportable before sending a report
 static void ReportTimerCallback()
 {
-#ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
-#endif
 }
 
 ReportSchedulerImpl::ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : ReportScheduler(aTimerDelegate)
@@ -54,18 +52,20 @@ void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
     VerifyOrReturn(nullptr != node);
+
+    Milliseconds32 newTimeout;
     if (node->IsReportableNow())
     {
         // If the handler is reportable now, just schedule a report immediately
-        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+        newTimeout = Milliseconds32(0);
     }
     else
     {
-        Milliseconds32 newTimeout =
-            Milliseconds32(node->GetMinInterval().count() - System::SystemClock().GetMonotonicTimestamp().count());
         // If the handler is not reportable now, schedule a report for the min interval
-        ScheduleReport(newTimeout, aReadHandler);
+        newTimeout = Milliseconds32(node->GetMinTimestamp().count() - System::SystemClock().GetMonotonicTimestamp().count());
     }
+
+    ScheduleReport(newTimeout, aReadHandler);
 }
 
 void ReportSchedulerImpl::OnReportSent(ReadHandler * apReadHandler)
@@ -75,7 +75,7 @@ void ReportSchedulerImpl::OnReportSent(ReadHandler * apReadHandler)
     // Schedule callback for max interval
     node->SetIntervalsTimeStamp(apReadHandler);
     Milliseconds32 newTimeout =
-        Milliseconds32(node->GetMaxInterval().count() - System::SystemClock().GetMonotonicTimestamp().count());
+        Milliseconds32(node->GetMaxTimestamp().count() - System::SystemClock().GetMonotonicTimestamp().count());
     ScheduleReport(newTimeout, apReadHandler);
 }
 
@@ -94,30 +94,32 @@ CHIP_ERROR ReportSchedulerImpl::RegisterReadHandler(ReadHandler * aReadHandler)
     mReadHandlerList.PushBack(newNode);
 
     ChipLogProgress(DataManagement,
-                    "Registered ReadHandler that will schedule a report between system Timestamp: %" PRIu64
+                    "Registered a ReadHandler that will schedule a report between system Timestamp: %" PRIu64
                     " and system Timestamp %" PRIu64 ".",
-                    newNode->GetMinInterval().count(), newNode->GetMaxInterval().count());
+                    newNode->GetMinTimestamp().count(), newNode->GetMaxTimestamp().count());
 
     Timestamp now = System::SystemClock().GetMonotonicTimestamp();
+    Milliseconds32 newTimeout;
     // If the handler is reportable, schedule a report for the min interval, otherwise schdule a report for the max interval
     if ((newNode->IsReportableNow()))
     {
         // If the handler is reportable now, just schedule a report immediately
-        ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
+        newTimeout = Milliseconds32(0);
     }
-    else if (IsReadHandlerReportable(aReadHandler) && (newNode->GetMinInterval() > now))
+    else if (IsReadHandlerReportable(aReadHandler) && (newNode->GetMinTimestamp() > now))
     {
-        Milliseconds32 newTimeout = Milliseconds32(newNode->GetMinInterval().count() - now.count());
         // If the handler is reportable now, but the min interval is not elapsed, schedule a report for the min interval
+        newTimeout = Milliseconds32(newNode->GetMinTimestamp().count() - now.count());
+
         ReturnErrorOnFailure(ScheduleReport(newTimeout, aReadHandler));
     }
     else
     {
-        Milliseconds32 newTimeout = Milliseconds32(newNode->GetMaxInterval().count() - now.count());
         // If the handler is not reportable now, schedule a report for the max interval
-        ReturnErrorOnFailure(ScheduleReport(newTimeout, aReadHandler));
+        newTimeout = Milliseconds32(newNode->GetMaxTimestamp().count() - now.count());
     }
 
+    ReturnErrorOnFailure(ScheduleReport(newTimeout, aReadHandler));
     return CHIP_NO_ERROR;
 }
 

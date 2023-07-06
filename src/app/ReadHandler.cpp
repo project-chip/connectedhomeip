@@ -64,14 +64,16 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
 
     mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
 
-    // TODO Uncomment when the ReportScheduler is implemented
-    // if (nullptr != observer)
-    //{
-    //    if (CHIP_NO_ERROR == SetObserver(observer))
-    //    {
-    //        mObserver->OnReadHandlerAdded(this);
-    //    }
-    //}
+// TODO (#27672): Uncomment when the ReportScheduler is implemented
+#if 0
+    if (nullptr != observer)
+    {
+        if (CHIP_NO_ERROR == SetObserver(observer))
+        {
+            mObserver->OnReadHandlerAdded(this);
+        }
+    }
+#endif
 }
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
@@ -82,14 +84,16 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer) :
     mInteractionType = InteractionType::Subscribe;
     mFlags.ClearAll();
 
-    // TODO Uncomment when the ReportScheduler is implemented
-    // if (nullptr != observer)
-    //{
-    //    if (CHIP_NO_ERROR == SetObserver(observer))
-    //    {
-    //        mObserver->OnReadHandlerAdded(this);
-    //    }
-    //}
+// TODO (#27672): Uncomment when the ReportScheduler is implemented
+#if 0
+    if (nullptr != observer)
+    {
+        if (CHIP_NO_ERROR == SetObserver(observer))
+        {
+            mObserver->OnReadHandlerAdded(this);
+        }
+    }
+#endif
 }
 
 void ReadHandler::ResumeSubscription(CASESessionManager & caseSessionManager,
@@ -156,11 +160,13 @@ ReadHandler::~ReadHandler()
     InteractionModelEngine::GetInstance()->ReleaseEventPathList(mpEventPathList);
     InteractionModelEngine::GetInstance()->ReleaseDataVersionFilterList(mpDataVersionFilterList);
 
-    // TODO Uncomment when the ReportScheduler is implemented
-    // if (nullptr != mObserver)
-    //{
-    //    mObserver->OnReadHandlerRemoved(this);
-    //}
+// TODO (#27672): Enable when the ReportScheduler is implemented
+#if 0
+    if (nullptr != mObserver)
+    {
+        mObserver->OnReadHandlerRemoved(this);
+    }
+#endif
 }
 
 void ReadHandler::Close(CloseOptions options)
@@ -343,12 +349,14 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 
         if (IsType(InteractionType::Subscribe) && !IsPriming())
         {
-            // TODO: Uncomment when the ReportScheduler is implemented and remove call to UpdateReportTimer, handled by
-            // the report Scheduler
-            // if (nullptr != mObserver)
-            //{
-            //    mObserver->OnReportSent(this);
-            //}
+// TODO (#27672): Enable when the ReportScheduler is implemented and remove call to UpdateReportTimer, will be handled by
+// the report Scheduler
+#if 0
+            if (nullptr != mObserver)
+            {
+                mObserver->OnReportSent(this);
+            }
+#endif
 
             // Ignore the error from UpdateReportTimer.  If we've
             // successfully sent the message, we need to return success from
@@ -624,11 +632,13 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
     //
     if (aTargetState == HandlerState::GeneratingReports && IsReportableNow())
     {
-        // TODO Uncomment when the ReportScheduler is implemented and remove the call to ScheduleRun()
-        // if(nullptr != mObserver)
-        //{
-        //    mObserver->OnBecameReportable(this);
-        //}
+// TODO (#27672): Enable when the ReportScheduler is implemented and remove the call to ScheduleRun()
+#if 0 
+         if(nullptr != mObserver)
+        {
+            mObserver->OnBecameReportable(this);
+        }
+#endif
         InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
     }
 }
@@ -670,12 +680,14 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
     ReturnErrorOnFailure(writer.Finalize(&packet));
     VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
 
-    // TODO: Uncomment when the ReportScheduler is implemented and remove call to UpdateReportTimer, handled by
+    // TODO (#27672): Uncomment when the ReportScheduler is implemented and remove call to UpdateReportTimer, handled by
     // the report Scheduler
-    // if (nullptr != mObserver)
-    //{
-    //    mObserver->OnReportSent(this);
-    //}
+#if 0
+    if (nullptr != mObserver)
+    {
+        mObserver->OnReportSent(this);
+    }
+#endif
     ReturnErrorOnFailure(UpdateReportTimer());
 
     ClearStateFlag(ReadHandlerFlags::PrimingReports);
@@ -795,7 +807,7 @@ void ReadHandler::PersistSubscription()
     }
 }
 
-// TODO: Remove as timing will now be handled by the ReportScheduler
+// TODO (#27672): Remove when ReportScheduler is enabled as timing will now be handled by the ReportScheduler
 void ReadHandler::MinIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState)
 {
     VerifyOrReturn(apAppState != nullptr);
@@ -807,7 +819,7 @@ void ReadHandler::MinIntervalExpiredCallback(System::Layer * apSystemLayer, void
         readHandler);
 }
 
-// TODO: Remove as timing will now be handled by the ReportScheduler
+// TODO (#27672): Remove when ReportScheduler is enabled as timing will now be handled by the ReportScheduler
 void ReadHandler::MaxIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState)
 {
     VerifyOrReturn(apAppState != nullptr);
@@ -817,7 +829,7 @@ void ReadHandler::MaxIntervalExpiredCallback(System::Layer * apSystemLayer, void
                     readHandler->mMaxInterval - readHandler->mMinIntervalFloorSeconds);
 }
 
-// TODO: Remove as timing will now be handled by the ReportScheduler
+// TODO (#27672): Remove when ReportScheduler is enabled as timing will now be handled by the ReportScheduler
 CHIP_ERROR ReadHandler::UpdateReportTimer()
 {
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
@@ -876,11 +888,13 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
 
     if (IsReportableNow())
     {
-        // TODO Uncomment when the ReportScheduler is implemented and remove the call to ScheduleRun()
-        // if(nullptr != mObserver)
-        //{
-        //    mObserver->OnBecameReportable(this);
-        //}
+        // TODO (#27672): Enable when the ReportScheduler is implemented and remove the call to ScheduleRun()
+#if 0
+        if(nullptr != mObserver)
+        {
+            mObserver->OnBecameReportable(this);
+        }
+#endif
         InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
     }
 }
@@ -907,11 +921,13 @@ void ReadHandler::SetStateFlag(ReadHandlerFlags aFlag, bool aValue)
     // If we became reportable, schedule a reporting run.
     if (!oldReportable && IsReportableNow())
     {
-        // TODO Uncomment when the ReportScheduler is implemented and remove the call to ScheduleRun()
-        // if(nullptr != mObserver)
-        //{
-        //    mObserver->OnBecameReportable(this);
-        //}
+// TODO (#27672): Enable when the ReportScheduler is implemented and remove the call to ScheduleRun()
+#if 0 
+        if(nullptr != mObserver)
+        {
+            mObserver->OnBecameReportable(this);
+        }
+#endif
         InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
     }
 }

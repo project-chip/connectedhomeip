@@ -154,7 +154,8 @@ public:
         virtual ApplicationCallback * GetAppCallback() = 0;
     };
 
-    // TODO : Merge existing callback and observer into one class and have an observer pool in the Readhandler to notify every
+    // TODO (#27675) : Merge existing callback and observer into one class and have an observer pool in the Readhandler to notify
+    // every
     /*
      * Observer class for ReadHandler, meant to allow multiple objects to observe the ReadHandler. Currently only one observer is
      * supported but all above callbacks should be merged into observer type and an observer pool should be added to allow multiple
@@ -213,9 +214,18 @@ public:
     ReadHandler(ManagementCallback & apCallback, Observer * observer = nullptr);
 #endif
 
-    const ObjectList<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
-    const ObjectList<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
-    const ObjectList<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
+    const ObjectList<AttributePathParams> * GetAttributePathList() const
+    {
+        return mpAttributePathList;
+    }
+    const ObjectList<EventPathParams> * GetEventPathList() const
+    {
+        return mpEventPathList;
+    }
+    const ObjectList<DataVersionFilter> * GetDataVersionFilterList() const
+    {
+        return mpDataVersionFilterList;
+    }
 
     void GetReportingIntervals(uint16_t & aMinInterval, uint16_t & aMaxInterval) const
     {
@@ -254,26 +264,32 @@ public:
     CHIP_ERROR SetObserver(Observer * aObserver)
     {
         VerifyOrReturnError(nullptr != aObserver, CHIP_ERROR_INVALID_ARGUMENT);
-        // TODO : After merging the callbacks and observer, change so the method adds a new observer to an observer pool
+        // TODO (#27675) : After merging the callbacks and observer, change so the method adds a new observer to an observer pool
         mObserver = aObserver;
         return CHIP_NO_ERROR;
     }
 
 private:
-    PriorityLevel GetCurrentPriority() const { return mCurrentPriority; }
-    EventNumber & GetEventMin() { return mEventMin; }
+    PriorityLevel GetCurrentPriority() const
+    {
+        return mCurrentPriority;
+    }
+    EventNumber & GetEventMin()
+    {
+        return mEventMin;
+    }
 
     enum class ReadHandlerFlags : uint8_t
     {
         // WaitingUntilMinInterval is used to prevent subscription data delivery while we are
         // waiting for the min reporting interval to elapse.
-        WaitingUntilMinInterval = (1 << 0), // TODO : Remove once ReportScheduler is implemented or change to test flag
+        WaitingUntilMinInterval = (1 << 0), // TODO (#27672): Remove once ReportScheduler is implemented or change to test flag
 
         // WaitingUntilMaxInterval is used to prevent subscription empty report delivery while we
         // are waiting for the max reporting interval to elaps.  When WaitingUntilMaxInterval
         // becomes false, we are allowed to send an empty report to keep the
         // subscription alive on the client.
-        WaitingUntilMaxInterval = (1 << 1), // TODO : Remove once ReportScheduler is implemented
+        WaitingUntilMaxInterval = (1 << 1), // TODO (#27672): Remove once ReportScheduler is implemented
 
         // The flag indicating we are in the middle of a series of chunked report messages, this flag will be cleared during
         // sending last chunked message.
@@ -342,10 +358,13 @@ private:
      */
     bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext) const;
 
-    bool IsIdle() const { return mState == HandlerState::Idle; }
+    bool IsIdle() const
+    {
+        return mState == HandlerState::Idle;
+    }
 
-    // TODO: Change back to IsReportable once ReportScheduler is implemented so this can assess reportability without considering
-    // timing. The ReporScheduler will handle timing.
+    // TODO (#27672): Change back to IsReportable once ReportScheduler is implemented so this can assess reportability without
+    // considering timing. The ReporScheduler will handle timing.
     /// @brief Returns whether the ReadHandler is in a state where it can immediately send a report. This function
     /// is used to determine whether a report generation should be scheduled for the handler.
     bool IsReportableNow() const
@@ -356,8 +375,14 @@ private:
         return mState == HandlerState::GeneratingReports && !mFlags.Has(ReadHandlerFlags::WaitingUntilMinInterval) &&
             (IsDirty() || !mFlags.Has(ReadHandlerFlags::WaitingUntilMaxInterval));
     }
-    bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
-    bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
+    bool IsGeneratingReports() const
+    {
+        return mState == HandlerState::GeneratingReports;
+    }
+    bool IsAwaitingReportResponse() const
+    {
+        return mState == HandlerState::AwaitingReportResponse;
+    }
 
     // Resets the path iterator to the beginning of the whole report for generating a series of new reports.
     void ResetPathIterator();
@@ -369,17 +394,41 @@ private:
     // sanpshotted last event, check with latest last event number, re-setup snapshoted checkpoint, and compare again.
     bool CheckEventClean(EventManagement & aEventManager);
 
-    bool IsType(InteractionType type) const { return (mInteractionType == type); }
-    bool IsChunkedReport() const { return mFlags.Has(ReadHandlerFlags::ChunkedReport); }
+    bool IsType(InteractionType type) const
+    {
+        return (mInteractionType == type);
+    }
+    bool IsChunkedReport() const
+    {
+        return mFlags.Has(ReadHandlerFlags::ChunkedReport);
+    }
     // Is reporting indicates whether we are in the middle of a series chunks. As we will set mIsChunkedReport on the first chunk
     // and clear that flag on the last chunk, we can use mIsChunkedReport to indicate this state.
-    bool IsReporting() const { return mFlags.Has(ReadHandlerFlags::ChunkedReport); }
-    bool IsPriming() const { return mFlags.Has(ReadHandlerFlags::PrimingReports); }
-    bool IsActiveSubscription() const { return mFlags.Has(ReadHandlerFlags::ActiveSubscription); }
-    bool IsFabricFiltered() const { return mFlags.Has(ReadHandlerFlags::FabricFiltered); }
+    bool IsReporting() const
+    {
+        return mFlags.Has(ReadHandlerFlags::ChunkedReport);
+    }
+    bool IsPriming() const
+    {
+        return mFlags.Has(ReadHandlerFlags::PrimingReports);
+    }
+    bool IsActiveSubscription() const
+    {
+        return mFlags.Has(ReadHandlerFlags::ActiveSubscription);
+    }
+    bool IsFabricFiltered() const
+    {
+        return mFlags.Has(ReadHandlerFlags::FabricFiltered);
+    }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
-    void GetSubscriptionId(SubscriptionId & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
-    AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
+    void GetSubscriptionId(SubscriptionId & aSubscriptionId) const
+    {
+        aSubscriptionId = mSubscriptionId;
+    }
+    AttributePathExpandIterator * GetAttributePathExpandIterator()
+    {
+        return &mAttributePathExpandIterator;
+    }
 
     /// @brief Notifies the read handler that a set of attribute paths has been marked dirty. This will schedule a reporting engine
     /// run if the change to the attribute path makes the ReadHandler reportable.
@@ -389,7 +438,10 @@ private:
     {
         return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
     }
-    void ClearForceDirtyFlag() { ClearStateFlag(ReadHandlerFlags::ForceDirty); }
+    void ClearForceDirtyFlag()
+    {
+        ClearStateFlag(ReadHandlerFlags::ForceDirty);
+    }
     NodeId GetInitiatorNodeId() const
     {
         auto session = GetSession();
@@ -403,23 +455,47 @@ private:
     }
 
     Transport::SecureSession * GetSession() const;
-    SubjectDescriptor GetSubjectDescriptor() const { return GetSession()->GetSubjectDescriptor(); }
+    SubjectDescriptor GetSubjectDescriptor() const
+    {
+        return GetSession()->GetSubjectDescriptor();
+    }
 
-    auto GetTransactionStartGeneration() const { return mTransactionStartGeneration; }
+    auto GetTransactionStartGeneration() const
+    {
+        return mTransactionStartGeneration;
+    }
 
     /// @brief Forces the read handler into a dirty state, regardless of what's going on with attributes.
     /// This can lead to scheduling of a reporting run immediately, if the min interval has been reached,
     /// or after the min interval is reached if it has not yet been reached.
     void ForceDirtyState();
 
-    const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
-    void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
-    uint32_t GetLastWrittenEventsBytes() const { return mLastWrittenEventsBytes; }
+    const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const
+    {
+        return mAttributeEncoderState;
+    }
+    void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState)
+    {
+        mAttributeEncoderState = aState;
+    }
+    uint32_t GetLastWrittenEventsBytes() const
+    {
+        return mLastWrittenEventsBytes;
+    }
 
     // Returns the number of interested paths, including wildcard and concrete paths.
-    size_t GetAttributePathCount() const { return mpAttributePathList == nullptr ? 0 : mpAttributePathList->Count(); };
-    size_t GetEventPathCount() const { return mpEventPathList == nullptr ? 0 : mpEventPathList->Count(); };
-    size_t GetDataVersionFilterCount() const { return mpDataVersionFilterList == nullptr ? 0 : mpDataVersionFilterList->Count(); };
+    size_t GetAttributePathCount() const
+    {
+        return mpAttributePathList == nullptr ? 0 : mpAttributePathList->Count();
+    };
+    size_t GetEventPathCount() const
+    {
+        return mpEventPathList == nullptr ? 0 : mpEventPathList->Count();
+    };
+    size_t GetDataVersionFilterCount() const
+    {
+        return mpDataVersionFilterList == nullptr ? 0 : mpDataVersionFilterList->Count();
+    };
 
     CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
@@ -464,12 +540,12 @@ private:
 
     /// @brief This function is called when the min interval timer has expired, it restarts the timer on a timeout equal to the
     /// difference between the max interval and the min interval.
-    static void MinIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState); // TODO : Remove once ReportScheduler
-                                                                                              // is implemented.
-    static void MaxIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState); // TODO : Remove once ReportScheduler
-                                                                                              // is implemented.
+    static void MinIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState); // TODO (#27672): Remove once
+                                                                                              // ReportScheduler is implemented.
+    static void MaxIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState); // TODO (#27672): Remove once
+                                                                                              // ReportScheduler is implemented.
     /// @brief This function is called when a report is sent and it restarts the min interval timer.
-    CHIP_ERROR UpdateReportTimer(); // TODO : Remove once ReportScheduler is implemented.
+    CHIP_ERROR UpdateReportTimer(); // TODO (#27672) : Remove once ReportScheduler is implemented.
 
     CHIP_ERROR SendSubscribeResponse();
     CHIP_ERROR ProcessSubscribeRequest(System::PacketBufferHandle && aPayload);
@@ -555,7 +631,7 @@ private:
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
     EventNumber mLastScheduledEventNumber = 0;
 
-    // TODO: We should shutdown the transaction when the session expires.
+    // TODO : We should shutdown the transaction when the session expires.
     SessionHolder mSessionHandle;
 
     Messaging::ExchangeHolder mExchangeCtx;
@@ -583,7 +659,7 @@ private:
     BitFlags<ReadHandlerFlags> mFlags;
     InteractionType mInteractionType = InteractionType::Read;
 
-    // TODO : Several objects are behaving as observers for this class, there should be a single
+    // TODO (#27675): Several objects are behaving as observers for this class, there should be a single
     // type for this and an array or a pool to store them.
     Observer * mObserver = nullptr;
 

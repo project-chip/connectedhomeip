@@ -93,8 +93,11 @@ class TestTimerDelegate : public ReportScheduler::TimerDelegate
 public:
     static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
     {
-        ReadHandlerNode * node = static_cast<ReadHandlerNode *>(aAppState);
-        node->RunCallback();
+        // Normaly we would call the callback here, thus scheduling an engine run, but we don't need it for this test as we simulate
+        // all the callbacks related to report emissions. The actual callback should look like this:
+        //
+        // ReadHandlerNode * node = static_cast<ReadHandlerNode *>(aAppState);
+        // node->RunCallback();
     }
     virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) override
     {

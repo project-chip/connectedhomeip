@@ -54,7 +54,7 @@ public:
             // the scheduler in the ReadHandler
             System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
             return (mReadHandler->IsGeneratingReports() &&
-                    ((now >= mMinIntervalSeconds && mReadHandler->IsDirty()) || now >= mMaxIntervalSeconds));
+                    ((now >= mMinTimestamp && mReadHandler->IsDirty()) || now >= mMaxTimestamp));
         }
 
         void SetIntervalsTimeStamp(ReadHandler * aReadHandler)
@@ -62,20 +62,20 @@ public:
             uint16_t minInterval, maxInterval;
             aReadHandler->GetReportingIntervals(minInterval, maxInterval);
             System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
-            mMinIntervalSeconds          = now + System::Clock::Seconds16(minInterval);
-            mMaxIntervalSeconds          = now + System::Clock::Seconds16(maxInterval);
+            mMinTimestamp                = now + System::Clock::Seconds16(minInterval);
+            mMaxTimestamp                = now + System::Clock::Seconds16(maxInterval);
         }
 
         void RunCallback() { mCallback(); }
 
-        System::Clock::Timestamp GetMinInterval() const { return mMinIntervalSeconds; }
-        System::Clock::Timestamp GetMaxInterval() const { return mMaxIntervalSeconds; }
+        System::Clock::Timestamp GetMinTimestamp() const { return mMinTimestamp; }
+        System::Clock::Timestamp GetMaxTimestamp() const { return mMaxTimestamp; }
 
     private:
         TimerCompleteCallback mCallback;
         ReadHandler * mReadHandler;
-        System::Clock::Timestamp mMinIntervalSeconds;
-        System::Clock::Timestamp mMaxIntervalSeconds;
+        System::Clock::Timestamp mMinTimestamp;
+        System::Clock::Timestamp mMaxTimestamp;
     };
 
     class TimerDelegate
