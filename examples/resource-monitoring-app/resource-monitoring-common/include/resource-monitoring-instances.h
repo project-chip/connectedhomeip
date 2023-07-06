@@ -20,13 +20,3 @@
 
 #include <instances/ActivatedCarbonFilterMonitoring.h>
 #include <instances/HepaFilterMonitoring.h>
-#include <instances/IonizingFilterMonitoring.h>
-#include <instances/OzoneFilterMonitoring.h>
-#include <instances/CeramicFilterMonitoring.h>
-#include <instances/UvFilterMonitoring.h>
-#include <instances/ZeoliteFilterMonitoring.h>
-#include <instances/ElectrostaticFilterMonitoring.h>
-#include <instances/WaterTankMonitoring.h>
-#include <instances/FuelTankMonitoring.h>
-#include <instances/InkCartridgeMonitoring.h>
-#include <instances/TonerCartridgeMonitoring.h>

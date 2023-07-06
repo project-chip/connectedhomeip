@@ -32,18 +32,8 @@ executable("chip-resource-monitoring-app") {
   sources = [
     "include/CHIPProjectAppConfig.h",
     "src/main.cpp",
-    "src/instances/ActivatedCarbonFilterMonitoring.cpp",
-    "src/instances/HepafilterMonitoring.cpp",
-    "src/instances/CeramicFilterMonitoring.cpp",
-    "src/instances/ElectrostaticFilterMonitoring.cpp",
-    "src/instances/FuelTankMonitoring.cpp",
-    "src/instances/InkCartridgeMonitoring.cpp",
-    "src/instances/IonizingFilterMonitoring.cpp",
-    "src/instances/OzoneFilterMonitoring.cpp",
-    "src/instances/TonerCartridgeMonitoring.cpp",
-    "src/instances/UVFilterMonitoring.cpp",
-    "src/instances/WaterTankMonitoring.cpp",
-    "src/instances/ZeoliteFilterMonitoring.cpp"
+    "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common/src/instances/ActivatedCarbonFilterMonitoring.cpp",
+    "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common/src/instances/HepafilterMonitoring.cpp",
   ]
 
   deps = [

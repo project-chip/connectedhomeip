@@ -51,16 +51,6 @@ Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &s
 // clang-format off
 HepaFilterMonitoringInstance            HepafilterInstance              (0x1, HepaFilterMonitoring::Id,             1, DegradationDirectionEnum::kDown, true);
 ActivatedCarbonFilterMonitoringInstance ActivatedCarbonFilterInstance   (0x1, ActivatedCarbonFilterMonitoring::Id,  1, DegradationDirectionEnum::kDown, true);
-CeramicFilterMonitoringInstance         CeramicFilterInstance           (0x1, CeramicFilterMonitoring::Id,          1, DegradationDirectionEnum::kDown, true);
-ElectrostaticFilterMonitoringInstance   ElectrostaticFilterInstance     (0x1, ElectrostaticFilterMonitoring::Id,    1, DegradationDirectionEnum::kDown, true);
-FuelTankMonitoringInstance              FuelTankInstance                (0x1, FuelTankMonitoring::Id,               1, DegradationDirectionEnum::kDown, true);
-InkCartridgeMonitoringInstance          InkCartridgeInstance            (0x1, InkCartridgeMonitoring::Id,           1, DegradationDirectionEnum::kDown, true);
-IonizingFilterMonitoringInstance        IonizingFilterInstance          (0x1, IonizingFilterMonitoring::Id,         1, DegradationDirectionEnum::kDown, true);
-OzoneFilterMonitoringInstance           OzoneFilterInstance             (0x1, OzoneFilterMonitoring::Id,            1, DegradationDirectionEnum::kDown, true);
-UvFilterMonitoringInstance              UvFilterInstance                (0x1, UvFilterMonitoring::Id,               1, DegradationDirectionEnum::kDown, true);
-WaterTankMonitoringInstance             WaterTankInstance               (0x1, WaterTankMonitoring::Id,              1, DegradationDirectionEnum::kDown, true);
-ZeoliteFilterMonitoringInstance         ZeoliteFilterInstance           (0x1, ZeoliteFilterMonitoring::Id,          1, DegradationDirectionEnum::kDown, true);
-TonerCartridgeMonitoringInstance        TonerCartridgeInstance          (0x1, TonerCartridgeMonitoring::Id,         1, DegradationDirectionEnum::kDown, true);
 // clang-format on
 void ApplicationInit()
 {
@@ -70,16 +60,6 @@ void ApplicationInit()
 
     HepafilterInstance.Init();
     ActivatedCarbonFilterInstance.Init();
-    CeramicFilterInstance.Init();
-    ElectrostaticFilterInstance.Init();
-    FuelTankInstance.Init();
-    InkCartridgeInstance.Init();
-    IonizingFilterInstance.Init();
-    OzoneFilterInstance.Init();
-    UvFilterInstance.Init();
-    WaterTankInstance.Init();
-    ZeoliteFilterInstance.Init();
-    TonerCartridgeInstance.Init();
 }
 
 int main(int argc, char * argv[])
