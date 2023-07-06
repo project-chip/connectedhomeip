@@ -23,8 +23,8 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <lib/support/TestPersistentStorageDelegate.h>
 #include <app/DefaultAttributePersistenceProvider.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
@@ -64,7 +64,7 @@ void TestStorageAndRetrivalByteSpans(nlTestSuite * inSuite, void * inContext)
     DefaultAttributePersistenceProvider persistenceProvider;
 
     // Failure before Init
-    uint8_t valueArray[1] = {0x42};
+    uint8_t valueArray[1] = { 0x42 };
     ByteSpan value(valueArray);
     CHIP_ERROR err = persistenceProvider.WriteValue(TestConcretePath, value);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
@@ -93,8 +93,8 @@ void TestStorageAndRetrivalByteSpans(nlTestSuite * inSuite, void * inContext)
  * @param testValue The test value to store and retrieve
  */
 template <typename T>
-void testHelperStorageAndRetrivalScalarValues(nlTestSuite * inSuite,
-                                              DefaultAttributePersistenceProvider & persistenceProvider, T testValue)
+void testHelperStorageAndRetrivalScalarValues(nlTestSuite * inSuite, DefaultAttributePersistenceProvider & persistenceProvider,
+                                              T testValue)
 {
     CHIP_ERROR err = persistenceProvider.WriteScalarValue(TestConcretePath, testValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -203,8 +203,6 @@ void TestStorageAndRetrivalNullableScalarValues(nlTestSuite * inSuite, void * in
     persistenceProvider.Shutdown();
 }
 
-
-
 /**
  * Test that the correct error is given when trying to read a value with a buffer that's too small.
  */
@@ -218,7 +216,7 @@ void TestBufferTooSmallErrors(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Store large data
-    uint8_t valueArray[9] = {0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42};
+    uint8_t valueArray[9] = { 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42 };
     ByteSpan value(valueArray);
     err = persistenceProvider.WriteValue(TestConcretePath, value);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -269,11 +267,13 @@ void TestBufferTooSmallErrors(nlTestSuite * inSuite, void * inContext)
 } // anonymous namespace
 
 namespace {
-const nlTest sTests[] = { NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of ByteSpans", TestStorageAndRetrivalByteSpans),
-                          NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of scalar values", TestStorageAndRetrivalScalarValues),
-                          NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of nullable scalar values", TestStorageAndRetrivalNullableScalarValues),
-                          NL_TEST_DEF("Test AttributePersistenceProvider: Small buffer errors", TestBufferTooSmallErrors),
-                          NL_TEST_SENTINEL() };
+const nlTest sTests[] = {
+    NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of ByteSpans", TestStorageAndRetrivalByteSpans),
+    NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of scalar values", TestStorageAndRetrivalScalarValues),
+    NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of nullable scalar values",
+                TestStorageAndRetrivalNullableScalarValues),
+    NL_TEST_DEF("Test AttributePersistenceProvider: Small buffer errors", TestBufferTooSmallErrors), NL_TEST_SENTINEL()
+};
 }
 
 int TestAttributePersistenceProvider()
