@@ -70,16 +70,16 @@ void TestStorageAndRetrivalByteSpans(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Store ByteSpan of size 1
-    uint8_t setArray[1] = {0x42};
-    ByteSpan setValue(setArray);
-    err = persistenceProvider.WriteValue(TestConcretePath, setValue);
+    uint8_t valueArray[1] = {0x42};
+    ByteSpan value(valueArray);
+    err = persistenceProvider.WriteValue(TestConcretePath, value);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     uint8_t getArray[1];
-    MutableByteSpan getValue(getArray);
-    err = persistenceProvider.ReadValue(TestConcretePath, 0x20, sizeof(getArray), getValue);
+    MutableByteSpan valueReadBack(getArray);
+    err = persistenceProvider.ReadValue(TestConcretePath, 0x20, sizeof(getArray), valueReadBack);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, std::equal(getValue.begin(), getValue.end(), setValue.begin(), setValue.end()));
+    NL_TEST_ASSERT(inSuite, std::equal(valueReadBack.begin(), valueReadBack.end(), value.begin(), value.end()));
 
     // Finishing
     persistenceProvider.Shutdown();
@@ -97,34 +97,15 @@ void testHelperStorageAndRetrivalScalarValues(nlTestSuite * inSuite,
     CHIP_ERROR err = persistenceProvider.WriteScalarValue(TestConcretePath, testValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    T getValue;
-    err = persistenceProvider.ReadScalarValue(TestConcretePath, getValue);
+    T valueReadBack;
+    err = persistenceProvider.ReadScalarValue(TestConcretePath, valueReadBack);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, getValue == testValue);
+    NL_TEST_ASSERT(inSuite, valueReadBack == testValue);
 }
 
 /**
- * Tests the storage and retrival of data from the KVS of type boolean.
- */
-void TestStorageAndRetrivalBool(nlTestSuite * inSuite, void * inContext)
-{
-    TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider persistenceProvider;
-
-    // Init
-    CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, bool(true));
-    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, bool(false));
-
-    // Finishing
-    persistenceProvider.Shutdown();
-}
-
-/**
- * Tests the storage and retrival of data from the KVS of types int8_t, int16_t, int32_t, int64_t.
+ * Tests the storage and retrival of data from the KVS of types  bool, int8_t, int16_t, int32_t, int64_t.
  */
 void TestStorageAndRetrivalScalarValues(nlTestSuite * inSuite, void * inContext)
 {
@@ -134,6 +115,11 @@ void TestStorageAndRetrivalScalarValues(nlTestSuite * inSuite, void * inContext)
     // Init
     CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Test bool
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, bool(true));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, bool(false));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, bool(true));
 
     // Test uint8_t
     testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, uint8_t(0));
@@ -160,7 +146,7 @@ void TestStorageAndRetrivalScalarValues(nlTestSuite * inSuite, void * inContext)
 }
 
 /**
- * Tests the storage and retrival of data from the KVS of DataModel::Nullable types int8_t, int16_t, int32_t, int64_t.
+ * Tests the storage and retrival of data from the KVS of DataModel::Nullable types bool int8_t, int16_t, int32_t, int64_t.
  */
 void TestStorageAndRetrivalNullableScalarValues(nlTestSuite * inSuite, void * inContext)
 {
@@ -230,48 +216,48 @@ void TestBufferTooSmallErrors(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Store large data
-    uint8_t setArray[9] = {0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42};
-    ByteSpan setValue(setArray);
-    err = persistenceProvider.WriteValue(TestConcretePath, setValue);
+    uint8_t valueArray[9] = {0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42};
+    ByteSpan value(valueArray);
+    err = persistenceProvider.WriteValue(TestConcretePath, value);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Confirm the daya is there
     uint8_t getArray[9];
-    MutableByteSpan getValue(getArray);
-    err = persistenceProvider.ReadValue(TestConcretePath, 0x20, sizeof(getArray), getValue);
+    MutableByteSpan valueReadBack(getArray);
+    err = persistenceProvider.ReadValue(TestConcretePath, 0x20, sizeof(getArray), valueReadBack);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, std::equal(getValue.begin(), getValue.end(), setValue.begin(), setValue.end()));
+    NL_TEST_ASSERT(inSuite, std::equal(valueReadBack.begin(), valueReadBack.end(), value.begin(), value.end()));
 
     // Fail to get data as ByteSpace of size 0
     uint8_t getArray0[0];
-    MutableByteSpan getValueByteSpan0(getArray0, 0);
-    err = persistenceProvider.ReadValue(TestConcretePath, 0x20, 1, getValueByteSpan0);
+    MutableByteSpan valueReadBackByteSpan0(getArray0, 0);
+    err = persistenceProvider.ReadValue(TestConcretePath, 0x20, 1, valueReadBackByteSpan0);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Fail to get data as ByteSpace of size > 0 but < required
     uint8_t getArray8[8];
-    MutableByteSpan getValueByteSpan8(getArray8, sizeof(getArray8));
-    err = persistenceProvider.ReadValue(TestConcretePath, 0x20, 1, getValueByteSpan8);
+    MutableByteSpan valueReadBackByteSpan8(getArray8, sizeof(getArray8));
+    err = persistenceProvider.ReadValue(TestConcretePath, 0x20, 1, valueReadBackByteSpan8);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Fail to get value as uint8_t
-    uint8_t getValue8;
-    err = persistenceProvider.ReadScalarValue(TestConcretePath, getValue8);
+    uint8_t valueReadBack8;
+    err = persistenceProvider.ReadScalarValue(TestConcretePath, valueReadBack8);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Fail to get value as uint16_t
-    uint16_t getValue16;
-    err = persistenceProvider.ReadScalarValue(TestConcretePath, getValue16);
+    uint16_t valueReadBack16;
+    err = persistenceProvider.ReadScalarValue(TestConcretePath, valueReadBack16);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Fail to get value as uint32_t
-    uint32_t getValue32;
-    err = persistenceProvider.ReadScalarValue(TestConcretePath, getValue32);
+    uint32_t valueReadBack32;
+    err = persistenceProvider.ReadScalarValue(TestConcretePath, valueReadBack32);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Fail to get value as uint64_t
-    uint64_t getValue64;
-    err = persistenceProvider.ReadScalarValue(TestConcretePath, getValue64);
+    uint64_t valueReadBack64;
+    err = persistenceProvider.ReadScalarValue(TestConcretePath, valueReadBack64);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Finishing
@@ -282,7 +268,6 @@ void TestBufferTooSmallErrors(nlTestSuite * inSuite, void * inContext)
 
 namespace {
 const nlTest sTests[] = { NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of ByteSpans", TestStorageAndRetrivalByteSpans),
-                          NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of boolean values", TestStorageAndRetrivalBool),
                           NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of scalar values", TestStorageAndRetrivalScalarValues),
                           NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of nullable scalar values", TestStorageAndRetrivalNullableScalarValues),
                           NL_TEST_DEF("Test AttributePersistenceProvider: Small buffer errors", TestBufferTooSmallErrors),
