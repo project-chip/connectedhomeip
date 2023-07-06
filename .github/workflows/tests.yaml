@@ -288,7 +288,8 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-tsan-clang, no-ble-asan-clang]
+                build_variant: [no-ble-asan-clang] 
+                # Since no-ble-tsan-clang doesn't run any tests, this is just wasted CI time for now
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
