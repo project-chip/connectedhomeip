@@ -15,7 +15,6 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/attribute-type.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
 #include <app/util/attribute-metadata.h>
@@ -108,8 +107,8 @@ public:
         MutableByteSpan tempVal(attrData);
         // **Note** aType in the ReadValue function is only used to check if the value is of a string type. Since this template
         // function is only enabled for integral values, we know that this case will not occur, so we can pass the enum of an
-        // arbitrary integral type.
-        auto err = ReadValue(aPath, ZCL_INT8U_ATTRIBUTE_TYPE, sizeof(T), tempVal);
+        // arbitrary integral type. 0x20 is the ZCL enum type for ZCL_INT8U_ATTRIBUTE_TYPE.
+        auto err = ReadValue(aPath, 0x20, sizeof(T), tempVal);
         if (err != CHIP_NO_ERROR)
         {
             return err;
