@@ -14,8 +14,8 @@
 #    limitations under the License.
 #
 
-from ctypes import CFUNCTYPE, c_char_p, c_int32, c_uint8, c_uint16, c_uint32
-from typing import Optional
+from ctypes import CFUNCTYPE, c_char_p, c_int32, c_uint8, c_uint16, c_uint32, create_string_buffer
+from typing import Optional, Tuple
 
 from chip.exceptions import ChipStackError
 from chip.native import GetLibraryHandle, NativeLibraryHandleMethodArguments
@@ -66,14 +66,20 @@ class SetupPayload:
 
         return self
 
-    # DEPRECATED
-    def PrintOnboardingCodes(self, passcode, vendorId, productId, discriminator, customFlow, capabilities, version):
+    def PrintOnboardingCodes(self, passcode, vendorId, productId, discriminator,
+                             customFlow, capabilities, version) -> Tuple[str, str]:
         self.Clear()
+
+        qr_code = create_string_buffer(64)
+        manual_code = create_string_buffer(64)
+
         err = self.chipLib.pychip_SetupPayload_PrintOnboardingCodes(
-            passcode, vendorId, productId, discriminator, customFlow, capabilities, version)
+            passcode, vendorId, productId, discriminator, customFlow, capabilities, version, qr_code, 64, manual_code, 64)
 
         if err != 0:
             raise ChipStackError(err)
+
+        return qr_code.value.decode(), manual_code.value.decode()
 
     # DEPRECATED
     def Print(self):
@@ -117,10 +123,14 @@ class SetupPayload:
                    [c_char_p, SetupPayload.AttributeVisitor, SetupPayload.VendorAttributeVisitor])
         setter.Set("pychip_SetupPayload_PrintOnboardingCodes",
                    c_int32,
-                   [c_uint32, c_uint16, c_uint16, c_uint16, c_uint8, c_uint8, c_uint8])
+                   [c_uint32, c_uint16, c_uint16, c_uint16, c_uint8, c_uint8, c_uint8, c_char_p, c_uint32, c_char_p, c_uint32])
 
     # Getters from parsed contents.
     # Prefer using the methods below to access setup payload information once parse.
+
+    @property
+    def version(self) -> int:
+        return int(self.attributes.get("Version", "0"))
 
     @property
     def vendor_id(self) -> int:

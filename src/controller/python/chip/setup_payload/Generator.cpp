@@ -27,7 +27,8 @@ using namespace chip;
 
 extern "C" PyChipError pychip_SetupPayload_PrintOnboardingCodes(uint32_t passcode, uint16_t vendorId, uint16_t productId,
                                                                 uint16_t discriminator, uint8_t customFlow, uint8_t capabilities,
-                                                                uint8_t version)
+                                                                uint8_t version, char * outQRCode, uint32_t maxQRCodeLen,
+                                                                char * outManualCode, uint32_t maxManualCodeLen)
 {
     std::string QRCode;
     std::string manualPairingCode;
@@ -59,10 +60,14 @@ extern "C" PyChipError pychip_SetupPayload_PrintOnboardingCodes(uint32_t passcod
 
     CHIP_ERROR err = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+    VerifyOrReturnError(manualPairingCode.size() <= maxManualCodeLen, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    memcpy(outManualCode, manualPairingCode.c_str(), manualPairingCode.size());
     ChipLogProgress(SetupPayload, "Manual pairing code: [%s]", manualPairingCode.c_str());
 
     err = QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(QRCode);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+    VerifyOrReturnError(QRCode.size() <= maxQRCodeLen, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    memcpy(outQRCode, QRCode.c_str(), QRCode.size());
     ChipLogProgress(SetupPayload, "SetupQRCode: [%s]", QRCode.c_str());
 
     return ToPyChipError(CHIP_NO_ERROR);
