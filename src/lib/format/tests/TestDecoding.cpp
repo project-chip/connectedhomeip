@@ -512,7 +512,7 @@ void TestEmptyClusterMetaDataDecode(nlTestSuite * inSuite, void * inContext)
                    "            ContextSpecific(0x3)\n"        // subjects
                    "              UnknownTag(0x100): 112233\n" // List entry (subjects is a list)
                    "            ContextSpecific(0x4): NULL\n"  // targets
-                   "            ContextSpecific(0xfe): 1\n"    // fabricIndex
+                   "            ContextSpecific(0xFE): 1\n"    // fabricIndex
                    "  suppress_response: true\n"
                    "  interaction_model_revison: 1\n");
 }
@@ -551,9 +551,9 @@ void TestWrongDecodeData(nlTestSuite * inSuite, void * inContext)
                    "            ContextSpecific(0x3)\n"
                    "              UnknownTag(0x100): 112233\n"
                    "            ContextSpecific(0x4): NULL\n"
-                   "            ContextSpecific(0xfe): 1\n"
+                   "            ContextSpecific(0xFE): 1\n"
                    "  ContextSpecific(0x4): true\n"
-                   "  ContextSpecific(0xff): 1\n");
+                   "  ContextSpecific(0xFF): 1\n");
 }
 
 void TestNestingOverflow(nlTestSuite * inSuite, void * inContext)
@@ -639,12 +639,12 @@ void TestNestingOverflow(nlTestSuite * inSuite, void * inContext)
                    "                ContextSpecific(0x7)\n"
                    "                  ContextSpecific(0x8)\n"
                    "                    ContextSpecific(0x9)\n"
-                   "                      ContextSpecific(0xa)\n"
-                   "                        ContextSpecific(0xb)\n"
-                   "                          ContextSpecific(0xc)\n"
-                   "                            ContextSpecific(0xd)\n"
-                   "                              ContextSpecific(0xe)\n"
-                   "                                ContextSpecific(0xf): NESTING DEPTH REACHED\n"
+                   "                      ContextSpecific(0xA)\n"
+                   "                        ContextSpecific(0xB)\n"
+                   "                          ContextSpecific(0xC)\n"
+                   "                            ContextSpecific(0xD)\n"
+                   "                              ContextSpecific(0xE)\n"
+                   "                                ContextSpecific(0xF): NESTING DEPTH REACHED\n"
                    "                  ContextSpecific(0x20)\n"
                    "                    ContextSpecific(0x21)\n"
                    "                      ContextSpecific(0x22)\n"
