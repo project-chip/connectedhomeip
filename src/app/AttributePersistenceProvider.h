@@ -73,6 +73,32 @@ public:
     virtual CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, size_t aSize,
                                  MutableByteSpan & aValue) = 0;
 
+    /**
+     * Get the KVS representation of null for the given type.
+     * @tparam T The type for which the null representation should be returned.
+     * @return A value of type T that in the KVS represents null.
+     */
+    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
+    static T GetNull()
+    {
+        T nullValue = 0;
+        nullValue   = T(~nullValue);
+        return nullValue;
+    }
+
+    /**
+     * Get the KVS representation of null for the given type.
+     * @tparam T The type for which the null representation should be returned.
+     * @return A value of type T that in the KVS represents null.
+     */
+    template <typename T, std::enable_if_t<std::is_signed<T>::value && !std::is_same<bool, T>::value, bool> = true>
+    static T GetNull()
+    {
+        T nullValue;
+        nullValue = 1u << ((sizeof(nullValue) * 8) - 1);
+        return nullValue;
+    }
+
     // The following API provides helper functions to simplify the access of commonly used types.
     // The API may not be complete.
     // Currently implemented write and read types are: uint8_t, uint16_t, uint32_t, unit64_t and
@@ -130,9 +156,8 @@ public:
     {
         if (aValue.IsNull())
         {
-            T nullValue = 0;
-            nullValue   = T(~nullValue);
-            return WriteScalarValue(aPath, nullValue);
+            T nullVal = GetNull<T>();
+            return WriteScalarValue(aPath, nullVal);
         }
         return WriteScalarValue(aPath, aValue.Value());
     }
@@ -147,8 +172,6 @@ public:
     CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
         T tempIntegral;
-        T nullValue = 0;
-        nullValue   = T(~nullValue);
 
         CHIP_ERROR err = ReadScalarValue(aPath, tempIntegral);
         if (err != CHIP_NO_ERROR)
@@ -156,7 +179,7 @@ public:
             return err;
         }
 
-        if (tempIntegral == nullValue)
+        if (tempIntegral == GetNull<T>())
         {
             aValue.SetNull();
             return CHIP_NO_ERROR;
