@@ -144,7 +144,12 @@ public:
 
     // After work callback, processed in the main Matter task via `PlatformManager::ScheduleWork`.
     // This is a member function to be called on the associated session after the work callback.
-    // The `status` value is the result of the work callback (called beforehand).
+    // The `status` value is the result of the work callback (called beforehand), or the status of
+    // queueing the after work callback back to the Matter thread, if the work callback succeeds
+    // but queueing fails.
+    //
+    // When this callback is called asynchronously (i.e. via ScheduleWork), the helper guarantees
+    // that it will keep itself (and hence `data`) alive until the callback completes.
     typedef CHIP_ERROR (CASESession::*AfterWorkCallback)(DATA & data, CHIP_ERROR status);
 
 public:
@@ -169,6 +174,9 @@ public:
 
     // Do the work immediately.
     // No scheduling, no outstanding work, no shared lifetime management.
+    //
+    // The caller must guarantee that it keeps the helper alive across this call, most likely by
+    // holding a reference to it on the stack.
     CHIP_ERROR DoWork()
     {
         // Ensure that this function is being called from main Matter thread
@@ -195,7 +203,7 @@ public:
         auto status = DeviceLayer::PlatformMgr().ScheduleBackgroundWork(WorkHandler, reinterpret_cast<intptr_t>(this));
         if (status != CHIP_NO_ERROR)
         {
-            // Release strong ptr since scheduling failed
+            // Release strong ptr since scheduling failed.
             mStrongPtr.reset();
         }
         return status;
@@ -246,7 +254,9 @@ private:
             ChipLogError(SecureChannel, "Failed to Schedule the AfterWorkCallback on foreground thread");
             helper->mScheduleAfterWorkFailed.store(true);
 
-            // Release strong ptr since scheduling failed
+            // Release strong ptr since scheduling failed, because nothing guarantees that
+            // AfterWorkHandler will get called at this point to release the reference, and we
+            // don't want to leak.
             helper->mStrongPtr.reset();
         }
     }
@@ -258,8 +268,15 @@ private:
         assertChipStackLockedByCurrentThread();
 
         auto * helper = reinterpret_cast<WorkHelper *>(arg);
-        // Hold strong ptr while work is handled
+        // Hold strong ptr while work is handled, and ensure that helper->mStrongPtr does not keep
+        // holding a reference.
         auto strongPtr(std::move(helper->mStrongPtr));
+        if (!strongPtr)
+        {
+            // This can happen if scheduling AfterWorkHandler failed.  Just grab a strong ref to
+            // handler directly, to fulfill our API contract.
+            strongPtr = helper->mWeakPtr.lock();
+        }
         if (auto * session = helper->mSession.load())
         {
             // Execute callback in Matter thread; session should be OK with this
