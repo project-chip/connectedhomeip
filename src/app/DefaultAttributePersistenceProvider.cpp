@@ -65,7 +65,7 @@ CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttribut
     else
     {
         // Ensure we got the expected number of bytes for all other types.
-        VerifyOrReturnError(size == aSize, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(size == aSize, CHIP_ERROR_INVALID_ARGUMENT);
     }
     aValue.reduce_size(size);
     return CHIP_NO_ERROR;
