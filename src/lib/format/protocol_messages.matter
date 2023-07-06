@@ -188,7 +188,7 @@ client cluster IMProtocol = 0xFFFF0001 {
   struct SubscribeResponseMessage {
     int32u subscription_id = 0;
     // NOTE: 1 missing here
-    int16u max_interval = 1;
+    int16u max_interval = 2;
 
     // 10.2.2.2. Context Tag Encoded Action Information
     int8u interaction_model_revison = 0xFF;
