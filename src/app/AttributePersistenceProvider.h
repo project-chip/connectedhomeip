@@ -78,7 +78,18 @@ public:
      * @tparam T The type for which the null representation should be returned.
      * @return A value of type T that in the KVS represents null.
      */
-    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
+    template <typename T, std::enable_if_t<std::is_same<bool, T>::value, bool> = true>
+    static uint8_t GetNull()
+    {
+        return 0xff;
+    }
+
+    /**
+     * Get the KVS representation of null for the given type.
+     * @tparam T The type for which the null representation should be returned.
+     * @return A value of type T that in the KVS represents null.
+     */
+    template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true>
     static T GetNull()
     {
         T nullValue = 0;
@@ -146,17 +157,17 @@ public:
     }
 
     /**
-     * Write an attribute value of type nullable unsigned intX to non-volatile memory.
+     * Write an attribute value of type nullable unsigned intX or bool to non-volatile memory.
      *
      * @param [in] aPath the attribute path for the data being written.
      * @param [in] aValue the data to write.
      */
-    template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true>
+    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
     CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
         if (aValue.IsNull())
         {
-            T nullVal = GetNull<T>();
+            auto nullVal = GetNull<T>();
             return WriteScalarValue(aPath, nullVal);
         }
         return WriteScalarValue(aPath, aValue.Value());
@@ -172,6 +183,33 @@ public:
     CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
         T tempIntegral;
+
+        CHIP_ERROR err = ReadScalarValue(aPath, tempIntegral);
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        if (tempIntegral == GetNull<T>())
+        {
+            aValue.SetNull();
+            return CHIP_NO_ERROR;
+        }
+
+        aValue.SetNonNull(tempIntegral);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * Read an attribute of type nullable bool from non-volatile memory.
+     *
+     * @param [in]     aPath the attribute path for the data being persisted.
+     * @param [in,out] aValue where to place the data.
+     */
+    template <typename T, std::enable_if_t<std::is_same<bool, T>::value, bool> = true>
+    CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
+    {
+        uint8_t tempIntegral;
 
         CHIP_ERROR err = ReadScalarValue(aPath, tempIntegral);
         if (err != CHIP_NO_ERROR)

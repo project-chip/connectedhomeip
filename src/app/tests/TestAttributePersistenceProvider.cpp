@@ -71,12 +71,12 @@ void TestStorageAndRetrivalByteSpans(nlTestSuite * inSuite, void * inContext)
 
     // Store ByteSpan of size 1
     uint8_t setArray[1] = {0x42};
-    ByteSpan setValue(setArray, sizeof(setArray));
+    ByteSpan setValue(setArray);
     err = persistenceProvider.WriteValue(TestConcretePath, setValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     uint8_t getArray[1];
-    MutableByteSpan getValue(getArray, sizeof(getArray));
+    MutableByteSpan getValue(getArray);
     err = persistenceProvider.ReadValue(TestConcretePath, 0x20, sizeof(getArray), getValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, std::equal(getValue.begin(), getValue.end(), setValue.begin(), setValue.end()));
@@ -171,6 +171,14 @@ void TestStorageAndRetrivalNullableScalarValues(nlTestSuite * inSuite, void * in
     CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    // Test bool
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<bool>(true));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<bool>(false));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<bool>(true));
+    auto nullValBool = DataModel::Nullable<bool>();
+    nullValBool.SetNull();
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, nullValBool);
+
     // Test uint8_t
     testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<uint8_t>(0));
     testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<uint8_t>(42));
@@ -223,20 +231,20 @@ void TestBufferTooSmallErrors(nlTestSuite * inSuite, void * inContext)
 
     // Store large data
     uint8_t setArray[9] = {0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42};
-    ByteSpan setValue(setArray, sizeof(setArray));
+    ByteSpan setValue(setArray);
     err = persistenceProvider.WriteValue(TestConcretePath, setValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Confirm the daya is there
     uint8_t getArray[9];
-    MutableByteSpan getValue(getArray, sizeof(getArray));
+    MutableByteSpan getValue(getArray);
     err = persistenceProvider.ReadValue(TestConcretePath, 0x20, sizeof(getArray), getValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, std::equal(getValue.begin(), getValue.end(), setValue.begin(), setValue.end()));
 
     // Fail to get data as ByteSpace of size 0
     uint8_t getArray0[0];
-    MutableByteSpan getValueByteSpan0(getArray0, sizeof(getArray0));
+    MutableByteSpan getValueByteSpan0(getArray0, 0);
     err = persistenceProvider.ReadValue(TestConcretePath, 0x20, 1, getValueByteSpan0);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
 
