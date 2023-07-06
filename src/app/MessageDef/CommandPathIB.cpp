@@ -78,7 +78,7 @@ CHIP_ERROR CommandPathIB::Parser::PrettyPrint() const
             {
                 chip::CommandId commandId;
                 ReturnErrorOnFailure(reader.Get(commandId));
-                PRETTY_PRINT("\tCommandId = 0x%x,", commandId);
+                PRETTY_PRINT("\tCommandId = 0x%" PRIx32 ",", commandId);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
