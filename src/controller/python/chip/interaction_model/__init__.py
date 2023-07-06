@@ -28,7 +28,8 @@ from chip.exceptions import ChipStackException
 
 from .delegate import AttributePath, AttributePathIBstruct, DataVersionFilterIBstruct, EventPath, EventPathIBstruct
 
-__all__ = ["Status", "InteractionModelError"]
+__all__ = ["AttributePath", "AttributePathIBstruct", "DataVersionFilterIBstruct",
+           "EventPath", "EventPathIBstruct", "Status", "InteractionModelError"]
 
 
 # defined src/controller/python/chip/interaction_model/Delegate.h
