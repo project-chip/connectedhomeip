@@ -32,42 +32,42 @@ public:
 
     void RegisterCluster(const char * clusterName, commands_list commandsList)
     {
-        Register(clusterName, commandsList, nullptr, false);
+        Register(clusterName, commandsList, nullptr, true);
     }
     // Command sets represent chip-tool functionality that is not actually
     // XML-defined clusters.  All command sets should have help text explaining
     // what sort of commands one should expect to find in the set.
-    void RegisterCommandSet(const char * clusterName, commands_list commandsList, const char * helpText)
+    void RegisterCommandSet(const char * commandSetName, commands_list commandsList, const char * helpText)
     {
-        Register(clusterName, commandsList, helpText, true);
+        Register(commandSetName, commandsList, helpText, false);
     }
     int Run(int argc, char ** argv);
     int RunInteractive(const char * command, const chip::Optional<char *> & storageDirectory = chip::NullOptional);
 
 private:
-    struct ClusterData
+    struct CommandSet
     {
         CommandsVector commands;
-        bool isSynthetic      = false;
+        bool isCluster        = false;
         const char * helpText = nullptr;
     };
     // The tuple contains the commands, whether it's a synthetic cluster, and
     // the help text for the cluster (which may be null).
-    using ClusterMap = std::map<std::string, ClusterData>;
+    using CommandSetMap = std::map<std::string, CommandSet>;
 
     CHIP_ERROR RunCommand(int argc, char ** argv, bool interactive = false,
                           const chip::Optional<char *> & interactiveStorageDirectory = chip::NullOptional);
 
-    ClusterMap::iterator GetCluster(std::string clusterName);
+    CommandSetMap::iterator GetCommandSet(std::string commandSetName);
     Command * GetCommand(CommandsVector & commands, std::string commandName);
     Command * GetGlobalCommand(CommandsVector & commands, std::string commandName, std::string attributeName);
     bool IsAttributeCommand(std::string commandName) const;
     bool IsEventCommand(std::string commandName) const;
     bool IsGlobalCommand(std::string commandName) const;
 
-    void ShowClusters(std::string executable);
-    static void ShowClusterOverview(std::string clusterName, const ClusterData & clusterData);
-    void ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands, const char * helpText);
+    void ShowCommandSets(std::string executable);
+    static void ShowCommandSetOverview(std::string commandSetName, const CommandSet & commandSet);
+    void ShowCommandSet(std::string executable, std::string commandSetName, CommandsVector & commands, const char * helpText);
     void ShowClusterAttributes(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
     void ShowClusterEvents(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
     void ShowCommand(std::string executable, std::string clusterName, Command * command);
@@ -79,9 +79,9 @@ private:
     // helpText may be null, in which case it's not shown.
     static void ShowHelpText(const char * helpText);
 
-    void Register(const char * clusterName, commands_list commandsList, const char * helpText, bool isSynthetic);
+    void Register(const char * commandSetName, commands_list commandsList, const char * helpText, bool isCluster);
 
-    ClusterMap mClusters;
+    CommandSetMap mCommandSets;
 #ifdef CONFIG_USE_LOCAL_STORAGE
     PersistentStorage mStorage;
 #endif // CONFIG_USE_LOCAL_STORAGE

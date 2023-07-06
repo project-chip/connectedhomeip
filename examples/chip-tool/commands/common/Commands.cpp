@@ -119,13 +119,13 @@ static void DetectAndLogMismatchedDoubleQuotes(int argc, char ** argv)
 
 } // namespace
 
-void Commands::Register(const char * clusterName, commands_list commandsList, const char * helpText, bool isSynthetic)
+void Commands::Register(const char * commandSetName, commands_list commandsList, const char * helpText, bool isCluster)
 {
-    mClusters[clusterName].isSynthetic = isSynthetic;
-    mClusters[clusterName].helpText    = helpText;
+    mCommandSets[commandSetName].isCluster = isCluster;
+    mCommandSets[commandSetName].helpText  = helpText;
     for (auto & command : commandsList)
     {
-        mClusters[clusterName].commands.push_back(std::move(command));
+        mCommandSets[commandSetName].commands.push_back(std::move(command));
     }
 }
 
@@ -194,25 +194,25 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
     if (argc <= 1)
     {
         ChipLogError(chipTool, "Missing cluster or command set name");
-        ShowClusters(argv[0]);
+        ShowCommandSets(argv[0]);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    auto clusterIter = GetCluster(argv[1]);
-    if (clusterIter == mClusters.end())
+    auto commandSetIter = GetCommandSet(argv[1]);
+    if (commandSetIter == mCommandSets.end())
     {
         ChipLogError(chipTool, "Unknown cluster or command set: %s", argv[1]);
-        ShowClusters(argv[0]);
+        ShowCommandSets(argv[0]);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    auto & commandList = clusterIter->second.commands;
-    auto * clusterHelp = clusterIter->second.helpText;
+    auto & commandList = commandSetIter->second.commands;
+    auto * helpText    = commandSetIter->second.helpText;
 
     if (argc <= 2)
     {
         ChipLogError(chipTool, "Missing command name");
-        ShowCluster(argv[0], argv[1], commandList, clusterHelp);
+        ShowCommandSet(argv[0], argv[1], commandList, helpText);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -223,7 +223,7 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
         if (command == nullptr)
         {
             ChipLogError(chipTool, "Unknown command: %s", argv[2]);
-            ShowCluster(argv[0], argv[1], commandList, clusterHelp);
+            ShowCommandSet(argv[0], argv[1], commandList, helpText);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
@@ -294,19 +294,19 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
     return command->Run();
 }
 
-Commands::ClusterMap::iterator Commands::GetCluster(std::string clusterName)
+Commands::CommandSetMap::iterator Commands::GetCommandSet(std::string commandSetName)
 {
-    for (auto & cluster : mClusters)
+    for (auto & commandSet : mCommandSets)
     {
-        std::string key(cluster.first);
+        std::string key(commandSet.first);
         std::transform(key.begin(), key.end(), key.begin(), ::tolower);
-        if (key.compare(clusterName) == 0)
+        if (key.compare(commandSetName) == 0)
         {
-            return mClusters.find(cluster.first);
+            return mCommandSets.find(commandSet.first);
         }
     }
 
-    return mClusters.end();
+    return mCommandSets.end();
 }
 
 Command * Commands::GetCommand(CommandsVector & commands, std::string commandName)
@@ -351,14 +351,15 @@ bool Commands::IsGlobalCommand(std::string commandName) const
     return IsAttributeCommand(commandName) || IsEventCommand(commandName);
 }
 
-void Commands::ShowClusterOverview(std::string clusterName, const ClusterData & clusterData)
+void Commands::ShowCommandSetOverview(std::string commandSetName, const CommandSet & commandSet)
 {
-    std::transform(clusterName.begin(), clusterName.end(), clusterName.begin(), [](unsigned char c) { return std::tolower(c); });
-    fprintf(stderr, "  | * %-82s|\n", clusterName.c_str());
-    ShowHelpText(clusterData.helpText);
+    std::transform(commandSetName.begin(), commandSetName.end(), commandSetName.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+    fprintf(stderr, "  | * %-82s|\n", commandSetName.c_str());
+    ShowHelpText(commandSet.helpText);
 }
 
-void Commands::ShowClusters(std::string executable)
+void Commands::ShowCommandSets(std::string executable)
 {
     fprintf(stderr, "Usage:\n");
     fprintf(stderr, "  %s cluster_name command_name [param1 param2 ...]\n", executable.c_str());
@@ -368,11 +369,11 @@ void Commands::ShowClusters(std::string executable)
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | Clusters:                                                                           |\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
-    for (auto & cluster : mClusters)
+    for (auto & commandSet : mCommandSets)
     {
-        if (!cluster.second.isSynthetic)
+        if (commandSet.second.isCluster)
         {
-            ShowClusterOverview(cluster.first, cluster.second);
+            ShowCommandSetOverview(commandSet.first, commandSet.second);
         }
     }
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
@@ -380,20 +381,20 @@ void Commands::ShowClusters(std::string executable)
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | Command sets:                                                                       |\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
-    for (auto & cluster : mClusters)
+    for (auto & commandSet : mCommandSets)
     {
-        if (cluster.second.isSynthetic)
+        if (!commandSet.second.isCluster)
         {
-            ShowClusterOverview(cluster.first, cluster.second);
+            ShowCommandSetOverview(commandSet.first, commandSet.second);
         }
     }
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
 }
 
-void Commands::ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands, const char * helpText)
+void Commands::ShowCommandSet(std::string executable, std::string commandSetName, CommandsVector & commands, const char * helpText)
 {
     fprintf(stderr, "Usage:\n");
-    fprintf(stderr, "  %s %s command_name [param1 param2 ...]\n", executable.c_str(), clusterName.c_str());
+    fprintf(stderr, "  %s %s command_name [param1 param2 ...]\n", executable.c_str(), commandSetName.c_str());
 
     if (helpText)
     {
@@ -575,8 +576,8 @@ bool Commands::DecodeArgumentsFromBase64EncodedJson(const char * json, std::vect
     auto commandName = jsonValue[kJsonCommandKey].asString();
     auto arguments   = jsonValue[kJsonArgumentsKey].asString();
 
-    auto clusterIter = GetCluster(clusterName);
-    VerifyOrReturnValue(clusterIter != mClusters.end(), false,
+    auto clusterIter = GetCommandSet(clusterName);
+    VerifyOrReturnValue(clusterIter != mCommandSets.end(), false,
                         ChipLogError(chipTool, "Cluster '%s' is not supported.", clusterName.c_str()));
 
     auto & commandList = clusterIter->second.commands;
