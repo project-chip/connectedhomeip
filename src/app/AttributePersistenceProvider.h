@@ -71,7 +71,7 @@ public:
      *                 representation description in the WriteValue
      *                 documentation.
      */
-    virtual CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, uint16_t aSize,
+    virtual CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, size_t aSize,
                                  MutableByteSpan & aValue) = 0;
 
     // The following API provides helper functions to simplify the access of commonly used types.
@@ -105,7 +105,7 @@ public:
     CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, T & aValue)
     {
         uint8_t attrData[sizeof(T)];
-        MutableByteSpan tempVal(attrData, sizeof(T));
+        MutableByteSpan tempVal(attrData);
         // **Note** aType in the ReadValue function is only used to check if the value is of a string type. Since this template
         // function is only enabled for integral values, we know that this case will not occur, so we can pass the enum of an
         // arbitrary integral type.

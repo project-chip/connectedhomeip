@@ -27,8 +27,8 @@ CHIP_ERROR DefaultAttributePersistenceProvider::WriteValue(const ConcreteAttribu
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // TODO: we may want to have a small cache for values that change a lot, so
-    // we only write them once a bunch of changes happen or on timer or
-    // shutdown.
+    //  we only write them once a bunch of changes happen or on timer or
+    //  shutdown.
     if (!CanCastTo<uint16_t>(aValue.size()))
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
@@ -39,7 +39,7 @@ CHIP_ERROR DefaultAttributePersistenceProvider::WriteValue(const ConcreteAttribu
 }
 
 CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType,
-                                                          uint16_t aSize, MutableByteSpan & aValue)
+                                                          size_t aSize, MutableByteSpan & aValue)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
