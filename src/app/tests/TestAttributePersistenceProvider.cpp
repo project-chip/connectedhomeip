@@ -63,15 +63,17 @@ void TestStorageAndRetrivalByteSpans(nlTestSuite * inSuite, void * inContext)
     TestPersistentStorageDelegate storageDelegate;
     DefaultAttributePersistenceProvider persistenceProvider;
 
-    // todo Failure before Init
+    // Failure before Init
+    uint8_t valueArray[1] = {0x42};
+    ByteSpan value(valueArray);
+    CHIP_ERROR err = persistenceProvider.WriteValue(TestConcretePath, value);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     // Init
-    CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);
+    err = persistenceProvider.Init(&storageDelegate);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Store ByteSpan of size 1
-    uint8_t valueArray[1] = {0x42};
-    ByteSpan value(valueArray);
     err = persistenceProvider.WriteValue(TestConcretePath, value);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
