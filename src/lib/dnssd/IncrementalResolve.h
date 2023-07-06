@@ -182,7 +182,7 @@ private:
 
     StoredServerName mRecordName;     // Record name for what is parsed (SRV/PTR/TXT)
     StoredServerName mTargetHostName; // `Target` for the SRV record
-    ServiceNameType  mServiceNameType = ServiceNameType::kInvalid;
+    ServiceNameType mServiceNameType = ServiceNameType::kInvalid;
     CommonResolutionData mCommonResolutionData;
     ParsedRecordSpecificData mSpecificResolutionData;
 };
