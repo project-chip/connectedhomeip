@@ -252,7 +252,8 @@
         "TestAccessControlConstraints",
         "TestLevelControlWithOnOffDependency",
         "TestCommissioningWindow",
-        "TestCommissionerNodeId"
+        "TestCommissionerNodeId",
+        "TestTimeSynchronization"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
