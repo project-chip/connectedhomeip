@@ -33,8 +33,10 @@
 #include <app/clusters/level-control/level-control.h>
 #endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
 
+#ifdef EMBER_AF_PLUGIN_MODE_BASE
 #include <app/clusters/mode-base-server/mode-base-cluster-objects.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
+#endif // EMBER_AF_PLUGIN_MODE_BASE
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
@@ -81,7 +83,7 @@ void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
     }
 }
 
-#endif
+#endif // EMBER_AF_PLUGIN_MODE_BASE
 
 } // namespace
 
