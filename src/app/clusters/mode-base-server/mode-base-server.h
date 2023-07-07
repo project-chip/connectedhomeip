@@ -42,7 +42,7 @@ public:
      */
     static chip::app::Clusters::detail::Structs::ModeOptionStruct::Type
     BuildModeOptionStruct(const char * label, uint8_t mode,
-                          const List<const chip::app::Clusters::detail::Structs::ModeTagStruct::Type> modeTags)
+                          const DataModel::List<const chip::app::Clusters::detail::Structs::ModeTagStruct::Type> modeTags)
     {
         chip::app::Clusters::detail::Structs::ModeOptionStruct::Type option;
         option.label    = CharSpan::fromCharString(label);
@@ -185,7 +185,7 @@ public:
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
     virtual CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex,
-                                          List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) = 0;
+                                          DataModel::List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) = 0;
 
     /**
      * When a ChangeToMode command is received, if the NewMode value is a supported made, this function is called to 1) decide if

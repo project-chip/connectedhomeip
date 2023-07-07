@@ -332,7 +332,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
                 // Get the mode tags
                 ModeTagStructType tagsBuffer[8];
-                List<ModeTagStructType> tags(tagsBuffer);
+                DataModel::List<ModeTagStructType> tags(tagsBuffer);
                 err1 = d->GetModeTagsByIndex(i, tags);
                 if (err1 != CHIP_NO_ERROR)
                 {

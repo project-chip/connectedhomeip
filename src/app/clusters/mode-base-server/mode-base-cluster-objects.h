@@ -25,9 +25,6 @@
 
 #define EMBER_AF_PLUGIN_MODE_BASE
 
-template <typename T>
-using List = chip::app::DataModel::List<T>;
-
 // todo have this be part of the auto generated code
 namespace chip {
 namespace app {
