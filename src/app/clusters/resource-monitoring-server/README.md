@@ -9,7 +9,7 @@ To use a Resource Monitoring aliased cluster, you need to
 
 -   Create a class that inherits the `ResourceMonitoring::Instance` class. For
     examples look at the files in the `src/instances` and `include/instances`
-    directorins in `examples/resource-monitoring-app/`.
+    directories in `examples/resource-monitoring-app/`.
 -   For this class implement the `OnResetCondition` method. Look at the
     documentation in `resource-monitoring-server.h` for more information about
     these methods. Cluster-specific enums can be accessed from the cluster
