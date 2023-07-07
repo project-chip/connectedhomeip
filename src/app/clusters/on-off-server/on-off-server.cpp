@@ -46,6 +46,8 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
+#ifdef EMBER_AF_PLUGIN_MODE_BASE
+
 /**
  * For all ModeBase alias clusters on the given endpoint, if the OnOff feature is supported and
  * the OnMode attribute is set, update the CurrentMode attribute value to the OnMode value.
@@ -78,6 +80,8 @@ void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
         }
     }
 }
+
+#endif
 
 } // namespace
 
