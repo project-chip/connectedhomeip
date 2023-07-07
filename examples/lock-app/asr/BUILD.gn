@@ -87,6 +87,7 @@ asr_executable("lock_app") {
   ]
 
   sources = [
+    "${examples_plat_dir}/ButtonHandler.cpp",
     "${examples_plat_dir}/CHIPDeviceManager.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/init_Matter.cpp",
@@ -94,9 +95,7 @@ asr_executable("lock_app") {
     "${examples_plat_dir}/shell/matter_shell.cpp",
     "src/AppTask.cpp",
     "src/BoltLockManager.cpp",
-    "src/ButtonHandler.cpp",
     "src/DeviceCallbacks.cpp",
-    "src/LEDManager.cpp",
     "src/main.cpp",
   ]
 

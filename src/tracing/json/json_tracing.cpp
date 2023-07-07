@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <tracing/log_json/log_json_tracing.h>
+#include <tracing/json/json_tracing.h>
 
 #include <lib/address_resolve/TracingStructs.h>
 #include <lib/support/ErrorStr.h>
@@ -25,31 +25,20 @@
 
 #include <json/json.h>
 
+#include <errno.h>
+
 #include <sstream>
 #include <string>
 
 namespace chip {
 namespace Tracing {
-namespace LogJson {
+namespace Json {
 
 namespace {
 
 using chip::StringBuilder;
 
-/// Writes the given value to chip log
-void LogJsonValue(Json::Value const & value)
-{
-    Json::StreamWriterBuilder builder;
-
-    std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
-    std::stringstream output;
-
-    writer->write(value, &output);
-
-    ChipLogProgress(Automation, "%s", output.str().c_str());
-}
-
-void DecodePayloadHeader(Json::Value & value, const PayloadHeader * payloadHeader)
+void DecodePayloadHeader(::Json::Value & value, const PayloadHeader * payloadHeader)
 {
 
     value["exchangeFlags"] = payloadHeader->GetExchangeFlags();
@@ -66,7 +55,7 @@ void DecodePayloadHeader(Json::Value & value, const PayloadHeader * payloadHeade
     }
 }
 
-void DecodePacketHeader(Json::Value & value, const PacketHeader * packetHeader)
+void DecodePacketHeader(::Json::Value & value, const PacketHeader * packetHeader)
 {
     value["msgCounter"]    = packetHeader->GetMessageCounter();
     value["sessionId"]     = packetHeader->GetSessionId();
@@ -98,9 +87,9 @@ void DecodePacketHeader(Json::Value & value, const PacketHeader * packetHeader)
     }
 }
 
-void DecodePayloadData(Json::Value & value, chip::ByteSpan payload)
+void DecodePayloadData(::Json::Value & value, chip::ByteSpan payload)
 {
-    value["payloadSize"] = static_cast<Json::Value::UInt>(payload.size());
+    value["payloadSize"] = static_cast<::Json::Value::UInt>(payload.size());
 
     // TODO: a decode would be useful however it likely requires more decode
     //       metadata
@@ -108,36 +97,42 @@ void DecodePayloadData(Json::Value & value, chip::ByteSpan payload)
 
 } // namespace
 
-void LogJsonBackend::TraceBegin(const char * label, const char * group)
+JsonBackend::~JsonBackend()
 {
-    Json::Value value;
+    CloseFile();
+}
+
+void JsonBackend::TraceBegin(const char * label, const char * group)
+{
+    ::Json::Value value;
+
     value["event"] = "TraceBegin";
     value["label"] = label;
     value["group"] = group;
-    LogJsonValue(value);
+    OutputValue(value);
 }
 
-void LogJsonBackend::TraceEnd(const char * label, const char * group)
+void JsonBackend::TraceEnd(const char * label, const char * group)
 {
-    Json::Value value;
+    ::Json::Value value;
     value["event"] = "TraceEnd";
     value["label"] = label;
     value["group"] = group;
-    LogJsonValue(value);
+    OutputValue(value);
 }
 
-void LogJsonBackend::TraceInstant(const char * label, const char * group)
+void JsonBackend::TraceInstant(const char * label, const char * group)
 {
-    Json::Value value;
+    ::Json::Value value;
     value["event"] = "TraceInstant";
     value["label"] = label;
     value["group"] = group;
-    LogJsonValue(value);
+    OutputValue(value);
 }
 
-void LogJsonBackend::LogMessageSend(MessageSendInfo & info)
+void JsonBackend::LogMessageSend(MessageSendInfo & info)
 {
-    Json::Value value;
+    ::Json::Value value;
     value["event"] = "MessageSend";
 
     switch (info.messageType)
@@ -157,12 +152,12 @@ void LogJsonBackend::LogMessageSend(MessageSendInfo & info)
     DecodePacketHeader(value["packetHeader"], info.packetHeader);
     DecodePayloadData(value["payload"], info.payload);
 
-    LogJsonValue(value);
+    OutputValue(value);
 }
 
-void LogJsonBackend::LogMessageReceived(MessageReceivedInfo & info)
+void JsonBackend::LogMessageReceived(MessageReceivedInfo & info)
 {
-    Json::Value value;
+    ::Json::Value value;
 
     value["event"] = "MessageReceived";
 
@@ -183,12 +178,12 @@ void LogJsonBackend::LogMessageReceived(MessageReceivedInfo & info)
     DecodePacketHeader(value["packetHeader"], info.packetHeader);
     DecodePayloadData(value["payload"], info.payload);
 
-    LogJsonValue(value);
+    OutputValue(value);
 }
 
-void LogJsonBackend::LogNodeLookup(NodeLookupInfo & info)
+void JsonBackend::LogNodeLookup(NodeLookupInfo & info)
 {
-    Json::Value value;
+    ::Json::Value value;
 
     value["event"]                = "LogNodeLookup";
     value["node_id"]              = info.request->GetPeerId().GetNodeId();
@@ -196,12 +191,12 @@ void LogJsonBackend::LogNodeLookup(NodeLookupInfo & info)
     value["min_lookup_time_ms"]   = info.request->GetMinLookupTime().count();
     value["max_lookup_time_ms"]   = info.request->GetMaxLookupTime().count();
 
-    LogJsonValue(value);
+    OutputValue(value);
 }
 
-void LogJsonBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
+void JsonBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
 {
-    Json::Value value;
+    ::Json::Value value;
     value["event"] = "LogNodeDiscovered";
 
     value["node_id"]              = info.peerId->GetNodeId();
@@ -221,7 +216,7 @@ void LogJsonBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
     }
 
     {
-        Json::Value result;
+        ::Json::Value result;
 
         char address_buff[chip::Transport::PeerAddress::kMaxToStringSize];
 
@@ -236,21 +231,76 @@ void LogJsonBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
         value["result"] = result;
     }
 
-    LogJsonValue(value);
+    OutputValue(value);
 }
 
-void LogJsonBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info)
+void JsonBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info)
 {
-    Json::Value value;
+    ::Json::Value value;
 
     value["event"]                = "LogNodeDiscoveryFailed";
     value["node_id"]              = info.peerId->GetNodeId();
     value["compressed_fabric_id"] = info.peerId->GetCompressedFabricId();
     value["error"]                = chip::ErrorStr(info.error);
 
-    LogJsonValue(value);
+    OutputValue(value);
 }
 
-} // namespace LogJson
+void JsonBackend::CloseFile()
+{
+    if (!mOutputFile.is_open())
+    {
+        return;
+    }
+
+    mOutputFile << "]\n";
+
+    mOutputFile.close();
+}
+
+CHIP_ERROR JsonBackend::OpenFile(const char * path)
+{
+    CloseFile();
+    mOutputFile.open(path, std::ios_base::out);
+
+    if (!mOutputFile)
+    {
+        return CHIP_ERROR_POSIX(errno);
+    }
+
+    mOutputFile << "[\n";
+    mFirstRecord = true;
+
+    return CHIP_NO_ERROR;
+}
+
+void JsonBackend::OutputValue(::Json::Value & value)
+{
+    ::Json::StreamWriterBuilder builder;
+    std::unique_ptr<::Json::StreamWriter> writer(builder.newStreamWriter());
+
+    if (mOutputFile.is_open())
+    {
+        if (!mFirstRecord)
+        {
+            mOutputFile << ",\n";
+        }
+        else
+        {
+            mFirstRecord = false;
+        }
+        value["time_ms"] = chip::System::SystemClock().GetMonotonicTimestamp().count();
+        writer->write(value, &mOutputFile);
+        mOutputFile.flush();
+    }
+    else
+    {
+        std::stringstream output;
+        writer->write(value, &output);
+        ChipLogProgress(Automation, "%s", output.str().c_str());
+    }
+}
+
+} // namespace Json
 } // namespace Tracing
 } // namespace chip

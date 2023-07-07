@@ -91,6 +91,28 @@ public:
     CHIP_ERROR StatusCode() const { return mStatus; }
 
     /**
+     * @return false if the reader is in error, true if the reader is OK.
+     */
+    bool IsSuccess() const { return StatusCode() == CHIP_NO_ERROR; }
+
+    /**
+     * Read a bool, assuming single byte storage.
+     *
+     * @param [out] dest Where the 8-bit integer goes.
+     *
+     * @note The read can put the reader in a failed-status state if there are
+     *       not enough octets available.  Callers must either continue to do
+     *       more reads on the return value or check its status to see whether
+     *       the sequence of reads that has been performed succeeded.
+     */
+    CHECK_RETURN_VALUE
+    Reader & ReadBool(bool * dest)
+    {
+        RawReadLowLevelBeCareful(dest);
+        return *this;
+    }
+
+    /**
      * Read a single 8-bit unsigned integer.
      *
      * @param [out] dest Where the 8-bit integer goes.
@@ -103,7 +125,7 @@ public:
     CHECK_RETURN_VALUE
     Reader & Read8(uint8_t * dest)
     {
-        RawRead(dest);
+        RawReadLowLevelBeCareful(dest);
         return *this;
     }
 
@@ -120,7 +142,7 @@ public:
     CHECK_RETURN_VALUE
     Reader & Read16(uint16_t * dest)
     {
-        RawRead(dest);
+        RawReadLowLevelBeCareful(dest);
         return *this;
     }
 
@@ -137,7 +159,7 @@ public:
     CHECK_RETURN_VALUE
     Reader & Read32(uint32_t * dest)
     {
-        RawRead(dest);
+        RawReadLowLevelBeCareful(dest);
         return *this;
     }
 
@@ -154,7 +176,75 @@ public:
     CHECK_RETURN_VALUE
     Reader & Read64(uint64_t * dest)
     {
-        RawRead(dest);
+        RawReadLowLevelBeCareful(dest);
+        return *this;
+    }
+
+    /**
+     * Read a single 8-bit signed integer.
+     *
+     * @param [out] dest Where the 8-bit integer goes.
+     *
+     * @note The read can put the reader in a failed-status state if there are
+     *       not enough octets available.  Callers must either continue to do
+     *       more reads on the return value or check its status to see whether
+     *       the sequence of reads that has been performed succeeded.
+     */
+    CHECK_RETURN_VALUE
+    Reader & ReadSigned8(int8_t * dest)
+    {
+        RawReadLowLevelBeCareful(dest);
+        return *this;
+    }
+
+    /**
+     * Read a single 16-bit signed integer.
+     *
+     * @param [out] dest Where the 16-bit integer goes.
+     *
+     * @note The read can put the reader in a failed-status state if there are
+     *       not enough octets available.  Callers must either continue to do
+     *       more reads on the return value or check its status to see whether
+     *       the sequence of reads that has been performed succeeded.
+     */
+    CHECK_RETURN_VALUE
+    Reader & ReadSigned16(int16_t * dest)
+    {
+        RawReadLowLevelBeCareful(dest);
+        return *this;
+    }
+
+    /**
+     * Read a single 32-bit signed integer.
+     *
+     * @param [out] dest Where the 32-bit integer goes.
+     *
+     * @note The read can put the reader in a failed-status state if there are
+     *       not enough octets available.  Callers must either continue to do
+     *       more reads on the return value or check its status to see whether
+     *       the sequence of reads that has been performed succeeded.
+     */
+    CHECK_RETURN_VALUE
+    Reader & ReadSigned32(int32_t * dest)
+    {
+        RawReadLowLevelBeCareful(dest);
+        return *this;
+    }
+
+    /**
+     * Read a single 64-bit signed integer.
+     *
+     * @param [out] dest Where the 64-bit integer goes.
+     *
+     * @note The read can put the reader in a failed-status state if there are
+     *       not enough octets available.  Callers must either continue to do
+     *       more reads on the return value or check its status to see whether
+     *       the sequence of reads that has been performed succeeded.
+     */
+    CHECK_RETURN_VALUE
+    Reader & ReadSigned64(int64_t * dest)
+    {
+        RawReadLowLevelBeCareful(dest);
         return *this;
     }
 
@@ -180,7 +270,7 @@ public:
      * delegate to this one.
      */
     template <typename T>
-    void RawRead(T * retval);
+    void RawReadLowLevelBeCareful(T * retval);
 
     /**
      * Advance the Reader forward by the specified number of octets.

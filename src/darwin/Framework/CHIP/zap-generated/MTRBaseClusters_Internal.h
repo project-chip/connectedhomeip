@@ -200,41 +200,6 @@
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
-@interface MTRBaseClusterTemperatureControl ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
-@interface MTRBaseClusterRefrigeratorAlarm ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
-@interface MTRBaseClusterAirQuality ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
-@interface MTRBaseClusterSmokeCOAlarm ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
-@interface MTRBaseClusterOperationalState ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
-@interface MTRBaseClusterHEPAFilterMonitoring ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
-@interface MTRBaseClusterActivatedCarbonFilterMonitoring ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
 @interface MTRBaseClusterDoorLock ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
@@ -306,56 +271,6 @@
 @end
 
 @interface MTRBaseClusterOccupancySensing ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
-@interface MTRBaseClusterCarbonMonoxideConcentrationMeasurement ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
-@interface MTRBaseClusterCarbonDioxideConcentrationMeasurement ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
-@interface MTRBaseClusterNitrogenDioxideConcentrationMeasurement ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
-@interface MTRBaseClusterOzoneConcentrationMeasurement ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
-@interface MTRBaseClusterPM25ConcentrationMeasurement ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
-@interface MTRBaseClusterFormaldehydeConcentrationMeasurement ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
-@interface MTRBaseClusterPM1ConcentrationMeasurement ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
-@interface MTRBaseClusterPM10ConcentrationMeasurement ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
-@interface MTRBaseClusterTotalVolatileOrganicCompoundsConcentrationMeasurement ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
-@interface MTRBaseClusterRadonConcentrationMeasurement ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end

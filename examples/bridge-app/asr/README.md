@@ -5,19 +5,11 @@ This example demonstrates the Matter Bridge application on ASR platform.
 ---
 
 -   [Matter ASR Bridge Example](#matter-asr-bridge-example)
-    -   [Supported Chips](#supported-chips)
     -   [Introduction](#introduction)
     -   [Building and Commissioning](#building-and-commissioning)
     -   [Testing the example](#testing-the-example)
 
 ---
-
-## Supported Chips
-
-The Matter demo application is supported on:
-
--   ASR582X
--   ASR595X
 
 ## Introduction
 
@@ -62,6 +54,6 @@ guides to get started
     This demo uses button to test changing the `Light1`, and the bridge device
     will output log information:
 
-    |  Name  | Pin  |
-    | :----: | :--: |
-    | BUTTON | PAD6 |
+    |  Name  |  Pin  |
+    | :----: | :---: |
+    | BUTTON | PAD12 |
