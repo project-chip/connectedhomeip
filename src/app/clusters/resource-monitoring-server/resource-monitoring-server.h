@@ -121,7 +121,10 @@ public:
         mFeature    = aFeature;
     }
 
-    ~Instance() {}
+    ~Instance() = default;
+    // Not copyable or movable
+    Instance(const Instance&) = delete;
+    Instance& operator=(const Instance&) = delete;
 
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
