@@ -1,4 +1,4 @@
-name: Kotlin - Detekt
+name: Kotlin
 
 on:
   pull_request:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   detekt:
+    name: Static code analysis
     runs-on: ubuntu-latest
 
     steps:
@@ -20,3 +21,20 @@ jobs:
         # explicit paths below
         with:
           args: --parallel --build-upon-default-config --config kotlin-detect-config.yaml --input examples/android/CHIPTest,examples/android/CHIPTool,examples/java-matter-controller/java,src/controller/java
+
+  ktlint:
+    name: "Format check"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+
+      - name: "ktfmt"
+        uses: rsookram/ktfmt-action@v1
+        with:
+          style: kotlinlang
