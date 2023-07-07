@@ -1,0 +1,20 @@
+name: Kotlin - Detekt
+
+on:
+  pull_request:
+    paths:
+      - "**/*.kt"
+      - ".github/workflows/kotlin-detekt.yaml"
+
+ jobs:
+   detekt:
+     runs-on: ubuntu-latest
+
+     steps:
+       - name: "checkout"
+         uses: actions/checkout@v2
+
+       - name: "detekt"
+         uses: natiginfo/action-detekt-all@1.23.0
+         with:
+           args: --parallel --input examples/android/CHIPTest/,examples/android/CHIPTool,examples/java-matter-controller/java,src/controller/java

@@ -23,7 +23,7 @@
 #include "ButtonHandler.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
-#include "LEDManager.h"
+#include "LEDWidget.h"
 #include "LightSwitch.h"
 #include "init_Matter.h"
 #include "lega_rtos_api.h"
@@ -56,18 +56,12 @@ namespace {
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-LEDManager sStatusLED;
-LEDManager sSwitchLED;
+LEDWidget sStatusLED;
 
 constexpr EndpointId kLightSwitch1_EndpointId = 1;
-#if DUAL_LIGHTSWITCH_ENDPOINT
-LightSwitch kLightSwitch2;
-constexpr EndpointId kLightSwitch2_EndpointId = 2;
-#endif
-#if GENERIC_SWITCH_ENDPOINT
+
 LightSwitch GenericSwitch;
 constexpr EndpointId kGenericSwitchEndpointId = 2;
-#endif
 
 constexpr size_t kAppEventQueueSize = 10;
 
@@ -176,20 +170,12 @@ CHIP_ERROR AppTask::Init()
     NetWorkCommissioningInstInit();
 
     kLightSwitch1.Init(kLightSwitch1_EndpointId);
-#if DUAL_LIGHTSWITCH_ENDPOINT
-    kLightSwitch2.Init(kLightSwitch2_EndpointId);
-#endif
-#if GENERIC_SWITCH_ENDPOINT
-    GenericSwitch.InitGeneric(kGenericSwitchEndpointId);
-#endif
-    // Initialize LEDs
-    LEDManager::InitGpio();
 
-    sStatusLED.Init(SYSTEM_STATE_LED);
+    GenericSwitch.InitGeneric(kGenericSwitchEndpointId);
+    // Initialize LEDs
+    sStatusLED.Init(LIGHT_LED);
     sStatusLED.Set(false);
 
-    sSwitchLED.Init(SWITCH_LED);
-    sSwitchLED.Set(false);
     UpdateStatusLED();
 
     // Initialise WSTK buttons PB0 and PB1 (including debounce).
@@ -202,7 +188,11 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
 
     // Print setup info
+#if CONFIG_NETWORK_LAYER_BLE
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+#else
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
+#endif /* CONFIG_NETWORK_LAYER_BLE */
 
     return CHIP_NO_ERROR;
 }
@@ -228,7 +218,6 @@ void AppTask::AppTaskMain(void * pvParameter)
         }
 
         sStatusLED.Animate();
-        sSwitchLED.Animate();
     }
 }
 
@@ -278,26 +267,6 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState(void) {}
 
-#define SWITCH_Toggle
-
-//#define SWITCH_DELAY_ONOFF
-
-#if DUAL_LIGHTSWITCH_ENDPOINT
-#undef SWITCH_Toggle
-#undef SWITCH_DELAY_ONOFF
-#endif
-
-#ifdef SWITCH_DELAY_ONOFF
-#define SWITCH_TIMER "switch_delay_timer"
-#define SWITCH_DELAY_TIME 5 * 1000
-static TimerHandle_t Switch_TimerHandle;
-void Switch_Delay_CallBack(TimerHandle_t xTimer)
-{
-    ASR_LOG("Switch1 OFF!");
-    kLightSwitch1.InitiateActionSwitch(LightSwitch::Action::Off);
-}
-#endif
-
 void AppTask::ButtonPushHandler(AppEvent * aEvent)
 {
     if (aEvent->Type == AppEvent::kEventType_Button)
@@ -305,54 +274,11 @@ void AppTask::ButtonPushHandler(AppEvent * aEvent)
         switch (aEvent->ButtonEvent.PinNo)
         {
         case SWITCH1_BUTTON:
-#ifdef SWITCH_Toggle
-            // ASR_LOG("Switch1 Button Pushed.");
-#endif
-#if DUAL_LIGHTSWITCH_ENDPOINT
-            ASR_LOG("Switch1 ON!");
-            kLightSwitch1.InitiateActionSwitch(LightSwitch::Action::On);
-#endif
-#ifdef SWITCH_DELAY_ONOFF
-            {
-                ASR_LOG("Switch1 ON ,delay %d ms!", SWITCH_DELAY_TIME);
-                kLightSwitch1.InitiateActionSwitch(LightSwitch::Action::On);
-
-                if (Switch_TimerHandle == NULL)
-                {
-                    Switch_TimerHandle =
-                        xTimerCreate(SWITCH_TIMER, pdMS_TO_TICKS(SWITCH_DELAY_TIME), pdFALSE, NULL, Switch_Delay_CallBack);
-                    if (Switch_TimerHandle == NULL)
-                    {
-                        ASR_LOG("Failed to create a timer");
-                    }
-                }
-                if (xTimerIsTimerActive(Switch_TimerHandle))
-                {
-                    ASR_LOG("switch timer already started!");
-                    if (xTimerStop(Switch_TimerHandle, 0) == pdFAIL)
-                    {
-                        ASR_LOG("switch timer stop() failed");
-                    }
-                }
-                if (xTimerChangePeriod(Switch_TimerHandle, pdMS_TO_TICKS(SWITCH_DELAY_TIME), 100) != pdPASS)
-                {
-                    ASR_LOG("switch timer start() failed");
-                }
-            }
-#endif
             break;
-#if DUAL_LIGHTSWITCH_ENDPOINT
         case SWITCH2_BUTTON:
-            ASR_LOG("Switch2 ON!");
-            kLightSwitch2.InitiateActionSwitch(LightSwitch::Action::On);
-            break;
-#endif
-#if GENERIC_SWITCH_ENDPOINT
-        case GENERIC_SWITCH_BUTTON:
             ASR_LOG("GenericSwitch: InitialPress");
             GenericSwitch.GenericSwitchInitialPress();
             break;
-#endif
         default:
             break;
         }
@@ -367,28 +293,13 @@ void AppTask::ButtonReleaseHandler(AppEvent * aEvent)
         switch (aEvent->ButtonEvent.PinNo)
         {
         case SWITCH1_BUTTON:
-#ifdef SWITCH_Toggle
-            sSwitchLED.Set(false);
             ASR_LOG("Switch1 Toggle!");
             kLightSwitch1.InitiateActionSwitch(LightSwitch::Action::Toggle);
-#endif
-#if DUAL_LIGHTSWITCH_ENDPOINT
-            ASR_LOG("Switch1 OFF!");
-            kLightSwitch1.InitiateActionSwitch(LightSwitch::Action::Off);
-#endif
             break;
-#if DUAL_LIGHTSWITCH_ENDPOINT
         case SWITCH2_BUTTON:
-            ASR_LOG("Switch2 OFF!");
-            kLightSwitch2.InitiateActionSwitch(LightSwitch::Action::Off);
-            break;
-#endif
-#if GENERIC_SWITCH_ENDPOINT
-        case GENERIC_SWITCH_BUTTON:
             ASR_LOG("GenericSwitch: ShortRelease");
             GenericSwitch.GenericSwitchReleasePress();
             break;
-#endif
         default:
             break;
         }
@@ -468,7 +379,6 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
             sAppTask.PostEvent(&buttonEvent);
         }
     }
-#if DUAL_LIGHTSWITCH_ENDPOINT
     else if (btnIdx == SWITCH2_BUTTON)
     {
         if (btnAction == BUTTON_PRESSED)
@@ -486,24 +396,4 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
             sAppTask.PostEvent(&buttonEvent);
         }
     }
-#endif
-#if GENERIC_SWITCH_ENDPOINT
-    else if (btnIdx == GENERIC_SWITCH_BUTTON)
-    {
-        if (btnAction == BUTTON_PRESSED)
-        {
-            buttonEvent.ButtonEvent.PinNo  = GENERIC_SWITCH_BUTTON;
-            buttonEvent.ButtonEvent.Action = AppEvent::kButtonPushEvent;
-            buttonEvent.Handler            = ButtonPushHandler;
-            sAppTask.PostEvent(&buttonEvent);
-        }
-        else if (btnAction == BUTTON_RELEASED)
-        {
-            buttonEvent.ButtonEvent.PinNo  = GENERIC_SWITCH_BUTTON;
-            buttonEvent.ButtonEvent.Action = AppEvent::kButtonReleaseEvent;
-            buttonEvent.Handler            = ButtonReleaseHandler;
-            sAppTask.PostEvent(&buttonEvent);
-        }
-    }
-#endif
 }
