@@ -79,7 +79,7 @@ public:
      * @return A value of type T that in the KVS represents null.
      */
     template <typename T, std::enable_if_t<std::is_same<bool, T>::value, bool> = true>
-    static uint8_t GetNull()
+    static uint8_t GetNullValueForNullableType()
     {
         return 0xff;
     }
@@ -90,7 +90,7 @@ public:
      * @return A value of type T that in the KVS represents null.
      */
     template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true>
-    static T GetNull()
+    static T GetNullValueForNullableType()
     {
         T nullValue = 0;
         nullValue   = T(~nullValue);
@@ -103,7 +103,7 @@ public:
      * @return A value of type T that in the KVS represents null.
      */
     template <typename T, std::enable_if_t<std::is_signed<T>::value && !std::is_same<bool, T>::value, bool> = true>
-    static T GetNull()
+    static T GetNullValueForNullableType()
     {
         T nullValue;
         nullValue = 1u << ((sizeof(nullValue) * 8) - 1);
@@ -167,7 +167,7 @@ public:
     {
         if (aValue.IsNull())
         {
-            auto nullVal = GetNull<T>();
+            auto nullVal = GetNullValueForNullableType<T>();
             return WriteScalarValue(aPath, nullVal);
         }
         return WriteScalarValue(aPath, aValue.Value());
@@ -190,7 +190,7 @@ public:
             return err;
         }
 
-        if (tempIntegral == GetNull<T>())
+        if (tempIntegral == GetNullValueForNullableType<T>())
         {
             aValue.SetNull();
             return CHIP_NO_ERROR;
@@ -217,7 +217,7 @@ public:
             return err;
         }
 
-        if (tempIntegral == GetNull<T>())
+        if (tempIntegral == GetNullValueForNullableType<T>())
         {
             aValue.SetNull();
             return CHIP_NO_ERROR;
