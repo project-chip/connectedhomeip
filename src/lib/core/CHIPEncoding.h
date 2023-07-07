@@ -216,6 +216,13 @@ namespace LittleEndian {
 template <typename T>
 inline T HostSwap(T v);
 
+// For completeness of the set, we have identity.
+template <>
+inline uint8_t HostSwap<uint8_t>(uint8_t v)
+{
+    return v;
+}
+
 /**
  * This conditionally performs, as necessary for the target system, a
  * byte order swap by value of the specified 16-bit value, presumed to

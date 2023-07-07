@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,21 +18,24 @@
 
 #pragma once
 
-#include "AppEvent.h"
-#include "FreeRTOS.h"
-#include "timers.h" // provides FreeRTOS timer support
-#include <stdint.h>
-#ifdef CFG_PLF_RV32
-#include "asr_gpio.h"
-#else
-#include "duet_gpio.h"
-#endif
+#include "time-synchronization-delegate.h"
 
-class ButtonHandler
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace TimeSynchronization {
+class DefaultTimeSyncDelegate : public Delegate
 {
-public:
-    static void Init(void);
 
-private:
-    static void GpioInit(void);
+public:
+    DefaultTimeSyncDelegate() : Delegate(){};
+    void TimeZoneListChanged(const Span<TimeSyncDataProvider::TimeZoneStore> timeZoneList) override;
+    bool HandleUpdateDSTOffset(CharSpan name) override;
+    bool IsNTPAddressValid(CharSpan ntp) override;
+    bool IsNTPAddressDomain(CharSpan ntp) override;
 };
+
+} // namespace TimeSynchronization
+} // namespace Clusters
+} // namespace app
+} // namespace chip

@@ -31,14 +31,20 @@ public:
 
     EmberAfStatus GetMaskValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * mask);
     EmberAfStatus GetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * state);
+    EmberAfStatus GetSupportedValue(chip::EndpointId endpoint,
+                                    chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * suppported);
 
-    // Whenever there is change on Mask we should change State accordingly.
+    // A change in mask value will result in a corresponding change in state.
     EmberAfStatus SetMaskValue(chip::EndpointId endpoint,
                                const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> mask);
 
     // When State changes we are generating Notify event.
     EmberAfStatus SetStateValue(chip::EndpointId endpoint,
                                 chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> newState);
+
+    // A change in supported value will result in a corresponding change in mask and state.
+    EmberAfStatus SetSupportedValue(chip::EndpointId endpoint,
+                                    const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> supported);
 
 private:
     static RefrigeratorAlarmServer instance;

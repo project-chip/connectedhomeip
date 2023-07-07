@@ -187,7 +187,6 @@ private:
     static void CharacteristicNotificationCb(bt_gatt_h characteristic, char * value, int len, void * userData);
 
     // ==== Connection.
-    void InitConnectionData();
     void AddConnectionData(const char * remoteAddr);
     void RemoveConnectionData(const char * remoteAddr);
 
