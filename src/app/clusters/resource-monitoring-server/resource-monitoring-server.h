@@ -38,7 +38,7 @@ public:
     /**
      * Initialise the Resource Monitoring cluster.
      *
-     * @return CHIP_ERROR       If the cluster ID given ist not a valid Resource Monitoring cluster ID.
+     * @return CHIP_ERROR       If the cluster ID given is not a valid Resource Monitoring cluster ID.
      * @return CHIP_ERROR       If the endpoint and cluster ID have not been enabled in zap.
      * @return CHIP_ERROR       If the CommandHandler or Attribute Handler could not be registered.
      * @return CHIP_ERROR       If the AppInit() function returned an error.
@@ -87,7 +87,7 @@ private:
 
     uint32_t mFeature;
 
-    const bool mResetCondtitionCommandSupported = false;
+    const bool mResetConditionCommandSupported = false;
 
     /**
      * This checks if the clusters instance is a valid ResourceMonitoring cluster based on the AliasedClusters list.
@@ -114,7 +114,7 @@ public:
              bool aResetConditionCommandSupported) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
         AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDegradationDirection(aDegradationDirection),
-        mResetCondtitionCommandSupported(aResetConditionCommandSupported)
+        mResetConditionCommandSupported(aResetConditionCommandSupported)
     {
         mEndpointId = aEndpointId;
         mClusterId  = aClusterId;

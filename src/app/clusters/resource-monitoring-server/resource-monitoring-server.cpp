@@ -101,7 +101,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
                                                CommandHandlerInterface::CommandIdCallback callback, void * context)
 {
     ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");
-    if (mResetCondtitionCommandSupported)
+    if (mResetConditionCommandSupported)
     {
         callback(ResourceMonitoring::Commands::ResetCondition::Id, context);
     }
