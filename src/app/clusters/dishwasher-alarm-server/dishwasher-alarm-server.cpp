@@ -25,7 +25,6 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/error-mapping.h>
 
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -35,7 +34,6 @@ using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
 
 using namespace std;
-
 
 DishwasherAlarmServer DishwasherAlarmServer::instance;
 
@@ -139,8 +137,8 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, BitMask<
     return status;
 }
 
-void DishwasherAlarmServer::SendNotifyEvent(EndpointId endpointId, BitMask<AlarmMap> becameActive,
-                                              BitMask<AlarmMap> becameInactive, BitMask<AlarmMap> newState, BitMask<AlarmMap> mask)
+void DishwasherAlarmServer::SendNotifyEvent(EndpointId endpointId, BitMask<AlarmMap> becameActive, BitMask<AlarmMap> becameInactive,
+                                            BitMask<AlarmMap> newState, BitMask<AlarmMap> mask)
 {
     Events::Notify::Type event{ .active = becameActive, .inactive = becameInactive, .state = newState, .mask = mask };
     EventNumber eventNumber;
