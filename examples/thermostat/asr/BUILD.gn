@@ -90,7 +90,6 @@ asr_executable("thermostat") {
 
   sources = [
     "${examples_plat_dir}/CHIPDeviceManager.cpp",
-    "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/init_Matter.cpp",
     "${examples_plat_dir}/init_asrPlatform.cpp",
     "${examples_plat_dir}/shell/matter_shell.cpp",

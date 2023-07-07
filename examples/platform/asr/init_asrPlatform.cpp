@@ -36,15 +36,22 @@
 #include "asr_pinmux.h"
 #include "asr_sec_hw_common.h"
 #include "asr_uart.h"
-#else
+#elif defined CFG_PLF_DUET
 #include "duet_flash_kv.h"
 #include "duet_pinmux.h"
 #include "duet_uart.h"
 #include "duet_version.h"
+#else
+#include "lega_flash_kv.h"
+#include "lega_pinmux.h"
+#include "lega_uart.h"
+#include "lega_version.h"
 #endif
 #include "lega_ota_utils.h"
 #include "lega_rtos_api.h"
+#if defined(CFG_PLF_RV32) || defined(CFG_PLF_DUET)
 #include "printf_uart.h"
+#endif
 #include "tcpip.h"
 #if (CFG_EASY_LOG_ENABLE == 1)
 #include "elog.h"
@@ -58,10 +65,15 @@
 #define duet_pinmux_config asr_pinmux_config
 #define duet_uart_init printf_uart_init
 #define duet_flash_kv_init alto_flash_kv_init
-#else
+#elif defined CFG_PLF_DUET
 #define LEGA_UART0_INDEX DUET_UART0_INDEX
 #define LEGA_UART1_INDEX DUET_UART1_INDEX
 #define LEGA_UART2_INDEX DUET_UART2_INDEX
+#else
+#define duet_pinmux_config lega_pinmux_config
+#define duet_uart_init lega_uart_init
+#define duet_flash_kv_init lega_flash_kv_init
+#define UART1_INDEX LEGA_UART1_INDEX
 #endif
 
 #define UART1_TX_PIN PAD2
@@ -69,8 +81,10 @@
 
 #ifdef CFG_PLF_RV32
 extern asr_uart_dev_t lega_at_uart;
-#else
+#elif defined CFG_PLF_DUET
 extern duet_uart_dev_t lega_at_uart;
+#else
+extern lega_uart_dev_t lega_at_uart;
 #endif
 
 #ifdef __cplusplus
@@ -102,10 +116,10 @@ void at_uart_init(void)
     lega_at_uart.config.stop_bits    = STOP_1BIT;
     lega_at_uart.config.mode         = TX_RX_MODE;
     lega_at_uart.port                = UART1_INDEX;
-
+#if defined CFG_PLF_RV32 || defined CFG_PLF_DUET
     duet_pinmux_config(UART1_TX_PIN, PF_UART1);
     duet_pinmux_config(UART1_RX_PIN, PF_UART1);
-
+#endif
     // register uart callback func for receiving at command
     lega_at_uart.priv = (void *) (at_handle_uartirq);
     duet_uart_init(&lega_at_uart);
@@ -144,13 +158,13 @@ void init_asrPlatform(void)
     elog_set_fmt(ELOG_LVL_VERBOSE, ELOG_FMT_LVL | ELOG_FMT_TAG | ELOG_FMT_TIME);
     elog_start();
 #endif
-
+#if defined CFG_PLF_RV32 || defined CFG_PLF_DUET
     lega_wlan_efuse_read();
 
     lega_sram_rf_pta_init();
 
     lega_recovery_phy_fsm_config();
-
+#endif
     asr_security_engine_init();
 #if !CONFIG_ENABLE_CHIP_SHELL
     lega_at_init();

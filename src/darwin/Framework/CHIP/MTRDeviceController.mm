@@ -120,6 +120,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         _factory = factory;
         _deviceMapLock = OS_UNFAIR_LOCK_INIT;
         _nodeIDToDeviceMap = [NSMutableDictionary dictionary];
+        _commissionableBrowser = nil;
 
         _deviceControllerDelegateBridge = new MTRDeviceControllerDelegateBridge();
         if ([self checkForInitError:(_deviceControllerDelegateBridge != nullptr) logMsg:kErrorPairingInit]) {
@@ -166,7 +167,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         [device invalidate];
     }
     [self.nodeIDToDeviceMap removeAllObjects];
-    [self stopScan];
+    [self stopBrowseForCommissionables];
 
     [_factory controllerShuttingDown:self];
 }
@@ -465,12 +466,12 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         self->_operationalCredentialsDelegate->SetDeviceID(nodeId);
 
         auto errorCode = CHIP_ERROR_INVALID_ARGUMENT;
-        if (discoveredDevice.params.HasValue()) {
-            auto params = discoveredDevice.params.Value();
-            auto pinCode = static_cast<uint32_t>([[payload setupPasscode] unsignedLongValue]);
-            params.SetSetupPINCode(pinCode);
+        chip::Optional<chip::Controller::SetUpCodePairerParameters> params = discoveredDevice.params;
+        if (params.HasValue()) {
+            auto pinCode = static_cast<uint32_t>(payload.setupPasscode.unsignedLongValue);
+            params.Value().SetSetupPINCode(pinCode);
 
-            errorCode = self.cppCommissioner->EstablishPASEConnection(nodeId, params);
+            errorCode = self.cppCommissioner->EstablishPASEConnection(nodeId, params.Value());
         } else {
             // Try to get a QR code if possible (because it has a better
             // discriminator, etc), then fall back to manual code if that fails.
@@ -588,23 +589,31 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
 }
 
-- (BOOL)startScan:(id<MTRCommissionableBrowserDelegate>)delegate queue:(dispatch_queue_t)queue
+- (BOOL)startBrowseForCommissionables:(id<MTRCommissionableBrowserDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     auto block = ^BOOL {
-        self->_commissionableBrowser = [[MTRCommissionableBrowser alloc] initWithDelegate:delegate queue:queue];
-        return [self.commissionableBrowser start];
+        VerifyOrReturnValue(self.commissionableBrowser == nil, NO);
+
+        auto commissionableBrowser = [[MTRCommissionableBrowser alloc] initWithDelegate:delegate controller:self queue:queue];
+        VerifyOrReturnValue([commissionableBrowser start], NO);
+
+        self->_commissionableBrowser = commissionableBrowser;
+        return YES;
     };
 
     return [self syncRunOnWorkQueueWithBoolReturnValue:block error:nil];
 }
 
-- (BOOL)stopScan
+- (BOOL)stopBrowseForCommissionables
 {
     auto block = ^BOOL {
+        VerifyOrReturnValue(self.commissionableBrowser != nil, NO);
+
         auto commissionableBrowser = self.commissionableBrowser;
-        VerifyOrReturnValue(commissionableBrowser, NO);
+        VerifyOrReturnValue([commissionableBrowser stop], NO);
+
         self->_commissionableBrowser = nil;
-        return [commissionableBrowser stop];
+        return YES;
     };
 
     return [self syncRunOnWorkQueueWithBoolReturnValue:block error:nil];
@@ -911,6 +920,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 - (void)syncRunOnWorkQueue:(SyncWorkQueueBlock)block error:(NSError * __autoreleasing *)error
 {
+    VerifyOrDie(!chip::DeviceLayer::PlatformMgrImpl().IsWorkQueueCurrentQueue());
     VerifyOrReturn([self checkIsRunning:error]);
 
     dispatch_sync(_chipWorkQueue, ^{

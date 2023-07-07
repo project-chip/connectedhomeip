@@ -37,7 +37,10 @@ def GetUnionUnderlyingType(typeToCheck, matchingType=None):
 
     for t in typing.get_args(typeToCheck):
         if (matchingType is None):
-            if (t != type(None) and t != Nullable):
+            # Comparison below explicitly not using 'isinstance' as that doesn't do what we want.
+            # type_none is simple hack for Flake8 E721
+            type_none = type(None)
+            if (t != type_none and t != Nullable):
                 return t
         else:
             if (t == matchingType):
@@ -50,7 +53,7 @@ def GetUnionUnderlyingType(typeToCheck, matchingType=None):
 class ClusterObjectFieldDescriptor:
     Label: str = ''
     Tag: int = None
-    Type: Type = None
+    Type: type = None
 
     def _PutSingleElementToTLV(self, tag, val, elementType, writer: tlv.TLVWriter, debugPath: str = '?'):
         if issubclass(elementType, ClusterObject):
@@ -111,15 +114,15 @@ class ClusterObjectDescriptor:
     Fields: List[ClusterObjectFieldDescriptor]
 
     def GetFieldByTag(self, tag: int) -> ClusterObjectFieldDescriptor:
-        for field in self.Fields:
-            if field.Tag == tag:
-                return field
+        for _field in self.Fields:
+            if _field.Tag == tag:
+                return _field
         return None
 
     def GetFieldByLabel(self, label: str) -> ClusterObjectFieldDescriptor:
-        for field in self.Fields:
-            if field.Label == label:
-                return field
+        for _field in self.Fields:
+            if _field.Label == label:
+                return _field
         return None
 
     def _ConvertNonArray(self, debugPath: str, elementType, value: Any) -> Any:
@@ -176,10 +179,9 @@ class ClusterObjectDescriptor:
 
     def DictToTLVWithWriter(self, debugPath: str, tag, data: Mapping, writer: tlv.TLVWriter):
         writer.startStructure(tag)
-        for field in self.Fields:
-            val = data.get(field.Label, None)
-            field.PutFieldToTLV(field.Tag, val, writer,
-                                debugPath + f'.{field.Label}')
+        for _field in self.Fields:
+            val = data.get(_field.Label, None)
+            _field.PutFieldToTLV(_field.Tag, val, writer, debugPath + f'.{_field.Label}')
         writer.endContainer()
 
     def DictToTLV(self, data: dict) -> bytes:
@@ -268,9 +270,11 @@ class ClusterAttributeDescriptor:
     '''
     The ClusterAttributeDescriptor is used for holding an attribute's metadata like its cluster id, attribute id and its type.
 
-    Users should not initialize an object based on this class. Instead, users should pass the subclass objects to tell some methods what they want.
+    Users should not initialize an object based on this class. Instead, users should pass
+    the subclass objects to tell some methods what they want.
 
-    The implementation of this functions is quite tricky, it will create a cluster object on-the-fly, and use it for actual encode / decode routine to save lines of code.
+    The implementation of this functions is quite tricky, it will create a cluster object on-the-fly,
+    and use it for actual encode / decode routine to save lines of code.
     '''
 
     def __init_subclass__(cls, *args, **kwargs) -> None:
@@ -297,7 +301,8 @@ class ClusterAttributeDescriptor:
     @classmethod
     def FromTLV(cls, tlvBuffer: bytes):
         obj_class = cls._cluster_object
-        return obj_class.FromDict(obj_class.descriptor.TagDictToLabelDict('', {0: tlv.TLVReader(tlvBuffer).get().get('Any', {})})).Value
+        return obj_class.FromDict(
+            obj_class.descriptor.TagDictToLabelDict('', {0: tlv.TLVReader(tlvBuffer).get().get('Any', {})})).Value
 
     @classmethod
     def FromTagDictOrRawValue(cls, val: Any):
