@@ -464,7 +464,7 @@ bool Instance::IsSupportedMode(uint8_t modeValue)
         auto err = GetModeValueByIndex(i, value);
         if (err == CHIP_NO_ERROR && value == modeValue)
         {
-                return true;
+            return true;
         }
     }
     ChipLogDetail(Zcl, "Cannot find a mode with value %u", modeValue);

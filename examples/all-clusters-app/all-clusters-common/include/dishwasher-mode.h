@@ -38,17 +38,24 @@ const uint8_t ModeLight  = 2;
 class DishwasherModeInstance : public ModeBase::Instance
 {
 private:
-    detail::Structs::ModeTagStruct::Type modeTagsNormal[1] = { { .value = static_cast<uint16_t>(Clusters::DishwasherMode::ModeTag::kNormal) } };
-    detail::Structs::ModeTagStruct::Type modeTagsHeavy[2]  = { { .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kMax) },
-                                           { .value = static_cast<uint16_t>(Clusters::DishwasherMode::ModeTag::kHeavy) } };
-    detail::Structs::ModeTagStruct::Type modeTagsLight[3]  = { { .value = static_cast<uint16_t>(Clusters::DishwasherMode::ModeTag::kLight) },
-                                           { .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kNight) },
-                                           { .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kQuiet) } };
+    detail::Structs::ModeTagStruct::Type modeTagsNormal[1] = { { .value = static_cast<uint16_t>(
+                                                                     Clusters::DishwasherMode::ModeTag::kNormal) } };
+    detail::Structs::ModeTagStruct::Type modeTagsHeavy[2] = { { .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kMax) },
+                                                              { .value = static_cast<uint16_t>(
+                                                                    Clusters::DishwasherMode::ModeTag::kHeavy) } };
+    detail::Structs::ModeTagStruct::Type modeTagsLight[3] = {
+        { .value = static_cast<uint16_t>(Clusters::DishwasherMode::ModeTag::kLight) },
+        { .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kNight) },
+        { .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kQuiet) }
+    };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        BuildModeOptionStruct("Normal", Clusters::DishwasherMode::ModeNormal, DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsNormal)),
-        BuildModeOptionStruct("Heavy", Clusters::DishwasherMode::ModeHeavy, DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsHeavy)),
-        BuildModeOptionStruct("Light", Clusters::DishwasherMode::ModeLight, DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsLight)),
+        BuildModeOptionStruct("Normal", Clusters::DishwasherMode::ModeNormal,
+                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsNormal)),
+        BuildModeOptionStruct("Heavy", Clusters::DishwasherMode::ModeHeavy,
+                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsHeavy)),
+        BuildModeOptionStruct("Light", Clusters::DishwasherMode::ModeLight,
+                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsLight)),
     };
 
     CHIP_ERROR AppInit() override;

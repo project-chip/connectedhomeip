@@ -23,9 +23,8 @@ using namespace chip::app::Clusters::RvcRunMode;
 using namespace chip::app::Clusters::RvcCleanMode;
 using chip::Protocols::InteractionModel::Status;
 template <typename T>
-using List                 = chip::app::DataModel::List<T>;
-using ModeTagStructType    = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
-
+using List              = chip::app::DataModel::List<T>;
+using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
 CHIP_ERROR RvcRunModeInstance::AppInit()
 {

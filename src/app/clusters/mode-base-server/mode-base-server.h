@@ -184,8 +184,9 @@ public:
      * to copy into the buffer.
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
-    virtual CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex,
-                                          DataModel::List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) = 0;
+    virtual CHIP_ERROR
+    GetModeTagsByIndex(uint8_t modeIndex,
+                       DataModel::List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) = 0;
 
     /**
      * When a ChangeToMode command is received, if the NewMode value is a supported made, this function is called to 1) decide if

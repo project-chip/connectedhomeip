@@ -39,7 +39,8 @@ const uint8_t ModeRapidFreeze = 2;
 class TccModeInstance : public ModeBase::Instance
 {
 private:
-    detail::Structs::ModeTagStruct::Type modeTagsTccNormal[1]    = { { .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kAuto) } };
+    detail::Structs::ModeTagStruct::Type modeTagsTccNormal[1]    = { { .value = static_cast<uint16_t>(
+                                                                        Clusters::ModeBase::ModeTag::kAuto) } };
     detail::Structs::ModeTagStruct::Type modeTagsTccRapidCool[1] = {
         { .value = static_cast<uint16_t>(Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeTag::kRapidCool) }
     };

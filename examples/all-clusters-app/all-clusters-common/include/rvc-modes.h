@@ -38,14 +38,19 @@ const uint8_t ModeMapping  = 2;
 class RvcRunModeInstance : public ModeBase::Instance
 {
 private:
-    detail::Structs::ModeTagStruct::Type ModeTagsIdle[1]     = { { .value = static_cast<uint16_t>(Clusters::RvcRunMode::ModeTag::kIdle) } };
-    detail::Structs::ModeTagStruct::Type ModeTagsCleaning[1] = { { .value = static_cast<uint16_t>(Clusters::RvcRunMode::ModeTag::kCleaning) } };
+    detail::Structs::ModeTagStruct::Type ModeTagsIdle[1]     = { { .value =
+                                                                   static_cast<uint16_t>(Clusters::RvcRunMode::ModeTag::kIdle) } };
+    detail::Structs::ModeTagStruct::Type ModeTagsCleaning[1] = { { .value = static_cast<uint16_t>(
+                                                                       Clusters::RvcRunMode::ModeTag::kCleaning) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        BuildModeOptionStruct("Idle", Clusters::RvcRunMode::ModeIdle, DataModel::List<const detail::Structs::ModeTagStruct::Type>(ModeTagsIdle)),
-        BuildModeOptionStruct("Cleaning", Clusters::RvcRunMode::ModeCleaning, DataModel::List<const detail::Structs::ModeTagStruct::Type>(ModeTagsCleaning)),
-        BuildModeOptionStruct("Mapping", Clusters::RvcRunMode::ModeMapping,
-                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(ModeTagsIdle)), // todo set to no mode tags
+        BuildModeOptionStruct("Idle", Clusters::RvcRunMode::ModeIdle,
+                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(ModeTagsIdle)),
+        BuildModeOptionStruct("Cleaning", Clusters::RvcRunMode::ModeCleaning,
+                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(ModeTagsCleaning)),
+        BuildModeOptionStruct(
+            "Mapping", Clusters::RvcRunMode::ModeMapping,
+            DataModel::List<const detail::Structs::ModeTagStruct::Type>(ModeTagsIdle)), // todo set to no mode tags
     };
 
     CHIP_ERROR AppInit() override;
@@ -75,15 +80,21 @@ const uint8_t ModeDeepClean = 2;
 class RvcCleanModeInstance : public ModeBase::Instance
 {
 private:
-    detail::Structs::ModeTagStruct::Type modeTagsVac[1]   = { { .value = static_cast<uint16_t>(Clusters::RvcCleanMode::ModeTag::kVacuum) } };
-    detail::Structs::ModeTagStruct::Type modeTagsMop[1]   = { { .value = static_cast<uint16_t>(Clusters::RvcCleanMode::ModeTag::kMop) } };
+    detail::Structs::ModeTagStruct::Type modeTagsVac[1]   = { { .value = static_cast<uint16_t>(
+                                                                  Clusters::RvcCleanMode::ModeTag::kVacuum) } };
+    detail::Structs::ModeTagStruct::Type modeTagsMop[1]   = { { .value =
+                                                                  static_cast<uint16_t>(Clusters::RvcCleanMode::ModeTag::kMop) } };
     detail::Structs::ModeTagStruct::Type modeTagsBoost[2] = { { .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kMax) },
-                                           { .value = static_cast<uint16_t>(Clusters::RvcCleanMode::ModeTag::kDeepClean) } };
+                                                              { .value = static_cast<uint16_t>(
+                                                                    Clusters::RvcCleanMode::ModeTag::kDeepClean) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        BuildModeOptionStruct("Vacuum", Clusters::RvcCleanMode::ModeVacuum, DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsVac)),
-        BuildModeOptionStruct("Wash", Clusters::RvcCleanMode::ModeWash, DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsMop)),
-        BuildModeOptionStruct("Deep clean", Clusters::RvcCleanMode::ModeDeepClean, DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsBoost)),
+        BuildModeOptionStruct("Vacuum", Clusters::RvcCleanMode::ModeVacuum,
+                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsVac)),
+        BuildModeOptionStruct("Wash", Clusters::RvcCleanMode::ModeWash,
+                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsMop)),
+        BuildModeOptionStruct("Deep clean", Clusters::RvcCleanMode::ModeDeepClean,
+                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsBoost)),
     };
 
     CHIP_ERROR AppInit() override;
