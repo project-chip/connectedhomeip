@@ -95,7 +95,26 @@ void testHelperStorageAndRetrivalScalarValues(nlTestSuite * inSuite, DefaultAttr
     CHIP_ERROR err = persistenceProvider.WriteScalarValue(TestConcretePath, testValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    T valueReadBack;
+    T valueReadBack = 0;
+    err = persistenceProvider.ReadScalarValue(TestConcretePath, valueReadBack);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, valueReadBack == testValue);
+}
+
+/**
+ * Helper to test the storage and retrival of various nullable types from persistent storage.
+ * @tparam T The type of the value to store and retrieve
+ * @param testValue The test value to store and retrieve
+ */
+template <typename T>
+void testHelperStorageAndRetrivalScalarValues(nlTestSuite * inSuite, DefaultAttributePersistenceProvider & persistenceProvider,
+                                              DataModel::Nullable<T> testValue)
+{
+    CHIP_ERROR err = persistenceProvider.WriteScalarValue(TestConcretePath, testValue);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    DataModel::Nullable<T> valueReadBack(0);
     err = persistenceProvider.ReadScalarValue(TestConcretePath, valueReadBack);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
