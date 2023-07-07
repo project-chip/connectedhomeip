@@ -6,19 +6,10 @@ control on ASR platform.
 ---
 
 -   [Matter ASR All Clusters Example](#matter-asr-all-clusters-example)
-    -   [Supported Chips](#supported-chips)
     -   [Building and Commissioning](#building-and-commissioning)
     -   [Cluster Control](#cluster-control)
-    -   [Light switch press button and light status LED](#light-switch-press-button-and-light-status-led)
 
 ---
-
-## Supported Chips
-
-The Matter demo application is supported on:
-
--   ASR582X
--   ASR595X
 
 ## Building and Commissioning
 
@@ -42,13 +33,3 @@ For example,control the OnOff Cluster attribute:
 ./chip-tool onoff off <NODE ID> 1
 ./chip-tool onoff toggle <NODE ID> 1
 ```
-
-## Light switch press button and light status LED
-
-This demo uses button to test changing the light states and LED to show the
-state of these changes.
-
-|  Name  |  Pin  |
-| :----: | :---: |
-|  LED   | PAD6  |
-| BUTTON | PAD12 |

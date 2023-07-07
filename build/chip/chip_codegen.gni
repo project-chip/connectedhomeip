@@ -53,8 +53,18 @@ template("_chip_build_time_codegen") {
       rebase_path(target_gen_dir, root_build_dir),
       "--expected-outputs",
       rebase_path(_expected_outputs, root_build_dir),
-      rebase_path(_idl_file, root_build_dir),
     ]
+
+    if (defined(invoker.options)) {
+      foreach(option, invoker.options) {
+        args += [
+          "--option",
+          option,
+        ]
+      }
+    }
+
+    args += [ rebase_path(_idl_file, root_build_dir) ]
 
     inputs = [
       _idl_file,
@@ -313,11 +323,14 @@ template("chip_codegen") {
                                "generator",
                                "input",
                                "outputs",
+                               "options",
                                "public_configs",
                              ])
     }
   } else {
     _name = target_name
+
+    not_needed(invoker, [ "options" ])
 
     # This constructs a path like:
     #  FROM all-clusters-app.matter (inside examples/all-clusters-app/all-clusters-common/)

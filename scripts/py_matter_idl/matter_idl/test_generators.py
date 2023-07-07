@@ -32,6 +32,7 @@ except ImportError:
 
 from matter_idl.generators import GeneratorStorage
 from matter_idl.generators.cpp.application import CppApplicationGenerator
+from matter_idl.generators.cpp.tlvmeta import TLVMetaDataGenerator
 from matter_idl.generators.java import JavaClassGenerator, JavaJNIGenerator
 from matter_idl.matter_idl_types import Idl
 
@@ -121,6 +122,8 @@ class GeneratorTest:
             return JavaClassGenerator(storage, idl)
         if self.generator_name.lower() == 'cpp-app':
             return CppApplicationGenerator(storage, idl)
+        if self.generator_name.lower() == 'cpp-tlvmeta':
+            return TLVMetaDataGenerator(storage, idl, table_name="clusters_meta")
         if self.generator_name.lower() == 'custom-example-proto':
             sys.path.append(os.path.abspath(
                 os.path.join(os.path.dirname(__file__), '../examples')))
