@@ -159,10 +159,6 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
 
 chip::Protocols::InteractionModel::Status Instance::UpdateCondition(uint8_t aNewCondition)
 {
-    if (aNewCondition < 0 || aNewCondition > 100)
-    {
-        return Protocols::InteractionModel::Status::InvalidValue;
-    }
     auto oldCondition = mCondition;
     mCondition        = aNewCondition;
     if (mCondition != oldCondition)
