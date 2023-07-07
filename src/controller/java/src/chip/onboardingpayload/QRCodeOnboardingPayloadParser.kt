@@ -24,39 +24,6 @@ import java.util.concurrent.atomic.AtomicInteger
  *   to a OnboardingPayload object
  */
 class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
-  private fun extractPayload(inString: String): String {
-    var chipSegment = ""
-    val delimiter = '%'
-    val startIndices = mutableListOf<Int>()
-    startIndices.add(0)
-
-    for (i in inString.indices) {
-      if (inString[i] == delimiter) {
-        startIndices.add(i + 1)
-      }
-    }
-
-    // Find the first string between delimiters that starts with kQRCodePrefix
-    for (i in 0 until startIndices.size) {
-      val startIndex = startIndices[i]
-      val endIndex = if (i == startIndices.size - 1) inString.length else startIndices[i + 1] - 1
-      val length = if (endIndex != inString.length) endIndex - startIndex else inString.length
-      val segment = inString.substring(startIndex, startIndex + length)
-
-      // Find a segment that starts with kQRCodePrefix
-      if (segment.startsWith(kQRCodePrefix) && segment.length > kQRCodePrefix.length) {
-        chipSegment = segment
-        break
-      }
-    }
-
-    if (chipSegment.length > 0) {
-      return chipSegment.substring(kQRCodePrefix.length) // strip out prefix before returning
-    }
-
-    return chipSegment
-  }
-
   fun populatePayload(outPayload: OnboardingPayload) {
     var indexToReadFrom: AtomicInteger = AtomicInteger(0)
 
@@ -112,6 +79,15 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
       }
       index.addAndGet(numberOfBitsToRead)
       return dest
+    }
+
+    fun extractPayload(inString: String?): String {
+      return inString
+        ?.split('%')
+        ?.filter { s -> s.startsWith(kQRCodePrefix) }
+        ?.firstOrNull()
+        ?.substring(kQRCodePrefix.length)
+        ?: ""
     }
   }
 }
