@@ -71,6 +71,7 @@ class AndroidApp(Enum):
     TV_SERVER = auto()
     TV_CASTING_APP = auto()
     JAVA_MATTER_CONTROLLER = auto()
+    ST_DEVICE_APP = auto()
 
     def AppName(self):
         if self == AndroidApp.CHIP_TOOL:
@@ -81,6 +82,8 @@ class AndroidApp(Enum):
             return "tv-server"
         elif self == AndroidApp.TV_CASTING_APP:
             return "tv-casting"
+        elif self == AndroidApp.ST_DEVICE_APP:
+            return "st-device-app"
         else:
             raise Exception("Unknown app type: %r" % self)
 
@@ -91,6 +94,8 @@ class AndroidApp(Enum):
             gn_args["chip_config_network_layer_ble"] = False
         elif self == AndroidApp.TV_CASTING_APP:
             gn_args["chip_config_network_layer_ble"] = False
+        elif self == AndroidApp.ST_DEVICE_APP:
+            gn_args["chip_config_network_layer_ble"] = True
         return gn_args
 
     def ExampleName(self):
@@ -98,6 +103,8 @@ class AndroidApp(Enum):
             return "tv-app"
         elif self == AndroidApp.TV_CASTING_APP:
             return "tv-casting-app"
+        elif self == AndroidApp.ST_DEVICE_APP:
+            return "st-device-app"
         else:
             return None
 
@@ -301,20 +308,35 @@ class AndroidBuilder(Builder):
                         self.identifier, module),
                 )
         else:
-            self._Execute(
-                [
-                    "%s/examples/%s/android/App/gradlew"
-                    % (self.root, self.app.ExampleName()),
-                    "-p",
-                    "%s/examples/%s/android/App/" % (self.root,
-                                                     self.app.ExampleName()),
-                    "-PmatterBuildSrcDir=%s" % self.output_dir,
-                    "-PmatterSdkSourceBuild=false",
-                    "-PbuildDir=%s" % self.output_dir,
-                    "assembleDebug",
-                ],
-                title="Building Example " + self.identifier,
-            )
+            if self.app.ExampleName() == "st-device-app":
+                self._Execute(
+                    [
+                        "%s/examples/%s/android/App/gradlew"
+                        % (self.root, self.app.ExampleName()),
+                        "-p",
+                        "%s/examples/%s/android/App/" % (self.root,
+                                                         self.app.ExampleName()),
+                        "-PmatterBuildSrcDir=%s" % self.output_dir,
+                        "-PmatterSdkSourceBuild=false",
+                        ":app:assembleDebug",
+                    ],
+                    title="Building Example " + self.identifier,
+                )
+            else:
+                self._Execute(
+                    [
+                        "%s/examples/%s/android/App/gradlew"
+                        % (self.root, self.app.ExampleName()),
+                        "-p",
+                        "%s/examples/%s/android/App/" % (self.root,
+                                                         self.app.ExampleName()),
+                        "-PmatterBuildSrcDir=%s" % self.output_dir,
+                        "-PmatterSdkSourceBuild=false",
+                        "-PbuildDir=%s" % self.output_dir,
+                        "assembleDebug",
+                    ],
+                    title="Building Example " + self.identifier,
+                )
 
     def generate(self):
         self._Execute(
@@ -486,6 +508,46 @@ class AndroidBuilder(Builder):
 
                 self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
                 self.gradlewBuildExampleAndroid()
+            elif exampleName == "st-device-app":
+                jnilibs_dir = os.path.join(
+                    self.root,
+                    "examples/",
+                    self.app.ExampleName(),
+                    "android/App/app/libs/jniLibs",
+                    self.board.AbiName(),
+                )
+
+                libs_dir = os.path.join(
+                    self.root, "examples/", self.app.ExampleName(), "android/App/app/libs"
+                )
+
+                libs = ["libc++_shared.so", "libStDeviceApp.so"]
+
+                jars = {
+                    "OnboardingPayload.jar": "third_party/connectedhomeip/src/controller/java/OnboardingPayload.jar",
+                    "AndroidPlatform.jar": "third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar",
+                    "CHIPAppServer.jar": "third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar",
+                    "StDeviceApp.jar": "StDeviceApp.jar",
+                }
+
+                self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
+                self.gradlewBuildExampleAndroid()
+
+                output_dir = os.path.join(
+                    self.output_dir, "outputs", "apk"
+                )
+
+                self._Execute(
+                    ["mkdir", "-p", output_dir], title="Prepare outputs directory"
+                )
+
+                apk_dir = os.path.join(
+                    self.root, "examples", self.app.ExampleName(), "android/App/app/build/outputs/apk/debug"
+                )
+
+                self._Execute(
+                    ["cp", "-f", "-r", apk_dir, output_dir], title="Copying outputs"
+                )
 
             if (self.profile != AndroidProfile.DEBUG):
                 self.stripSymbols()

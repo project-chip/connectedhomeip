@@ -328,6 +328,7 @@ def BuildAndroidTarget():
         TargetPart('tv-casting-app', app=AndroidApp.TV_CASTING_APP),
         TargetPart('java-matter-controller',
                    app=AndroidApp.JAVA_MATTER_CONTROLLER),
+        TargetPart('st-device-app', app=AndroidApp.ST_DEVICE_APP),
     ])
 
     # Modifiers
