@@ -16,6 +16,7 @@ import enum
 import importlib
 
 from matter_idl.generators.cpp.application import CppApplicationGenerator
+from matter_idl.generators.cpp.tlvmeta import TLVMetaDataGenerator
 from matter_idl.generators.java import JavaClassGenerator, JavaJNIGenerator
 
 
@@ -28,6 +29,7 @@ class CodeGenerator(enum.Enum):
     JAVA_JNI = enum.auto()
     JAVA_CLASS = enum.auto()
     CPP_APPLICATION = enum.auto()
+    CPP_TLVMETA = enum.auto()
     CUSTOM = enum.auto()
 
     def Create(self, *args, **kargs):
@@ -37,6 +39,8 @@ class CodeGenerator(enum.Enum):
             return JavaClassGenerator(*args, **kargs)
         elif self == CodeGenerator.CPP_APPLICATION:
             return CppApplicationGenerator(*args, **kargs)
+        elif self == CodeGenerator.CPP_TLVMETA:
+            return TLVMetaDataGenerator(*args, **kargs)
         elif self == CodeGenerator.CUSTOM:
             # Use a package naming convention to find the custom generator:
             # ./matter_idl_plugin/__init__.py defines a subclass of CodeGenerator named CustomGenerator.
@@ -65,5 +69,6 @@ GENERATORS = {
     'java-jni': CodeGenerator.JAVA_JNI,
     'java-class': CodeGenerator.JAVA_CLASS,
     'cpp-app': CodeGenerator.CPP_APPLICATION,
+    'cpp-tlvmeta': CodeGenerator.CPP_TLVMETA,
     'custom': CodeGenerator.CUSTOM,
 }

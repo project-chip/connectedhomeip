@@ -285,6 +285,7 @@ source_set("efr32-common") {
 
   sources = [
     "${silabs_common_plat_dir}/LEDWidget.cpp",
+    "${silabs_common_plat_dir}/SoftwareFaultReports.cpp",
     "${silabs_common_plat_dir}/heap_4_silabs.c",
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",

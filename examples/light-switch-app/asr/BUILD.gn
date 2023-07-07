@@ -86,6 +86,7 @@ asr_executable("light_switch_app") {
   ]
 
   sources = [
+    "${examples_plat_dir}/ButtonHandler.cpp",
     "${examples_plat_dir}/CHIPDeviceManager.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/init_Matter.cpp",
@@ -93,9 +94,7 @@ asr_executable("light_switch_app") {
     "${examples_plat_dir}/shell/matter_shell.cpp",
     "src/AppTask.cpp",
     "src/BindingHandler.cpp",
-    "src/ButtonHandler.cpp",
     "src/DeviceCallbacks.cpp",
-    "src/LEDManager.cpp",
     "src/LightSwitch.cpp",
     "src/main.cpp",
   ]
@@ -111,8 +110,6 @@ asr_executable("light_switch_app") {
     sources += [ "${examples_plat_dir}/shell/launch_shell.cpp" ]
     include_dirs += [ "${examples_plat_dir}/shell" ]
   }
-
-  defines += [ "GENERIC_SWITCH_ENDPOINT=1" ]
 
   public_deps +=
       [ "${chip_root}/examples/light-switch-app/light-switch-common" ]

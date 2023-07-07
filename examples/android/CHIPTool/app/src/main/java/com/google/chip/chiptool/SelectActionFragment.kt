@@ -40,12 +40,13 @@ import com.google.chip.chiptool.util.FragmentUtil
 /** Fragment to select from various options to interact with a CHIP device. */
 class SelectActionFragment : Fragment() {
   private var _binding: SelectActionFragmentBinding? = null
-  private val binding get() = _binding!!
+  private val binding
+    get() = _binding!!
 
   override fun onCreateView(
-      inflater: LayoutInflater,
-      container: ViewGroup?,
-      savedInstanceState: Bundle?
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
   ): View {
     _binding = SelectActionFragmentBinding.inflate(inflater, container, false)
 
@@ -67,9 +68,9 @@ class SelectActionFragment : Fragment() {
     binding.basicClusterBtn.setOnClickListener { handleBasicClicked() }
     binding.attestationTestBtn.setOnClickListener { handleAttestationTestClicked() }
     binding.clusterInteractionBtn.setOnClickListener { handleClusterInteractionClicked() }
-    binding.provisionCustomFlowBtn.setOnClickListener{  handleProvisionCustomFlowClicked() }
+    binding.provisionCustomFlowBtn.setOnClickListener { handleProvisionCustomFlowClicked() }
     binding.wildcardBtn.setOnClickListener { handleWildcardClicked() }
-    binding.unpairDeviceBtn.setOnClickListener{ handleUnpairDeviceClicked() }
+    binding.unpairDeviceBtn.setOnClickListener { handleUnpairDeviceClicked() }
 
     return binding.root
   }
@@ -153,9 +154,10 @@ class SelectActionFragment : Fragment() {
   }
 
   private fun showFragment(fragment: Fragment, showOnBack: Boolean = true) {
-    val fragmentTransaction = parentFragmentManager
-      .beginTransaction()
-      .replace(R.id.nav_host_fragment, fragment, fragment.javaClass.simpleName)
+    val fragmentTransaction =
+      parentFragmentManager
+        .beginTransaction()
+        .replace(R.id.nav_host_fragment, fragment, fragment.javaClass.simpleName)
 
     if (showOnBack) {
       fragmentTransaction.addToBackStack(null)
@@ -164,95 +166,69 @@ class SelectActionFragment : Fragment() {
     fragmentTransaction.commit()
   }
 
-  /**
-   * Notifies listener of Scan QR code button click.
-   */
+  /** Notifies listener of Scan QR code button click. */
   private fun handleScanQrCodeClicked() {
     showFragment(BarcodeFragment.newInstance(), false)
   }
 
-  /**
-   * Notifies listener of Light On/Off & Level Cluster button click.
-   */
+  /** Notifies listener of Light On/Off & Level Cluster button click. */
   private fun handleOnOffClicked() {
     showFragment(OnOffClientFragment.newInstance())
   }
 
-  /**
-   * Notifies listener of Sensor Clusters button click.
-   */
+  /** Notifies listener of Sensor Clusters button click. */
   private fun handleSensorClicked() {
     showFragment(SensorClientFragment.newInstance())
   }
 
-  /**
-   * Notifies listener of Multi-admin Clusters button click.
-   */
+  /** Notifies listener of Multi-admin Clusters button click. */
   private fun handleMultiAdminClicked() {
     showFragment(MultiAdminClientFragment.newInstance())
   }
 
-  /**
-   * Notifies listener of Operational Credentials Clusters button click.
-   */
+  /** Notifies listener of Operational Credentials Clusters button click. */
   private fun handleOpCredClicked() {
     showFragment(OpCredClientFragment.newInstance())
   }
 
-  /**
-   * Notifies listener of Basic Clusters button click.
-   */
+  /** Notifies listener of Basic Clusters button click. */
   private fun handleBasicClicked() {
     showFragment(BasicClientFragment.newInstance())
   }
 
-  /**
-   * Notifies listener of attestation command button clicked.
-   */
+  /** Notifies listener of attestation command button clicked. */
   private fun handleAttestationTestClicked() {
     showFragment(AttestationTestFragment.newInstance())
   }
 
-  /**
-   * Notifies listener of cluster interaction button click.
-   */
+  /** Notifies listener of cluster interaction button click. */
   private fun handleClusterInteractionClicked() {
     showFragment(ClusterInteractionFragment.newInstance())
   }
 
-  /**
-   * Notifies listener of wildcard button click.
-   */
+  /** Notifies listener of wildcard button click. */
   private fun handleWildcardClicked() {
     showFragment(WildcardFragment.newInstance())
   }
 
-  /**
-   * Notifies listener of unpair button click.
-   */
+  /** Notifies listener of unpair button click. */
   private fun handleUnpairDeviceClicked() {
     showFragment(UnpairDeviceFragment.newInstance())
   }
 
-  /**
-   * Notifies listener of provision-WiFi-credentials button click.
-   */
+  /** Notifies listener of provision-WiFi-credentials button click. */
   private fun handleProvisionWiFiCredentialsClicked() {
     getCallback()?.SetNetworkType(ProvisionNetworkType.WIFI)
     showFragment(BarcodeFragment.newInstance(), false)
   }
 
-  /**
-   * Notifies listener of provision-Thread-credentials button click.
-   */
+  /** Notifies listener of provision-Thread-credentials button click. */
   private fun handleProvisionThreadCredentialsClicked() {
     getCallback()?.SetNetworkType(ProvisionNetworkType.THREAD)
     showFragment(BarcodeFragment.newInstance(), false)
   }
 
-  /**
-   * Notifies listener of provision-custom-flow button click.
-   */
+  /** Notifies listener of provision-custom-flow button click. */
   private fun handleProvisionCustomFlowClicked() {
     showFragment(BarcodeFragment.newInstance(), false)
   }
