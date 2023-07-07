@@ -21,14 +21,20 @@ import chip.devicecontroller.ChipDeviceController
 import com.matter.controller.commands.common.CredentialsIssuer
 
 class PairCodeWifiCommand(controller: ChipDeviceController, credsIssue: CredentialsIssuer?) :
-  PairingCommand(controller, "code-wifi", credsIssue, PairingModeType.CODE, PairingNetworkType.WIFI) {
+  PairingCommand(
+    controller,
+    "code-wifi",
+    credsIssue,
+    PairingModeType.CODE,
+    PairingNetworkType.WIFI
+  ) {
   override fun runCommand() {
     currentCommissioner()
       .pairDeviceWithCode(
         getNodeId(),
         getOnboardingPayload(),
         getDiscoverOnce(),
-        getUseOnlyOnNetworkDiscovery(),        
+        getUseOnlyOnNetworkDiscovery(),
         null,
         getWifiNetworkCredentials(),
       )

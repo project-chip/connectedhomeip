@@ -18,15 +18,13 @@
 
 package chip.jsontlv
 
+import chip.tlv.*
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonParser
 import kotlin.test.assertFailsWith
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import chip.tlv.*
-import chip.jsontlv.fromJsonString
-import chip.jsontlv.toJsonString
 
 @RunWith(JUnit4::class)
 class JsonToTlvToJsonTest {

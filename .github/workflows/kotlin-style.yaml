@@ -48,7 +48,7 @@ jobs:
       - name: Format kotlin files
         run: |
           find src examples -name '*.kt' \
-            | xargs java -jar /tmp/ktfmt-0.44-jar-with-dependencies.jar
+            | xargs java -jar /tmp/ktfmt-0.44-jar-with-dependencies.jar --google-style
 
       - name: Ensure git works in current working directory
         run: git config --global --add safe.directory `pwd`
