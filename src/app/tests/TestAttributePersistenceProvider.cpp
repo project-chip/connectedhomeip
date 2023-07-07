@@ -63,17 +63,13 @@ void TestStorageAndRetrivalByteSpans(nlTestSuite * inSuite, void * inContext)
     TestPersistentStorageDelegate storageDelegate;
     DefaultAttributePersistenceProvider persistenceProvider;
 
-    // Failure before Init
-    uint8_t valueArray[1] = { 0x42 };
-    ByteSpan value(valueArray);
-    CHIP_ERROR err = persistenceProvider.WriteValue(TestConcretePath, value);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
-
     // Init
-    err = persistenceProvider.Init(&storageDelegate);
+    ChipError err = persistenceProvider.Init(&storageDelegate);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Store ByteSpan of size 1
+    uint8_t valueArray[1] = { 0x42 };
+    ByteSpan value(valueArray);
     err = persistenceProvider.WriteValue(TestConcretePath, value);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -99,7 +95,26 @@ void testHelperStorageAndRetrivalScalarValues(nlTestSuite * inSuite, DefaultAttr
     CHIP_ERROR err = persistenceProvider.WriteScalarValue(TestConcretePath, testValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    T valueReadBack;
+    T valueReadBack = 0;
+    err             = persistenceProvider.ReadScalarValue(TestConcretePath, valueReadBack);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, valueReadBack == testValue);
+}
+
+/**
+ * Helper to test the storage and retrival of various nullable types from persistent storage.
+ * @tparam T The type of the value to store and retrieve
+ * @param testValue The test value to store and retrieve
+ */
+template <typename T>
+void testHelperStorageAndRetrivalScalarValues(nlTestSuite * inSuite, DefaultAttributePersistenceProvider & persistenceProvider,
+                                              DataModel::Nullable<T> testValue)
+{
+    CHIP_ERROR err = persistenceProvider.WriteScalarValue(TestConcretePath, testValue);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    DataModel::Nullable<T> valueReadBack(0);
     err = persistenceProvider.ReadScalarValue(TestConcretePath, valueReadBack);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -107,7 +122,7 @@ void testHelperStorageAndRetrivalScalarValues(nlTestSuite * inSuite, DefaultAttr
 }
 
 /**
- * Tests the storage and retrival of data from the KVS of types  bool, int8_t, int16_t, int32_t, int64_t.
+ * Tests the storage and retrival of data from the KVS of types  bool, uint8_t, uint16_t, uint32_t, uint64_t.
  */
 void TestStorageAndRetrivalScalarValues(nlTestSuite * inSuite, void * inContext)
 {
@@ -148,7 +163,58 @@ void TestStorageAndRetrivalScalarValues(nlTestSuite * inSuite, void * inContext)
 }
 
 /**
- * Tests the storage and retrival of data from the KVS of DataModel::Nullable types bool int8_t, int16_t, int32_t, int64_t.
+ * Tests the storage and retrival of data from the KVS of types  int8_t, int16_t, int32_t, int64_t.
+ */
+void TestStorageAndRetrivalSignedScalarValues(nlTestSuite * inSuite, void * inContext)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider persistenceProvider;
+
+    // Init
+    CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Test int8_t
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int8_t(0));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int8_t(42));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int8_t(-127));
+
+    // Test int16_t
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int16_t(0));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int16_t(0x7fff));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int16_t(0x8000));
+
+    // Test int32_t
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int32_t(0));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int32_t(0x7fffffff));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int32_t(0x80000000));
+
+    // Test int64_t
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int64_t(0));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int64_t(0x7fffffffffffffff));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int64_t(0x8000000000000000));
+
+    // Finishing
+    persistenceProvider.Shutdown();
+}
+
+void TestGetNullFunctions(nlTestSuite * inSuite, void * inContext)
+{
+    NL_TEST_ASSERT(inSuite, AttributePersistenceProvider::GetNullValueForNullableType<bool>() == uint8_t(0xff));
+
+    NL_TEST_ASSERT(inSuite, AttributePersistenceProvider::GetNullValueForNullableType<uint8_t>() == uint8_t(0xff));
+    NL_TEST_ASSERT(inSuite, AttributePersistenceProvider::GetNullValueForNullableType<uint16_t>() == uint16_t(0xffff));
+    NL_TEST_ASSERT(inSuite, AttributePersistenceProvider::GetNullValueForNullableType<uint32_t>() == uint32_t(0xffffffff));
+    NL_TEST_ASSERT(inSuite, AttributePersistenceProvider::GetNullValueForNullableType<uint64_t>() == uint64_t(0xffffffffffffffff));
+
+    NL_TEST_ASSERT(inSuite, AttributePersistenceProvider::GetNullValueForNullableType<int8_t>() == int8_t(0x80));
+    NL_TEST_ASSERT(inSuite, AttributePersistenceProvider::GetNullValueForNullableType<int16_t>() == int16_t(0x8000));
+    NL_TEST_ASSERT(inSuite, AttributePersistenceProvider::GetNullValueForNullableType<int32_t>() == int32_t(0x80000000));
+    NL_TEST_ASSERT(inSuite, AttributePersistenceProvider::GetNullValueForNullableType<int64_t>() == int64_t(0x8000000000000000));
+}
+
+/**
+ * Tests the storage and retrival of data from the KVS of DataModel::Nullable types bool, uint8_t, uint16_t, uint32_t, uint64_t.
  */
 void TestStorageAndRetrivalNullableScalarValues(nlTestSuite * inSuite, void * inContext)
 {
@@ -196,6 +262,54 @@ void TestStorageAndRetrivalNullableScalarValues(nlTestSuite * inSuite, void * in
     testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<uint64_t>(0x0100000001));
     testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<uint64_t>(0xfffffffffffffffe));
     auto nullVal64 = DataModel::Nullable<uint64_t>();
+    nullVal64.SetNull();
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, nullVal64);
+
+    // Finishing
+    persistenceProvider.Shutdown();
+}
+
+/**
+ * Tests the storage and retrival of data from the KVS of DataModel::Nullable types int8_t, int16_t, int32_t, int64_t.
+ */
+void TestStorageAndRetrivalSignedNullableScalarValues(nlTestSuite * inSuite, void * inContext)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider persistenceProvider;
+
+    // Init
+    CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Test int8_t
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<int8_t>(0));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<int8_t>(42));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<int8_t>(-127));
+    auto nullVal8 = DataModel::Nullable<int8_t>();
+    nullVal8.SetNull();
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, nullVal8);
+
+    // Test int16_t
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<int16_t>(0));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<int16_t>(0x7fff));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<int16_t>(-0x7fff));
+    auto nullVal16 = DataModel::Nullable<int16_t>();
+    nullVal16.SetNull();
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, nullVal16);
+
+    // Test int32_t
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<int32_t>(0));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<int32_t>(0x7fffffff));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<int32_t>(-0x7fffffff));
+    auto nullVal32 = DataModel::Nullable<int32_t>();
+    nullVal32.SetNull();
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, nullVal32);
+
+    // Test int64_t
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<int64_t>(0));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<int64_t>(0x7fffffffffffffff));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, DataModel::Nullable<int64_t>(-0x7fffffffffffffff));
+    auto nullVal64 = DataModel::Nullable<int64_t>();
     nullVal64.SetNull();
     testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, nullVal64);
 
@@ -268,11 +382,14 @@ void TestBufferTooSmallErrors(nlTestSuite * inSuite, void * inContext)
 
 namespace {
 const nlTest sTests[] = {
-    NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of ByteSpans", TestStorageAndRetrivalByteSpans),
-    NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of scalar values", TestStorageAndRetrivalScalarValues),
-    NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of nullable scalar values",
-                TestStorageAndRetrivalNullableScalarValues),
-    NL_TEST_DEF("Test AttributePersistenceProvider: Small buffer errors", TestBufferTooSmallErrors), NL_TEST_SENTINEL()
+    NL_TEST_DEF("Storage and retrival of ByteSpans", TestStorageAndRetrivalByteSpans),
+    NL_TEST_DEF("Storage and retrival of unsigned scalar values", TestStorageAndRetrivalScalarValues),
+    NL_TEST_DEF("Storage and retrival of signed scalar values", TestStorageAndRetrivalSignedScalarValues),
+    NL_TEST_DEF("Check GetNullValueForNullableType return values", TestGetNullFunctions),
+    NL_TEST_DEF("Storage and retrival of unsigned nullable scalar values", TestStorageAndRetrivalNullableScalarValues),
+    NL_TEST_DEF("Storage and retrival of signed nullable scalar values", TestStorageAndRetrivalSignedNullableScalarValues),
+    NL_TEST_DEF("Small buffer errors", TestBufferTooSmallErrors),
+    NL_TEST_SENTINEL()
 };
 }
 

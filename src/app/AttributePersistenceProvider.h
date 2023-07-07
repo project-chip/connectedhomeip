@@ -19,6 +19,7 @@
 #include <app/data-model/Nullable.h>
 #include <app/util/attribute-metadata.h>
 #include <cstring>
+#include <inttypes.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/Span.h>
@@ -79,7 +80,7 @@ public:
      * @return A value of type T that in the KVS represents null.
      */
     template <typename T, std::enable_if_t<std::is_same<bool, T>::value, bool> = true>
-    static uint8_t GetNull()
+    static uint8_t GetNullValueForNullableType()
     {
         return 0xff;
     }
@@ -90,7 +91,7 @@ public:
      * @return A value of type T that in the KVS represents null.
      */
     template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true>
-    static T GetNull()
+    static T GetNullValueForNullableType()
     {
         T nullValue = 0;
         nullValue   = T(~nullValue);
@@ -103,11 +104,10 @@ public:
      * @return A value of type T that in the KVS represents null.
      */
     template <typename T, std::enable_if_t<std::is_signed<T>::value && !std::is_same<bool, T>::value, bool> = true>
-    static T GetNull()
+    static T GetNullValueForNullableType()
     {
-        T nullValue;
-        nullValue = 1u << ((sizeof(nullValue) * 8) - 1);
-        return nullValue;
+        T shiftBit = 1;
+        return T(shiftBit << ((sizeof(T) * 8) - 1));
     }
 
     // The following API provides helper functions to simplify the access of commonly used types.
@@ -116,28 +116,28 @@ public:
     // their nullable varieties, and bool.
 
     /**
-     * Write an attribute value of type unsigned intX or bool to non-volatile memory.
+     * Write an attribute value of type intX, uintX or bool to non-volatile memory.
      *
      * @param [in] aPath the attribute path for the data being written.
      * @param [in] aValue the data to write.
      */
-    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
+    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
     CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, T & aValue)
     {
         uint8_t value[sizeof(T)];
         auto w = Encoding::LittleEndian::BufferWriter(value, sizeof(T));
-        w.EndianPut(aValue, sizeof(T));
+        w.EndianPut(uint64_t(aValue), sizeof(T));
 
         return WriteValue(aPath, ByteSpan(value));
     }
 
     /**
-     * Read an attribute of type unsigned intX or bool from non-volatile memory.
+     * Read an attribute of type intX, uintX or bool from non-volatile memory.
      *
      * @param [in]     aPath the attribute path for the data being persisted.
      * @param [in,out] aValue where to place the data.
      */
-    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
+    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
     CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, T & aValue)
     {
         uint8_t attrData[sizeof(T)];
@@ -152,34 +152,34 @@ public:
         }
 
         chip::Encoding::LittleEndian::Reader r(tempVal.data(), tempVal.size());
-        r.RawRead(&aValue);
+        r.RawReadLowLevelBeCareful(&aValue);
         return r.StatusCode();
     }
 
     /**
-     * Write an attribute value of type nullable unsigned intX or bool to non-volatile memory.
+     * Write an attribute value of type nullable intX, uintX or bool to non-volatile memory.
      *
      * @param [in] aPath the attribute path for the data being written.
      * @param [in] aValue the data to write.
      */
-    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
+    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
     CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
         if (aValue.IsNull())
         {
-            auto nullVal = GetNull<T>();
+            auto nullVal = GetNullValueForNullableType<T>();
             return WriteScalarValue(aPath, nullVal);
         }
         return WriteScalarValue(aPath, aValue.Value());
     }
 
     /**
-     * Read an attribute of type nullable unsigned intX from non-volatile memory.
+     * Read an attribute of type nullable intX, uintX from non-volatile memory.
      *
      * @param [in]     aPath the attribute path for the data being persisted.
      * @param [in,out] aValue where to place the data.
      */
-    template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true>
+    template <typename T, std::enable_if_t<std::is_integral<T>::value && !std::is_same<bool, T>::value, bool> = true>
     CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
         T tempIntegral;
@@ -190,7 +190,7 @@ public:
             return err;
         }
 
-        if (tempIntegral == GetNull<T>())
+        if (tempIntegral == GetNullValueForNullableType<T>())
         {
             aValue.SetNull();
             return CHIP_NO_ERROR;
@@ -217,7 +217,7 @@ public:
             return err;
         }
 
-        if (tempIntegral == GetNull<T>())
+        if (tempIntegral == GetNullValueForNullableType<T>())
         {
             aValue.SetNull();
             return CHIP_NO_ERROR;
