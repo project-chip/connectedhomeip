@@ -129,7 +129,7 @@ style:
             - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/QRCodeBasicOnboardingPayloadGenerator.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
-            - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"            
+            - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
     UnusedParameter:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/bluetooth/BluetoothManager.kt"
@@ -203,7 +203,7 @@ exceptions:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Argument.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/Main.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
-            - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"            
+            - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
     SwallowedException:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/SensorClientFragment.kt"
@@ -224,7 +224,7 @@ naming:
             - "**/src/controller/java/tests/chip/tlv/TlvReaderTest.kt"
             - "**/src/controller/java/tests/chip/jsontlv/JsonToTlvToJsonTest.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
-            - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"            
+            - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
             - "**/examples/android/CHIPTest/app/src/test/java/com/tcl/chip/chiptest/ExampleUnitTest.kt"
     ConstructorParameterNaming:
         excludes:
@@ -268,7 +268,7 @@ complexity:
             - "**/src/controller/java/src/chip/tlv/TlvWriter.kt"
             - "**/src/controller/java/tests/chip/jsontlv/JsonToTlvToJsonTest.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
-            - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"            
+            - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
             - "**/src/controller/java/tests/chip/tlv/TlvReadWriteTest.kt"
     NestedBlockDepth:
         excludes:
@@ -287,7 +287,7 @@ complexity:
             - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadParser.kt"
             - "**/src/controller/java/tests/chip/jsontlv/JsonToTlvToJsonTest.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
-            - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"            
+            - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
             - "**/src/controller/java/tests/chip/tlv/TlvReaderTest.kt"
     LargeClass:
         excludes:
