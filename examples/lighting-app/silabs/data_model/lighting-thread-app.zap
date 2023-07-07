@@ -2957,21 +2957,21 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "included": 1
+              "included": 0
             },
             {
               "name": "RadioFaultChange",
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "included": 1
+              "included": 0
             },
             {
               "name": "NetworkFaultChange",
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "included": 1
+              "included": 0
             },
             {
               "name": "BootReason",
@@ -7856,7 +7856,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "included": 1
+              "included": 0
             }
           ]
         },

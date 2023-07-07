@@ -907,7 +907,7 @@ server cluster PowerSource = 47 {
   }
 
   enum BatChargeLevelEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -921,15 +921,15 @@ server cluster PowerSource = 47 {
 
   enum BatCommonDesignationEnum : ENUM16 {
     kUnspecified = 0;
-    kAaa = 1;
-    kAa = 2;
+    kAAA = 1;
+    kAA = 2;
     kC = 3;
     kD = 4;
     k4v5 = 5;
     k6v0 = 6;
     k9v0 = 7;
-    k12aa = 8;
-    kAaaa = 9;
+    k12AA = 8;
+    kAAAA = 9;
     kA = 10;
     kB = 11;
     kF = 12;
@@ -938,9 +938,9 @@ server cluster PowerSource = 47 {
     kSubC = 15;
     kA23 = 16;
     kA27 = 17;
-    kBa5800 = 18;
+    kBA5800 = 18;
     kDuplex = 19;
-    k4sr44 = 20;
+    k4SR44 = 20;
     k523 = 21;
     k531 = 22;
     k15v0 = 23;
@@ -949,39 +949,39 @@ server cluster PowerSource = 47 {
     k45v0 = 26;
     k67v5 = 27;
     kJ = 28;
-    kCr123a = 29;
-    kCr2 = 30;
-    k2cr5 = 31;
-    kCrP2 = 32;
-    kCrV3 = 33;
-    kSr41 = 34;
-    kSr43 = 35;
-    kSr44 = 36;
-    kSr45 = 37;
-    kSr48 = 38;
-    kSr54 = 39;
-    kSr55 = 40;
-    kSr57 = 41;
-    kSr58 = 42;
-    kSr59 = 43;
-    kSr60 = 44;
-    kSr63 = 45;
-    kSr64 = 46;
-    kSr65 = 47;
-    kSr66 = 48;
-    kSr67 = 49;
-    kSr68 = 50;
-    kSr69 = 51;
-    kSr516 = 52;
-    kSr731 = 53;
-    kSr712 = 54;
-    kLr932 = 55;
+    kCR123A = 29;
+    kCR2 = 30;
+    k2CR5 = 31;
+    kCRP2 = 32;
+    kCRV3 = 33;
+    kSR41 = 34;
+    kSR43 = 35;
+    kSR44 = 36;
+    kSR45 = 37;
+    kSR48 = 38;
+    kSR54 = 39;
+    kSR55 = 40;
+    kSR57 = 41;
+    kSR58 = 42;
+    kSR59 = 43;
+    kSR60 = 44;
+    kSR63 = 45;
+    kSR64 = 46;
+    kSR65 = 47;
+    kSR66 = 48;
+    kSR67 = 49;
+    kSR68 = 50;
+    kSR69 = 51;
+    kSR516 = 52;
+    kSR731 = 53;
+    kSR712 = 54;
+    kLR932 = 55;
     kA5 = 56;
     kA10 = 57;
     kA13 = 58;
     kA312 = 59;
     kA675 = 60;
-    kAc41e = 61;
+    kAC41E = 61;
     k10180 = 62;
     k10280 = 63;
     k10440 = 64;
@@ -991,7 +991,7 @@ server cluster PowerSource = 47 {
     k14650 = 68;
     k15270 = 69;
     k16340 = 70;
-    kRcr123a = 71;
+    kRCR123A = 71;
     k17500 = 72;
     k17670 = 73;
     k18350 = 74;
@@ -1024,8 +1024,8 @@ server cluster PowerSource = 47 {
   }
 
   enum WiredCurrentTypeEnum : ENUM8 {
-    kAc = 0;
-    kDc = 1;
+    kAC = 0;
+    kDC = 1;
   }
 
   enum WiredFaultEnum : ENUM8 {
@@ -2182,9 +2182,6 @@ endpoint 0 {
   }
 
   server cluster GeneralDiagnostics {
-    emits event HardwareFaultChange;
-    emits event RadioFaultChange;
-    emits event NetworkFaultChange;
     emits event BootReason;
     callback attribute networkInterfaces;
     callback attribute rebootCount default = 0x0000;
