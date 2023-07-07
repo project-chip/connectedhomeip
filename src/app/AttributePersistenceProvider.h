@@ -22,6 +22,7 @@
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/Span.h>
+#include <inttypes.h>
 
 namespace chip {
 namespace app {
@@ -105,8 +106,8 @@ public:
     template <typename T, std::enable_if_t<std::is_signed<T>::value && !std::is_same<bool, T>::value, bool> = true>
     static T GetNullValueForNullableType()
     {
-        T nullValue;
-        nullValue = 1u << ((sizeof(nullValue) * 8) - 1);
+        T nullValue = 0;
+        nullValue = 1LU << ((sizeof(nullValue) * 8) - 1);
         return nullValue;
     }
 
@@ -116,7 +117,7 @@ public:
     // their nullable varieties, and bool.
 
     /**
-     * Write an attribute value of type unsigned intX or bool to non-volatile memory.
+     * Write an attribute value of type intX, uintX or bool to non-volatile memory.
      *
      * @param [in] aPath the attribute path for the data being written.
      * @param [in] aValue the data to write.
@@ -132,7 +133,7 @@ public:
     }
 
     /**
-     * Read an attribute of type unsigned intX or bool from non-volatile memory.
+     * Read an attribute of type intX, uintX or bool from non-volatile memory.
      *
      * @param [in]     aPath the attribute path for the data being persisted.
      * @param [in,out] aValue where to place the data.
@@ -157,12 +158,12 @@ public:
     }
 
     /**
-     * Write an attribute value of type nullable unsigned intX or bool to non-volatile memory.
+     * Write an attribute value of type nullable intX, uintX or bool to non-volatile memory.
      *
      * @param [in] aPath the attribute path for the data being written.
      * @param [in] aValue the data to write.
      */
-    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
+    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
     CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
         if (aValue.IsNull())
@@ -174,12 +175,12 @@ public:
     }
 
     /**
-     * Read an attribute of type nullable unsigned intX from non-volatile memory.
+     * Read an attribute of type nullable intX, uintX from non-volatile memory.
      *
      * @param [in]     aPath the attribute path for the data being persisted.
      * @param [in,out] aValue where to place the data.
      */
-    template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true>
+    template <typename T, std::enable_if_t<std::is_integral<T>::value && !std::is_same<bool, T>::value, bool> = true>
     CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
         T tempIntegral;
