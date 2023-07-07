@@ -157,7 +157,8 @@ PyChipError pychip_DeviceController_DiscoverCommissionableNodesDeviceType(chip::
 PyChipError pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Controller::DeviceCommissioner * devCtrl);
 
 PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::DeviceCommissioner * devCtrl, uint64_t nodeId,
-                                                        uint32_t setupPasscode, const uint8_t filterType, const char * filterParam);
+                                                        uint32_t setupPasscode, const uint8_t filterType, const char * filterParam,
+                                                        uint32_t discoveryTimeoutMsec);
 
 PyChipError pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFunct callback, void * pythonContext);
 
@@ -432,7 +433,8 @@ PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommiss
 }
 
 PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::DeviceCommissioner * devCtrl, uint64_t nodeId,
-                                                        uint32_t setupPasscode, const uint8_t filterType, const char * filterParam)
+                                                        uint32_t setupPasscode, const uint8_t filterType, const char * filterParam,
+                                                        uint32_t discoveryTimeoutMsec)
 {
     Dnssd::DiscoveryFilter filter(static_cast<Dnssd::DiscoveryFilterType>(filterType));
     switch (static_cast<Dnssd::DiscoveryFilterType>(filterType))
@@ -468,8 +470,8 @@ PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::Device
     }
 
     sPairingDelegate.SetExpectingPairingComplete(true);
-    CHIP_ERROR err =
-        sPairingDeviceDiscoveryDelegate.Init(nodeId, setupPasscode, sCommissioningParameters, &sPairingDelegate, devCtrl);
+    CHIP_ERROR err = sPairingDeviceDiscoveryDelegate.Init(nodeId, setupPasscode, sCommissioningParameters, &sPairingDelegate,
+                                                          devCtrl, discoveryTimeoutMsec);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
     devCtrl->RegisterDeviceDiscoveryDelegate(&sPairingDeviceDiscoveryDelegate);
     return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));

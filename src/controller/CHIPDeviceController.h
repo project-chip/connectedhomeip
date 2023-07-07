@@ -189,16 +189,6 @@ public:
         return nullptr;
     }
 
-    System::Layer * GetSystemLayer()
-    {
-        if (mSystemState)
-        {
-            return mSystemState->SystemLayer();
-        }
-
-        return nullptr;
-    }
-
     CHIP_ERROR GetPeerAddressAndPort(NodeId peerId, Inet::IPAddress & addr, uint16_t & port);
 
     /**

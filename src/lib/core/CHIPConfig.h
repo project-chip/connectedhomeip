@@ -1346,18 +1346,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS
 
 /**
- *  @def CHIP_CONFIG_ON_NETWORK_PAIRER_DISCOVERY_TIMEOUT_SECS
- *
- *  @brief
- *    This is the default timeout for the discovery of devices by
- *    the on network pairer.
- *
- */
-#ifndef CHIP_CONFIG_ON_NETWORK_PAIRER_DISCOVERY_TIMEOUT_SECS
-#define CHIP_CONFIG_ON_NETWORK_PAIRER_DISCOVERY_TIMEOUT_SECS 30
-#endif // CHIP_CONFIG_ON_NETWORK_PAIRER_DISCOVERY_TIMEOUT_SECS
-
-/**
  * @def CHIP_CONFIG_NUM_CD_KEY_SLOTS
  *
  * @brief Number of custom CD signing keys supported by default CD keystore

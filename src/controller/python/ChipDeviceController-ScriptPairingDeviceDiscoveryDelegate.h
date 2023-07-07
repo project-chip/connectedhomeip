@@ -21,9 +21,8 @@
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 
 #include <controller/CHIPDeviceController.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
-
-constexpr uint32_t kDeviceDiscoveredTimeout = CHIP_CONFIG_ON_NETWORK_PAIRER_DISCOVERY_TIMEOUT_SECS * chip::kMillisecondsPerSecond;
 
 namespace chip {
 namespace Controller {
@@ -32,7 +31,8 @@ class ScriptPairingDeviceDiscoveryDelegate : public DeviceDiscoveryDelegate
 {
 public:
     CHIP_ERROR Init(NodeId nodeId, uint32_t setupPasscode, CommissioningParameters commissioningParams,
-                    ScriptDevicePairingDelegate * pairingDelegate, DeviceCommissioner * activeDeviceCommissioner)
+                    ScriptDevicePairingDelegate * pairingDelegate, DeviceCommissioner * activeDeviceCommissioner,
+                    uint32_t discoveryTimeoutMsec)
     {
         mNodeId                   = nodeId;
         mSetupPasscode            = setupPasscode;
@@ -40,9 +40,8 @@ public:
         mPairingDelegate          = pairingDelegate;
         mActiveDeviceCommissioner = activeDeviceCommissioner;
         VerifyOrReturnError(mActiveDeviceCommissioner != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(mActiveDeviceCommissioner->GetSystemLayer() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        return mActiveDeviceCommissioner->GetSystemLayer()->StartTimer(System::Clock::Milliseconds32(kDeviceDiscoveredTimeout),
-                                                                       OnDiscoveredTimeout, this);
+        return chip::DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(discoveryTimeoutMsec), OnDiscoveredTimeout,
+                                                           this);
     }
     void OnDiscoveredDevice(const Dnssd::DiscoveredNodeData & nodeData);
 
