@@ -277,9 +277,12 @@ complexity:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/AddressCommissioningFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
-            - "**/src/controller/java/tests/chip/tlv/TlvReaderTest.kt"
+            - "**/src/controller/java/src/chip/onboardingpayload/Base38.kt"
+            - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadParser.kt"
             - "**/src/controller/java/tests/chip/jsontlv/JsonToTlvToJsonTest.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
+            - "**/src/controller/java/tests/chip/tlv/TlvReaderTest.kt"
     LargeClass:
         excludes:
             - "**/src/controller/java/tests/chip/tlv/TlvReadWriteTest.kt"
