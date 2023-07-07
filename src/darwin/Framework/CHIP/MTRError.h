@@ -63,19 +63,19 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
      * MTRErrorCodeUnknownSchema means the schema for the given cluster/attribute,
      * cluster/event, or cluster/command combination is not known.
      */
-    MTRErrorCodeUnknownSchema MTR_NEWLY_AVAILABLE = 12,
+    MTRErrorCodeUnknownSchema API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 12,
     /**
      * MTRErrorCodeSchemaMismatch means that provided data did not match the
      * expected schema.
      */
-    MTRErrorCodeSchemaMismatch MTR_NEWLY_AVAILABLE = 13,
+    MTRErrorCodeSchemaMismatch API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 13,
     /**
      * MTRErrorCodeTLVDecodeFailed means that the TLV being decoded was malformed in
      * some way.  This can include things like lengths running past the end of
      * the buffer, strings that are not actually UTF-8, and various other
      * TLV-level failures.
      */
-    MTRErrorCodeTLVDecodeFailed MTR_NEWLY_AVAILABLE = 14,
+    MTRErrorCodeTLVDecodeFailed API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 14,
 };
 // clang-format on
 
