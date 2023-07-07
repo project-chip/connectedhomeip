@@ -17,10 +17,10 @@
  */
 
 #pragma once
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/util/af.h>
-#include <app-common/zap-generated/cluster-objects.h>
 
 namespace chip {
 namespace app {
