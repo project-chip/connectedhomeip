@@ -271,7 +271,6 @@ complexity:
     LongParameterList:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterDetailFragment.kt"
-            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Command.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
     LongMethod:
         excludes:
