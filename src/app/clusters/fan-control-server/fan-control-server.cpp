@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,6 +24,7 @@
 #include <assert.h>
 #include <math.h>
 
+#include "fan-control.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -35,381 +37,731 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::FanControl;
 using namespace chip::app::Clusters::FanControl::Attributes;
+using chip::Protocols::InteractionModel::Status;
 
-namespace {
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace FanControl {
 
-// Indicates if the write operation is from the cluster server itself
-bool gWriteFromClusterLogic = false;
-
-EmberAfStatus SetFanModeToOff(EndpointId endpointId)
+Instance::Instance(EndpointId aEndpointId, FanModeSequenceEnum aFanModeSequence, uint32_t aFeature, Delegate * aDelegate) :
+    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), FanControl::Id),
+    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), FanControl::Id), mEndpointId(aEndpointId), mFeatureMap(aFeature),
+    mFanModeSequence(aFanModeSequence), mDelegate(aDelegate)
 {
-    FanModeEnum currentFanMode;
-    EmberAfStatus status = FanMode::Get(endpointId, &currentFanMode);
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    Init();
+}
 
-    if (currentFanMode != FanModeEnum::kOff)
+Instance::Instance(EndpointId aEndpointId, FanModeSequenceEnum aFanModeSequence, uint8_t aSpeedMax, uint32_t aFeature,
+                   Delegate * aDelegate) :
+    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), FanControl::Id),
+    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), FanControl::Id), mEndpointId(aEndpointId), mFeatureMap(aFeature),
+    mFanModeSequence(aFanModeSequence), mSpeedMax(aSpeedMax), mDelegate(aDelegate)
+{
+    Init();
+}
+
+Instance::Instance(EndpointId aEndpointId, FanModeSequenceEnum aFanModeSequence, uint8_t aSpeedMax, RockBitmap aRockSupport,
+                   WindBitmap aWindSupport, uint32_t aFeature, Delegate * aDelegate) :
+    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), FanControl::Id),
+    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), FanControl::Id), mEndpointId(aEndpointId), mFeatureMap(aFeature),
+    mFanModeSequence(aFanModeSequence), mSpeedMax(aSpeedMax), mRockSupport(aRockSupport), mWindSupport(aWindSupport),
+    mDelegate(aDelegate)
+{
+    Init();
+}
+
+CHIP_ERROR Instance::Init()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Check if the cluster has been selected in zap
+    if (!emberAfContainsServer(mEndpointId, FanControl::Id))
     {
-        status = FanMode::Set(endpointId, FanModeEnum::kOff);
+        ChipLogError(Zcl, "FanControl: The cluster with ID %lu was not enabled in zap.", long(mClusterId));
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    else
+    {
+        mDelegate->SetParent(this);
+
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
+        VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+        loadPersistentAttributes(); // TODO
+
+        // TODO Delegate Init()
+
+        if (mFanMode == FanModeEnum::kOff)
+        {
+            // TODO: Set up other attributes and delegate callback
+        }
+        else if (mFanMode == FanModeEnum::kAuto)
+        {
+            // TODO: Set up other attributes and delegate callback
+        }
+        else
+        {
+            // TODO: Call FanMode callback
+        }
+    }
+
+    return err;
+}
+
+CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    case FanMode::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mFanMode));
+        break;
+
+    case FanModeSequence::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mFanModeSequence));
+        break;
+
+    case PercentSetting::Id:
+        if (mPercentSetting.IsNull())
+        {
+            ReturnErrorOnFailure(aEncoder.EncodeNull());
+        }
+        else
+        {
+            ReturnErrorOnFailure(aEncoder.Encode(mPercentSetting.Value()));
+        }
+        break;
+
+    case PercentCurrent::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mPercentCurrent));
+        break;
+
+    case SpeedMax::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mSpeedMax));
+        break;
+
+    case SpeedSetting::Id:
+        if
+        {
+            mSpeedSetting.IsNull()
+        }
+        {
+            ReturnErrorOnFailure(aEncoder.EncodeNull());
+        }
+        else
+        {
+            ReturnErrorOnFailure(aEncoder.Encode(mSpeedSetting.Value()));
+        }
+        break;
+
+    case SpeedCurrent::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mSpeedCurrent));
+        break;
+
+    case RockSupport::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mRockSupport));
+        break;
+
+    case RockSetting::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mRockSetting));
+        break;
+
+    case WindSupport::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mWindSupport));
+        break;
+
+    case WindSetting::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mWindSetting));
+        break;
+
+    case AirflowDirection::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mAirflowDirection));
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, AttributeValueDecoder & aDecoder)
+{
+    Status status;
+
+    switch (attributePath.mAttributeId)
+    {
+    case FanMode::Id:
+        status = handleFanModeWrite(aDecoder);
+        return StatusIB(status).ToChipError();
+
+    case PercentSetting::Id:
+        status = handlePercentSettingWrite(aDecoder);
+        return StatusIB(status).ToChipError();
+
+    case SpeedSetting::Id:
+        if (SupportsMultiSpeed())
+        {
+            status = handleSpeedSettingWrite(aDecoder);
+        }
+        else
+        {
+            status = Status::UnsupportedAttribute;
+        }
+
+        return StatusIB(status).ToChipError();
+
+    case RockSetting::Id:
+        if (SupportsRock())
+        {
+            status = handleRockSettingWrite(aDecoder);
+        }
+        else
+        {
+            status = Status::UnsupportedAttribute;
+        }
+
+        return StatusIB(status).ToChipError();
+
+    case WindSetting::Id:
+        if (SupportsWind())
+        {
+            status = handleWindSettingWrite(aDecoder);
+        }
+        else
+        {
+            status = Status::UnsupportedAttribute;
+        }
+
+        return StatusIB(status).ToChipError();
+
+    case AirflowDirection::Id:
+        if (SupportsAirflowDirection())
+        {
+            status = handleAirflowDirectionWrite(aDecoder);
+        }
+        else
+        {
+            status = Status::UnsupportedAttribute;
+        }
+
+        return StatusIB(status).ToChipError();
+    }
+}
+
+template <typename RequestT, typename FuncT>
+void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
+{
+    if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
+    {
+        RequestT requestPayload;
+
+        // If the command matches what the caller is looking for, let's mark this as being handled
+        // even if errors happen after this. This ensures that we don't execute any fall-back strategies
+        // to handle this command since at this point, the caller is taking responsibility for handling
+        // the command in its entirety, warts and all.
+        //
+        handlerContext.SetCommandHandled();
+
+        if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
+                                                     Protocols::InteractionModel::Status::InvalidCommand);
+            return;
+        }
+
+        func(handlerContext, requestPayload);
+    }
+}
+
+// This function is called by the interaction model engine when a command destined for this instance is received.
+void Instance::InvokeCommand(HandlerContext & handlerContext)
+{
+    switch (handlerContext.mRequestPath.mCommandId)
+    {
+    case Commands::Step::Id:
+        ChipLogDetail(Zcl, "FanControl: Handling Step Command");
+
+        HandleCommand<Commands::Step::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { handleStep(ctx, commandData); });
+    }
+}
+
+// List the commands supported by this instance.
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                               CommandHandlerInterface::CommandIdCallback callback, void * context)
+{
+    if (SupportsStep())
+    {
+        callback(FanControl::Commands::Step::Id, context);
+    }
+    return CHIP_NO_ERROR;
+}
+
+Status chip::app::Clusters::FanControl::Instance::UpdateFanMode(FanModeEnum fanMode)
+{
+    if (fanMode == FanModeEnum::kOn)
+    {
+        ChipLogProgress(Zcl, "FanControl: Fan Mode On deprecated");
+        fanMode = FanModeEnum::kHigh;
+    }
+    else if (fanMode == FanModeEnum::kSmart)
+    {
+        ChipLogProgress(Zcl, "FanControl: Fan Mode Smart deprecated");
+        if (SupportsAuto(attributePath.mEndpointId) &&
+            ((mFanModeSequence == FanModeSequenceEnum::kOffLowHighAuto) ||
+             (mFanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto)))
+        {
+            fanMode = FanModeEnum::kAuto;
+        }
+        else
+        {
+            fanMode = FanModeEnum::kHigh;
+        }
+    }
+
+    if (mFanMode != fanMode)
+    {
+        mFanMode = fanMode;
+        ChipLogProgress(Zcl, "FanControl: fanMode change: %" PRIu8 "", fanMode);
+
+        // TODO: Write Value to Persistent Storage
+        MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::FanMode::Id);
+    }
+
+    return Status::Success;
+}
+
+Status Instance::UpdatePercentSetting(DataModel::Nullable<Percent> percentSetting)
+{
+    Status status;
+
+    if (percentSetting.IsNull())
+    {
+        status = Status::WriteIgnored;
+    }
+    else
+    {
+        if (percentSetting > mPercentMax)
+        {
+            status = Status::ConstraintError;
+        }
+        else
+        {
+            if (mPercentSetting != percentSetting)
+            {
+                mPercentSetting = percentSetting;
+                ChipLogProgress(Zcl, "FanControl: percentSetting change: %" PRIu8 "", percentSetting);
+                MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::PercentSetting::Id);
+            }
+            status = Status::Success;
+        }
+    }
+    return status;
+}
+
+Status Instance::UpdatePercentCurrent(Percent percentCurrent)
+{
+    Status status;
+
+    if (percentCurrent > mPercentMax)
+    {
+        status = Status::ConstraintError;
+    }
+    else
+    {
+        if (percentCurrent > mPercentMax)
+        {
+            status = Status::ConstraintError;
+        }
+        else
+        {
+            if (mPercentCurrent != percentCurrent)
+            {
+                mPercentCurrent = percentCurrent;
+                ChipLogProgress(Zcl, "FanControl: percentCurrent change: %" PRIu8 "", percentCurrent);
+                MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::PercentCurrent::Id);
+            }
+            status = Status::Success;
+        }
+    }
+    return status;
+}
+
+Status Instance::UpdateSpeedSetting(DataModel::Nullable<uint8_t> speedSetting)
+{
+    Status status;
+
+    if (speedSetting.IsNull())
+    {
+        status = Status::WriteIgnored;
+    }
+    else
+    {
+        if (speedSetting > mSpeedMax)
+        {
+            status = Status::ConstraintError;
+        }
+        else
+        {
+            mSpeedSetting = speedSetting;
+            status        = Status::Success;
+            ChipLogProgress(Zcl, "FanControl: speedSetting change: %" PRIu8 "", speedSetting);
+            MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::SpeedSetting::Id);
+        }
     }
 
     return status;
 }
 
-bool HasFeature(EndpointId endpoint, Feature feature)
+Status Instance::UpdateSpeedCurrent(uint8_t speedCurrent)
 {
-    bool success;
-    uint32_t featureMap;
-    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+    Status status;
 
-    return success ? ((featureMap & to_underlying(feature)) != 0) : false;
-}
-
-inline bool SupportsMultiSpeed(EndpointId endpointId)
-{
-    return HasFeature(endpointId, Feature::kMultiSpeed);
-}
-
-inline bool SupportsAuto(EndpointId endpointId)
-{
-    return HasFeature(endpointId, Feature::kAuto);
-}
-
-inline bool SupportsRocking(EndpointId endpointId)
-{
-    return HasFeature(endpointId, Feature::kRocking);
-}
-
-inline bool SupportsWind(EndpointId endpointId)
-{
-    return HasFeature(endpointId, Feature::kWind);
-}
-
-inline bool SupportsStep(EndpointId endpointId)
-{
-    return HasFeature(endpointId, Feature::kStep);
-}
-
-inline bool SupportsAirflowDirection(EndpointId endpointId)
-{
-    return HasFeature(endpointId, Feature::kAirflowDirection);
-}
-
-} // anonymous namespace
-
-// =============================================================================
-// Pre-change callbacks for cluster attributes
-// =============================================================================
-
-using Status = Protocols::InteractionModel::Status;
-
-Protocols::InteractionModel::Status
-MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttributePath & attributePath,
-                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
-{
-    Protocols::InteractionModel::Status res;
-
-    switch (attributePath.mAttributeId)
+    if (speedCurrent > mSpeedMax)
     {
-    case FanMode::Id: {
-        if (*value == to_underlying(FanModeEnum::kOn))
-        {
-            FanMode::Set(attributePath.mEndpointId, FanModeEnum::kHigh);
-            res = Status::WriteIgnored;
-        }
-        else if (*value == to_underlying(FanModeEnum::kSmart))
-        {
-            FanModeSequenceEnum fanModeSequence;
-            EmberAfStatus status = FanModeSequence::Get(attributePath.mEndpointId, &fanModeSequence);
-            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::Failure);
-
-            if (SupportsAuto(attributePath.mEndpointId) &&
-                ((fanModeSequence == FanModeSequenceEnum::kOffLowHighAuto) ||
-                 (fanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto)))
-            {
-                FanMode::Set(attributePath.mEndpointId, FanModeEnum::kAuto);
-            }
-            else
-            {
-                FanMode::Set(attributePath.mEndpointId, FanModeEnum::kHigh);
-            }
-            res = Status::WriteIgnored;
-        }
-        else
-        {
-            res = Status::Success;
-        }
-        break;
+        status = Status::ConstraintError;
     }
-    case SpeedSetting::Id: {
-        if (SupportsMultiSpeed(attributePath.mEndpointId))
-        {
-            // Check if the SpeedSetting is null.
-            if (NumericAttributeTraits<uint8_t>::IsNullValue(*value))
-            {
+    else
+    {
+        mSpeedCurrent = speedCurrent;
+        status        = Status::Success;
+        ChipLogProgress(Zcl, "FanControl: speedCurrent change: %" PRIu8 "", speedCurrent);
+        MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::SpeedCurrent::Id);
+    }
 
-                if (gWriteFromClusterLogic)
+    return status;
+}
+
+Status Instance::UpdateRockSetting(RockBitmap rockSetting)
+{
+    Status status;
+    if (rockSetting.Raw() & mRockSupport.Raw() == rockSetting.Raw())
+    {
+        if (mRockSetting != rockSetting)
+        {
+            mRockSetting = rockSetting;
+            ChipLogProgress(Zcl, "FanControl: rockSetting change: %" PRIu8 "", rockSetting);
+            MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::RockSetting::Id);
+        }
+        status = Status::Success;
+    }
+    else
+    {
+        status = Status::ConstraintError;
+    }
+
+    return status;
+}
+
+Status Instance::UpdateWindSetting(WindBitmap windSetting)
+{
+    Status status;
+    if (windSetting.Raw() & mWindSupport.Raw() == windSetting.Raw())
+    {
+        if (mWindSetting != windSetting)
+        {
+            mWindSetting = windSetting;
+            ChipLogProgress(Zcl, "FanControl: windSetting change: %" PRIu8 "", windSetting);
+            MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::WindSetting::Id);
+        }
+        status = Status::Success;
+    }
+    else
+    {
+        status = Status::ConstraintError;
+    }
+}
+
+Status Instance::UpdateAirflowDirection(AirflowDirectionEnum airflowDirection)
+{
+    if (mAirflowDirection != airflowDirection)
+    {
+        mAirflowDirection = airflowDirection;
+        ChipLogProgress(Zcl, "FanControl: airflowDirection change: %" PRIu8 "", airflowDirection);
+        MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::AirflowDirection::Id);
+    }
+
+    return Status::Success;
+}
+
+Status Instance::UpdatePercentageAndSpeedSetting(DataModel::Nullable<Percent> percentSetting)
+{
+    Status status;
+    status = UpdatePercentSetting(percentSetting);
+    if (status == Status::Success)
+    {
+        if ((status == Status::Success) && SupportsMultiSpeed())
+        {
+            status = UpdateSpeedSetting(getSpeedFromPercent(percentSetting.Value(), mSpeedMax));
+        }
+    }
+    return status;
+}
+
+Status Instance::UpdatePercentageAndSpeedSetting(DataModel::Nullable<uint8_t> speedSetting)
+{
+    Status status;
+    status = UpdateSpeedSetting(speedSetting);
+    if (status == Status::Success)
+    {
+        if (status == Status::Success)
+        {
+            status = UpdatePercentSetting(getPercentFromSpeed(speedSetting.Value(), mSpeedMax));
+        }
+    }
+    return status
+}
+
+Status Instance::UpdatePercentageAndSpeedCurrent(Percent percentCurrent)
+{
+    Status status;
+    status = UpdatePercentCurrent(percentCurrent);
+    if (status == Status::Success)
+    {
+        if ((status == Status::Success) && SupportsMultiSpeed())
+        {
+            status = UpdateSpeedCurrent(getSpeedFromPercent(percentCurrent.Value(), mSpeedMax));
+        }
+    }
+    return status;
+}
+
+Status Instance::UpdatePercentageAndSpeedCurrent(uint8_t speedCurrent)
+{
+    Status status;
+    status = UpdateSpeedCurrent(speedCurrent);
+    if (status == Status::Success)
+    {
+        if (status == Status::Success)
+        {
+            status = UpdatePercentCurrent(getPercentFromSpeed(speedCurrent.Value(), mSpeedMax));
+        }
+    }
+    return status
+}
+
+Status Instance::nullifyPercentSetting()
+{
+    mPercentSetting.SetNull();
+}
+
+Status Instance::nullifySpeedSetting()
+{
+    mSpeedSetting.SetNull();
+}
+
+Status Instance::handleFanModeWrite(AttributeValueDecoder & aDecoder)
+{
+    Status status = Status::Success;
+    FanModeEnum fanMode;
+
+    if (aDecoder.Decode(fanMode) != CHIP_NO_ERROR)
+    {
+        status = Status::InvalidValue;
+    }
+    else
+    {
+        if (mFanMode != fanMode)
+        {
+            status = UpdateFanMode(fanMode);
+            if (status == Status::Success)
+            {
+                // Setting the FanMode value to Off SHALL set the values of PercentSetting and
+                // SpeedSetting attributes to 0 (zero).
+                if (fanMode == FanModeEnum::kOff)
                 {
-                    res                    = Status::Success;
-                    gWriteFromClusterLogic = false;
+                    status = UpdatePercentSetting(0);
+
+                    if (status == Status::Success)
+                    {
+                        status = UpdateSpeedSetting(0);
+                    }
+
+                    if (status == Status::Success)
+                    {
+                        // Call into Delegate to handle updates
+                        if (mDelegate->HandleFanModeOff(mPercentSetting, mSpeedSetting) != CHIP_NO_ERROR)
+                        {
+                            status = Status::Failure;
+                        }
+                    }
+                }
+                // Setting the FanMode value to Auto SHALL set the values of PercentSetting and
+                // SpeedSetting attributes to null.
+                else if (fanMode == FanModeEnum::kAuto)
+                {
+                    status = nullifyPercentSetting();
+
+                    if (status == Status::Success)
+                    {
+                        status = nullifySpeedSetting();
+                    }
+
+                    if (status == Status::Success)
+                    {
+                        // Call into Delegate to handle updates
+                        if (mDelegate->HandleFanModeAuto(mPercentSetting, mSpeedSetting) != CHIP_NO_ERROR)
+                        {
+                            status = Status::Failure;
+                        }
+                    }
                 }
                 else
                 {
-                    res = Status::WriteIgnored;
-                }
-            }
-            else
-            {
-                uint8_t speedMax;
-                EmberAfStatus status = SpeedMax::Get(attributePath.mEndpointId, &speedMax);
-                VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::ConstraintError);
-
-                if (*value <= speedMax)
-                {
-                    res = Status::Success;
-                }
-                else
-                {
-                    res = Status::ConstraintError;
+                    // Call into Delegate to handle updates
+                    if (mDelegate->HandleFanMode(fanMode) != CHIP_NO_ERROR)
+                    {
+                        status = Status::Failure;
+                    }
                 }
             }
         }
-        else
-        {
-            res = Status::UnsupportedAttribute;
-        }
-        break;
-    }
-    case PercentSetting::Id: {
-        // Check if the PercentSetting is null.
-        if (NumericAttributeTraits<Percent>::IsNullValue(*value))
-        {
-            if (gWriteFromClusterLogic)
-            {
-                res                    = Status::Success;
-                gWriteFromClusterLogic = false;
-            }
-            else
-            {
-                res = Status::WriteIgnored;
-            }
-        }
-        else
-        {
-            res = Status::Success;
-        }
-        break;
-    }
-    case RockSetting::Id: {
-        if (SupportsRocking(attributePath.mEndpointId))
-        {
-            BitMask<RockBitmap> rockSupport;
-            EmberAfStatus status = RockSupport::Get(attributePath.mEndpointId, &rockSupport);
-            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::ConstraintError);
-            auto rawRockSupport = rockSupport.Raw();
-            if ((*value & rawRockSupport) == *value)
-            {
-                res = Status::Success;
-            }
-            else
-            {
-                res = Status::ConstraintError;
-            }
-        }
-        else
-        {
-            res = Status::UnsupportedAttribute;
-        }
-        break;
-    }
-    case WindSetting::Id: {
-        if (SupportsWind(attributePath.mEndpointId))
-        {
-            BitMask<WindBitmap> windSupport;
-            EmberAfStatus status = WindSupport::Get(attributePath.mEndpointId, &windSupport);
-            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::ConstraintError);
-            auto rawWindSupport = windSupport.Raw();
-            if ((*value & rawWindSupport) == *value)
-            {
-                res = Status::Success;
-            }
-            else
-            {
-                res = Status::ConstraintError;
-            }
-        }
-        else
-        {
-            res = Status::UnsupportedAttribute;
-        }
-        break;
-    }
-    case AirflowDirection::Id: {
-        if (SupportsAirflowDirection(attributePath.mEndpointId))
-        {
-            res = Status::Success;
-        }
-        else
-        {
-            res = Status::UnsupportedAttribute;
-        }
-        break;
-    }
-    default:
-        res = Status::Success;
-        break;
     }
 
-    return res;
+    return status;
 }
 
-void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
+Status Instance::handlePercentSettingWrite(AttributeValueDecoder & aDecoder)
 {
-    switch (attributePath.mAttributeId)
+    Status status = Status::Success;
+    DataModel::DecodableType<Percent> percentSetting;
+
+    if (aDecoder.Decode(percentSetting) != CHIP_NO_ERROR)
     {
-    case FanMode::Id: {
-        FanModeEnum mode;
-        EmberAfStatus status = FanMode::Get(attributePath.mEndpointId, &mode);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status);
-
-        // Setting the FanMode value to Off SHALL set the values of PercentSetting, PercentCurrent,
-        // SpeedSetting, SpeedCurrent attributes to 0 (zero).
-        if (mode == FanModeEnum::kOff)
-        {
-            status = PercentSetting::Set(attributePath.mEndpointId, 0);
-            VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                           ChipLogError(Zcl, "Failed to write PercentSetting with error: 0x%02x", status));
-
-            status = PercentCurrent::Set(attributePath.mEndpointId, 0);
-            VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                           ChipLogError(Zcl, "Failed to write PercentCurrent with error: 0x%02x", status));
-
-            if (SupportsMultiSpeed(attributePath.mEndpointId))
-            {
-                status = SpeedSetting::Set(attributePath.mEndpointId, 0);
-                VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                               ChipLogError(Zcl, "Failed to write SpeedSetting with error: 0x%02x", status));
-
-                status = SpeedCurrent::Set(attributePath.mEndpointId, 0);
-                VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                               ChipLogError(Zcl, "Failed to write SpeedCurrent with error: 0x%02x", status));
-            }
-        }
-
-        // Setting the attribute value to Auto SHALL set the values of PercentSetting, SpeedSetting (if present)
-        // to null.
-        if (mode == FanModeEnum::kAuto)
-        {
-            gWriteFromClusterLogic = true;
-            status                 = PercentSetting::SetNull(attributePath.mEndpointId);
-            VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                           ChipLogError(Zcl, "Failed to write PercentSetting with error: 0x%02x", status));
-
-            if (SupportsMultiSpeed(attributePath.mEndpointId))
-            {
-                gWriteFromClusterLogic = true;
-                status                 = SpeedSetting::SetNull(attributePath.mEndpointId);
-                VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                               ChipLogError(Zcl, "Failed to write SpeedSetting with error: 0x%02x", status));
-            }
-        }
-        break;
+        status = Status::InvalidValue;
     }
-    case PercentSetting::Id: {
-        DataModel::Nullable<Percent> percentSetting;
-        EmberAfStatus status = PercentSetting::Get(attributePath.mEndpointId, percentSetting);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status && !percentSetting.IsNull());
-
-        // If PercentSetting is set to 0, the server SHALL set the FanMode attribute value to Off.
-        if (percentSetting.Value() == 0)
+    else
+    {
+        if (mPercentSetting != percentSetting)
         {
-            status = SetFanModeToOff(attributePath.mEndpointId);
-            VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                           ChipLogError(Zcl, "Failed to set FanMode to off with error: 0x%02x", status));
-        }
+            status = UpdatePercentageAndSpeedSetting(percentSetting);
 
-        if (SupportsMultiSpeed(attributePath.mEndpointId))
-        {
-            // Adjust SpeedSetting from a percent value change for PercentSetting
-            // speed = ceil( SpeedMax * (percent * 0.01) )
-            uint8_t speedMax;
-            status = SpeedMax::Get(attributePath.mEndpointId, &speedMax);
-            VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                           ChipLogError(Zcl, "Failed to get SpeedMax with error: 0x%02x", status));
-
-            DataModel::Nullable<uint8_t> currentSpeedSetting;
-            status = SpeedSetting::Get(attributePath.mEndpointId, currentSpeedSetting);
-            VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                           ChipLogError(Zcl, "Failed to get SpeedSetting with error: 0x%02x", status));
-
-            float percent        = percentSetting.Value();
-            uint8_t speedSetting = static_cast<uint8_t>(ceil(speedMax * (percent * 0.01)));
-
-            if (currentSpeedSetting.IsNull() || speedSetting != currentSpeedSetting.Value())
+            // Call into Delegate to handle updates
+            if ((status == Status::Success) &&
+                (mDelegate->HandlePercentSpeedSettingChange(mPercentSetting, mSpeedSetting) != CHIP_NO_ERROR))
             {
-                status = SpeedSetting::Set(attributePath.mEndpointId, speedSetting);
-                VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                               ChipLogError(Zcl, "Failed to set SpeedSetting with error: 0x%02x", status));
+                status = Status::Failure;
             }
         }
-        break;
     }
-    case SpeedSetting::Id: {
-        if (SupportsMultiSpeed(attributePath.mEndpointId))
-        {
-            DataModel::Nullable<uint8_t> speedSetting;
-            EmberAfStatus status = SpeedSetting::Get(attributePath.mEndpointId, speedSetting);
-            VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status && !speedSetting.IsNull());
 
-            // If SpeedSetting is set to 0, the server SHALL set the FanMode attribute value to Off.
-            if (speedSetting.Value() == 0)
-            {
-                status = SetFanModeToOff(attributePath.mEndpointId);
-                VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                               ChipLogError(Zcl, "Failed to set FanMode to off with error: 0x%02x", status));
-            }
-
-            // Adjust PercentSetting from a speed value change for SpeedSetting
-            // percent = floor( speed/SpeedMax * 100 )
-            uint8_t speedMax;
-            status = SpeedMax::Get(attributePath.mEndpointId, &speedMax);
-            VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                           ChipLogError(Zcl, "Failed to get SpeedMax with error: 0x%02x", status));
-
-            DataModel::Nullable<Percent> currentPercentSetting;
-            status = PercentSetting::Get(attributePath.mEndpointId, currentPercentSetting);
-            VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                           ChipLogError(Zcl, "Failed to get PercentSetting with error: 0x%02x", status));
-
-            float speed            = speedSetting.Value();
-            Percent percentSetting = static_cast<Percent>(speed / speedMax * 100);
-
-            if (currentPercentSetting.IsNull() || percentSetting != currentPercentSetting.Value())
-            {
-                status = PercentSetting::Set(attributePath.mEndpointId, percentSetting);
-                VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                               ChipLogError(Zcl, "Failed to set PercentSetting with error: 0x%02x", status));
-            }
-        }
-        break;
-    }
-    default:
-        break;
-    }
+    return status;
 }
 
-bool emberAfFanControlClusterStepCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                          const Commands::Step::DecodableType & commandData)
+Status Instance::handleSpeedSettingWrite(AttributeValueDecoder & aDecoder)
 {
-    /*
-     * TODO: Clarification needed in spec issue #6496 - if this is tied to the SpeedSetting attribute, then
-     * the attribute can be updated here, if it is supposed to be implementation specific, then the command
-     * will have to be handed off to an application specific callback which will require some sort of delegate.
-     */
+    Status status = Status::Success;
+    DataModel::DecodableType<uint8_t> speedSetting;
+
+    if (aDecoder.Decode(speedSetting) != CHIP_NO_ERROR)
+    {
+        status = Status::InvalidValue;
+    }
+    else
+    {
+        if (mSpeedSetting != speedSetting)
+        {
+            status = UpdatePercentageAndSpeedSetting(speedSetting);
+
+            // Call into Delegate to handle updates
+            if ((status == Status::Success) &&
+                (mDelegate->HandlePercentSpeedSettingChange(mPercentSetting, mSpeedSetting) != CHIP_NO_ERROR))
+            {
+                status = Status::Failure;
+            }
+        }
+    }
+
+    return status;
+}
+
+Status Instance::handleRockSettingWrite(AttributeValueDecoder & aDecoder)
+{
+    Status status = Status::Success;
+    DataModel::DecodableType<RockBitmap> rockSetting;
+
+    if (aDecoder.Decode(rockSetting) != CHIP_NO_ERROR)
+    {
+        status = Status::InvalidValue;
+    }
+    else
+    {
+        if (mRockSetting != rockSetting)
+        {
+            status = UpdateRockSetting(rockSetting);
+            if (status == Status::Success)
+            {
+                // Call into Delegate to handle updates
+                if (mDelegate->HandleRockSettingChange(mRockSetting) != CHIP_NO_ERROR)
+                {
+                    status = Status::Failure;
+                }
+            }
+        }
+    }
+
+    return status;
+}
+
+Status Instance::handleWindSettingWrite(AttributeValueDecoder & aDecoder)
+{
+    Status status = Status::Success;
+    DataModel::DecodableType<WindBitmap> windSetting;
+
+    if (aDecoder.Decode(windSetting) != CHIP_NO_ERROR)
+    {
+        status = Status::InvalidValue;
+    }
+    else
+    {
+        if (mWindSetting != windSetting)
+        {
+            status = UpdateWindSetting(windSetting);
+            if (status == Status::Success)
+            {
+                // Call into Delegate to handle updates
+                if (mDelegate->HandleWindSettingChange(mWindSetting) != CHIP_NO_ERROR)
+                {
+                    status = Status::Failure;
+                }
+            }
+        }
+    }
+
+    return status;
+}
+
+Status Instance::handleAirflowDirectionWrite(AttributeValueDecoder & aDecoder)
+{
+    Status status = Status::Success;
+    DataModel::DecodableType<AirflowDirectionEnum> airflowDirection;
+
+    if (aDecoder.Decode(airflowDirection) != CHIP_NO_ERROR)
+    {
+        status = Status::InvalidValue;
+    }
+    else
+    {
+        if (mAirflowDirection != airflowDirection)
+        {
+            status = UpdateAirflowDirection(airflowDirection);
+            if (status == Status::Success)
+            {
+                // Call into Delegate to handle updates
+                if (mDelegate->HandleAirflowDirectionChange(mAirflowDirection) != CHIP_NO_ERROR)
+                {
+                    status = Status::Failure;
+                }
+            }
+        }
+    }
+
+    return status;
+}
+
+void Instance::handleStep(HandlerContext & ctx, const Commands::Step::DecodableType & commandData)
+{
+    auto direction = commandData.direction;
+    auto wrap      = commandData.wrap;
+    auto lowestOff = commandData.lowestOff;
 
     Protocols::InteractionModel::Status status = Status::Success;
 
@@ -417,6 +769,24 @@ bool emberAfFanControlClusterStepCallback(CommandHandler * commandObj, const Con
     {
         status = Status::UnsupportedCommand;
     }
-    commandObj->AddStatus(commandPath, status);
-    return true;
+    else
+    {
+        status = mDelegate->HandleStep(direction, wrap, lowestOff);
+    }
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
+
+static uint8_t Instance::getSpeedFromPercent(float percent, uint8_t speedMax)
+{
+    return static_cast<uint8_t>(ceil(speedMax * (percent * 0.01)));
+}
+
+static Percent Instance::getPercentFromSpeed(uint8_t speed, uint8_t speedMax)
+{
+    return static_cast<Percent>(ceil(speed / speedMax * 100));
+}
+
+} // namespace FanControl
+} // namespace Clusters
+} // namespace app
+} // namespace chip

@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/clusters/fan-control-server/fan-control.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -31,77 +32,199 @@ using namespace chip::app::Clusters::FanControl::Attributes;
 
 namespace {
 
-/*
- * TODO: This is a stop-gap solution to allow the existing fan control cluster tests to run after changes to
- * the cluster objects for TE1. This should be removed once #6496 is resolved as it will likely result in a
- * FanControl delegate added to the SDK.
- *
- * FYI... The previous implementation of the FanControl cluster set the speedCurrent/percentCurrent when it received
- * speedSetting/percentSetting. The new implementation of the FanControl cluster does not do this as this should
- * really be done by the application.
- */
-
-class FanAttrAccess : public AttributeAccessInterface
+class FanManager : public FanControl::Delegate
 {
 public:
-    // Register for the FanControl cluster on all endpoints.
-    FanAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), FanControl::Id) {}
-
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Init();
+    CHIP_ERROR HandleFanModeChange(FanModeEnum newMode);
+    CHIP_ERROR HandleFanModeOff(DataModel::Nullable<Percent> newPercentSetting, DataModel::Nullable<uint8_t> newSpeedSetting);
+    CHIP_ERROR HandleFanModeAuto(DataModel::Nullable<Percent> newPercentSetting, DataModel::Nullable<uint8_t> newSpeedSetting);
+    CHIP_ERROR HandlePercentSpeedSettingChange(DataModel::Nullable<Percent> newPercentSetting,
+                                               DataModel::Nullable<uint8_t> newSpeedSetting);
+    CHIP_ERROR HandleRockSettingChange(RockBitmap newRockSetting);
+    CHIP_ERROR HandleWindSettingChange(WindBitmap newWindSetting);
+    CHIP_ERROR HandleAirflowDirectionChange(AirflowDirectionEnum newAirflowDirection);
+    Status HandleStep(StepDirectionEnum stepDirection, bool wrap, bool lowestOff);
 
 private:
-    CHIP_ERROR ReadPercentCurrent(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadSpeedCurrent(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    Status doUpdateSpeedSetting(uint8_t newSpeedSetting);
 };
 
-CHIP_ERROR FanAttrAccess::ReadPercentCurrent(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+FanControl::Instance * gFanControlInstance;
+FanManager gFanManager;
+
+CHIP_ERROR FanManager::Init()
 {
-    // Return PercentSetting attribute value for now
-    DataModel::Nullable<Percent> percentSetting;
-    PercentSetting::Get(endpoint, percentSetting);
-    Percent ret = 0;
-    if (!percentSetting.IsNull())
-    {
-        ret = percentSetting.Value();
-    }
-
-    return aEncoder.Encode(ret);
-}
-
-CHIP_ERROR FanAttrAccess::ReadSpeedCurrent(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    // Return SpeedCurrent attribute value for now
-    DataModel::Nullable<uint8_t> speedSetting;
-    SpeedSetting::Get(endpoint, speedSetting);
-    uint8_t ret = 0;
-    if (!speedSetting.IsNull())
-    {
-        ret = speedSetting.Value();
-    }
-
-    return aEncoder.Encode(ret);
-}
-
-FanAttrAccess gAttrAccess;
-
-CHIP_ERROR FanAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    VerifyOrDie(aPath.mClusterId == FanControl::Id);
-
-    switch (aPath.mAttributeId)
-    {
-    case SpeedCurrent::Id:
-        return ReadSpeedCurrent(aPath.mEndpointId, aEncoder);
-    case PercentCurrent::Id:
-        return ReadPercentCurrent(aPath.mEndpointId, aEncoder);
-    default:
-        break;
-    }
+    ChipLogProgress(NotSpecified, "FanManager::Init()");
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FanManager::HandleFanModeChange(FanModeEnum newMode)
+{
+    ChipLogProgress(NotSpecified, "FanManager::HandleFanModeChange()");
+    switch (newMode)
+    {
+    case FanModeEnum::kLow:
+        return doUpdateSpeedSetting(GetClusterSpeedMax() / 3);
+    case FanModeEnum::kMedium:
+        return doUpdateSpeedSetting(GetClusterSpeedMax() / 2);
+    case FanModeEnum::kHigh:
+        return doUpdateSpeedSetting(GetClusterSpeedMax());
+        return CHIP_NO_ERROR;
+    }
+}
+
+CHIP_ERROR FanManager::HandleFanModeOff(DataModel::Nullable<Percent> newPercentSetting,
+                                        DataModel::Nullable<uint8_t> newSpeedSetting)
+{
+    ChipLogProgress(NotSpecified, "FanManager::HandleFanModeOff()");
+    UpdateClusterPercentageAndSpeedCurrent(newPercentSetting.Value());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FanManager::HandleFanModeAuto(DataModel::Nullable<Percent> newPercentSetting,
+                                         DataModel::Nullable<uint8_t> newSpeedSetting)
+{
+    ChipLogProgress(NotSpecified, "FanManager::HandleFanModeAuto()");
+    UpdateClusterPercentageAndSpeedCurrent((Percent) 50);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FanManager::HandlePercentSpeedSettingChange(DataModel::Nullable<Percent> newPercentSetting,
+                                                       DataModel::Nullable<uint8_t> newSpeedSetting)
+{
+    ChipLogProgress(NotSpecified, "FanManager::HandlePercentSpeedChange()");
+    UpdateClusterPercentageAndSpeedCurrent(newPercentSetting.Value());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FanManager::HandleRockSettingChange(RockBitmap newRockSetting)
+{
+    ChipLogProgress(NotSpecified, "FanManager::HandleRockSettingChange()");
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FanManager::HandleWindSettingChange(WindBitmap newWindSetting)
+{
+    ChipLogProgress(NotSpecified, "FanManager::HandleWindSettingChange()");
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FanManager::HandleAirflowDirectionChange(AirflowDirectionEnum newAirflowDirection)
+{
+    ChipLogProgress(NotSpecified, "FanManager::HandleAirflowDirectionChange()");
+    return CHIP_NO_ERROR;
+}
+
+Status FanManager::HandleStep(StepDirectionEnum stepDirection, bool wrap, bool lowestOff)
+{
+    // Example implementation of the possible effect of the application specific Step Command
+    ChipLogProgress(NotSpecified, "FanManager::HandleStep()");
+    Status status = Status::Success;
+
+    uint8_t speedMax                          = GetClusterSpeedMax();
+    DataModel::Nullable<uint8_t> speedSetting = GetClusterSpeedSetting();
+
+    uint8_t newSpeedSetting;
+
+    if ((speedSetting.Value() > 1) && (speedSetting.Value() < speedMax))
+    {
+        if (direction == DirectionEnum::kIncrease)
+        {
+            newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() + 1);
+            status          = doUpdateSpeedSetting(newSpeedSetting);
+        }
+        else if (direction == DirectionEnum::kDecrease)
+        {
+            newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() - 1);
+            status          = doUpdateSpeedSetting(newSpeedSetting);
+        }
+        else
+        {
+            status = Status::InvalidCommand;
+        }
+    }
+    else if (speedSetting.Value() == 1)
+    {
+        if (direction == DirectionEnum::kIncrease)
+        {
+            newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() + 1);
+            status          = doUpdateSpeedSetting(newSpeedSetting);
+        }
+        else if (direction == DirectionEnum::kDecrease)
+        {
+            if (lowestOff)
+            {
+                newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() - 1);
+                status          = doUpdateSpeedSetting(newSpeedSetting);
+            }
+            else if (wrap)
+            {
+                newSpeedSetting = speedMax;
+                status          = doUpdateSpeedSetting(newSpeedSetting);
+            }
+        }
+        else
+        {
+            status = Status::InvalidCommand;
+        }
+    }
+    else if (speedSetting.Value() == 0)
+    {
+        if (direction == DirectionEnum::kIncrease)
+        {
+            newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() + 1);
+            status          = doUpdateSpeedSetting(newSpeedSetting);
+        }
+        else if (direction == DirectionEnum::kDecrease)
+        {
+            if (wrap)
+            {
+                newSpeedSetting = speedMax;
+                status          = doUpdateSpeedSetting(newSpeedSetting);
+            }
+        }
+        else
+        {
+            status = Status::InvalidCommand;
+        }
+    }
+    else if (speedSetting.Value() == speedMax)
+    {
+        if (direction == DirectionEnum::kIncrease)
+        {
+            if (wrap)
+            {
+                newSpeedSetting = lowestOff ? 0 : 1;
+                status          = doUpdateSpeedSetting(newSpeedSetting);
+            }
+        }
+        else if (direction == DirectionEnum::kDecrease)
+        {
+            newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() - 1);
+            status          = doUpdateSpeedSetting(newSpeedSetting);
+        }
+        else
+        {
+            status = Status::InvalidCommand;
+        }
+    }
+    return status;
+}
+
+Status FanManager::doUpdateSpeedSetting(uint8_t newSpeedSetting)
+{
+    Status status = UpdateClusterPercentageAndSpeedSetting(newSpeedSetting);
+    HandlePercentSpeedSettingChange(GetClusterPercentSetting(), GetClusterSpeedSetting());
+
+    return status
 }
 } // anonymous namespace
 
 void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    ChipLogProgress(NotSpecified, "FanControl Cluster init: endpoint %" PRIx16, endpoint);
+    uint8_t speedMax = 10;
+
+    gFanControlInstance = new FanControl::Instance(endpoint, FanModeSequenceEnum::kOffLowMedHighAuto, 10, 7, 3, &gFanManager);
 }
