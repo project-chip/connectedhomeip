@@ -96,7 +96,7 @@ void testHelperStorageAndRetrivalScalarValues(nlTestSuite * inSuite, DefaultAttr
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     T valueReadBack = 0;
-    err = persistenceProvider.ReadScalarValue(TestConcretePath, valueReadBack);
+    err             = persistenceProvider.ReadScalarValue(TestConcretePath, valueReadBack);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, valueReadBack == testValue);
@@ -372,7 +372,8 @@ const nlTest sTests[] = {
     NL_TEST_DEF("Storage and retrival of signed scalar values", TestStorageAndRetrivalSignedScalarValues),
     NL_TEST_DEF("Storage and retrival of unsigned nullable scalar values", TestStorageAndRetrivalNullableScalarValues),
     NL_TEST_DEF("Storage and retrival of signed nullable scalar values", TestStorageAndRetrivalSignedNullableScalarValues),
-    NL_TEST_DEF("Small buffer errors", TestBufferTooSmallErrors), NL_TEST_SENTINEL()
+    NL_TEST_DEF("Small buffer errors", TestBufferTooSmallErrors),
+    NL_TEST_SENTINEL()
 };
 }
 

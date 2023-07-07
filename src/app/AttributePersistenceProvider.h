@@ -19,10 +19,10 @@
 #include <app/data-model/Nullable.h>
 #include <app/util/attribute-metadata.h>
 #include <cstring>
+#include <inttypes.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/Span.h>
-#include <inttypes.h>
 
 namespace chip {
 namespace app {
