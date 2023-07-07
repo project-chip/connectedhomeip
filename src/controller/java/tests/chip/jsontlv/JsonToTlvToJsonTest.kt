@@ -18,15 +18,13 @@
 
 package chip.jsontlv
 
+import chip.tlv.*
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonParser
 import kotlin.test.assertFailsWith
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import chip.tlv.*
-import chip.jsontlv.fromJsonString
-import chip.jsontlv.toJsonString
 
 @RunWith(JUnit4::class)
 class JsonToTlvToJsonTest {
@@ -864,7 +862,8 @@ class JsonToTlvToJsonTest {
       }
       """
 
-    // Throws exception because subtype encoded in the Json key (Boolean) doesn't match the String
+    // Throws exception because subtype encoded in the Json key (Boolean) doesn't match the
+    // String
     // type of the elements in the array
     assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
   }
@@ -882,7 +881,8 @@ class JsonToTlvToJsonTest {
       }
       """
 
-    // Throws exception because subtype encoded in the Json key (Boolean) doesn't match the String
+    // Throws exception because subtype encoded in the Json key (Boolean) doesn't match the
+    // String
     // type of the elements in the array
     assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
   }
@@ -902,7 +902,8 @@ class JsonToTlvToJsonTest {
       }
       """
 
-    // Throws exception because subtype encoded in the Json key (Float) doesn't match the Structure
+    // Throws exception because subtype encoded in the Json key (Float) doesn't match the
+    // Structure
     // type of the elements in the array
     assertFailsWith<IllegalArgumentException> { TlvWriter().fromJsonString(json) }
   }
@@ -1021,7 +1022,8 @@ class JsonToTlvToJsonTest {
 
   @Test
   fun convertStructWithMixedTags() {
-    // Context and Common Profile tags, Unsigned Integer structure: {255 = 42, 256 = 17000, 65535 =
+    // Context and Common Profile tags, Unsigned Integer structure: {255 = 42, 256 = 17000,
+    // 65535 =
     // 1, 65536 = 345678, 4294967295 = 500000000000}
     val encoding =
       TlvWriter()
@@ -1054,7 +1056,8 @@ class JsonToTlvToJsonTest {
 
   @Test
   fun convertContextTag_invalidContextTag_throwsIllegalArgumentException() {
-    // Context and Common Profile tags, Unsigned Integer structure: {255 = 42, 256 = 17000, 65535 =
+    // Context and Common Profile tags, Unsigned Integer structure: {255 = 42, 256 = 17000,
+    // 65535 =
     // 1, 65536 = 345678, 4294967295 = 500000000000, , 4294967296 = 34}
     val json =
       """
@@ -1130,9 +1133,12 @@ class JsonToTlvToJsonTest {
 
   @Test
   fun convertFullyQualifiedTags_throwsIllegalArgumentException() {
-    // Structure with the fully qualified tag, Vendor ID 0xFFF1/65521, profile number 0xDEED/57069,
-    // 2-octet tag 1. The structure contains a single element labeled using a fully qualified tag
-    // under the same profile, with 2-octet tag 0xAA55/43605.65521::57069:1 = {65521::57069:43605 =
+    // Structure with the fully qualified tag, Vendor ID 0xFFF1/65521, profile number
+    // 0xDEED/57069,
+    // 2-octet tag 1. The structure contains a single element labeled using a fully qualified
+    // tag
+    // under the same profile, with 2-octet tag 0xAA55/43605.65521::57069:1 =
+    // {65521::57069:43605 =
     // 42U}
     val value = 42U
     val structTag = FullyQualifiedTag(6, 0xFFF1u, 0xDEEDu, 1u)
