@@ -93,10 +93,10 @@ private:
      * This checks if the clusters instance is a valid ResourceMonitoring cluster based on the AliasedClusters list.
      * @return true     if the cluster is a valid ResourceMonitoring cluster.
      */
-    bool IsAliascluster() const;
+    bool IsValidAliasCluster() const;
 
     /**
-     * internal function to handle the ResetCondition command.
+     * Internal method to handle the ResetCondition command.
      */
     void HandleResetCondition(HandlerContext & ctx,
                               const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData);

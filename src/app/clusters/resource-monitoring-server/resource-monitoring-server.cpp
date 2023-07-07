@@ -66,7 +66,7 @@ CHIP_ERROR Instance::Init()
 {
     ChipLogError(Zcl, "ResourceMonitoring: Init");
     // Check that the cluster ID given is a valid mode select alias cluster ID.
-    VerifyOrDie(IsAliascluster());
+    VerifyOrDie(IsValidAliasCluster());
 
     // Check if the cluster has been selected in zap
     VerifyOrDie(emberAfContainsServer(mEndpointId, mClusterId));
@@ -236,7 +236,7 @@ DataModel::Nullable<uint32_t> Instance::GetLastChangedTime() const
     return mLastChangedTime;
 }
 
-bool Instance::IsAliascluster() const
+bool Instance::IsValidAliasCluster() const
 {
     for (unsigned int AliasedCluster : AliasedClusters)
     {
