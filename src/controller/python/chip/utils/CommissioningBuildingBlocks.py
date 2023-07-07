@@ -23,7 +23,7 @@ import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import ChipDeviceController as ChipDeviceController
 from chip.clusters import GeneralCommissioning as generalCommissioning
 from chip.clusters import OperationalCredentials as opCreds
-from chip.clusters.Types import *
+from chip.clusters.Types import NullValue
 from chip.FabricAdmin import FabricAdmin as FabricAdmin
 
 _UINT16_MAX = 65535
@@ -41,19 +41,24 @@ async def _IsNodeInFabricList(devCtrl, nodeId):
     return False
 
 
-async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDeviceController, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, targetNodeId: int, targetCatTags: typing.List[int] = []):
-    ''' Given an existing controller with admin privileges over a target node, grants the specified privilege to the new ChipDeviceController instance to the entire Node. This is achieved
+async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDeviceController,
+                         privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
+                         targetNodeId: int, targetCatTags: typing.List[int] = []):
+    ''' Given an existing controller with admin privileges over a target node, grants the specified privilege
+        to the new ChipDeviceController instance to the entire Node. This is achieved
         by updating the ACL entries on the target.
 
-        This will automatically take care of working within the minimas of the target as well as doing an efficient read-modify-write operation that takes
-        into consideration the existing entries on the target and minimizing the total number of ACL entries written per fabric.
+        This will automatically take care of working within the minimas of the target as well as doing an efficient
+        read-modify-write operation that takes into consideration the existing entries on the target and minimizing
+        the total number of ACL entries written per fabric.
 
         Args:
             adminCtrl:      ChipDeviceController instance with admin privileges over the target node
             grantedCtrl:    ChipDeviceController instance that is being granted the new privilege.
             privilege:      Privilege to grant to the granted controller. If None, no privilege is granted.
             targetNodeId:   Target node to which the controller is granted privilege.
-            targetCatTag:   Target 32-bit CAT tag that is granted privilege. If provided, this will be used in the subject list instead of the nodeid of that of grantedCtrl.
+            targetCatTag:   Target 32-bit CAT tag that is granted privilege.
+                            If provided, this will be used in the subject list instead of the nodeid of that of grantedCtrl.
     '''
     data = await adminCtrl.ReadAttribute(targetNodeId, [(Clusters.AccessControl.Attributes.Acl)])
     if 0 not in data:
@@ -92,10 +97,14 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
         if (not (addedPrivilege)):
             if len(currentAcls) >= 3:
                 raise ValueError(
-                    f"Cannot add another ACL entry to grant privilege to existing count of {currentAcls} ACLs -- will exceed minimas!")
+                    f"Cannot add another ACL entry to grant privilege to existing count of {currentAcls} "
+                    "ACLs -- will exceed minimas!")
 
-            currentAcls.append(Clusters.AccessControl.Structs.AccessControlEntryStruct(privilege=privilege, authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                                                                                       subjects=targetSubjects))
+            currentAcls.append(Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                privilege=privilege,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                subjects=targetSubjects
+            ))
 
     # Step 4: Prune ACLs which have empty subjects.
     currentAcls = [acl for acl in currentAcls if acl.subjects != NullValue and len(acl.subjects) != 0]
@@ -104,16 +113,23 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
     await adminCtrl.WriteAttribute(targetNodeId, [(0, Clusters.AccessControl.Attributes.Acl(currentAcls))])
 
 
-async def CreateControllersOnFabric(fabricAdmin: FabricAdmin, adminDevCtrl: ChipDeviceController, controllerNodeIds: typing.List[int], privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, targetNodeId: int, catTags: typing.List[int] = []) -> typing.List[ChipDeviceController]:
+async def CreateControllersOnFabric(fabricAdmin: FabricAdmin,
+                                    adminDevCtrl: ChipDeviceController,
+                                    controllerNodeIds: typing.List[int],
+                                    privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
+                                    targetNodeId: int,
+                                    catTags: typing.List[int] = []) -> typing.List[ChipDeviceController]:
     ''' Create new ChipDeviceController instances on a given fabric with a specific privilege on a target node.
 
         Args:
             fabricAdmin:                A FabricAdmin object that is capable of vending new controller instances on a fabric.
-            adminDevCtrl:               An existing ChipDeviceController instance that already has admin privileges on the target node.
+            adminDevCtrl:               An existing ChipDeviceController instance that already has admin privileges
+                                        on the target node.
             controllerNodeIds:          List of desired nodeIds for the controllers.
             privilege:                  The specific ACL privilege to grant to the newly minted controllers.
             targetNodeId:               The Node ID of the target.
-            catTags:                    CAT Tags to include in the NOC of controller, as well as when setting up the ACLs on the target.
+            catTags:                    CAT Tags to include in the NOC of controller, as well as when setting
+                                        up the ACLs on the target.
     '''
 
     controllerList = []
@@ -148,13 +164,20 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
     csrForAddNOC = await commissionerDevCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.CSRRequest(CSRNonce=os.urandom(32)))
 
     chainForAddNOC = newFabricDevCtrl.IssueNOCChain(csrForAddNOC, newNodeId)
-    if chainForAddNOC.rcacBytes is None or chainForAddNOC.icacBytes is None or chainForAddNOC.nocBytes is None or chainForAddNOC.ipkBytes is None:
+    if (chainForAddNOC.rcacBytes is None or
+            chainForAddNOC.icacBytes is None or
+            chainForAddNOC.nocBytes is None or chainForAddNOC.ipkBytes is None):
         # Expiring the failsafe timer in an attempt to clean up.
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
 
     await commissionerDevCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.AddTrustedRootCertificate(chainForAddNOC.rcacBytes))
-    resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.AddNOC(chainForAddNOC.nocBytes, chainForAddNOC.icacBytes, chainForAddNOC.ipkBytes, newFabricDevCtrl.nodeId, 0xFFF1))
+    resp = await commissionerDevCtrl.SendCommand(existingNodeId,
+                                                 0,
+                                                 opCreds.Commands.AddNOC(chainForAddNOC.nocBytes,
+                                                                         chainForAddNOC.icacBytes,
+                                                                         chainForAddNOC.ipkBytes,
+                                                                         newFabricDevCtrl.nodeId, 0xFFF1))
     if resp.statusCode is not opCreds.Enums.NodeOperationalCertStatusEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
@@ -194,11 +217,14 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId):
     csrForUpdateNOC = await devCtrl.SendCommand(
         existingNodeId, 0, opCreds.Commands.CSRRequest(CSRNonce=os.urandom(32), isForUpdateNOC=True))
     chainForUpdateNOC = devCtrl.IssueNOCChain(csrForUpdateNOC, newNodeId)
-    if chainForUpdateNOC.rcacBytes is None or chainForUpdateNOC.icacBytes is None or chainForUpdateNOC.nocBytes is None or chainForUpdateNOC.ipkBytes is None:
+    if (chainForUpdateNOC.rcacBytes is None or
+            chainForUpdateNOC.icacBytes is None or
+            chainForUpdateNOC.nocBytes is None or chainForUpdateNOC.ipkBytes is None):
         await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
 
-    resp = await devCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.UpdateNOC(chainForUpdateNOC.nocBytes, chainForUpdateNOC.icacBytes))
+    resp = await devCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.UpdateNOC(chainForUpdateNOC.nocBytes,
+                                                                                   chainForUpdateNOC.icacBytes))
     if resp.statusCode is not opCreds.Enums.NodeOperationalCertStatusEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
         await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))

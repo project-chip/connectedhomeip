@@ -42,6 +42,7 @@ asr_sdk_sources("lighting_app_sdk_sources") {
 
   defines = [
     "ASR_LOG_ENABLED=1",
+    "LIGHT_SELECT_RGB",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
   ]

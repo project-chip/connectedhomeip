@@ -28,18 +28,6 @@
 
 #define MATTER_DEVICE_NAME "ASR-Clusters"
 
-#define GPIO_TASK_NAME "gpio"
-#define GPIO_TASK_STACK_SIZE 1024
-
-#define APP_BUTTON_PRESSED 0
-#define APP_BUTTON_RELEASED 1
-
-#define SWITCH1_BUTTON GPIO12_INDEX
-#define SWITCH2_BUTTON GPIO13_INDEX
-
-#define LIGHT1_LED PWM_OUTPUT_CH4
-#define LIGHT2_LED PWM_OUTPUT_CH6
-
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.
 #define ACTUATOR_MOVEMENT_PERIOS_MS 2000
