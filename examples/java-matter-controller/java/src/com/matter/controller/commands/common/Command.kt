@@ -99,14 +99,14 @@ abstract class Command(private val name: String, private val helpText: String? =
 
   /**
    * Add a short command argument
-   * 
+   *
    * @param name The name that will be displayed in the command help
    * @param min The minimum value of the argv value
    * @param max The minimum value of the argv value
    * @param out A pointer to a AtomicInteger where the argv value will be stored
    * @param desc The description of the argument that will be displayed in the command help
    * @param optional Indicate if an optional argument
-   * 
+   *
    * @return The number of arguments currently added to the command
    */
   fun addArgument(

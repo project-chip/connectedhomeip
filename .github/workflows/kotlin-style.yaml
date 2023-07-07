@@ -22,11 +22,15 @@ jobs:
         uses: actions/checkout@v2
 
       - name: "detekt"
-        uses: natiginfo/action-detekt-all@1.23.0
-        # Detekt seems not to like circular symlinks, so we set up
-        # explicit paths below
+        uses: alaegin/Detekt-Action@v1.23.0
         with:
-          args: --parallel --build-upon-default-config --config kotlin-detect-config.yaml --input examples/android/CHIPTest,examples/android/CHIPTool,examples/java-matter-controller/java,src/controller/java
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reviewdog_reporter: github-pr-review
+          detekt_build_upon_default_config: true
+          detekt_config: kotlin-detect-config.yaml
+          detekt_parallel: true
+          # Detekt seems not to like circular symlinks, so exclude them
+          detect_excludes: "**/third_party/**,**/connectedhomeip/**"
 
   ktlint:
     name: "Format check"
