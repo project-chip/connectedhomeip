@@ -19,10 +19,8 @@
  * @file
  * @brief Implementation for the Operational State Server Cluster
  ***************************************************************************/
-#include "operational-state-delegate.h"
 #include "operational-state-server.h"
-#include <app/util/af.h>
-#include <app/util/attribute-storage.h>
+#include "operational-state-delegate.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -32,6 +30,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
