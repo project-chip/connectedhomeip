@@ -52,11 +52,8 @@ public:
     CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
     CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, size_t aSize,
                          MutableByteSpan & aValue) override;
-    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType,
-                         uint16_t aSize, MutableByteSpan & aValue) override;
 
-
-    protected:
+protected:
     PersistentStorageDelegate * mStorage;
 };
 

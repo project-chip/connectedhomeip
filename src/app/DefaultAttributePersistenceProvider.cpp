@@ -18,9 +18,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/BufferWriter.h>
-#include <lib/support/BufferReader.h>
-#include <app-common/zap-generated/attribute-type.h>
 
 namespace chip {
 namespace app {
@@ -58,7 +55,7 @@ CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttribut
         // byte).
         VerifyOrReturnError(size >= emberAfStringLength(aValue.data()) + 1, CHIP_ERROR_INCORRECT_STATE);
     }
-    else if (emberAfIsLongStringAttributeType(aType))
+    else if (emberAfIsLongStringAttributeType(type))
     {
         // Ensure that we've read enough bytes that we are not ending up with
         // un-initialized memory.  Should have read length + 2 (for the length
@@ -73,14 +70,6 @@ CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttribut
     aValue.reduce_size(size);
     return CHIP_NO_ERROR;
 }
-
-CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath,
-                                                          const EmberAfAttributeMetadata * aMetadata, MutableByteSpan & aValue)
-{
-    return ReadValue(aPath, aMetadata->attributeType, aMetadata->size, aValue);
-}
-
-
 
 namespace {
 

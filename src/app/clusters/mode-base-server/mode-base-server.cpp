@@ -24,7 +24,6 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <app/AttributePersistenceAccessors.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -58,7 +57,7 @@ bool Instance::isAliasCluster() const
 
 void Instance::loadPersistentAttributes()
 {
-    CHIP_ERROR err = AttributePersistenceAccessors::ReadUint8Value(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), mCurrentMode);
+    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), mCurrentMode);
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "ModeBase: Loaded CurrentMode as %u", mCurrentMode);
@@ -69,7 +68,7 @@ void Instance::loadPersistentAttributes()
         // list, as was initialised in the constructor.
         ChipLogDetail(Zcl, "ModeBase: Unable to load the CurrentMode from the KVS. Assuming %u", mCurrentMode);
     }
-    err = AttributePersistenceAccessors::ReadNullableUint8Value(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), mStartUpMode);
+    err = GetAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), mStartUpMode);
     if (err == CHIP_NO_ERROR)
     {
         if (mStartUpMode.IsNull()){
@@ -84,7 +83,7 @@ void Instance::loadPersistentAttributes()
     {
         ChipLogDetail(Zcl, "ModeBase: Unable to load the StartUpMode from the KVS. Assuming null");
     }
-    err = AttributePersistenceAccessors::ReadNullableUint8Value(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id), mOnMode);
+    err = GetAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id), mOnMode);
     if (err == CHIP_NO_ERROR)
     {
         if (mOnMode.IsNull()){
@@ -383,7 +382,7 @@ Status Instance::UpdateCurrentMode(uint8_t aNewMode)
     if (mCurrentMode != oldMode)
     {
         // Write new value to persistent storage.
-        AttributePersistenceAccessors::WriteUint8Value(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), mCurrentMode);
+        GetAttributePersistenceProvider()->WriteScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), mCurrentMode);
         // The Administrator Commissioning cluster is always on the root endpoint.
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::CurrentMode::Id);
     }
@@ -404,7 +403,7 @@ Status Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
     if (mStartUpMode != oldStartUpMode)
     {
         // Write new value to persistent storage.
-        AttributePersistenceAccessors::WriteNullableUint8Value(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), mStartUpMode);
+        GetAttributePersistenceProvider()->WriteScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), mStartUpMode);
         // The Administrator Commissioning cluster is always on the root endpoint.
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::StartUpMode::Id);
     }
@@ -425,7 +424,7 @@ Status Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
     if (mOnMode != oldOnMode)
     {
         // Write new value to persistent storage.
-        AttributePersistenceAccessors::WriteNullableUint8Value(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id), mOnMode);
+        GetAttributePersistenceProvider()->WriteScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id), mOnMode);
         // The Administrator Commissioning cluster is always on the root endpoint.
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OnMode::Id);
     }
