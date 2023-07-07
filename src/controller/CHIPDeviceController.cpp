@@ -1590,6 +1590,12 @@ void DeviceCommissioner::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData 
     mSetUpCodePairer.NotifyCommissionableDeviceDiscovered(nodeData);
 }
 
+void OnBasicSuccess(void * context, const chip::app::DataModel::NullObjectType &)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+}
+
 void OnBasicFailure(void * context, CHIP_ERROR error)
 {
     ChipLogProgress(Controller, "Received failure response %s\n", chip::ErrorStr(error));
@@ -1853,6 +1859,22 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
 // ClusterStateCache::Callback impl
 void DeviceCommissioner::OnDone(app::ReadClient *)
 {
+    switch (mCommissioningStage)
+    {
+    case CommissioningStage::kReadCommissioningInfo:
+        ParseCommissioningInfo();
+        break;
+    case CommissioningStage::kReadTimeSyncInfo:
+        ParseTimeSyncInfo();
+        break;
+    default:
+        // We're not trying to read anything here, just exit
+        break;
+    }
+}
+
+void DeviceCommissioner::ParseCommissioningInfo()
+{
     CHIP_ERROR err;
     CHIP_ERROR return_err = CHIP_NO_ERROR;
     ReadCommissioningInfo info;
@@ -2064,6 +2086,74 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     CommissioningStageComplete(return_err, report);
 }
 
+void DeviceCommissioner::ParseTimeSyncInfo()
+{
+    using namespace app::Clusters;
+
+    CHIP_ERROR err;
+    CHIP_ERROR return_err = CHIP_NO_ERROR;
+    CommissioningDelegate::CommissioningReport report;
+    ReadTimeSyncInfo info = {};
+    // If we fail to get the feature map, there's no viable time cluster, don't set anything.
+    TimeSynchronization::Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
+    err = mAttributeCache->Get<TimeSynchronization::Attributes::FeatureMap::TypeInfo>(kRootEndpointId, featureMap);
+    if (err != CHIP_NO_ERROR)
+    {
+        info.requiresUTC               = false;
+        info.requiresTimeZone          = false;
+        info.requiresDefaultNTP        = false;
+        info.requiresTrustedTimeSource = false;
+        report.Set<ReadTimeSyncInfo>(info);
+        CommissioningStageComplete(return_err, report);
+        return;
+    }
+    info.requiresUTC               = true;
+    info.requiresTimeZone          = featureMap & chip::to_underlying(TimeSynchronization::Feature::kTimeZone);
+    info.requiresDefaultNTP        = featureMap & chip::to_underlying(TimeSynchronization::Feature::kNTPClient);
+    info.requiresTrustedTimeSource = featureMap & chip::to_underlying(TimeSynchronization::Feature::kTimeSyncClient);
+
+    if (info.requiresTimeZone)
+    {
+        err = mAttributeCache->Get<TimeSynchronization::Attributes::TimeZoneListMaxSize::TypeInfo>(kRootEndpointId,
+                                                                                                   info.maxTimeZoneSize);
+        if (err != CHIP_NO_ERROR)
+        {
+            // This information should be available, let's do our best with what we have, but we can't set
+            // the time zone without this information
+            info.requiresTimeZone = false;
+        }
+        err =
+            mAttributeCache->Get<TimeSynchronization::Attributes::DSTOffsetListMaxSize::TypeInfo>(kRootEndpointId, info.maxDSTSize);
+        if (err != CHIP_NO_ERROR)
+        {
+            info.requiresTimeZone = false;
+        }
+    }
+    if (info.requiresDefaultNTP)
+    {
+        TimeSynchronization::Attributes::DefaultNTP::TypeInfo::DecodableType defaultNTP;
+        err = mAttributeCache->Get<TimeSynchronization::Attributes::DefaultNTP::TypeInfo>(kRootEndpointId, defaultNTP);
+        if (err == CHIP_NO_ERROR && (!defaultNTP.IsNull()) && (defaultNTP.Value().size() != 0))
+        {
+            ChipLogProgress(Controller, "setting requires defaultNTP to false size = %d", (int) defaultNTP.Value().size());
+            info.requiresDefaultNTP = false;
+        }
+    }
+    if (info.requiresTrustedTimeSource)
+    {
+        TimeSynchronization::Attributes::TrustedTimeSource::TypeInfo::DecodableType trustedTimeSource;
+        err =
+            mAttributeCache->Get<TimeSynchronization::Attributes::TrustedTimeSource::TypeInfo>(kRootEndpointId, trustedTimeSource);
+
+        if (err == CHIP_NO_ERROR && !trustedTimeSource.IsNull())
+        {
+            info.requiresTrustedTimeSource = false;
+        }
+    }
+    report.Set<ReadTimeSyncInfo>(info);
+    CommissioningStageComplete(return_err, report);
+}
+
 void DeviceCommissioner::OnArmFailSafe(void * context,
                                        const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
 {
@@ -2095,6 +2185,25 @@ void DeviceCommissioner::OnSetRegulatoryConfigResponse(
     }
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(err, report);
+}
+
+void DeviceCommissioner::OnSetTimeZoneResponse(void * context,
+                                               const TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType & data)
+{
+    CommissioningDelegate::CommissioningReport report;
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    TimeZoneResponseInfo info;
+    info.requiresDSTOffsets = data.DSTOffsetRequired;
+    report.Set<TimeZoneResponseInfo>(info);
+    commissioner->CommissioningStageComplete(err, report);
+}
+
+void DeviceCommissioner::OnSetUTCError(void * context, CHIP_ERROR error)
+{
+    // For SetUTCTime, we don't actually care if the commissionee didn't want out time, that's its choice
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
 }
 
 void DeviceCommissioner::OnScanNetworksFailure(void * context, CHIP_ERROR error)
@@ -2284,6 +2393,91 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         mReadClient     = std::move(readClient);
     }
     break;
+    case CommissioningStage::kReadTimeSyncInfo: {
+        // This is done in a separate step since we've already used up all the available read paths in the previous read step
+        app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
+        app::ReadPrepareParams readParams(proxy->GetSecureSession().Value());
+
+        // For now, just read the whole cluster. Per the spec, it is mandated to be only on EP0.
+        // TODO: We can reduce the traffic here by being specific about the attributes
+        app::AttributePathParams readPaths[1];
+        readPaths[0]                            = app::AttributePathParams(endpoint, app::Clusters::TimeSynchronization::Id);
+        readParams.mpAttributePathParamsList    = readPaths;
+        readParams.mAttributePathParamsListSize = 1;
+        readParams.mIsFabricFiltered            = false;
+        if (timeout.HasValue())
+        {
+            readParams.mTimeout = timeout.Value();
+        }
+        auto attributeCache = Platform::MakeUnique<app::ClusterStateCache>(*this);
+        auto readClient     = chip::Platform::MakeUnique<app::ReadClient>(
+            engine, proxy->GetExchangeManager(), attributeCache->GetBufferedCallback(), app::ReadClient::InteractionType::Read);
+        CHIP_ERROR err = readClient->SendRequest(readParams);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed to send read request for time sync cluster");
+            CommissioningStageComplete(err);
+            return;
+        }
+        // This should cause any previously allocated objects to be released
+        mAttributeCache = std::move(attributeCache);
+        mReadClient     = std::move(readClient);
+    }
+    break;
+    case CommissioningStage::kConfigureUTCTime: {
+        TimeSynchronization::Commands::SetUTCTime::Type request;
+        uint64_t kChipEpochUsSinceUnixEpoch = static_cast<uint64_t>(kChipEpochSecondsSinceUnixEpoch) * chip::kMicrosecondsPerSecond;
+        System::Clock::Microseconds64 utcTime;
+        if (System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR && utcTime.count() > kChipEpochUsSinceUnixEpoch)
+        {
+            request.UTCTime = utcTime.count() - kChipEpochUsSinceUnixEpoch;
+            // For now, we assume a seconds granularity
+            request.granularity = TimeSynchronization::GranularityEnum::kSecondsGranularity;
+            SendCommand(proxy, request, OnBasicSuccess, OnSetUTCError, endpoint, timeout);
+        }
+        else
+        {
+            // We have no time to give, but that's OK, just complete this stage
+            CommissioningStageComplete(CHIP_NO_ERROR);
+        }
+        break;
+    }
+    case CommissioningStage::kConfigureTimeZone: {
+        if (!params.GetTimeZone().HasValue())
+        {
+            ChipLogError(Controller, "ConfigureTimeZone stage called with no time zone data");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+        TimeSynchronization::Commands::SetTimeZone::Type request;
+        request.timeZone = params.GetTimeZone().Value();
+        SendCommand(proxy, request, OnSetTimeZoneResponse, OnBasicFailure, endpoint, timeout);
+        break;
+    }
+    case CommissioningStage::kConfigureDSTOffset: {
+        if (!params.GetDSTOffsets().HasValue())
+        {
+            ChipLogError(Controller, "ConfigureDSTOffset stage called with no DST data");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+        TimeSynchronization::Commands::SetDSTOffset::Type request;
+        request.DSTOffset = params.GetDSTOffsets().Value();
+        SendCommand(proxy, request, OnBasicSuccess, OnBasicFailure, endpoint, timeout);
+        break;
+    }
+    case CommissioningStage::kConfigureDefaultNTP: {
+        if (!params.GetDefaultNTP().HasValue())
+        {
+            ChipLogError(Controller, "ConfigureDefaultNTP stage called with no default NTP data");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+        TimeSynchronization::Commands::SetDefaultNTP::Type request;
+        request.defaultNTP = params.GetDefaultNTP().Value();
+        SendCommand(proxy, request, OnBasicSuccess, OnBasicFailure, endpoint, timeout);
+        break;
+    }
     case CommissioningStage::kScanNetworks: {
         NetworkCommissioning::Commands::ScanNetworks::Type request;
         if (params.GetWiFiCredentials().HasValue())
@@ -2300,12 +2494,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         break;
     }
     case CommissioningStage::kConfigRegulatory: {
-        // To set during config phase:
-        // UTC time
-        // time zone
-        // dst offset
-        // Regulatory config
-        // TODO(cecille): Set time as well once the time cluster is implemented
         // TODO(cecille): Worthwhile to keep this around as part of the class?
         // TODO(cecille): Where is the country config actually set?
         ChipLogProgress(Controller, "Setting Regulatory Config");
@@ -2490,6 +2678,18 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac(), params.GetIpk().Value(),
                                    params.GetAdminSubject().Value(), timeout);
         break;
+    case CommissioningStage::kConfigureTrustedTimeSource: {
+        if (!params.GetTrustedTimeSource().HasValue())
+        {
+            ChipLogError(Controller, "ConfigureTrustedTimeSource stage called with no trusted time source data");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+        TimeSynchronization::Commands::SetTrustedTimeSource::Type request;
+        request.trustedTimeSource.SetNull();
+        SendCommand(proxy, request, OnBasicSuccess, OnBasicFailure, endpoint, timeout);
+        break;
+    }
     case CommissioningStage::kWiFiNetworkSetup: {
         if (!params.GetWiFiCredentials().HasValue())
         {

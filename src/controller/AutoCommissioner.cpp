@@ -242,10 +242,51 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             // Per the spec, we restart from after adding the NOC.
             return GetNextCommissioningStage(CommissioningStage::kSendNOC, lastErr);
         }
+        return CommissioningStage::kReadTimeSyncInfo;
+    case CommissioningStage::kReadTimeSyncInfo:
         return CommissioningStage::kArmFailsafe;
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kConfigRegulatory:
+        if (mTimeSyncInfo.requiresUTC)
+        {
+            return CommissioningStage::kConfigureUTCTime;
+        }
+        else
+        {
+            // Time cluster is not supported, move right to DA
+            return CommissioningStage::kSendPAICertificateRequest;
+        }
+    case CommissioningStage::kConfigureUTCTime:
+        if (mTimeSyncInfo.requiresTimeZone && mParams.GetTimeZone().HasValue())
+        {
+            return kConfigureTimeZone;
+        }
+        else
+        {
+            return GetNextCommissioningStageInternal(CommissioningStage::kConfigureTimeZone, lastErr);
+        }
+    case CommissioningStage::kConfigureTimeZone:
+        if (mNeedsDST && mParams.GetDSTOffsets().HasValue())
+        {
+            return CommissioningStage::kConfigureDSTOffset;
+        }
+        else
+        {
+            return GetNextCommissioningStageInternal(CommissioningStage::kConfigureDSTOffset, lastErr);
+        }
+    case CommissioningStage::kConfigureDSTOffset:
+        ChipLogProgress(Controller, "requires default NTP = %d, have params = %d", mTimeSyncInfo.requiresDefaultNTP,
+                        mParams.GetDefaultNTP().HasValue());
+        if (mTimeSyncInfo.requiresDefaultNTP && mParams.GetDefaultNTP().HasValue())
+        {
+            return CommissioningStage::kConfigureDefaultNTP;
+        }
+        else
+        {
+            return GetNextCommissioningStageInternal(CommissioningStage::kConfigureDefaultNTP, lastErr);
+        }
+    case CommissioningStage::kConfigureDefaultNTP:
         return CommissioningStage::kSendPAICertificateRequest;
     case CommissioningStage::kSendPAICertificateRequest:
         return CommissioningStage::kSendDACCertificateRequest;
@@ -264,6 +305,15 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kSendTrustedRootCert:
         return CommissioningStage::kSendNOC;
     case CommissioningStage::kSendNOC:
+        if (mTimeSyncInfo.requiresTrustedTimeSource && mParams.GetTrustedTimeSource().HasValue())
+        {
+            return CommissioningStage::kConfigureTrustedTimeSource;
+        }
+        else
+        {
+            return GetNextCommissioningStageInternal(CommissioningStage::kConfigureTrustedTimeSource, lastErr);
+        }
+    case CommissioningStage::kConfigureTrustedTimeSource:
         // TODO(cecille): device attestation casues operational cert provisioning to happen, This should be a separate stage.
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
@@ -585,6 +635,14 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 mParams.SetRemoteNodeId(mDeviceCommissioningInfo.nodeId);
             }
             break;
+        case CommissioningStage::kReadTimeSyncInfo:
+            mTimeSyncInfo = report.Get<ReadTimeSyncInfo>();
+            // Don't send DST unless the device says it needs it
+            mNeedsDST = false;
+            break;
+        case CommissioningStage::kConfigureTimeZone:
+            mNeedsDST = report.Get<TimeZoneResponseInfo>().requiresDSTOffsets;
+            break;
         case CommissioningStage::kSendPAICertificateRequest:
             SetPAI(report.Get<RequestedCertificate>().certificate);
             break;
@@ -691,6 +749,26 @@ CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
     {
         ChipLogError(Controller, "Invalid device for commissioning");
         return CHIP_ERROR_INCORRECT_STATE;
+    }
+    // Perform any last minute parameter adjustments before calling the commissioner object
+    switch (nextStage)
+    {
+    case CommissioningStage::kConfigureTimeZone:
+        if (mParams.GetTimeZone().Value().size() > mTimeSyncInfo.maxTimeZoneSize)
+        {
+            mParams.SetTimeZone(app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>(
+                mParams.GetTimeZone().Value().SubSpan(0, mTimeSyncInfo.maxTimeZoneSize)));
+        }
+        break;
+    case CommissioningStage::kConfigureDSTOffset:
+        if (mParams.GetDSTOffsets().Value().size() > mTimeSyncInfo.maxDSTSize)
+        {
+            mParams.SetDSTOffsets(app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>(
+                mParams.GetDSTOffsets().Value().SubSpan(0, mTimeSyncInfo.maxDSTSize)));
+        }
+        break;
+    default:
+        break;
     }
 
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, GetEndpoint(nextStage),

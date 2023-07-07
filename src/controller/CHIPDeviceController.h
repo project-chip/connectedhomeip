@@ -85,6 +85,7 @@ constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVI
 
 // Raw functions for cluster callbacks
 void OnBasicFailure(void * context, CHIP_ERROR err);
+void OnBasicSuccess(void * context, const chip::app::DataModel::NullObjectType &);
 
 struct ControllerInitParams
 {
@@ -684,6 +685,9 @@ public:
 
     // ClusterStateCache::Callback impl
     void OnDone(app::ReadClient *) override;
+    // Parsers for the two different read clients
+    void ParseCommissioningInfo();
+    void ParseTimeSyncInfo();
 
     // Issue an NOC chain using the associated OperationalCredentialsDelegate. The NOC chain will
     // be provided in X509 DER format.
@@ -827,6 +831,11 @@ private:
     static void OnSetRegulatoryConfigResponse(
         void * context,
         const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
+    static void OnSetUTCError(void * context, CHIP_ERROR error);
+    static void
+    OnSetTimeZoneResponse(void * context,
+                          const chip::app::Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType & data);
+
     static void
     OnScanNetworksResponse(void * context,
                            const app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data);
