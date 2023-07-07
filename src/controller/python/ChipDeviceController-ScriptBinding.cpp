@@ -473,7 +473,6 @@ PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::Device
     CHIP_ERROR err = sPairingDeviceDiscoveryDelegate.Init(nodeId, setupPasscode, sCommissioningParameters, &sPairingDelegate,
                                                           devCtrl, discoveryTimeoutMsec);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
-    devCtrl->RegisterDeviceDiscoveryDelegate(&sPairingDeviceDiscoveryDelegate);
     return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
 }
 

@@ -40,6 +40,7 @@ public:
         mPairingDelegate          = pairingDelegate;
         mActiveDeviceCommissioner = activeDeviceCommissioner;
         VerifyOrReturnError(mActiveDeviceCommissioner != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        mActiveDeviceCommissioner->RegisterDeviceDiscoveryDelegate(this);
         return chip::DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(discoveryTimeoutMsec), OnDiscoveredTimeout,
                                                            this);
     }
