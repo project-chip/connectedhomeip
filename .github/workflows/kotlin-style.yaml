@@ -30,7 +30,7 @@ jobs:
           detekt_config: kotlin-detect-config.yaml
           detekt_parallel: true
           # Detekt seems not to like circular symlinks, so exclude them
-          detect_excludes: "**/third_party/**,**/connectedhomeip/**"
+          detect_excludes: "**/third_party/**,**/connectedhomeip/**,**/build_overrides/**,**/build/**"
 
   ktlint:
     name: "Format check"
