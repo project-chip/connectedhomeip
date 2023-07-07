@@ -88,6 +88,6 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
         ?.firstOrNull()
         ?.substring(kQRCodePrefix.length)
         ?: ""
-    }    
+    }
   }
 }

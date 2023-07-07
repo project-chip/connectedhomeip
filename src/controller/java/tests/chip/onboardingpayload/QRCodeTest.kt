@@ -19,43 +19,40 @@
 package chip.onboardingpayload
 
 import com.google.common.truth.Truth.assertThat
-import java.math.BigInteger
-import java.util.concurrent.atomic.AtomicInteger
-import kotlin.math.ceil
-import kotlin.math.log10
-import kotlin.math.pow
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.junit.Assert.assertThrows
-import org.junit.Assert.assertEquals
 
 @RunWith(JUnit4::class)
 class QRCodeTest {
   private fun getDefaultPayload(): OnboardingPayload {
     val payload = OnboardingPayload()
 
-    payload.version      = 0
-    payload.vendorId     = 12
-    payload.productId    = 1
+    payload.version = 0
+    payload.vendorId = 12
+    payload.productId = 1
     payload.setupPinCode = 2048
     payload.commissioningFlow = CommissioningFlow.STANDARD.value
-    payload.discoveryCapabilities.add(DiscoveryCapability.SOFT_AP) 
+    payload.discoveryCapabilities.add(DiscoveryCapability.SOFT_AP)
     payload.setLongDiscriminatorValue(128)
-    
+
     return payload
   }
 
-  private fun checkWriteRead(inPayload: OnboardingPayload, allowInvalidPayload: Boolean = false): Boolean {
+  private fun checkWriteRead(
+    inPayload: OnboardingPayload,
+    allowInvalidPayload: Boolean = false
+  ): Boolean {
     var generator = QRCodeOnboardingPayloadGenerator(inPayload)
-    generator.setAllowInvalidPayload(allowInvalidPayload);
+    generator.setAllowInvalidPayload(allowInvalidPayload)
     var result = generator.payloadBase38Representation()
 
     var outPayload = OnboardingPayload()
     QRCodeOnboardingPayloadParser(result).populatePayload(outPayload)
 
     return inPayload == outPayload
-  }  
+  }
 
   private fun compareBinary(payload: OnboardingPayload, expectedBinary: String): Boolean {
     var generator = QRCodeOnboardingPayloadGenerator(payload)
@@ -75,7 +72,7 @@ class QRCodeTest {
     // Convert it to binary
     val binaryResult = StringBuilder()
     for (i in buffer.size downTo 1) {
-        binaryResult.append(buffer[i - 1].toString(2).padStart(8, '0'))
+      binaryResult.append(buffer[i - 1].toString(2).padStart(8, '0'))
     }
 
     // Insert spaces after each block
@@ -106,9 +103,9 @@ class QRCodeTest {
     binaryResult.insert(pos, " ")
 
     return binaryResult.toString()
-  } 
+  }
 
-  /* 
+  /*
    * Test Rendezvous Flags
    */
   @Test
@@ -116,16 +113,16 @@ class QRCodeTest {
     val inPayload = getDefaultPayload()
 
     // Not having a value in rendezvousInformation is not allowed for a QR code.
-    inPayload.setRendezvousInformation(0L);
+    inPayload.setRendezvousInformation(0L)
     assertEquals(true, checkWriteRead(inPayload))
 
-    inPayload.setRendezvousInformation(1L shl 0);
+    inPayload.setRendezvousInformation(1L shl 0)
     assertEquals(true, checkWriteRead(inPayload))
 
-    inPayload.setRendezvousInformation(1L shl 1);
+    inPayload.setRendezvousInformation(1L shl 1)
     assertEquals(true, checkWriteRead(inPayload))
 
-    inPayload.setRendezvousInformation(1L shl 2);
+    inPayload.setRendezvousInformation(1L shl 2)
     assertEquals(true, checkWriteRead(inPayload))
 
     inPayload.setRendezvousInformation((1L shl 0) or (1L shl 2))
@@ -138,7 +135,7 @@ class QRCodeTest {
     assertEquals(true, checkWriteRead(inPayload))
   }
 
-  /* 
+  /*
    * Test Commissioning Flow
    */
   @Test
@@ -153,39 +150,40 @@ class QRCodeTest {
 
     inPayload.commissioningFlow = CommissioningFlow.CUSTOM.value
     assertEquals(true, checkWriteRead(inPayload))
-  } 
+  }
 
-  /* 
+  /*
    * Test Maximum Values
    */
   @Test
   fun testMaximumValues() {
     val inPayload = getDefaultPayload()
 
-    inPayload.version           = (1 shl kVersionFieldLengthInBits) -1
-    inPayload.vendorId          = 0xFFFF
-    inPayload.productId         = 0xFFFF
+    inPayload.version = (1 shl kVersionFieldLengthInBits) - 1
+    inPayload.vendorId = 0xFFFF
+    inPayload.productId = 0xFFFF
     inPayload.commissioningFlow = CommissioningFlow.CUSTOM.value
 
     inPayload.setRendezvousInformation((1L shl 0) and (1L shl 1) and (1L shl 2))
-    inPayload.setLongDiscriminatorValue((1 shl kVersionFieldLengthInBits) -1)
-    inPayload.setupPinCode = (1L shl kVersionFieldLengthInBits) -1
+    inPayload.setLongDiscriminatorValue((1 shl kVersionFieldLengthInBits) - 1)
+    inPayload.setupPinCode = (1L shl kVersionFieldLengthInBits) - 1
 
     assertEquals(true, checkWriteRead(inPayload, allowInvalidPayload = true))
   }
 
-  /* 
+  /*
    * Test Payload Byte Array Representation
    */
   @Test
   fun testPayloadByteArrayRep() {
     val payload = getDefaultPayload()
 
-    val expected = " 0000 000000000000000100000000000 000010000000 00000001 00 0000000000000001 0000000000001100 000"
-    assertEquals(true, compareBinary(payload, expected))    
+    val expected =
+      " 0000 000000000000000100000000000 000010000000 00000001 00 0000000000000001 0000000000001100 000"
+    assertEquals(true, compareBinary(payload, expected))
   }
 
-  /* 
+  /*
    * Test Bitset Length
    */
   @Test
@@ -193,31 +191,31 @@ class QRCodeTest {
     assertEquals(true, kTotalPayloadDataSizeInBits % 8 == 0)
   }
 
-  /* 
+  /*
    * Test Setup Payload Verify
    */
   @Test
   fun testSetupPayloadVerify() {
     var payload = getDefaultPayload()
-    assertEquals(true, payload.isValidQRCodePayload()) 
+    assertEquals(true, payload.isValidQRCodePayload())
 
     // test invalid commissioning flow
     payload = getDefaultPayload()
     payload.commissioningFlow = CommissioningFlow.CUSTOM.value
-    assertEquals(true, payload.isValidQRCodePayload()) 
+    assertEquals(true, payload.isValidQRCodePayload())
 
     // test invalid version
     payload = getDefaultPayload()
     payload.version = (1 shl kVersionFieldLengthInBits)
-    assertEquals(false, payload.isValidQRCodePayload()) 
+    assertEquals(false, payload.isValidQRCodePayload())
 
     // test invalid setup PIN
     payload = getDefaultPayload()
     payload.setupPinCode = (1L shl kSetupPINCodeFieldLengthInBits)
-    assertEquals(false, payload.isValidQRCodePayload()) 
-  } 
+    assertEquals(false, payload.isValidQRCodePayload())
+  }
 
-  /* 
+  /*
    * Test Invalid QR Code Payload - Wrong Character Set
    */
   @Test
@@ -235,7 +233,7 @@ class QRCodeTest {
     }
   }
 
-  /* 
+  /*
    * Test Invalid QR Code Payload - Wrong  Length
    */
   @Test
@@ -251,33 +249,33 @@ class QRCodeTest {
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
     }
-  } 
+  }
 
-  /* 
+  /*
    * Test Payload Equality
    */
   @Test
   fun testPayloadEquality() {
     val payload = getDefaultPayload()
-    val equalPayload = getDefaultPayload()    
+    val equalPayload = getDefaultPayload()
     assertEquals(true, payload == equalPayload)
   }
 
-  /* 
+  /*
    * Test Payload Inequality
    */
   @Test
   fun testPayloadInEquality() {
     val payload = getDefaultPayload()
-    val unequalPayload = getDefaultPayload()  
+    val unequalPayload = getDefaultPayload()
 
     unequalPayload.setLongDiscriminatorValue(28)
     unequalPayload.setupPinCode = 121233
 
     assertEquals(false, payload == unequalPayload)
-  }  
+  }
 
-  /* 
+  /*
    * Test QRCode to Payload Generation
    */
   @Test
@@ -289,14 +287,14 @@ class QRCodeTest {
     var resultingPayload = OnboardingPayload()
     QRCodeOnboardingPayloadParser(base38Rep).populatePayload(resultingPayload)
 
-    assertEquals(true, resultingPayload.isValidQRCodePayload()) 
+    assertEquals(true, resultingPayload.isValidQRCodePayload())
     assertEquals(true, payload == resultingPayload)
   }
 
-  /* 
+  /*
    * Test Extract Payload
    */
-  @Test   
+  @Test
   fun testExtractPayload() {
     assertEquals("ABC", QRCodeOnboardingPayloadParser.extractPayload("MT:ABC"))
     assertEquals("", QRCodeOnboardingPayloadParser.extractPayload("MT:"))
@@ -315,10 +313,9 @@ class QRCodeTest {
     assertEquals("", QRCodeOnboardingPayloadParser.extractPayload("A%"))
     assertEquals("", QRCodeOnboardingPayloadParser.extractPayload("MT:%"))
     assertEquals("ABC", QRCodeOnboardingPayloadParser.extractPayload("%MT:ABC"))
-  } 
+  }
 
   companion object {
     const val kDefaultPayloadQRCode: String = "MT:M5L90MP500K64J00000"
   }
 }
-
