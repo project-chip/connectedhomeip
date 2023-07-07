@@ -111,12 +111,26 @@ declare_args() {
   }
 }
 
+declare_args() {
+  if (chip_persist_subscriptions) {
+    chip_subscription_timeout_resumption = true
+  } else {
+    chip_subscription_timeout_resumption = false
+  }
+}
+
 if (chip_device_platform == "bl702" || chip_device_platform == "bl702l") {
   if (chip_enable_openthread) {
     chip_mdns = "platform"
   } else {
     chip_mdns = "minimal"
   }
+
+if ((chip_device_platform == "bl702" || chip_device_platform == "bl702l") &&
+    chip_enable_openthread) {
+  chip_mdns = "platform"
+} else if (chip_device_platform == "bl702" && chip_enable_wifi) {
+  chip_mdns = "minimal"
 }
 
 _chip_device_layer = "none"

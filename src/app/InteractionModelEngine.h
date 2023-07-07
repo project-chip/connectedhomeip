@@ -613,6 +613,13 @@ private:
     bool mForceHandlerQuota = false;
 #endif
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    bool HasSubscriptionsToResume();
+    uint32_t ComputeTimeTillNextSubscriptionResumption();
+    uint32_t mNumSubscriptionResumptionRetries = 0;
+    bool mSubscriptionResumptionScheduled      = false;
+#endif
+
     FabricTable * mpFabricTable;
 
     CASESessionManager * mpCASESessionMgr = nullptr;
