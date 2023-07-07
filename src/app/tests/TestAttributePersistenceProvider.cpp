@@ -122,7 +122,7 @@ void testHelperStorageAndRetrivalScalarValues(nlTestSuite * inSuite, DefaultAttr
 }
 
 /**
- * Tests the storage and retrival of data from the KVS of types  bool, int8_t, int16_t, int32_t, int64_t.
+ * Tests the storage and retrival of data from the KVS of types  bool, uint8_t, uint16_t, uint32_t, uint64_t.
  */
 void TestStorageAndRetrivalScalarValues(nlTestSuite * inSuite, void * inContext)
 {
@@ -157,6 +157,42 @@ void TestStorageAndRetrivalScalarValues(nlTestSuite * inSuite, void * inContext)
     testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, uint64_t(0));
     testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, uint64_t(0x0100000001));
     testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, uint64_t(0xffffffffffffffff));
+
+    // Finishing
+    persistenceProvider.Shutdown();
+}
+
+/**
+ * Tests the storage and retrival of data from the KVS of types  int8_t, int16_t, int32_t, int64_t.
+ */
+void TestStorageAndRetrivalSignedScalarValues(nlTestSuite * inSuite, void * inContext)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider persistenceProvider;
+
+    // Init
+    CHIP_ERROR err = persistenceProvider.Init(&storageDelegate);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Test int8_t
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int8_t(0));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int8_t(42));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int8_t(-127));
+
+    // Test int16_t
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int16_t(0));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int16_t(0x7fff));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int16_t(0x8000));
+
+    // Test int32_t
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int32_t(0));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int32_t(0x7fffffff));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int32_t(0x80000000));
+
+    // Test int64_t
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int64_t(0));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int64_t(0x7fffffffffffffff));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, int64_t(0x8000000000000000));
 
     // Finishing
     persistenceProvider.Shutdown();
@@ -285,6 +321,7 @@ namespace {
 const nlTest sTests[] = {
     NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of ByteSpans", TestStorageAndRetrivalByteSpans),
     NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of scalar values", TestStorageAndRetrivalScalarValues),
+    NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of signed scalar values", TestStorageAndRetrivalSignedScalarValues),
     NL_TEST_DEF("Test AttributePersistenceProvider: Storage and retrival of nullable scalar values",
                 TestStorageAndRetrivalNullableScalarValues),
     NL_TEST_DEF("Test AttributePersistenceProvider: Small buffer errors", TestBufferTooSmallErrors), NL_TEST_SENTINEL()

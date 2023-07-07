@@ -121,12 +121,12 @@ public:
      * @param [in] aPath the attribute path for the data being written.
      * @param [in] aValue the data to write.
      */
-    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
+    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
     CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, T & aValue)
     {
         uint8_t value[sizeof(T)];
         auto w = Encoding::LittleEndian::BufferWriter(value, sizeof(T));
-        w.EndianPut(aValue, sizeof(T));
+        w.EndianPut(uint64_t(aValue), sizeof(T));
 
         return WriteValue(aPath, ByteSpan(value));
     }
@@ -137,7 +137,7 @@ public:
      * @param [in]     aPath the attribute path for the data being persisted.
      * @param [in,out] aValue where to place the data.
      */
-    template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
+    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
     CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, T & aValue)
     {
         uint8_t attrData[sizeof(T)];
