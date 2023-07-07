@@ -4,7 +4,8 @@ on:
   pull_request:
     paths:
       - "**/*.kt"
-      - ".github/workflows/kotlin-detekt.yaml"
+      - ".github/workflows/kotlin-style.yaml"
+      - "kotlin-detect-config.yaml"
 
 jobs:
   detekt:
