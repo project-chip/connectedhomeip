@@ -11,10 +11,10 @@ To use a ModeBase derived cluster, you need to
     look at the `<alias name>-mode.*` files in the `src` and `include`
     directorins in `examples/all-clusters-app/all-clusters-common`.
 -   For this class implement the `NumberOfModes`, `GetModeLabelByIndex`,
-    `GetModeValueByIndex` `GetModeTagsByIndex` and `HandleChangeToMode`
-    methods. Look at the documentation in `mode-base-server.h` for more
-    information about these methods. Cluster-specific enums can be accessed
-    from the cluster namespace.
+    `GetModeValueByIndex` `GetModeTagsByIndex` and `HandleChangeToMode` methods.
+    Look at the documentation in `mode-base-server.h` for more information about
+    these methods. Cluster-specific enums can be accessed from the cluster
+    namespace.
 -   Optionally implement the `AppInit` function.
 -   In your main file, instantiate your `ModeBase::Instance` inherited class.
     See the constructor documentation in `mode-base-server.h`.
