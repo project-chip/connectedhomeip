@@ -27,8 +27,7 @@
 
 #include <lib/support/CHIPMem.h>
 #include <platform/KeyValueStoreManager.h>
-
-#include CHIP_OPEN_IOT_SDK_KV_STORE_CONFIG_INCLUDE
+#include <platform/openiotsdk/KVPsaPsStore.h>
 
 using namespace ::chip::DeviceLayer::Internal;
 

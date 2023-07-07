@@ -31,9 +31,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    # XXX: Workaround for https://github.com/actions/cache/issues/1141
-    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
-
+    
 jobs:
     build_linux_gcc_debug:
         name: Build on Linux (gcc_debug)
@@ -57,46 +55,17 @@ jobs:
               env:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
-              with:
-                  action: actions/checkout@v3.5.2
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
+            - name: Checkout
+              uses: actions/checkout@v3
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
-
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Bootstrap cache
-              continue-on-error: true
-              timeout-minutes: 10
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                action: buildjet/cache@v3
-                attempt_limit: 3
-                attempt_delay: 2000
-                with: |
-                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                    path: |
-                        .environment
-                        build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              run: bash scripts/bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v3
-              if: ${{ always() && !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
-
+                platform: linux
             - name: Initialize CodeQL
               if: ${{ inputs.run-codeql  }}
               uses: github/codeql-action/init@v2
@@ -138,34 +107,9 @@ jobs:
                   retention-days: 5
             - name: Perform CodeQL Analysis
               if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/analyze@v2
+              uses: ./.github/actions/perform-codeql-analysis
               with:
-                  category: "/language:cpp"
-                  upload: False
-                  output: sarif-results
-            - name: filter-sarif
-              if: ${{ inputs.run-codeql  }}
-              uses: advanced-security/filter-sarif@v1
-              with:
-                  patterns: |
-                    -**/third_party/**
-                    -**/scripts/**
-                  input: "sarif-results/cpp.sarif"
-                  output: "sarif-results/cpp.sarif"
-        
-            - name: Upload SARIF
-              if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/upload-sarif@v2
-              with:
-                  sarif_file: "sarif-results/cpp.sarif"
-        
-            - name: Upload loc as a Build Artifact
-              if: ${{ inputs.run-codeql  }}
-              uses: actions/upload-artifact@v2.2.0
-              with:
-                  name: sarif-results
-                  path: sarif-results
-                  retention-days: 1
+                language: cpp
             # OBJDIR on linux is > 10K files and takes more than 50 minutes to upload, usually
             # having the job timeout.
             #
@@ -202,45 +146,17 @@ jobs:
               env:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
-              with:
-                  action: actions/checkout@v3.5.2
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
+            - name: Checkout
+              uses: actions/checkout@v3
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
-
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Bootstrap cache
-              continue-on-error: true
-              timeout-minutes: 10
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                action: buildjet/cache@v3
-                attempt_limit: 3
-                attempt_delay: 2000
-                with: |
-                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                    path: |
-                        .environment
-                        build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              run: bash scripts/bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v3
-              if: ${{ always() && !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+                platform: linux
             - name: Initialize CodeQL
               if: ${{ inputs.run-codeql  }}
               uses: github/codeql-action/init@v2
@@ -326,34 +242,10 @@ jobs:
                     "./scripts/build/build_examples.py --target linux-fake-tests build"
             - name: Perform CodeQL Analysis
               if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/analyze@v2
+              uses: ./.github/actions/perform-codeql-analysis
               with:
-                  category: "/language:cpp"
-                  upload: False
-                  output: sarif-results
-            - name: filter-sarif
-              if: ${{ inputs.run-codeql  }}
-              uses: advanced-security/filter-sarif@v1
-              with:
-                  patterns: |
-                    -**/third_party/**
-                    -**/scripts/**
-                  input: "sarif-results/cpp.sarif"
-                  output: "sarif-results/cpp.sarif"
+                language: cpp
         
-            - name: Upload SARIF
-              if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/upload-sarif@v2
-              with:
-                  sarif_file: "sarif-results/cpp.sarif"
-        
-            - name: Upload loc as a Build Artifact
-              if: ${{ inputs.run-codeql  }}
-              uses: actions/upload-artifact@v2.2.0
-              with:
-                  name: sarif-results
-                  path: sarif-results
-                  retention-days: 1
             - name: Uploading core files
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
@@ -398,32 +290,12 @@ jobs:
               env:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3.5.2
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Bootstrap cache
-              continue-on-error: true
-              timeout-minutes: 10
-              with:
-                action: buildjet/cache@v3
-                attempt_limit: 3
-                attempt_delay: 2000
-                with: |
-                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                    path: |
-                        .environment
-                        build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              run: bash scripts/bootstrap.sh
+                platform: linux
 
             - name: Setup Build, Run Build and Run Tests
               run: |
@@ -449,49 +321,21 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3.5.2
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform darwin
+                platform: darwin
             - name: Try to ensure the directory for diagnostic log collection exists
               run: |
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
-
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Bootstrap cache
-              continue-on-error: true
-              timeout-minutes: 10
-              with:
-                action: buildjet/cache@v3
-                attempt_limit: 3
-                attempt_delay: 2000
-                with: |
-                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                    path: |
-                        .environment
-                        build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              run: bash scripts/bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v3
-              if: ${{ always() && !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
-
             - name: Initialize CodeQL
               if: ${{ inputs.run-codeql  }}
               uses: github/codeql-action/init@v2
               with:
                   languages: "cpp"
+
             - name: Setup and Build Simulated Device
               run: |
                   BUILD_TYPE=simulated
@@ -536,36 +380,13 @@ jobs:
               with:
                   name: crash-log-darwin
                   path: ~/Library/Logs/DiagnosticReports/
+
             - name: Perform CodeQL Analysis
               if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/analyze@v2
+              uses: ./.github/actions/perform-codeql-analysis
               with:
-                  category: "/language:cpp"
-                  upload: False
-                  output: sarif-results
-            - name: filter-sarif
-              if: ${{ inputs.run-codeql  }}
-              uses: advanced-security/filter-sarif@v1
-              with:
-                  patterns: |
-                    -**/third_party/**
-                    -**/scripts/**
-                  input: "sarif-results/cpp.sarif"
-                  output: "sarif-results/cpp.sarif"
+                language: cpp
         
-            - name: Upload SARIF
-              if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/upload-sarif@v2
-              with:
-                  sarif_file: "sarif-results/cpp.sarif"
-        
-            - name: Upload loc as a Build Artifact
-              if: ${{ inputs.run-codeql  }}
-              uses: actions/upload-artifact@v2.2.0
-              with:
-                  name: sarif-results
-                  path: sarif-results
-                  retention-days: 1
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
 
@@ -583,40 +404,12 @@ jobs:
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3.5.2
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Bootstrap cache
-              continue-on-error: true
-              timeout-minutes: 10
-              with:
-                action: buildjet/cache@v3
-                attempt_limit: 3
-                attempt_delay: 2000
-                with: |
-                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                    path: |
-                        .environment
-                        build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              run: bash scripts/bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v3
-              if: ${{ always() && !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+                platform: linux
 
             - name: Run Build Coverage
               run: ./scripts/build_coverage.sh

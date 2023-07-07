@@ -504,22 +504,11 @@ void CHIPScenesClusterViewSceneResponseCallback::CallbackFn(
                 auto & entry_3 = iter_newElement_1_attributeValueList_3.GetValue();
                 jobject newElement_3;
                 jobject newElement_3_attributeID;
-                if (!entry_3.attributeID.HasValue())
-                {
-                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_3_attributeID);
-                }
-                else
-                {
-                    jobject newElement_3_attributeIDInsideOptional;
-                    std::string newElement_3_attributeIDInsideOptionalClassName     = "java/lang/Long";
-                    std::string newElement_3_attributeIDInsideOptionalCtorSignature = "(J)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
-                        newElement_3_attributeIDInsideOptionalClassName.c_str(),
-                        newElement_3_attributeIDInsideOptionalCtorSignature.c_str(), entry_3.attributeID.Value(),
-                        newElement_3_attributeIDInsideOptional);
-                    chip::JniReferences::GetInstance().CreateOptional(newElement_3_attributeIDInsideOptional,
-                                                                      newElement_3_attributeID);
-                }
+                std::string newElement_3_attributeIDClassName     = "java/lang/Long";
+                std::string newElement_3_attributeIDCtorSignature = "(J)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_3_attributeIDClassName.c_str(),
+                                                                               newElement_3_attributeIDCtorSignature.c_str(),
+                                                                               entry_3.attributeID, newElement_3_attributeID);
                 jobject newElement_3_attributeValue;
                 std::string newElement_3_attributeValueClassName     = "java/lang/Long";
                 std::string newElement_3_attributeValueCtorSignature = "(J)V";
@@ -536,7 +525,7 @@ void CHIPScenesClusterViewSceneResponseCallback::CallbackFn(
                     return;
                 }
                 jmethodID attributeValuePairStructCtor_4 =
-                    env->GetMethodID(attributeValuePairStructClass_4, "<init>", "(Ljava/util/Optional;Ljava/lang/Long;)V");
+                    env->GetMethodID(attributeValuePairStructClass_4, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;)V");
                 if (attributeValuePairStructCtor_4 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$ScenesClusterAttributeValuePair constructor");
@@ -1078,22 +1067,11 @@ void CHIPScenesClusterEnhancedViewSceneResponseCallback::CallbackFn(
                 auto & entry_3 = iter_newElement_1_attributeValueList_3.GetValue();
                 jobject newElement_3;
                 jobject newElement_3_attributeID;
-                if (!entry_3.attributeID.HasValue())
-                {
-                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_3_attributeID);
-                }
-                else
-                {
-                    jobject newElement_3_attributeIDInsideOptional;
-                    std::string newElement_3_attributeIDInsideOptionalClassName     = "java/lang/Long";
-                    std::string newElement_3_attributeIDInsideOptionalCtorSignature = "(J)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
-                        newElement_3_attributeIDInsideOptionalClassName.c_str(),
-                        newElement_3_attributeIDInsideOptionalCtorSignature.c_str(), entry_3.attributeID.Value(),
-                        newElement_3_attributeIDInsideOptional);
-                    chip::JniReferences::GetInstance().CreateOptional(newElement_3_attributeIDInsideOptional,
-                                                                      newElement_3_attributeID);
-                }
+                std::string newElement_3_attributeIDClassName     = "java/lang/Long";
+                std::string newElement_3_attributeIDCtorSignature = "(J)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_3_attributeIDClassName.c_str(),
+                                                                               newElement_3_attributeIDCtorSignature.c_str(),
+                                                                               entry_3.attributeID, newElement_3_attributeID);
                 jobject newElement_3_attributeValue;
                 std::string newElement_3_attributeValueClassName     = "java/lang/Long";
                 std::string newElement_3_attributeValueCtorSignature = "(J)V";
@@ -1110,7 +1088,7 @@ void CHIPScenesClusterEnhancedViewSceneResponseCallback::CallbackFn(
                     return;
                 }
                 jmethodID attributeValuePairStructCtor_4 =
-                    env->GetMethodID(attributeValuePairStructClass_4, "<init>", "(Ljava/util/Optional;Ljava/lang/Long;)V");
+                    env->GetMethodID(attributeValuePairStructClass_4, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;)V");
                 if (attributeValuePairStructCtor_4 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$ScenesClusterAttributeValuePair constructor");

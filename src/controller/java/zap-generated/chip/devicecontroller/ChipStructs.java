@@ -25,11 +25,11 @@ import java.util.Optional;
 
 public class ChipStructs {
 public static class ScenesClusterAttributeValuePair {
-public Optional<Long> attributeID;
+public Long attributeID;
 public Long attributeValue;
 
   public ScenesClusterAttributeValuePair(
-    Optional<Long> attributeID
+    Long attributeID
       , Long attributeValue
   ) {
     this.attributeID = attributeID;

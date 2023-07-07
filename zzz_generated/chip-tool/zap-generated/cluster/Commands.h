@@ -4907,6 +4907,7 @@ private:
 | * DegradationDirection                                              | 0x0001 |
 | * ChangeIndication                                                  | 0x0002 |
 | * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -4958,6 +4959,7 @@ private:
 | * DegradationDirection                                              | 0x0001 |
 | * ChangeIndication                                                  | 0x0002 |
 | * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -5009,6 +5011,7 @@ private:
 | * DegradationDirection                                              | 0x0001 |
 | * ChangeIndication                                                  | 0x0002 |
 | * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -5060,6 +5063,7 @@ private:
 | * DegradationDirection                                              | 0x0001 |
 | * ChangeIndication                                                  | 0x0002 |
 | * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -5111,6 +5115,7 @@ private:
 | * DegradationDirection                                              | 0x0001 |
 | * ChangeIndication                                                  | 0x0002 |
 | * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -5162,6 +5167,7 @@ private:
 | * DegradationDirection                                              | 0x0001 |
 | * ChangeIndication                                                  | 0x0002 |
 | * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -5213,6 +5219,7 @@ private:
 | * DegradationDirection                                              | 0x0001 |
 | * ChangeIndication                                                  | 0x0002 |
 | * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -5264,6 +5271,7 @@ private:
 | * DegradationDirection                                              | 0x0001 |
 | * ChangeIndication                                                  | 0x0002 |
 | * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -5315,6 +5323,7 @@ private:
 | * DegradationDirection                                              | 0x0001 |
 | * ChangeIndication                                                  | 0x0002 |
 | * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -5366,6 +5375,7 @@ private:
 | * DegradationDirection                                              | 0x0001 |
 | * ChangeIndication                                                  | 0x0002 |
 | * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -5417,6 +5427,7 @@ private:
 | * DegradationDirection                                              | 0x0001 |
 | * ChangeIndication                                                  | 0x0002 |
 | * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -5468,6 +5479,7 @@ private:
 | * DegradationDirection                                              | 0x0001 |
 | * ChangeIndication                                                  | 0x0002 |
 | * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -15721,6 +15733,7 @@ void registerClusterHepaFilterMonitoring(Commands & commands, CredentialIssuerCo
         make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -15738,6 +15751,9 @@ void registerClusterHepaFilterMonitoring(Commands & commands, CredentialIssuerCo
             credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -15756,6 +15772,7 @@ void registerClusterHepaFilterMonitoring(Commands & commands, CredentialIssuerCo
         make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -15791,6 +15808,7 @@ void registerClusterActivatedCarbonFilterMonitoring(Commands & commands, Credent
         make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -15808,6 +15826,9 @@ void registerClusterActivatedCarbonFilterMonitoring(Commands & commands, Credent
             credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -15826,6 +15847,7 @@ void registerClusterActivatedCarbonFilterMonitoring(Commands & commands, Credent
         make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -15861,6 +15883,7 @@ void registerClusterCeramicFilterMonitoring(Commands & commands, CredentialIssue
         make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -15878,6 +15901,9 @@ void registerClusterCeramicFilterMonitoring(Commands & commands, CredentialIssue
             credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -15896,6 +15922,7 @@ void registerClusterCeramicFilterMonitoring(Commands & commands, CredentialIssue
         make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -15931,6 +15958,7 @@ void registerClusterElectrostaticFilterMonitoring(Commands & commands, Credentia
         make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -15948,6 +15976,9 @@ void registerClusterElectrostaticFilterMonitoring(Commands & commands, Credentia
             credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -15966,6 +15997,7 @@ void registerClusterElectrostaticFilterMonitoring(Commands & commands, Credentia
         make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16001,6 +16033,7 @@ void registerClusterUvFilterMonitoring(Commands & commands, CredentialIssuerComm
         make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16018,6 +16051,9 @@ void registerClusterUvFilterMonitoring(Commands & commands, CredentialIssuerComm
             credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -16036,6 +16072,7 @@ void registerClusterUvFilterMonitoring(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16071,6 +16108,7 @@ void registerClusterIonizingFilterMonitoring(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16088,6 +16126,9 @@ void registerClusterIonizingFilterMonitoring(Commands & commands, CredentialIssu
             credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -16106,6 +16147,7 @@ void registerClusterIonizingFilterMonitoring(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16141,6 +16183,7 @@ void registerClusterZeoliteFilterMonitoring(Commands & commands, CredentialIssue
         make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16158,6 +16201,9 @@ void registerClusterZeoliteFilterMonitoring(Commands & commands, CredentialIssue
             credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -16176,6 +16222,7 @@ void registerClusterZeoliteFilterMonitoring(Commands & commands, CredentialIssue
         make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16211,6 +16258,7 @@ void registerClusterOzoneFilterMonitoring(Commands & commands, CredentialIssuerC
         make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16228,6 +16276,9 @@ void registerClusterOzoneFilterMonitoring(Commands & commands, CredentialIssuerC
             credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -16246,6 +16297,7 @@ void registerClusterOzoneFilterMonitoring(Commands & commands, CredentialIssuerC
         make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16281,6 +16333,7 @@ void registerClusterWaterTankMonitoring(Commands & commands, CredentialIssuerCom
         make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16298,6 +16351,9 @@ void registerClusterWaterTankMonitoring(Commands & commands, CredentialIssuerCom
             credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -16316,6 +16372,7 @@ void registerClusterWaterTankMonitoring(Commands & commands, CredentialIssuerCom
         make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16351,6 +16408,7 @@ void registerClusterFuelTankMonitoring(Commands & commands, CredentialIssuerComm
         make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16368,6 +16426,9 @@ void registerClusterFuelTankMonitoring(Commands & commands, CredentialIssuerComm
             credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -16386,6 +16447,7 @@ void registerClusterFuelTankMonitoring(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16421,6 +16483,7 @@ void registerClusterInkCartridgeMonitoring(Commands & commands, CredentialIssuer
         make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16438,6 +16501,9 @@ void registerClusterInkCartridgeMonitoring(Commands & commands, CredentialIssuer
             credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -16456,6 +16522,7 @@ void registerClusterInkCartridgeMonitoring(Commands & commands, CredentialIssuer
         make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16491,6 +16558,7 @@ void registerClusterTonerCartridgeMonitoring(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16508,6 +16576,9 @@ void registerClusterTonerCartridgeMonitoring(Commands & commands, CredentialIssu
             credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -16526,6 +16597,7 @@ void registerClusterTonerCartridgeMonitoring(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -17626,28 +17698,28 @@ void registerClusterFanControl(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<chip::app::Clusters::FanControl::FanModeType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FanControl::FanModeEnum>>(
             Id, "fan-mode", 0, UINT8_MAX, Attributes::FanMode::Id, WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FanControl::FanModeSequenceType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FanControl::FanModeSequenceEnum>>(
             Id, "fan-mode-sequence", 0, UINT8_MAX, Attributes::FanModeSequence::Id, WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent>>>(
             Id, "percent-setting", 0, UINT8_MAX, Attributes::PercentSetting::Id, WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "percent-current", 0, UINT8_MAX, Attributes::PercentCurrent::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::Percent>>(Id, "percent-current", 0, UINT8_MAX, Attributes::PercentCurrent::Id,
+                                                   WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "speed-max", 0, UINT8_MAX, Attributes::SpeedMax::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(
             Id, "speed-setting", 0, UINT8_MAX, Attributes::SpeedSetting::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "speed-current", 0, UINT8_MAX, Attributes::SpeedCurrent::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "rock-support", 0, UINT8_MAX, Attributes::RockSupport::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "rock-setting", 0, UINT8_MAX, Attributes::RockSetting::Id,
-                                             WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "wind-support", 0, UINT8_MAX, Attributes::WindSupport::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "wind-setting", 0, UINT8_MAX, Attributes::WindSetting::Id,
-                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>>(
+            Id, "rock-support", 0, UINT8_MAX, Attributes::RockSupport::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>>(
+            Id, "rock-setting", 0, UINT8_MAX, Attributes::RockSetting::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>>(
+            Id, "wind-support", 0, UINT8_MAX, Attributes::WindSupport::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>>(
+            Id, "wind-setting", 0, UINT8_MAX, Attributes::WindSetting::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::Clusters::FanControl::AirflowDirectionEnum>>(
             Id, "airflow-direction", 0, UINT8_MAX, Attributes::AirflowDirection::Id, WriteCommandType::kWrite,
             credsIssuerConfig), //

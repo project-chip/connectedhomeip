@@ -35,6 +35,7 @@ steps:
               --target android-arm64-tv-server
               --target android-x64-chip-tool
               --target bouffalolab-bl602-iot-matter-v1-light
+              --target bouffalolab-bl704l-dvk-light
               --target bouffalolab-xt-zb6-devkit-light-rpc
               --target cc13x2x7_26x2x7-lighting
               --target cc13x2x7_26x2x7-lock-mtd

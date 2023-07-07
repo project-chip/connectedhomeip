@@ -17,20 +17,6 @@
  */
 
 #include "LEDWidget.h"
-#ifdef CFG_PLF_RV32
-#include "asr_gpio.h"
-#include "asr_pinmux.h"
-#include "asr_pwm.h"
-#define duet_pwm_dev_t asr_pwm_dev_t
-#define duet_pwm_config_t asr_pwm_config_t
-#define duet_pwm_para_chg asr_pwm_para_chg
-#define duet_pwm_init asr_pwm_init
-#define duet_pwm_start asr_pwm_start
-#else
-#include "duet_gpio.h"
-#include "duet_pinmux.h"
-#include "duet_pwm.h"
-#endif
 #include "AppConfig.h"
 #include <platform/CHIPDeviceLayer.h>
 
@@ -51,6 +37,7 @@
 // PWM period in micro seconds
 #define LED_PWM_PERIOD_US (255u)
 
+#ifdef LIGHT_SELECT_RGB
 static void show_pwm(duet_pwm_dev_t * pwm_dev, uint8_t val)
 {
     duet_pwm_config_t pwm_cfg;
@@ -71,6 +58,7 @@ static void init_pwm(duet_pwm_dev_t * pwm_dev, uint8_t ledNum, uint8_t val)
     pwm_dev->priv              = NULL;
     duet_pwm_init(pwm_dev);
 }
+#endif
 
 void LEDWidget::Init(uint8_t ledNum)
 {
@@ -81,7 +69,7 @@ void LEDWidget::Init(uint8_t ledNum)
     mbrightness       = LED_MIN_BRIGHTNESS;
     mHue              = 0;
     mSaturation       = 0;
-
+#ifdef LIGHT_SELECT_RGB
     if (ledNum == LIGHT_RGB_GREEN)
     {
 #ifdef CFG_PLF_RV32
@@ -103,6 +91,11 @@ void LEDWidget::Init(uint8_t ledNum)
 #endif
         init_pwm(&pwm_led, ledNum, LED_MIN_BRIGHTNESS);
     }
+#else
+    gpio.port   = ledNum;
+    gpio.config = DUET_OUTPUT_PUSH_PULL;
+    duet_gpio_init(&gpio);
+#endif
 }
 
 void LEDWidget::Invert(void)
@@ -153,11 +146,16 @@ void LEDWidget::DoSet(bool state)
 {
     if (mState != state)
     {
+#ifdef LIGHT_SELECT_RGB
         (state) ? PWM_start() : PWM_stop();
+#else
+        (state) ? duet_gpio_output_low(&gpio) : duet_gpio_output_high(&gpio);
+#endif
     }
     mState = state;
 }
 
+#ifdef LIGHT_SELECT_RGB
 void LEDWidget::RGB_init()
 {
     Init(LIGHT_RGB_RED);   // red light of RGB
@@ -175,7 +173,6 @@ void LEDWidget::PWM_start()
             ASR_LOG("PWM failed to start!");
         }
 
-#if (LIGHT_SELECT == LIGHT_SELECT_RGB)
         /* Start PWM to turn the LED on */
         if (0 != duet_pwm_start(&pwm_led_g))
         {
@@ -187,7 +184,6 @@ void LEDWidget::PWM_start()
         {
             ASR_LOG("PWM failed to start!");
         }
-#endif
         mState = 1;
     }
 }
@@ -272,9 +268,8 @@ void LEDWidget::showRGB(uint8_t red, uint8_t green, uint8_t blue)
 {
     show_pwm(&pwm_led, red);
 
-#if (LIGHT_SELECT == LIGHT_SELECT_RGB)
     show_pwm(&pwm_led_g, green);
 
     show_pwm(&pwm_led_b, blue);
-#endif
 }
+#endif

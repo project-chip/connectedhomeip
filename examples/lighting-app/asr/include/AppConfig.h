@@ -27,8 +27,6 @@
 
 #define APP_TASK_NAME "APP"
 
-#define LIGHT_LED PWM_OUTPUT_CH4
-
 #define APP_TASK_STACK_SIZE (1024 * 4)
 
 #define MATTER_DEVICE_NAME "ASR-Lighting"

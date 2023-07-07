@@ -109,7 +109,8 @@ class AttributeWriteResult:
 
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct)(uint64_t commandSenderPtr,
 #                                                                                         void * commandStatusBuf);
-# typedef void (*PythonInteractionModelDelegate_OnCommandResponseProtocolErrorFunct)(uint64_t commandSenderPtr, uint8_t commandIndex);
+# typedef void (*PythonInteractionModelDelegate_OnCommandResponseProtocolErrorFunct)(uint64_t commandSenderPtr,
+#                                                                                    uint8_t commandIndex);
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseFunct)(uint64_t commandSenderPtr, uint32_t error);
 _OnCommandResponseStatusCodeReceivedFunct = CFUNCTYPE(
     None, c_uint64, c_void_p, c_uint32)
@@ -183,7 +184,8 @@ def _OnWriteResponseStatus(IMAttributeWriteResult, IMAttributeWriteResultLen):
 
     appId = status["AppIdentifier"]
     if appId < 256:
-        # For all attribute write requests using CHIPCluster API, appId is filled by CHIPDevice, and should be smaller than 256 (UINT8_MAX).
+        # For all attribute write requests using CHIPCluster API, appId is filled by CHIPDevice,
+        # and should be smaller than 256 (UINT8_MAX).
         appId = DEFAULT_ATTRIBUTEWRITE_APPID
 
     with _writeStatusDictLock:

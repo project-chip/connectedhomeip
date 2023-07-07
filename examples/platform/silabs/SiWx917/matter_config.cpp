@@ -56,7 +56,7 @@ using namespace ::chip::DeviceLayer;
 
 #include "SilabsDeviceDataProvider.h"
 #include "SilabsTestEventTriggerDelegate.h"
-#include <string.h>
+#include <lib/support/BytesToHex.h>
 
 #if SILABS_OTA_ENABLED
 void SilabsMatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
@@ -86,45 +86,6 @@ void SilabsMatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
-
-static int hex_digit_to_int(char hex)
-{
-    if ('A' <= hex && hex <= 'F')
-    {
-        return 10 + hex - 'A';
-    }
-    if ('a' <= hex && hex <= 'f')
-    {
-        return 10 + hex - 'a';
-    }
-    if ('0' <= hex && hex <= '9')
-    {
-        return hex - '0';
-    }
-    return -1;
-}
-
-static size_t hex_string_to_binary(const char * hex_string, uint8_t * buf, size_t buf_size)
-{
-    size_t num_char = strlen(hex_string);
-    if (num_char != buf_size * 2)
-    {
-        return 0;
-    }
-    for (size_t i = 0; i < num_char; i += 2)
-    {
-        int digit0 = hex_digit_to_int(hex_string[i]);
-        int digit1 = hex_digit_to_int(hex_string[i + 1]);
-
-        if (digit0 < 0 || digit1 < 0)
-        {
-            return 0;
-        }
-        buf[i / 2] = (digit0 << 4) + digit1;
-    }
-
-    return buf_size;
-}
 #endif // SILABS_TEST_EVENT_TRIGGER_ENABLED
 
 CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
@@ -180,8 +141,9 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     static chip::CommonCaseDeviceServerInitParams initParams;
 
 #if SILABS_TEST_EVENT_TRIGGER_ENABLED
-    if (hex_string_to_binary(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY, sTestEventTriggerEnableKey,
-                             sizeof(sTestEventTriggerEnableKey)) == 0)
+    if (Encoding::HexToBytes(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY, strlen(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY),
+                             sTestEventTriggerEnableKey,
+                             TestEventTriggerDelegate::kEnableKeyLength) != TestEventTriggerDelegate::kEnableKeyLength)
     {
         SILABS_LOG("Failed to convert the EnableKey string to octstr type value");
         memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));

@@ -130,7 +130,7 @@ class _DeviceInfoReceiver:
 
 
 def DiscoverSync(timeoutMs: int, adapter=None) -> Generator[DeviceInfo, None, None]:
-    """Discover BLE devices over the specified period of time. 
+    """Discover BLE devices over the specified period of time.
 
     NOTE: devices are not guaranteed to be unique. New entries are returned
     as soon as the underlying BLE manager detects changes.

@@ -79,6 +79,15 @@ source_set("ota-requestor-test-srcs") {
   ]
 }
 
+source_set("time-sync-data-provider-test-srcs") {
+  sources = [ "${chip_root}/src/app/clusters/time-synchronization-server/TimeSyncDataProvider.cpp" ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
 source_set("scenes-table-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSets.h",
@@ -103,6 +112,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestAclEvent.cpp",
     "TestAttributePathExpandIterator.cpp",
+    "TestAttributePersistenceProvider.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
     "TestBindingTable.cpp",
@@ -128,6 +138,7 @@ chip_test_suite("tests") {
     "TestSceneTable.cpp",
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
+    "TestTimeSyncDataProvider.cpp",
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
   ]
@@ -163,6 +174,7 @@ chip_test_suite("tests") {
     ":icd-management-test-srcs",
     ":ota-requestor-test-srcs",
     ":scenes-table-test-srcs",
+    ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/icd:manager-srcs",

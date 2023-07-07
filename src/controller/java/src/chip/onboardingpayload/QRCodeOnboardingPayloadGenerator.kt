@@ -111,12 +111,11 @@ class QRCodeOnboardingPayloadGenerator(private val onboardingPayload: Onboarding
     }
 
     var tlvDataLengthInBytes = generateTLVFromOptionalData(onboardingPayload, tlvDataStart, tlvDataStartSize)
-    
     val bits = ByteArray(kTotalPayloadDataSizeInBytes + tlvDataLengthInBytes)
     val buffer = CharArray(base38EncodedLength(bits.size) + kQRCodePrefix.length)
     payloadBase38RepresentationWithTLV(onboardingPayload, buffer, bits, tlvDataStart, tlvDataLengthInBytes)
     
-    return buffer.toString()
+    return String(buffer)
   }
 
   private fun generateTLVFromOptionalData(
