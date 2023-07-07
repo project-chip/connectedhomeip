@@ -25,6 +25,8 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+    "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common/src/instances/ActivatedCarbonFilterMonitoring.cpp",
+    "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common/src/instances/HepafilterMonitoring.cpp",
     "AllClustersCommandDelegate.cpp",
     "AppOptions.cpp",
     "WindowCoveringManager.cpp",
@@ -41,8 +43,10 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/third_party/jsoncpp",
   ]
 
-  include_dirs =
-      [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
+  include_dirs = [ 
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+    "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common/include" 
+  ]
 
   cflags = [ "-Wconversion" ]
 

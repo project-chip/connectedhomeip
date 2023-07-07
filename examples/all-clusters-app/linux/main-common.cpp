@@ -36,6 +36,9 @@
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
 
+#include <instances/ActivatedCarbonFilterMonitoring.h>
+#include <instances/HepaFilterMonitoring.h>
+
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #include <platform/Darwin/NetworkCommissioningDriver.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -60,6 +63,13 @@ LowPowerManager sLowPowerManager;
 NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
 chip::app::Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
+
+chip::app::Clusters::ResourceMonitoring::HepaFilterMonitoringInstance
+    gHepafilterInstance(0x1, chip::app::Clusters::HepaFilterMonitoring::Id, 1,
+                        chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);
+chip::app::Clusters::ResourceMonitoring::ActivatedCarbonFilterMonitoringInstance
+    gActivatedCarbonFilterInstance(0x1, chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id, 1,
+                                   chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);
 
 } // namespace
 
@@ -251,6 +261,9 @@ void ApplicationInit()
     {
         sEthernetNetworkCommissioningInstance.Init();
     }
+
+    gHepafilterInstance.Init();
+    gActivatedCarbonFilterInstance.Init();
 
     std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
 
