@@ -37,8 +37,8 @@ import json
 import threading
 import time
 import typing
-from ctypes import (CDLL, CFUNCTYPE, POINTER, byref, c_bool, c_char, c_char_p, c_int, c_size_t, c_uint8, c_uint16, c_uint32, c_int32,
-                    c_uint64, c_void_p, create_string_buffer, pointer, py_object, resize, string_at)
+from ctypes import (CDLL, CFUNCTYPE, POINTER, byref, c_bool, c_char, c_char_p, c_int, c_int32, c_size_t, c_uint8, c_uint16,
+                    c_uint32, c_uint64, c_void_p, create_string_buffer, pointer, py_object, resize, string_at)
 from dataclasses import dataclass
 
 import dacite
