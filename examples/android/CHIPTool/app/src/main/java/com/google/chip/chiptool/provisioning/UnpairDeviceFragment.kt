@@ -24,7 +24,8 @@ class UnpairDeviceFragment : Fragment() {
   private lateinit var addressUpdateFragment: AddressUpdateFragment
 
   private var _binding: UnpairDeviceFragmentBinding? = null
-  private val binding get() = _binding!!
+  private val binding
+    get() = _binding!!
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -57,13 +58,16 @@ class UnpairDeviceFragment : Fragment() {
     }
   }
 
-  private  fun unpairDeviceClick() {
-    deviceController.unpairDeviceCallback(addressUpdateFragment.deviceId, ChipUnpairDeviceCallback())
+  private fun unpairDeviceClick() {
+    deviceController.unpairDeviceCallback(
+      addressUpdateFragment.deviceId,
+      ChipUnpairDeviceCallback()
+    )
   }
-
 
   companion object {
     private const val TAG = "UnpairDeviceFragment"
+
     fun newInstance(): UnpairDeviceFragment = UnpairDeviceFragment()
   }
 }
