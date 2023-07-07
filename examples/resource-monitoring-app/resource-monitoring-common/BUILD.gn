@@ -26,6 +26,7 @@ source_set("instances") {
 chip_data_model("resource-monitoring-common") {
   zap_file = "resource-monitoring-app.zap"
 
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/resource-monitoring-app/zap-generated"
+  zap_pregenerated_dir =
+      "${chip_root}/zzz_generated/resource-monitoring-app/zap-generated"
   is_server = true
 }

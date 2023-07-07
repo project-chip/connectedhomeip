@@ -309,17 +309,17 @@
         "Operational State": ["OperationalState", "OperationalError"],
         "RVC Operational State": ["OperationalState", "OperationalError"],
         "Activated Carbon Filter Monitoring": [
-            "Condition", 
-            "DegradationDirection", 
-            "ChangeIndication", 
-            "InPlaceIndicator", 
+            "Condition",
+            "DegradationDirection",
+            "ChangeIndication",
+            "InPlaceIndicator",
             "LastChangedTime"
         ],
         "HEPA Filter Monitoring": [
-            "Condition", 
-            "DegradationDirection", 
-            "ChangeIndication", 
-            "InPlaceIndicator", 
+            "Condition",
+            "DegradationDirection",
+            "ChangeIndication",
+            "InPlaceIndicator",
             "LastChangedTime"
         ]
     },

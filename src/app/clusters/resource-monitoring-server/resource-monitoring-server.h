@@ -34,7 +34,6 @@ class Instance : public CommandHandlerInterface, public AttributeAccessInterface
 {
 
 public:
-
     void LoadPersistentAttributes();
 
     /**
@@ -123,7 +122,7 @@ public:
         mFeature    = aFeature;
     }
 
-    ~Instance() { }
+    ~Instance() {}
 
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
@@ -134,15 +133,16 @@ public:
      * This init function will be called during Resource Monitoring Server initialization after the instance information has been
      * validated and the instance has been registered. This function should be overridden by the SDK user to initialize the
      * application logic.
-     * 
-     * @return CHIP_NO_ERROR    If the application was initialized successfully. All other values will cause the initialization to fail.
+     *
+     * @return CHIP_NO_ERROR    If the application was initialized successfully. All other values will cause the initialization to
+     * fail.
      */
     virtual CHIP_ERROR AppInit() = 0;
 
     /**
      * This function is to be overridden by a user implemented method to handle the application specifics of the ResetCondition
      * command.
-     * 
+     *
      * @return Status::Success      If the command was handled successfully, all other will cause the command to fail.
      */
     virtual chip::Protocols::InteractionModel::Status OnResetCondition() = 0;

@@ -21,11 +21,11 @@ Status HepaFilterMonitoringInstance::OnResetCondition()
 {
     ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::OnResetCondition()");
 
-    if ( GetDegradationDirection() == DegradationDirectionEnum::kDown)
+    if (GetDegradationDirection() == DegradationDirectionEnum::kDown)
     {
         UpdateCondition(100);
     }
-    else if ( GetDegradationDirection() == DegradationDirectionEnum::kUp)
+    else if (GetDegradationDirection() == DegradationDirectionEnum::kUp)
     {
         UpdateCondition(0);
     }

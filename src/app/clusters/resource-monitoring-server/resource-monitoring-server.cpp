@@ -17,6 +17,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/AttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
 #include <app/reporting/reporting.h>
@@ -24,7 +25,6 @@
 #include <app/util/util.h>
 #include <map>
 #include <platform/DiagnosticDataProvider.h>
-#include <app/AttributePersistenceProvider.h>
 
 // using namespace std;
 using namespace chip;
@@ -42,14 +42,16 @@ namespace ResourceMonitoring {
 
 void Instance::LoadPersistentAttributes()
 {
-    CHIP_ERROR err = chip::app::GetAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id),mLastChangedTime);
+    CHIP_ERROR err = chip::app::GetAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id), mLastChangedTime);
     if (err == CHIP_NO_ERROR)
     {
         if (mLastChangedTime.IsNull())
         {
-                ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as null");
+            ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as null");
         }
-        else {
+        else
+        {
 
             ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as %u", mLastChangedTime.Value());
         }
@@ -66,10 +68,10 @@ CHIP_ERROR Instance::Init()
     ChipLogError(Zcl, "ResourceMonitoring: Init");
     // Check that the cluster ID given is a valid mode select alias cluster ID.
     VerifyOrDie(IsAliascluster());
-    
+
     // Check if the cluster has been selected in zap
     VerifyOrDie(emberAfContainsServer(mEndpointId, mClusterId));
-    
+
     LoadPersistentAttributes();
 
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
@@ -204,7 +206,8 @@ chip::Protocols::InteractionModel::Status Instance::UpdateLastChangedTime(DataMo
     mLastChangedTime        = aNewLastChangedTime;
     if (mLastChangedTime != oldLastchangedTime)
     {
-        chip::app::GetAttributePersistenceProvider()->WriteScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id),mLastChangedTime);
+        chip::app::GetAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id), mLastChangedTime);
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::LastChangedTime::Id);
     }
     return Protocols::InteractionModel::Status::Success;
@@ -280,13 +283,11 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
 
     if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
     {
-        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
-                                                Protocols::InteractionModel::Status::InvalidCommand);
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
         return;
     }
 
     func(handlerContext, requestPayload);
-    
 }
 
 } // namespace ResourceMonitoring

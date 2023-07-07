@@ -152,7 +152,9 @@
         "ACCESS_CONTROL_CLUSTER": ["access-control-server"],
         "ACCOUNT_LOGIN_CLUSTER": ["account-login-server"],
         "ACTIONS_CLUSTER": [],
-        "ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER": ["resource-monitoring-server"],
+        "ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER": [
+            "resource-monitoring-server"
+        ],
         "ADMINISTRATOR_COMMISSIONING_CLUSTER": [
             "administrator-commissioning-server"
         ],
