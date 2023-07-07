@@ -17,16 +17,11 @@
 
 package chip.onboardingpayload
 
-import java.lang.StringBuilder
 import java.util.concurrent.atomic.AtomicInteger
-import chip.tlv.Tag
-import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
-import chip.tlv.TlvReader
 
 /**
- * @class QRCodeOnboardingPayloadParser
- * A class that can be used to convert a base38 encoded payload to a OnboardingPayload object
+ * @class QRCodeOnboardingPayloadParser A class that can be used to convert a base38 encoded payload
+ *   to a OnboardingPayload object
  */
 class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
   private fun extractPayload(inString: String): String {
@@ -36,27 +31,27 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
     startIndices.add(0)
 
     for (i in inString.indices) {
-        if (inString[i] == delimiter) {
-            startIndices.add(i + 1)
-        }
+      if (inString[i] == delimiter) {
+        startIndices.add(i + 1)
+      }
     }
 
     // Find the first string between delimiters that starts with kQRCodePrefix
     for (i in 0 until startIndices.size) {
-        val startIndex = startIndices[i]
-        val endIndex = if (i == startIndices.size - 1) inString.length else startIndices[i + 1] - 1
-        val length = if (endIndex != inString.length) endIndex - startIndex else inString.length
-        val segment = inString.substring(startIndex, startIndex + length)
+      val startIndex = startIndices[i]
+      val endIndex = if (i == startIndices.size - 1) inString.length else startIndices[i + 1] - 1
+      val length = if (endIndex != inString.length) endIndex - startIndex else inString.length
+      val segment = inString.substring(startIndex, startIndex + length)
 
-        // Find a segment that starts with kQRCodePrefix
-        if (segment.startsWith(kQRCodePrefix) && segment.length > kQRCodePrefix.length) {
-            chipSegment = segment
-            break
-        }
+      // Find a segment that starts with kQRCodePrefix
+      if (segment.startsWith(kQRCodePrefix) && segment.length > kQRCodePrefix.length) {
+        chipSegment = segment
+        break
+      }
     }
 
     if (chipSegment.length > 0) {
-        return chipSegment.substring(kQRCodePrefix.length) // strip out prefix before returning
+      return chipSegment.substring(kQRCodePrefix.length) // strip out prefix before returning
     }
 
     return chipSegment
@@ -98,7 +93,7 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
     }
 
     // TODO: populate TLV optional fields
-  }  
+  }
 
   companion object {
     // Populate numberOfBits into dest from buf starting at startIndex
@@ -107,7 +102,7 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
       if (index.get() + numberOfBitsToRead > buf.size * 8 || numberOfBitsToRead > Long.SIZE_BITS) {
         throw UnrecognizedQrCodeException("Invalid argument")
       }
-    
+
       var currentIndex = index.get()
       for (bitsRead in 0 until numberOfBitsToRead) {
         if (buf[currentIndex / 8].toInt() and (1 shl (currentIndex % 8)) != 0) {

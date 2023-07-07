@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ClusterIDMapping.*
 import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.WriteAttributesCallback
 import chip.devicecontroller.model.AttributeWriteRequest
@@ -21,11 +22,9 @@ import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.BasicClientFragmentBinding
 import com.google.chip.chiptool.util.TlvParseUtil
+import java.util.Optional
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.Optional
-
-import chip.devicecontroller.ClusterIDMapping.*
 
 class BasicClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
@@ -36,7 +35,8 @@ class BasicClientFragment : Fragment() {
   private lateinit var addressUpdateFragment: AddressUpdateFragment
 
   private var _binding: BasicClientFragmentBinding? = null
-  private val binding get() = _binding!!
+  private val binding
+    get() = _binding!!
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -50,25 +50,38 @@ class BasicClientFragment : Fragment() {
 
     addressUpdateFragment =
       childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
-    binding.writeNodeLabelBtn.setOnClickListener { scope.launch {
-      // TODO : Need to be implement poj-to-tlv
-      sendWriteAttribute(BasicInformation.Attribute.NodeLabel, TlvParseUtil.encode(binding.nodeLabelEd.text.toString()))
-      binding.nodeLabelEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
-    }}
-    binding.writeLocationBtn.setOnClickListener { scope.launch {
-      // TODO : Need to be implement poj-to-tlv
-      sendWriteAttribute(BasicInformation.Attribute.Location, TlvParseUtil.encode(binding.locationEd.text.toString()))
-      binding.locationEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
-    }}
+    binding.writeNodeLabelBtn.setOnClickListener {
+      scope.launch {
+        // TODO : Need to be implement poj-to-tlv
+        sendWriteAttribute(
+          BasicInformation.Attribute.NodeLabel,
+          TlvParseUtil.encode(binding.nodeLabelEd.text.toString())
+        )
+        binding.nodeLabelEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
+      }
+    }
+    binding.writeLocationBtn.setOnClickListener {
+      scope.launch {
+        // TODO : Need to be implement poj-to-tlv
+        sendWriteAttribute(
+          BasicInformation.Attribute.Location,
+          TlvParseUtil.encode(binding.locationEd.text.toString())
+        )
+        binding.locationEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
+      }
+    }
     binding.writeLocalConfigDisabledSwitch.setOnCheckedChangeListener { _, isChecked ->
       scope.launch {
         // TODO : Need to be implement poj-to-tlv
-        sendWriteAttribute(BasicInformation.Attribute.LocalConfigDisabled, TlvParseUtil.encode(isChecked))
+        sendWriteAttribute(
+          BasicInformation.Attribute.LocalConfigDisabled,
+          TlvParseUtil.encode(isChecked)
+        )
       }
     }
     makeAttributeList()
     binding.attributeNameSpinner.adapter = makeAttributeNamesAdapter()
-    binding.readAttributeBtn.setOnClickListener { scope.launch { readAttributeButtonClick() }}
+    binding.readAttributeBtn.setOnClickListener { scope.launch { readAttributeButtonClick() } }
 
     return binding.root
   }
@@ -98,15 +111,13 @@ class BasicClientFragment : Fragment() {
     }
   }
 
-
   private fun makeAttributeNamesAdapter(): ArrayAdapter<String> {
     return ArrayAdapter(
-      requireContext(),
-      android.R.layout.simple_spinner_dropdown_item,
-      ATTRIBUTES.toList()
-    ).apply {
-      setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-    }
+        requireContext(),
+        android.R.layout.simple_spinner_dropdown_item,
+        ATTRIBUTES.toList()
+      )
+      .apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
   }
 
   private suspend fun readAttributeButtonClick() {
@@ -123,21 +134,39 @@ class BasicClientFragment : Fragment() {
     val attributeName = ATTRIBUTES[itemIndex]
     val attributeId = BasicInformation.Attribute.valueOf(attributeName).id
 
-    val devicePtr = ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+    val devicePtr =
+      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
 
-    ChipClient.getDeviceController(requireContext()).readPath(object: ReportCallback {
-      override fun onError(attributePath: ChipAttributePath?, eventPath: ChipEventPath?, ex: java.lang.Exception) {
-        showMessage("Read $attributeName failure $ex")
-        Log.e(TAG, "Read $attributeName failure", ex)
-      }
+    ChipClient.getDeviceController(requireContext())
+      .readPath(
+        object : ReportCallback {
+          override fun onError(
+            attributePath: ChipAttributePath?,
+            eventPath: ChipEventPath?,
+            ex: java.lang.Exception
+          ) {
+            showMessage("Read $attributeName failure $ex")
+            Log.e(TAG, "Read $attributeName failure", ex)
+          }
 
-      override fun onReport(nodeState: NodeState?) {
-        val value = nodeState?.getEndpointState(endpointId)?.getClusterState(clusterId)?.getAttributeState(attributeId)?.value ?: "null"
-        Log.i(TAG,"[Read Success] $attributeName: $value")
-        showMessage("[Read Success] $attributeName: $value")
-      }
-
-    }, devicePtr, listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)), null, false, 0 /* imTimeoutMs */)
+          override fun onReport(nodeState: NodeState?) {
+            val value =
+              nodeState
+                ?.getEndpointState(endpointId)
+                ?.getClusterState(clusterId)
+                ?.getAttributeState(attributeId)
+                ?.value
+                ?: "null"
+            Log.i(TAG, "[Read Success] $attributeName: $value")
+            showMessage("[Read Success] $attributeName: $value")
+          }
+        },
+        devicePtr,
+        listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)),
+        null,
+        false,
+        0 /* imTimeoutMs */
+      )
   }
 
   private fun makeAttributeList() {
@@ -148,25 +177,38 @@ class BasicClientFragment : Fragment() {
 
   private suspend fun sendWriteAttribute(attribute: BasicInformation.Attribute, tlv: ByteArray) {
     val clusterId = BasicInformation.ID
-    val devicePtr = ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+    val devicePtr =
+      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
 
-    ChipClient.getDeviceController(requireContext()).write(object: WriteAttributesCallback {
-      override fun onError(attributePath: ChipAttributePath?, ex: java.lang.Exception?) {
-        showMessage("Write ${attribute.name} failure $ex")
-        Log.e(TAG, "Write ${attribute.name} failure", ex)
-      }
+    ChipClient.getDeviceController(requireContext())
+      .write(
+        object : WriteAttributesCallback {
+          override fun onError(attributePath: ChipAttributePath?, ex: java.lang.Exception?) {
+            showMessage("Write ${attribute.name} failure $ex")
+            Log.e(TAG, "Write ${attribute.name} failure", ex)
+          }
 
-      override fun onResponse(attributePath: ChipAttributePath?) {
-        showMessage("Write ${attribute.name} success")
-      }
-
-    }, devicePtr, listOf(AttributeWriteRequest.newInstance(addressUpdateFragment.endpointId, clusterId, attribute.id, tlv, Optional.empty())), 0, 0)
+          override fun onResponse(attributePath: ChipAttributePath?) {
+            showMessage("Write ${attribute.name} success")
+          }
+        },
+        devicePtr,
+        listOf(
+          AttributeWriteRequest.newInstance(
+            addressUpdateFragment.endpointId,
+            clusterId,
+            attribute.id,
+            tlv,
+            Optional.empty()
+          )
+        ),
+        0,
+        0
+      )
   }
 
   private fun showMessage(msg: String) {
-    requireActivity().runOnUiThread {
-      binding.basicClusterCommandStatus.text = msg
-    }
+    requireActivity().runOnUiThread { binding.basicClusterCommandStatus.text = msg }
   }
 
   override fun onResume() {
