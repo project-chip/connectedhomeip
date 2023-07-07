@@ -29,7 +29,7 @@ class DishwasherAlarmServer
 {
 public:
     static DishwasherAlarmServer & Instance();
-	
+
 	void ResetCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
 						  const chip::app::Clusters::DishwasherAlarm::Commands::Reset::DecodableType & commandData);
 
