@@ -16,9 +16,6 @@
  *    limitations under the License.
  */
 
-#include <gio/gio.h>
-#include <sys/types.h>
-
 #include <peripheral_io.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -30,28 +27,71 @@
 #include <LightingManager.h>
 #include <TizenServiceAppMain.h>
 
-#include "dbus/DBusLightApp.h"
+#if ENABLE_DBUS_UI
+#include "DBusInterface.h"
+#endif
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Clusters;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 namespace {
-DeviceLayer::NetworkCommissioning::TizenWiFiDriver sTizenWiFiDriver;
-Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &sTizenWiFiDriver);
-} // namespace
+
+#if ENABLE_DBUS_UI
+example::DBusInterface sDBusInterface(chip::EndpointId(1));
 #endif
 
-static std::mutex light_set_mutex;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+DeviceLayer::NetworkCommissioning::TizenWiFiDriver sTizenWiFiDriver;
+Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &sTizenWiFiDriver);
+#endif
+
+} // namespace
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-    if (attributePath.mClusterId == OnOff::Id && attributePath.mAttributeId == OnOff::Attributes::OnOff::Id)
+    ChipLogDetail(
+        NotSpecified, "MatterPostAttributeChangeCallback: EndPoint=0x%x, Cluster=" ChipLogFormatMEI ", Attribute=" ChipLogFormatMEI,
+        attributePath.mEndpointId, ChipLogValueMEI(attributePath.mClusterId), ChipLogValueMEI(attributePath.mAttributeId));
+    switch (attributePath.mClusterId)
     {
-        std::lock_guard<std::mutex> guard(light_set_mutex);
-        LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
+    case Clusters::OnOff::Id:
+        switch (attributePath.mAttributeId)
+        {
+        case Clusters::OnOff::Attributes::OnOff::Id:
+            LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
+#if ENABLE_DBUS_UI
+            sDBusInterface.SetOnOff(*value);
+#endif
+            break;
+        default:
+            ChipLogDetail(NotSpecified, "Not handled OnOff cluster attribute ID: " ChipLogFormatMEI,
+                          ChipLogValueMEI(attributePath.mAttributeId));
+        }
+        break;
+    case Clusters::LevelControl::Id:
+        switch (attributePath.mAttributeId)
+        {
+        case Clusters::LevelControl::Attributes::CurrentLevel::Id:
+#if ENABLE_DBUS_UI
+            sDBusInterface.SetLevel(*value);
+#endif
+            break;
+        default:
+            ChipLogDetail(NotSpecified, "Not handled LevelControl cluster attribute ID: " ChipLogFormatMEI,
+                          ChipLogValueMEI(attributePath.mAttributeId));
+        }
+        break;
+    case Clusters::ColorControl::Id:
+        switch (attributePath.mAttributeId)
+        {
+        default:
+            ChipLogDetail(NotSpecified, "Not handled ColorControl cluster attribute ID: " ChipLogFormatMEI,
+                          ChipLogValueMEI(attributePath.mAttributeId));
+        }
+        break;
+    default:
+        ChipLogDetail(NotSpecified, "Not handled cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mClusterId));
     }
 }
 
@@ -76,86 +116,18 @@ static int gpio_init()
     return 0;
 }
 
-static void gpio_turn_on()
+static void gpio_on_off(bool on)
 {
-    peripheral_gpio_write(green_gpio, 1);
-    peripheral_gpio_write(blue_gpio, 1);
-    peripheral_gpio_write(red_gpio, 1);
-}
-
-static void gpio_turn_off()
-{
-    peripheral_gpio_write(green_gpio, 0);
-    peripheral_gpio_write(blue_gpio, 0);
-    peripheral_gpio_write(red_gpio, 0);
-}
-
-static GDBusObjectManagerServer * dbus_manager = NULL;
-static gboolean dbus_name_acquired             = FALSE;
-
-static void on_bus_acquired(G_GNUC_UNUSED GDBusConnection * conn, G_GNUC_UNUSED const char * name, G_GNUC_UNUSED void * userdata)
-{
-    dbus_name_acquired = true;
-}
-
-static void on_bus_lost(G_GNUC_UNUSED GDBusConnection * conn, const char * name, G_GNUC_UNUSED void * userdata)
-{
-    if (!dbus_name_acquired)
-    {
-        g_printerr("Couldn't acquire D-Bus name. Please check D-Bus configuration."
-                   " Requested name: %s\n",
-                   name);
-    }
-}
-
-static gboolean on_on_changed(LightAppManager1 * lightAppManager, GDBusMethodInvocation * invocation, G_GNUC_UNUSED void * userdata)
-{
-    bool on = light_app_manager1_get_on(lightAppManager);
-    std::lock_guard<std::mutex> guard(light_set_mutex);
-    LightingMgr().InitiateAction(on ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
-    return G_DBUS_METHOD_INVOCATION_HANDLED;
-}
-
-static CHIP_ERROR dbusInit(gpointer)
-{
-    g_autoptr(GDBusConnection) bus = NULL;
-    g_autoptr(GError) error        = NULL;
-
-    if ((bus = g_bus_get_sync(G_BUS_TYPE_SYSTEM, NULL, &error)) == NULL)
-    {
-        ChipLogError(NotSpecified, "Couldn't get D-Bus bus: %s\n", error->message);
-        return CHIP_ERROR_NOT_CONNECTED;
-    }
-    dbus_manager = g_dbus_object_manager_server_new("/");
-
-    LightAppObjectSkeleton * object = light_app_object_skeleton_new("/lightapp");
-
-    LightAppManager1 * lightAppManager = light_app_manager1_skeleton_new();
-    g_signal_connect(lightAppManager, "notify::on", G_CALLBACK(on_on_changed), NULL);
-    light_app_object_skeleton_set_manager1(object, lightAppManager);
-    g_object_unref(lightAppManager);
-
-    g_dbus_object_manager_server_export(dbus_manager, G_DBUS_OBJECT_SKELETON(object));
-    g_dbus_object_manager_server_set_connection(dbus_manager, bus);
-    g_object_unref(object);
-
-    g_bus_own_name_on_connection(bus, "org.tizen.matter.example.lighting", G_BUS_NAME_OWNER_FLAGS_NONE, on_bus_acquired,
-                                 on_bus_lost, NULL, NULL);
-
-    return CHIP_NO_ERROR;
-}
-
-void initCallback()
-{
-    chip::DeviceLayer::PlatformMgrImpl().GLibMatterContextInvokeSync(dbusInit, static_cast<void *>(nullptr));
-    if (LightingMgr().IsTurnedOn())
-        gpio_turn_on();
-    else
-        gpio_turn_off();
+    peripheral_gpio_write(green_gpio, on ? 1 : 0);
+    peripheral_gpio_write(blue_gpio, on ? 1 : 0);
+    peripheral_gpio_write(red_gpio, on ? 1 : 0);
 }
 
 void ApplicationInit()
 {
+#if ENABLE_DBUS_UI
+    sDBusInterface.Init();
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     sWiFiNetworkCommissioningInstance.Init();
 #endif
@@ -170,20 +142,11 @@ int main(int argc, char * argv[])
 
     VerifyOrDie(gpio_init() == 0);
     VerifyOrDie(LightingMgr().Init() == CHIP_NO_ERROR);
-    LightingMgr().SetCallbacks(
-        [](LightingManager::Action_t action) {
-            if (action == LightingManager::ON_ACTION)
-            {
-                gpio_turn_on();
-            }
-            else if (action == LightingManager::OFF_ACTION)
-            {
-                gpio_turn_off();
-            }
-        },
-        [](LightingManager::Action_t action) {
 
-        });
-    app.SetInitializedCb(initCallback);
+    LightingMgr().SetCallbacks([](LightingManager::Action_t action) { gpio_on_off(action == LightingManager::ON_ACTION); },
+                               [](LightingManager::Action_t action) {});
+
+    app.SetInitializedCb([]() { gpio_on_off(LightingMgr().IsTurnedOn()); });
+
     return app.RunMainLoop();
 }

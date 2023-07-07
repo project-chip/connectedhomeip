@@ -22,6 +22,11 @@ import("${tizen_sdk_build_root}/tizen_sdk.gni")
 
 assert(chip_build_tools)
 
+declare_args() {
+  # Enable D-Bus based UI functionality for example app
+  chip_examples_enable_ui = false
+}
+
 gdbus_library("chip-lighting-app-manager") {
   sources = [ "xml/DBusLightApp.xml" ]
   interface_prefix = "org.tizen.matter.example.lighting"
@@ -37,12 +42,17 @@ executable("chip-lighting-app") {
   ]
 
   deps = [
-    ":chip-lighting-app-manager",
     "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/examples/lighting-app/lighting-common:lighting-manager",
     "${chip_root}/examples/platform/tizen:app-main",
     "${chip_root}/src/lib",
   ]
+
+  if (chip_examples_enable_ui) {
+    sources += [ "src/DBusInterface.cpp" ]
+    deps += [ ":chip-lighting-app-manager" ]
+    defines = [ "ENABLE_DBUS_UI=1" ]
+  }
 
   include_dirs = [ "include" ]
 
