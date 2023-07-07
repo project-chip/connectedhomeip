@@ -119,52 +119,6 @@ Delegate * GetOperationalStateDelegate(EndpointId endpointId, ClusterId clusterI
     return getGenericDelegateTable(endpointId, clusterId);
 }
 
-/**
- * Log OperationalError Event
- * @param[in] aEndpointId Target endpointId to log event
- * @param[in] err Set the operational error to event.
- * @return true: send event success; fail : send event fail.
- */
-bool LogOperationalErrorEvent(EndpointId aEndpointId, const GenericOperationalError & err)
-{
-    Events::OperationalError::Type event;
-    EventNumber eventNumber;
-
-    event.errorState = err;
-    CHIP_ERROR error = app::LogEvent(event, aEndpointId, eventNumber);
-
-    if (error != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-
-    // notify operational state need to change
-    MatterReportingAttributeChangeCallback(aEndpointId, event.GetClusterId(), OperationalState::Attributes::OperationalState::Id);
-    return true;
-}
-
-/**
- * Log OperationalCompletion Event
- * @param[in] aEndpointId Target endpointId to log event
- * @param[in] op Set the operational completion to event.
- * @return true: send event success; fail : send event fail.
- */
-bool LogOperationCompletion(EndpointId aEndpointId, const GenericOperationCompletion & op)
-{
-    Events::OperationCompletion::Type event;
-    EventNumber eventNumber;
-    event = op;
-
-    CHIP_ERROR error = app::LogEvent(event, aEndpointId, eventNumber);
-
-    if (error != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-
-    return true;
-}
-
 } // namespace OperationalState
 } // namespace Clusters
 } // namespace app
