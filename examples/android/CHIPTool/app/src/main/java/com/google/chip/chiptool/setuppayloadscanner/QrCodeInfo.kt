@@ -4,7 +4,7 @@ import android.os.Parcelable
 import chip.onboardingpayload.OptionalQRCodeInfoType
 import kotlinx.parcelize.Parcelize
 
-@Parcelize
+@Parcelize 
 data class QrCodeInfo(
     val tag: Int,
     val type: OptionalQRCodeInfoType,

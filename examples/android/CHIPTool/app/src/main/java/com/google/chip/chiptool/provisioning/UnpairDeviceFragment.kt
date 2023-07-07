@@ -16,59 +16,54 @@ import com.google.chip.chiptool.databinding.UnpairDeviceFragmentBinding
 import kotlinx.coroutines.*
 
 class UnpairDeviceFragment : Fragment() {
-    private val deviceController: ChipDeviceController
-        get() = ChipClient.getDeviceController(requireContext())
+  private val deviceController: ChipDeviceController
+    get() = ChipClient.getDeviceController(requireContext())
 
-    private lateinit var scope: CoroutineScope
+  private lateinit var scope: CoroutineScope
 
-    private lateinit var addressUpdateFragment: AddressUpdateFragment
+  private lateinit var addressUpdateFragment: AddressUpdateFragment
 
-    private var _binding: UnpairDeviceFragmentBinding? = null
-    private val binding
-        get() = _binding!!
+  private var _binding: UnpairDeviceFragmentBinding? = null
+  private val binding get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = UnpairDeviceFragmentBinding.inflate(inflater, container, false)
-        scope = viewLifecycleOwner.lifecycleScope
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    _binding = UnpairDeviceFragmentBinding.inflate(inflater, container, false)
+    scope = viewLifecycleOwner.lifecycleScope
 
-        addressUpdateFragment =
-            childFragmentManager.findFragmentById(R.id.addressUpdateFragment)
-                as AddressUpdateFragment
+    addressUpdateFragment =
+      childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
 
-        binding.unpairDeviceBtn.setOnClickListener { scope.launch { unpairDeviceClick() } }
+    binding.unpairDeviceBtn.setOnClickListener { scope.launch { unpairDeviceClick() } }
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
+
+  inner class ChipUnpairDeviceCallback : UnpairDeviceCallback {
+    override fun onError(status: Int, remoteDeviceId: Long) {
+      Log.d(TAG, "onError : $remoteDeviceId, $status")
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    override fun onSuccess(remoteDeviceId: Long) {
+      Log.d(TAG, "onSuccess : $remoteDeviceId")
     }
+  }
 
-    inner class ChipUnpairDeviceCallback : UnpairDeviceCallback {
-        override fun onError(status: Int, remoteDeviceId: Long) {
-            Log.d(TAG, "onError : $remoteDeviceId, $status")
-        }
+  private  fun unpairDeviceClick() {
+    deviceController.unpairDeviceCallback(addressUpdateFragment.deviceId, ChipUnpairDeviceCallback())
+  }
 
-        override fun onSuccess(remoteDeviceId: Long) {
-            Log.d(TAG, "onSuccess : $remoteDeviceId")
-        }
-    }
 
-    private fun unpairDeviceClick() {
-        deviceController.unpairDeviceCallback(
-            addressUpdateFragment.deviceId,
-            ChipUnpairDeviceCallback()
-        )
-    }
-
-    companion object {
-        private const val TAG = "UnpairDeviceFragment"
-
-        fun newInstance(): UnpairDeviceFragment = UnpairDeviceFragment()
-    }
+  companion object {
+    private const val TAG = "UnpairDeviceFragment"
+    fun newInstance(): UnpairDeviceFragment = UnpairDeviceFragment()
+  }
 }

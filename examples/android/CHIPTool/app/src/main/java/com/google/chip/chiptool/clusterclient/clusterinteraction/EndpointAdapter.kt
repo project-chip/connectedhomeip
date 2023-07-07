@@ -12,41 +12,41 @@ import com.google.chip.chiptool.R
  * endpoint with the same onClick function provided in [ClusterInteractionFragment.EndpointListener]
  */
 class EndpointAdapter(
-    private val endpointList: List<EndpointItem>,
-    private val listener: OnItemClickListener
+  private val endpointList: List<EndpointItem>,
+  private val listener: OnItemClickListener
 ) : RecyclerView.Adapter<EndpointAdapter.EndpointViewHolder>() {
 
-    inner class EndpointViewHolder(itemView: View) :
-        RecyclerView.ViewHolder(itemView), View.OnClickListener {
-        val endpointId: TextView = itemView.findViewById(R.id.endpointNumberTv)
+  inner class EndpointViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+                                                   View.OnClickListener {
+    val endpointId: TextView = itemView.findViewById(R.id.endpointNumberTv)
 
-        init {
-            itemView.setOnClickListener(this)
-        }
-
-        override fun onClick(endpointItem: View) {
-            val position = this.adapterPosition
-            if (position != RecyclerView.NO_POSITION) {
-                listener.onItemClick(position)
-            }
-        }
+    init {
+      itemView.setOnClickListener(this)
     }
 
-    interface OnItemClickListener {
-        fun onItemClick(position: Int)
+    override fun onClick(endpointItem: View) {
+      val position = this.adapterPosition
+      if (position != RecyclerView.NO_POSITION) {
+        listener.onItemClick(position)
+      }
     }
+  }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EndpointViewHolder {
-        val itemView =
-            LayoutInflater.from(parent.context).inflate(R.layout.endpoint_item, parent, false)
-        return EndpointViewHolder(itemView)
-    }
+  interface OnItemClickListener {
+    fun onItemClick(position: Int)
+  }
 
-    override fun onBindViewHolder(holder: EndpointViewHolder, position: Int) {
-        holder.endpointId.text = endpointList[position].endpointId.toString()
-    }
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EndpointViewHolder {
+    val itemView =
+      LayoutInflater.from(parent.context).inflate(R.layout.endpoint_item, parent, false)
+    return EndpointViewHolder(itemView)
+  }
 
-    override fun getItemCount(): Int {
-        return endpointList.size
-    }
+  override fun onBindViewHolder(holder: EndpointViewHolder, position: Int) {
+    holder.endpointId.text = endpointList[position].endpointId.toString()
+  }
+
+  override fun getItemCount(): Int {
+    return endpointList.size
+  }
 }

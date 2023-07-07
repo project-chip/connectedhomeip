@@ -10,7 +10,6 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
-import chip.devicecontroller.ClusterIDMapping.*
 import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.WriteAttributesCallback
 import chip.devicecontroller.model.AttributeWriteRequest
@@ -22,209 +21,164 @@ import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.BasicClientFragmentBinding
 import com.google.chip.chiptool.util.TlvParseUtil
-import java.util.Optional
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.Optional
+
+import chip.devicecontroller.ClusterIDMapping.*
 
 class BasicClientFragment : Fragment() {
-    private val deviceController: ChipDeviceController
-        get() = ChipClient.getDeviceController(requireContext())
+  private val deviceController: ChipDeviceController
+    get() = ChipClient.getDeviceController(requireContext())
 
-    private lateinit var scope: CoroutineScope
+  private lateinit var scope: CoroutineScope
 
-    private lateinit var addressUpdateFragment: AddressUpdateFragment
+  private lateinit var addressUpdateFragment: AddressUpdateFragment
 
-    private var _binding: BasicClientFragmentBinding? = null
-    private val binding
-        get() = _binding!!
+  private var _binding: BasicClientFragmentBinding? = null
+  private val binding get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = BasicClientFragmentBinding.inflate(inflater, container, false)
-        scope = viewLifecycleOwner.lifecycleScope
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    _binding = BasicClientFragmentBinding.inflate(inflater, container, false)
+    scope = viewLifecycleOwner.lifecycleScope
 
-        deviceController.setCompletionListener(ChipControllerCallback())
+    deviceController.setCompletionListener(ChipControllerCallback())
 
-        addressUpdateFragment =
-            childFragmentManager.findFragmentById(R.id.addressUpdateFragment)
-                as AddressUpdateFragment
-        binding.writeNodeLabelBtn.setOnClickListener {
-            scope.launch {
-                // TODO : Need to be implement poj-to-tlv
-                sendWriteAttribute(
-                    BasicInformation.Attribute.NodeLabel,
-                    TlvParseUtil.encode(binding.nodeLabelEd.text.toString())
-                )
-                binding.nodeLabelEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
-            }
-        }
-        binding.writeLocationBtn.setOnClickListener {
-            scope.launch {
-                // TODO : Need to be implement poj-to-tlv
-                sendWriteAttribute(
-                    BasicInformation.Attribute.Location,
-                    TlvParseUtil.encode(binding.locationEd.text.toString())
-                )
-                binding.locationEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
-            }
-        }
-        binding.writeLocalConfigDisabledSwitch.setOnCheckedChangeListener { _, isChecked ->
-            scope.launch {
-                // TODO : Need to be implement poj-to-tlv
-                sendWriteAttribute(
-                    BasicInformation.Attribute.LocalConfigDisabled,
-                    TlvParseUtil.encode(isChecked)
-                )
-            }
-        }
-        makeAttributeList()
-        binding.attributeNameSpinner.adapter = makeAttributeNamesAdapter()
-        binding.readAttributeBtn.setOnClickListener { scope.launch { readAttributeButtonClick() } }
+    addressUpdateFragment =
+      childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
+    binding.writeNodeLabelBtn.setOnClickListener { scope.launch {
+      // TODO : Need to be implement poj-to-tlv
+      sendWriteAttribute(BasicInformation.Attribute.NodeLabel, TlvParseUtil.encode(binding.nodeLabelEd.text.toString()))
+      binding.nodeLabelEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
+    }}
+    binding.writeLocationBtn.setOnClickListener { scope.launch {
+      // TODO : Need to be implement poj-to-tlv
+      sendWriteAttribute(BasicInformation.Attribute.Location, TlvParseUtil.encode(binding.locationEd.text.toString()))
+      binding.locationEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
+    }}
+    binding.writeLocalConfigDisabledSwitch.setOnCheckedChangeListener { _, isChecked ->
+      scope.launch {
+        // TODO : Need to be implement poj-to-tlv
+        sendWriteAttribute(BasicInformation.Attribute.LocalConfigDisabled, TlvParseUtil.encode(isChecked))
+      }
+    }
+    makeAttributeList()
+    binding.attributeNameSpinner.adapter = makeAttributeNamesAdapter()
+    binding.readAttributeBtn.setOnClickListener { scope.launch { readAttributeButtonClick() }}
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
+
+  inner class ChipControllerCallback : GenericChipDeviceListener() {
+    override fun onConnectDeviceComplete() {}
+
+    override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
+      Log.d(TAG, "onCommissioningComplete for nodeId $nodeId: $errorCode")
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    override fun onNotifyChipConnectionClosed() {
+      Log.d(TAG, "onNotifyChipConnectionClosed")
     }
 
-    inner class ChipControllerCallback : GenericChipDeviceListener() {
-        override fun onConnectDeviceComplete() {}
-
-        override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
-            Log.d(TAG, "onCommissioningComplete for nodeId $nodeId: $errorCode")
-        }
-
-        override fun onNotifyChipConnectionClosed() {
-            Log.d(TAG, "onNotifyChipConnectionClosed")
-        }
-
-        override fun onCloseBleComplete() {
-            Log.d(TAG, "onCloseBleComplete")
-        }
-
-        override fun onError(error: Throwable?) {
-            Log.d(TAG, "onError: $error")
-        }
+    override fun onCloseBleComplete() {
+      Log.d(TAG, "onCloseBleComplete")
     }
 
-    private fun makeAttributeNamesAdapter(): ArrayAdapter<String> {
-        return ArrayAdapter(
-                requireContext(),
-                android.R.layout.simple_spinner_dropdown_item,
-                ATTRIBUTES.toList()
-            )
-            .apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+    override fun onError(error: Throwable?) {
+      Log.d(TAG, "onError: $error")
     }
+  }
 
-    private suspend fun readAttributeButtonClick() {
-        try {
-            readBasicClusters(binding.attributeNameSpinner.selectedItemPosition)
-        } catch (ex: Exception) {
-            showMessage("readBasicCluster failed: $ex")
-        }
+
+  private fun makeAttributeNamesAdapter(): ArrayAdapter<String> {
+    return ArrayAdapter(
+      requireContext(),
+      android.R.layout.simple_spinner_dropdown_item,
+      ATTRIBUTES.toList()
+    ).apply {
+      setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
     }
+  }
 
-    private suspend fun readBasicClusters(itemIndex: Int) {
-        val endpointId = addressUpdateFragment.endpointId
-        val clusterId = BasicInformation.ID
-        val attributeName = ATTRIBUTES[itemIndex]
-        val attributeId = BasicInformation.Attribute.valueOf(attributeName).id
-
-        val devicePtr =
-            ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-
-        ChipClient.getDeviceController(requireContext())
-            .readPath(
-                object : ReportCallback {
-                    override fun onError(
-                        attributePath: ChipAttributePath?,
-                        eventPath: ChipEventPath?,
-                        ex: java.lang.Exception
-                    ) {
-                        showMessage("Read $attributeName failure $ex")
-                        Log.e(TAG, "Read $attributeName failure", ex)
-                    }
-
-                    override fun onReport(nodeState: NodeState?) {
-                        val value =
-                            nodeState
-                                ?.getEndpointState(endpointId)
-                                ?.getClusterState(clusterId)
-                                ?.getAttributeState(attributeId)
-                                ?.value
-                                ?: "null"
-                        Log.i(TAG, "[Read Success] $attributeName: $value")
-                        showMessage("[Read Success] $attributeName: $value")
-                    }
-                },
-                devicePtr,
-                listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)),
-                null,
-                false,
-                0 /* imTimeoutMs */
-            )
+  private suspend fun readAttributeButtonClick() {
+    try {
+      readBasicClusters(binding.attributeNameSpinner.selectedItemPosition)
+    } catch (ex: Exception) {
+      showMessage("readBasicCluster failed: $ex")
     }
+  }
 
-    private fun makeAttributeList() {
-        for (attribute in BasicInformation.Attribute.values()) {
-            ATTRIBUTES.add(attribute.name)
-        }
+  private suspend fun readBasicClusters(itemIndex: Int) {
+    val endpointId = addressUpdateFragment.endpointId
+    val clusterId = BasicInformation.ID
+    val attributeName = ATTRIBUTES[itemIndex]
+    val attributeId = BasicInformation.Attribute.valueOf(attributeName).id
+
+    val devicePtr = ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+
+    ChipClient.getDeviceController(requireContext()).readPath(object: ReportCallback {
+      override fun onError(attributePath: ChipAttributePath?, eventPath: ChipEventPath?, ex: java.lang.Exception) {
+        showMessage("Read $attributeName failure $ex")
+        Log.e(TAG, "Read $attributeName failure", ex)
+      }
+
+      override fun onReport(nodeState: NodeState?) {
+        val value = nodeState?.getEndpointState(endpointId)?.getClusterState(clusterId)?.getAttributeState(attributeId)?.value ?: "null"
+        Log.i(TAG,"[Read Success] $attributeName: $value")
+        showMessage("[Read Success] $attributeName: $value")
+      }
+
+    }, devicePtr, listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)), null, false, 0 /* imTimeoutMs */)
+  }
+
+  private fun makeAttributeList() {
+    for (attribute in BasicInformation.Attribute.values()) {
+      ATTRIBUTES.add(attribute.name)
     }
+  }
 
-    private suspend fun sendWriteAttribute(attribute: BasicInformation.Attribute, tlv: ByteArray) {
-        val clusterId = BasicInformation.ID
-        val devicePtr =
-            ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+  private suspend fun sendWriteAttribute(attribute: BasicInformation.Attribute, tlv: ByteArray) {
+    val clusterId = BasicInformation.ID
+    val devicePtr = ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
 
-        ChipClient.getDeviceController(requireContext())
-            .write(
-                object : WriteAttributesCallback {
-                    override fun onError(
-                        attributePath: ChipAttributePath?,
-                        ex: java.lang.Exception?
-                    ) {
-                        showMessage("Write ${attribute.name} failure $ex")
-                        Log.e(TAG, "Write ${attribute.name} failure", ex)
-                    }
+    ChipClient.getDeviceController(requireContext()).write(object: WriteAttributesCallback {
+      override fun onError(attributePath: ChipAttributePath?, ex: java.lang.Exception?) {
+        showMessage("Write ${attribute.name} failure $ex")
+        Log.e(TAG, "Write ${attribute.name} failure", ex)
+      }
 
-                    override fun onResponse(attributePath: ChipAttributePath?) {
-                        showMessage("Write ${attribute.name} success")
-                    }
-                },
-                devicePtr,
-                listOf(
-                    AttributeWriteRequest.newInstance(
-                        addressUpdateFragment.endpointId,
-                        clusterId,
-                        attribute.id,
-                        tlv,
-                        Optional.empty()
-                    )
-                ),
-                0,
-                0
-            )
+      override fun onResponse(attributePath: ChipAttributePath?) {
+        showMessage("Write ${attribute.name} success")
+      }
+
+    }, devicePtr, listOf(AttributeWriteRequest.newInstance(addressUpdateFragment.endpointId, clusterId, attribute.id, tlv, Optional.empty())), 0, 0)
+  }
+
+  private fun showMessage(msg: String) {
+    requireActivity().runOnUiThread {
+      binding.basicClusterCommandStatus.text = msg
     }
+  }
 
-    private fun showMessage(msg: String) {
-        requireActivity().runOnUiThread { binding.basicClusterCommandStatus.text = msg }
-    }
+  override fun onResume() {
+    super.onResume()
+    addressUpdateFragment.endpointId = ENDPOINT
+  }
 
-    override fun onResume() {
-        super.onResume()
-        addressUpdateFragment.endpointId = ENDPOINT
-    }
+  companion object {
+    private const val TAG = "BasicClientFragment"
+    private const val ENDPOINT = 0
+    private val ATTRIBUTES: MutableList<String> = mutableListOf()
 
-    companion object {
-        private const val TAG = "BasicClientFragment"
-        private const val ENDPOINT = 0
-        private val ATTRIBUTES: MutableList<String> = mutableListOf()
-
-        fun newInstance(): BasicClientFragment = BasicClientFragment()
-    }
+    fun newInstance(): BasicClientFragment = BasicClientFragment()
+  }
 }

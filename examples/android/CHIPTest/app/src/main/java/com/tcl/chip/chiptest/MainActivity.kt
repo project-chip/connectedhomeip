@@ -9,22 +9,22 @@ import androidx.appcompat.app.AppCompatActivity
 import chip.platform.*
 import com.tcl.chip.chiptest.databinding.ActivityMainBinding
 
+
 class MainActivity : AppCompatActivity() {
 
     private val msgShowLog = 1
 
     private lateinit var binding: ActivityMainBinding
-    private val mainHandler: Handler =
-        object : Handler(Looper.getMainLooper()) {
-            override fun handleMessage(msg: Message) {
-                super.handleMessage(msg)
-                when (msg.what) {
-                    msgShowLog -> {
-                        binding.testLog.append(msg.obj.toString())
-                    }
+    private val mainHandler: Handler = object : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            when (msg.what) {
+                msgShowLog -> {
+                    binding.testLog.append(msg.obj.toString())
                 }
             }
         }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.testLog.movementMethod = ScrollingMovementMethod()
+        binding.testLog.movementMethod = ScrollingMovementMethod();
         TestEngine.setListener { log ->
             var msg = mainHandler.obtainMessage(msgShowLog, log)
             mainHandler.sendMessage(msg)
@@ -40,29 +40,19 @@ class MainActivity : AppCompatActivity() {
 
         binding.runButton.setOnClickListener {
             binding.testLog.text = ""
-            Thread {
-                    var ret = TestEngine.runTest()
+            Thread{
+                var ret = TestEngine.runTest();
 
-                    var log: String =
-                        if (ret == 0) {
-                            getString(R.string.test_finished)
-                        } else {
-                            getString(R.string.test_failed, ret)
-                        }
-                    var msg = mainHandler.obtainMessage(msgShowLog, log)
-                    mainHandler.sendMessage(msg)
+                var log:String = if (ret == 0) {
+                    getString(R.string.test_finished)
+                } else {
+                    getString(R.string.test_failed,ret)
                 }
-                .start()
+                var msg = mainHandler.obtainMessage(msgShowLog, log)
+                mainHandler.sendMessage(msg)
+            }.start()
         }
 
-        AndroidChipPlatform(
-            AndroidBleManager(),
-            PreferencesKeyValueStoreManager(this),
-            PreferencesConfigurationManager(this),
-            NsdManagerServiceResolver(this),
-            NsdManagerServiceBrowser(this),
-            ChipMdnsCallbackImpl(),
-            DiagnosticDataProviderImpl(this)
-        )
+        AndroidChipPlatform(AndroidBleManager(), PreferencesKeyValueStoreManager(this), PreferencesConfigurationManager(this), NsdManagerServiceResolver(this), NsdManagerServiceBrowser(this), ChipMdnsCallbackImpl(), DiagnosticDataProviderImpl(this))
     }
 }

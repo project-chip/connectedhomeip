@@ -30,79 +30,76 @@ import com.google.chip.chiptool.util.FragmentUtil
 
 /** Show the [CHIPDeviceInfo]. */
 class CHIPDeviceDetailsFragment : Fragment() {
-    private lateinit var deviceInfo: CHIPDeviceInfo
-    private var _binding: ChipDeviceInfoFragmentBinding? = null
-    private val binding
-        get() = _binding!!
+  private lateinit var deviceInfo: CHIPDeviceInfo
+  private var _binding: ChipDeviceInfoFragmentBinding? = null
+  private val binding get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = ChipDeviceInfoFragmentBinding.inflate(inflater, container, false)
-        deviceInfo = checkNotNull(requireArguments().getParcelable(ARG_DEVICE_INFO))
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    _binding = ChipDeviceInfoFragmentBinding.inflate(inflater, container, false)
+    deviceInfo = checkNotNull(requireArguments().getParcelable(ARG_DEVICE_INFO))
 
-        binding.versionTv.text = "${deviceInfo.version}"
-        binding.vendorIdTv.text = "${deviceInfo.vendorId}"
-        binding.productIdTv.text = "${deviceInfo.productId}"
-        binding.setupCodeTv.text = "${deviceInfo.setupPinCode}"
-        binding.discriminatorTv.text = "${deviceInfo.discriminator}"
-        binding.discoveryCapabilitiesTv.text =
-            requireContext()
-                .getString(
-                    R.string.chip_device_info_discovery_capabilities_text,
-                    deviceInfo.discoveryCapabilities
-                )
+    binding.versionTv.text = "${deviceInfo.version}"
+    binding.vendorIdTv.text = "${deviceInfo.vendorId}"
+    binding.productIdTv.text = "${deviceInfo.productId}"
+    binding.setupCodeTv.text = "${deviceInfo.setupPinCode}"
+    binding.discriminatorTv.text = "${deviceInfo.discriminator}"
+    binding.discoveryCapabilitiesTv.text = requireContext().getString(
+      R.string.chip_device_info_discovery_capabilities_text,
+      deviceInfo.discoveryCapabilities
+    )
 
-        if (deviceInfo.optionalQrCodeInfoMap.isEmpty()) {
-            binding.vendorTagsLabelTv.visibility = View.GONE
-            binding.vendorTagsContainer.visibility = View.GONE
-        } else {
-            binding.vendorTagsLabelTv.visibility = View.VISIBLE
-            binding.vendorTagsContainer.visibility = View.VISIBLE
+    if (deviceInfo.optionalQrCodeInfoMap.isEmpty()) {
+      binding.vendorTagsLabelTv.visibility = View.GONE
+      binding.vendorTagsContainer.visibility = View.GONE
+    } else {
+      binding.vendorTagsLabelTv.visibility = View.VISIBLE
+      binding.vendorTagsContainer.visibility = View.VISIBLE
 
-            deviceInfo.optionalQrCodeInfoMap.forEach { (_, qrCodeInfo) ->
-                val tv = inflater.inflate(R.layout.barcode_vendor_tag, null, false) as TextView
-                val info = "${qrCodeInfo.tag}. ${qrCodeInfo.data}, ${qrCodeInfo.intDataValue}"
-                tv.text = info
-                binding.vendorTagsContainer.addView(tv)
-            }
-        }
-
-        binding.commissioningFlowTv.text = "${deviceInfo.commissioningFlow}"
-
-        // commissioningFlow = 2 (Custom), read device info from Ledger
-        if (deviceInfo.commissioningFlow == 2) {
-            binding.customFlowBtn.visibility = View.VISIBLE
-            binding.customFlowBtn.setOnClickListener {
-                FragmentUtil.getHost(this@CHIPDeviceDetailsFragment, Callback::class.java)
-                    ?.handleReadFromLedgerClicked(deviceInfo)
-            }
-        }
-
-        return binding.root
+      deviceInfo.optionalQrCodeInfoMap.forEach { (_, qrCodeInfo) ->
+        val tv = inflater.inflate(R.layout.barcode_vendor_tag, null, false) as TextView
+        val info = "${qrCodeInfo.tag}. ${qrCodeInfo.data}, ${qrCodeInfo.intDataValue}"
+        tv.text = info
+        binding.vendorTagsContainer.addView(tv)
+      }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    binding.commissioningFlowTv.text = "${deviceInfo.commissioningFlow}"
+
+    // commissioningFlow = 2 (Custom), read device info from Ledger
+    if (deviceInfo.commissioningFlow == 2) {
+      binding.customFlowBtn.visibility = View.VISIBLE
+      binding.customFlowBtn.setOnClickListener {
+        FragmentUtil.getHost(this@CHIPDeviceDetailsFragment, Callback::class.java)
+          ?.handleReadFromLedgerClicked(deviceInfo)
+      }
     }
 
-    /** Interface for notifying the host. */
-    interface Callback {
-        /** Notifies listener of Read Device Info from Ledger button click. */
-        fun handleReadFromLedgerClicked(deviceInfo: CHIPDeviceInfo)
-    }
+    return binding.root
+  }
 
-    companion object {
-        private const val ARG_DEVICE_INFO = "device_info"
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
 
-        @JvmStatic
-        fun newInstance(deviceInfo: CHIPDeviceInfo): CHIPDeviceDetailsFragment {
-            return CHIPDeviceDetailsFragment().apply {
-                arguments = Bundle(1).apply { putParcelable(ARG_DEVICE_INFO, deviceInfo) }
-            }
-        }
+  /** Interface for notifying the host. */
+  interface Callback {
+    /** Notifies listener of Read Device Info from Ledger button click. */
+    fun handleReadFromLedgerClicked(deviceInfo: CHIPDeviceInfo)
+  }
+
+  companion object {
+    private const val ARG_DEVICE_INFO = "device_info"
+
+    @JvmStatic
+    fun newInstance(deviceInfo: CHIPDeviceInfo): CHIPDeviceDetailsFragment {
+      return CHIPDeviceDetailsFragment().apply {
+        arguments = Bundle(1).apply { putParcelable(ARG_DEVICE_INFO, deviceInfo) }
+      }
     }
+  }
 }
