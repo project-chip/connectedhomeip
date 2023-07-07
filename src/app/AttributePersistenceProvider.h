@@ -106,8 +106,8 @@ public:
     template <typename T, std::enable_if_t<std::is_signed<T>::value && !std::is_same<bool, T>::value, bool> = true>
     static T GetNullValueForNullableType()
     {
-        T nullValue = 0;
-        nullValue = 1LU << ((sizeof(nullValue) * 8) - 1);
+        T nullValue;
+        nullValue = T(1UL << ((sizeof(nullValue) * 8) - 1));
         return nullValue;
     }
 

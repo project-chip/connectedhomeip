@@ -154,9 +154,9 @@ void TestStorageAndRetrivalScalarValues(nlTestSuite * inSuite, void * inContext)
     testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, uint32_t(0xffffffff));
 
     // Test uint64_t
-//    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, uint64_t(0));
-//    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, uint64_t(0x0100000001));
-//    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, uint64_t(0xffffffffffffffff));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, uint64_t(0));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, uint64_t(0x0100000001));
+    testHelperStorageAndRetrivalScalarValues(inSuite, persistenceProvider, uint64_t(0xffffffffffffffff));
 
     // Finishing
     persistenceProvider.Shutdown();
