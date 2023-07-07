@@ -332,10 +332,7 @@ public:
         }
         iter->Release();
 
-        if (err == CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(err);
         ReturnErrorOnFailure(groupDataProvider->RemoveKeySet(fabricIndex, keysetId));
 
         SetCommandExitStatus(CHIP_NO_ERROR);
