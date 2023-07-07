@@ -14,16 +14,16 @@ import com.google.chip.chiptool.R
  */
 class ClusterInteractionSettingsFragment : Fragment() {
 
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View? {
-    // Inflate the layout for this fragment
-    return inflater.inflate(R.layout.cluster_interaction_settings_fragment, container, false)
-  }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.cluster_interaction_settings_fragment, container, false)
+    }
 
-  companion object {
-    fun newInstance() = ClusterInteractionSettingsFragment()
-  }
+    companion object {
+        fun newInstance() = ClusterInteractionSettingsFragment()
+    }
 }

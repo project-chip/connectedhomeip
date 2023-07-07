@@ -30,207 +30,263 @@ import java.util.logging.Level
 import java.util.logging.Logger
 
 abstract class PairingCommand(
-  controller: ChipDeviceController,
-  commandName: String,
-  credsIssuer: CredentialsIssuer?,
-  private val pairingMode: PairingModeType = PairingModeType.NONE,
-  private val networkType: PairingNetworkType = PairingNetworkType.NONE,
-  private val filterType: DiscoveryFilterType = DiscoveryFilterType.NONE
+    controller: ChipDeviceController,
+    commandName: String,
+    credsIssuer: CredentialsIssuer?,
+    private val pairingMode: PairingModeType = PairingModeType.NONE,
+    private val networkType: PairingNetworkType = PairingNetworkType.NONE,
+    private val filterType: DiscoveryFilterType = DiscoveryFilterType.NONE
 ) : MatterCommand(controller, credsIssuer, commandName), ChipDeviceController.CompletionListener {
-  private val remoteAddr: IPAddress = IPAddress(InetAddress.getByName("::1"))
-  private val nodeId = AtomicLong()
-  private val discoveryFilterCode = AtomicLong()
-  private val timeoutMillis = AtomicLong()
-  private val discoverOnce = AtomicBoolean()
-  private val useOnlyOnNetworkDiscovery = AtomicBoolean()
-  private val remotePort = AtomicInteger()
-  private val discriminator = AtomicInteger()
-  private val setupPINCode = AtomicLong()
-  private val operationalDataset = StringBuffer()
-  private val ssid = StringBuffer()
-  private val password = StringBuffer()
-  private val onboardingPayload = StringBuffer()
-  private val discoveryFilterInstanceName = StringBuffer()
+    private val remoteAddr: IPAddress = IPAddress(InetAddress.getByName("::1"))
+    private val nodeId = AtomicLong()
+    private val discoveryFilterCode = AtomicLong()
+    private val timeoutMillis = AtomicLong()
+    private val discoverOnce = AtomicBoolean()
+    private val useOnlyOnNetworkDiscovery = AtomicBoolean()
+    private val remotePort = AtomicInteger()
+    private val discriminator = AtomicInteger()
+    private val setupPINCode = AtomicLong()
+    private val operationalDataset = StringBuffer()
+    private val ssid = StringBuffer()
+    private val password = StringBuffer()
+    private val onboardingPayload = StringBuffer()
+    private val discoveryFilterInstanceName = StringBuffer()
 
-  init {
-    addArgument("node-id", 0, Long.MAX_VALUE, nodeId, null, false)
+    init {
+        addArgument("node-id", 0, Long.MAX_VALUE, nodeId, null, false)
 
-    when (networkType) {
-      PairingNetworkType.NONE -> {}
-      PairingNetworkType.WIFI -> {
-        addArgument("ssid", ssid, null, false)
-        addArgument("password", password, null, false)
-      }
-      PairingNetworkType.THREAD ->
-        addArgument("operationalDataset", operationalDataset, null, false)
+        when (networkType) {
+            PairingNetworkType.NONE -> {}
+            PairingNetworkType.WIFI -> {
+                addArgument("ssid", ssid, null, false)
+                addArgument("password", password, null, false)
+            }
+            PairingNetworkType.THREAD ->
+                addArgument("operationalDataset", operationalDataset, null, false)
+        }
+
+        when (pairingMode) {
+            PairingModeType.NONE -> {}
+            PairingModeType.CODE,
+            PairingModeType.CODE_PASE_ONLY -> {
+                addArgument("payload", onboardingPayload, null, false)
+                addArgument("discover-once", discoverOnce, null, true)
+                addArgument("use-only-onnetwork-discovery", useOnlyOnNetworkDiscovery, null, true)
+            }
+            PairingModeType.ADDRESS_PASE_ONLY -> {
+                addArgument("setup-pin-code", 0, 134217727, setupPINCode, null, false)
+                addArgument("device-remote-ip", remoteAddr, false)
+                addArgument(
+                    "device-remote-port",
+                    0.toShort(),
+                    Short.MAX_VALUE,
+                    remotePort,
+                    null,
+                    false
+                )
+            }
+            PairingModeType.BLE -> {
+                addArgument("setup-pin-code", 0, 134217727, setupPINCode, null, false)
+                addArgument(
+                    "discriminator",
+                    0.toShort(),
+                    4096.toShort(),
+                    discriminator,
+                    null,
+                    false
+                )
+            }
+            PairingModeType.ON_NETWORK ->
+                addArgument("setup-pin-code", 0, 134217727, setupPINCode, null, false)
+            PairingModeType.SOFT_AP -> {
+                addArgument("setup-pin-code", 0, 134217727, setupPINCode, null, false)
+                addArgument(
+                    "discriminator",
+                    0.toShort(),
+                    4096.toShort(),
+                    discriminator,
+                    null,
+                    false
+                )
+                addArgument("device-remote-ip", remoteAddr, false)
+                addArgument(
+                    "device-remote-port",
+                    0.toShort(),
+                    Short.MAX_VALUE,
+                    remotePort,
+                    null,
+                    false
+                )
+            }
+            PairingModeType.ALREADY_DISCOVERED -> {
+                addArgument("setup-pin-code", 0, 134217727, setupPINCode, null, false)
+                addArgument("device-remote-ip", remoteAddr, false)
+                addArgument(
+                    "device-remote-port",
+                    0.toShort(),
+                    Short.MAX_VALUE,
+                    remotePort,
+                    null,
+                    false
+                )
+            }
+        }
+
+        when (filterType) {
+            DiscoveryFilterType.NONE -> {}
+            DiscoveryFilterType.SHORT_DISCRIMINATOR,
+            DiscoveryFilterType.LONG_DISCRIMINATOR ->
+                addArgument(
+                    "discriminator",
+                    0.toShort(),
+                    4096.toShort(),
+                    discriminator,
+                    null,
+                    false
+                )
+            DiscoveryFilterType.VENDOR_ID ->
+                addArgument(
+                    "vendor-id",
+                    1.toShort(),
+                    Short.MAX_VALUE,
+                    discoveryFilterCode,
+                    null,
+                    false
+                )
+            DiscoveryFilterType.COMPRESSED_FABRIC_ID ->
+                addArgument("fabric-id", 0L, Long.MAX_VALUE, discoveryFilterCode, null, false)
+            DiscoveryFilterType.COMMISSIONING_MODE,
+            DiscoveryFilterType.COMMISSIONER -> {}
+            DiscoveryFilterType.DEVICE_TYPE ->
+                addArgument(
+                    "device-type",
+                    0.toShort(),
+                    Short.MAX_VALUE,
+                    discoveryFilterCode,
+                    null,
+                    false
+                )
+            DiscoveryFilterType.INSTANCE_NAME ->
+                addArgument("name", discoveryFilterInstanceName, null, false)
+        }
+
+        addArgument("timeout", 0L, Long.MAX_VALUE, timeoutMillis, null, false)
     }
 
-    when (pairingMode) {
-      PairingModeType.NONE -> {}
-      PairingModeType.CODE,
-      PairingModeType.CODE_PASE_ONLY -> {
-        addArgument("payload", onboardingPayload, null, false)
-        addArgument("discover-once", discoverOnce, null, true)
-        addArgument("use-only-onnetwork-discovery", useOnlyOnNetworkDiscovery, null, true)
-      }
-      PairingModeType.ADDRESS_PASE_ONLY -> {
-        addArgument("setup-pin-code", 0, 134217727, setupPINCode, null, false)
-        addArgument("device-remote-ip", remoteAddr, false)
-        addArgument("device-remote-port", 0.toShort(), Short.MAX_VALUE, remotePort, null, false)
-      }
-      PairingModeType.BLE -> {
-        addArgument("setup-pin-code", 0, 134217727, setupPINCode, null, false)
-        addArgument("discriminator", 0.toShort(), 4096.toShort(), discriminator, null, false)
-      }
-      PairingModeType.ON_NETWORK ->
-        addArgument("setup-pin-code", 0, 134217727, setupPINCode, null, false)
-      PairingModeType.SOFT_AP -> {
-        addArgument("setup-pin-code", 0, 134217727, setupPINCode, null, false)
-        addArgument("discriminator", 0.toShort(), 4096.toShort(), discriminator, null, false)
-        addArgument("device-remote-ip", remoteAddr, false)
-        addArgument("device-remote-port", 0.toShort(), Short.MAX_VALUE, remotePort, null, false)
-      }
-      PairingModeType.ALREADY_DISCOVERED -> {
-        addArgument("setup-pin-code", 0, 134217727, setupPINCode, null, false)
-        addArgument("device-remote-ip", remoteAddr, false)
-        addArgument("device-remote-port", 0.toShort(), Short.MAX_VALUE, remotePort, null, false)
-      }
+    override fun onConnectDeviceComplete() {
+        logger.log(Level.INFO, "onConnectDeviceComplete")
     }
 
-    when (filterType) {
-      DiscoveryFilterType.NONE -> {}
-      DiscoveryFilterType.SHORT_DISCRIMINATOR,
-      DiscoveryFilterType.LONG_DISCRIMINATOR ->
-        addArgument("discriminator", 0.toShort(), 4096.toShort(), discriminator, null, false)
-      DiscoveryFilterType.VENDOR_ID ->
-        addArgument("vendor-id", 1.toShort(), Short.MAX_VALUE, discoveryFilterCode, null, false)
-      DiscoveryFilterType.COMPRESSED_FABRIC_ID ->
-        addArgument("fabric-id", 0L, Long.MAX_VALUE, discoveryFilterCode, null, false)
-      DiscoveryFilterType.COMMISSIONING_MODE,
-      DiscoveryFilterType.COMMISSIONER -> {}
-      DiscoveryFilterType.DEVICE_TYPE ->
-        addArgument("device-type", 0.toShort(), Short.MAX_VALUE, discoveryFilterCode, null, false)
-      DiscoveryFilterType.INSTANCE_NAME ->
-        addArgument("name", discoveryFilterInstanceName, null, false)
+    override fun onStatusUpdate(status: Int) {
+        logger.log(Level.INFO, "onStatusUpdate with status: $status")
     }
 
-    addArgument("timeout", 0L, Long.MAX_VALUE, timeoutMillis, null, false)
-  }
-
-  override fun onConnectDeviceComplete() {
-    logger.log(Level.INFO, "onConnectDeviceComplete")
-  }
-
-  override fun onStatusUpdate(status: Int) {
-    logger.log(Level.INFO, "onStatusUpdate with status: $status")
-  }
-
-  override fun onPairingComplete(errorCode: Int) {
-    logger.log(Level.INFO, "onPairingComplete with error code: $errorCode")
-    if (errorCode != 0) {
-      setFailure("onPairingComplete failure")
+    override fun onPairingComplete(errorCode: Int) {
+        logger.log(Level.INFO, "onPairingComplete with error code: $errorCode")
+        if (errorCode != 0) {
+            setFailure("onPairingComplete failure")
+        }
     }
-  }
 
-  override fun onPairingDeleted(errorCode: Int) {
-    logger.log(Level.INFO, "onPairingDeleted with error code: $errorCode")
-  }
-
-  override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
-    logger.log(Level.INFO, "onCommissioningComplete with error code: $errorCode")
-    if (errorCode == 0) {
-      setSuccess()
-    } else {
-      setFailure("onCommissioningComplete failure")
+    override fun onPairingDeleted(errorCode: Int) {
+        logger.log(Level.INFO, "onPairingDeleted with error code: $errorCode")
     }
-  }
 
-  override fun onReadCommissioningInfo(
-    vendorId: Int,
-    productId: Int,
-    wifiEndpointId: Int,
-    threadEndpointId: Int
-  ) {
-    logger.log(Level.INFO, "onReadCommissioningInfo")
-  }
-
-  override fun onCommissioningStatusUpdate(nodeId: Long, stage: String?, errorCode: Int) {
-    logger.log(Level.INFO, "onCommissioningStatusUpdate")
-  }
-
-  override fun onNotifyChipConnectionClosed() {
-    logger.log(Level.INFO, "onNotifyChipConnectionClosed")
-  }
-
-  override fun onCloseBleComplete() {
-    logger.log(Level.INFO, "onCloseBleComplete")
-  }
-
-  override fun onError(error: Throwable) {
-    setFailure(error.toString())
-    logger.log(Level.INFO, "onError with error: $error")
-  }
-
-  override fun onOpCSRGenerationComplete(csr: ByteArray) {
-    logger.log(Level.INFO, "onOpCSRGenerationComplete")
-    for (i in csr.indices) {
-      print(csr[i].toString() + " ")
+    override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
+        logger.log(Level.INFO, "onCommissioningComplete with error code: $errorCode")
+        if (errorCode == 0) {
+            setSuccess()
+        } else {
+            setFailure("onCommissioningComplete failure")
+        }
     }
-  }
 
-  fun getNodeId(): Long {
-    return nodeId.get()
-  }
+    override fun onReadCommissioningInfo(
+        vendorId: Int,
+        productId: Int,
+        wifiEndpointId: Int,
+        threadEndpointId: Int
+    ) {
+        logger.log(Level.INFO, "onReadCommissioningInfo")
+    }
 
-  fun getRemoteAddr(): IPAddress {
-    return remoteAddr
-  }
+    override fun onCommissioningStatusUpdate(nodeId: Long, stage: String?, errorCode: Int) {
+        logger.log(Level.INFO, "onCommissioningStatusUpdate")
+    }
 
-  fun getRemotePort(): Int {
-    return remotePort.get()
-  }
+    override fun onNotifyChipConnectionClosed() {
+        logger.log(Level.INFO, "onNotifyChipConnectionClosed")
+    }
 
-  fun getSetupPINCode(): Long {
-    return setupPINCode.get()
-  }
+    override fun onCloseBleComplete() {
+        logger.log(Level.INFO, "onCloseBleComplete")
+    }
 
-  fun getDiscriminator(): Int {
-    return discriminator.get()
-  }
+    override fun onError(error: Throwable) {
+        setFailure(error.toString())
+        logger.log(Level.INFO, "onError with error: $error")
+    }
 
-  fun getTimeoutMillis(): Long {
-    return timeoutMillis.get()
-  }
+    override fun onOpCSRGenerationComplete(csr: ByteArray) {
+        logger.log(Level.INFO, "onOpCSRGenerationComplete")
+        for (i in csr.indices) {
+            print(csr[i].toString() + " ")
+        }
+    }
 
-  fun getOnboardingPayload(): String {
-    return onboardingPayload.toString()
-  }
+    fun getNodeId(): Long {
+        return nodeId.get()
+    }
 
-  fun getWifiNetworkCredentials(): NetworkCredentials {
-    return NetworkCredentials.forWiFi(
-      NetworkCredentials.WiFiCredentials(ssid.toString(), password.toString())
-    )
-  }
+    fun getRemoteAddr(): IPAddress {
+        return remoteAddr
+    }
 
-  fun getThreadNetworkCredentials(): NetworkCredentials {
-    return NetworkCredentials.forThread(
-      NetworkCredentials.ThreadCredentials(operationalDataset.toString().hexToByteArray())
-    )
-  }
+    fun getRemotePort(): Int {
+        return remotePort.get()
+    }
 
-  private fun String.hexToByteArray(): ByteArray {
-    return chunked(2).map { byteStr -> byteStr.toUByte(16).toByte() }.toByteArray()
-  }
+    fun getSetupPINCode(): Long {
+        return setupPINCode.get()
+    }
 
-  fun getDiscoverOnce(): Boolean {
-    return discoverOnce.get()
-  }
+    fun getDiscriminator(): Int {
+        return discriminator.get()
+    }
 
-  fun getUseOnlyOnNetworkDiscovery(): Boolean {
-    return useOnlyOnNetworkDiscovery.get()
-  }
+    fun getTimeoutMillis(): Long {
+        return timeoutMillis.get()
+    }
 
-  companion object {
-    private val logger = Logger.getLogger(PairingCommand::class.java.name)
-  }
+    fun getOnboardingPayload(): String {
+        return onboardingPayload.toString()
+    }
+
+    fun getWifiNetworkCredentials(): NetworkCredentials {
+        return NetworkCredentials.forWiFi(
+            NetworkCredentials.WiFiCredentials(ssid.toString(), password.toString())
+        )
+    }
+
+    fun getThreadNetworkCredentials(): NetworkCredentials {
+        return NetworkCredentials.forThread(
+            NetworkCredentials.ThreadCredentials(operationalDataset.toString().hexToByteArray())
+        )
+    }
+
+    private fun String.hexToByteArray(): ByteArray {
+        return chunked(2).map { byteStr -> byteStr.toUByte(16).toByte() }.toByteArray()
+    }
+
+    fun getDiscoverOnce(): Boolean {
+        return discoverOnce.get()
+    }
+
+    fun getUseOnlyOnNetworkDiscovery(): Boolean {
+        return useOnlyOnNetworkDiscovery.get()
+    }
+
+    companion object {
+        private val logger = Logger.getLogger(PairingCommand::class.java.name)
+    }
 }

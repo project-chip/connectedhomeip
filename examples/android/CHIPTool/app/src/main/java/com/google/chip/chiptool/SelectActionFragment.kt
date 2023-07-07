@@ -39,202 +39,204 @@ import com.google.chip.chiptool.util.FragmentUtil
 
 /** Fragment to select from various options to interact with a CHIP device. */
 class SelectActionFragment : Fragment() {
-  private var _binding: SelectActionFragmentBinding? = null
-  private val binding
-    get() = _binding!!
+    private var _binding: SelectActionFragmentBinding? = null
+    private val binding
+        get() = _binding!!
 
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View {
-    _binding = SelectActionFragmentBinding.inflate(inflater, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = SelectActionFragmentBinding.inflate(inflater, container, false)
 
-    binding.provisionWiFiCredentialsBtn.apply {
-      isEnabled = hasLocationPermission()
-      setOnClickListener { handleProvisionWiFiCredentialsClicked() }
-    }
-
-    binding.provisionThreadCredentialsBtn.apply {
-      isEnabled = hasLocationPermission()
-      setOnClickListener { handleProvisionThreadCredentialsClicked() }
-    }
-
-    binding.scanQrBtn.setOnClickListener { handleScanQrCodeClicked() }
-    binding.onOffClusterBtn.setOnClickListener { handleOnOffClicked() }
-    binding.sensorClustersBtn.setOnClickListener { handleSensorClicked() }
-    binding.multiAdminClusterBtn.setOnClickListener { handleMultiAdminClicked() }
-    binding.opCredClustersBtn.setOnClickListener { handleOpCredClicked() }
-    binding.basicClusterBtn.setOnClickListener { handleBasicClicked() }
-    binding.attestationTestBtn.setOnClickListener { handleAttestationTestClicked() }
-    binding.clusterInteractionBtn.setOnClickListener { handleClusterInteractionClicked() }
-    binding.provisionCustomFlowBtn.setOnClickListener { handleProvisionCustomFlowClicked() }
-    binding.wildcardBtn.setOnClickListener { handleWildcardClicked() }
-    binding.unpairDeviceBtn.setOnClickListener { handleUnpairDeviceClicked() }
-
-    return binding.root
-  }
-
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-
-    if (savedInstanceState != null) return
-    if (hasLocationPermission()) return
-
-    val permissionRequest =
-      registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grantResults
-        ->
-        var granted = true
-        for (value in grantResults.values) {
-          if (!value) {
-            granted = false
-          }
+        binding.provisionWiFiCredentialsBtn.apply {
+            isEnabled = hasLocationPermission()
+            setOnClickListener { handleProvisionWiFiCredentialsClicked() }
         }
-        if (granted) {
-          binding.provisionWiFiCredentialsBtn.isEnabled = true
-          binding.provisionThreadCredentialsBtn.isEnabled = true
-        } else {
-          binding.provisionWiFiCredentialsBtn.isEnabled = false
-          binding.provisionThreadCredentialsBtn.isEnabled = false
 
-          AlertDialog.Builder(requireContext())
-            .setTitle(R.string.location_permission_denied_title)
-            .setMessage(R.string.location_permission_denied_message)
-            .setPositiveButton(R.string.text_ok) { dialog, _ -> dialog.dismiss() }
-            .setCancelable(false)
-            .create()
-            .show()
+        binding.provisionThreadCredentialsBtn.apply {
+            isEnabled = hasLocationPermission()
+            setOnClickListener { handleProvisionThreadCredentialsClicked() }
         }
-      }
 
-    val permissions: Array<String> =
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        arrayOf(
-          Manifest.permission.BLUETOOTH_SCAN,
-          Manifest.permission.BLUETOOTH_CONNECT,
-          Manifest.permission.ACCESS_FINE_LOCATION,
-        )
-      } else {
-        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
-      }
-    permissionRequest.launch(permissions)
-  }
+        binding.scanQrBtn.setOnClickListener { handleScanQrCodeClicked() }
+        binding.onOffClusterBtn.setOnClickListener { handleOnOffClicked() }
+        binding.sensorClustersBtn.setOnClickListener { handleSensorClicked() }
+        binding.multiAdminClusterBtn.setOnClickListener { handleMultiAdminClicked() }
+        binding.opCredClustersBtn.setOnClickListener { handleOpCredClicked() }
+        binding.basicClusterBtn.setOnClickListener { handleBasicClicked() }
+        binding.attestationTestBtn.setOnClickListener { handleAttestationTestClicked() }
+        binding.clusterInteractionBtn.setOnClickListener { handleClusterInteractionClicked() }
+        binding.provisionCustomFlowBtn.setOnClickListener { handleProvisionCustomFlowClicked() }
+        binding.wildcardBtn.setOnClickListener { handleWildcardClicked() }
+        binding.unpairDeviceBtn.setOnClickListener { handleUnpairDeviceClicked() }
 
-  override fun onDestroyView() {
-    super.onDestroyView()
-    _binding = null
-  }
-
-  private fun hasLocationPermission(): Boolean {
-    val locationPermissionGranted =
-      ContextCompat.checkSelfPermission(
-        requireContext(),
-        Manifest.permission.ACCESS_FINE_LOCATION
-      ) == PackageManager.PERMISSION_GRANTED
-
-    // Android 12 new permission
-    var bleScanPermissionGranted = true
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-      bleScanPermissionGranted =
-        ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_SCAN) ==
-          PackageManager.PERMISSION_GRANTED
+        return binding.root
     }
 
-    return locationPermissionGranted && bleScanPermissionGranted
-  }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-  private fun getCallback() = FragmentUtil.getHost(this, Callback::class.java)
+        if (savedInstanceState != null) return
+        if (hasLocationPermission()) return
 
-  /** Interface for notifying the host. */
-  interface Callback {
-    /** Notifies listener of a click to manually input the CHIP device address. */
-    fun onShowDeviceAddressInput()
+        val permissionRequest =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+                grantResults ->
+                var granted = true
+                for (value in grantResults.values) {
+                    if (!value) {
+                        granted = false
+                    }
+                }
+                if (granted) {
+                    binding.provisionWiFiCredentialsBtn.isEnabled = true
+                    binding.provisionThreadCredentialsBtn.isEnabled = true
+                } else {
+                    binding.provisionWiFiCredentialsBtn.isEnabled = false
+                    binding.provisionThreadCredentialsBtn.isEnabled = false
 
-    fun SetNetworkType(type: ProvisionNetworkType)
-  }
+                    AlertDialog.Builder(requireContext())
+                        .setTitle(R.string.location_permission_denied_title)
+                        .setMessage(R.string.location_permission_denied_message)
+                        .setPositiveButton(R.string.text_ok) { dialog, _ -> dialog.dismiss() }
+                        .setCancelable(false)
+                        .create()
+                        .show()
+                }
+            }
 
-  private fun showFragment(fragment: Fragment, showOnBack: Boolean = true) {
-    val fragmentTransaction =
-      parentFragmentManager
-        .beginTransaction()
-        .replace(R.id.nav_host_fragment, fragment, fragment.javaClass.simpleName)
-
-    if (showOnBack) {
-      fragmentTransaction.addToBackStack(null)
+        val permissions: Array<String> =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                arrayOf(
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                )
+            } else {
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+        permissionRequest.launch(permissions)
     }
 
-    fragmentTransaction.commit()
-  }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
-  /** Notifies listener of Scan QR code button click. */
-  private fun handleScanQrCodeClicked() {
-    showFragment(BarcodeFragment.newInstance(), false)
-  }
+    private fun hasLocationPermission(): Boolean {
+        val locationPermissionGranted =
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
 
-  /** Notifies listener of Light On/Off & Level Cluster button click. */
-  private fun handleOnOffClicked() {
-    showFragment(OnOffClientFragment.newInstance())
-  }
+        // Android 12 new permission
+        var bleScanPermissionGranted = true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            bleScanPermissionGranted =
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.BLUETOOTH_SCAN
+                ) == PackageManager.PERMISSION_GRANTED
+        }
 
-  /** Notifies listener of Sensor Clusters button click. */
-  private fun handleSensorClicked() {
-    showFragment(SensorClientFragment.newInstance())
-  }
+        return locationPermissionGranted && bleScanPermissionGranted
+    }
 
-  /** Notifies listener of Multi-admin Clusters button click. */
-  private fun handleMultiAdminClicked() {
-    showFragment(MultiAdminClientFragment.newInstance())
-  }
+    private fun getCallback() = FragmentUtil.getHost(this, Callback::class.java)
 
-  /** Notifies listener of Operational Credentials Clusters button click. */
-  private fun handleOpCredClicked() {
-    showFragment(OpCredClientFragment.newInstance())
-  }
+    /** Interface for notifying the host. */
+    interface Callback {
+        /** Notifies listener of a click to manually input the CHIP device address. */
+        fun onShowDeviceAddressInput()
 
-  /** Notifies listener of Basic Clusters button click. */
-  private fun handleBasicClicked() {
-    showFragment(BasicClientFragment.newInstance())
-  }
+        fun SetNetworkType(type: ProvisionNetworkType)
+    }
 
-  /** Notifies listener of attestation command button clicked. */
-  private fun handleAttestationTestClicked() {
-    showFragment(AttestationTestFragment.newInstance())
-  }
+    private fun showFragment(fragment: Fragment, showOnBack: Boolean = true) {
+        val fragmentTransaction =
+            parentFragmentManager
+                .beginTransaction()
+                .replace(R.id.nav_host_fragment, fragment, fragment.javaClass.simpleName)
 
-  /** Notifies listener of cluster interaction button click. */
-  private fun handleClusterInteractionClicked() {
-    showFragment(ClusterInteractionFragment.newInstance())
-  }
+        if (showOnBack) {
+            fragmentTransaction.addToBackStack(null)
+        }
 
-  /** Notifies listener of wildcard button click. */
-  private fun handleWildcardClicked() {
-    showFragment(WildcardFragment.newInstance())
-  }
+        fragmentTransaction.commit()
+    }
 
-  /** Notifies listener of unpair button click. */
-  private fun handleUnpairDeviceClicked() {
-    showFragment(UnpairDeviceFragment.newInstance())
-  }
+    /** Notifies listener of Scan QR code button click. */
+    private fun handleScanQrCodeClicked() {
+        showFragment(BarcodeFragment.newInstance(), false)
+    }
 
-  /** Notifies listener of provision-WiFi-credentials button click. */
-  private fun handleProvisionWiFiCredentialsClicked() {
-    getCallback()?.SetNetworkType(ProvisionNetworkType.WIFI)
-    showFragment(BarcodeFragment.newInstance(), false)
-  }
+    /** Notifies listener of Light On/Off & Level Cluster button click. */
+    private fun handleOnOffClicked() {
+        showFragment(OnOffClientFragment.newInstance())
+    }
 
-  /** Notifies listener of provision-Thread-credentials button click. */
-  private fun handleProvisionThreadCredentialsClicked() {
-    getCallback()?.SetNetworkType(ProvisionNetworkType.THREAD)
-    showFragment(BarcodeFragment.newInstance(), false)
-  }
+    /** Notifies listener of Sensor Clusters button click. */
+    private fun handleSensorClicked() {
+        showFragment(SensorClientFragment.newInstance())
+    }
 
-  /** Notifies listener of provision-custom-flow button click. */
-  private fun handleProvisionCustomFlowClicked() {
-    showFragment(BarcodeFragment.newInstance(), false)
-  }
+    /** Notifies listener of Multi-admin Clusters button click. */
+    private fun handleMultiAdminClicked() {
+        showFragment(MultiAdminClientFragment.newInstance())
+    }
 
-  companion object {
+    /** Notifies listener of Operational Credentials Clusters button click. */
+    private fun handleOpCredClicked() {
+        showFragment(OpCredClientFragment.newInstance())
+    }
 
-    @JvmStatic fun newInstance() = SelectActionFragment()
-  }
+    /** Notifies listener of Basic Clusters button click. */
+    private fun handleBasicClicked() {
+        showFragment(BasicClientFragment.newInstance())
+    }
+
+    /** Notifies listener of attestation command button clicked. */
+    private fun handleAttestationTestClicked() {
+        showFragment(AttestationTestFragment.newInstance())
+    }
+
+    /** Notifies listener of cluster interaction button click. */
+    private fun handleClusterInteractionClicked() {
+        showFragment(ClusterInteractionFragment.newInstance())
+    }
+
+    /** Notifies listener of wildcard button click. */
+    private fun handleWildcardClicked() {
+        showFragment(WildcardFragment.newInstance())
+    }
+
+    /** Notifies listener of unpair button click. */
+    private fun handleUnpairDeviceClicked() {
+        showFragment(UnpairDeviceFragment.newInstance())
+    }
+
+    /** Notifies listener of provision-WiFi-credentials button click. */
+    private fun handleProvisionWiFiCredentialsClicked() {
+        getCallback()?.SetNetworkType(ProvisionNetworkType.WIFI)
+        showFragment(BarcodeFragment.newInstance(), false)
+    }
+
+    /** Notifies listener of provision-Thread-credentials button click. */
+    private fun handleProvisionThreadCredentialsClicked() {
+        getCallback()?.SetNetworkType(ProvisionNetworkType.THREAD)
+        showFragment(BarcodeFragment.newInstance(), false)
+    }
+
+    /** Notifies listener of provision-custom-flow button click. */
+    private fun handleProvisionCustomFlowClicked() {
+        showFragment(BarcodeFragment.newInstance(), false)
+    }
+
+    companion object {
+
+        @JvmStatic fun newInstance() = SelectActionFragment()
+    }
 }

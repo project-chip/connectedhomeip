@@ -29,85 +29,85 @@ import java.util.logging.Level
 import java.util.logging.Logger
 
 class PairOnNetworkLongImWriteCommand(
-  controller: ChipDeviceController,
-  credsIssue: CredentialsIssuer?
+    controller: ChipDeviceController,
+    credsIssue: CredentialsIssuer?
 ) :
-  PairingCommand(
-    controller,
-    "onnetwork-long-im-write",
-    credsIssue,
-    PairingModeType.ON_NETWORK,
-    PairingNetworkType.NONE,
-    DiscoveryFilterType.LONG_DISCRIMINATOR
-  ) {
-  private var devicePointer: Long = 0
+    PairingCommand(
+        controller,
+        "onnetwork-long-im-write",
+        credsIssue,
+        PairingModeType.ON_NETWORK,
+        PairingNetworkType.NONE,
+        DiscoveryFilterType.LONG_DISCRIMINATOR
+    ) {
+    private var devicePointer: Long = 0
 
-  private inner class InternalWriteAttributesCallback : WriteAttributesCallback {
-    override fun onError(attributePath: ChipAttributePath?, e: Exception) {
-      logger.log(Level.INFO, "Write receive onError on ")
-      if (attributePath != null) {
-        logger.log(Level.INFO, attributePath.toString())
-      }
-      setFailure("write failure")
+    private inner class InternalWriteAttributesCallback : WriteAttributesCallback {
+        override fun onError(attributePath: ChipAttributePath?, e: Exception) {
+            logger.log(Level.INFO, "Write receive onError on ")
+            if (attributePath != null) {
+                logger.log(Level.INFO, attributePath.toString())
+            }
+            setFailure("write failure")
+        }
+
+        override fun onResponse(attributePath: ChipAttributePath?) {
+            logger.log(Level.INFO, "Write receve OnResponse on ")
+            if (attributePath != null) {
+                logger.log(Level.INFO, attributePath.toString())
+            }
+            setSuccess()
+        }
     }
 
-    override fun onResponse(attributePath: ChipAttributePath?) {
-      logger.log(Level.INFO, "Write receve OnResponse on ")
-      if (attributePath != null) {
-        logger.log(Level.INFO, attributePath.toString())
-      }
-      setSuccess()
-    }
-  }
+    private inner class InternalGetConnectedDeviceCallback : GetConnectedDeviceCallback {
+        override fun onDeviceConnected(devicePointer: Long) {
+            this@PairOnNetworkLongImWriteCommand.devicePointer = devicePointer
+            logger.log(Level.INFO, "onDeviceConnected")
+        }
 
-  private inner class InternalGetConnectedDeviceCallback : GetConnectedDeviceCallback {
-    override fun onDeviceConnected(devicePointer: Long) {
-      this@PairOnNetworkLongImWriteCommand.devicePointer = devicePointer
-      logger.log(Level.INFO, "onDeviceConnected")
+        override fun onConnectionFailure(nodeId: Long, error: Exception?) {
+            logger.log(Level.INFO, "onConnectionFailure")
+        }
     }
 
-    override fun onConnectionFailure(nodeId: Long, error: Exception?) {
-      logger.log(Level.INFO, "onConnectionFailure")
+    override fun runCommand() {
+        val tlvWriter = TlvWriter()
+        tlvWriter.put(AnonymousTag, true)
+        val attributeList =
+            listOf(
+                AttributeWriteRequest.newInstance(
+                    /* endpointId= */ 0,
+                    CLUSTER_ID_BASIC,
+                    ATTR_ID_LOCAL_CONFIG_DISABLED,
+                    tlvWriter.getEncoded(),
+                )
+            )
+
+        currentCommissioner()
+            .pairDeviceWithAddress(
+                getNodeId(),
+                getRemoteAddr().getHostAddress(),
+                MATTER_PORT,
+                getDiscriminator(),
+                getSetupPINCode(),
+                null
+            )
+        currentCommissioner().setCompletionListener(this)
+        waitCompleteMs(getTimeoutMillis())
+        currentCommissioner()
+            .getConnectedDevicePointer(getNodeId(), InternalGetConnectedDeviceCallback())
+        clear()
+        currentCommissioner()
+            .write(InternalWriteAttributesCallback(), devicePointer, attributeList, 0, 0)
+        waitCompleteMs(getTimeoutMillis())
     }
-  }
 
-  override fun runCommand() {
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, true)
-    val attributeList =
-      listOf(
-        AttributeWriteRequest.newInstance(
-          /* endpointId= */ 0,
-          CLUSTER_ID_BASIC,
-          ATTR_ID_LOCAL_CONFIG_DISABLED,
-          tlvWriter.getEncoded(),
-        )
-      )
+    companion object {
+        private val logger = Logger.getLogger(PairOnNetworkLongImWriteCommand::class.java.name)
 
-    currentCommissioner()
-      .pairDeviceWithAddress(
-        getNodeId(),
-        getRemoteAddr().getHostAddress(),
-        MATTER_PORT,
-        getDiscriminator(),
-        getSetupPINCode(),
-        null
-      )
-    currentCommissioner().setCompletionListener(this)
-    waitCompleteMs(getTimeoutMillis())
-    currentCommissioner()
-      .getConnectedDevicePointer(getNodeId(), InternalGetConnectedDeviceCallback())
-    clear()
-    currentCommissioner()
-      .write(InternalWriteAttributesCallback(), devicePointer, attributeList, 0, 0)
-    waitCompleteMs(getTimeoutMillis())
-  }
-
-  companion object {
-    private val logger = Logger.getLogger(PairOnNetworkLongImWriteCommand::class.java.name)
-
-    private const val MATTER_PORT = 5540
-    private const val CLUSTER_ID_BASIC = 0x0028L
-    private const val ATTR_ID_LOCAL_CONFIG_DISABLED = 16L
-  }
+        private const val MATTER_PORT = 5540
+        private const val CLUSTER_ID_BASIC = 0x0028L
+        private const val ATTR_ID_LOCAL_CONFIG_DISABLED = 16L
+    }
 }

@@ -21,13 +21,13 @@ import chip.devicecontroller.ChipDeviceController
 import com.matter.controller.commands.common.CredentialsIssuer
 
 class PairOnNetworkFabricCommand(controller: ChipDeviceController, credsIssue: CredentialsIssuer?) :
-  PairingCommand(
-    controller,
-    "onnetwork-fabric",
-    credsIssue,
-    PairingModeType.ON_NETWORK,
-    PairingNetworkType.NONE,
-    DiscoveryFilterType.COMPRESSED_FABRIC_ID
-  ) {
-  override fun runCommand() {}
+    PairingCommand(
+        controller,
+        "onnetwork-fabric",
+        credsIssue,
+        PairingModeType.ON_NETWORK,
+        PairingNetworkType.NONE,
+        DiscoveryFilterType.COMPRESSED_FABRIC_ID
+    ) {
+    override fun runCommand() {}
 }

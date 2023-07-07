@@ -6,8 +6,8 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class QrCodeInfo(
-  val tag: Int,
-  val type: OptionalQRCodeInfoType,
-  val data: String?,
-  val intDataValue: Int
+    val tag: Int,
+    val type: OptionalQRCodeInfoType,
+    val data: String?,
+    val intDataValue: Int
 ) : Parcelable

@@ -24,21 +24,21 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
 class CloseSessionCommand(controller: ChipDeviceController, credsIssuer: CredentialsIssuer?) :
-  MatterCommand(controller, credsIssuer, "close-session") {
-  private val destinationId: AtomicLong = AtomicLong()
-  private val timeoutSecs: AtomicInteger = AtomicInteger()
+    MatterCommand(controller, credsIssuer, "close-session") {
+    private val destinationId: AtomicLong = AtomicLong()
+    private val timeoutSecs: AtomicInteger = AtomicInteger()
 
-  init {
-    addArgument("destination-id", 0, Long.MAX_VALUE, destinationId, null, false)
-    addArgument(
-      "timeout",
-      0.toShort(),
-      Short.MAX_VALUE,
-      timeoutSecs,
-      "Time, in seconds, before this command is considered to have timed out.",
-      false
-    )
-  }
+    init {
+        addArgument("destination-id", 0, Long.MAX_VALUE, destinationId, null, false)
+        addArgument(
+            "timeout",
+            0.toShort(),
+            Short.MAX_VALUE,
+            timeoutSecs,
+            "Time, in seconds, before this command is considered to have timed out.",
+            false
+        )
+    }
 
-  override fun runCommand() {}
+    override fun runCommand() {}
 }

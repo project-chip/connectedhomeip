@@ -8,17 +8,17 @@ import java.io.Serializable
  * for each item in [ClusterInteractionHistoryFragment]
  */
 data class HistoryCommand(
-  val clusterName: String,
-  val commandName: String,
-  val parameterList: MutableList<HistoryParameterInfo>,
-  var responseValue: Map<CommandResponseInfo, Any>?,
-  var status: String?,
-  var endpointId: Int,
-  var deviceId: Long,
+    val clusterName: String,
+    val commandName: String,
+    val parameterList: MutableList<HistoryParameterInfo>,
+    var responseValue: Map<CommandResponseInfo, Any>?,
+    var status: String?,
+    var endpointId: Int,
+    var deviceId: Long,
 ) : Serializable
 
 data class HistoryParameterInfo(
-  val parameterName: String,
-  val parameterData: String,
-  val parameterType: Class<*>
+    val parameterName: String,
+    val parameterData: String,
+    val parameterType: Class<*>
 )

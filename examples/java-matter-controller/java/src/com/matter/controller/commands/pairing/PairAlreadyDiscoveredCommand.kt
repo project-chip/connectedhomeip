@@ -21,27 +21,27 @@ import chip.devicecontroller.ChipDeviceController
 import com.matter.controller.commands.common.CredentialsIssuer
 
 class PairAlreadyDiscoveredCommand(
-  controller: ChipDeviceController,
-  credsIssue: CredentialsIssuer?
+    controller: ChipDeviceController,
+    credsIssue: CredentialsIssuer?
 ) :
-  PairingCommand(
-    controller,
-    "already-discovered",
-    credsIssue,
-    PairingModeType.ALREADY_DISCOVERED,
-    PairingNetworkType.NONE
-  ) {
-  override fun runCommand() {
-    currentCommissioner()
-      .pairDeviceWithAddress(
-        getNodeId(),
-        getRemoteAddr().getHostAddress(),
-        getRemotePort(),
-        getDiscriminator(),
-        getSetupPINCode(),
-        null
-      )
-    currentCommissioner().setCompletionListener(this)
-    waitCompleteMs(getTimeoutMillis())
-  }
+    PairingCommand(
+        controller,
+        "already-discovered",
+        credsIssue,
+        PairingModeType.ALREADY_DISCOVERED,
+        PairingNetworkType.NONE
+    ) {
+    override fun runCommand() {
+        currentCommissioner()
+            .pairDeviceWithAddress(
+                getNodeId(),
+                getRemoteAddr().getHostAddress(),
+                getRemotePort(),
+                getDiscriminator(),
+                getSetupPINCode(),
+                null
+            )
+        currentCommissioner().setCompletionListener(this)
+        waitCompleteMs(getTimeoutMillis())
+    }
 }

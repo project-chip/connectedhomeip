@@ -44,8 +44,8 @@ import java.util.Base64
  * @throws IllegalArgumentException if the data was invalid
  */
 fun TlvWriter.fromJsonString(json: String): ByteArray {
-  validateIsJsonObjectAndConvert(JsonParser.parseString(json), AnonymousTag)
-  return validateTlv().getEncoded()
+    validateIsJsonObjectAndConvert(JsonParser.parseString(json), AnonymousTag)
+    return validateTlv().getEncoded()
 }
 
 /**
@@ -55,11 +55,11 @@ fun TlvWriter.fromJsonString(json: String): ByteArray {
  * @throws IllegalArgumentException if the data was invalid
  */
 private fun TlvWriter.fromJson(json: JsonObject): TlvWriter {
-  json.keySet().forEach { key ->
-    val (tag, type, subType) = extractTagAndTypeFromJsonKey(key)
-    fromJson(json.get(key), tag, type, subType)
-  }
-  return this
+    json.keySet().forEach { key ->
+        val (tag, type, subType) = extractTagAndTypeFromJsonKey(key)
+        fromJson(json.get(key), tag, type, subType)
+    }
+    return this
 }
 
 /**
@@ -70,8 +70,8 @@ private fun TlvWriter.fromJson(json: JsonObject): TlvWriter {
  * @throws IllegalArgumentException if the data was invalid
  */
 private fun TlvWriter.fromJson(json: JsonArray, type: String): TlvWriter {
-  json.iterator().forEach { element -> fromJson(element, AnonymousTag, type) }
-  return this
+    json.iterator().forEach { element -> fromJson(element, AnonymousTag, type) }
+    return this
 }
 
 /**
@@ -85,28 +85,28 @@ private fun TlvWriter.fromJson(json: JsonArray, type: String): TlvWriter {
  * @throws IllegalArgumentException if the data was invalid
  */
 private fun TlvWriter.fromJson(element: JsonElement, tag: Tag, type: String, subType: String = "") {
-  when (type) {
-    JSON_VALUE_TYPE_INT -> put(tag, validateIsNumber(element).toLong())
-    JSON_VALUE_TYPE_UINT -> put(tag, validateIsNumber(element).toLong().toULong())
-    JSON_VALUE_TYPE_BOOL -> put(tag, validateIsBoolean(element))
-    JSON_VALUE_TYPE_FLOAT -> put(tag, validateIsDouble(element).toFloat())
-    JSON_VALUE_TYPE_DOUBLE -> put(tag, validateIsDouble(element))
-    JSON_VALUE_TYPE_BYTES -> put(tag, validateIsString(element).base64Encode())
-    JSON_VALUE_TYPE_STRING -> put(tag, validateIsString(element))
-    JSON_VALUE_TYPE_NULL -> validateIsNullAndPut(element, tag)
-    JSON_VALUE_TYPE_STRUCT -> validateIsJsonObjectAndConvert(element, tag)
-    JSON_VALUE_TYPE_ARRAY -> {
-      if (subType.isEmpty()) {
-        throw IllegalArgumentException("Multi-Dimensional JSON Array is Invalid")
-      } else {
-        require(element.isJsonArray()) { "Expected Array; the actual element is: $element" }
-        startArray(tag).fromJson(element.getAsJsonArray(), subType).endArray()
-      }
+    when (type) {
+        JSON_VALUE_TYPE_INT -> put(tag, validateIsNumber(element).toLong())
+        JSON_VALUE_TYPE_UINT -> put(tag, validateIsNumber(element).toLong().toULong())
+        JSON_VALUE_TYPE_BOOL -> put(tag, validateIsBoolean(element))
+        JSON_VALUE_TYPE_FLOAT -> put(tag, validateIsDouble(element).toFloat())
+        JSON_VALUE_TYPE_DOUBLE -> put(tag, validateIsDouble(element))
+        JSON_VALUE_TYPE_BYTES -> put(tag, validateIsString(element).base64Encode())
+        JSON_VALUE_TYPE_STRING -> put(tag, validateIsString(element))
+        JSON_VALUE_TYPE_NULL -> validateIsNullAndPut(element, tag)
+        JSON_VALUE_TYPE_STRUCT -> validateIsJsonObjectAndConvert(element, tag)
+        JSON_VALUE_TYPE_ARRAY -> {
+            if (subType.isEmpty()) {
+                throw IllegalArgumentException("Multi-Dimensional JSON Array is Invalid")
+            } else {
+                require(element.isJsonArray()) { "Expected Array; the actual element is: $element" }
+                startArray(tag).fromJson(element.getAsJsonArray(), subType).endArray()
+            }
+        }
+        JSON_VALUE_TYPE_EMPTY ->
+            throw IllegalArgumentException("Empty array was expected but there is value: $element}")
+        else -> throw IllegalArgumentException("Invalid type was specified: $type")
     }
-    JSON_VALUE_TYPE_EMPTY ->
-      throw IllegalArgumentException("Empty array was expected but there is value: $element}")
-    else -> throw IllegalArgumentException("Invalid type was specified: $type")
-  }
 }
 
 /**
@@ -117,85 +117,85 @@ private fun TlvWriter.fromJson(element: JsonElement, tag: Tag, type: String, sub
  * @throws IllegalArgumentException if the key format was invalid
  */
 private fun extractTagAndTypeFromJsonKey(key: String): Triple<Tag, String, String> {
-  val keyFields = key.split(":")
-  var type = keyFields.last()
-  val typeFields = type.split("-")
-  var subType = ""
+    val keyFields = key.split(":")
+    var type = keyFields.last()
+    val typeFields = type.split("-")
+    var subType = ""
 
-  val tagNumber =
-    when (keyFields.size) {
-      2 -> keyFields.first().toUIntOrNull()
-      3 -> keyFields[1].toUIntOrNull()
-      else -> throw IllegalArgumentException("Invalid JSON key value: $key")
+    val tagNumber =
+        when (keyFields.size) {
+            2 -> keyFields.first().toUIntOrNull()
+            3 -> keyFields[1].toUIntOrNull()
+            else -> throw IllegalArgumentException("Invalid JSON key value: $key")
+        }
+
+    val tag =
+        when {
+            tagNumber == null -> throw IllegalArgumentException("Invalid JSON key value: $key")
+            tagNumber <= UByte.MAX_VALUE.toUInt() -> ContextSpecificTag(tagNumber.toInt())
+            tagNumber <= UShort.MAX_VALUE.toUInt() -> CommonProfileTag(2, tagNumber)
+            else -> CommonProfileTag(4, tagNumber)
+        }
+
+    // Valid type field of the JSON key SHOULD have type and optional subtype component
+    require(typeFields.size in (1..2)) { "Invalid JSON key value: $key" }
+
+    if (typeFields.size == 2) {
+        require(typeFields[0] == JSON_VALUE_TYPE_ARRAY) { "Invalid JSON key value: $key" }
+        type = JSON_VALUE_TYPE_ARRAY
+        subType = typeFields[1]
     }
 
-  val tag =
-    when {
-      tagNumber == null -> throw IllegalArgumentException("Invalid JSON key value: $key")
-      tagNumber <= UByte.MAX_VALUE.toUInt() -> ContextSpecificTag(tagNumber.toInt())
-      tagNumber <= UShort.MAX_VALUE.toUInt() -> CommonProfileTag(2, tagNumber)
-      else -> CommonProfileTag(4, tagNumber)
-    }
-
-  // Valid type field of the JSON key SHOULD have type and optional subtype component
-  require(typeFields.size in (1..2)) { "Invalid JSON key value: $key" }
-
-  if (typeFields.size == 2) {
-    require(typeFields[0] == JSON_VALUE_TYPE_ARRAY) { "Invalid JSON key value: $key" }
-    type = JSON_VALUE_TYPE_ARRAY
-    subType = typeFields[1]
-  }
-
-  return Triple(tag, type, subType)
+    return Triple(tag, type, subType)
 }
 
 private fun String.base64Encode(): ByteArray {
-  return Base64.getDecoder().decode(this)
+    return Base64.getDecoder().decode(this)
 }
 
 /** Verifies JsonElement is Number. If yes, returns the value. */
 private fun validateIsNumber(element: JsonElement): Number {
-  require(
-    element.isJsonPrimitive() &&
-      (element.getAsJsonPrimitive().isNumber() || element.getAsJsonPrimitive().isString())
-  ) {
-    "Expected Integer represented as a Number or as a String; the actual element is: $element"
-  }
-  return element.getAsJsonPrimitive().getAsNumber()
+    require(
+        element.isJsonPrimitive() &&
+            (element.getAsJsonPrimitive().isNumber() || element.getAsJsonPrimitive().isString())
+    ) {
+        "Expected Integer represented as a Number or as a String; the actual element is: $element"
+    }
+    return element.getAsJsonPrimitive().getAsNumber()
 }
 
 /** Verifies JsonElement is Boolean. If yes, returns the value. */
 private fun validateIsBoolean(element: JsonElement): Boolean {
-  require(element.isJsonPrimitive() && element.getAsJsonPrimitive().isBoolean()) {
-    "Expected Boolean; the actual element is: $element"
-  }
-  return element.getAsJsonPrimitive().getAsBoolean()
+    require(element.isJsonPrimitive() && element.getAsJsonPrimitive().isBoolean()) {
+        "Expected Boolean; the actual element is: $element"
+    }
+    return element.getAsJsonPrimitive().getAsBoolean()
 }
 
 /** Verifies JsonElement is Double. If yes, returns the value. */
 private fun validateIsDouble(element: JsonElement): Double {
-  require(element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber()) {
-    "Expected Double; the actual element is: $element"
-  }
-  return element.getAsJsonPrimitive().getAsDouble()
+    require(element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber()) {
+        "Expected Double; the actual element is: $element"
+    }
+    return element.getAsJsonPrimitive().getAsDouble()
 }
 
 /** Verifies JsonElement is String. If yes, returns the value. */
 private fun validateIsString(element: JsonElement): String {
-  require(element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
-    "Expected String; the actual element is: $element"
-  }
-  return element.getAsJsonPrimitive().getAsString()
+    require(element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
+        "Expected String; the actual element is: $element"
+    }
+    return element.getAsJsonPrimitive().getAsString()
 }
 
 /** Verifies JsonElement is Null. If yes, puts it into TLV. */
 private fun TlvWriter.validateIsNullAndPut(element: JsonElement, tag: Tag) {
-  require(element.isJsonNull()) { "Expected Null; the actual element is: $element" }
-  putNull(tag)
+    require(element.isJsonNull()) { "Expected Null; the actual element is: $element" }
+    putNull(tag)
 }
 
 /** Verifies JsonElement is JsonObject. If yes, converts it into TLV Structure. */
 private fun TlvWriter.validateIsJsonObjectAndConvert(element: JsonElement, tag: Tag) {
-  require(element.isJsonObject()) { "Expected JsonObject; the actual element is: $element" }
-  startStructure(tag).fromJson(element.getAsJsonObject()).endStructure()
+    require(element.isJsonObject()) { "Expected JsonObject; the actual element is: $element" }
+    startStructure(tag).fromJson(element.getAsJsonObject()).endStructure()
 }
