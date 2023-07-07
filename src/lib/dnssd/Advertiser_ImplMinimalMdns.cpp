@@ -906,7 +906,7 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
         // This optimization likely will take more logic and state storage, so
         // for now it is not done.
         QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
-        queryData.SetIsInternalBroadcast(true);
+        queryData.SetIsAnnounceBroadcast(true);
 
         for (auto & it : mOperationalResponders)
         {
@@ -916,6 +916,7 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
         mQueryResponderAllocatorCommissioner.GetQueryResponder()->ClearBroadcastThrottle();
 
         CHIP_ERROR err = mResponseSender.Respond(0, queryData, &packetInfo, responseConfiguration);
+
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Discovery, "Failed to advertise records: %" CHIP_ERROR_FORMAT, err.Format());

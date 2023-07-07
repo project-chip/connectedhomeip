@@ -31,16 +31,31 @@ using SemanticTag          = Structs::SemanticTagStruct::Type;
 template <typename T>
 using List = app::DataModel::List<T>;
 
+SupportedModesManager::ModeOptionsProvider * StaticSupportedModesManager::epModeOptionsProviderList = nullptr;
+
 const StaticSupportedModesManager StaticSupportedModesManager::instance = StaticSupportedModesManager();
 
-SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::epModeOptionsProviderList[FIXED_ENDPOINT_COUNT];
+int StaticSupportedModesManager::mSize = 0;
 
-void StaticSupportedModesManager::InitEndpointArray()
+CHIP_ERROR StaticSupportedModesManager::InitEndpointArray(int size)
 {
-    for (int i = 0; i < FIXED_ENDPOINT_COUNT; i++)
+    if (epModeOptionsProviderList != nullptr)
+    {
+        ChipLogError(Zcl, "Cannot allocate epModeOptionsProviderList");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    mSize                     = size;
+    epModeOptionsProviderList = new SupportedModesManager::ModeOptionsProvider[mSize];
+    if (epModeOptionsProviderList == nullptr)
+    {
+        ChipLogError(Zcl, "Failed to allocate memory to epModeOptionsProviderList");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    for (int i = 0; i < mSize; i++)
     {
         epModeOptionsProviderList[i] = ModeOptionsProvider();
     }
+    return CHIP_NO_ERROR;
 }
 
 SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeOptionsProvider(EndpointId endpointId) const
@@ -181,7 +196,7 @@ Status StaticSupportedModesManager::getModeOptionByMode(unsigned short endpointI
 
 const ModeSelect::SupportedModesManager * ModeSelect::getSupportedModesManager()
 {
-    return &StaticSupportedModesManager::instance;
+    return &StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
 }
 
 void StaticSupportedModesManager::FreeSupportedModes(EndpointId endpointId) const

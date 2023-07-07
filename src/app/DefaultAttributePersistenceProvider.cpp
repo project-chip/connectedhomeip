@@ -30,8 +30,8 @@ CHIP_ERROR DefaultAttributePersistenceProvider::WriteValue(const ConcreteAttribu
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // TODO: we may want to have a small cache for values that change a lot, so
-    // we only write them once a bunch of changes happen or on timer or
-    // shutdown.
+    //  we only write them once a bunch of changes happen or on timer or
+    //  shutdown.
     if (!CanCastTo<uint16_t>(aValue.size()))
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
@@ -41,7 +41,8 @@ CHIP_ERROR DefaultAttributePersistenceProvider::WriteValue(const ConcreteAttribu
         aValue.data(), static_cast<uint16_t>(aValue.size()));
 }
 
-CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, uint16_t aSize, MutableByteSpan & aValue)
+CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType,
+                                                          size_t aSize, MutableByteSpan & aValue)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -49,7 +50,8 @@ CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttribut
     ReturnErrorOnFailure(mStorage->SyncGetKeyValue(
         DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId).KeyName(),
         aValue.data(), size));
-    if (emberAfIsStringAttributeType(aType))
+    EmberAfAttributeType type = aType;
+    if (emberAfIsStringAttributeType(type))
     {
         // Ensure that we've read enough bytes that we are not ending up with
         // un-initialized memory.  Should have read length + 1 (for the length
@@ -66,7 +68,7 @@ CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttribut
     else
     {
         // Ensure we got the expected number of bytes for all other types.
-        VerifyOrReturnError(size == aSize, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(size == aSize, CHIP_ERROR_INVALID_ARGUMENT);
     }
     aValue.reduce_size(size);
     return CHIP_NO_ERROR;

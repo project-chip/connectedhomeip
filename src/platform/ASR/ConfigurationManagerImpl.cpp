@@ -27,8 +27,10 @@
 #include <platform/KeyValueStoreManager.h>
 #ifdef CFG_PLF_RV32
 #include "alto_common.h"
+#elif defined CFG_PLF_DUET
+#include "duet.h"
 #else
-#include <duet.h>
+#include "lega_cm4.h"
 #endif
 namespace chip {
 namespace DeviceLayer {

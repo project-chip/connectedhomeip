@@ -98,7 +98,8 @@ if (chip_build_tests) {
         "${chip_root}/src/transport/tests",
       ]
 
-      if (matter_enable_tracing_support) {
+      if (matter_enable_tracing_support &&
+          matter_trace_config == "multiplexed") {
         deps += [ "${chip_root}/src/tracing/tests" ]
       }
     }

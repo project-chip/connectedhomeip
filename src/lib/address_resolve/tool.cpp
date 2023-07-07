@@ -33,13 +33,6 @@ using namespace chip;
 using chip::Inet::InterfaceId;
 using chip::Transport::PeerAddress;
 
-class AutoStopTracing
-{
-public:
-    AutoStopTracing() {}
-    ~AutoStopTracing() { chip::CommandLineApp::StopTracing(); }
-};
-
 // clang-format off
 const char * const sHelp =
     "Usage: address-resolve-tool [<options...>] <command> [ <args...> ]\n"
@@ -160,7 +153,7 @@ extern "C" int main(int argc, const char ** argv)
     argc--;
     argv++;
 
-    AutoStopTracing auto_stop_tracing;
+    chip::CommandLineApp::TracingSetup tracing_setup;
 
     while (argc > 0)
     {
@@ -174,7 +167,7 @@ extern "C" int main(int argc, const char ** argv)
         {
             if (argc > 1)
             {
-                chip::CommandLineApp::EnableTracingFor(argv[1]);
+                tracing_setup.EnableTracingFor(argv[1]);
                 argc -= 2;
                 argv += 2;
             }

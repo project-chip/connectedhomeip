@@ -1265,6 +1265,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(RefrigeratorAndTemperat
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasherControls::NumberOfRinsesEnum val)
+{
+    using EnumType = LaundryWasherControls::NumberOfRinsesEnum;
+    switch (val)
+    {
+    case EnumType::kNone:
+    case EnumType::kNormal:
+    case EnumType::kExtra:
+    case EnumType::kMax:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(RvcRunMode::ModeTag val)
 {
     using EnumType = RvcRunMode::ModeTag;
@@ -1385,8 +1400,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::EndOfServ
     using EnumType = SmokeCoAlarm::EndOfServiceEnum;
     switch (val)
     {
-    case EnumType::kExpired:
     case EnumType::kNormal:
+    case EnumType::kExpired:
         return val;
     default:
         return static_cast<EnumType>(2);
@@ -2307,21 +2322,26 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::AirflowDire
         return static_cast<EnumType>(2);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::DirectionEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeEnum val)
 {
-    using EnumType = FanControl::DirectionEnum;
+    using EnumType = FanControl::FanModeEnum;
     switch (val)
     {
-    case EnumType::kIncrease:
-    case EnumType::kDecrease:
+    case EnumType::kOff:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kOn:
+    case EnumType::kAuto:
+    case EnumType::kSmart:
         return val;
     default:
-        return static_cast<EnumType>(2);
+        return static_cast<EnumType>(7);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeSequenceType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeSequenceEnum val)
 {
-    using EnumType = FanControl::FanModeSequenceType;
+    using EnumType = FanControl::FanModeSequenceEnum;
     switch (val)
     {
     case EnumType::kOffLowMedHigh:
@@ -2335,21 +2355,16 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeSequ
         return static_cast<EnumType>(6);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::StepDirectionEnum val)
 {
-    using EnumType = FanControl::FanModeType;
+    using EnumType = FanControl::StepDirectionEnum;
     switch (val)
     {
-    case EnumType::kOff:
-    case EnumType::kLow:
-    case EnumType::kMedium:
-    case EnumType::kHigh:
-    case EnumType::kOn:
-    case EnumType::kAuto:
-    case EnumType::kSmart:
+    case EnumType::kIncrease:
+    case EnumType::kDecrease:
         return val;
     default:
-        return static_cast<EnumType>(7);
+        return static_cast<EnumType>(2);
     }
 }
 
@@ -2512,8 +2527,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonMonoxideConcentra
     using EnumType = CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -2559,8 +2574,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonDioxideConcentrat
     using EnumType = CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -2606,8 +2621,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneConcentrationMe
     using EnumType = EthyleneConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -2653,8 +2668,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneOxideConcentrat
     using EnumType = EthyleneOxideConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -2700,8 +2715,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenConcentrationMe
     using EnumType = HydrogenConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -2747,8 +2762,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenSulfideConcentr
     using EnumType = HydrogenSulfideConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -2794,8 +2809,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(NitricOxideConcentratio
     using EnumType = NitricOxideConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -2841,8 +2856,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(NitrogenDioxideConcentr
     using EnumType = NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -2888,8 +2903,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OxygenConcentrationMeas
     using EnumType = OxygenConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -2935,8 +2950,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneConcentrationMeasu
     using EnumType = OzoneConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -2982,8 +2997,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SulfurDioxideConcentrat
     using EnumType = SulfurDioxideConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3029,8 +3044,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DissolvedOxygenConcentr
     using EnumType = DissolvedOxygenConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3076,8 +3091,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BromateConcentrationMea
     using EnumType = BromateConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3123,8 +3138,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ChloraminesConcentratio
     using EnumType = ChloraminesConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3170,8 +3185,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorineConcentrationMe
     using EnumType = ChlorineConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3217,8 +3232,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FecalColiformEColiConce
     using EnumType = FecalColiformEColiConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3264,8 +3279,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FluorideConcentrationMe
     using EnumType = FluorideConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3311,8 +3326,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(HaloaceticAcidsConcentr
     using EnumType = HaloaceticAcidsConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3358,8 +3373,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TotalTrihalomethanesCon
     using EnumType = TotalTrihalomethanesConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3405,8 +3420,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TotalColiformBacteriaCo
     using EnumType = TotalColiformBacteriaConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3452,8 +3467,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TurbidityConcentrationM
     using EnumType = TurbidityConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3499,8 +3514,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CopperConcentrationMeas
     using EnumType = CopperConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3546,8 +3561,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(LeadConcentrationMeasur
     using EnumType = LeadConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3593,8 +3608,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ManganeseConcentrationM
     using EnumType = ManganeseConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3640,8 +3655,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SulfateConcentrationMea
     using EnumType = SulfateConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3687,8 +3702,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BromodichloromethaneCon
     using EnumType = BromodichloromethaneConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3734,8 +3749,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BromoformConcentrationM
     using EnumType = BromoformConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3781,8 +3796,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorodibromomethaneCon
     using EnumType = ChlorodibromomethaneConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3828,8 +3843,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ChloroformConcentration
     using EnumType = ChloroformConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3875,8 +3890,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SodiumConcentrationMeas
     using EnumType = SodiumConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3922,8 +3937,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Pm25ConcentrationMeasur
     using EnumType = Pm25ConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -3969,8 +3984,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FormaldehydeConcentrati
     using EnumType = FormaldehydeConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -4016,8 +4031,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Pm1ConcentrationMeasure
     using EnumType = Pm1ConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -4063,8 +4078,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Pm10ConcentrationMeasur
     using EnumType = Pm10ConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -4111,8 +4126,8 @@ EnsureKnownEnumValue(TotalVolatileOrganicCompoundsConcentrationMeasurement::Meas
     using EnumType = TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:
@@ -4159,8 +4174,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(RadonConcentrationMeasu
     using EnumType = RadonConcentrationMeasurement::MeasurementMediumEnum;
     switch (val)
     {
-    case EnumType::kGas:
-    case EnumType::kLiquid:
+    case EnumType::kAir:
+    case EnumType::kWater:
     case EnumType::kSoil:
         return val;
     default:

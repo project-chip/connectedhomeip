@@ -15,9 +15,9 @@ for various operations. They are:
 -   _instant_ where a single notable event is emitted, representing a point in
     time of a notable event
 
-Tracing and instant values are set to know enumeration values at compile time,
-to allow implementation of backends that require compile-time strings for their
-tracing.
+Tracing and instant values MUST be constant strings as some backends rely on
+that property for caching (e.g. pw_trace would do tokenization and perfetto
+marks them as `perfetto::StaticString`)
 
 ### Data Logging
 

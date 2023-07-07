@@ -40,8 +40,7 @@ using clusterId = chip::ClusterId;
 class DefaultSceneHandlerImpl : public scenes::SceneHandler
 {
 public:
-    static constexpr uint8_t kMaxValueSize = 4;
-    static constexpr uint8_t kMaxAvPair    = 15;
+    static constexpr uint8_t kMaxAvPair = CHIP_CONFIG_SCENES_MAX_AV_PAIRS_EFS;
 
     DefaultSceneHandlerImpl() = default;
     ~DefaultSceneHandlerImpl() override{};
@@ -98,8 +97,7 @@ class DefaultSceneTableImpl : public SceneTable<scenes::ExtensionFieldSetsImpl>
 {
 public:
     DefaultSceneTableImpl() {}
-
-    ~DefaultSceneTableImpl() override {}
+    ~DefaultSceneTableImpl() { Finish(); };
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage) override;
     void Finish() override;

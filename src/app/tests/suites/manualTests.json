@@ -182,12 +182,10 @@
     ],
     "ModeSelect": [
         "Test_TC_MOD_1_2",
-        "Test_TC_MOD_1_3",
         "Test_TC_MOD_2_1",
-        "Test_TC_MOD_2_2",
+        "Test_TC_MOD_2_3",
         "Test_TC_MOD_3_1",
         "Test_TC_MOD_3_2",
-        "Test_TC_MOD_3_3",
         "Test_TC_MOD_3_4"
     ],
     "OTASoftwareUpdate": [
@@ -245,36 +243,25 @@
     "WindowCovering": [],
     "FlowMeasurement": ["Test_TC_FLW_2_2"],
     "OccupancySensing": ["Test_TC_OCC_3_1"],
-    "PowerSource": ["Test_TC_PS_2_2"],
+    "PowerSource": ["Test_TC_PS_2_2", "Test_TC_PS_3_1"],
     "BooleanState": ["Test_TC_BOOL_2_2"],
     "ColorControl": [
-        "Test_TC_CC_2_2",
         "Test_TC_CC_3_1",
         "Test_TC_CC_7_1",
         "Test_TC_CC_9_1",
         "Test_TC_CC_9_2",
         "Test_TC_CC_9_3"
     ],
-    "DoorLock": [
-        "Test_TC_DRLK_2_1",
-        "Test_TC_DRLK_2_8",
-        "Test_TC_DRLK_2_10",
-        "Test_TC_DRLK_3_1",
-        "Test_TC_DRLK_3_2",
-        "Test_TC_DRLK_3_3"
-    ],
+    "DoorLock": ["Test_TC_DRLK_2_10", "Test_TC_DRLK_3_2", "Test_TC_DRLK_3_3"],
     "LocalizationConfiguration": ["Test_TC_LCFG_2_1"],
-    "LevelControl": ["Test_TC_LVL_7_1", "Test_TC_LVL_8_1"],
+    "LevelControl": ["Test_TC_LVL_8_1"],
     "OnOff": ["Test_TC_OO_2_3"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_2_2"],
     "Switch": ["Test_TC_SWTCH_2_2", "Test_TC_SWTCH_3_2"],
     "TemperatureMeasurement": ["Test_TC_TMP_2_2"],
     "Thermostat": ["Test_TC_TSTAT_3_1", "Test_TC_TSTAT_3_2"],
     "ThermostatUserConfiguration": [],
-    "ThreadNetworkDiagnostics": [
-        "Test_TC_DGTHREAD_2_5",
-        "Test_TC_DGTHREAD_3_1"
-    ],
+    "ThreadNetworkDiagnostics": ["Test_TC_DGTHREAD_2_5"],
     "Actions": ["Test_TC_ACT_2_1", "Test_TC_ACT_2_2", "Test_TC_ACT_3_2"],
     "TimeFormatLocalization": ["Test_TC_LTIME_2_1", "Test_TC_LTIME_3_1"],
     "UnitLocalization": [],

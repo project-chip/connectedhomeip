@@ -49,6 +49,11 @@
  */
 #define LWIP_RAW (1)
 
+/**
+ * Disable DHCP as the IP6 link local address can be used.
+ */
+#define LWIP_DHCP 0
+
 #ifdef LWIP_DEBUG
 
 // Debug Options

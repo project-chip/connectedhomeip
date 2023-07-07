@@ -20,35 +20,24 @@ import("${chip_root}/src/platform/device.gni")
 assert(chip_device_platform == "openiotsdk")
 
 declare_args() {
-  # Add Trusted Firmware-M (TF-M) support
-  chip_openiotsdk_use_tfm = false
+  # Default value of software version
+  chip_openiotsdk_software_version = "0"
 
-  # By default use flash block device storage
-  chip_openiotsdk_use_psa_ps = false
+  # Default value of software version in string
+  chip_openiotsdk_software_version_string = "0.0.0"
 }
 
 buildconfig_header("openiotsdk_buildconfig") {
   header = "OpenIoTSDKConfig.h"
   header_dir = "ois"
 
-  if (chip_openiotsdk_use_psa_ps) {
-    _chip_openiotsdk_kv_store_config_include =
-        "<platform/" + chip_device_platform + "/KVPsaPsStore.h>"
-    _chip_openiotsdk_persisted_storage_key_type = "uint64_t"
-  } else {
-    _chip_openiotsdk_kv_store_config_include =
-        "<platform/" + chip_device_platform + "/KVBlockDeviceStore.h>"
-    _chip_openiotsdk_persisted_storage_key_type = "const char *"
-  }
+  _chip_openiotsdk_persisted_storage_key_type = "uint64_t"
 
   defines = [
-    "CHIP_OPEN_IOT_SDK_KV_STORE_CONFIG_INCLUDE=${_chip_openiotsdk_kv_store_config_include}",
     "CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE=${_chip_openiotsdk_persisted_storage_key_type}",
+    "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${chip_openiotsdk_software_version_string}\"",
+    "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_openiotsdk_software_version}",
   ]
-
-  if (chip_openiotsdk_use_tfm) {
-    defines += [ "CHIP_OPEN_IOT_SDK_USE_TFM=1" ]
-  }
 }
 
 static_library("openiotsdk") {
@@ -65,6 +54,8 @@ static_library("openiotsdk") {
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "InetPlatformConfig.h",
+    "KVPsaPsStore.cpp",
+    "KVPsaPsStore.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
@@ -84,18 +75,6 @@ static_library("openiotsdk") {
     ":openiotsdk_buildconfig",
     "${chip_root}/src/platform:platform_base",
   ]
-
-  if (chip_openiotsdk_use_psa_ps) {
-    sources += [
-      "KVPsaPsStore.cpp",
-      "KVPsaPsStore.h",
-    ]
-  } else {
-    sources += [
-      "KVBlockDeviceStore.cpp",
-      "KVBlockDeviceStore.h",
-    ]
-  }
 
   cflags = [ "-Wconversion" ]
 }

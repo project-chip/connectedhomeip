@@ -73,6 +73,21 @@ CHIP_ERROR CASEServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloa
 CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                          System::PacketBufferHandle && payload)
 {
+    if (GetSession().GetState() != CASESession::State::kInitialized)
+    {
+        // We are in the middle of CASE handshake
+
+        // Invoke watchdog to fix any stuck handshakes
+        bool watchdogFired = GetSession().InvokeBackgroundWorkWatchdog();
+        if (!watchdogFired)
+        {
+            // Handshake wasn't stuck, let it continue its work
+            // TODO: Send Busy response, #27473
+            ChipLogError(Inet, "CASE session is in establishing state, returning without responding");
+            return CHIP_NO_ERROR;
+        }
+    }
+
     if (!ec->GetSessionHandle()->IsUnauthenticatedSession())
     {
         ChipLogError(Inet, "CASE Server received Sigma1 message %s EC %p", "over encrypted session. Ignoring.", ec);
@@ -86,8 +101,6 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
 
     // TODO - Enable multiple concurrent CASE session establishment
     // https://github.com/project-chip/connectedhomeip/issues/8342
-    ChipLogProgress(Inet, "CASE Server disabling CASE session setups");
-    mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1);
 
     err = GetSession().OnMessageReceived(ec, payloadHeader, std::move(payload));
     SuccessOrExit(err);

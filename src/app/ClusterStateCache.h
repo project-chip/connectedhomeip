@@ -152,6 +152,17 @@ public:
         return DataModel::Decode(reader, value);
     }
 
+    /**
+     * Get the value of a particular attribute for the given endpoint.  See the
+     * documentation for Get() with a ConcreteAttributePath above.
+     */
+    template <typename AttributeObjectTypeT>
+    CHIP_ERROR Get(EndpointId endpoint, typename AttributeObjectTypeT::DecodableType & value) const
+    {
+        ConcreteAttributePath path(endpoint, AttributeObjectTypeT::GetClusterId(), AttributeObjectTypeT::GetAttributeId());
+        return Get<AttributeObjectTypeT>(path, value);
+    }
+
     /*
      * Retrieve the StatusIB for a given attribute if one exists currently in the cache.
      *

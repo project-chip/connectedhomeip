@@ -5,18 +5,10 @@ This example demonstrates the Matter Light Switch application on ASR platform.
 ---
 
 -   [Matter ASR Light Switch Example](#matter-asr-light-switch-example)
-    -   [Supported Chips](#supported-chips)
     -   [Building and Commissioning](#building-and-commissioning)
     -   [Testing the example](#testing-the-example)
 
 ---
-
-## Supported Chips
-
-The Matter demo application is supported on:
-
--   ASR582X
--   ASR595X
 
 ## Building and Commissioning
 
@@ -47,6 +39,6 @@ guides to get started
 
     This demo uses button to test changing the state of lighting:
 
-    |  Name  | Pin  |
-    | :----: | :--: |
-    | BUTTON | PAD6 |
+    |  Name  |  Pin  |
+    | :----: | :---: |
+    | BUTTON | PAD12 |

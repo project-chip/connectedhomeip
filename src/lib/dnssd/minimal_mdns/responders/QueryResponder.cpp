@@ -142,6 +142,11 @@ void QueryResponderBase::MarkAdditionalRepliesFor(QueryResponderIterator it)
 void QueryResponderBase::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                                          const ResponseConfiguration & configuration)
 {
+    if (!delegate->ShouldSend(*this))
+    {
+        return;
+    }
+
     // reply to dns-sd service list request
     for (size_t i = 0; i < mResponderInfoSize; i++)
     {
@@ -159,6 +164,8 @@ void QueryResponderBase::AddAllResponses(const chip::Inet::IPPacketInfo * source
         configuration.Adjust(record);
         delegate->AddResponse(record);
     }
+
+    delegate->ResponsesAdded(*this);
 }
 
 void QueryResponderBase::ClearBroadcastThrottle()

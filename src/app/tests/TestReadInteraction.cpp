@@ -1587,7 +1587,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         dirtyPath5.mAttributeId = 4;
 
         // Test report with 2 different path
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
         delegate.mGotReport            = false;
         delegate.mGotEventResponse     = false;
         delegate.mNumAttributeResponse = 0;
@@ -1604,7 +1604,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 2 different path, and 1 same path
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -1620,7 +1620,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 3 different path, and one path is overlapped with another
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -1636,7 +1636,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 3 different path, all are not overlapped, one path is not interested for current subscription
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -1652,8 +1652,8 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test empty report
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldSync, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMaxInterval, false);
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
@@ -1740,12 +1740,13 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
 
         GenerateEvents(apSuite, apContext);
 
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval));
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
         delegate.mGotEventResponse = false;
         delegate.mGotReport        = false;
 
-        NL_TEST_ASSERT(apSuite, nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite,
+                       nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval));
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
         nonUrgentDelegate.mGotEventResponse = false;
         nonUrgentDelegate.mGotReport        = false;
@@ -1781,13 +1782,14 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
 
         // Since we just sent a report for our urgent subscription, we should have our min interval timer
         // running again.
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval));
         NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
         delegate.mGotEventResponse = false;
 
         // For our non-urgent subscription, we did not send anything, so we
         // should not have a min interval timer running there.
-        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite,
+                       !nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval));
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
 
         // Wait for the min interval timer to fire.
@@ -1807,15 +1809,16 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
 
         // min-interval timer should have fired, and our handler should still
         // not be dirty or even reportable.
-        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval));
         NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
-        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsReportable());
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsReportableNow());
 
         // And the non-urgent one should not have changed state either, since
         // it's waiting for the max-interval.
-        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite,
+                       !nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval));
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
-        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsReportable());
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsReportableNow());
 
         // There should be no reporting run scheduled.  This is very important;
         // otherwise we can get a false-positive pass below because the run was
@@ -1827,11 +1830,11 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
 
         // Urgent read handler should now be dirty, and reportable.
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsReportable());
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsReportableNow());
 
         // Non-urgent read handler should not be reportable.
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
-        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsReportable());
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsReportableNow());
 
         // Still no reporting should have happened.
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
@@ -1914,7 +1917,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
         // Set a concrete path dirty
         {
-            delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+            delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
 
@@ -1935,7 +1938,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
         // Set a endpoint dirty
         {
-            delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+            delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
             delegate.mNumArrayItems        = 0;
@@ -2027,7 +2030,7 @@ void TestReadInteraction::TestSubscribePartialOverlap(nlTestSuite * apSuite, voi
 
         // Set a partial overlapped path dirty
         {
-            delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+            delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
 
@@ -2104,7 +2107,7 @@ void TestReadInteraction::TestSubscribeSetDirtyFullyOverlap(nlTestSuite * apSuit
 
         // Set a full overlapped path dirty and expect to receive one E2C3A1
         {
-            delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+            delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
 
@@ -2225,8 +2228,8 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldSync, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMaxInterval, false);
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
 
         ctx.DrainAndServiceIO();
@@ -2401,7 +2404,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         dirtyPath2.mAttributeId = 2;
 
         // Test report with 2 different path
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
 
@@ -2415,8 +2418,8 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldSync, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMaxInterval, false);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         ctx.ExpireSessionBobToAlice();
@@ -2763,8 +2766,8 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
 
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldSync, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMaxInterval, false);
         err = engine->GetReportingEngine().SetDirty(dirtyPath1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         delegate.mGotReport            = false;
@@ -2865,8 +2868,8 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
 
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldSync, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMaxInterval, false);
         err = engine->GetReportingEngine().SetDirty(dirtyPath1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         delegate.mGotReport            = false;
@@ -4246,7 +4249,7 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
         NL_TEST_ASSERT(apSuite, SessionHandle(*readHandler->GetSession()) == ctx.GetSessionAliceToBob());
 
         // Test that we send reports as needed.
-        readHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        readHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         engine->GetReportingEngine().SetDirty(subscribePath);
@@ -4262,7 +4265,7 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
         // Test that if the session is defunct we don't send reports and clean
         // up properly.
         readHandler->GetSession()->MarkAsDefunct();
-        readHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        readHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         engine->GetReportingEngine().SetDirty(subscribePath);
