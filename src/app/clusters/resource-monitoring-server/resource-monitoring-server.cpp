@@ -150,7 +150,6 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
     case Attributes::LastChangedTime::Id: {
         DataModel::Nullable<uint32_t> newLastChangedTime;
         ReturnErrorOnFailure(aDecoder.Decode(newLastChangedTime));
-        // Todo write the attribute to persistant storage
         UpdateLastChangedTime(newLastChangedTime);
         break;
     }
