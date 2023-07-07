@@ -140,7 +140,7 @@ private:
     GenericOperationalState mOperationalState;
     GenericOperationalError mOperationalError;
     app::DataModel::List<const GenericOperationalState> mOperationalStateList;
-    app::DataModel::List<const GenericOperationalPhase> mOperationalPhaseList;
+    Span<const GenericOperationalPhase> mOperationalPhaseList;
     app::DataModel::Nullable<uint8_t> mOperationalPhase;
     app::DataModel::Nullable<uint32_t> mCountdownTime;
 };
