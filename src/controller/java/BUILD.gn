@@ -312,6 +312,7 @@ android_library("java") {
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
+    "src/chip/devicecontroller/ChipIdLookup.java",
     "src/chip/devicecontroller/ControllerParams.java",
     "src/chip/devicecontroller/DeviceAttestationDelegate.java",
     "src/chip/devicecontroller/DiscoveredDevice.java",
@@ -345,7 +346,6 @@ android_library("java") {
     "src/chip/devicecontroller/model/NodeState.java",
     "zap-generated/chip/devicecontroller/ChipClusters.java",
     "zap-generated/chip/devicecontroller/ChipEventStructs.java",
-    "zap-generated/chip/devicecontroller/ChipIdLookup.java",
     "zap-generated/chip/devicecontroller/ChipStructs.java",
     "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
   ]

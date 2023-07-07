@@ -154,15 +154,18 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  *
  * nil is used to represent wildcards.
  */
-MTR_NEWLY_AVAILABLE
+API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
 @interface MTRAttributeRequestPath : NSObject <NSCopying>
-@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint;
-@property (nonatomic, readonly, copy, nullable) NSNumber * cluster;
-@property (nonatomic, readonly, copy, nullable) NSNumber * attribute;
+@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
+    ;
+@property (nonatomic, readonly, copy, nullable) NSNumber * cluster API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+@property (nonatomic, readonly, copy, nullable)
+    NSNumber * attribute API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 + (MTRAttributeRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
                                              clusterID:(NSNumber * _Nullable)clusterID
-                                           attributeID:(NSNumber * _Nullable)attributeID MTR_NEWLY_AVAILABLE;
+                                           attributeID:(NSNumber * _Nullable)attributeID
+    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @end
 
 /**
@@ -170,15 +173,17 @@ MTR_NEWLY_AVAILABLE
  *
  * nil is used to represent wildcards.
  */
-MTR_NEWLY_AVAILABLE
+API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
 @interface MTREventRequestPath : NSObject <NSCopying>
-@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint;
-@property (nonatomic, readonly, copy, nullable) NSNumber * cluster;
-@property (nonatomic, readonly, copy, nullable) NSNumber * event;
+@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
+    ;
+@property (nonatomic, readonly, copy, nullable) NSNumber * cluster API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+@property (nonatomic, readonly, copy, nullable) NSNumber * event API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 + (MTREventRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
                                          clusterID:(NSNumber * _Nullable)clusterID
-                                           eventID:(NSNumber * _Nullable)eventID MTR_NEWLY_AVAILABLE;
+                                           eventID:(NSNumber * _Nullable)eventID
+    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @end
 
 @interface MTRBaseDevice : NSObject
@@ -299,7 +304,7 @@ MTR_NEWLY_AVAILABLE
                 eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
                     params:(MTRReadParams * _Nullable)params
                      queue:(dispatch_queue_t)queue
-                completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
+                completion:(MTRDeviceResponseHandler)completion API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Write to attribute in a designated attribute path
@@ -418,7 +423,8 @@ MTR_NEWLY_AVAILABLE
                             queue:(dispatch_queue_t)queue
                     reportHandler:(MTRDeviceResponseHandler)reportHandler
           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-          resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled MTR_NEWLY_AVAILABLE;
+          resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled
+    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Deregister all local report handlers for a remote device
@@ -466,7 +472,8 @@ MTR_NEWLY_AVAILABLE
 - (void)openCommissioningWindowWithDiscriminator:(NSNumber *)discriminator
                                         duration:(NSNumber *)duration
                                            queue:(dispatch_queue_t)queue
-                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion MTR_NEWLY_AVAILABLE;
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion
+    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Reads events from the device.
@@ -633,7 +640,8 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * * The data does not match the known schema.
  */
 - (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+                                         error:(NSError * __autoreleasing *)error
+    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 @end
 
@@ -706,7 +714,8 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
  * * The data does not match the known schema.
  */
 - (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+                                         error:(NSError * __autoreleasing *)error
+    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 @end
 

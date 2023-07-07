@@ -113,6 +113,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/hardware/board/inc",
       "${efr32_sdk_root}/hardware/driver/memlcd/inc",
       "${efr32_sdk_root}/hardware/driver/memlcd/src/ls013b7dh03",
+      "${efr32_sdk_root}/hardware/driver/configuration_over_swo/inc/",
       "${efr32_sdk_root}/platform/bootloader",
       "${efr32_sdk_root}/platform/bootloader/config",
       "${efr32_sdk_root}/platform/bootloader/config/s2/btl_interface",
@@ -179,11 +180,6 @@ template("efr32_sdk") {
       "${silabs_gen_folder}/autogen",
     ]
 
-    if (slc_generate || slc_reuse_files || silabs_family == "mgm24") {
-      _include_dirs +=
-          [ "${efr32_sdk_root}/hardware/driver/configuration_over_swo/inc/" ]
-    }
-
     if (silabs_family != "mgm24") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/radio/rail_lib/hal",
@@ -227,6 +223,8 @@ template("efr32_sdk") {
       "SL_COMPONENT_CATALOG_PRESENT=1",
       "PLATFORM_HEADER=\"platform-header.h\"",
       "USE_NVM3=1",
+      "SL_CATALOG_POWER_MANAGER_PRESENT",
+      "SL_CATALOG_SLEEPTIMER_PRESENT",
 
       #"__STACK_SIZE=0",
     ]
@@ -308,20 +306,12 @@ template("efr32_sdk") {
     if (use_system_view) {
       _include_dirs += [
         "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER",
-        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10/Config/Cortex-M",
-        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10",
         "${efr32_sdk_root}/util/third_party/segger/systemview/Config/",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/init/",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/",
       ]
 
       defines += [ "SL_SYSTEM_VIEW=1" ]
-    }
-
-    if (silabs_board == "BRD2704A" || silabs_board == "BRD4318A") {
-      _include_dirs += [
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/",
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rssi/",
-        "${efr32_sdk_root}/platform/driver/debug/inc/",
-      ]
     }
 
     defines += board_defines
@@ -339,8 +329,6 @@ template("efr32_sdk") {
     if (enable_sleepy_device) {
       defines += [
         "CHIP_DEVICE_CONFIG_ENABLE_SED=1",
-        "SL_CATALOG_POWER_MANAGER_PRESENT",
-        "SL_CATALOG_SLEEPTIMER_PRESENT",
         "SL_OT_IDLE_INTERVAL=${sl_ot_idle_interval_ms}",
         "SL_OT_ACTIVE_INTERVAL=${sl_ot_active_interval_ms}",
         "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold}",
@@ -453,10 +441,13 @@ template("efr32_sdk") {
     } else if (silabs_family == "mgm24") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM24/Include",
+        "${efr32_sdk_root}/platform/driver/debug/inc/",
         "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg2x",
         "${efr32_sdk_root}/platform/radio/rail_lib/protocol/ble",
         "${efr32_sdk_root}/platform/radio/rail_lib/protocol/ieee802154",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rssi/",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg24",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg24/config",
         "${efr32_sdk_root}/platform/service/device_init/config/s2/",
@@ -549,11 +540,13 @@ template("efr32_sdk") {
       "${chip_root}/third_party/mbedtls/repo/include/mbedtls/platform.h",
       "${efr32_sdk_root}/hardware/board/src/sl_board_control_gpio.c",
       "${efr32_sdk_root}/hardware/board/src/sl_board_init.c",
+      "${efr32_sdk_root}/hardware/driver/configuration_over_swo/src/sl_cos.c",
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Source/os_systick.c",
       "${efr32_sdk_root}/platform/bootloader/api/btl_interface.c",
       "${efr32_sdk_root}/platform/bootloader/api/btl_interface_storage.c",
       "${efr32_sdk_root}/platform/bootloader/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",
+      "${efr32_sdk_root}/platform/driver/debug/src/sl_debug_swo.c",
       "${efr32_sdk_root}/platform/emdrv/dmadrv/src/dmadrv.c",
       "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/src/gpiointerrupt.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default.c",
@@ -627,6 +620,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/croutine.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/event_groups.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/list.c",
+      "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/tick_power_manager.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/queue.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
@@ -723,13 +717,6 @@ template("efr32_sdk") {
       ]
     }
 
-    if (slc_generate || slc_reuse_files || silabs_family == "mgm24") {
-      sources += [
-        "${efr32_sdk_root}/hardware/driver/configuration_over_swo/src/sl_cos.c",
-        "${efr32_sdk_root}/platform/driver/debug/src/sl_debug_swo.c",
-      ]
-    }
-
     if (silabs_family != "mgm24") {
       sources +=
           [ "${efr32_sdk_root}/platform/radio/rail_lib/hal/efr32/hal_efr.c" ]
@@ -763,8 +750,8 @@ template("efr32_sdk") {
     if (use_system_view) {
       sources += [
         "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER/SEGGER_SYSVIEW.c",
-        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10/Config/Cortex-M/SEGGER_SYSVIEW_Config_FreeRTOS.c",
-        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10/SEGGER_SYSVIEW_FreeRTOS.c",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/init/SEGGER_SYSVIEW_Init.c",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/SEGGER_SYSVIEW_FreeRTOS.c",
       ]
     }
 
@@ -784,10 +771,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emdrv/spidrv/src/spidrv.c",
         "${silabs_gen_folder}/autogen/sl_spidrv_init.c",
       ]
-    }
-
-    if (enable_sleepy_device) {
-      sources += [ "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/tick_power_manager.c" ]
     }
 
     if (defined(enable_fem)) {
@@ -924,6 +907,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_transparent_driver_mac.c",
         "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_transparent_key_derivation.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dcdc_s2.c",
+        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dpll_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s2.c",
@@ -935,6 +919,8 @@ template("efr32_sdk") {
       sources += [
         "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM24/Source/startup_mgm24.c",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM24/Source/system_mgm24.c",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/sl_fem_util.c",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rssi/sl_rail_util_rssi.c",
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager.c",
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_attestation.c",
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_cipher.c",
@@ -962,25 +948,13 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_transparent_driver_mac.c",
         "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_transparent_key_derivation.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dcdc_s2.c",
+        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dpll_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_mgm24.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s2.c",
         "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
-      ]
-    }
-
-    if (silabs_board == "BRD4186A" || silabs_board == "BRD4186C" ||
-        silabs_board == "BRD4187A" || silabs_board == "BRD4187C" ||
-        silabs_board == "BRD2704A") {
-      sources += [ "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dpll_s2.c" ]
-    }
-
-    if (silabs_board == "BRD2704A" || silabs_board == "BRD4318A") {
-      sources += [
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/sl_fem_util.c",
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rssi/sl_rail_util_rssi.c",
       ]
     }
 
