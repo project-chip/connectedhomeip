@@ -18,10 +18,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: "checkout"
+      - name: Checkout
         uses: actions/checkout@v2
 
-      - name: "detekt"
+      - name: Reviewdog/detekt
         uses: alaegin/Detekt-Action@v1.23.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
