@@ -41,7 +41,7 @@ public:
         ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
         bool aResetConditionCommandSupported) :
         Instance(aEndpointId, aClusterId, aFeature, aDegradationDirection, aResetConditionCommandSupported){};
-    ~ActivatedCarbonFilterMonitoringInstance() override = default;
+
 };
 
 } // namespace ResourceMonitoring

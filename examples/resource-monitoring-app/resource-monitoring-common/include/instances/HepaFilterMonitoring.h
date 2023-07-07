@@ -40,7 +40,6 @@ public:
                                  bool aResetConditionCommandSupported) :
         Instance(aEndpointId, aClusterId, aFeature, aDegradationDirection, aResetConditionCommandSupported){};
 
-    ~HepaFilterMonitoringInstance() override = default;
 };
 
 } // namespace ResourceMonitoring
