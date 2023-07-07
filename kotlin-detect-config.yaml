@@ -314,4 +314,3 @@ empty-blocks:
       - '**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkShortCommand.kt'
       - '**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkVendorCommand.kt'
       - '**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/UnpairCommand.kt'
-
