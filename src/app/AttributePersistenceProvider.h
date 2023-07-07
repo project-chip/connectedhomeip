@@ -152,7 +152,7 @@ public:
         }
 
         chip::Encoding::LittleEndian::Reader r(tempVal.data(), tempVal.size());
-        r.RawRead(&aValue);
+        r.RawReadLowLevelBeCareful(&aValue);
         return r.StatusCode();
     }
 
