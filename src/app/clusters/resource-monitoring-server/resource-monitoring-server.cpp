@@ -23,7 +23,6 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
-#include <map>
 #include <platform/DiagnosticDataProvider.h>
 
 // using namespace std;

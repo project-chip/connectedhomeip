@@ -23,7 +23,6 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/util/af.h>
-#include <map>
 
 namespace chip {
 namespace app {
