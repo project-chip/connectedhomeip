@@ -106,9 +106,8 @@ public:
     template <typename T, std::enable_if_t<std::is_signed<T>::value && !std::is_same<bool, T>::value, bool> = true>
     static T GetNullValueForNullableType()
     {
-        T nullValue;
-        nullValue = T(1UL << ((sizeof(nullValue) * 8) - 1));
-        return nullValue;
+        T shiftBit = 1;
+        return T(shiftBit << ((sizeof(T) * 8) - 1));
     }
 
     // The following API provides helper functions to simplify the access of commonly used types.
