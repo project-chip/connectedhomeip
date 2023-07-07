@@ -62,8 +62,8 @@ public:
      * @param aWindSupport The WindSupport attribute value, this is fixed in the cluster. If unused, set to 0.
      * @param aFeature The bitmask value that identifies which features are supported by this instance.
      */
-    Instance(EndpointId aEndpointId, FanModeSequenceEnum aFanModeSequence, uint8_t aSpeedMax, RockBitmap aRockSupport,
-             WindBitmap aWindSupport, uint32_t aFeature, Delegate * aDelegate);
+    Instance(EndpointId aEndpointId, FanModeSequenceEnum aFanModeSequence, uint8_t aSpeedMax, BitMask<RockBitmap> aRockSupport,
+             BitMask<WindBitmap> aWindSupport, uint32_t aFeature, Delegate * aDelegate);
 
     /**
      * Initialise the FanControl server instance.
@@ -84,18 +84,18 @@ public:
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
 
     // Attribute setters
-    Status UpdateFanMode(FanModeEnum fanMode);
-    Status UpdatePercentSetting(DataModel::Nullable<Percent> percentSetting);
-    Status UpdatePercentCurrent(Percent percentCurrent);
-    Status UpdateSpeedSetting(DataModel::Nullable<uint8_t> speedSetting);
-    Status UpdateSpeedCurrent(uint8_t speedCurrent);
-    Status UpdateRockSetting(RockBitmap rockSetting);
-    Status UpdateWindSetting(WindBitmap windSetting);
-    Status UpdateAirflowDirection(AirflowDirectionEnum airflowDirection);
-    Status UpdatePercentageAndSpeedSetting(DataModel::Nullable<Percent> percentSetting);
-    Status UpdatePercentageAndSpeedSetting(DataModel::Nullable<uint8_t> speedSetting);
-    Status UpdatePercentageAndSpeedCurrent(Percent percentCurrent);
-    Status UpdatePercentageAndSpeedCurrent(uint8_t speedCurrent);
+    chip::Protocols::InteractionModel::Status UpdateFanMode(FanModeEnum fanMode);
+    chip::Protocols::InteractionModel::Status UpdatePercentSetting(DataModel::Nullable<Percent> percentSetting);
+    chip::Protocols::InteractionModel::Status UpdatePercentCurrent(Percent percentCurrent);
+    chip::Protocols::InteractionModel::Status UpdateSpeedSetting(DataModel::Nullable<uint8_t> speedSetting);
+    chip::Protocols::InteractionModel::Status UpdateSpeedCurrent(uint8_t speedCurrent);
+    chip::Protocols::InteractionModel::Status UpdateRockSetting(BitMask<RockBitmap> rockSetting);
+    chip::Protocols::InteractionModel::Status UpdateWindSetting(BitMask<WindBitmap> windSetting);
+    chip::Protocols::InteractionModel::Status UpdateAirflowDirection(AirflowDirectionEnum airflowDirection);
+    chip::Protocols::InteractionModel::Status UpdatePercentageAndSpeedSetting(DataModel::Nullable<Percent> percentSetting);
+    chip::Protocols::InteractionModel::Status UpdateSpeedAndPercentageSetting(DataModel::Nullable<uint8_t> speedSetting);
+    chip::Protocols::InteractionModel::Status UpdatePercentageAndSpeedCurrent(Percent percentCurrent);
+    chip::Protocols::InteractionModel::Status UpdateSpeedAndPercentageCurrent(uint8_t speedCurrent);
 
     // Attribute getters
     FanModeEnum GetFanMode() const { return mFanMode; }
@@ -105,10 +105,10 @@ public:
     uint8_t GetSpeedMax() const { return mSpeedMax; }
     DataModel::Nullable<uint8_t> GetSpeedSetting() const { return mSpeedSetting; }
     uint8_t GetSpeedCurrent() const { return mSpeedCurrent; }
-    RockBitmap GetRockSupport() const { return mRockSupport; }
-    RockBitmap GetRockSetting() const { return mRockSetting; }
-    WindBitmap GetWindSupport() const { return mWindSupport; }
-    WindBitmap GetWindSetting() const { return mWindSetting; }
+    BitMask<RockBitmap> GetRockSupport() const { return mRockSupport; }
+    BitMask<RockBitmap> GetRockSetting() const { return mRockSetting; }
+    BitMask<WindBitmap> GetWindSupport() const { return mWindSupport; }
+    BitMask<WindBitmap> GetWindSetting() const { return mWindSetting; }
     AirflowDirectionEnum GetAirflowDirection() const { return mAirflowDirection; }
     EndpointId GetEndpointId() const { return mEndpointId; }
 
@@ -143,26 +143,31 @@ public:
     bool SupportsAirflowDirection() const { return hasFeature(Feature::kAirflowDirection); }
 
 private:
-    static const mPercentMax = 100;
+    static const Percent mPercentMax = 100;
 
     EndpointId mEndpointId{};
 
     // Attribute data store
     FanModeEnum mFanMode = FanModeEnum::kOff;
     FanModeSequenceEnum mFanModeSequence;
-    DataModel::Nullable<Percent> mPercentSetting = 0;
+    DataModel::Nullable<Percent> mPercentSetting = (DataModel::Nullable<Percent>) 0;
     Percent mPercentCurrent                      = 0;
     uint8_t mSpeedMax                            = 0;
-    DataModel::Nullable<uint8_t> mSpeedSetting   = 0;
+    DataModel::Nullable<uint8_t> mSpeedSetting   = (DataModel::Nullable<Percent>) 0;
     uint8_t mSpeedCurrent                        = 0;
-    RockBitmap mRockSupport                      = 0;
-    RockBitmap mRockSetting                      = 0;
-    WindBitmap mWindSupport                      = 0;
-    WindBitmap mWindSetting                      = 0;
+    BitMask<RockBitmap> mRockSupport             = 0;
+    BitMask<RockBitmap> mRockSetting             = 0;
+    BitMask<WindBitmap> mWindSupport             = 0;
+    BitMask<WindBitmap> mWindSetting             = 0;
     AirflowDirectionEnum mAirflowDirection       = AirflowDirectionEnum::kForward;
     uint32_t mFeatureMap                         = 0;
 
     Delegate * mDelegate = nullptr;
+
+    /**
+     * Internal function to initialise the persistent attributes in the cluster.
+     */
+    void loadPersistentAttributes();
 
     /**
      * Internal feature checking function.
@@ -172,47 +177,47 @@ private:
     /**
      * Internal function to nullify the PercentSetting attribute.
      */
-    Status nullifyPercentSetting();
+    chip::Protocols::InteractionModel::Status nullifyPercentSetting();
 
     /**
      * Internal function to nullify the SpeedSetting attribute.
      */
-    Status nullifySpeedSetting();
+    chip::Protocols::InteractionModel::Status nullifySpeedSetting();
 
     /**
      * Internal fan mode write handler function.
      */
-    Status handleFanModeWrite(AttributeValueDecoder & aDecoder);
+    chip::Protocols::InteractionModel::Status handleFanModeWrite(AttributeValueDecoder & aDecoder);
 
     /**
      * Internal percent setting write handler function.
      */
-    Status handlePercentSettingWrite(AttributeValueDecoder & aDecoder);
+    chip::Protocols::InteractionModel::Status handlePercentSettingWrite(AttributeValueDecoder & aDecoder);
 
     /**
      * Internal speed setting write handler function.
      */
-    Status handleSpeedSettingWrite(AttributeValueDecoder & aDecoder);
+    chip::Protocols::InteractionModel::Status handleSpeedSettingWrite(AttributeValueDecoder & aDecoder);
 
     /**
      * Internal rock setting write handler function.
      */
-    Status handleRockSettingWrite(AttributeValueDecoder & aDecoder);
+    chip::Protocols::InteractionModel::Status handleRockSettingWrite(AttributeValueDecoder & aDecoder);
 
     /**
      * Internal wind setting write handler function.
      */
-    Status handleWindSettingWrite(AttributeValueDecoder & aDecoder);
+    chip::Protocols::InteractionModel::Status handleWindSettingWrite(AttributeValueDecoder & aDecoder);
 
     /**
      * Internal airflow direction write handler function.
      */
-    Status handleAirflowDirectionWrite(AttributeValueDecoder & aDecoder);
+    chip::Protocols::InteractionModel::Status handleAirflowDirectionWrite(AttributeValueDecoder & aDecoder);
 
     /**
      * Internal step command handler function.
      */
-    void handleStep(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & commandData);
+    void handleStep(HandlerContext & ctx, const Commands::Step::DecodableType & commandData);
 
     /**
      * Internal function to convert percentage into speed
@@ -222,12 +227,14 @@ private:
     /**
      * Internal function to convert speed into percentage
      */
-    static Percent getPercentFromSpeed(uint8_t speed);
+    static Percent getPercentFromSpeed(uint8_t speed, uint8_t speedMax);
 };
 
 class Delegate
 {
 public:
+    virtual ~Delegate() = default;
+
     /**
      * This init function will be called during the FanControl server initialization after the Instance information has been
      * validated and the Instance has been registered. This can be used to initialise app logic if required.
@@ -279,14 +286,14 @@ public:
      * @param newRockSetting The new RockSetting value.
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
-    virtual CHIP_ERROR HandleRockSettingChange(RockBitmap newRockSetting) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR HandleRockSettingChange(BitMask<RockBitmap> newRockSetting) { return CHIP_NO_ERROR; }
 
     /**
      * This function will be called when the WindSetting attribute is changed.
      * @param newWindSetting The new WindSetting value.
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
-    virtual CHIP_ERROR HandleWindSettingChange(WindBitmap newWindSetting) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR HandleWindSettingChange(BitMask<WindBitmap> newWindSetting) { return CHIP_NO_ERROR; }
 
     /**
      * This function will be called when the AirflowDirection attribute is changed.
@@ -302,12 +309,16 @@ public:
      * @param lowestOff Whether the lowest setting should be treated as off.
      * @return Returns an interation model status code indicating the result of the command.
      */
-    virtual Status HandleStep(StepDirectionEnum stepDirection, bool wrap, bool lowestOff) { return Status::UnsupportedCommand; }
+    virtual chip::Protocols::InteractionModel::Status HandleStep(StepDirectionEnum stepDirection, chip::Optional<bool> pWrap,
+                                                                 chip::Optional<bool> pLowestOff)
+    {
+        return chip::Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
 
     /**
      * This function will link the delegate to a parent FanControl server instance
      */
-    void SetParent(Instance * parent) { this->parent = parent; }
+    void SetParent(Instance * aParent) { this->parent = aParent; }
 
 protected:
     // Cluster Attribute Accessors
@@ -318,48 +329,63 @@ protected:
     uint8_t GetClusterSpeedMax() const { return parent->GetSpeedMax(); }
     DataModel::Nullable<uint8_t> GetClusterSpeedSetting() const { return parent->GetSpeedSetting(); }
     uint8_t GetClusterSpeedCurrent() const { return parent->GetSpeedCurrent(); }
-    RockBitmap GetClusterRockSupport() const { return parent->GetRockSupport(); }
-    RockBitmap GetClusterRockSetting() const { return parent->GetRockSetting(); }
-    WindBitmap GetClusterWindSupport() const { return parent->GetWindSupport(); }
-    WindBitmap GetClusterWindSetting() const { return parent->GetWindSetting(); }
+    BitMask<RockBitmap> GetClusterRockSupport() const { return parent->GetRockSupport(); }
+    BitMask<RockBitmap> GetClusterRockSetting() const { return parent->GetRockSetting(); }
+    BitMask<WindBitmap> GetClusterWindSupport() const { return parent->GetWindSupport(); }
+    BitMask<WindBitmap> GetClusterWindSetting() const { return parent->GetWindSetting(); }
     AirflowDirectionEnum GetClusterAirflowDirection() const { return parent->GetAirflowDirection(); }
     EndpointId GetClusterEndpointId() const { return parent->GetEndpointId(); }
 
     // Cluster Attribute Setters
-    Status UpdateClusterFanMode(FanModeEnum fanMode) { return parent->UpdateFanMode(fanMode); }
-    Status UpdateClusterPercentSetting(DataModel::Nullable<Percent> percentSetting)
+    chip::Protocols::InteractionModel::Status UpdateClusterFanMode(FanModeEnum fanMode) { return parent->UpdateFanMode(fanMode); }
+    chip::Protocols::InteractionModel::Status UpdateClusterPercentSetting(DataModel::Nullable<Percent> percentSetting)
     {
         return parent->UpdatePercentSetting(percentSetting);
     }
-    Status UpdateClusterPercentCurrent(Percent percentCurrent) { return parent->UpdatePercentCurrent(percentCurrent); }
-    Status UpdateClusterSpeedSetting(uint8_t speedSetting) { return parent->UpdateSpeedSetting(speedSetting); }
-    Status UpdateClusterSpeedCurrent(uint8_t speedCurrent) { return parent->UpdateSpeedCurrent(speedCurrent); }
-    Status UpdateClusterRockSetting(RockBitmap rockSetting) { return parent->UpdateRockSetting(rockSetting); }
-    Status UpdateClusterWindSetting(WindBitmap windSetting) { return parent->UpdateWindSetting(windSetting); }
-    Status UpdateClusterAirflowDirection(AirflowDirectionEnum airflowDirection)
+    chip::Protocols::InteractionModel::Status UpdateClusterPercentCurrent(Percent percentCurrent)
+    {
+        return parent->UpdatePercentCurrent(percentCurrent);
+    }
+    chip::Protocols::InteractionModel::Status UpdateClusterSpeedSetting(DataModel::Nullable<uint8_t> speedSetting)
+    {
+        return parent->UpdateSpeedSetting(speedSetting);
+    }
+    chip::Protocols::InteractionModel::Status UpdateClusterSpeedCurrent(uint8_t speedCurrent)
+    {
+        return parent->UpdateSpeedCurrent(speedCurrent);
+    }
+    chip::Protocols::InteractionModel::Status UpdateClusterRockSetting(BitMask<RockBitmap> rockSetting)
+    {
+        return parent->UpdateRockSetting(rockSetting);
+    }
+    chip::Protocols::InteractionModel::Status UpdateClusterWindSetting(BitMask<WindBitmap> windSetting)
+    {
+        return parent->UpdateWindSetting(windSetting);
+    }
+    chip::Protocols::InteractionModel::Status UpdateClusterAirflowDirection(AirflowDirectionEnum airflowDirection)
     {
         return parent->UpdateAirflowDirection(airflowDirection);
     }
-    Status UpdateClusterPercentageAndSpeedSetting(DataModel::Nullable<Percent> percentSetting)
+    chip::Protocols::InteractionModel::Status UpdateClusterPercentageAndSpeedSetting(DataModel::Nullable<Percent> percentSetting)
     {
         return parent->UpdatePercentageAndSpeedSetting(percentSetting);
     }
-    Status UpdateClusterPercentageAndSpeedSetting(DataModel::Nullable<uint8_t> speedSetting)
+    chip::Protocols::InteractionModel::Status UpdateClusterSpeedAndPercentageSetting(DataModel::Nullable<uint8_t> speedSetting)
     {
-        return parent->UpdatePercentageAndSpeedSetting(speedSetting);
+        return parent->UpdateSpeedAndPercentageSetting(speedSetting);
     }
-    Status UpdateClusterPercentageAndSpeedCurrent(Percent percentCurrent)
+    chip::Protocols::InteractionModel::Status UpdateClusterPercentageAndSpeedCurrent(Percent percentCurrent)
     {
         return parent->UpdatePercentageAndSpeedCurrent(percentCurrent);
     }
-    Status UpdateClusterPercentageAndSpeedCurrent(uint8_t speedCurrent)
+    chip::Protocols::InteractionModel::Status UpdateClusterSpeedAndPercentageCurrent(uint8_t speedCurrent)
     {
-        return parent->UpdatePercentageAndSpeedCurrent(speedCurrent);
+        return parent->UpdateSpeedAndPercentageCurrent(speedCurrent);
     }
 
 private:
     Instance * parent;
-}
+};
 
 } // namespace FanControl
 } // namespace Clusters
