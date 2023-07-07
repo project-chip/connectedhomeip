@@ -194,11 +194,13 @@ class TC_IDM_1_2(MatterBaseTest):
         TH2 = new_fabric_admin.NewController(nodeId=112233)
 
         devices = TH2.DiscoverCommissionableNodes(
-            filterType=Discovery.FilterType.LONG_DISCRIMINATOR, filter=discriminator, stopOnFirst=True)
-        for a in devices[0].addresses:
+            filterType=Discovery.FilterType.LONG_DISCRIMINATOR, filter=discriminator, stopOnFirst=False)
+        # For some reason, the devices returned here aren't filtered, so filter ourselves
+        device = next(filter(lambda d: d.commissioningMode == 2 and d.longDiscriminator == discriminator, devices))
+        for a in device.addresses:
             try:
-                TH2.EstablishPASESessionIP(ipaddr=a, setupPinCode=params.setupPinCode, nodeid=self.dut_node_id+1)
-                return
+                TH2.EstablishPASESessionIP(ipaddr=a, setupPinCode=params.setupPinCode,
+                                           nodeid=self.dut_node_id+1, port=device.port)
                 break
             except ChipStackError:
                 continue
