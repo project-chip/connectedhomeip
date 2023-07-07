@@ -6,15 +6,17 @@ on:
       - "**/*.kt"
       - ".github/workflows/kotlin-detekt.yaml"
 
- jobs:
-   detekt:
-     runs-on: ubuntu-latest
+jobs:
+  detekt:
+    runs-on: ubuntu-latest
 
-     steps:
-       - name: "checkout"
-         uses: actions/checkout@v2
+    steps:
+      - name: "checkout"
+        uses: actions/checkout@v2
 
-       - name: "detekt"
-         uses: natiginfo/action-detekt-all@1.23.0
-         with:
-           args: --parallel --input examples/android/CHIPTest/,examples/android/CHIPTool,examples/java-matter-controller/java,src/controller/java
+      - name: "detekt"
+        uses: natiginfo/action-detekt-all@1.23.0
+        # Detekt seems not to like circular symlinks, so we set up
+        # explicit paths below
+        with:
+          args: --parallel --build-upon-default-config --config kotlin-detect-config.yaml --input examples/android/CHIPTest,examples/android/CHIPTool,examples/java-matter-controller/java,src/controller/java
