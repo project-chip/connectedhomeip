@@ -17,8 +17,8 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/InteractionModelEngine.h>
 #include <app/AttributePersistenceProvider.h>
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/reporting/reporting.h>
@@ -29,7 +29,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using chip::Protocols::InteractionModel::Status;
-using BootReasonType = GeneralDiagnostics::BootReasonEnum;
+using BootReasonType       = GeneralDiagnostics::BootReasonEnum;
 using ModeOptionStructType = chip::app::Clusters::detail::Structs::ModeOptionStruct::Type;
 using ModeTagStructType    = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
@@ -57,7 +57,8 @@ bool Instance::isAliasCluster() const
 
 void Instance::loadPersistentAttributes()
 {
-    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), mCurrentMode);
+    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), mCurrentMode);
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "ModeBase: Loaded CurrentMode as %u", mCurrentMode);
@@ -68,10 +69,12 @@ void Instance::loadPersistentAttributes()
         // list, as was initialised in the constructor.
         ChipLogDetail(Zcl, "ModeBase: Unable to load the CurrentMode from the KVS. Assuming %u", mCurrentMode);
     }
-    err = GetAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), mStartUpMode);
+    err = GetAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), mStartUpMode);
     if (err == CHIP_NO_ERROR)
     {
-        if (mStartUpMode.IsNull()){
+        if (mStartUpMode.IsNull())
+        {
             ChipLogDetail(Zcl, "ModeBase: Loaded StartUpMode as null");
         }
         else
@@ -83,10 +86,12 @@ void Instance::loadPersistentAttributes()
     {
         ChipLogDetail(Zcl, "ModeBase: Unable to load the StartUpMode from the KVS. Assuming null");
     }
-    err = GetAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id), mOnMode);
+    err = GetAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id),
+                                                             mOnMode);
     if (err == CHIP_NO_ERROR)
     {
-        if (mOnMode.IsNull()){
+        if (mOnMode.IsNull())
+        {
             ChipLogDetail(Zcl, "ModeBase: Loaded OnMode as null");
         }
         else
@@ -159,12 +164,13 @@ CHIP_ERROR Instance::Init()
         // todo should we move this before the OnMode section and check for boot reason in the onoff server code?
         // If we have powered up because of an OTA, do not override the CurrentMode.
         BootReasonType bootReason = BootReasonType::kUnspecified;
-        CHIP_ERROR error = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
+        CHIP_ERROR error          = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
 
         if (error != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Unable to retrieve boot reason: %" CHIP_ERROR_FORMAT
-                              ". Assuming that we did not reboot because of an OTA", error.Format());
+            ChipLogError(
+                Zcl, "Unable to retrieve boot reason: %" CHIP_ERROR_FORMAT ". Assuming that we did not reboot because of an OTA",
+                error.Format());
             bootReason = BootReasonType::kUnspecified;
         }
 
@@ -185,7 +191,8 @@ CHIP_ERROR Instance::Init()
                 return StatusIB(status).ToChipError();
             }
 
-            ChipLogProgress(Zcl, "ModeBase: Successfully initialized CurrentMode to the StartUpMode value %u", mStartUpMode.Value());
+            ChipLogProgress(Zcl, "ModeBase: Successfully initialized CurrentMode to the StartUpMode value %u",
+                            mStartUpMode.Value());
         }
     }
 
@@ -382,7 +389,8 @@ Status Instance::UpdateCurrentMode(uint8_t aNewMode)
     if (mCurrentMode != oldMode)
     {
         // Write new value to persistent storage.
-        GetAttributePersistenceProvider()->WriteScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), mCurrentMode);
+        GetAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), mCurrentMode);
         // The Administrator Commissioning cluster is always on the root endpoint.
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::CurrentMode::Id);
     }
@@ -403,7 +411,8 @@ Status Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
     if (mStartUpMode != oldStartUpMode)
     {
         // Write new value to persistent storage.
-        GetAttributePersistenceProvider()->WriteScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), mStartUpMode);
+        GetAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), mStartUpMode);
         // The Administrator Commissioning cluster is always on the root endpoint.
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::StartUpMode::Id);
     }
@@ -424,7 +433,8 @@ Status Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
     if (mOnMode != oldOnMode)
     {
         // Write new value to persistent storage.
-        GetAttributePersistenceProvider()->WriteScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id), mOnMode);
+        GetAttributePersistenceProvider()->WriteScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id),
+                                                            mOnMode);
         // The Administrator Commissioning cluster is always on the root endpoint.
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OnMode::Id);
     }

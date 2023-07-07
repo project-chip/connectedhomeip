@@ -79,7 +79,7 @@ void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
     }
 }
 
-}
+} // namespace
 
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
 static bool LevelControlWithOnOffFeaturePresent(EndpointId endpoint)

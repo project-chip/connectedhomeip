@@ -20,8 +20,8 @@
 
 #include "mode-base-cluster-objects.h"
 #include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
 #include <app/AttributePersistenceProvider.h>
+#include <app/CommandHandlerInterface.h>
 #include <app/util/af.h>
 #include <map>
 
@@ -40,9 +40,9 @@ public:
      * **NOTE** The caller must ensure that the lifetime of the label and modeTags is as long as the
      * returned structure.
      */
-    static chip::app::Clusters::detail::Structs::ModeOptionStruct::Type BuildModeOptionStruct(
-        const char * label, uint8_t mode,
-        const List<const chip::app::Clusters::detail::Structs::ModeTagStruct::Type> modeTags)
+    static chip::app::Clusters::detail::Structs::ModeOptionStruct::Type
+    BuildModeOptionStruct(const char * label, uint8_t mode,
+                          const List<const chip::app::Clusters::detail::Structs::ModeTagStruct::Type> modeTags)
     {
         chip::app::Clusters::detail::Structs::ModeOptionStruct::Type option;
         option.label    = CharSpan::fromCharString(label);
@@ -117,6 +117,7 @@ private:
      * StartUpMode and OnMode.
      */
     void loadPersistentAttributes();
+
 public:
     /**
      * Creates a mode base cluster instance. The Init() function needs to be called for this instance to be registered and
@@ -127,13 +128,13 @@ public:
      */
     Instance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature)
+        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mEndpointId(aEndpointId), mClusterId(aClusterId),
+        mFeature(aFeature)
     {
         mCurrentMode = 0; // This is a temporary value and may not be valid. We will change this to the value of the first
                           // mode in the list at the start of the Init function to ensure that it represents a valid mode.
         mStartUpMode = DataModel::Nullable<uint8_t>(); // Initialised to null
-        mOnMode = DataModel::Nullable<uint8_t>(); // Initialised to null
+        mOnMode      = DataModel::Nullable<uint8_t>(); // Initialised to null
     }
 
     ~Instance() override;
@@ -152,7 +153,7 @@ public:
     /**
      * Returns the number of modes managed by this instance.
      */
-    virtual uint8_t NumberOfModes()  = 0;
+    virtual uint8_t NumberOfModes() = 0;
 
     /**
      * Get the mode label of the Nth mode in the list of modes.
@@ -161,7 +162,7 @@ public:
      * CopyCharSpanToMutableCharSpan to copy into the MutableCharSpan.
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
-    virtual CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)  = 0;
+    virtual CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label) = 0;
 
     /**
      * Get the mode value of the Nth mode in the list of modes.
@@ -184,7 +185,7 @@ public:
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
     virtual CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex,
-                                          List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & modeTags)  = 0;
+                                          List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) = 0;
 
     /**
      * When a ChangeToMode command is received, if the NewMode value is a supported made, this function is called to 1) decide if
