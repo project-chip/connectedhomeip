@@ -6,38 +6,38 @@ linux:
 
 # Special Keywords for Cert Blockers
 air purifiers:
-  - "(Area-AirPurifiers)"
+  - "(Area:AirPurifiers)"
 air quality sensors:
-  - "(Area-AirQualitySensor)"
+  - "(Area:AirQualitySensor)"
 concentration measurement:
-  - "(Area-ConcentrationMeasurement)"
+  - "(Area:ConcentrationMeasurement)"
 device appearance:
-  - "(Area-DeviceAppearance)"
+  - "(Area:DeviceAppearance)"
 dishwashers:
-  - "(Area-Dishwashers)"
+  - "(Area:Dishwashers)"
 door lock enhancements:
-  - "(Area-DoorLockEnhancements)"
+  - "(Area:DoorLockEnhancements)"
 event list:
-  - "(Area-EventList)"
+  - "(Area;EventList)"
 icd:
-  - "(Area-ICDPhase2)"
+  - "(Area:ICDPhase2)"
 icd phase 2:
-  - "(Area-ICDPhase2)"
+  - "(Area:ICDPhase2)"
 mode select:
-  - "(Area-ModeSelect)"
+  - "(Area:ModeSelect)"
 operational state:
-  - "(Area-OperationalState)"
+  - "(Area:OperationalState)"
 refrigerators:
-  - "(Area-Refrigerators)"
+  - "(Area:Refrigerators)"
 robot vacuums:
-  - "(Area-RobotVacuums)"
+  - "(Area:RobotVacuums)"
 room air conditioners:
-  - "(Area-RoomAirConditioner)"
+  - "(Area:RoomAirConditioner)"
 scenes:
-  - "(Area-Scenes)"
+  - "(Area:Scenes)"
 smoke & c02:
-  - "(Area-SmokeCO2)"
+  - "(Area:SmokeCO2)"
 temperature controlled cabinet:
-  - "(Area-TemperatureControlledCabinet)"
+  - "(Area:TemperatureControlledCabinet)"
 time sync:
-  - "(Area-TimeSync)"
+  - "(Area:TimeSync)"
