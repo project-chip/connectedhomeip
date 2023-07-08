@@ -70,9 +70,6 @@ class FutureResult {
   }
 
   fun clear() {
-    synchronized(lock) {
-      realResult = null
-    }
+    synchronized(lock) { realResult = null }
   }
 }
-
