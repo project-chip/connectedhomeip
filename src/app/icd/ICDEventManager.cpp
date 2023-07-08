@@ -23,6 +23,8 @@ namespace chip {
 namespace app {
 
 uint8_t ICDEventManager::expectedMsgCount = 0;
+static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
+              "ICDEventManager::expectedMsgCount cannot hold count for the max exchange count");
 
 CHIP_ERROR ICDEventManager::Init(ICDManager * icdManager)
 {
@@ -43,9 +45,9 @@ CHIP_ERROR ICDEventManager::Shutdown()
 
 void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
-    ICDManager * pIcdManager = reinterpret_cast<ICDManager *>(arg);
+    ICDManager * icdManager = reinterpret_cast<ICDManager *>(arg);
 
-    if (pIcdManager == nullptr)
+    if (icdManager == nullptr)
     {
         return;
     }
@@ -53,11 +55,11 @@ void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t ar
     switch (event->Type)
     {
     case DeviceEventType::kCommissioningWindowStatusChanged:
-        pIcdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kCommissioningWindowOpen,
-                                                   event->CommissioningWindowStatus.open);
+        icdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kCommissioningWindowOpen,
+                                                  event->CommissioningWindowStatus.open);
         break;
     case DeviceEventType::kFailSafeStateChanged:
-        pIcdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kFailSafeArmed, event->FailSafeState.armed);
+        icdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kFailSafeArmed, event->FailSafeState.armed);
         break;
     case DeviceEventType::kChipMsgSentEvent:
 
@@ -66,11 +68,11 @@ void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t ar
         if (event->MessageSent.ExpectResponse)
         {
             expectedMsgCount++;
-            pIcdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kExpectingMsgResponse, true);
+            icdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kExpectingMsgResponse, true);
         }
         else
         {
-            pIcdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+            icdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
         }
         break;
     case DeviceEventType::kChipMsgRxEventHandled:
@@ -82,23 +84,23 @@ void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t ar
             }
             else
             {
-                // Should we assert
+                // Should we assert?
                 ChipLogError(DeviceLayer, "No response was expected by the ICD Manager");
             }
 
             if (expectedMsgCount == 0)
             {
-                pIcdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kExpectingMsgResponse, false);
+                icdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kExpectingMsgResponse, false);
             }
         }
         else if (event->RxEventContext.wasReceived)
         {
-            pIcdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+            icdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
         }
 
         break;
     case DeviceEventType::kAppWakeUpEvent:
-        pIcdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+        icdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
         break;
     default:
         break;

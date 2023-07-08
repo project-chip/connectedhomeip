@@ -238,8 +238,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
                 session->AsSecureSession()->MarkAsDefunct();
             }
         }
-
-        if (err == CHIP_NO_ERROR)
+        else
         {
 #if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
             DeviceLayer::ChipDeviceEvent event;

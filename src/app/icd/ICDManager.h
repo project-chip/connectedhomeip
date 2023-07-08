@@ -71,6 +71,11 @@ private:
     static constexpr System::Clock::Milliseconds32 kSlowPollingInterval         = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
     static constexpr System::Clock::Milliseconds32 kFastPollingInterval         = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
 
+    // Minimal constraint value of the the ICD attributes.
+    static constexpr uint32_t kMinIdleModeInterval    = 500;
+    static constexpr uint32_t kMinActiveModeInterval  = 300;
+    static constexpr uint16_t kMinActiveModeThreshold = 300;
+
     bool SupportsCheckInProtocol();
 
     BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };

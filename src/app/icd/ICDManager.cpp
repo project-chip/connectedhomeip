@@ -35,7 +35,10 @@ using namespace chip::app::Clusters::IcdManagement;
 void ICDManager::ICDManager::Init()
 {
     uint32_t activeModeInterval;
-    Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval);
+    if (Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval) != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        activeModeInterval = kMinActiveModeInterval;
+    }
     VerifyOrDie(kFastPollingInterval.count() < activeModeInterval);
     UpdateIcdMode();
     UpdateOperationState(OperationalState::ActiveMode);
@@ -65,12 +68,11 @@ void ICDManager::UpdateIcdMode()
 
     ICDMode tempMode = ICDMode::SIT;
 
+    // TODO ICD LIT FIX DEPENDENCY ISSUE with app/util/IcdMonitoringTable.h and app/server:server
     // The Check In Protocol Feature is required and the slow polling interval shall also be greater than 15 seconds
     // to run an ICD in LIT mode.
     // if (kSlowPollingInterval > kICDSitModePollingThreashold && SupportsCheckInProtocol())
     // {
-    //     TODO ICD LIT FIX DEPENDENCY ISSUE with app/util/IcdMonitoringTable.h and app/server:server
-    //     Check In protocol not implented yet.
     //     // We can only get to LIT Mode, if at least one client is registered to the ICD device
     //     const auto & fabricTable = Server::GetInstance().GetFabricTable();
     //     for (const auto & fabricInfo : fabricTable)
@@ -90,14 +92,17 @@ void ICDManager::UpdateIcdMode()
 void ICDManager::UpdateOperationState(OperationalState state)
 {
     assertChipStackLockedByCurrentThread();
-    // Active mode can be re-trigger
+    // Active mode can be re-triggered.
     VerifyOrReturn(mOperationalState != state || state == OperationalState::ActiveMode);
 
     if (state == OperationalState::IdleMode)
     {
         mOperationalState         = OperationalState::IdleMode;
         uint32_t idleModeInterval = 0;
-        Attributes::IdleModeInterval::Get(kRootEndpointId, &idleModeInterval);
+        if (Attributes::IdleModeInterval::Get(kRootEndpointId, &idleModeInterval) != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            idleModeInterval = kMinIdleModeInterval;
+        }
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(idleModeInterval), OnIdleModeDone, this);
 
         CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(GetSlowPollingInterval());
@@ -116,7 +121,10 @@ void ICDManager::UpdateOperationState(OperationalState state)
 
             mOperationalState           = OperationalState::ActiveMode;
             uint32_t activeModeInterval = 0;
-            Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval);
+            if (Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval) != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                activeModeInterval = kMinActiveModeInterval;
+            }
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeInterval), OnActiveModeDone, this);
 
             CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(GetFastPollingInterval());
@@ -128,7 +136,10 @@ void ICDManager::UpdateOperationState(OperationalState state)
         else
         {
             uint16_t activeModeThreshold = 0;
-            Attributes::ActiveModeThreshold::Get(kRootEndpointId, &activeModeThreshold);
+            if (Attributes::ActiveModeThreshold::Get(kRootEndpointId, &activeModeThreshold) != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                activeModeThreshold = kMinActiveModeThreshold;
+            }
             DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeThreshold), OnActiveModeDone, this);
         }
     }

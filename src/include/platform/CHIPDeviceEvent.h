@@ -196,7 +196,7 @@ enum PublicEventTypes
     kInterfaceIpAddressChanged,
 
     /**
-     * Signals that the commissioning window has open or closed.
+     * Signals that the commissioning window has opened or closed.
      */
     kCommissioningWindowStatusChanged,
 
@@ -259,23 +259,23 @@ enum PublicEventTypes
 
     /**
      * An Exchange Context sent a message.
-     * This event is coupled with MessageSent structure.
+     * This event contains a with MessageSent structure.
      */
     kChipMsgSentEvent,
 
     /**
-     * An Exchange Context handled a reception transaction.
-     * This event can occur by one of the 3 following scenarios:
-     *  - A message was received.
-     *  - An expected reception has timed out.
-     *  - The exchange context was closed while an reception was expected.
+     * An Exchange Context that was waiting for a response is no longer waiting for it.
+     * This event can occur due to any of the following:
+     *  - A response message was received.
+     *  - An exchange context timed out waiting for a response.
+     *  - The exchange context was closed while a response was expected.
      *
-     * This event is coupled with RxEventContext structure.
+     * This event contains an RxEventContext structure.
      */
     kChipMsgRxEventHandled,
 
     /**
-     * An application event occurent that should wake up the system/device
+     * An application event occured that should wake up the system/device
      */
     kAppWakeUpEvent,
 };
@@ -573,6 +573,10 @@ struct ChipDeviceEvent final
 
         struct
         {
+            /*
+             * wasReceived is only true when the event was triggered by a response message reception.
+             * See the brief of kChipMsgRxEventHandled, above in this file, for additional details.
+             */
             bool wasReceived;
             bool clearsExpectedResponse;
         } RxEventContext;
