@@ -50,3 +50,9 @@ fi
 
 declare -a paths="($(git diff --ignore-submodules --name-only --merge-base "$ref"))"
 restyle-paths "${paths[@]}"
+
+if [ ! -f "/tmp/ktfmt-0.44-jar-with-dependencies.jar" ]; then
+    wget "https://repo1.maven.org/maven2/com/facebook/ktfmt/0.44/ktfmt-0.44-jar-with-dependencies.jar" -P /tmp
+fi
+
+find src examples -name '*.kt' | xargs java -jar /tmp/ktfmt-0.44-jar-with-dependencies.jar --google-style
