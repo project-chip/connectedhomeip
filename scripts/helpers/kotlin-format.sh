@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ set -e
 CHIP_ROOT=$(cd "$here/../.." && pwd)
 cd "$CHIP_ROOT"
 
-if ! command -v java &> /dev/null; then
+if ! command -v java &>/dev/null; then
     echo "Java is not installed. Please install Java and try again."
     exit 1
 fi
