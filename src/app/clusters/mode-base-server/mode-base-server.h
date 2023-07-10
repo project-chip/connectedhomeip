@@ -189,7 +189,7 @@ public:
                        DataModel::List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) = 0;
 
     /**
-     * When a ChangeToMode command is received, if the NewMode value is a supported made, this function is called to 1) decide if
+     * When a ChangeToMode command is received, if the NewMode value is a supported mode, this method is called to 1) decide if
      * we should go ahead with transitioning to this mode and 2) formulate the ChangeToModeResponse that will be sent back to the
      * client. If this function returns a response.status of StatusCode::kSuccess, the change request is accepted
      * and the CurrentMode is set to the NewMode. Else, the CurrentMode is left untouched. The response is sent as a
