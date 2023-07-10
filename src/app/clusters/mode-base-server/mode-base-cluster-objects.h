@@ -214,6 +214,7 @@ enum class StatusCode : uint8_t
     kSuccess         = 0x0,
     kUnsupportedMode = 0x1,
     kGenericFailure  = 0x2,
+    kInvalidInMode   = 0x3,
 };
 
 } // namespace ModeBase

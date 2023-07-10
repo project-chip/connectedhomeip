@@ -22,14 +22,15 @@ Due to the ModeBase cluster not having a clustre ID, these enems will need to be
 These enems can be used once the zap generation tool supports aliased and derived clusters.
 -->
 <!--  <enum name="StatusCode" type="ENUM8">-->
-<!--    <cluster code="0xf123"/>-->
+<!--    <cluster code="0x..."/>-->
 <!--    <item value="0x0" name="Success"/>-->
 <!--    <item value="0x1" name="UnsupportedMode"/>-->
 <!--    <item value="0x2" name="GenericFailure"/>-->
+<!--    <item value="0x3" name="InvalidInMode"/>-->
 <!--  </enum>-->
 
 <!--  <enum name="ModeTag" type="ENUM16">-->
-<!--    <cluster code="0xf123"/>-->
+<!--    <cluster code="0x..."/>-->
 <!--    <item value="0x0" name="Auto"/>-->
 <!--    <item value="0x1" name="Quick"/>-->
 <!--    <item value="0x2" name="Quiet"/>-->
@@ -67,7 +68,7 @@ These enems can be used once the zap generation tool supports aliased and derive
 <!--  <cluster>-->
 <!--    <domain>General</domain>-->
 <!--    <name>Mode Base</name>-->
-<!--    <code>0xf123</code>-->
+<!--    <code>0x...</code>-->
 <!--    <define>MODE_BASE_CLUSTER</define>-->
 <!--    <client init="false" tick="false">true</client>-->
 <!--    <server init="false" tick="false">true</server>-->
@@ -98,7 +99,7 @@ These enems can be used once the zap generation tool supports aliased and derive
 <!--  </cluster>-->
 
   <bitmap name="Feature" type="BITMAP32">
-<!--    <cluster code="0xf123"/>-->
+<!--    <cluster code="0x..."/>-->
     <cluster code="0x0051"/>
     <cluster code="0x0052"/>
     <cluster code="0x0054"/>
