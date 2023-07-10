@@ -4948,8 +4948,8 @@ client cluster FanControl = 514 {
     kOffLowHigh = 1;
     kOffLowMedHighAuto = 2;
     kOffLowHighAuto = 3;
-    kOffOnAuto = 4;
-    kOffOn = 5;
+    kOffHighAuto = 4;
+    kOffHigh = 5;
   }
 
   enum StepDirectionEnum : ENUM8 {
