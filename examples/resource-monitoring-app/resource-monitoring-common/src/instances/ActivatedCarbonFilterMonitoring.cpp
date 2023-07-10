@@ -29,6 +29,7 @@ Status ActivatedCarbonFilterMonitoringInstance::OnResetCondition()
     {
         UpdateCondition(0);
     }
+    UpdateChangeIndication(ChangeIndicationEnum::kOk);
     if (emberAfContainsAttribute(0x1, Clusters::ActivatedCarbonFilterMonitoring::Id, Attributes::LastChangedTime::Id))
     {
         System::Clock::Milliseconds64 currentUnixTimeMS;
