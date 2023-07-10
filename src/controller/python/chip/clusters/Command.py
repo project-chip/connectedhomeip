@@ -107,7 +107,7 @@ class AsyncCommandTransaction:
             try:
                 self._future.set_exception(
                     chip.interaction_model.InteractionModelError(chip.interaction_model.Status(imError.IMStatus), imError.ClusterStatus))
-            except Exception as e2:
+            except Exception:
                 logger.exception("Failed to map interaction model status received: %s. Remapping to Failure." % imError)
                 self._future.set_exception(chip.interaction_model.InteractionModelError(
                     chip.interaction_model.Status.Failure, imError.ClusterStatus))

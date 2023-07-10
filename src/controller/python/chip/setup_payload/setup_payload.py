@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 
-from ctypes import CFUNCTYPE, c_char_p, c_int32, c_uint8
+from ctypes import CFUNCTYPE, c_char_p, c_int32, c_uint8, c_uint16, c_uint32
 from typing import Optional
 
 from chip.exceptions import ChipStackError
@@ -117,7 +117,7 @@ class SetupPayload:
                    [c_char_p, SetupPayload.AttributeVisitor, SetupPayload.VendorAttributeVisitor])
         setter.Set("pychip_SetupPayload_PrintOnboardingCodes",
                    c_int32,
-                   [c_uint32, c_uint16, c_uint16, c_uint16, uint8_t, uint8_t, uint8_t])
+                   [c_uint32, c_uint16, c_uint16, c_uint16, c_uint8, c_uint8, c_uint8])
 
     # Getters from parsed contents.
     # Prefer using the methods below to access setup payload information once parse.

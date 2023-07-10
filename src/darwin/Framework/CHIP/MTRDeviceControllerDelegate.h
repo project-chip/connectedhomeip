@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#import <Foundation/Foundation.h>
 #import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -31,7 +32,7 @@ typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
 /**
  * A representation of a (vendor, product) pair that identifies a specific product.
  */
-MTR_NEWLY_AVAILABLE
+API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
 @interface MTRProductIdentity : NSObject
 
 @property (nonatomic, copy, readonly) NSNumber * vendorID;
@@ -66,7 +67,9 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Notify the delegate when commissioning is completed.
  */
 - (void)controller:(MTRDeviceController *)controller
-    commissioningComplete:(NSError * _Nullable)error MTR_NEWLY_DEPRECATED("Please use controller:commissioningComplete:nodeID:");
+    commissioningComplete:(NSError * _Nullable)error
+    MTR_DEPRECATED("Please use controller:commissioningComplete:nodeID:", ios(16.4, 17.0), macos(13.3, 14.0), watchos(9.4, 10.0),
+        tvos(16.4, 17.0));
 
 /**
  * Notify the delegate when commissioning is completed.
@@ -77,7 +80,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 - (void)controller:(MTRDeviceController *)controller
     commissioningComplete:(NSError * _Nullable)error
-                   nodeID:(NSNumber * _Nullable)nodeID MTR_NEWLY_AVAILABLE;
+                   nodeID:(NSNumber * _Nullable)nodeID API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Notify the delegate when commissioning infomation has been read from the Basic
@@ -86,7 +89,8 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * At the point when this notification happens, device attestation has not been performed yet,
  * so the information delivered by this notification should not be trusted.
  */
-- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(MTRProductIdentity *)info MTR_NEWLY_AVAILABLE;
+- (void)controller:(MTRDeviceController *)controller
+    readCommissioningInfo:(MTRProductIdentity *)info API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @end
 
 typedef NS_ENUM(NSUInteger, MTRPairingStatus) {
