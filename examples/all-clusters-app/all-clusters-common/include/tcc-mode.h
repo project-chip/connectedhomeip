@@ -39,22 +39,23 @@ const uint8_t ModeRapidFreeze = 2;
 class TccModeInstance : public ModeBase::Instance
 {
 private:
-    detail::Structs::ModeTagStruct::Type modeTagsTccNormal[1]    = { { .value = static_cast<uint16_t>(
+    using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
+    ModeTagStructType modeTagsTccNormal[1]    = { { .value = to_underlying(
                                                                         Clusters::ModeBase::ModeTag::kAuto) } };
-    detail::Structs::ModeTagStruct::Type modeTagsTccRapidCool[1] = {
-        { .value = static_cast<uint16_t>(Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeTag::kRapidCool) }
+    ModeTagStructType modeTagsTccRapidCool[1] = {
+        { .value = to_underlying(Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeTag::kRapidCool) }
     };
-    detail::Structs::ModeTagStruct::Type modeTagsTccRapidFreeze[1] = {
-        { .value = static_cast<uint16_t>(Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeTag::kRapidFreeze) }
+    ModeTagStructType modeTagsTccRapidFreeze[1] = {
+        { .value = to_underlying(Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeTag::kRapidFreeze) }
     };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
         BuildModeOptionStruct("Normal", Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeNormal,
-                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsTccNormal)),
+                              DataModel::List<const ModeTagStructType>(modeTagsTccNormal)),
         BuildModeOptionStruct("Rapid Cool", Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeRapidCool,
-                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsTccRapidCool)),
+                              DataModel::List<const ModeTagStructType>(modeTagsTccRapidCool)),
         BuildModeOptionStruct("Rapid Freeze", Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeRapidFreeze,
-                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsTccRapidFreeze)),
+                              DataModel::List<const ModeTagStructType>(modeTagsTccRapidFreeze)),
     };
 
     CHIP_ERROR AppInit() override;
@@ -63,7 +64,7 @@ private:
     uint8_t NumberOfModes() override { return ArraySize(kModeOptions); };
     CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label) override;
     CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
-    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<detail::Structs::ModeTagStruct::Type> & tags) override;
+    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override;
 
 public:
     TccModeInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :

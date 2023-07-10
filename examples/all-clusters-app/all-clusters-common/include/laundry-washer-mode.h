@@ -39,28 +39,29 @@ const uint8_t ModeWhites   = 3;
 class LaundryWasherModeInstance : public ModeBase::Instance
 {
 private:
-    detail::Structs::ModeTagStruct::Type modeTagsNormal[1]   = { { .value = static_cast<uint16_t>(
+    using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
+    ModeTagStructType modeTagsNormal[1]   = { { .value = to_underlying(
                                                                      Clusters::LaundryWasherMode::ModeTag::kNormal) } };
-    detail::Structs::ModeTagStruct::Type modeTagsDelicate[3] = {
-        { .value = static_cast<uint16_t>(Clusters::LaundryWasherMode::ModeTag::kDelicate) },
-        { .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kNight) },
-        { .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kQuiet) }
+    ModeTagStructType modeTagsDelicate[3] = {
+        { .value = to_underlying(Clusters::LaundryWasherMode::ModeTag::kDelicate) },
+        { .value = to_underlying(Clusters::ModeBase::ModeTag::kNight) },
+        { .value = to_underlying(Clusters::ModeBase::ModeTag::kQuiet) }
     };
-    detail::Structs::ModeTagStruct::Type modeTagsHeavy[2] = { { .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kMax) },
-                                                              { .value = static_cast<uint16_t>(
+    ModeTagStructType modeTagsHeavy[2] = { { .value = to_underlying(Clusters::ModeBase::ModeTag::kMax) },
+                                                              { .value = to_underlying(
                                                                     Clusters::LaundryWasherMode::ModeTag::kHeavy) } };
-    detail::Structs::ModeTagStruct::Type modeTagsWhites[1] = { { .value = static_cast<uint16_t>(
+    ModeTagStructType modeTagsWhites[1] = { { .value = to_underlying(
                                                                      Clusters::LaundryWasherMode::ModeTag::kWhites) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[4] = {
         BuildModeOptionStruct("Normal", Clusters::LaundryWasherMode::ModeNormal,
-                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsNormal)),
+                              DataModel::List<const ModeTagStructType>(modeTagsNormal)),
         BuildModeOptionStruct("Delicate", Clusters::LaundryWasherMode::ModeDelicate,
-                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsDelicate)),
+                              DataModel::List<const ModeTagStructType>(modeTagsDelicate)),
         BuildModeOptionStruct("Heavy", Clusters::LaundryWasherMode::ModeHeavy,
-                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsHeavy)),
+                              DataModel::List<const ModeTagStructType>(modeTagsHeavy)),
         BuildModeOptionStruct("Whites", Clusters::LaundryWasherMode::ModeWhites,
-                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsWhites)),
+                              DataModel::List<const ModeTagStructType>(modeTagsWhites)),
     };
 
     CHIP_ERROR AppInit() override;
@@ -69,7 +70,7 @@ private:
     uint8_t NumberOfModes() override { return ArraySize(kModeOptions); };
     CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label) override;
     CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
-    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<detail::Structs::ModeTagStruct::Type> & tags) override;
+    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override;
 
 public:
     LaundryWasherModeInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :

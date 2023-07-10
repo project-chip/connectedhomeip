@@ -38,24 +38,25 @@ const uint8_t ModeLight  = 2;
 class DishwasherModeInstance : public ModeBase::Instance
 {
 private:
-    detail::Structs::ModeTagStruct::Type modeTagsNormal[1] = { { .value = static_cast<uint16_t>(
+    using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
+    ModeTagStructType modeTagsNormal[1] = { { .value = to_underlying(
                                                                      Clusters::DishwasherMode::ModeTag::kNormal) } };
-    detail::Structs::ModeTagStruct::Type modeTagsHeavy[2] = { { .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kMax) },
-                                                              { .value = static_cast<uint16_t>(
+    ModeTagStructType modeTagsHeavy[2] = { { .value = to_underlying(Clusters::ModeBase::ModeTag::kMax) },
+                                                              { .value = to_underlying(
                                                                     Clusters::DishwasherMode::ModeTag::kHeavy) } };
-    detail::Structs::ModeTagStruct::Type modeTagsLight[3] = {
-        { .value = static_cast<uint16_t>(Clusters::DishwasherMode::ModeTag::kLight) },
-        { .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kNight) },
-        { .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kQuiet) }
+    ModeTagStructType modeTagsLight[3] = {
+        { .value = to_underlying(Clusters::DishwasherMode::ModeTag::kLight) },
+        { .value = to_underlying(Clusters::ModeBase::ModeTag::kNight) },
+        { .value = to_underlying(Clusters::ModeBase::ModeTag::kQuiet) }
     };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
         BuildModeOptionStruct("Normal", Clusters::DishwasherMode::ModeNormal,
-                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsNormal)),
+                              DataModel::List<const ModeTagStructType>(modeTagsNormal)),
         BuildModeOptionStruct("Heavy", Clusters::DishwasherMode::ModeHeavy,
-                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsHeavy)),
+                              DataModel::List<const ModeTagStructType>(modeTagsHeavy)),
         BuildModeOptionStruct("Light", Clusters::DishwasherMode::ModeLight,
-                              DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsLight)),
+                              DataModel::List<const ModeTagStructType>(modeTagsLight)),
     };
 
     CHIP_ERROR AppInit() override;
@@ -64,7 +65,7 @@ private:
     uint8_t NumberOfModes() override { return ArraySize(kModeOptions); };
     CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label) override;
     CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
-    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<detail::Structs::ModeTagStruct::Type> & tags) override;
+    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override;
 
 public:
     DishwasherModeInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
