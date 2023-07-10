@@ -58,7 +58,7 @@
     } while (0)
 
 #else // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED || CHIP_CONFIG_TRANSPORT_PW_TRACE_ENABLED
-#define CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, peerAddress, data, dataLen) \
+#define CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, peerAddress, data, dataLen)                                           \
     do                                                                                                                             \
     {                                                                                                                              \
     } while (0)
