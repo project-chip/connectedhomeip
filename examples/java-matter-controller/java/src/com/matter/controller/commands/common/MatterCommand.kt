@@ -96,11 +96,11 @@ abstract class MatterCommand(
   protected abstract fun runCommand()
 
   fun setSuccess() {
-    futureResult.setRealResult(RealResult.Success())
+    futureResult.setRealResult(RealResult.success())
   }
 
   fun setFailure(error: String?) {
-    futureResult.setRealResult(RealResult.Error(error))
+    futureResult.setRealResult(RealResult.error(error))
   }
 
   fun waitCompleteMs(timeoutMs: Long) {
