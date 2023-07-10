@@ -306,6 +306,7 @@ bool PayloadDecoderBase::ReaderEnterContainer(PayloadEntry & entry)
     if (mCurrentNesting >= kMaxDecodeDepth)
     {
         mValueBuilder.AddFormat("NESTING DEPTH REACHED");
+        mReader.GetTag().AppendTo(mNameBuilder.Reset());
         entry = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
         return false;
     }
@@ -315,6 +316,7 @@ bool PayloadDecoderBase::ReaderEnterContainer(PayloadEntry & entry)
     if (err != CHIP_NO_ERROR)
     {
         mValueBuilder.AddFormat("ERROR entering container: %" CHIP_ERROR_FORMAT, err.Format());
+        mReader.GetTag().AppendTo(mNameBuilder.Reset()); // assume enter is not done, so tag is correct
         entry  = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
         mState = State::kDone;
         return false;
