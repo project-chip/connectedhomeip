@@ -32,19 +32,19 @@ shift
 NINJA_ARGS=()
 for arg; do
     case $arg in
-    -v)
-        NINJA_ARGS+=(-v)
-        ;;
-    *=*)
-        GN_ARGS+=("$arg")
-        ;;
-    *import*)
-        GN_ARGS+=("$arg")
-        ;;
-    *)
-        echo >&2 "invalid argument: $arg"
-        exit 2
-        ;;
+        -v)
+            NINJA_ARGS+=(-v)
+            ;;
+        *=*)
+            GN_ARGS+=("$arg")
+            ;;
+        *import*)
+            GN_ARGS+=("$arg")
+            ;;
+        *)
+            echo >&2 "invalid argument: $arg"
+            exit 2
+            ;;
     esac
 done
 
