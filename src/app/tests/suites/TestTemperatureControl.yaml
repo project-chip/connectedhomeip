@@ -34,23 +34,18 @@ tests:
       response:
           value: ["Hot", "Warm", "Freezing"]
 
-    - label: "Write selected temperature level"
-      command: "writeAttribute"
-      attribute: "SelectedTemperatureLevel"
-      arguments:
-          value: 2
-
-    - label: "Read back selected temperature level"
+    - label: "Read selected temperature level"
       command: "readAttribute"
       attribute: "SelectedTemperatureLevel"
       response:
-          value: 2
+          value: 0
 
-    - label: "Write selected temperature level"
-      command: "writeAttribute"
-      attribute: "SelectedTemperatureLevel"
+    - label: "Set temperature level to different level"
+      command: "SetTemperature"
       arguments:
-          value: 1
+          values:
+              - name: "TargetTemperatureLevel"
+                value: 1
 
     - label: "Read back selected temperature level"
       command: "readAttribute"
@@ -58,11 +53,14 @@ tests:
       response:
           value: 1
 
-    - label: "Write selected temperature level"
-      command: "writeAttribute"
-      attribute: "SelectedTemperatureLevel"
+    - label: "Set temperature level to different level"
+      command: "SetTemperature"
       arguments:
-          value: 3
+          values:
+              - name: "TargetTemperatureLevel"
+                value: 3
+      response:
+          error: CONSTRAINT_ERROR
 
     - label: "Read back selected temperature level"
       command: "readAttribute"

@@ -87,7 +87,7 @@ CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & 
         CHIP_ERROR err;
         err = aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
             char buffer[kMaxTemperatureLevelStringSize];
-            chip::MutableCharSpan item(buffer);
+            MutableCharSpan item(buffer);
             while (instance->Next(item) == CHIP_NO_ERROR)
             {
                 ReturnErrorOnFailure(encoder.Encode(item));
@@ -121,7 +121,6 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
     EndpointId endpoint           = commandPath.mEndpointId;
     Status status                 = Status::Success;
     EmberAfStatus emberAfStatus   = EMBER_ZCL_STATUS_SUCCESS;
-
 
     if (TemperatureControlHasFeature(endpoint, Feature::kTemperatureNumber) &&
         TemperatureControlHasFeature(endpoint, Feature::kTemperatureLevel))
@@ -216,10 +215,6 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
         {
             status = Status::InvalidCommand;
         }
-        else
-        {
-            status = Status::InvalidCommand;
-        }
     }
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -227,7 +222,7 @@ exit:
     return true;
 }
 
-void emberAfTemperatureControlClusterServerInitCallback(chip::EndpointId endpoint) {}
+void emberAfTemperatureControlClusterServerInitCallback(EndpointId endpoint) {}
 
 void MatterTemperatureControlPluginServerInitCallback()
 {

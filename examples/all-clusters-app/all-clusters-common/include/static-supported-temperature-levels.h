@@ -36,30 +36,26 @@ class AppSupportedTemperatureLevelsDelegate : public SupportedTemperatureLevelsI
     struct EndpointPair
     {
         EndpointId mEndpointId;
-        chip::CharSpan * mTemperatureLevels;
+        CharSpan * mTemperatureLevels;
         uint8_t mSize;
 
-        EndpointPair(EndpointId aEndpointId, chip::CharSpan * aTemperatureLevels, uint8_t aSize) :
+        EndpointPair(EndpointId aEndpointId, CharSpan * aTemperatureLevels, uint8_t aSize) :
             mEndpointId(aEndpointId), mTemperatureLevels(aTemperatureLevels), mSize(aSize)
         {}
 
         ~EndpointPair() {}
     };
 
-    static chip::CharSpan temperatureLevelOptions[3];
+    static CharSpan temperatureLevelOptions[3];
 
 public:
     static const EndpointPair supportedOptionsByEndpoints[EMBER_AF_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
     uint8_t Size() override;
 
-    CHIP_ERROR Next(chip::MutableCharSpan & item) override;
+    CHIP_ERROR Next(MutableCharSpan & item) override;
 
     ~AppSupportedTemperatureLevelsDelegate() {}
-
-    CHIP_ERROR Next(chip::MutableCharSpan & item) override;
-
-    ~StaticSupportedTemperatureLevels() {}
 };
 
 } // namespace TemperatureControl

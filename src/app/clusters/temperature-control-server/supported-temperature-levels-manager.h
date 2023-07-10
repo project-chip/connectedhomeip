@@ -43,9 +43,10 @@ public:
         mIndex    = 0;
     }
 
+    // Returns total size of SupportedTemperatureLevels list.
     virtual uint8_t Size() = 0;
 
-    virtual CHIP_ERROR Next(chip::MutableCharSpan & item) = 0;
+    virtual CHIP_ERROR Next(MutableCharSpan & item) = 0;
 
 protected:
     EndpointId mEndpoint;

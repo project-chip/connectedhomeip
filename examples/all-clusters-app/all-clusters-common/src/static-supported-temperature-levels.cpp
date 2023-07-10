@@ -26,9 +26,8 @@ using namespace chip::app::Clusters::TemperatureControl;
 using chip::Protocols::InteractionModel::Status;
 
 // TODO: Configure your options for each endpoint
-chip::CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { chip::CharSpan("Hot", 3),
-                                                                                    chip::CharSpan("Warm", 4),
-                                                                                    chip::CharSpan("Freezing", 8) };
+CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { CharSpan("Hot", 3), CharSpan("Warm", 4),
+                                                                              CharSpan("Freezing", 8) };
 
 const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
     [EMBER_AF_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
@@ -38,23 +37,6 @@ const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatur
 uint8_t AppSupportedTemperatureLevelsDelegate::Size()
 {
     for (auto & endpointPair : AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints)
-=======
-chip::CharSpan StaticSupportedTemperatureLevels::temperatureLevelOptions[] = { chip::CharSpan("Cold", 4), chip::CharSpan("Warm", 4),
-                                                                               chip::CharSpan("Hot", 3) };
-=======
-chip::CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { chip::CharSpan("Hot", 3),
-                                                                                    chip::CharSpan("Warm", 4),
-                                                                                    chip::CharSpan("Freezing", 8) };
->>>>>>> 569182fe4e (Addressed review comments)
-
-const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
-    [EMBER_AF_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
-        EndpointPair(1, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions, 3) // Options for Endpoint 1
-    };
-
-uint8_t AppSupportedTemperatureLevelsDelegate::Size()
-{
-    for (auto & endpointPair : StaticSupportedTemperatureLevels::supportedOptionsByEndpoints)
     {
         if (endpointPair.mEndpointId == mEndpoint)
         {
@@ -64,7 +46,7 @@ uint8_t AppSupportedTemperatureLevelsDelegate::Size()
     return 0;
 }
 
-CHIP_ERROR AppSupportedTemperatureLevelsDelegate::Next(chip::MutableCharSpan & item)
+CHIP_ERROR AppSupportedTemperatureLevelsDelegate::Next(MutableCharSpan & item)
 {
     for (auto & endpointPair : AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints)
     {
@@ -72,10 +54,10 @@ CHIP_ERROR AppSupportedTemperatureLevelsDelegate::Next(chip::MutableCharSpan & i
         {
             if (endpointPair.mSize > mIndex)
             {
-                CHIP_ERROR err = chip::CopyCharSpanToMutableCharSpan(endpointPair.mTemperatureLevels[mIndex], item);
+                CHIP_ERROR err = CopyCharSpanToMutableCharSpan(endpointPair.mTemperatureLevels[mIndex], item);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Error copying char span to mutable char span %s", chip::ErrorStr(err));
+                    ChipLogError(Zcl, "Error copying char span to mutable char span %s", ErrorStr(err));
                     return err;
                 }
                 mIndex++;
