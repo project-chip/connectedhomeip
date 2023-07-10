@@ -118,11 +118,6 @@ void sl_ble_event_handling_task(void)
     {
         //! This semaphore is waiting for next ble event task
         event_id = rsi_ble_app_get_event();
-        if (event_id == -1)
-        {
-            rsi_semaphore_wait(&sl_ble_event_sem, 0);
-            continue;
-        }
         switch (event_id)
         {
         case RSI_BLE_CONN_EVENT: {
@@ -160,6 +155,7 @@ void sl_ble_event_handling_task(void)
         }
         break;
         default:
+            rsi_semaphore_wait(&sl_ble_event_sem, 0);
             break;
         }
     }
