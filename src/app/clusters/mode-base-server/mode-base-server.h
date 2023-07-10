@@ -106,7 +106,7 @@ private:
      * This checks to see if this clusters instance is a valid ModeBase aliased cluster based on the AliasedClusters list.
      * @return true if the clusterId of this instance is a valid ModeBase cluster.
      */
-    bool isAliasCluster() const;
+    bool isDerivedCluster() const;
 
     /**
      * Internal change-to-mode command handler function.

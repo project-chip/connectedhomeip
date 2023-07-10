@@ -43,7 +43,7 @@ bool Instance::HasFeature(Feature feature) const
     return (mFeature & to_underlying(feature)) != 0;
 }
 
-bool Instance::isAliasCluster() const
+bool Instance::isDerivedCluster() const
 {
     for (unsigned int AliasedCluster : AliasedClusters)
     {
@@ -144,7 +144,7 @@ CHIP_ERROR Instance::Init()
 
     ChipLogError(Zcl, "ModeBase: Initialising the cluster with ID %lu.", long(mClusterId));
     // Check that the cluster ID given is a valid mode base alias cluster ID.
-    if (!isAliasCluster())
+    if (!isDerivedCluster())
     {
         ChipLogError(Zcl, "ModeBase: The cluster with ID %lu is not a mode base alias.", long(mClusterId));
         return CHIP_ERROR_INVALID_ARGUMENT; // todo is this the correct error?
