@@ -60,7 +60,7 @@ jobs:
             # Note you likely still need to have non submodules setup for the
             # local machine, like:
             #   git submodule deinit --all
-            - uses: actions/checkout@v3.5.2
+            - uses: actions/checkout@v3
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
             - name: Checkout submodules & Bootstrap
@@ -411,7 +411,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3.5.2
+              uses: actions/checkout@v3
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -480,7 +480,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3.5.2
+              uses: actions/checkout@v3
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
