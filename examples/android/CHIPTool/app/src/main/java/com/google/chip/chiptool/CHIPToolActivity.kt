@@ -28,9 +28,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import chip.setuppayload.SetupPayload
-import chip.setuppayload.SetupPayloadParser
-import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
+import chip.onboardingpayload.OnboardingPayload
+import chip.onboardingpayload.OnboardingPayloadParser
+import chip.onboardingpayload.UnrecognizedQrCodeException
 import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
 import com.google.chip.chiptool.provisioning.EnterNetworkFragment
@@ -60,16 +60,15 @@ class CHIPToolActivity :
     if (savedInstanceState == null) {
       val fragment = SelectActionFragment.newInstance()
       supportFragmentManager
-          .beginTransaction()
-          .add(R.id.nav_host_fragment, fragment, fragment.javaClass.simpleName)
-          .commit()
+        .beginTransaction()
+        .add(R.id.nav_host_fragment, fragment, fragment.javaClass.simpleName)
+        .commit()
     } else {
       networkType =
-          ProvisionNetworkType.fromName(savedInstanceState.getString(ARG_PROVISION_NETWORK_TYPE))
+        ProvisionNetworkType.fromName(savedInstanceState.getString(ARG_PROVISION_NETWORK_TYPE))
     }
 
-    if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED)
-      onNfcIntent(intent)
+    if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED) onNfcIntent(intent)
 
     if (Intent.ACTION_VIEW == intent?.action) {
       onReturnIntent(intent)
@@ -97,10 +96,8 @@ class CHIPToolActivity :
 
   override fun onCommissioningComplete(code: Int) {
     runOnUiThread {
-      Toast.makeText(
-          this,
-          getString(R.string.commissioning_completed, code),
-          Toast.LENGTH_SHORT).show()
+      Toast.makeText(this, getString(R.string.commissioning_completed, code), Toast.LENGTH_SHORT)
+        .show()
     }
     ChipClient.getDeviceController(this).close()
     showFragment(SelectActionFragment.newInstance(), false)
@@ -128,7 +125,8 @@ class CHIPToolActivity :
   }
 
   private fun showFragment(fragment: Fragment, showOnBack: Boolean = true) {
-    val fragmentTransaction = supportFragmentManager
+    val fragmentTransaction =
+      supportFragmentManager
         .beginTransaction()
         .replace(R.id.nav_host_fragment, fragment, fragment.javaClass.simpleName)
 
@@ -151,10 +149,9 @@ class CHIPToolActivity :
     val uri = records[0].toUri()
     if (!uri?.scheme.equals("mt", true)) return
 
-    lateinit var setupPayload: SetupPayload
+    lateinit var setupPayload: OnboardingPayload
     try {
-      setupPayload =
-        SetupPayloadParser().parseQrCode(uri.toString().toUpperCase())
+      setupPayload = OnboardingPayloadParser().parseQrCode(uri.toString().toUpperCase())
     } catch (ex: UnrecognizedQrCodeException) {
       Log.e(TAG, "Unrecognized QR Code", ex)
       Toast.makeText(this, "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
@@ -163,23 +160,26 @@ class CHIPToolActivity :
 
     val deviceInfo = CHIPDeviceInfo.fromSetupPayload(setupPayload)
 
-    val buttons = arrayOf(
+    val buttons =
+      arrayOf(
         getString(R.string.nfc_tag_action_show),
         getString(R.string.nfc_tag_action_wifi),
-        getString(R.string.nfc_tag_action_thread))
+        getString(R.string.nfc_tag_action_thread)
+      )
 
     AlertDialog.Builder(this)
-        .setTitle(R.string.nfc_tag_action_title)
-        .setItems(buttons) { _, which ->
-          this.networkType = when (which) {
+      .setTitle(R.string.nfc_tag_action_title)
+      .setItems(buttons) { _, which ->
+        this.networkType =
+          when (which) {
             1 -> ProvisionNetworkType.WIFI
             2 -> ProvisionNetworkType.THREAD
             else -> null
           }
-          onCHIPDeviceInfoReceived(deviceInfo)
-        }
-        .create()
-        .show()
+        onCHIPDeviceInfoReceived(deviceInfo)
+      }
+      .create()
+      .show()
   }
 
   private fun onReturnIntent(intent: Intent) {
@@ -208,10 +208,10 @@ class CHIPToolActivity :
       val payload = JSONObject(payloadString)
 
       // parse payload from JSON
-      val setupPayload = SetupPayload()
+      val setupPayload = OnboardingPayload()
       // set defaults
-      setupPayload.discoveryCapabilities = setOf()
-      setupPayload.optionalQRCodeInfo = mapOf()
+      setupPayload.discoveryCapabilities = mutableSetOf()
+      setupPayload.optionalQRCodeInfo = HashMap()
 
       // read from payload
       setupPayload.version = payload.getInt("version")
@@ -222,18 +222,13 @@ class CHIPToolActivity :
       setupPayload.setupPinCode = payload.getLong("setupPinCode")
 
       val deviceInfo = CHIPDeviceInfo.fromSetupPayload(setupPayload)
-      val buttons = arrayOf(
-        getString(R.string.nfc_tag_action_show)
-      )
+      val buttons = arrayOf(getString(R.string.nfc_tag_action_show))
 
       AlertDialog.Builder(this)
         .setTitle(R.string.provision_custom_flow_alert_title)
-        .setItems(buttons) { _, _ ->
-          onCHIPDeviceInfoReceived(deviceInfo)
-        }
+        .setItems(buttons) { _, _ -> onCHIPDeviceInfoReceived(deviceInfo) }
         .create()
         .show()
-
     } catch (ex: UnrecognizedQrCodeException) {
       Log.e(TAG, "Unrecognized Payload", ex)
       Toast.makeText(this, "Unrecognized Setup Payload", Toast.LENGTH_SHORT).show()

@@ -199,6 +199,7 @@ __CHIP_SIZED_TYPES__ = {
     "endpoint_no": BasicInteger(idl_name="endpoint_no", byte_count=2, is_signed=False),
     "epoch_s": BasicInteger(idl_name="epoch_s", byte_count=4, is_signed=False),
     "epoch_us": BasicInteger(idl_name="epoch_us", byte_count=8, is_signed=False),
+    "elapsed_s": BasicInteger(idl_name="elapsed_s", byte_count=4, is_signed=False),
     "event_id": BasicInteger(idl_name="event_id", byte_count=4, is_signed=False),
     "event_no": BasicInteger(idl_name="event_no", byte_count=8, is_signed=False),
     "fabric_id": BasicInteger(idl_name="fabric_id", byte_count=8, is_signed=False),
@@ -208,8 +209,11 @@ __CHIP_SIZED_TYPES__ = {
     "node_id": BasicInteger(idl_name="node_id", byte_count=8, is_signed=False),
     "percent": BasicInteger(idl_name="percent", byte_count=1, is_signed=False),
     "percent100ths": BasicInteger(idl_name="percent100ths", byte_count=2, is_signed=False),
+    "posix_ms": BasicInteger(idl_name="posix_ms", byte_count=8, is_signed=False),
     "status": BasicInteger(idl_name="status", byte_count=2, is_signed=False),
     "systime_us": BasicInteger(idl_name="systime_us", byte_count=8, is_signed=False),
+    "systime_ms": BasicInteger(idl_name="systime_ms", byte_count=8, is_signed=False),
+    "temperature": BasicInteger(idl_name="temperature", byte_count=2, is_signed=True),
     "tod": BasicInteger(idl_name="tod", byte_count=4, is_signed=False),
     "trans_id": BasicInteger(idl_name="trans_id", byte_count=4, is_signed=False),
     "vendor_id": BasicInteger(idl_name="vendor_id", byte_count=2, is_signed=False),
@@ -340,6 +344,10 @@ class TypeLookupContext:
         """
         return any(map(lambda s: s.name == name, self.all_structs))
 
+    def is_untyped_bitmap_type(self, name: str):
+        """Determine if the given type is a untyped bitmap (just an interger size)."""
+        return name.lower() in {"bitmap8", "bitmap16", "bitmap24", "bitmap32", "bitmap64"}
+
     def is_bitmap_type(self, name: str):
         """
         Determine if the given type name is type that is known to be a bitmap.
@@ -347,7 +355,7 @@ class TypeLookupContext:
         Handles both standard/zcl names (like bitmap32) and types defined within
         the current lookup context.
         """
-        if name.lower() in ["bitmap8", "bitmap16", "bitmap24", "bitmap32", "bitmap64"]:
+        if self.is_untyped_bitmap_type(name):
             return True
 
         return any(map(lambda s: s.name == name, self.all_bitmaps))
@@ -404,3 +412,29 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
             "Data type %s is NOT known, but treating it as a generic IDL type." % data_type)
 
     return result
+
+
+def IsSignedDataType(data_type: DataType) -> bool:
+    """
+    Returns if the data type is a signed type.
+    Returns if the data type is a signed data type of False if the data type can not be found.
+    """
+    lowercase_name = data_type.name.lower()
+    sized_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
+    if sized_type is None:
+        return False
+
+    return sized_type.is_signed
+
+
+def GetDataTypeSizeInBits(data_type: DataType) -> Optional[int]:
+    """
+    Returns the size in bits for a given data type or None if the data type can not be found.
+    """
+
+    lowercase_name = data_type.name.lower()
+    sized_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
+    if sized_type is None:
+        return None
+
+    return sized_type.power_of_two_bits

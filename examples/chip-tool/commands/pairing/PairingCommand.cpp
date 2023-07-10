@@ -82,6 +82,9 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::AlreadyDiscoveredByIndex:
         err = PairWithMdnsOrBleByIndex(remoteId, mIndex);
         break;
+    case PairingMode::AlreadyDiscoveredByIndexWithCode:
+        err = PairWithMdnsOrBleByIndexWithCode(remoteId, mIndex);
+        break;
     }
 
     return err;
@@ -173,6 +176,7 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 
 CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndex(NodeId remoteId, uint16_t index)
 {
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
     VerifyOrReturnError(IsInteractive(), CHIP_ERROR_INCORRECT_STATE);
 
     RendezvousParameters params;
@@ -190,6 +194,56 @@ CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndex(NodeId remoteId, uint16_t in
         err                      = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
     }
     return err;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
+}
+
+CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndexWithCode(NodeId remoteId, uint16_t index)
+{
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+    VerifyOrReturnError(IsInteractive(), CHIP_ERROR_INCORRECT_STATE);
+
+    Dnssd::CommonResolutionData resolutionData;
+    auto err = GetDeviceScanner().Get(index, resolutionData);
+    if (CHIP_ERROR_NOT_FOUND == err)
+    {
+        // There is no device with this index that has some resolution data. This could simply
+        // be because the device is a ble device. In this case let's fall back to looking for
+        // a device with this index and some RendezvousParameters.
+        chip::SetupPayload payload;
+        bool isQRCode = strncmp(mOnboardingPayload, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
+        if (isQRCode)
+        {
+            ReturnErrorOnFailure(QRCodeSetupPayloadParser(mOnboardingPayload).populatePayload(payload));
+            VerifyOrReturnError(payload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        else
+        {
+            ReturnErrorOnFailure(ManualSetupPayloadParser(mOnboardingPayload).populatePayload(payload));
+            VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
+        }
+
+        mSetupPINCode = payload.setUpPINCode;
+        return PairWithMdnsOrBleByIndex(remoteId, index);
+    }
+
+    err = CHIP_NO_ERROR;
+    if (mPaseOnly.ValueOr(false))
+    {
+        err = CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload, DiscoveryType::kDiscoveryNetworkOnly,
+                                                            MakeOptional(resolutionData));
+    }
+    else
+    {
+        auto commissioningParams = GetCommissioningParameters();
+        err                      = CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams,
+                                               DiscoveryType::kDiscoveryNetworkOnly, MakeOptional(resolutionData));
+    }
+    return err;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 }
 
 CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)

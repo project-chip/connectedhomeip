@@ -20,10 +20,10 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/ClusterEnums.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CommonIterator.h>
 

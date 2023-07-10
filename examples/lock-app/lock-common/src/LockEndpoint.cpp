@@ -29,6 +29,17 @@ bool LockEndpoint::Lock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum
 
 bool LockEndpoint::Unlock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
 {
+    if (DoorLockServer::Instance().SupportsUnbolt(mEndpointId))
+    {
+        // If Unbolt is supported Unlock is supposed to pull the latch
+        setLockState(DlLockState::kUnlatched, pin, err, opSource);
+    }
+
+    return setLockState(DlLockState::kUnlocked, pin, err, opSource);
+}
+
+bool LockEndpoint::Unbolt(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
+{
     return setLockState(DlLockState::kUnlocked, pin, err, opSource);
 }
 
@@ -547,6 +558,8 @@ const char * LockEndpoint::lockStateToString(DlLockState lockState) const
         return "Locked";
     case DlLockState::kUnlocked:
         return "Unlocked";
+    case DlLockState::kUnlatched:
+        return "Unlatched";
     case DlLockState::kUnknownEnumValue:
         break;
     }

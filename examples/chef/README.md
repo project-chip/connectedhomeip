@@ -137,20 +137,12 @@ chef_$PLATFORM:
         options: --user root
 
     steps:
-        - uses: Wandalen/wretry.action@v1.0.36
-          name: Checkout
+        - name: Checkout
+          uses: actions/checkout@v3
+        - name: Checkout submodules & Bootstrap
+          uses: ./.github/actions/checkout-submodules-and-bootstrap
           with:
-              action: actions/checkout@v3
-              with: |
-                  token: ${{ github.token }}
-              attempt_limit: 3
-              attempt_delay: 2000
-        - name: Checkout submodules
-          run: |
-              scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform $PLATFORM
-        - name: Bootstrap
-          timeout-minutes: 25
-          run: bash scripts/bootstrap.sh
+              platform: $PLATFORM
         - name: CI Examples $PLATFORM
           shell: bash
           run: |

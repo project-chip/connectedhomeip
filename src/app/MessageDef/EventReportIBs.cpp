@@ -78,10 +78,10 @@ EventReportIB::Builder & EventReportIBs::Builder::CreateEventReport()
     return mEventReport;
 }
 
-EventReportIBs::Builder & EventReportIBs::Builder::EndOfEventReports()
+CHIP_ERROR EventReportIBs::Builder::EndOfEventReports()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

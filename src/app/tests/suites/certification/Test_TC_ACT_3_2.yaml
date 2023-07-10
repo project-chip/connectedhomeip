@@ -33,12 +33,12 @@ tests:
           "Preparation: TH as server exposes an Actions server cluster on EP 1,
           with one action (supporting all possible commands) and corresponding
           ActionLists and EndpointLists attributes: ActionList: contains one
-          list element (ActionListStruct):  ActionIO = 0x1001  Name = some
-          test  Type = other  EndpointListID = 0xE001  SupportedCommands =
+          list element (ActionListStruct):  ActionIO = 0x1001  Name = 'some
+          test'  Type = other  EndpointListID = 0xE001  SupportedCommands =
           0x0fff // suppports all commands  State = Inactive EndpointLists:
           contains one list element (EndpointListStruct):  EndpointListID =
-          0xE001  Name = test room  Type = room  Endpoints = [3]
-          SetupURL:  (empty string)"
+          0xE001  Name = 'test room'  Type = room  Endpoints = [3] SetupURL: ''
+          (empty string)"
       verification: |
           pre-condition :
           Please use the below chip-tool commmands as example on how this TC can be performed using chip-tool. The DUT vendor to use commands per the DUT implemetnation
@@ -204,59 +204,59 @@ tests:
     - label: "DUT issues an StopAction command to TH"
       PICS: ACT.C.C04.Tx
       verification: |
-          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+          Out of scope for V1.0, The reference app doesn't have implementation for this command
       disabled: true
 
     - label: "DUT issues an PauseAction command to TH"
       PICS: ACT.C.C05.Tx
       verification: |
-          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+          Out of scope for V1.0, The reference app doesn't have implementation for this command
       disabled: true
 
     - label: "DUT issues an ResumeAction command to TH"
       PICS: ACT.C.C07.Tx
       verification: |
-          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+          Out of scope for V1.0, The reference app doesn't have implementation for this command
       disabled: true
 
     - label: "DUT issues an EnableAction command to TH"
       PICS: ACT.C.C08.Tx
       verification: |
-          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+          Out of scope for V1.0, The reference app doesn't have implementation for this command
       disabled: true
 
     - label: "DUT issues an DisableAction command to TH"
       PICS: ACT.C.C0a.Tx
       verification: |
-          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+          Out of scope for V1.0, The reference app doesn't have implementation for this command
       disabled: true
 
     - label: "DUT issues an StartActionWithDuration command to TH"
       PICS: ACT.C.C03.Tx
       verification: |
-          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+          Out of scope for V1.0, The reference app doesn't have implementation for this command
       disabled: true
 
     - label: "DUT issues an PauseActionWithDuration command to TH"
       PICS: ACT.C.C06.Tx
       verification: |
-          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+          Out of scope for V1.0, The reference app doesn't have implementation for this command
       disabled: true
 
     - label: "DUT issues an EnableActionWithDuration command to TH"
       PICS: ACT.C.C09.Tx
       verification: |
-          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+          Out of scope for V1.0, The reference app doesn't have implementation for this command
       disabled: true
 
     - label: "DUT issues an DisableActionWithDuration command to TH"
       PICS: ACT.C.C0b.Tx
       verification: |
-          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+          Out of scope for V1.0, The reference app doesn't have implementation for this command
       disabled: true
 
     - label: "DUT issues an InstantActionWithTransition command to TH"
       PICS: ACT.C.C01.Tx
       verification: |
-          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+          Out of scope for V1.0, The reference app doesn't have implementation for this command
       disabled: true

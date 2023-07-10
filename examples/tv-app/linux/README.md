@@ -1,13 +1,13 @@
-# CHIP TV Example
+# Matter TV Example
 
 An example showing the use of CHIP on the Linux. The document will describe how
-to build and run CHIP TV Example on Raspberry Pi. This doc is tested on **Ubuntu
-for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for Raspberry Pi
-Desktop 20.10 (aarch64)**
+to build and run Matter TV Example on Raspberry Pi. This doc is tested on
+**Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
+Raspberry Pi Desktop 20.10 (aarch64)**
 
 <hr>
 
--   [CHIP TV Example](#chip-tv-example)
+-   [Matter TV Example](#matter-tv-example)
     -   [Building](#building)
     -   [Exercising Commissioning](#exercising-commissioning)
     -   [App Platform commands](#app-platform-commands)
@@ -74,14 +74,15 @@ As an app platform, Content Apps can be launched and assigned to endpoints
 following (see Video Player Architecture in the Device Library spec).
 
 There is a dummy app platform included in the linux tv-app which includes a
-small number of hardcoded apps. See AppImpl.h/.cpp for this dummy
-implementation. These apps have hardcoded values for many operations - on a real
-device, these apps would usually be developed by streaming video content
-providers and the native platform may or may not provide Matter interfaces to
-these apps. In some cases, the video player platform will bridge its existing
-internal interfaces to Matter, allowing apps to continue to not be Matter-aware,
-while other platforms may provide Matter interfaces to Content Apps so that they
-can directly respond to each Matter cluster.
+small number of hardcoded apps. See `examples/tv-app/tv-common/src/AppTv.h` and
+`examples/tv-app/tv-common/src/AppTv.cpp` for this dummy implementation. These
+apps have hardcoded values for many operations - on a real device, these apps
+would usually be developed by streaming video content providers and the native
+platform may or may not provide Matter interfaces to these apps. In some cases,
+the video player platform will bridge its existing internal interfaces to
+Matter, allowing apps to continue to not be Matter-aware, while other platforms
+may provide Matter interfaces to Content Apps so that they can directly respond
+to each Matter cluster.
 
 On Linux, there are shell commands to start and stop the dummy apps (by vendor
 id):
@@ -181,8 +182,8 @@ TODO
 
     1. A Raspberry Pi 4 board
     2. A USB Bluetooth Dongle, Ubuntu desktop will send Bluetooth advertisement,
-       which will block CHIP from connecting via BLE. On Ubuntu server, you need
-       to install `pi-bluetooth` via APT.
+       which will block Matter from connecting via BLE. On Ubuntu server, you
+       need to install `pi-bluetooth` via APT.
     3. Ubuntu 20.04 or newer image for ARM64 platform.
 
 -   Building

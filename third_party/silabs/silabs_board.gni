@@ -36,6 +36,8 @@ declare_args() {
   use_SiWx917 = false
   chip_enable_ble_rs911x = false
 
+  wifi_soc = false
+
   #Disable MQTT by default
   enable_dic = false
 
@@ -99,6 +101,7 @@ if (silabs_board == "BRD4304A") {
   silabs_mcu = "EFR32MG12P432F1024GL125"
   disable_lcd = true
   show_qr_code = false
+  wifi_soc = true
 } else if (silabs_board == "BRD4180A") {
   assert(
       false,

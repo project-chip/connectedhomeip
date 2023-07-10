@@ -70,7 +70,6 @@ void rsi_gpio_irq_cb(uint8_t irqnum)
 void rsi_hal_intr_config(void (*rsi_interrupt_handler)(void))
 {
     call_back = rsi_interrupt_handler;
-    SILABS_LOG("RSI:Set SPI intr CB to=%x", (uint32_t) call_back);
 }
 
 /*===================================================*/

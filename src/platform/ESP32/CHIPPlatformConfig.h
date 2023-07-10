@@ -41,7 +41,11 @@
 // The ESP NVS implementation limits key names to 15 characters.
 #define CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH 15
 
+#ifndef CONFIG_CHIP_LOG_FILTERING
 #define CHIP_LOG_FILTERING 0
+#else
+#define CHIP_LOG_FILTERING CONFIG_CHIP_LOG_FILTERING
+#endif
 
 #define CHIP_CONFIG_ABORT() abort()
 

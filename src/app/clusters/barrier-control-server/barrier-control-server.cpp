@@ -288,7 +288,7 @@ static void sendDefaultResponse(app::CommandHandler * commandObj, const app::Con
 {
     if (commandObj->AddStatus(commandPath, status) != CHIP_NO_ERROR)
     {
-        emberAfBarrierControlClusterPrintln("Failed to send default response");
+        ChipLogProgress(Zcl, "Failed to send default response");
     }
 }
 
@@ -301,7 +301,7 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
     EndpointId endpoint = commandPath.mEndpointId;
     Status status       = Status::Success;
 
-    emberAfBarrierControlClusterPrintln("RX: GoToPercentCallback p=%d", percentOpen);
+    ChipLogProgress(Zcl, "RX: GoToPercentCallback p=%d", percentOpen);
 
     if (isRemoteLockoutOn(endpoint))
     {
@@ -319,8 +319,8 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
         state.currentPosition = getCurrentPosition(endpoint);
         state.targetPosition  = percentOpen;
         state.delayMs         = calculateDelayMs(endpoint, state.targetPosition, &state.increasing);
-        emberAfBarrierControlClusterPrintln("Scheduling barrier move from %d to %d with %" PRIu32 "ms delay", state.currentPosition,
-                                            state.targetPosition, state.delayMs);
+        ChipLogProgress(Zcl, "Scheduling barrier move from %d to %d with %" PRIu32 "ms delay", state.currentPosition,
+                        state.targetPosition, state.delayMs);
         scheduleTimerCallbackMs(endpoint, state.delayMs);
 
         if (state.currentPosition < state.targetPosition)
@@ -353,6 +353,6 @@ void MatterBarrierControlPluginServerInitCallback() {}
 
 void MatterBarrierControlClusterServerShutdownCallback(EndpointId endpoint)
 {
-    emberAfBarrierControlClusterPrintln("Shuting barrier control server cluster on endpoint %d", endpoint);
+    ChipLogProgress(Zcl, "Shuting barrier control server cluster on endpoint %d", endpoint);
     cancelEndpointTimerCallback(endpoint);
 }

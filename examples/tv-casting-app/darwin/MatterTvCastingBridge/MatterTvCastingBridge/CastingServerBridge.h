@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@
 
  @return Onboarding payload
  */
-- (OnboardingPayload * _Nonnull)getOnboardingPaylod;
+- (OnboardingPayload * _Nonnull)getOnboardingPayload;
 
 /*!
  @brief Request opening of a basic commissioning window

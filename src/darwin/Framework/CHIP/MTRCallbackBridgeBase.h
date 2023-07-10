@@ -25,7 +25,7 @@
 #include <app/data-model/NullObject.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <transport/SessionHandle.h>
+#include <transport/Session.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

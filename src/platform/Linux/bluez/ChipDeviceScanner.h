@@ -66,6 +66,9 @@ public:
     ~ChipDeviceScanner();
 
     /// Initiate a scan for devices, with the given timeout
+    ///
+    /// This method must be called while in the Matter context (from the Matter event
+    /// loop, or while holding the Matter stack lock).
     CHIP_ERROR StartScan(System::Clock::Timeout timeout);
 
     /// Stop any currently running scan

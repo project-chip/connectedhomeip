@@ -1,0 +1,108 @@
+name: "\U0001F4DC Test Case Failure / Cert Blocker"
+description: Create a report to identify matter certification test failures
+title: "[CERT-TEST-FAILURE] "
+labels: [bug, "cert blocker", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting an issue against the Matter SDK! We need information about the cert blocker to follow up, so please help us out by filling out this information.
+  - type: dropdown
+    attributes:
+      label: Feature Area
+      description: What feature area is the test failing in?
+      multiple: true
+      options:
+        - Area:AirPurifiers
+        - Area:AirQualitySensor
+        - Area:ConcentrationMeasurement
+        - Area:DeviceAppearance
+        - Area:Dishwashers
+        - Area:DoorLockEnhancements
+        - Area:EventList
+        - Area:ICDPhase2
+        - Area:ModeSelect
+        - Area:OperationalState
+        - Area:Refrigerators
+        - Area:RobotVacuums
+        - Area:RoomAirConditioner
+        - Area:Scenes
+        - Area:SmokeCO2
+        - Area:TemperatureControlledCabinet
+        - Area:TimeSync
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: testcase
+    attributes:
+      label: Test Case
+      description: "Which test case is failing?"
+      placeholder: "TC-XXXX"
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction steps
+      description: "How do you trigger this bug? Please walk us through it step by step."
+      placeholder: |
+        Please list reproduction steps step by step.
+        Place shell commands between ```.
+        Attach logs as files instead of pasting them in.
+        1.
+        2.
+        3.
+        ...
+    validations:
+      required: true
+  - type: input
+    id: prevalence
+    attributes:
+      label: Bug prevalence
+      description: "How often do you or others encounter this bug?"
+      placeholder: "Example: Whenever I do this, 1-2 times a week, day, hour, etc"
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: GitHub hash of the SDK that was being used
+      description: Hash of the GitHub SDK used
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Platform
+      description: What platforms are affected?
+      multiple: true
+      options:
+        - ameba
+        - android
+        - cc13x2_cc26x2
+        - darwin
+        - efr32
+        - esp32
+        - freeRTOS
+        - IMX8
+        - k32w
+        - nrf
+        - python
+        - raspi
+        - vscode
+        - windows
+        - other
+        - core
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Anything else?
+      description: |
+        Links? References? Anything that will give us more context about the issue you are encountering!
+
+        Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: "Thanks for submitting a test case/cert blocker!"

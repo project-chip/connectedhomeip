@@ -1023,35 +1023,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                             return CHIP_ERROR_INVALID_ARGUMENT;
                                         }
                                         auto element_2 = (MTRScenesClusterAttributeValuePair *) element_0.attributeValueList[i_2];
-                                        if (element_2.attributeID != nil) {
-                                            auto & definedValue_4 = listHolder_2->mList[i_2].attributeID.Emplace();
-                                            definedValue_4 = element_2.attributeID.unsignedIntValue;
-                                        }
-                                        {
-                                            using ListType_4
-                                                = std::remove_reference_t<decltype(listHolder_2->mList[i_2].attributeValue)>;
-                                            using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
-                                            if (element_2.attributeValue.count != 0) {
-                                                auto * listHolder_4
-                                                    = new ListHolder<ListMemberType_4>(element_2.attributeValue.count);
-                                                if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
-                                                    return CHIP_ERROR_INVALID_ARGUMENT;
-                                                }
-                                                listFreer.add(listHolder_4);
-                                                for (size_t i_4 = 0; i_4 < element_2.attributeValue.count; ++i_4) {
-                                                    if (![element_2.attributeValue[i_4] isKindOfClass:[NSNumber class]]) {
-                                                        // Wrong kind of value.
-                                                        return CHIP_ERROR_INVALID_ARGUMENT;
-                                                    }
-                                                    auto element_4 = (NSNumber *) element_2.attributeValue[i_4];
-                                                    listHolder_4->mList[i_4] = element_4.unsignedCharValue;
-                                                }
-                                                listHolder_2->mList[i_2].attributeValue
-                                                    = ListType_4(listHolder_4->mList, element_2.attributeValue.count);
-                                            } else {
-                                                listHolder_2->mList[i_2].attributeValue = ListType_4();
-                                            }
-                                        }
+                                        listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
+                                        listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedIntValue;
                                     }
                                     listHolder_0->mList[i_0].attributeValueList
                                         = ListType_2(listHolder_2->mList, element_0.attributeValueList.count);
@@ -1599,35 +1572,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                             return CHIP_ERROR_INVALID_ARGUMENT;
                                         }
                                         auto element_2 = (MTRScenesClusterAttributeValuePair *) element_0.attributeValueList[i_2];
-                                        if (element_2.attributeID != nil) {
-                                            auto & definedValue_4 = listHolder_2->mList[i_2].attributeID.Emplace();
-                                            definedValue_4 = element_2.attributeID.unsignedIntValue;
-                                        }
-                                        {
-                                            using ListType_4
-                                                = std::remove_reference_t<decltype(listHolder_2->mList[i_2].attributeValue)>;
-                                            using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
-                                            if (element_2.attributeValue.count != 0) {
-                                                auto * listHolder_4
-                                                    = new ListHolder<ListMemberType_4>(element_2.attributeValue.count);
-                                                if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
-                                                    return CHIP_ERROR_INVALID_ARGUMENT;
-                                                }
-                                                listFreer.add(listHolder_4);
-                                                for (size_t i_4 = 0; i_4 < element_2.attributeValue.count; ++i_4) {
-                                                    if (![element_2.attributeValue[i_4] isKindOfClass:[NSNumber class]]) {
-                                                        // Wrong kind of value.
-                                                        return CHIP_ERROR_INVALID_ARGUMENT;
-                                                    }
-                                                    auto element_4 = (NSNumber *) element_2.attributeValue[i_4];
-                                                    listHolder_4->mList[i_4] = element_4.unsignedCharValue;
-                                                }
-                                                listHolder_2->mList[i_2].attributeValue
-                                                    = ListType_4(listHolder_4->mList, element_2.attributeValue.count);
-                                            } else {
-                                                listHolder_2->mList[i_2].attributeValue = ListType_4();
-                                            }
-                                        }
+                                        listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
+                                        listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedIntValue;
                                     }
                                     listHolder_0->mList[i_0].attributeValueList
                                         = ListType_2(listHolder_2->mList, element_0.attributeValueList.count);
@@ -11935,7 +11881,18 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     }
 }
 
-- (void)keySetReadAllIndicesWithParams:(MTRGroupKeyManagementClusterKeySetReadAllIndicesParams *)params
+- (void)keySetReadAllIndicesWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                    completion:
+                                        (void (^)(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
+                                            NSError * _Nullable error))completion
+{
+    [self keySetReadAllIndicesWithParams:nil
+                          expectedValues:expectedValues
+                   expectedValueInterval:expectedValueIntervalMs
+                              completion:completion];
+}
+- (void)keySetReadAllIndicesWithParams:(MTRGroupKeyManagementClusterKeySetReadAllIndicesParams * _Nullable)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completion:(void (^)(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
@@ -11982,28 +11939,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         auto * serverSideProcessingTimeout
                             = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
                         invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
-                    }
-                }
-                {
-                    using ListType_0 = std::remove_reference_t<decltype(request.groupKeySetIDs)>;
-                    using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                    if (params.groupKeySetIDs.count != 0) {
-                        auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.groupKeySetIDs.count);
-                        if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        listFreer.add(listHolder_0);
-                        for (size_t i_0 = 0; i_0 < params.groupKeySetIDs.count; ++i_0) {
-                            if (![params.groupKeySetIDs[i_0] isKindOfClass:[NSNumber class]]) {
-                                // Wrong kind of value.
-                                return CHIP_ERROR_INVALID_ARGUMENT;
-                            }
-                            auto element_0 = (NSNumber *) params.groupKeySetIDs[i_0];
-                            listHolder_0->mList[i_0] = element_0.unsignedShortValue;
-                        }
-                        request.groupKeySetIDs = ListType_0(listHolder_0->mList, params.groupKeySetIDs.count);
-                    } else {
-                        request.groupKeySetIDs = ListType_0();
                     }
                 }
 
@@ -12160,7 +12095,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
            expectedValueInterval:expectedValueIntervalMs
                       completion:completionHandler];
 }
-- (void)keySetReadAllIndicesWithParams:(MTRGroupKeyManagementClusterKeySetReadAllIndicesParams *)params
+- (void)keySetReadAllIndicesWithParams:(MTRGroupKeyManagementClusterKeySetReadAllIndicesParams * _Nullable)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                      completionHandler:(void (^)(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
@@ -22306,7 +22241,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
                     }
                 }
-                request.count = params.count.unsignedShortValue;
+                request.count = params.count.shortValue;
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);

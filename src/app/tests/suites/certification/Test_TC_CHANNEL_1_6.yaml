@@ -41,7 +41,7 @@ tests:
               type: int16u
 
     - label: "Read the global attribute: FeatureMap"
-      PICS: ( !CHANNEL.S.CL && !CHANNEL.S.LI )
+      PICS: ( !CHANNEL.S.F00 && !CHANNEL.S.F01 )
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -49,8 +49,9 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Given CHANNEL.S.CL ensure featuremap has the correct bit set"
-      PICS: CHANNEL.S.CL
+    - label:
+          "Given CCHANNEL.S.F00(CL) ensure featuremap has the correct bit set"
+      PICS: CHANNEL.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -58,8 +59,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "Given CHANNEL.S.LI ensure featuremap has the correct bit set"
-      PICS: CHANNEL.S.LI
+    - label: "Given CHANNEL.S.F01(LI) ensure featuremap has the correct bit set"
+      PICS: CHANNEL.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -73,7 +74,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [65528, 65529, 65531, 65532, 65533]
+              contains: [65528, 65529, 65530, 65531, 65532, 65533]
 
     - label: "Read the optional attribute(ChannelList): AttributeList"
       PICS: CHANNEL.S.A0000
@@ -132,7 +133,7 @@ tests:
               contains: [3]
 
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS: ( !CHANNEL.S.CL && !CHANNEL.S.LI )
+      PICS: ( !CHANNEL.S.F00 && !CHANNEL.S.F01 )
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
@@ -141,25 +142,18 @@ tests:
               type: list
 
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS: CHANNEL.S.CL || CHANNEL.S.LI
+      PICS: CHANNEL.S.F00 || CHANNEL.S.F01
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
           constraints:
               type: list
               contains: [1]
-    #Commenting out the step EventList attribute which is out of scope for matter V1.0
-    #- label:
-    #      "Read EventList attribute from the DUT and Verify that the DUT
-    #      response provides a list of supported events."
-    #  verification: |
-    #      Not implemented in chip-tool
-    #  cluster: "LogCommands"
-    #  command: "UserPrompt"
-    #  PICS: PICS_USER_PROMPT
-    #  arguments:
-    #      values:
-    #          - name: "message"
-    #            value: "Please enter 'y' for success"
-    #          - name: "expectedValue"
-    #            value: "y"
+
+    - label: "Read the global attribute: EventList"
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list

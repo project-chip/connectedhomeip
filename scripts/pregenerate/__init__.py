@@ -20,8 +20,8 @@ from dataclasses import dataclass, field
 from typing import Iterator, List, Optional
 
 from .types import IdlFileType, InputIdlFile
-from .using_codegen import (CodegenBridgePregenerator, CodegenCppAppPregenerator, CodegenJavaClassPregenerator,
-                            CodegenJavaJNIPregenerator)
+from .using_codegen import (CodegenCppAppPregenerator, CodegenCppClustersTLVMetaPregenerator,
+                            CodegenCppProtocolsTLVMetaPregenerator, CodegenJavaClassPregenerator, CodegenJavaJNIPregenerator)
 from .using_zap import ZapApplicationPregenerator
 
 
@@ -92,10 +92,11 @@ def FindPregenerationTargets(sdk_root: str, external_roots: Optional[List[str]],
 
     generators = [
         # Jinja-based codegen
-        CodegenBridgePregenerator(sdk_root),
         CodegenJavaJNIPregenerator(sdk_root),
         CodegenJavaClassPregenerator(sdk_root),
         CodegenCppAppPregenerator(sdk_root),
+        CodegenCppClustersTLVMetaPregenerator(sdk_root),
+        CodegenCppProtocolsTLVMetaPregenerator(sdk_root),
 
         # ZAP codegen
         ZapApplicationPregenerator(sdk_root),

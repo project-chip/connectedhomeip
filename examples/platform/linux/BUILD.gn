@@ -17,6 +17,7 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
 
 config("app-main-config") {
   include_dirs = [ "." ]
@@ -29,18 +30,14 @@ source_set("ota-test-event-trigger") {
 }
 
 source_set("app-main") {
-  defines = []
+  defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
   sources = [
     "AppMain.cpp",
     "AppMain.h",
     "CommissionableInit.cpp",
     "CommissionableInit.h",
-    "CommissioneeShellCommands.cpp",
-    "CommissioneeShellCommands.h",
     "CommissionerMain.cpp",
     "CommissionerMain.h",
-    "ControllerShellCommands.cpp",
-    "ControllerShellCommands.h",
     "LinuxCommissionableDataProvider.cpp",
     "LinuxCommissionableDataProvider.h",
     "NamedPipeCommands.cpp",
@@ -53,29 +50,39 @@ source_set("app-main") {
     "testing/CustomCSRResponseOperationalKeyStore.h",
   ]
 
-  defines = []
+  public_deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:force_stdio",
+  ]
+  deps = [
+    ":ota-test-event-trigger",
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/app/server",
+  ]
 
   if (chip_enable_pw_rpc) {
     defines += [ "PW_RPC_ENABLED" ]
   }
+
   if (chip_build_libshell) {
     defines += [ "ENABLE_CHIP_SHELL" ]
+    sources += [
+      "CommissioneeShellCommands.cpp",
+      "CommissioneeShellCommands.h",
+      "ControllerShellCommands.cpp",
+      "ControllerShellCommands.h",
+    ]
   }
 
-  public_deps = [
-    ":ota-test-event-trigger",
-    "${chip_root}/examples/providers:device_info_provider",
-    "${chip_root}/src/app/server",
-    "${chip_root}/src/credentials:default_attestation_verifier",
-    "${chip_root}/src/lib",
-    "${chip_root}/src/lib/shell",
-    "${chip_root}/src/lib/shell:shell_core",
-    "${chip_root}/src/platform/logging:force_stdio",
-  ]
-
   if (chip_enable_transport_trace) {
-    public_deps +=
-        [ "${chip_root}/examples/common/tracing:trace_handlers_decoder" ]
+    deps += [ "${chip_root}/examples/common/tracing:trace_handlers_decoder" ]
+  }
+
+  if (matter_enable_tracing_support) {
+    deps += [
+      "${chip_root}/examples/common/tracing:commandline",
+      "${chip_root}/src/tracing",
+    ]
   }
 
   public_configs = [ ":app-main-config" ]
@@ -88,25 +95,15 @@ source_set("commissioner-main") {
     "CommissionerMain.h",
   ]
 
-  defines = []
-
-  if (chip_enable_pw_rpc) {
-    defines += [ "PW_RPC_ENABLED" ]
-  }
   if (chip_build_libshell) {
     defines += [ "ENABLE_CHIP_SHELL" ]
   }
 
-  public_deps = [
-    "${chip_root}/src/app/server",
-    "${chip_root}/src/credentials:default_attestation_verifier",
-    "${chip_root}/src/lib",
-    "${chip_root}/src/lib/shell",
-    "${chip_root}/src/lib/shell:shell_core",
-  ]
+  public_deps = [ "${chip_root}/src/lib" ]
+  deps = [ "${chip_root}/src/app/server" ]
 
   if (chip_enable_transport_trace) {
-    public_deps += [ "${chip_root}/examples/common/tracing:trace_handlers" ]
+    deps += [ "${chip_root}/examples/common/tracing:trace_handlers" ]
   }
 
   public_configs = [ ":app-main-config" ]

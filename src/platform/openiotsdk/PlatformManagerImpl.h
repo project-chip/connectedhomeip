@@ -26,6 +26,7 @@
 
 #include "cmsis_os2.h"
 #include "mbedtls/platform.h"
+#include <atomic>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
@@ -53,10 +54,10 @@ public:
     /* none so far */
 
 private:
-    static constexpr uint32_t kTaskRunningEventFlag = 1 << 0;
-    static constexpr uint32_t kTaskStopEventFlag    = 1 << 1;
-    static constexpr uint32_t kPostEventFlag        = 1 << 2;
-    static constexpr uint32_t kTimerEventFlag       = 1 << 3;
+    static constexpr uint32_t kTaskHasEventLoopRunFlag  = 1 << 0;
+    static constexpr uint32_t kTaskHasEventLoopStopFlag = 1 << 1;
+    static constexpr uint32_t kPostEventFlag            = 1 << 2;
+    static constexpr uint32_t kTimerEventFlag           = 1 << 3;
 
     // ===== Methods that implement the PlatformManager abstract interface.
 
@@ -71,6 +72,8 @@ private:
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StopEventLoopTask();
 
+    CHIP_ERROR PlatformTimerInit(void);
+    CHIP_ERROR PlatformTimerDeinit(void);
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
     void _Shutdown();
 
@@ -80,8 +83,6 @@ private:
 
     static void EventLoopTask(void * arg);
     static void TimerCallback(void * arg);
-
-    void RunEventLoopInternal(void);
 
     // ===== Members for internal use by the following friends.
 
@@ -100,6 +101,9 @@ private:
     osMutexId_t mEventTaskMutex     = nullptr;
     osMessageQueueId_t mQueue       = nullptr;
     osTimerId_t mTimer              = nullptr;
+    bool mInitialized               = false;
+    std::atomic<bool> mRunEventLoop;
+    osThreadId_t mEventTask = nullptr;
 };
 
 /**

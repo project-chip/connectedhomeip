@@ -39,6 +39,10 @@
 #include <platform/telink/FactoryDataProvider.h>
 #endif
 
+#ifdef CONFIG_CHIP_PW_RPC
+#include "Rpc.h"
+#endif
+
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <cstdint>
@@ -62,7 +66,17 @@ public:
     CHIP_ERROR StartApp();
     void PostEvent(AppEvent * event);
 
-    static void IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect);
+    static void IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEnum aEffect);
+
+#ifdef CONFIG_CHIP_PW_RPC
+    enum ButtonId_t
+    {
+        kButtonId_ExampleAction = 1,
+        kButtonId_FactoryReset,
+        kButtonId_StartThread,
+        kButtonId_StartBleAdv
+    } ButtonId;
+#endif
 
 protected:
     CHIP_ERROR InitCommonParts(void);
@@ -109,5 +123,10 @@ protected:
 
 #if CONFIG_CHIP_FACTORY_DATA
     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;
+#endif
+
+#ifdef CONFIG_CHIP_PW_RPC
+    friend class chip::rpc::TelinkButton;
+    static void ButtonEventHandler(ButtonId_t btnId, bool btnPressed);
 #endif
 };

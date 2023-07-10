@@ -1,6 +1,6 @@
 /*
- *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,132 +15,50 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of the DiagnosticDataProvider object
- *          for Bouffalolab BL602 platform.
- */
-
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <DiagnosticDataProviderImpl.h>
-#include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CHIPMemString.h>
+#include <platform/DiagnosticDataProvider.h>
+#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <lwip/tcpip.h>
 
 extern "C" {
+#include <bl_efuse.h>
+#include <bl_sys.h>
+
 #include <bl60x_fw_api.h>
 #include <bl60x_wifi_driver/bl_main.h>
 #include <bl60x_wifi_driver/wifi_mgmr.h>
-#include <bl_efuse.h>
-#include <bl_sys.h>
 #include <wifi_mgmr_ext.h>
 #include <wifi_mgmr_portable.h>
 }
 
-extern uint8_t _heap_size;
-
 namespace chip {
 namespace DeviceLayer {
 
-DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
-{
-    static DiagnosticDataProviderImpl sInstance;
-    return sInstance;
-}
-
-CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
-{
-    size_t freeHeapSize;
-
-    freeHeapSize    = xPortGetFreeHeapSize();
-    currentHeapFree = static_cast<uint64_t>(freeHeapSize);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
-{
-    currentHeapUsed = (uint32_t) &_heap_size - xPortGetFreeHeapSize();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
-{
-    currentHeapHighWatermark = (uint32_t) &_heap_size - xPortGetMinimumEverFreeHeapSize();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
-{
-    uint32_t count = 0;
-
-    CHIP_ERROR err = ConfigurationMgr().GetRebootCount(count);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(count <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        rebootCount = static_cast<uint16_t>(count);
-    }
-
-    return err;
-}
-
-CHIP_ERROR DiagnosticDataProviderImpl::GetUpTime(uint64_t & upTime)
-{
-    System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
-    System::Clock::Timestamp startTime   = PlatformMgrImpl().GetStartTime();
-
-    if (currentTime >= startTime)
-    {
-        upTime = std::chrono::duration_cast<System::Clock::Seconds64>(currentTime - startTime).count();
-        return CHIP_NO_ERROR;
-    }
-
-    return CHIP_ERROR_INVALID_TIME;
-}
-
-CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
-{
-    uint64_t upTime = 0;
-
-    if (GetUpTime(upTime) == CHIP_NO_ERROR)
-    {
-        uint32_t totalHours = 0;
-        if (ConfigurationMgr().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
-        {
-            VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-            totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);
-            return CHIP_NO_ERROR;
-        }
-    }
-
-    return CHIP_ERROR_INVALID_TIME;
-}
-
 CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
-    BL_RST_REASON_E BL_RST_REASON = bl_sys_rstinfo_get();
+    BL_RST_REASON_E bootCause = bl_sys_rstinfo_get();
 
-    bootReason = BootReasonType::kUnspecified;
-
-    if (BL_RST_REASON == BL_RST_POWER_OFF)
+    if (bootCause == BL_RST_POWER_OFF)
     {
         bootReason = BootReasonType::kPowerOnReboot;
     }
-    else if (BL_RST_REASON == BL_RST_HARDWARE_WATCHDOG)
+    else if (bootCause == BL_RST_HARDWARE_WATCHDOG)
     {
         bootReason = BootReasonType::kHardwareWatchdogReset;
     }
-    else if (BL_RST_REASON == BL_RST_SOFTWARE_WATCHDOG)
+    else if (bootCause == BL_RST_SOFTWARE_WATCHDOG)
     {
         bootReason = BootReasonType::kSoftwareWatchdogReset;
     }
-    else if (BL_RST_REASON == BL_RST_SOFTWARE)
+    else if (bootCause == BL_RST_SOFTWARE)
     {
         bootReason = BootReasonType::kSoftwareReset;
+    }
+    else
+    {
+        bootReason = BootReasonType::kUnspecified;
     }
 
     return CHIP_NO_ERROR;
@@ -212,11 +130,6 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
         netifp                 = netifp->Next;
         delete del;
     }
-}
-
-DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
-{
-    return DiagnosticDataProviderImpl::GetDefaultInstance();
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
@@ -376,5 +289,4 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxC
 }
 
 } // namespace DeviceLayer
-wifi_diagnosis_info_t * info;
 } // namespace chip

@@ -19,15 +19,15 @@ limitations under the License.
 
   <struct name="SemanticTagStruct">
     <cluster code="0x0050"/>
-    <item name="MfgCode" type="vendor_id"/>
-    <item name="Value" type="ENUM16" optional="false"/>
+    <item name="MfgCode" type="vendor_id" optional="false"/>
+    <item name="Value"   type="ENUM16"    optional="false"/>
   </struct>
 
   <struct name="ModeOptionStruct">
     <cluster code="0x0050"/>
-    <item name="Label" type="CHAR_STRING" optional="false" length="64"/>
-    <item name="Mode" type="INT8U" optional="false"/>
-    <item name="SemanticTags" type="SemanticTagStruct" array="true" optional="false"/>
+    <item name="Label"        type="CHAR_STRING"                     length="64" optional="false"/>
+    <item name="Mode"         type="INT8U"                                       optional="false"/>
+    <item name="SemanticTags" type="SemanticTagStruct" array="true"  length="64" optional="false"/>
   </struct>
 
   <cluster>
@@ -39,12 +39,12 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>Attributes and commands for selecting a mode from a list of supported options.</description>
     <!-- Base data types -->
-    <attribute side="server" code="0x0000" define="MODE_DESCRIPTION" type="CHAR_STRING"                                     writable="false" optional="false" isNullable="false" length="32">Description</attribute>
-    <attribute side="server" code="0x0001" define="STANDARD_NAMESPACE" type="ENUM16"                                        writable="false" optional="false"  isNullable="true">StandardNamespace</attribute>
-    <attribute side="server" code="0x0002" define="SUPPORTED_MODES" type="ARRAY" entryType="ModeOptionStruct"               writable="false" optional="false" isNullable="false">SupportedModes</attribute>
-    <attribute side="server" code="0x0003" define="CURRENT_MODE"    type="INT8U"                                            writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
-    <attribute side="server" code="0x0004" define="START_UP_MODE"   type="INT8U"                                            writable="true" optional="true"  isNullable="true">StartUpMode</attribute>
-    <attribute side="server" code="0x0005" define="ON_MODE"         type="INT8U"                                            writable="true"  optional="true" isNullable="true">OnMode</attribute>
+    <attribute side="server" code="0x0000" define="MODE_DESCRIPTION"   type="CHAR_STRING"                        length="64"  writable="false" optional="false" isNullable="false">Description</attribute>
+    <attribute side="server" code="0x0001" define="STANDARD_NAMESPACE" type="ENUM16"                                          writable="false" optional="false" isNullable="true">StandardNamespace</attribute>
+    <attribute side="server" code="0x0002" define="SUPPORTED_MODES"    type="ARRAY" entryType="ModeOptionStruct" length="255" writable="false" optional="false" isNullable="false">SupportedModes</attribute>
+    <attribute side="server" code="0x0003" define="CURRENT_MODE"       type="INT8U"                                           writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
+    <attribute side="server" code="0x0004" define="START_UP_MODE"      type="INT8U"                                           writable="true"  optional="true"  isNullable="true">StartUpMode</attribute>
+    <attribute side="server" code="0x0005" define="ON_MODE"            type="INT8U"                                           writable="true"  optional="true"  isNullable="true">OnMode</attribute>
 
     <!-- Test Commands -->
     <command source="client" code="0x00" name="ChangeToMode" optional="false">
@@ -56,8 +56,8 @@ limitations under the License.
 
   </cluster>
 
-  <bitmap name="ModeSelectFeature" type="BITMAP32">
+  <bitmap name="Feature" type="BITMAP32">
     <cluster code="0x0050"/>
-    <field name="DEPONOFF" mask="0x1"/>
+    <field name="OnOff" mask="0x1"/>
   </bitmap>
 </configurator>

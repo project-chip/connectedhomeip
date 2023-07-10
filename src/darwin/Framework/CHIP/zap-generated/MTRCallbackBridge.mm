@@ -17,7 +17,10 @@
 
 #import "MTRCallbackBridge.h"
 #import "MTRCommandPayloadsObjc.h"
+#import "MTRCommandPayloads_Internal.h"
 #import "MTRStructsObjc.h"
+#import "NSDataSpanConversion.h"
+#import "NSStringSpanConversion.h"
 
 #include <lib/support/TypeTraits.h>
 
@@ -31,7 +34,7 @@ void MTRCommandSuccessCallbackBridge::OnSuccessFn(void * context, const chip::ap
 void MTROctetStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::ByteSpan value)
 {
     NSData * _Nonnull objCValue;
-    objCValue = [NSData dataWithBytes:value.data() length:value.size()];
+    objCValue = AsData(value);
     DispatchSuccess(context, objCValue);
 };
 
@@ -57,7 +60,7 @@ void MTRNullableOctetStringAttributeCallbackBridge::OnSuccessFn(
     if (value.IsNull()) {
         objCValue = nil;
     } else {
-        objCValue = [NSData dataWithBytes:value.Value().data() length:value.Value().size()];
+        objCValue = AsData(value.Value());
     }
     DispatchSuccess(context, objCValue);
 };
@@ -80,7 +83,12 @@ void MTRNullableOctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEs
 void MTRCharStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::CharSpan value)
 {
     NSString * _Nonnull objCValue;
-    objCValue = [[NSString alloc] initWithBytes:value.data() length:value.size() encoding:NSUTF8StringEncoding];
+    objCValue = AsString(value);
+    if (objCValue == nil) {
+        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+        OnFailureFn(context, err);
+        return;
+    }
     DispatchSuccess(context, objCValue);
 };
 
@@ -106,7 +114,12 @@ void MTRNullableCharStringAttributeCallbackBridge::OnSuccessFn(
     if (value.IsNull()) {
         objCValue = nil;
     } else {
-        objCValue = [[NSString alloc] initWithBytes:value.Value().data() length:value.Value().size() encoding:NSUTF8StringEncoding];
+        objCValue = AsString(value.Value());
+        if (objCValue == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            OnFailureFn(context, err);
+            return;
+        }
     }
     DispatchSuccess(context, objCValue);
 };
@@ -803,6 +816,29 @@ void MTRIdentifyAttributeListListAttributeCallbackBridge::OnSuccessFn(
 };
 
 void MTRIdentifyAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRGroupsNameSupportAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRGroupsNameSupportAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -2007,8 +2043,8 @@ void MTRAccessControlACLListAttributeCallbackBridge::OnSuccessFn(void * context,
                     auto iter_3 = entry_0.targets.Value().begin();
                     while (iter_3.Next()) {
                         auto & entry_3 = iter_3.GetValue();
-                        MTRAccessControlClusterTarget * newElement_3;
-                        newElement_3 = [MTRAccessControlClusterTarget new];
+                        MTRAccessControlClusterAccessControlTargetStruct * newElement_3;
+                        newElement_3 = [MTRAccessControlClusterAccessControlTargetStruct new];
                         if (entry_3.cluster.IsNull()) {
                             newElement_3.cluster = nil;
                         } else {
@@ -2074,7 +2110,7 @@ void MTRAccessControlExtensionListAttributeCallbackBridge::OnSuccessFn(void * co
             auto & entry_0 = iter_0.GetValue();
             MTRAccessControlClusterAccessControlExtensionStruct * newElement_0;
             newElement_0 = [MTRAccessControlClusterAccessControlExtensionStruct new];
-            newElement_0.data = [NSData dataWithBytes:entry_0.data.data() length:entry_0.data.size()];
+            newElement_0.data = AsData(entry_0.data);
             newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
             [array_0 addObject:newElement_0];
         }
@@ -2229,9 +2265,12 @@ void MTRActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * context
             MTRActionsClusterActionStruct * newElement_0;
             newElement_0 = [MTRActionsClusterActionStruct new];
             newElement_0.actionID = [NSNumber numberWithUnsignedShort:entry_0.actionID];
-            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                         length:entry_0.name.size()
-                                                       encoding:NSUTF8StringEncoding];
+            newElement_0.name = AsString(entry_0.name);
+            if (newElement_0.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
             newElement_0.endpointListID = [NSNumber numberWithUnsignedShort:entry_0.endpointListID];
             newElement_0.supportedCommands = [NSNumber numberWithUnsignedShort:entry_0.supportedCommands.Raw()];
@@ -2275,9 +2314,12 @@ void MTRActionsEndpointListsListAttributeCallbackBridge::OnSuccessFn(void * cont
             MTRActionsClusterEndpointListStruct * newElement_0;
             newElement_0 = [MTRActionsClusterEndpointListStruct new];
             newElement_0.endpointListID = [NSNumber numberWithUnsignedShort:entry_0.endpointListID];
-            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                         length:entry_0.name.size()
-                                                       encoding:NSUTF8StringEncoding];
+            newElement_0.name = AsString(entry_0.name);
+            if (newElement_0.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
             { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
@@ -2884,7 +2926,12 @@ void MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge::On
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             NSString * newElement_0;
-            newElement_0 = [[NSString alloc] initWithBytes:entry_0.data() length:entry_0.size() encoding:NSUTF8StringEncoding];
+            newElement_0 = AsString(entry_0);
+            if (newElement_0 == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -3812,8 +3859,8 @@ void MTRGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge
 }
 
 void MTRNetworkCommissioningNetworksListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
-        value)
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3821,9 +3868,9 @@ void MTRNetworkCommissioningNetworksListAttributeCallbackBridge::OnSuccessFn(voi
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRNetworkCommissioningClusterNetworkInfo * newElement_0;
-            newElement_0 = [MTRNetworkCommissioningClusterNetworkInfo new];
-            newElement_0.networkID = [NSData dataWithBytes:entry_0.networkID.data() length:entry_0.networkID.size()];
+            MTRNetworkCommissioningClusterNetworkInfoStruct * newElement_0;
+            newElement_0 = [MTRNetworkCommissioningClusterNetworkInfoStruct new];
+            newElement_0.networkID = AsData(entry_0.networkID);
             newElement_0.connected = [NSNumber numberWithBool:entry_0.connected];
             [array_0 addObject:newElement_0];
         }
@@ -4092,9 +4139,12 @@ void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucces
             auto & entry_0 = iter_0.GetValue();
             MTRGeneralDiagnosticsClusterNetworkInterface * newElement_0;
             newElement_0 = [MTRGeneralDiagnosticsClusterNetworkInterface new];
-            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                         length:entry_0.name.size()
-                                                       encoding:NSUTF8StringEncoding];
+            newElement_0.name = AsString(entry_0.name);
+            if (newElement_0.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             newElement_0.isOperational = [NSNumber numberWithBool:entry_0.isOperational];
             if (entry_0.offPremiseServicesReachableIPv4.IsNull()) {
                 newElement_0.offPremiseServicesReachableIPv4 = nil;
@@ -4108,15 +4158,14 @@ void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucces
                 newElement_0.offPremiseServicesReachableIPv6 =
                     [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv6.Value()];
             }
-            newElement_0.hardwareAddress = [NSData dataWithBytes:entry_0.hardwareAddress.data()
-                                                          length:entry_0.hardwareAddress.size()];
+            newElement_0.hardwareAddress = AsData(entry_0.hardwareAddress);
             { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
                 auto iter_2 = entry_0.IPv4Addresses.begin();
                 while (iter_2.Next()) {
                     auto & entry_2 = iter_2.GetValue();
                     NSData * newElement_2;
-                    newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
+                    newElement_2 = AsData(entry_2);
                     [array_2 addObject:newElement_2];
                 }
                 CHIP_ERROR err = iter_2.GetStatus();
@@ -4132,7 +4181,7 @@ void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucces
                 while (iter_2.Next()) {
                     auto & entry_2 = iter_2.GetValue();
                     NSData * newElement_2;
-                    newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
+                    newElement_2 = AsData(entry_2);
                     [array_2 addObject:newElement_2];
                 }
                 CHIP_ERROR err = iter_2.GetStatus();
@@ -4412,9 +4461,12 @@ void MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessFn
             newElement_0 = [MTRSoftwareDiagnosticsClusterThreadMetricsStruct new];
             newElement_0.id = [NSNumber numberWithUnsignedLongLong:entry_0.id];
             if (entry_0.name.HasValue()) {
-                newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.Value().data()
-                                                             length:entry_0.name.Value().size()
-                                                           encoding:NSUTF8StringEncoding];
+                newElement_0.name = AsString(entry_0.name.Value());
+                if (newElement_0.name == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
             } else {
                 newElement_0.name = nil;
             }
@@ -4576,7 +4628,7 @@ void MTRSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge:
 
 void MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & value)
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTableStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4584,8 +4636,8 @@ void MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackBridge::OnSucc
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRThreadNetworkDiagnosticsClusterNeighborTable * newElement_0;
-            newElement_0 = [MTRThreadNetworkDiagnosticsClusterNeighborTable new];
+            MTRThreadNetworkDiagnosticsClusterNeighborTableStruct * newElement_0;
+            newElement_0 = [MTRThreadNetworkDiagnosticsClusterNeighborTableStruct new];
             newElement_0.extAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extAddress];
             newElement_0.age = [NSNumber numberWithUnsignedInt:entry_0.age];
             newElement_0.rloc16 = [NSNumber numberWithUnsignedShort:entry_0.rloc16];
@@ -4636,8 +4688,8 @@ void MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackSubscriptionBr
 }
 
 void MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
-        value)
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTableStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4645,8 +4697,8 @@ void MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackBridge::OnSuccess
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRThreadNetworkDiagnosticsClusterRouteTable * newElement_0;
-            newElement_0 = [MTRThreadNetworkDiagnosticsClusterRouteTable new];
+            MTRThreadNetworkDiagnosticsClusterRouteTableStruct * newElement_0;
+            newElement_0 = [MTRThreadNetworkDiagnosticsClusterRouteTableStruct new];
             newElement_0.extAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extAddress];
             newElement_0.rloc16 = [NSNumber numberWithUnsignedShort:entry_0.rloc16];
             newElement_0.routerId = [NSNumber numberWithUnsignedChar:entry_0.routerId];
@@ -4754,8 +4806,8 @@ void MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallb
     }
 }
 
-void MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value)
+void MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5517,11 +5569,11 @@ void MTROperationalCredentialsNOCsListAttributeCallbackBridge::OnSuccessFn(void 
             auto & entry_0 = iter_0.GetValue();
             MTROperationalCredentialsClusterNOCStruct * newElement_0;
             newElement_0 = [MTROperationalCredentialsClusterNOCStruct new];
-            newElement_0.noc = [NSData dataWithBytes:entry_0.noc.data() length:entry_0.noc.size()];
+            newElement_0.noc = AsData(entry_0.noc);
             if (entry_0.icac.IsNull()) {
                 newElement_0.icac = nil;
             } else {
-                newElement_0.icac = [NSData dataWithBytes:entry_0.icac.Value().data() length:entry_0.icac.Value().size()];
+                newElement_0.icac = AsData(entry_0.icac.Value());
             }
             newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
             [array_0 addObject:newElement_0];
@@ -5563,13 +5615,16 @@ void MTROperationalCredentialsFabricsListAttributeCallbackBridge::OnSuccessFn(vo
             auto & entry_0 = iter_0.GetValue();
             MTROperationalCredentialsClusterFabricDescriptorStruct * newElement_0;
             newElement_0 = [MTROperationalCredentialsClusterFabricDescriptorStruct new];
-            newElement_0.rootPublicKey = [NSData dataWithBytes:entry_0.rootPublicKey.data() length:entry_0.rootPublicKey.size()];
+            newElement_0.rootPublicKey = AsData(entry_0.rootPublicKey);
             newElement_0.vendorID = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.vendorID)];
             newElement_0.fabricID = [NSNumber numberWithUnsignedLongLong:entry_0.fabricID];
             newElement_0.nodeID = [NSNumber numberWithUnsignedLongLong:entry_0.nodeID];
-            newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                          length:entry_0.label.size()
-                                                        encoding:NSUTF8StringEncoding];
+            newElement_0.label = AsString(entry_0.label);
+            if (newElement_0.label == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
             [array_0 addObject:newElement_0];
         }
@@ -5608,7 +5663,7 @@ void MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             NSData * newElement_0;
-            newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+            newElement_0 = AsData(entry_0);
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -5822,9 +5877,12 @@ void MTRGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(voi
                 newElement_0.endpoints = array_2;
             }
             if (entry_0.groupName.HasValue()) {
-                newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.Value().data()
-                                                                  length:entry_0.groupName.Value().size()
-                                                                encoding:NSUTF8StringEncoding];
+                newElement_0.groupName = AsString(entry_0.groupName.Value());
+                if (newElement_0.groupName == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
             } else {
                 newElement_0.groupName = nil;
             }
@@ -5981,12 +6039,18 @@ void MTRFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * conte
             auto & entry_0 = iter_0.GetValue();
             MTRFixedLabelClusterLabelStruct * newElement_0;
             newElement_0 = [MTRFixedLabelClusterLabelStruct new];
-            newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                          length:entry_0.label.size()
-                                                        encoding:NSUTF8StringEncoding];
-            newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
-                                                          length:entry_0.value.size()
-                                                        encoding:NSUTF8StringEncoding];
+            newElement_0.label = AsString(entry_0.label);
+            if (newElement_0.label == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
+            newElement_0.value = AsString(entry_0.value);
+            if (newElement_0.value == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -6139,12 +6203,18 @@ void MTRUserLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * contex
             auto & entry_0 = iter_0.GetValue();
             MTRUserLabelClusterLabelStruct * newElement_0;
             newElement_0 = [MTRUserLabelClusterLabelStruct new];
-            newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                          length:entry_0.label.size()
-                                                        encoding:NSUTF8StringEncoding];
-            newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
-                                                          length:entry_0.value.size()
-                                                        encoding:NSUTF8StringEncoding];
+            newElement_0.label = AsString(entry_0.label);
+            if (newElement_0.label == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
+            newElement_0.value = AsString(entry_0.value);
+            if (newElement_0.value == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -6411,9 +6481,12 @@ void MTRModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * 
             auto & entry_0 = iter_0.GetValue();
             MTRModeSelectClusterModeOptionStruct * newElement_0;
             newElement_0 = [MTRModeSelectClusterModeOptionStruct new];
-            newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                          length:entry_0.label.size()
-                                                        encoding:NSUTF8StringEncoding];
+            newElement_0.label = AsString(entry_0.label);
+            if (newElement_0.label == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
             { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
@@ -7337,6 +7410,98 @@ void MTRThermostatAttributeListListAttributeCallbackBridge::OnSuccessFn(
 };
 
 void MTRThermostatAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRFanControlRockSupportAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRFanControlRockSupportAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRFanControlRockSettingAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRFanControlRockSettingAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRFanControlWindSupportAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRFanControlWindSupportAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRFanControlWindSettingAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRFanControlWindSettingAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -8665,23 +8830,32 @@ void MTRChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * contex
             newElement_0.majorNumber = [NSNumber numberWithUnsignedShort:entry_0.majorNumber];
             newElement_0.minorNumber = [NSNumber numberWithUnsignedShort:entry_0.minorNumber];
             if (entry_0.name.HasValue()) {
-                newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.Value().data()
-                                                             length:entry_0.name.Value().size()
-                                                           encoding:NSUTF8StringEncoding];
+                newElement_0.name = AsString(entry_0.name.Value());
+                if (newElement_0.name == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
             } else {
                 newElement_0.name = nil;
             }
             if (entry_0.callSign.HasValue()) {
-                newElement_0.callSign = [[NSString alloc] initWithBytes:entry_0.callSign.Value().data()
-                                                                 length:entry_0.callSign.Value().size()
-                                                               encoding:NSUTF8StringEncoding];
+                newElement_0.callSign = AsString(entry_0.callSign.Value());
+                if (newElement_0.callSign == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
             } else {
                 newElement_0.callSign = nil;
             }
             if (entry_0.affiliateCallSign.HasValue()) {
-                newElement_0.affiliateCallSign = [[NSString alloc] initWithBytes:entry_0.affiliateCallSign.Value().data()
-                                                                          length:entry_0.affiliateCallSign.Value().size()
-                                                                        encoding:NSUTF8StringEncoding];
+                newElement_0.affiliateCallSign = AsString(entry_0.affiliateCallSign.Value());
+                if (newElement_0.affiliateCallSign == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
             } else {
                 newElement_0.affiliateCallSign = nil;
             }
@@ -8720,20 +8894,29 @@ void MTRChannelLineupStructAttributeCallbackBridge::OnSuccessFn(void * context,
         objCValue = nil;
     } else {
         objCValue = [MTRChannelClusterLineupInfoStruct new];
-        objCValue.operatorName = [[NSString alloc] initWithBytes:value.Value().operatorName.data()
-                                                          length:value.Value().operatorName.size()
-                                                        encoding:NSUTF8StringEncoding];
+        objCValue.operatorName = AsString(value.Value().operatorName);
+        if (objCValue.operatorName == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            OnFailureFn(context, err);
+            return;
+        }
         if (value.Value().lineupName.HasValue()) {
-            objCValue.lineupName = [[NSString alloc] initWithBytes:value.Value().lineupName.Value().data()
-                                                            length:value.Value().lineupName.Value().size()
-                                                          encoding:NSUTF8StringEncoding];
+            objCValue.lineupName = AsString(value.Value().lineupName.Value());
+            if (objCValue.lineupName == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
         } else {
             objCValue.lineupName = nil;
         }
         if (value.Value().postalCode.HasValue()) {
-            objCValue.postalCode = [[NSString alloc] initWithBytes:value.Value().postalCode.Value().data()
-                                                            length:value.Value().postalCode.Value().size()
-                                                          encoding:NSUTF8StringEncoding];
+            objCValue.postalCode = AsString(value.Value().postalCode.Value());
+            if (objCValue.postalCode == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
         } else {
             objCValue.postalCode = nil;
         }
@@ -8768,23 +8951,32 @@ void MTRChannelCurrentChannelStructAttributeCallbackBridge::OnSuccessFn(void * c
         objCValue.majorNumber = [NSNumber numberWithUnsignedShort:value.Value().majorNumber];
         objCValue.minorNumber = [NSNumber numberWithUnsignedShort:value.Value().minorNumber];
         if (value.Value().name.HasValue()) {
-            objCValue.name = [[NSString alloc] initWithBytes:value.Value().name.Value().data()
-                                                      length:value.Value().name.Value().size()
-                                                    encoding:NSUTF8StringEncoding];
+            objCValue.name = AsString(value.Value().name.Value());
+            if (objCValue.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
         } else {
             objCValue.name = nil;
         }
         if (value.Value().callSign.HasValue()) {
-            objCValue.callSign = [[NSString alloc] initWithBytes:value.Value().callSign.Value().data()
-                                                          length:value.Value().callSign.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
+            objCValue.callSign = AsString(value.Value().callSign.Value());
+            if (objCValue.callSign == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
         } else {
             objCValue.callSign = nil;
         }
         if (value.Value().affiliateCallSign.HasValue()) {
-            objCValue.affiliateCallSign = [[NSString alloc] initWithBytes:value.Value().affiliateCallSign.Value().data()
-                                                                   length:value.Value().affiliateCallSign.Value().size()
-                                                                 encoding:NSUTF8StringEncoding];
+            objCValue.affiliateCallSign = AsString(value.Value().affiliateCallSign.Value());
+            if (objCValue.affiliateCallSign == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
         } else {
             objCValue.affiliateCallSign = nil;
         }
@@ -8934,9 +9126,12 @@ void MTRTargetNavigatorTargetListListAttributeCallbackBridge::OnSuccessFn(void *
             MTRTargetNavigatorClusterTargetInfoStruct * newElement_0;
             newElement_0 = [MTRTargetNavigatorClusterTargetInfoStruct new];
             newElement_0.identifier = [NSNumber numberWithUnsignedChar:entry_0.identifier];
-            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                         length:entry_0.name.size()
-                                                       encoding:NSUTF8StringEncoding];
+            newElement_0.name = AsString(entry_0.name);
+            if (newElement_0.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -9239,12 +9434,18 @@ void MTRMediaInputInputListListAttributeCallbackBridge::OnSuccessFn(void * conte
             newElement_0 = [MTRMediaInputClusterInputInfoStruct new];
             newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
             newElement_0.inputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.inputType)];
-            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                         length:entry_0.name.size()
-                                                       encoding:NSUTF8StringEncoding];
-            newElement_0.descriptionString = [[NSString alloc] initWithBytes:entry_0.description.data()
-                                                                      length:entry_0.description.size()
-                                                                    encoding:NSUTF8StringEncoding];
+            newElement_0.name = AsString(entry_0.name);
+            if (newElement_0.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
+            newElement_0.descriptionString = AsString(entry_0.description);
+            if (newElement_0.descriptionString == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -9624,7 +9825,12 @@ void MTRContentLauncherAcceptHeaderListAttributeCallbackBridge::OnSuccessFn(
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             NSString * newElement_0;
-            newElement_0 = [[NSString alloc] initWithBytes:entry_0.data() length:entry_0.size() encoding:NSUTF8StringEncoding];
+            newElement_0 = AsString(entry_0);
+            if (newElement_0 == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -9779,9 +9985,12 @@ void MTRAudioOutputOutputListListAttributeCallbackBridge::OnSuccessFn(void * con
             newElement_0 = [MTRAudioOutputClusterOutputInfoStruct new];
             newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
             newElement_0.outputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.outputType)];
-            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                         length:entry_0.name.size()
-                                                       encoding:NSUTF8StringEncoding];
+            newElement_0.name = AsString(entry_0.name);
+            if (newElement_0.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -9972,9 +10181,12 @@ void MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge::OnSuccessFn(
         objCValue = [MTRApplicationLauncherClusterApplicationEPStruct new];
         objCValue.application = [MTRApplicationLauncherClusterApplicationStruct new];
         objCValue.application.catalogVendorID = [NSNumber numberWithUnsignedShort:value.Value().application.catalogVendorID];
-        objCValue.application.applicationID = [[NSString alloc] initWithBytes:value.Value().application.applicationID.data()
-                                                                       length:value.Value().application.applicationID.size()
-                                                                     encoding:NSUTF8StringEncoding];
+        objCValue.application.applicationID = AsString(value.Value().application.applicationID);
+        if (objCValue.application.applicationID == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            OnFailureFn(context, err);
+            return;
+        }
         if (value.Value().endpoint.HasValue()) {
             objCValue.endpoint = [NSNumber numberWithUnsignedShort:value.Value().endpoint.Value()];
         } else {
@@ -10119,9 +10331,12 @@ void MTRApplicationBasicApplicationStructAttributeCallbackBridge::OnSuccessFn(
     MTRApplicationBasicClusterApplicationStruct * _Nonnull objCValue;
     objCValue = [MTRApplicationBasicClusterApplicationStruct new];
     objCValue.catalogVendorID = [NSNumber numberWithUnsignedShort:value.catalogVendorID];
-    objCValue.applicationID = [[NSString alloc] initWithBytes:value.applicationID.data()
-                                                       length:value.applicationID.size()
-                                                     encoding:NSUTF8StringEncoding];
+    objCValue.applicationID = AsString(value.applicationID);
+    if (objCValue.applicationID == nil) {
+        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+        OnFailureFn(context, err);
+        return;
+    }
     DispatchSuccess(context, objCValue);
 };
 
@@ -10660,7 +10875,7 @@ void MTRUnitTestingListOctetStringListAttributeCallbackBridge::OnSuccessFn(
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             NSData * newElement_0;
-            newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+            newElement_0 = AsData(entry_0);
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -10701,7 +10916,7 @@ void MTRUnitTestingListStructOctetStringListAttributeCallbackBridge::OnSuccessFn
             MTRUnitTestingClusterTestListStructOctet * newElement_0;
             newElement_0 = [MTRUnitTestingClusterTestListStructOctet new];
             newElement_0.member1 = [NSNumber numberWithUnsignedLongLong:entry_0.member1];
-            newElement_0.member2 = [NSData dataWithBytes:entry_0.member2.data() length:entry_0.member2.size()];
+            newElement_0.member2 = AsData(entry_0.member2);
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -10764,14 +10979,20 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::O
             if (entry_0.nullableString.IsNull()) {
                 newElement_0.nullableString = nil;
             } else {
-                newElement_0.nullableString = [[NSString alloc] initWithBytes:entry_0.nullableString.Value().data()
-                                                                       length:entry_0.nullableString.Value().size()
-                                                                     encoding:NSUTF8StringEncoding];
+                newElement_0.nullableString = AsString(entry_0.nullableString.Value());
+                if (newElement_0.nullableString == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
             }
             if (entry_0.optionalString.HasValue()) {
-                newElement_0.optionalString = [[NSString alloc] initWithBytes:entry_0.optionalString.Value().data()
-                                                                       length:entry_0.optionalString.Value().size()
-                                                                     encoding:NSUTF8StringEncoding];
+                newElement_0.optionalString = AsString(entry_0.optionalString.Value());
+                if (newElement_0.optionalString == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
             } else {
                 newElement_0.optionalString = nil;
             }
@@ -10779,10 +11000,12 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 if (entry_0.nullableOptionalString.Value().IsNull()) {
                     newElement_0.nullableOptionalString = nil;
                 } else {
-                    newElement_0.nullableOptionalString =
-                        [[NSString alloc] initWithBytes:entry_0.nullableOptionalString.Value().Value().data()
-                                                 length:entry_0.nullableOptionalString.Value().Value().size()
-                                               encoding:NSUTF8StringEncoding];
+                    newElement_0.nullableOptionalString = AsString(entry_0.nullableOptionalString.Value().Value());
+                    if (newElement_0.nullableOptionalString == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        OnFailureFn(context, err);
+                        return;
+                    }
                 }
             } else {
                 newElement_0.nullableOptionalString = nil;
@@ -10795,11 +11018,13 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 newElement_0.nullableStruct.b = [NSNumber numberWithBool:entry_0.nullableStruct.Value().b];
                 newElement_0.nullableStruct.c =
                     [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableStruct.Value().c)];
-                newElement_0.nullableStruct.d = [NSData dataWithBytes:entry_0.nullableStruct.Value().d.data()
-                                                               length:entry_0.nullableStruct.Value().d.size()];
-                newElement_0.nullableStruct.e = [[NSString alloc] initWithBytes:entry_0.nullableStruct.Value().e.data()
-                                                                         length:entry_0.nullableStruct.Value().e.size()
-                                                                       encoding:NSUTF8StringEncoding];
+                newElement_0.nullableStruct.d = AsData(entry_0.nullableStruct.Value().d);
+                newElement_0.nullableStruct.e = AsString(entry_0.nullableStruct.Value().e);
+                if (newElement_0.nullableStruct.e == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
                 newElement_0.nullableStruct.f = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().f.Raw()];
                 newElement_0.nullableStruct.g = [NSNumber numberWithFloat:entry_0.nullableStruct.Value().g];
                 newElement_0.nullableStruct.h = [NSNumber numberWithDouble:entry_0.nullableStruct.Value().h];
@@ -10810,11 +11035,13 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 newElement_0.optionalStruct.b = [NSNumber numberWithBool:entry_0.optionalStruct.Value().b];
                 newElement_0.optionalStruct.c =
                     [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.optionalStruct.Value().c)];
-                newElement_0.optionalStruct.d = [NSData dataWithBytes:entry_0.optionalStruct.Value().d.data()
-                                                               length:entry_0.optionalStruct.Value().d.size()];
-                newElement_0.optionalStruct.e = [[NSString alloc] initWithBytes:entry_0.optionalStruct.Value().e.data()
-                                                                         length:entry_0.optionalStruct.Value().e.size()
-                                                                       encoding:NSUTF8StringEncoding];
+                newElement_0.optionalStruct.d = AsData(entry_0.optionalStruct.Value().d);
+                newElement_0.optionalStruct.e = AsString(entry_0.optionalStruct.Value().e);
+                if (newElement_0.optionalStruct.e == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
                 newElement_0.optionalStruct.f = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().f.Raw()];
                 newElement_0.optionalStruct.g = [NSNumber numberWithFloat:entry_0.optionalStruct.Value().g];
                 newElement_0.optionalStruct.h = [NSNumber numberWithDouble:entry_0.optionalStruct.Value().h];
@@ -10832,13 +11059,13 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                         [NSNumber numberWithBool:entry_0.nullableOptionalStruct.Value().Value().b];
                     newElement_0.nullableOptionalStruct.c =
                         [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableOptionalStruct.Value().Value().c)];
-                    newElement_0.nullableOptionalStruct.d =
-                        [NSData dataWithBytes:entry_0.nullableOptionalStruct.Value().Value().d.data()
-                                       length:entry_0.nullableOptionalStruct.Value().Value().d.size()];
-                    newElement_0.nullableOptionalStruct.e =
-                        [[NSString alloc] initWithBytes:entry_0.nullableOptionalStruct.Value().Value().e.data()
-                                                 length:entry_0.nullableOptionalStruct.Value().Value().e.size()
-                                               encoding:NSUTF8StringEncoding];
+                    newElement_0.nullableOptionalStruct.d = AsData(entry_0.nullableOptionalStruct.Value().Value().d);
+                    newElement_0.nullableOptionalStruct.e = AsString(entry_0.nullableOptionalStruct.Value().Value().e);
+                    if (newElement_0.nullableOptionalStruct.e == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        OnFailureFn(context, err);
+                        return;
+                    }
                     newElement_0.nullableOptionalStruct.f =
                         [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().f.Raw()];
                     newElement_0.nullableOptionalStruct.g =
@@ -10948,8 +11175,13 @@ void MTRUnitTestingStructAttrStructAttributeCallbackBridge::OnSuccessFn(
     objCValue.a = [NSNumber numberWithUnsignedChar:value.a];
     objCValue.b = [NSNumber numberWithBool:value.b];
     objCValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.c)];
-    objCValue.d = [NSData dataWithBytes:value.d.data() length:value.d.size()];
-    objCValue.e = [[NSString alloc] initWithBytes:value.e.data() length:value.e.size() encoding:NSUTF8StringEncoding];
+    objCValue.d = AsData(value.d);
+    objCValue.e = AsString(value.e);
+    if (objCValue.e == nil) {
+        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+        OnFailureFn(context, err);
+        return;
+    }
     objCValue.f = [NSNumber numberWithUnsignedChar:value.f.Raw()];
     objCValue.g = [NSNumber numberWithFloat:value.g];
     objCValue.h = [NSNumber numberWithDouble:value.h];
@@ -10981,7 +11213,7 @@ void MTRUnitTestingListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             NSData * newElement_0;
-            newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+            newElement_0 = AsData(entry_0);
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -11043,19 +11275,24 @@ void MTRUnitTestingListFabricScopedListAttributeCallbackBridge::OnSuccessFn(void
             } else {
                 newElement_0.nullableOptionalFabricSensitiveInt8u = nil;
             }
-            newElement_0.fabricSensitiveCharString = [[NSString alloc] initWithBytes:entry_0.fabricSensitiveCharString.data()
-                                                                              length:entry_0.fabricSensitiveCharString.size()
-                                                                            encoding:NSUTF8StringEncoding];
+            newElement_0.fabricSensitiveCharString = AsString(entry_0.fabricSensitiveCharString);
+            if (newElement_0.fabricSensitiveCharString == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             newElement_0.fabricSensitiveStruct = [MTRUnitTestingClusterSimpleStruct new];
             newElement_0.fabricSensitiveStruct.a = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveStruct.a];
             newElement_0.fabricSensitiveStruct.b = [NSNumber numberWithBool:entry_0.fabricSensitiveStruct.b];
             newElement_0.fabricSensitiveStruct.c =
                 [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.fabricSensitiveStruct.c)];
-            newElement_0.fabricSensitiveStruct.d = [NSData dataWithBytes:entry_0.fabricSensitiveStruct.d.data()
-                                                                  length:entry_0.fabricSensitiveStruct.d.size()];
-            newElement_0.fabricSensitiveStruct.e = [[NSString alloc] initWithBytes:entry_0.fabricSensitiveStruct.e.data()
-                                                                            length:entry_0.fabricSensitiveStruct.e.size()
-                                                                          encoding:NSUTF8StringEncoding];
+            newElement_0.fabricSensitiveStruct.d = AsData(entry_0.fabricSensitiveStruct.d);
+            newElement_0.fabricSensitiveStruct.e = AsString(entry_0.fabricSensitiveStruct.e);
+            if (newElement_0.fabricSensitiveStruct.e == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             newElement_0.fabricSensitiveStruct.f = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveStruct.f.Raw()];
             newElement_0.fabricSensitiveStruct.g = [NSNumber numberWithFloat:entry_0.fabricSensitiveStruct.g];
             newElement_0.fabricSensitiveStruct.h = [NSNumber numberWithDouble:entry_0.fabricSensitiveStruct.h];
@@ -11222,10 +11459,13 @@ void MTRUnitTestingNullableStructStructAttributeCallbackBridge::OnSuccessFn(void
         objCValue.a = [NSNumber numberWithUnsignedChar:value.Value().a];
         objCValue.b = [NSNumber numberWithBool:value.Value().b];
         objCValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value().c)];
-        objCValue.d = [NSData dataWithBytes:value.Value().d.data() length:value.Value().d.size()];
-        objCValue.e = [[NSString alloc] initWithBytes:value.Value().e.data()
-                                               length:value.Value().e.size()
-                                             encoding:NSUTF8StringEncoding];
+        objCValue.d = AsData(value.Value().d);
+        objCValue.e = AsString(value.Value().e);
+        if (objCValue.e == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            OnFailureFn(context, err);
+            return;
+        }
         objCValue.f = [NSNumber numberWithUnsignedChar:value.Value().f.Raw()];
         objCValue.g = [NSNumber numberWithFloat:value.Value().g];
         objCValue.h = [NSNumber numberWithDouble:value.Value().h];
@@ -11366,11 +11606,10 @@ void MTRGroupsClusterAddGroupResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType & data)
 {
     auto * response = [MTRGroupsClusterAddGroupResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11379,16 +11618,10 @@ void MTRGroupsClusterViewGroupResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType & data)
 {
     auto * response = [MTRGroupsClusterViewGroupResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        response.groupName = [[NSString alloc] initWithBytes:data.groupName.data()
-                                                      length:data.groupName.size()
-                                                    encoding:NSUTF8StringEncoding];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11397,30 +11630,10 @@ void MTRGroupsClusterGetGroupMembershipResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType & data)
 {
     auto * response = [MTRGroupsClusterGetGroupMembershipResponseParams new];
-    {
-        if (data.capacity.IsNull()) {
-            response.capacity = nil;
-        } else {
-            response.capacity = [NSNumber numberWithUnsignedChar:data.capacity.Value()];
-        }
-    }
-    {
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = data.groupList.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            response.groupList = array_0;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11429,11 +11642,10 @@ void MTRGroupsClusterRemoveGroupResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType & data)
 {
     auto * response = [MTRGroupsClusterRemoveGroupResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11442,14 +11654,10 @@ void MTRScenesClusterAddSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterAddSceneResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11458,90 +11666,10 @@ void MTRScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterViewSceneResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
-    }
-    {
-        if (data.transitionTime.HasValue()) {
-            response.transitionTime = [NSNumber numberWithUnsignedShort:data.transitionTime.Value()];
-        } else {
-            response.transitionTime = nil;
-        }
-    }
-    {
-        if (data.sceneName.HasValue()) {
-            response.sceneName = [[NSString alloc] initWithBytes:data.sceneName.Value().data()
-                                                          length:data.sceneName.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
-        } else {
-            response.sceneName = nil;
-        }
-    }
-    {
-        if (data.extensionFieldSets.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.extensionFieldSets.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRScenesClusterExtensionFieldSet * newElement_1;
-                    newElement_1 = [MTRScenesClusterExtensionFieldSet new];
-                    newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
-                    { // Scope for our temporary variables
-                        auto * array_3 = [NSMutableArray new];
-                        auto iter_3 = entry_1.attributeValueList.begin();
-                        while (iter_3.Next()) {
-                            auto & entry_3 = iter_3.GetValue();
-                            MTRScenesClusterAttributeValuePair * newElement_3;
-                            newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            if (entry_3.attributeID.HasValue()) {
-                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
-                            } else {
-                                newElement_3.attributeID = nil;
-                            }
-                            { // Scope for our temporary variables
-                                auto * array_5 = [NSMutableArray new];
-                                auto iter_5 = entry_3.attributeValue.begin();
-                                while (iter_5.Next()) {
-                                    auto & entry_5 = iter_5.GetValue();
-                                    NSNumber * newElement_5;
-                                    newElement_5 = [NSNumber numberWithUnsignedChar:entry_5];
-                                    [array_5 addObject:newElement_5];
-                                }
-                                CHIP_ERROR err = iter_5.GetStatus();
-                                if (err != CHIP_NO_ERROR) {
-                                    OnFailureFn(context, err);
-                                    return;
-                                }
-                                newElement_3.attributeValue = array_5;
-                            }
-                            [array_3 addObject:newElement_3];
-                        }
-                        CHIP_ERROR err = iter_3.GetStatus();
-                        if (err != CHIP_NO_ERROR) {
-                            OnFailureFn(context, err);
-                            return;
-                        }
-                        newElement_1.attributeValueList = array_3;
-                    }
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.extensionFieldSets = array_1;
-            }
-        } else {
-            response.extensionFieldSets = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11550,14 +11678,10 @@ void MTRScenesClusterRemoveSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterRemoveSceneResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11566,11 +11690,10 @@ void MTRScenesClusterRemoveAllScenesResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterRemoveAllScenesResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11579,14 +11702,10 @@ void MTRScenesClusterStoreSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterStoreSceneResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11595,40 +11714,10 @@ void MTRScenesClusterGetSceneMembershipResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterGetSceneMembershipResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        if (data.capacity.IsNull()) {
-            response.capacity = nil;
-        } else {
-            response.capacity = [NSNumber numberWithUnsignedChar:data.capacity.Value()];
-        }
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        if (data.sceneList.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.sceneList.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    NSNumber * newElement_1;
-                    newElement_1 = [NSNumber numberWithUnsignedChar:entry_1];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.sceneList = array_1;
-            }
-        } else {
-            response.sceneList = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11637,14 +11726,10 @@ void MTRScenesClusterEnhancedAddSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterEnhancedAddSceneResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11653,90 +11738,10 @@ void MTRScenesClusterEnhancedViewSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterEnhancedViewSceneResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
-    }
-    {
-        if (data.transitionTime.HasValue()) {
-            response.transitionTime = [NSNumber numberWithUnsignedShort:data.transitionTime.Value()];
-        } else {
-            response.transitionTime = nil;
-        }
-    }
-    {
-        if (data.sceneName.HasValue()) {
-            response.sceneName = [[NSString alloc] initWithBytes:data.sceneName.Value().data()
-                                                          length:data.sceneName.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
-        } else {
-            response.sceneName = nil;
-        }
-    }
-    {
-        if (data.extensionFieldSets.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.extensionFieldSets.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRScenesClusterExtensionFieldSet * newElement_1;
-                    newElement_1 = [MTRScenesClusterExtensionFieldSet new];
-                    newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
-                    { // Scope for our temporary variables
-                        auto * array_3 = [NSMutableArray new];
-                        auto iter_3 = entry_1.attributeValueList.begin();
-                        while (iter_3.Next()) {
-                            auto & entry_3 = iter_3.GetValue();
-                            MTRScenesClusterAttributeValuePair * newElement_3;
-                            newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            if (entry_3.attributeID.HasValue()) {
-                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
-                            } else {
-                                newElement_3.attributeID = nil;
-                            }
-                            { // Scope for our temporary variables
-                                auto * array_5 = [NSMutableArray new];
-                                auto iter_5 = entry_3.attributeValue.begin();
-                                while (iter_5.Next()) {
-                                    auto & entry_5 = iter_5.GetValue();
-                                    NSNumber * newElement_5;
-                                    newElement_5 = [NSNumber numberWithUnsignedChar:entry_5];
-                                    [array_5 addObject:newElement_5];
-                                }
-                                CHIP_ERROR err = iter_5.GetStatus();
-                                if (err != CHIP_NO_ERROR) {
-                                    OnFailureFn(context, err);
-                                    return;
-                                }
-                                newElement_3.attributeValue = array_5;
-                            }
-                            [array_3 addObject:newElement_3];
-                        }
-                        CHIP_ERROR err = iter_3.GetStatus();
-                        if (err != CHIP_NO_ERROR) {
-                            OnFailureFn(context, err);
-                            return;
-                        }
-                        newElement_1.attributeValueList = array_3;
-                    }
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.extensionFieldSets = array_1;
-            }
-        } else {
-            response.extensionFieldSets = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11745,14 +11750,10 @@ void MTRScenesClusterCopySceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterCopySceneResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupIdentifierFrom = [NSNumber numberWithUnsignedShort:data.groupIdentifierFrom];
-    }
-    {
-        response.sceneIdentifierFrom = [NSNumber numberWithUnsignedChar:data.sceneIdentifierFrom];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11761,62 +11762,10 @@ void MTROTASoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSucc
     void * context, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & data)
 {
     auto * response = [MTROTASoftwareUpdateProviderClusterQueryImageResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.delayedActionTime.HasValue()) {
-            response.delayedActionTime = [NSNumber numberWithUnsignedInt:data.delayedActionTime.Value()];
-        } else {
-            response.delayedActionTime = nil;
-        }
-    }
-    {
-        if (data.imageURI.HasValue()) {
-            response.imageURI = [[NSString alloc] initWithBytes:data.imageURI.Value().data()
-                                                         length:data.imageURI.Value().size()
-                                                       encoding:NSUTF8StringEncoding];
-        } else {
-            response.imageURI = nil;
-        }
-    }
-    {
-        if (data.softwareVersion.HasValue()) {
-            response.softwareVersion = [NSNumber numberWithUnsignedInt:data.softwareVersion.Value()];
-        } else {
-            response.softwareVersion = nil;
-        }
-    }
-    {
-        if (data.softwareVersionString.HasValue()) {
-            response.softwareVersionString = [[NSString alloc] initWithBytes:data.softwareVersionString.Value().data()
-                                                                      length:data.softwareVersionString.Value().size()
-                                                                    encoding:NSUTF8StringEncoding];
-        } else {
-            response.softwareVersionString = nil;
-        }
-    }
-    {
-        if (data.updateToken.HasValue()) {
-            response.updateToken = [NSData dataWithBytes:data.updateToken.Value().data() length:data.updateToken.Value().size()];
-        } else {
-            response.updateToken = nil;
-        }
-    }
-    {
-        if (data.userConsentNeeded.HasValue()) {
-            response.userConsentNeeded = [NSNumber numberWithBool:data.userConsentNeeded.Value()];
-        } else {
-            response.userConsentNeeded = nil;
-        }
-    }
-    {
-        if (data.metadataForRequestor.HasValue()) {
-            response.metadataForRequestor = [NSData dataWithBytes:data.metadataForRequestor.Value().data()
-                                                           length:data.metadataForRequestor.Value().size()];
-        } else {
-            response.metadataForRequestor = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11825,11 +11774,10 @@ void MTROTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge::OnSuc
     void * context, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & data)
 {
     auto * response = [MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams new];
-    {
-        response.action = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.action)];
-    }
-    {
-        response.delayedActionTime = [NSNumber numberWithUnsignedInt:data.delayedActionTime];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11838,13 +11786,10 @@ void MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge::OnSuccessF
     void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
 {
     auto * response = [MTRGeneralCommissioningClusterArmFailSafeResponseParams new];
-    {
-        response.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorCode)];
-    }
-    {
-        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                                      length:data.debugText.size()
-                                                    encoding:NSUTF8StringEncoding];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11853,13 +11798,10 @@ void MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge::On
     void * context, const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data)
 {
     auto * response = [MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams new];
-    {
-        response.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorCode)];
-    }
-    {
-        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                                      length:data.debugText.size()
-                                                    encoding:NSUTF8StringEncoding];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11868,13 +11810,10 @@ void MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge::
     void * context, const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data)
 {
     auto * response = [MTRGeneralCommissioningClusterCommissioningCompleteResponseParams new];
-    {
-        response.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorCode)];
-    }
-    {
-        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                                      length:data.debugText.size()
-                                                    encoding:NSUTF8StringEncoding];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11883,78 +11822,10 @@ void MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSuccess
     void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data)
 {
     auto * response = [MTRNetworkCommissioningClusterScanNetworksResponseParams new];
-    {
-        response.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.networkingStatus)];
-    }
-    {
-        if (data.debugText.HasValue()) {
-            response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
-                                                          length:data.debugText.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
-        } else {
-            response.debugText = nil;
-        }
-    }
-    {
-        if (data.wiFiScanResults.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.wiFiScanResults.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRNetworkCommissioningClusterWiFiInterfaceScanResult * newElement_1;
-                    newElement_1 = [MTRNetworkCommissioningClusterWiFiInterfaceScanResult new];
-                    newElement_1.security = [NSNumber numberWithUnsignedChar:entry_1.security.Raw()];
-                    newElement_1.ssid = [NSData dataWithBytes:entry_1.ssid.data() length:entry_1.ssid.size()];
-                    newElement_1.bssid = [NSData dataWithBytes:entry_1.bssid.data() length:entry_1.bssid.size()];
-                    newElement_1.channel = [NSNumber numberWithUnsignedShort:entry_1.channel];
-                    newElement_1.wiFiBand = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.wiFiBand)];
-                    newElement_1.rssi = [NSNumber numberWithChar:entry_1.rssi];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.wiFiScanResults = array_1;
-            }
-        } else {
-            response.wiFiScanResults = nil;
-        }
-    }
-    {
-        if (data.threadScanResults.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.threadScanResults.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRNetworkCommissioningClusterThreadInterfaceScanResult * newElement_1;
-                    newElement_1 = [MTRNetworkCommissioningClusterThreadInterfaceScanResult new];
-                    newElement_1.panId = [NSNumber numberWithUnsignedShort:entry_1.panId];
-                    newElement_1.extendedPanId = [NSNumber numberWithUnsignedLongLong:entry_1.extendedPanId];
-                    newElement_1.networkName = [[NSString alloc] initWithBytes:entry_1.networkName.data()
-                                                                        length:entry_1.networkName.size()
-                                                                      encoding:NSUTF8StringEncoding];
-                    newElement_1.channel = [NSNumber numberWithUnsignedShort:entry_1.channel];
-                    newElement_1.version = [NSNumber numberWithUnsignedChar:entry_1.version];
-                    newElement_1.extendedAddress = [NSData dataWithBytes:entry_1.extendedAddress.data()
-                                                                  length:entry_1.extendedAddress.size()];
-                    newElement_1.rssi = [NSNumber numberWithChar:entry_1.rssi];
-                    newElement_1.lqi = [NSNumber numberWithUnsignedChar:entry_1.lqi];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.threadScanResults = array_1;
-            }
-        } else {
-            response.threadScanResults = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11963,24 +11834,10 @@ void MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge::OnSucces
     void * context, const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
 {
     auto * response = [MTRNetworkCommissioningClusterNetworkConfigResponseParams new];
-    {
-        response.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.networkingStatus)];
-    }
-    {
-        if (data.debugText.HasValue()) {
-            response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
-                                                          length:data.debugText.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
-        } else {
-            response.debugText = nil;
-        }
-    }
-    {
-        if (data.networkIndex.HasValue()) {
-            response.networkIndex = [NSNumber numberWithUnsignedChar:data.networkIndex.Value()];
-        } else {
-            response.networkIndex = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -11989,24 +11846,10 @@ void MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge::OnSucce
     void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
 {
     auto * response = [MTRNetworkCommissioningClusterConnectNetworkResponseParams new];
-    {
-        response.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.networkingStatus)];
-    }
-    {
-        if (data.debugText.HasValue()) {
-            response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
-                                                          length:data.debugText.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
-        } else {
-            response.debugText = nil;
-        }
-    }
-    {
-        if (data.errorValue.IsNull()) {
-            response.errorValue = nil;
-        } else {
-            response.errorValue = [NSNumber numberWithInt:data.errorValue.Value()];
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12015,25 +11858,10 @@ void MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data)
 {
     auto * response = [MTRDiagnosticLogsClusterRetrieveLogsResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        response.logContent = [NSData dataWithBytes:data.logContent.data() length:data.logContent.size()];
-    }
-    {
-        if (data.UTCTimeStamp.HasValue()) {
-            response.utcTimeStamp = [NSNumber numberWithUnsignedLongLong:data.UTCTimeStamp.Value()];
-        } else {
-            response.utcTimeStamp = nil;
-        }
-    }
-    {
-        if (data.timeSinceBoot.HasValue()) {
-            response.timeSinceBoot = [NSNumber numberWithUnsignedLongLong:data.timeSinceBoot.Value()];
-        } else {
-            response.timeSinceBoot = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12042,13 +11870,10 @@ void MTROperationalCredentialsClusterAttestationResponseCallbackBridge::OnSucces
     void * context, const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & data)
 {
     auto * response = [MTROperationalCredentialsClusterAttestationResponseParams new];
-    {
-        response.attestationElements = [NSData dataWithBytes:data.attestationElements.data()
-                                                      length:data.attestationElements.size()];
-    }
-    {
-        response.attestationSignature = [NSData dataWithBytes:data.attestationSignature.data()
-                                                       length:data.attestationSignature.size()];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12057,8 +11882,10 @@ void MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge::OnS
     void * context, const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & data)
 {
     auto * response = [MTROperationalCredentialsClusterCertificateChainResponseParams new];
-    {
-        response.certificate = [NSData dataWithBytes:data.certificate.data() length:data.certificate.size()];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12067,12 +11894,10 @@ void MTROperationalCredentialsClusterCSRResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data)
 {
     auto * response = [MTROperationalCredentialsClusterCSRResponseParams new];
-    {
-        response.nocsrElements = [NSData dataWithBytes:data.NOCSRElements.data() length:data.NOCSRElements.size()];
-    }
-    {
-        response.attestationSignature = [NSData dataWithBytes:data.attestationSignature.data()
-                                                       length:data.attestationSignature.size()];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12081,24 +11906,10 @@ void MTROperationalCredentialsClusterNOCResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data)
 {
     auto * response = [MTROperationalCredentialsClusterNOCResponseParams new];
-    {
-        response.statusCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.statusCode)];
-    }
-    {
-        if (data.fabricIndex.HasValue()) {
-            response.fabricIndex = [NSNumber numberWithUnsignedChar:data.fabricIndex.Value()];
-        } else {
-            response.fabricIndex = nil;
-        }
-    }
-    {
-        if (data.debugText.HasValue()) {
-            response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
-                                                          length:data.debugText.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
-        } else {
-            response.debugText = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12107,44 +11918,10 @@ void MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & data)
 {
     auto * response = [MTRGroupKeyManagementClusterKeySetReadResponseParams new];
-    {
-        response.groupKeySet = [MTRGroupKeyManagementClusterGroupKeySetStruct new];
-        response.groupKeySet.groupKeySetID = [NSNumber numberWithUnsignedShort:data.groupKeySet.groupKeySetID];
-        response.groupKeySet.groupKeySecurityPolicy =
-            [NSNumber numberWithUnsignedChar:chip::to_underlying(data.groupKeySet.groupKeySecurityPolicy)];
-        if (data.groupKeySet.epochKey0.IsNull()) {
-            response.groupKeySet.epochKey0 = nil;
-        } else {
-            response.groupKeySet.epochKey0 = [NSData dataWithBytes:data.groupKeySet.epochKey0.Value().data()
-                                                            length:data.groupKeySet.epochKey0.Value().size()];
-        }
-        if (data.groupKeySet.epochStartTime0.IsNull()) {
-            response.groupKeySet.epochStartTime0 = nil;
-        } else {
-            response.groupKeySet.epochStartTime0 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime0.Value()];
-        }
-        if (data.groupKeySet.epochKey1.IsNull()) {
-            response.groupKeySet.epochKey1 = nil;
-        } else {
-            response.groupKeySet.epochKey1 = [NSData dataWithBytes:data.groupKeySet.epochKey1.Value().data()
-                                                            length:data.groupKeySet.epochKey1.Value().size()];
-        }
-        if (data.groupKeySet.epochStartTime1.IsNull()) {
-            response.groupKeySet.epochStartTime1 = nil;
-        } else {
-            response.groupKeySet.epochStartTime1 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime1.Value()];
-        }
-        if (data.groupKeySet.epochKey2.IsNull()) {
-            response.groupKeySet.epochKey2 = nil;
-        } else {
-            response.groupKeySet.epochKey2 = [NSData dataWithBytes:data.groupKeySet.epochKey2.Value().data()
-                                                            length:data.groupKeySet.epochKey2.Value().size()];
-        }
-        if (data.groupKeySet.epochStartTime2.IsNull()) {
-            response.groupKeySet.epochStartTime2 = nil;
-        } else {
-            response.groupKeySet.epochStartTime2 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime2.Value()];
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12153,23 +11930,10 @@ void MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge::OnS
     void * context, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data)
 {
     auto * response = [MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams new];
-    {
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = data.groupKeySetIDs.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            response.groupKeySetIDs = array_0;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12178,49 +11942,10 @@ void MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data)
 {
     auto * response = [MTRDoorLockClusterGetWeekDayScheduleResponseParams new];
-    {
-        response.weekDayIndex = [NSNumber numberWithUnsignedChar:data.weekDayIndex];
-    }
-    {
-        response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex];
-    }
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.daysMask.HasValue()) {
-            response.daysMask = [NSNumber numberWithUnsignedChar:data.daysMask.Value().Raw()];
-        } else {
-            response.daysMask = nil;
-        }
-    }
-    {
-        if (data.startHour.HasValue()) {
-            response.startHour = [NSNumber numberWithUnsignedChar:data.startHour.Value()];
-        } else {
-            response.startHour = nil;
-        }
-    }
-    {
-        if (data.startMinute.HasValue()) {
-            response.startMinute = [NSNumber numberWithUnsignedChar:data.startMinute.Value()];
-        } else {
-            response.startMinute = nil;
-        }
-    }
-    {
-        if (data.endHour.HasValue()) {
-            response.endHour = [NSNumber numberWithUnsignedChar:data.endHour.Value()];
-        } else {
-            response.endHour = nil;
-        }
-    }
-    {
-        if (data.endMinute.HasValue()) {
-            response.endMinute = [NSNumber numberWithUnsignedChar:data.endMinute.Value()];
-        } else {
-            response.endMinute = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12229,28 +11954,10 @@ void MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data)
 {
     auto * response = [MTRDoorLockClusterGetYearDayScheduleResponseParams new];
-    {
-        response.yearDayIndex = [NSNumber numberWithUnsignedChar:data.yearDayIndex];
-    }
-    {
-        response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex];
-    }
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.localStartTime.HasValue()) {
-            response.localStartTime = [NSNumber numberWithUnsignedInt:data.localStartTime.Value()];
-        } else {
-            response.localStartTime = nil;
-        }
-    }
-    {
-        if (data.localEndTime.HasValue()) {
-            response.localEndTime = [NSNumber numberWithUnsignedInt:data.localEndTime.Value()];
-        } else {
-            response.localEndTime = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12259,32 +11966,10 @@ void MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data)
 {
     auto * response = [MTRDoorLockClusterGetHolidayScheduleResponseParams new];
-    {
-        response.holidayIndex = [NSNumber numberWithUnsignedChar:data.holidayIndex];
-    }
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.localStartTime.HasValue()) {
-            response.localStartTime = [NSNumber numberWithUnsignedInt:data.localStartTime.Value()];
-        } else {
-            response.localStartTime = nil;
-        }
-    }
-    {
-        if (data.localEndTime.HasValue()) {
-            response.localEndTime = [NSNumber numberWithUnsignedInt:data.localEndTime.Value()];
-        } else {
-            response.localEndTime = nil;
-        }
-    }
-    {
-        if (data.operatingMode.HasValue()) {
-            response.operatingMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.operatingMode.Value())];
-        } else {
-            response.operatingMode = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12293,90 +11978,10 @@ void MTRDoorLockClusterGetUserResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data)
 {
     auto * response = [MTRDoorLockClusterGetUserResponseParams new];
-    {
-        response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex];
-    }
-    {
-        if (data.userName.IsNull()) {
-            response.userName = nil;
-        } else {
-            response.userName = [[NSString alloc] initWithBytes:data.userName.Value().data()
-                                                         length:data.userName.Value().size()
-                                                       encoding:NSUTF8StringEncoding];
-        }
-    }
-    {
-        if (data.userUniqueID.IsNull()) {
-            response.userUniqueID = nil;
-        } else {
-            response.userUniqueID = [NSNumber numberWithUnsignedInt:data.userUniqueID.Value()];
-        }
-    }
-    {
-        if (data.userStatus.IsNull()) {
-            response.userStatus = nil;
-        } else {
-            response.userStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userStatus.Value())];
-        }
-    }
-    {
-        if (data.userType.IsNull()) {
-            response.userType = nil;
-        } else {
-            response.userType = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType.Value())];
-        }
-    }
-    {
-        if (data.credentialRule.IsNull()) {
-            response.credentialRule = nil;
-        } else {
-            response.credentialRule = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.credentialRule.Value())];
-        }
-    }
-    {
-        if (data.credentials.IsNull()) {
-            response.credentials = nil;
-        } else {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.credentials.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRDoorLockClusterCredentialStruct * newElement_1;
-                    newElement_1 = [MTRDoorLockClusterCredentialStruct new];
-                    newElement_1.credentialType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.credentialType)];
-                    newElement_1.credentialIndex = [NSNumber numberWithUnsignedShort:entry_1.credentialIndex];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.credentials = array_1;
-            }
-        }
-    }
-    {
-        if (data.creatorFabricIndex.IsNull()) {
-            response.creatorFabricIndex = nil;
-        } else {
-            response.creatorFabricIndex = [NSNumber numberWithUnsignedChar:data.creatorFabricIndex.Value()];
-        }
-    }
-    {
-        if (data.lastModifiedFabricIndex.IsNull()) {
-            response.lastModifiedFabricIndex = nil;
-        } else {
-            response.lastModifiedFabricIndex = [NSNumber numberWithUnsignedChar:data.lastModifiedFabricIndex.Value()];
-        }
-    }
-    {
-        if (data.nextUserIndex.IsNull()) {
-            response.nextUserIndex = nil;
-        } else {
-            response.nextUserIndex = [NSNumber numberWithUnsignedShort:data.nextUserIndex.Value()];
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12385,22 +11990,10 @@ void MTRDoorLockClusterSetCredentialResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data)
 {
     auto * response = [MTRDoorLockClusterSetCredentialResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.userIndex.IsNull()) {
-            response.userIndex = nil;
-        } else {
-            response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex.Value()];
-        }
-    }
-    {
-        if (data.nextCredentialIndex.IsNull()) {
-            response.nextCredentialIndex = nil;
-        } else {
-            response.nextCredentialIndex = [NSNumber numberWithUnsignedShort:data.nextCredentialIndex.Value()];
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12409,36 +12002,10 @@ void MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data)
 {
     auto * response = [MTRDoorLockClusterGetCredentialStatusResponseParams new];
-    {
-        response.credentialExists = [NSNumber numberWithBool:data.credentialExists];
-    }
-    {
-        if (data.userIndex.IsNull()) {
-            response.userIndex = nil;
-        } else {
-            response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex.Value()];
-        }
-    }
-    {
-        if (data.creatorFabricIndex.IsNull()) {
-            response.creatorFabricIndex = nil;
-        } else {
-            response.creatorFabricIndex = [NSNumber numberWithUnsignedChar:data.creatorFabricIndex.Value()];
-        }
-    }
-    {
-        if (data.lastModifiedFabricIndex.IsNull()) {
-            response.lastModifiedFabricIndex = nil;
-        } else {
-            response.lastModifiedFabricIndex = [NSNumber numberWithUnsignedChar:data.lastModifiedFabricIndex.Value()];
-        }
-    }
-    {
-        if (data.nextCredentialIndex.IsNull()) {
-            response.nextCredentialIndex = nil;
-        } else {
-            response.nextCredentialIndex = [NSNumber numberWithUnsignedShort:data.nextCredentialIndex.Value()];
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12447,43 +12014,10 @@ void MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data)
 {
     auto * response = [MTRThermostatClusterGetWeeklyScheduleResponseParams new];
-    {
-        response.numberOfTransitionsForSequence = [NSNumber numberWithUnsignedChar:data.numberOfTransitionsForSequence];
-    }
-    {
-        response.dayOfWeekForSequence = [NSNumber numberWithUnsignedChar:data.dayOfWeekForSequence.Raw()];
-    }
-    {
-        response.modeForSequence = [NSNumber numberWithUnsignedChar:data.modeForSequence.Raw()];
-    }
-    {
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = data.transitions.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                MTRThermostatClusterThermostatScheduleTransition * newElement_0;
-                newElement_0 = [MTRThermostatClusterThermostatScheduleTransition new];
-                newElement_0.transitionTime = [NSNumber numberWithUnsignedShort:entry_0.transitionTime];
-                if (entry_0.heatSetpoint.IsNull()) {
-                    newElement_0.heatSetpoint = nil;
-                } else {
-                    newElement_0.heatSetpoint = [NSNumber numberWithShort:entry_0.heatSetpoint.Value()];
-                }
-                if (entry_0.coolSetpoint.IsNull()) {
-                    newElement_0.coolSetpoint = nil;
-                } else {
-                    newElement_0.coolSetpoint = [NSNumber numberWithShort:entry_0.coolSetpoint.Value()];
-                }
-                [array_0 addObject:newElement_0];
-            }
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            response.transitions = array_0;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12492,17 +12026,10 @@ void MTRChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & data)
 {
     auto * response = [MTRChannelClusterChangeChannelResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.data.HasValue()) {
-            response.data = [[NSString alloc] initWithBytes:data.data.Value().data()
-                                                     length:data.data.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
-        } else {
-            response.data = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12511,17 +12038,10 @@ void MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType & data)
 {
     auto * response = [MTRTargetNavigatorClusterNavigateTargetResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.data.HasValue()) {
-            response.data = [[NSString alloc] initWithBytes:data.data.Value().data()
-                                                     length:data.data.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
-        } else {
-            response.data = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12530,17 +12050,10 @@ void MTRMediaPlaybackClusterPlaybackResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType & data)
 {
     auto * response = [MTRMediaPlaybackClusterPlaybackResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.data.HasValue()) {
-            response.data = [[NSString alloc] initWithBytes:data.data.Value().data()
-                                                     length:data.data.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
-        } else {
-            response.data = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12549,8 +12062,10 @@ void MTRKeypadInputClusterSendKeyResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType & data)
 {
     auto * response = [MTRKeypadInputClusterSendKeyResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12559,17 +12074,10 @@ void MTRContentLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType & data)
 {
     auto * response = [MTRContentLauncherClusterLauncherResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.data.HasValue()) {
-            response.data = [[NSString alloc] initWithBytes:data.data.Value().data()
-                                                     length:data.data.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
-        } else {
-            response.data = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12578,15 +12086,10 @@ void MTRApplicationLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType & data)
 {
     auto * response = [MTRApplicationLauncherClusterLauncherResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.data.HasValue()) {
-            response.data = [NSData dataWithBytes:data.data.Value().data() length:data.data.Value().size()];
-        } else {
-            response.data = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12595,10 +12098,10 @@ void MTRAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data)
 {
     auto * response = [MTRAccountLoginClusterGetSetupPINResponseParams new];
-    {
-        response.setupPIN = [[NSString alloc] initWithBytes:data.setupPIN.data()
-                                                     length:data.setupPIN.size()
-                                                   encoding:NSUTF8StringEncoding];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12607,8 +12110,10 @@ void MTRUnitTestingClusterTestSpecificResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestSpecificResponseParams new];
-    {
-        response.returnValue = [NSNumber numberWithUnsignedChar:data.returnValue];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12617,8 +12122,10 @@ void MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestAddArgumentsResponseParams new];
-    {
-        response.returnValue = [NSNumber numberWithUnsignedChar:data.returnValue];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12627,8 +12134,10 @@ void MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestSimpleArgumentResponseParams new];
-    {
-        response.returnValue = [NSNumber numberWithBool:data.returnValue];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12637,200 +12146,22 @@ void MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge::OnSucce
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestStructArrayArgumentResponseParams new];
-    { { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-    auto iter_0 = data.arg1.begin();
-    while (iter_0.Next()) {
-        auto & entry_0 = iter_0.GetValue();
-        MTRUnitTestingClusterNestedStructList * newElement_0;
-        newElement_0 = [MTRUnitTestingClusterNestedStructList new];
-        newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
-        newElement_0.b = [NSNumber numberWithBool:entry_0.b];
-        newElement_0.c = [MTRUnitTestingClusterSimpleStruct new];
-        newElement_0.c.a = [NSNumber numberWithUnsignedChar:entry_0.c.a];
-        newElement_0.c.b = [NSNumber numberWithBool:entry_0.c.b];
-        newElement_0.c.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c.c)];
-        newElement_0.c.d = [NSData dataWithBytes:entry_0.c.d.data() length:entry_0.c.d.size()];
-        newElement_0.c.e = [[NSString alloc] initWithBytes:entry_0.c.e.data()
-                                                    length:entry_0.c.e.size()
-                                                  encoding:NSUTF8StringEncoding];
-        newElement_0.c.f = [NSNumber numberWithUnsignedChar:entry_0.c.f.Raw()];
-        newElement_0.c.g = [NSNumber numberWithFloat:entry_0.c.g];
-        newElement_0.c.h = [NSNumber numberWithDouble:entry_0.c.h];
-        { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.d.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                MTRUnitTestingClusterSimpleStruct * newElement_2;
-                newElement_2 = [MTRUnitTestingClusterSimpleStruct new];
-                newElement_2.a = [NSNumber numberWithUnsignedChar:entry_2.a];
-                newElement_2.b = [NSNumber numberWithBool:entry_2.b];
-                newElement_2.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.c)];
-                newElement_2.d = [NSData dataWithBytes:entry_2.d.data() length:entry_2.d.size()];
-                newElement_2.e = [[NSString alloc] initWithBytes:entry_2.e.data()
-                                                          length:entry_2.e.size()
-                                                        encoding:NSUTF8StringEncoding];
-                newElement_2.f = [NSNumber numberWithUnsignedChar:entry_2.f.Raw()];
-                newElement_2.g = [NSNumber numberWithFloat:entry_2.g];
-                newElement_2.h = [NSNumber numberWithDouble:entry_2.h];
-                [array_2 addObject:newElement_2];
-            }
-            CHIP_ERROR err = iter_2.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            newElement_0.d = array_2;
-        }
-        { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.e.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSNumber * newElement_2;
-                newElement_2 = [NSNumber numberWithUnsignedInt:entry_2];
-                [array_2 addObject:newElement_2];
-            }
-            CHIP_ERROR err = iter_2.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            newElement_0.e = array_2;
-        }
-        { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.f.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSData * newElement_2;
-                newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
-                [array_2 addObject:newElement_2];
-            }
-            CHIP_ERROR err = iter_2.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            newElement_0.f = array_2;
-        }
-        { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.g.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSNumber * newElement_2;
-                newElement_2 = [NSNumber numberWithUnsignedChar:entry_2];
-                [array_2 addObject:newElement_2];
-            }
-            CHIP_ERROR err = iter_2.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            newElement_0.g = array_2;
-        }
-        [array_0 addObject:newElement_0];
-    }
-    CHIP_ERROR err = iter_0.GetStatus();
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
     if (err != CHIP_NO_ERROR) {
         OnFailureFn(context, err);
         return;
     }
-    response.arg1 = array_0;
-}
-}
-{ { // Scope for our temporary variables
-    auto * array_0 = [NSMutableArray new];
-auto iter_0 = data.arg2.begin();
-while (iter_0.Next()) {
-    auto & entry_0 = iter_0.GetValue();
-    MTRUnitTestingClusterSimpleStruct * newElement_0;
-    newElement_0 = [MTRUnitTestingClusterSimpleStruct new];
-    newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
-    newElement_0.b = [NSNumber numberWithBool:entry_0.b];
-    newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
-    newElement_0.d = [NSData dataWithBytes:entry_0.d.data() length:entry_0.d.size()];
-    newElement_0.e = [[NSString alloc] initWithBytes:entry_0.e.data() length:entry_0.e.size() encoding:NSUTF8StringEncoding];
-    newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
-    newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
-    newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
-    [array_0 addObject:newElement_0];
-}
-CHIP_ERROR err = iter_0.GetStatus();
-if (err != CHIP_NO_ERROR) {
-    OnFailureFn(context, err);
-    return;
-}
-response.arg2 = array_0;
-}
-}
-{ { // Scope for our temporary variables
-    auto * array_0 = [NSMutableArray new];
-auto iter_0 = data.arg3.begin();
-while (iter_0.Next()) {
-    auto & entry_0 = iter_0.GetValue();
-    NSNumber * newElement_0;
-    newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-    [array_0 addObject:newElement_0];
-}
-CHIP_ERROR err = iter_0.GetStatus();
-if (err != CHIP_NO_ERROR) {
-    OnFailureFn(context, err);
-    return;
-}
-response.arg3 = array_0;
-}
-}
-{ { // Scope for our temporary variables
-    auto * array_0 = [NSMutableArray new];
-auto iter_0 = data.arg4.begin();
-while (iter_0.Next()) {
-    auto & entry_0 = iter_0.GetValue();
-    NSNumber * newElement_0;
-    newElement_0 = [NSNumber numberWithBool:entry_0];
-    [array_0 addObject:newElement_0];
-}
-CHIP_ERROR err = iter_0.GetStatus();
-if (err != CHIP_NO_ERROR) {
-    OnFailureFn(context, err);
-    return;
-}
-response.arg4 = array_0;
-}
-}
-{
-    response.arg5 = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg5)];
-}
-{
-    response.arg6 = [NSNumber numberWithBool:data.arg6];
-}
-DispatchSuccess(context, response);
-}
-;
+    DispatchSuccess(context, response);
+};
 
 void MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestListInt8UReverseResponseParams new];
-    {
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = data.arg1.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            response.arg1 = array_0;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12839,11 +12170,10 @@ void MTRUnitTestingClusterTestEnumsResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestEnumsResponseParams new];
-    {
-        response.arg1 = [NSNumber numberWithUnsignedShort:chip::to_underlying(data.arg1)];
-    }
-    {
-        response.arg2 = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg2)];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12852,33 +12182,10 @@ void MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge::OnSuccessF
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestNullableOptionalResponseParams new];
-    {
-        response.wasPresent = [NSNumber numberWithBool:data.wasPresent];
-    }
-    {
-        if (data.wasNull.HasValue()) {
-            response.wasNull = [NSNumber numberWithBool:data.wasNull.Value()];
-        } else {
-            response.wasNull = nil;
-        }
-    }
-    {
-        if (data.value.HasValue()) {
-            response.value = [NSNumber numberWithUnsignedChar:data.value.Value()];
-        } else {
-            response.value = nil;
-        }
-    }
-    {
-        if (data.originalValue.HasValue()) {
-            if (data.originalValue.Value().IsNull()) {
-                response.originalValue = nil;
-            } else {
-                response.originalValue = [NSNumber numberWithUnsignedChar:data.originalValue.Value().Value()];
-            }
-        } else {
-            response.originalValue = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12887,242 +12194,10 @@ void MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge::OnS
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestComplexNullableOptionalResponseParams new];
-    {
-        response.nullableIntWasNull = [NSNumber numberWithBool:data.nullableIntWasNull];
-    }
-    {
-        if (data.nullableIntValue.HasValue()) {
-            response.nullableIntValue = [NSNumber numberWithUnsignedShort:data.nullableIntValue.Value()];
-        } else {
-            response.nullableIntValue = nil;
-        }
-    }
-    {
-        response.optionalIntWasPresent = [NSNumber numberWithBool:data.optionalIntWasPresent];
-    }
-    {
-        if (data.optionalIntValue.HasValue()) {
-            response.optionalIntValue = [NSNumber numberWithUnsignedShort:data.optionalIntValue.Value()];
-        } else {
-            response.optionalIntValue = nil;
-        }
-    }
-    {
-        response.nullableOptionalIntWasPresent = [NSNumber numberWithBool:data.nullableOptionalIntWasPresent];
-    }
-    {
-        if (data.nullableOptionalIntWasNull.HasValue()) {
-            response.nullableOptionalIntWasNull = [NSNumber numberWithBool:data.nullableOptionalIntWasNull.Value()];
-        } else {
-            response.nullableOptionalIntWasNull = nil;
-        }
-    }
-    {
-        if (data.nullableOptionalIntValue.HasValue()) {
-            response.nullableOptionalIntValue = [NSNumber numberWithUnsignedShort:data.nullableOptionalIntValue.Value()];
-        } else {
-            response.nullableOptionalIntValue = nil;
-        }
-    }
-    {
-        response.nullableStringWasNull = [NSNumber numberWithBool:data.nullableStringWasNull];
-    }
-    {
-        if (data.nullableStringValue.HasValue()) {
-            response.nullableStringValue = [[NSString alloc] initWithBytes:data.nullableStringValue.Value().data()
-                                                                    length:data.nullableStringValue.Value().size()
-                                                                  encoding:NSUTF8StringEncoding];
-        } else {
-            response.nullableStringValue = nil;
-        }
-    }
-    {
-        response.optionalStringWasPresent = [NSNumber numberWithBool:data.optionalStringWasPresent];
-    }
-    {
-        if (data.optionalStringValue.HasValue()) {
-            response.optionalStringValue = [[NSString alloc] initWithBytes:data.optionalStringValue.Value().data()
-                                                                    length:data.optionalStringValue.Value().size()
-                                                                  encoding:NSUTF8StringEncoding];
-        } else {
-            response.optionalStringValue = nil;
-        }
-    }
-    {
-        response.nullableOptionalStringWasPresent = [NSNumber numberWithBool:data.nullableOptionalStringWasPresent];
-    }
-    {
-        if (data.nullableOptionalStringWasNull.HasValue()) {
-            response.nullableOptionalStringWasNull = [NSNumber numberWithBool:data.nullableOptionalStringWasNull.Value()];
-        } else {
-            response.nullableOptionalStringWasNull = nil;
-        }
-    }
-    {
-        if (data.nullableOptionalStringValue.HasValue()) {
-            response.nullableOptionalStringValue = [[NSString alloc] initWithBytes:data.nullableOptionalStringValue.Value().data()
-                                                                            length:data.nullableOptionalStringValue.Value().size()
-                                                                          encoding:NSUTF8StringEncoding];
-        } else {
-            response.nullableOptionalStringValue = nil;
-        }
-    }
-    {
-        response.nullableStructWasNull = [NSNumber numberWithBool:data.nullableStructWasNull];
-    }
-    {
-        if (data.nullableStructValue.HasValue()) {
-            response.nullableStructValue = [MTRUnitTestingClusterSimpleStruct new];
-            response.nullableStructValue.a = [NSNumber numberWithUnsignedChar:data.nullableStructValue.Value().a];
-            response.nullableStructValue.b = [NSNumber numberWithBool:data.nullableStructValue.Value().b];
-            response.nullableStructValue.c =
-                [NSNumber numberWithUnsignedChar:chip::to_underlying(data.nullableStructValue.Value().c)];
-            response.nullableStructValue.d = [NSData dataWithBytes:data.nullableStructValue.Value().d.data()
-                                                            length:data.nullableStructValue.Value().d.size()];
-            response.nullableStructValue.e = [[NSString alloc] initWithBytes:data.nullableStructValue.Value().e.data()
-                                                                      length:data.nullableStructValue.Value().e.size()
-                                                                    encoding:NSUTF8StringEncoding];
-            response.nullableStructValue.f = [NSNumber numberWithUnsignedChar:data.nullableStructValue.Value().f.Raw()];
-            response.nullableStructValue.g = [NSNumber numberWithFloat:data.nullableStructValue.Value().g];
-            response.nullableStructValue.h = [NSNumber numberWithDouble:data.nullableStructValue.Value().h];
-        } else {
-            response.nullableStructValue = nil;
-        }
-    }
-    {
-        response.optionalStructWasPresent = [NSNumber numberWithBool:data.optionalStructWasPresent];
-    }
-    {
-        if (data.optionalStructValue.HasValue()) {
-            response.optionalStructValue = [MTRUnitTestingClusterSimpleStruct new];
-            response.optionalStructValue.a = [NSNumber numberWithUnsignedChar:data.optionalStructValue.Value().a];
-            response.optionalStructValue.b = [NSNumber numberWithBool:data.optionalStructValue.Value().b];
-            response.optionalStructValue.c =
-                [NSNumber numberWithUnsignedChar:chip::to_underlying(data.optionalStructValue.Value().c)];
-            response.optionalStructValue.d = [NSData dataWithBytes:data.optionalStructValue.Value().d.data()
-                                                            length:data.optionalStructValue.Value().d.size()];
-            response.optionalStructValue.e = [[NSString alloc] initWithBytes:data.optionalStructValue.Value().e.data()
-                                                                      length:data.optionalStructValue.Value().e.size()
-                                                                    encoding:NSUTF8StringEncoding];
-            response.optionalStructValue.f = [NSNumber numberWithUnsignedChar:data.optionalStructValue.Value().f.Raw()];
-            response.optionalStructValue.g = [NSNumber numberWithFloat:data.optionalStructValue.Value().g];
-            response.optionalStructValue.h = [NSNumber numberWithDouble:data.optionalStructValue.Value().h];
-        } else {
-            response.optionalStructValue = nil;
-        }
-    }
-    {
-        response.nullableOptionalStructWasPresent = [NSNumber numberWithBool:data.nullableOptionalStructWasPresent];
-    }
-    {
-        if (data.nullableOptionalStructWasNull.HasValue()) {
-            response.nullableOptionalStructWasNull = [NSNumber numberWithBool:data.nullableOptionalStructWasNull.Value()];
-        } else {
-            response.nullableOptionalStructWasNull = nil;
-        }
-    }
-    {
-        if (data.nullableOptionalStructValue.HasValue()) {
-            response.nullableOptionalStructValue = [MTRUnitTestingClusterSimpleStruct new];
-            response.nullableOptionalStructValue.a = [NSNumber numberWithUnsignedChar:data.nullableOptionalStructValue.Value().a];
-            response.nullableOptionalStructValue.b = [NSNumber numberWithBool:data.nullableOptionalStructValue.Value().b];
-            response.nullableOptionalStructValue.c =
-                [NSNumber numberWithUnsignedChar:chip::to_underlying(data.nullableOptionalStructValue.Value().c)];
-            response.nullableOptionalStructValue.d = [NSData dataWithBytes:data.nullableOptionalStructValue.Value().d.data()
-                                                                    length:data.nullableOptionalStructValue.Value().d.size()];
-            response.nullableOptionalStructValue.e =
-                [[NSString alloc] initWithBytes:data.nullableOptionalStructValue.Value().e.data()
-                                         length:data.nullableOptionalStructValue.Value().e.size()
-                                       encoding:NSUTF8StringEncoding];
-            response.nullableOptionalStructValue.f =
-                [NSNumber numberWithUnsignedChar:data.nullableOptionalStructValue.Value().f.Raw()];
-            response.nullableOptionalStructValue.g = [NSNumber numberWithFloat:data.nullableOptionalStructValue.Value().g];
-            response.nullableOptionalStructValue.h = [NSNumber numberWithDouble:data.nullableOptionalStructValue.Value().h];
-        } else {
-            response.nullableOptionalStructValue = nil;
-        }
-    }
-    {
-        response.nullableListWasNull = [NSNumber numberWithBool:data.nullableListWasNull];
-    }
-    {
-        if (data.nullableListValue.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.nullableListValue.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    NSNumber * newElement_1;
-                    newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.nullableListValue = array_1;
-            }
-        } else {
-            response.nullableListValue = nil;
-        }
-    }
-    {
-        response.optionalListWasPresent = [NSNumber numberWithBool:data.optionalListWasPresent];
-    }
-    {
-        if (data.optionalListValue.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.optionalListValue.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    NSNumber * newElement_1;
-                    newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.optionalListValue = array_1;
-            }
-        } else {
-            response.optionalListValue = nil;
-        }
-    }
-    {
-        response.nullableOptionalListWasPresent = [NSNumber numberWithBool:data.nullableOptionalListWasPresent];
-    }
-    {
-        if (data.nullableOptionalListWasNull.HasValue()) {
-            response.nullableOptionalListWasNull = [NSNumber numberWithBool:data.nullableOptionalListWasNull.Value()];
-        } else {
-            response.nullableOptionalListWasNull = nil;
-        }
-    }
-    {
-        if (data.nullableOptionalListValue.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.nullableOptionalListValue.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    NSNumber * newElement_1;
-                    newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.nullableOptionalListValue = array_1;
-            }
-        } else {
-            response.nullableOptionalListValue = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13131,8 +12206,10 @@ void MTRUnitTestingClusterBooleanResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterBooleanResponseParams new];
-    {
-        response.value = [NSNumber numberWithBool:data.value];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13141,18 +12218,10 @@ void MTRUnitTestingClusterSimpleStructResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterSimpleStructResponseParams new];
-    {
-        response.arg1 = [MTRUnitTestingClusterSimpleStruct new];
-        response.arg1.a = [NSNumber numberWithUnsignedChar:data.arg1.a];
-        response.arg1.b = [NSNumber numberWithBool:data.arg1.b];
-        response.arg1.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg1.c)];
-        response.arg1.d = [NSData dataWithBytes:data.arg1.d.data() length:data.arg1.d.size()];
-        response.arg1.e = [[NSString alloc] initWithBytes:data.arg1.e.data()
-                                                   length:data.arg1.e.size()
-                                                 encoding:NSUTF8StringEncoding];
-        response.arg1.f = [NSNumber numberWithUnsignedChar:data.arg1.f.Raw()];
-        response.arg1.g = [NSNumber numberWithFloat:data.arg1.g];
-        response.arg1.h = [NSNumber numberWithDouble:data.arg1.h];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13161,8 +12230,10 @@ void MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestEmitTestEventResponseParams new];
-    {
-        response.value = [NSNumber numberWithUnsignedLongLong:data.value];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13171,21 +12242,23 @@ void MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge::O
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams new];
-    {
-        response.value = [NSNumber numberWithUnsignedLongLong:data.value];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
 
-void MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Identify::IdentifyEffectIdentifier value)
+void MTRIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Identify::EffectIdentifierEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRIdentifyClusterEffectIdentifierEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -13200,8 +12273,8 @@ void MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyEffectIdentifier> & value)
+void MTRNullableIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::EffectIdentifierEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -13212,7 +12285,7 @@ void MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableIdentifyClusterEffectIdentifierEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -13227,15 +12300,15 @@ void MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscrip
     }
 }
 
-void MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Identify::IdentifyEffectVariant value)
+void MTRIdentifyClusterEffectVariantEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Identify::EffectVariantEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRIdentifyClusterEffectVariantEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -13250,8 +12323,8 @@ void MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyEffectVariant> & value)
+void MTRNullableIdentifyClusterEffectVariantEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::EffectVariantEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -13262,7 +12335,7 @@ void MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableIdentifyClusterEffectVariantEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -13277,15 +12350,15 @@ void MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptio
     }
 }
 
-void MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Identify::IdentifyIdentifyType value)
+void MTRIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Identify::IdentifyTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRIdentifyClusterIdentifyTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -13300,8 +12373,8 @@ void MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyIdentifyType> & value)
+void MTRNullableIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -13312,7 +12385,7 @@ void MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableIdentifyClusterIdentifyTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15028,15 +14101,15 @@ void MTRNullablePowerSourceClusterWiredFaultEnumAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralCommissioning::CommissioningError value)
+void MTRGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15051,8 +14124,8 @@ void MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::CommissioningError> & value)
+void MTRNullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15063,7 +14136,7 @@ void MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15078,15 +14151,15 @@ void MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackSu
     }
 }
 
-void MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType value)
+void MTRGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15101,8 +14174,8 @@ void MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscr
     }
 }
 
-void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType> & value)
+void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15113,57 +14186,7 @@ void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallba
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::
+void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -15179,15 +14202,15 @@ void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCa
     }
 }
 
-void MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NetworkCommissioning::WiFiBand value)
+void MTRNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15202,8 +14225,8 @@ void MTRNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::WiFiBand> & value)
+void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15214,7 +14237,58 @@ void MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackSubscriptionBridge::
+    OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::NetworkCommissioning::WiFiBandEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNetworkCommissioningClusterWiFiBandEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::WiFiBandEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableNetworkCommissioningClusterWiFiBandEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15679,15 +14753,15 @@ void MTRNullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCall
     }
 }
 
-void MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault value)
+void MTRThreadNetworkDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRThreadNetworkDiagnosticsClusterNetworkFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15702,8 +14776,8 @@ void MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscription
     }
 }
 
-void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value)
+void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15714,7 +14788,7 @@ void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15729,15 +14803,15 @@ void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubs
     }
 }
 
-void MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole value)
+void MTRThreadNetworkDiagnosticsClusterRoutingRoleEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRoleEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRThreadNetworkDiagnosticsClusterRoutingRoleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15752,8 +14826,8 @@ void MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole> & value)
+void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRoleEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15764,7 +14838,7 @@ void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17784,15 +16858,15 @@ void MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscripti
     }
 }
 
-void MTRFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FanControl::FanModeSequenceType value)
+void MTRFanControlClusterFanModeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FanControl::FanModeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRFanControlClusterFanModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17807,8 +16881,8 @@ void MTRFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeSequenceType> & value)
+void MTRNullableFanControlClusterFanModeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17819,7 +16893,7 @@ void MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableFanControlClusterFanModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17834,15 +16908,15 @@ void MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptio
     }
 }
 
-void MTRFanControlClusterFanModeTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FanControl::FanModeType value)
+void MTRFanControlClusterFanModeSequenceEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FanControl::FanModeSequenceEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRFanControlClusterFanModeSequenceEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17857,8 +16931,8 @@ void MTRFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRNullableFanControlClusterFanModeTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeType> & value)
+void MTRNullableFanControlClusterFanModeSequenceEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeSequenceEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17869,7 +16943,7 @@ void MTRNullableFanControlClusterFanModeTypeAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableFanControlClusterFanModeSequenceEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -18284,15 +17358,15 @@ void MTRNullableColorControlClusterSaturationStepModeAttributeCallbackSubscripti
     }
 }
 
-void MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IlluminanceMeasurement::LightSensorType value)
+void MTRIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -18307,8 +17381,8 @@ void MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptio
     }
 }
 
-void MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorType> & value)
+void MTRNullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18319,7 +17393,7 @@ void MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

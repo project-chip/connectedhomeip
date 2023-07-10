@@ -16,9 +16,8 @@
  *    limitations under the License.
  */
 
-#include "AppImpl.h"
 #include "AppMain.h"
-#include "AppPlatformShellCommands.h"
+#include "AppTv.h"
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -27,21 +26,8 @@
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/util/af.h>
 
-#include "include/account-login/AccountLoginManager.h"
-#include "include/application-basic/ApplicationBasicManager.h"
-#include "include/application-launcher/ApplicationLauncherManager.h"
-#include "include/audio-output/AudioOutputManager.h"
-#include "include/channel/ChannelManager.h"
-#include "include/content-launcher/ContentLauncherManager.h"
-#include "include/keypad-input/KeypadInputManager.h"
-#include "include/low-power/LowPowerManager.h"
-#include "include/media-input/MediaInputManager.h"
-#include "include/media-playback/MediaPlaybackManager.h"
-#include "include/target-navigator/TargetNavigatorManager.h"
-#include "include/wake-on-lan/WakeOnLanManager.h"
-
 #if defined(ENABLE_CHIP_SHELL)
-#include <lib/shell/Engine.h>
+#include "AppTvShellCommands.h"
 #endif
 
 using namespace chip;
@@ -49,25 +35,6 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::AppPlatform;
 using namespace chip::app::Clusters;
-
-namespace {
-static AccountLoginManager accountLoginManager;
-static ApplicationBasicManager applicationBasicManager;
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-static ApplicationLauncherManager applicationLauncherManager(true);
-#else  // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-static ApplicationLauncherManager applicationLauncherManager(false);
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-static AudioOutputManager audioOutputManager;
-static ChannelManager channelManager;
-static ContentLauncherManager contentLauncherManager;
-static KeypadInputManager keypadInputManager;
-static LowPowerManager lowPowerManager;
-static MediaInputManager mediaInputManager;
-static MediaPlaybackManager mediaPlaybackManager;
-static TargetNavigatorManager targetNavigatorManager;
-static WakeOnLanManager wakeOnLanManager;
-} // namespace
 
 void ApplicationInit()
 {
@@ -85,87 +52,15 @@ int main(int argc, char * argv[])
 
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
 
-    InitVideoPlayerPlatform();
+    AppTvInit();
 
 #if defined(ENABLE_CHIP_SHELL)
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    Shell::RegisterAppPlatformCommands();
+    Shell::RegisterAppTvCommands();
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #endif
 
     ChipLinuxAppMainLoop();
 
     return 0;
-}
-
-void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: ContentLauncher::SetDefaultDelegate");
-    ContentLauncher::SetDefaultDelegate(endpoint, &contentLauncherManager);
-}
-
-void emberAfAccountLoginClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: AccountLogin::SetDefaultDelegate");
-    AccountLogin::SetDefaultDelegate(endpoint, &accountLoginManager);
-}
-
-void emberAfApplicationBasicClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: ApplicationBasic::SetDefaultDelegate");
-    ApplicationBasic::SetDefaultDelegate(endpoint, &applicationBasicManager);
-}
-
-void emberAfApplicationLauncherClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: ApplicationLauncher::SetDefaultDelegate");
-    ApplicationLauncher::SetDefaultDelegate(endpoint, &applicationLauncherManager);
-}
-
-void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: AudioOutput::SetDefaultDelegate");
-    AudioOutput::SetDefaultDelegate(endpoint, &audioOutputManager);
-}
-
-void emberAfChannelClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: Channel::SetDefaultDelegate");
-    Channel::SetDefaultDelegate(endpoint, &channelManager);
-}
-
-void emberAfKeypadInputClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: KeypadInput::SetDefaultDelegate");
-    KeypadInput::SetDefaultDelegate(endpoint, &keypadInputManager);
-}
-
-void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: LowPower::SetDefaultDelegate");
-    LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
-}
-
-void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: MediaInput::SetDefaultDelegate");
-    MediaInput::SetDefaultDelegate(endpoint, &mediaInputManager);
-}
-
-void emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: MediaPlayback::SetDefaultDelegate");
-    MediaPlayback::SetDefaultDelegate(endpoint, &mediaPlaybackManager);
-}
-
-void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: TargetNavigator::SetDefaultDelegate");
-    TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager);
-}
-
-void emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: WakeOnLanManager::SetDefaultDelegate");
-    WakeOnLan::SetDefaultDelegate(endpoint, &wakeOnLanManager);
 }

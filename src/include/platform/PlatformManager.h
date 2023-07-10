@@ -45,7 +45,6 @@ class ConfigurationManagerImpl;
 class DeviceControlServer;
 class TraitManager;
 class ThreadStackManagerImpl;
-class TimeSyncManager;
 
 namespace Internal {
 class BLEManagerImpl;
@@ -258,7 +257,6 @@ private:
     friend class FailSafeContext;
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
-    friend class TimeSyncManager;
     friend class Internal::BLEManagerImpl;
     template <class>
     friend class Internal::GenericPlatformManagerImpl;

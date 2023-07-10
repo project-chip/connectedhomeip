@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.3.1. [TC-DGGEN-3.1] Attributes observed at client side as DUT
+name: 88.3.1. [TC-DGGEN-3.1] Attributes [DUT as Client]
 
 PICS:
     - DGGEN.C
@@ -76,6 +76,7 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool generaldiagnostics read reboot-count 1 0
+
           verify that RebootCount attribute data type must be UINT16 and the count should match with the number of rebooted times on TH(all-clusters-app).
 
           Received Read request
@@ -144,6 +145,7 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool generaldiagnostics read total-operational-hours 1 0
+
           verify that TotalOperationalHours attribute data type must be UINT32 and the value indicates the number of hours the node has been operational since DUT (node) has been rebooted on TH(all-clusters-app).
 
           ReadRequestMessage =
@@ -176,7 +178,7 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          ./chip-tool generaldiagnostics read boot-reasons 1 0
+          ./chip-tool generaldiagnostics read boot-reason 1 0
 
           verify that  bootreason attribute data type must match the value listed in Table 105 BootReason ENUM table in spec on TH(all-clusters-app).
 
@@ -213,6 +215,7 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool generaldiagnostics read active-hardware-faults 1 0
+
           verify that ActiveHardwareFaults attribute the attribute response should be empty. But when a hardware fault occurs, the return attribute value must match the value listed in the HardwareFault ENUM table 11.11.6.1 on TH(all-clusters-app).
 
           [1659773303.234177][17263:17263] CHIP:DMG:
@@ -255,6 +258,7 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool generaldiagnostics read active-radio-faults 1 0
+
           verify that  the attribute response should be empty. But when a radio fault occurs, the return attribute value must match the value listed in the RadioFault ENUM table. 11.11.6.2 on TH(all-clusters-app).
 
           [1659971190.358722][3458:3458] CHIP:IM: Received Read request
@@ -290,6 +294,7 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool generaldiagnostics read active-network-faults 1 0
+
           verify that ActiveNetworkFaults attribute value attribute response should be empty. But when a network fault occurs, the return attribute value must match the value listed in the NetworkFault ENUM on TH(all-clusters-app)
 
           ReadRequestMessage =
@@ -325,6 +330,7 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool generaldiagnostics read   test-event-triggers-enabled  1 0
+
           verify that TestEventTriggersEnabled attribute value should be data type bool on TH(all-clusters-app)
 
           ReadRequestMessage =

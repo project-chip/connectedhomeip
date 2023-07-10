@@ -369,7 +369,7 @@ tests:
           DUT implementation required to verify the  list of structs which contain some fabric-sensitive data
 
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
+          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -433,7 +433,7 @@ tests:
 
 
           #3: From RC1 send a Write Request message to the DUT to write to an entry in the fabric scoped list associated with its own fabric.
-          accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 31, "endpoint": 0, "deviceType": null }]}]" 1 0
+          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 31, "endpoint": 0, "deviceType": null }]}]' 1 0
           ON RC1 Verify that the DUT sends a changed report data
           [1660742282.279163][9069:9074] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
           [1660742282.279187][9069:9074] CHIP:TOO:   Event number: 3

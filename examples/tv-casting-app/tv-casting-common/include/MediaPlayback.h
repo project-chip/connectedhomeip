@@ -19,8 +19,10 @@
 #include "MediaCommandBase.h"
 #include "MediaSubscriptionBase.h"
 
+#include <controller/CHIPCluster.h>
 #include <functional>
-#include <zap-generated/CHIPClusters.h>
+
+#include <app-common/zap-generated/cluster-objects.h>
 
 // COMMAND CLASSES
 class PlayCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::Play::Type,

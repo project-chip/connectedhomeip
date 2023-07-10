@@ -63,10 +63,13 @@ template("bouffalolab_executable") {
     flashing_options += [ "40M" ]
   } else if (invoker.bl_plat_name == "bl702") {
     flashing_options += [ "32M" ]
+  } else if (invoker.bl_plat_name == "bl702l") {
+    flashing_options += [ "32M" ]
   }
 
   flashing_options += [ "--pt" ]
-  if (invoker.board == "BL602-IOT-DVK-3S" || invoker.bl_plat_name == "bl702") {
+  if (invoker.board == "BL602-IOT-DVK-3S" || invoker.bl_plat_name == "bl702" ||
+      invoker.bl_plat_name == "bl702l") {
     flashing_options +=
         [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
   } else {

@@ -1,0 +1,43 @@
+darwin:
+  - "(ios|homepod|darwin|mac|macos)"
+
+linux:
+  - "(linux)"
+
+# Special Keywords for Cert Blockers
+air purifiers:
+  - "(Area:AirPurifiers)"
+air quality sensors:
+  - "(Area:AirQualitySensor)"
+concentration measurement:
+  - "(Area:ConcentrationMeasurement)"
+device appearance:
+  - "(Area:DeviceAppearance)"
+dishwashers:
+  - "(Area:Dishwashers)"
+door lock enhancements:
+  - "(Area:DoorLockEnhancements)"
+event list:
+  - "(Area;EventList)"
+icd:
+  - "(Area:ICDPhase2)"
+icd phase 2:
+  - "(Area:ICDPhase2)"
+mode select:
+  - "(Area:ModeSelect)"
+operational state:
+  - "(Area:OperationalState)"
+refrigerators:
+  - "(Area:Refrigerators)"
+robot vacuums:
+  - "(Area:RobotVacuums)"
+room air conditioners:
+  - "(Area:RoomAirConditioner)"
+scenes:
+  - "(Area:Scenes)"
+smoke & c02:
+  - "(Area:SmokeCO2)"
+temperature controlled cabinet:
+  - "(Area:TemperatureControlledCabinet)"
+time sync:
+  - "(Area:TimeSync)"

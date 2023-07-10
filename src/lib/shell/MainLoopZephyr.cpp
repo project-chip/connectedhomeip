@@ -29,7 +29,7 @@ static int cmd_matter(const struct shell * shell, size_t argc, char ** argv)
     return (Engine::Root().ExecCommand(argc - 1, argv + 1) == CHIP_NO_ERROR) ? 0 : -ENOEXEC;
 }
 
-static int RegisterCommands(const struct device * dev)
+static int RegisterCommands()
 {
     Engine::Root().RegisterDefaultCommands();
     return 0;

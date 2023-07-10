@@ -64,6 +64,7 @@ public:
     CHIP_ERROR _InitThreadStack();
     void SetRadioBlocked(bool state) { mRadioBlocked = state; }
     bool IsReadyToAttach(void) const { return mReadyToAttach; }
+    void Finalize(void);
 
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
@@ -78,6 +79,7 @@ protected:
     void _ProcessThreadActivity() {}
     CHIP_ERROR _AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
                                       NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
+    CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
 
     //} // namespace Internal
 
@@ -92,6 +94,8 @@ private:
     // ===== Private members for use by this class only.
     bool mRadioBlocked;
     bool mReadyToAttach;
+
+    NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
 };
 
 /**

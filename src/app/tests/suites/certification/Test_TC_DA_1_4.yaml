@@ -220,24 +220,19 @@ tests:
           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
 
           If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
-          [1662456484.492166][32193:32198] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
-          [1662456484.492170][32193:32198] CHIP:CTL: Received Attestation Information from the device
-          [1662456484.492173][32193:32198] CHIP:CTL: Successfully finished commissioning step 'SendAttestationRequest'
-          [1662456484.492179][32193:32198] CHIP:CTL: Commissioning stage next step: 'SendAttestationRequest' -> 'AttestationVerification'
-          [1662456484.492181][32193:32198] CHIP:CTL: Performing next commissioning step 'AttestationVerification'
-          [1662456484.492183][32193:32198] CHIP:CTL: Verifying attestation
-          [1662456484.492990][32193:32198] CHIP:CTL: Failed in verifying 'Attestation Information' command received from the device: err 605. Look at AttestationVerificationResult enum to understand the errors
-          [1662456484.493000][32193:32198] CHIP:CTL: Error on commissioning step 'AttestationVerification': '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error'
-          [1662456484.493005][32193:32198] CHIP:CTL: Failed to perform commissioning step 8
-          [1662456484.493007][32193:32198] CHIP:CTL: Going from commissioning step 'AttestationVerification' with lastErr = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error' -> 'Cleanup'
-          [1662456484.493011][32193:32198] CHIP:CTL: Performing next commissioning step 'Cleanup' with completion status = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error'
-          [1662456484.493013][32193:32198] CHIP:CTL: Expiring failsafe on proxy 0x7fd0a40236a0
-          [1662456484.493022][32193:32198] CHIP:DMG: ICR moving to [AddingComm]
-          [1662456484.493026][32193:32198] CHIP:DMG: ICR moving to [AddedComma]
-          [1662456484.493070][32193:32198] CHIP:IN: Prepared secure message 0x7fd0a4031c78 to 0xFFFFFFFB00000000 (0)  of type 0x8 and protocolId (0, 1) on exchange 58630i with MessageCounter:1810755.
-          [1662456484.493076][32193:32198] CHIP:IN: Sending encrypted msg 0x7fd0a4031c78 with MessageCounter:1810755 to 0xFFFFFFFB00000000 (0) at monotonic time: 00000000039222AD msec
-          [1662456484.493127][32193:32198] CHIP:DMG: >> to UDP:[fe80::b7b8:ff3e:9ace:3e12%wlp0s20f3]:5540 | 1810755 | [Interaction Model  (1) / InvokeCommandRequest (0x08) / Session = 29920 / Exchange = 58630]
-          [1662456484.493132][32193:32198] CHIP:DMG: Header Flags =
+          [1684494307.862989][176412:176414] CHIP:CTL: Commissioning stage next step: 'SendAttestationRequest' -> 'AttestationVerification'
+          [1684494307.862994][176412:176414] CHIP:CTL: Performing next commissioning step 'AttestationVerification'
+          [1684494307.862996][176412:176414] CHIP:CTL: Verifying attestation
+          [1684494307.864806][176412:176414] CHIP:CTL: Failed in verifying 'Attestation Information' command received from the device: err 303. Look at AttestationVerificationResult enum to understand the errors
+          [1684494307.864822][176412:176414] CHIP:CTL: Error on commissioning step 'AttestationVerification': '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1075: CHIP Error 0x000000AC: Internal error'
+          [1684494307.864826][176412:176414] CHIP:CTL: Failed to perform commissioning step 8
+          [1684494307.864829][176412:176414] CHIP:CTL: Going from commissioning step 'AttestationVerification' with lastErr = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1075: CHIP Error 0x000000AC: Internal error' -> 'Cleanup'
+          [1684494307.864837][176412:176414] CHIP:CTL: Performing next commissioning step 'Cleanup' with completion status = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1075: CHIP Error 0x000000AC: Internal error'
+          [1684494307.864844][176412:176414] CHIP:CTL: Expiring failsafe on proxy 0x7f2308036bd0
+          [1684494307.864860][176412:176414] CHIP:DMG: ICR moving to [AddingComm]
+          [1684494307.864865][176412:176414] CHIP:DMG: ICR moving to [AddedComma]
+          [1684494307.864945][176412:176414] CHIP:EM: <<< [E:6835i M:18286748] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:08 (IM:InvokeCommandRequest)
+
 
 
 
@@ -258,23 +253,18 @@ tests:
 
 
           If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
-          [1662459474.547436][32792:32797] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
-          [1662459474.547441][32792:32797] CHIP:CTL: Received Attestation Information from the device
-          [1662459474.547445][32792:32797] CHIP:CTL: Successfully finished commissioning step 'SendAttestationRequest'
-          [1662459474.547452][32792:32797] CHIP:CTL: Commissioning stage next step: 'SendAttestationRequest' -> 'AttestationVerification'
-          [1662459474.547456][32792:32797] CHIP:CTL: Performing next commissioning step 'AttestationVerification'
-          [1662459474.547458][32792:32797] CHIP:CTL: Verifying attestation
-          [1662459474.548034][32792:32797] CHIP:CTL: Failed in verifying 'Attestation Information' command received from the device: err 301. Look at AttestationVerificationResult enum to understand the errors
-          [1662459474.548043][32792:32797] CHIP:CTL: Error on commissioning step 'AttestationVerification': '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error'
-          [1662459474.548047][32792:32797] CHIP:CTL: Failed to perform commissioning step 8
-          [1662459474.548051][32792:32797] CHIP:CTL: Going from commissioning step 'AttestationVerification' with lastErr = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error' -> 'Cleanup'
-          [1662459474.548055][32792:32797] CHIP:CTL: Performing next commissioning step 'Cleanup' with completion status = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error'
-          [1662459474.548059][32792:32797] CHIP:CTL: Expiring failsafe on proxy 0x7f71200236a0
-          [1662459474.548073][32792:32797] CHIP:DMG: ICR moving to [AddingComm]
-          [1662459474.548077][32792:32797] CHIP:DMG: ICR moving to [AddedComma]
-          [1662459474.548122][32792:32797] CHIP:IN: Prepared secure message 0x7f7120031f38 to 0xFFFFFFFB00000000 (0)  of type 0x8 and protocolId (0, 1) on exchange 51350i with MessageCounter:196537634.
-          [1662459474.548128][32792:32797] CHIP:IN: Sending encrypted msg 0x7f7120031f38 with MessageCounter:196537634 to 0xFFFFFFFB00000000 (0) at monotonic time: 0000000003BFC294 msec
-          [1662459474.548181][32792:32797] CHIP:DMG: >> to UDP:[fe80::b7b8:ff3e:9ace:3e12%wlp0s20f3]:5540 | 196537634 | [Interaction Model  (1) / InvokeCommandRequest (0x08) / Session = 10880 / Exchange = 51350]
+          [1684494415.854066][176461:176463] CHIP:CTL: Received Attestation Information from the device
+          [1684494415.854069][176461:176463] CHIP:CTL: Successfully finished commissioning step 'SendAttestationRequest'
+          [1684494415.854072][176461:176463] CHIP:CTL: AutoCommissioner setting attestationElements buffer size 278/278
+          [1684494415.854080][176461:176463] CHIP:CTL: Commissioning stage next step: 'SendAttestationRequest' -> 'AttestationVerification'
+          [1684494415.854085][176461:176463] CHIP:CTL: Performing next commissioning step 'AttestationVerification'
+          [1684494415.854088][176461:176463] CHIP:CTL: Verifying attestation
+          [1684494415.860949][176461:176463] CHIP:CTL: Failed in verifying 'Attestation Information' command received from the device: err 300. Look at AttestationVerificationResult enum to understand the errors
+          [1684494415.860970][176461:176463] CHIP:CTL: Error on commissioning step 'AttestationVerification': '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1075: CHIP Error 0x000000AC: Internal error'
+          [1684494415.860974][176461:176463] CHIP:CTL: Failed to perform commissioning step 8
+          [1684494415.860978][176461:176463] CHIP:CTL: Going from commissioning step 'AttestationVerification' with lastErr = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1075: CHIP Error 0x000000AC: Internal error' -> 'Cleanup'
+          [1684494415.860990][176461:176463] CHIP:CTL: Performing next commissioning step 'Cleanup' with completion status = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1075: CHIP Error 0x000000AC: Internal error'
+          [1684494415.860994][176461:176463] CHIP:CTL: Expiring failsafe on proxy 0x7f617c036bd0
       disabled: true
 
     - label:
@@ -336,18 +326,26 @@ tests:
           Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
            ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
           If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
-          [1662460172.864493][32929:32934] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
-          [1662460172.864502][32929:32934] CHIP:CTL: Received Attestation Information from the device
-          [1662460172.864510][32929:32934] CHIP:CTL: Successfully finished commissioning step 'SendAttestationRequest'
-          [1662460172.864522][32929:32934] CHIP:CTL: Commissioning stage next step: 'SendAttestationRequest' -> 'AttestationVerification'
-          [1662460172.864526][32929:32934] CHIP:CTL: Performing next commissioning step 'AttestationVerification'
-          [1662460172.864528][32929:32934] CHIP:CTL: Verifying attestation
-          [1662460172.865422][32929:32934] CHIP:CTL: Failed in verifying 'Attestation Information' command received from the device: err 603. Look at AttestationVerificationResult enum to understand the errors
-          [1662460172.865435][32929:32934] CHIP:CTL: Error on commissioning step 'AttestationVerification': '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error'
-          [1662460172.865439][32929:32934] CHIP:CTL: Failed to perform commissioning step 8
-          [1662460172.865442][32929:32934] CHIP:CTL: Going from commissioning step 'AttestationVerification' with lastErr = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error' -> 'Cleanup'
-          [1662460172.865447][32929:32934] CHIP:CTL: Performing next commissioning step 'Cleanup' with completion status = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error'
-          [1662460172.865449][32929:32934] CHIP:CTL: Expiring failsafe on proxy 0x7fa380023460
+          [1684495876.434738][176910:176912] CHIP:DMG: },
+          [1684495876.434750][176910:176912] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
+          [1684495876.434754][176910:176912] CHIP:CTL: Received Attestation Information from the device
+          [1684495876.434758][176910:176912] CHIP:CTL: Successfully finished commissioning step 'SendAttestationRequest'
+          [1684495876.434761][176910:176912] CHIP:CTL: AutoCommissioner setting attestationElements buffer size 278/278
+          [1684495876.434768][176910:176912] CHIP:CTL: Commissioning stage next step: 'SendAttestationRequest' -> 'AttestationVerification'
+          [1684495876.434772][176910:176912] CHIP:CTL: Performing next commissioning step 'AttestationVerification'
+          [1684495876.434774][176910:176912] CHIP:CTL: Verifying attestation
+          [1684495876.441867][176910:176912] CHIP:CTL: Failed in verifying 'Attestation Information' command received from the device: err 604. Look at AttestationVerificationResult enum to understand the errors
+          [1684495876.441878][176910:176912] CHIP:CTL: Error on commissioning step 'AttestationVerification': '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1075: CHIP Error 0x000000AC: Internal error'
+          [1684495876.441881][176910:176912] CHIP:CTL: Failed to perform commissioning step 8
+          [1684495876.441885][176910:176912] CHIP:CTL: Going from commissioning step 'AttestationVerification' with lastErr = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1075: CHIP Error 0x000000AC: Internal error' -> 'Cleanup'
+          [1684495876.441891][176910:176912] CHIP:CTL: Performing next commissioning step 'Cleanup' with completion status = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1075: CHIP Error 0x000000AC: Internal error'
+          [1684495876.441894][176910:176912] CHIP:CTL: Expiring failsafe on proxy 0x7f1fc0036bd0
+          [1684495876.441907][176910:176912] CHIP:DMG: ICR moving to [AddingComm]
+          [1684495876.441912][176910:176912] CHIP:DMG: ICR moving to [AddedComma]
+          [1684495876.441967][176910:176912] CHIP:EM: <<< [E:25914i M:173255705] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:08 (IM:InvokeCommandRequest)
+          [1684495876.441973][176910:176912] CHIP:IN: (S) Sending msg 173255705 on secure session with LSID: 21068
+          [1684495876.442029][176910:176912] CHIP:DMG: >> to UDP:[fe80::529f:9f59:cfec:7130%wlp0s20f3]:5540 | 173255705 | [Interaction Model  (1) / InvokeCommandRequest
+
 
 
 
@@ -366,16 +364,23 @@ tests:
           Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
            ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
           If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
-          [1662460606.271896][33030:33035] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
-          [1662460606.271904][33030:33035] CHIP:CTL: Received Attestation Information from the device
-          [1662460606.271914][33030:33035] CHIP:CTL: Successfully finished commissioning step 'SendAttestationRequest'
-          [1662460606.271930][33030:33035] CHIP:CTL: Commissioning stage next step: 'SendAttestationRequest' -> 'AttestationVerification'
-          [1662460606.271938][33030:33035] CHIP:CTL: Performing next commissioning step 'AttestationVerification'
-          [1662460606.271942][33030:33035] CHIP:CTL: Verifying attestation
-          [1662460606.272912][33030:33035] CHIP:CTL: Failed in verifying 'Attestation Information' command received from the device: err 603. Look at AttestationVerificationResult enum to understand the errors
-          [1662460606.272924][33030:33035] CHIP:CTL: Error on commissioning step 'AttestationVerification': '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error'
-          [1662460606.272927][33030:33035] CHIP:CTL: Failed to perform commissioning step 8
-          [1662460606.272932][33030:33035] CHIP:CTL: Going from commissioning step 'AttestationVerification' with lastErr = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error' -> 'Cleanup'
+          [1684495930.801406][176931:176933] CHIP:CTL: Received Attestation Information from the device
+          [1684495930.801409][176931:176933] CHIP:CTL: Successfully finished commissioning step 'SendAttestationRequest'
+          [1684495930.801411][176931:176933] CHIP:CTL: AutoCommissioner setting attestationElements buffer size 278/278
+          [1684495930.801417][176931:176933] CHIP:CTL: Commissioning stage next step: 'SendAttestationRequest' -> 'AttestationVerification'
+          [1684495930.801420][176931:176933] CHIP:CTL: Performing next commissioning step 'AttestationVerification'
+          [1684495930.801421][176931:176933] CHIP:CTL: Verifying attestation
+          [1684495930.808506][176931:176933] CHIP:CTL: Failed in verifying 'Attestation Information' command received from the device: err 604. Look at AttestationVerificationResult enum to understand the errors
+          [1684495930.808521][176931:176933] CHIP:CTL: Error on commissioning step 'AttestationVerification': '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1075: CHIP Error 0x000000AC: Internal error'
+          [1684495930.808524][176931:176933] CHIP:CTL: Failed to perform commissioning step 8
+          [1684495930.808526][176931:176933] CHIP:CTL: Going from commissioning step 'AttestationVerification' with lastErr = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1075: CHIP Error 0x000000AC: Internal error' -> 'Cleanup'
+          [1684495930.808533][176931:176933] CHIP:CTL: Performing next commissioning step 'Cleanup' with completion status = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1075: CHIP Error 0x000000AC: Internal error'
+          [1684495930.808535][176931:176933] CHIP:CTL: Expiring failsafe on proxy 0x7fc730036bd0
+          [1684495930.808548][176931:176933] CHIP:DMG: ICR moving to [AddingComm]
+          [1684495930.808551][176931:176933] CHIP:DMG: ICR moving to [AddedComma]
+          [1684495930.808609][176931:176933] CHIP:EM: <<< [E:8667i M:71525087] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:08 (IM:InvokeCommandRequest)
+          [1684495930.808614][176931:176933] CHIP:IN: (S) Sending msg 71525087 on secure session with LSID: 21274
+
 
 
 
@@ -396,11 +401,17 @@ tests:
           Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
            ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
           If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
-          [1662460943.774883][33107:33112] CHIP:CTL: Commissioning stage next step: 'SendAttestationRequest' -> 'AttestationVerification'
-          [1662460943.774887][33107:33112] CHIP:CTL: Performing next commissioning step 'AttestationVerification'
-          [1662460943.774889][33107:33112] CHIP:CTL: Verifying attestation
-          [1662460943.775749][33107:33112] CHIP:CTL: Failed in verifying 'Attestation Information' command received from the device: err 603. Look at AttestationVerificationResult enum to understand the errors
-          [1662460943.775757][33107:33112] CHIP:CTL: Error on commissioning step 'AttestationVerification': '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error'
-          [1662460943.775760][33107:33112] CHIP:CTL: Failed to perform commissioning step 8
-          [1662460943.775763][33107:33112] CHIP:CTL: Going from commissioning step 'AttestationVerification' with lastErr = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error' -> 'Cleanup
+          [1684496002.435208][176959:176961] CHIP:CTL: Performing next commissioning step 'AttestationVerification'
+          [1684496002.435210][176959:176961] CHIP:CTL: Verifying attestation
+          [1684496002.442231][176959:176961] CHIP:CTL: Failed in verifying 'Attestation Information' command received from the device: err 605. Look at AttestationVerificationResult enum to understand the errors
+          [1684496002.442244][176959:176961] CHIP:CTL: Error on commissioning step 'AttestationVerification': '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1075: CHIP Error 0x000000AC: Internal error'
+          [1684496002.442248][176959:176961] CHIP:CTL: Failed to perform commissioning step 8
+          [1684496002.442252][176959:176961] CHIP:CTL: Going from commissioning step 'AttestationVerification' with lastErr = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1075: CHIP Error 0x000000AC: Internal error' -> 'Cleanup'
+          [1684496002.442259][176959:176961] CHIP:CTL: Performing next commissioning step 'Cleanup' with completion status = '../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1075: CHIP Error 0x000000AC: Internal error'
+          [1684496002.442262][176959:176961] CHIP:CTL: Expiring failsafe on proxy 0x7f0354036bd0
+          [1684496002.442275][176959:176961] CHIP:DMG: ICR moving to [AddingComm]
+          [1684496002.442279][176959:176961] CHIP:DMG: ICR moving to [AddedComma]
+          [1684496002.442334][176959:176961] CHIP:EM: <<< [E:26577i M:70580591] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:08 (IM:InvokeCommandRequest)
+          [1684496002.442340][176959:176961] CHIP:IN: (S) Sending msg 70580591 on secure session with LSID: 56268
+          [1684496002.442397][176959:176961] CHIP:DMG: >> to UDP:[fe80::529f:9f59:cfec:7130%wlp0s20f3]:5540 | 70580591 | [Interaction Model  (1) / InvokeCommandRequest (0x08) / Session = 4448 / Exchange = 26577]
       disabled: true

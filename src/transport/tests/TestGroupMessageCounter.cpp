@@ -404,15 +404,18 @@ void GroupMessageCounterTest(nlTestSuite * inSuite, void * inContext)
 
     chip::TestPersistentStorageDelegate delegate;
     TestGroupOutgoingCounters groupCientCounter;
+    uint32_t controlCounter = 0, dataCounter = 0;
     CHIP_ERROR err = groupCientCounter.Init(&delegate);
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Start Test with Control counter
-    NL_TEST_ASSERT(inSuite, groupCientCounter.GetCounter(true) == 0);
+    // Counter should be random
+    controlCounter = groupCientCounter.GetCounter(true);
+    dataCounter    = groupCientCounter.GetCounter(false);
     groupCientCounter.IncrementCounter(true);
 
-    NL_TEST_ASSERT(inSuite, groupCientCounter.GetCounter(true) == 1);
+    NL_TEST_ASSERT(inSuite, (groupCientCounter.GetCounter(true) - controlCounter) == 1);
 
     groupCientCounter.SetCounter(true, UINT32_MAX - GROUP_MSG_COUNTER_MIN_INCREMENT);
     NL_TEST_ASSERT(inSuite, groupCientCounter.GetCounter(true) == UINT32_MAX - GROUP_MSG_COUNTER_MIN_INCREMENT);
@@ -421,7 +424,7 @@ void GroupMessageCounterTest(nlTestSuite * inSuite, void * inContext)
     TestGroupOutgoingCounters groupCientCounter2(&delegate);
 
     NL_TEST_ASSERT(inSuite, groupCientCounter2.GetCounter(true) == UINT32_MAX);
-    NL_TEST_ASSERT(inSuite, groupCientCounter2.GetCounter(false) == GROUP_MSG_COUNTER_MIN_INCREMENT);
+    NL_TEST_ASSERT(inSuite, (groupCientCounter2.GetCounter(false) - dataCounter) == GROUP_MSG_COUNTER_MIN_INCREMENT);
 
     // Test Roll over
     groupCientCounter2.IncrementCounter(true);
@@ -433,9 +436,9 @@ void GroupMessageCounterTest(nlTestSuite * inSuite, void * inContext)
     // Redo the test with the second counter
 
     // Start Test with Control counter
-    NL_TEST_ASSERT(inSuite, groupCientCounter.GetCounter(false) == 0);
+    dataCounter = groupCientCounter.GetCounter(false);
     groupCientCounter.IncrementCounter(false);
-    NL_TEST_ASSERT(inSuite, groupCientCounter.GetCounter(false) == 1);
+    NL_TEST_ASSERT(inSuite, (groupCientCounter.GetCounter(false) - dataCounter) == 1);
 
     groupCientCounter.SetCounter(false, UINT32_MAX - GROUP_MSG_COUNTER_MIN_INCREMENT);
     NL_TEST_ASSERT(inSuite, groupCientCounter.GetCounter(false) == UINT32_MAX - GROUP_MSG_COUNTER_MIN_INCREMENT);

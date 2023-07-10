@@ -423,7 +423,10 @@ CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
                    std::min(sizeof(wifiConfig.sta.password), strlen(CONFIG_DEFAULT_WIFI_PASSWORD)));
             wifiConfig.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
             wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
-            esp_err_t err              = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
+#if CONFIG_WIFI_POWER_SAVE_MAX
+            wifiConfig.sta.listen_interval = CONFIG_WIFI_PS_LISTEN_INTERVAL;
+#endif
+            esp_err_t err = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
             if (err != ESP_OK)
             {
                 ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", esp_err_to_name(err));
@@ -1104,9 +1107,37 @@ void ConnectivityManagerImpl::OnStationIPv6AddressAvailable(const ip_event_got_i
     event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
     PlatformMgr().PostEventOrDie(&event);
-
+#if CONFIG_ENABLE_ROUTE_HOOK
     esp_route_hook_init(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"));
+#endif
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+static constexpr uint32_t kBeaconIntervalMs    = 100;
+static constexpr uint32_t kDefaultDTIMInterval = 3; // this is determined by the AP, use a constant value for it.
+
+CHIP_ERROR ConnectivityManagerImpl::_GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & sedIntervalsConfig)
+{
+    sedIntervalsConfig.ActiveIntervalMS = chip::System::Clock::Milliseconds32(kBeaconIntervalMs);
+#if CONFIG_WIFI_POWER_SAVE_MIN
+    sedIntervalsConfig.IdleIntervalMS = chip::System::Clock::Milliseconds32(kDefaultDTIMInterval * kBeaconIntervalMs);
+#elif CONFIG_WIFI_POWER_SAVE_MAX
+    sedIntervalsConfig.IdleIntervalMS = chip::System::Clock::Milliseconds32(CONFIG_WIFI_PS_LISTEN_INTERVAL * kBeaconIntervalMs);
+#endif
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_RequestSEDActiveMode(bool onOff, bool delayIdle)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 
 } // namespace DeviceLayer
 } // namespace chip

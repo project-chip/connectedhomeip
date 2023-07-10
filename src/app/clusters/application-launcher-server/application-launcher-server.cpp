@@ -49,6 +49,7 @@ using namespace chip::Uint8;
 
 static constexpr size_t kApplicationLauncherDelegateTableSize =
     EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kApplicationLauncherDelegateTableSize <= kEmberInvalidEndpointIndex, "ApplicationLauncher Delegate table size error");
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -74,8 +75,9 @@ Delegate * GetDelegate(EndpointId endpoint)
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogProgress(Zcl, "ApplicationLauncher NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ApplicationLauncher::Id);
-    return ((ep == 0xFFFF || ep >= EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ApplicationLauncher::Id,
+                                                       EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kApplicationLauncherDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -96,9 +98,10 @@ namespace ApplicationLauncher {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ApplicationLauncher::Id);
-    // if endpoint is found and is not a dynamic endpoint
-    if (ep != 0xFFFF && ep < EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ApplicationLauncher::Id,
+                                                       EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT);
+    // if endpoint is found
+    if (ep < kApplicationLauncherDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }
@@ -107,7 +110,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     }
 }
 
-bool HasFeature(chip::EndpointId endpoint, ApplicationLauncherFeature feature)
+bool HasFeature(chip::EndpointId endpoint, Feature feature)
 {
     bool hasFeature     = false;
     uint32_t featureMap = 0;
@@ -125,7 +128,7 @@ bool HasFeature(chip::EndpointId endpoint, ApplicationLauncherFeature feature)
 CHIP_ERROR Delegate::HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    if (HasFeature(ApplicationLauncherFeature::kApplicationPlatform))
+    if (HasFeature(Feature::kApplicationPlatform))
     {
         auto & platform = ContentAppPlatform::GetInstance();
         if (platform.HasCurrentApp())
@@ -246,7 +249,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
         //  2. Set current app to Content App
         //  3. Set Content App status (basic cluster) to ACTIVE_VISIBLE_FOCUS
         //  4. Call launch app command on Content App
-        if (delegate->HasFeature(ApplicationLauncherFeature::kApplicationPlatform))
+        if (delegate->HasFeature(Feature::kApplicationPlatform))
         {
             ChipLogError(Zcl, "ApplicationLauncher has content platform feature");
             ContentApp * app = ContentAppPlatform::GetInstance().LoadContentApp(&vendorApp);
@@ -340,7 +343,7 @@ bool emberAfApplicationLauncherClusterStopAppCallback(app::CommandHandler * comm
         //  3. If this was the current app then stop it
         //  2. Set Content App status (basic cluster) to ACTIVE_STOPPED
         //  4. Call stop app command on Content App
-        if (delegate->HasFeature(ApplicationLauncherFeature::kApplicationPlatform))
+        if (delegate->HasFeature(Feature::kApplicationPlatform))
         {
             ChipLogError(Zcl, "ApplicationLauncher has content platform feature");
             ContentApp * app = ContentAppPlatform::GetInstance().LoadContentApp(&vendorApp);
@@ -429,7 +432,7 @@ bool emberAfApplicationLauncherClusterHideAppCallback(app::CommandHandler * comm
         //  3. If this was the current app then hide it
         //  2. Set Content App status (basic cluster) to ACTIVE_VISIBLE_NOT_FOCUS
         //  4. Call stop app command on Content App
-        if (delegate->HasFeature(ApplicationLauncherFeature::kApplicationPlatform))
+        if (delegate->HasFeature(Feature::kApplicationPlatform))
         {
             ChipLogError(Zcl, "ApplicationLauncher has content platform feature");
             ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(&vendorApp);

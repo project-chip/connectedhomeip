@@ -19,7 +19,6 @@
 package chip.tlv
 
 import com.google.common.truth.Truth.assertThat
-import com.google.protobuf.ByteString
 import java.math.BigInteger
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -44,6 +43,9 @@ private val fabricConfig =
 
 @RunWith(JUnit4::class)
 class TlvWriterTest {
+  private fun String.octetsToByteArray(): ByteArray =
+    replace(" ", "").chunked(2).map { it.toInt(16) and 0xFF }.map { it.toByte() }.toByteArray()
+
   @Test
   fun encodingFabricConfig_allElements() {
     val encodedTlv =
@@ -54,8 +56,8 @@ class TlvWriterTest {
         .startStructure(AnonymousTag)
         .put(ContextSpecificTag(1), 0x1001u)
         .put(ContextSpecificTag(2), 0x01u)
-        .put(ContextSpecificTag(3), ByteString.fromHex("149BF1430B26F5E4BBF380D3DB855BA1"))
-        .put(ContextSpecificTag(4), ByteString.fromHex("E0E8BAA1CAC6E8E7216D720BD13C61C5E0E7B901"))
+        .put(ContextSpecificTag(3), "149BF1430B26F5E4BBF380D3DB855BA1".octetsToByteArray())
+        .put(ContextSpecificTag(4), "E0E8BAA1CAC6E8E7216D720BD13C61C5E0E7B901".octetsToByteArray())
         .put(ContextSpecificTag(5), 0u)
         .put(ContextSpecificTag(6), 0u)
         .endStructure()

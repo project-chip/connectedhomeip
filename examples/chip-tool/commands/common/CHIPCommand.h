@@ -24,6 +24,7 @@
 
 #include "Command.h"
 
+#include <TracingCommandLineArgument.h>
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -57,8 +58,8 @@ public:
     using PeerId                 = ::chip::PeerId;
     using PeerAddress            = ::chip::Transport::PeerAddress;
 
-    static constexpr uint16_t kMaxGroupsPerFabric    = 5;
-    static constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+    static constexpr uint16_t kMaxGroupsPerFabric    = 50;
+    static constexpr uint16_t kMaxGroupKeysPerFabric = 25;
 
     CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds, const char * helpText = nullptr) :
         Command(commandName, helpText), mCredIssuerCmds(credIssuerCmds)
@@ -85,7 +86,13 @@ public:
         AddArgument("trace_log", 0, 1, &mTraceLog);
         AddArgument("trace_decode", 0, 1, &mTraceDecode);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+        AddArgument("trace-to", &mTraceTo, "Trace destinations, comma-separated (" SUPPORTED_COMMAND_LINE_TRACING_TARGETS ")");
         AddArgument("ble-adapter", 0, UINT16_MAX, &mBleAdapterId);
+        AddArgument("storage-directory", &mStorageDirectory,
+                    "Directory to place chip-tool's storage files in.  Defaults to $TMPDIR, with fallback to /tmp");
+        AddArgument(
+            "commissioner-vendor-id", 0, UINT16_MAX, &mCommissionerVendorId,
+            "The vendor id to use for chip-tool. If not provided, chip::VendorId::TestVendor1 (65521, 0xFFF1) will be used.");
     }
 
     /////////// Command Interface /////////
@@ -201,6 +208,7 @@ private:
 
     chip::Optional<char *> mCommissionerName;
     chip::Optional<chip::NodeId> mCommissionerNodeId;
+    chip::Optional<chip::VendorId> mCommissionerVendorId;
     chip::Optional<uint16_t> mBleAdapterId;
     chip::Optional<char *> mPaaTrustStorePath;
     chip::Optional<char *> mCDTrustStorePath;
@@ -232,4 +240,7 @@ private:
     chip::Optional<bool> mTraceLog;
     chip::Optional<bool> mTraceDecode;
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
+    chip::CommandLineApp::TracingSetup mTracingSetup;
+    chip::Optional<std::vector<std::string>> mTraceTo;
 };

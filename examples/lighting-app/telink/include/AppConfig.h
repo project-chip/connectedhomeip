@@ -24,15 +24,7 @@
 #define APP_USE_THREAD_START_BUTTON 1
 #define APP_SET_DEVICE_INFO_PROVIDER 1
 #define APP_SET_NETWORK_COMM_ENDPOINT_SEC 0
-#define APP_USE_IDENTIFY_PWM 1 // APP_USE_IDENTIFY_PWM must be defined before including "AppConfigCommon.h"
-
-#include "AppConfigCommon.h"
+#define APP_USE_IDENTIFY_PWM 1
 
 // Lighting LED config
 #define USE_RGB_PWM 0
-
-#define LIGHTING_PWM_SPEC_RGB_BLUE PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0))
-#if USE_RGB_PWM
-#define LIGHTING_PWM_SPEC_RGB_GREEN PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1))
-#define LIGHTING_PWM_SPEC_RGB_RED PWM_DT_SPEC_GET(DT_ALIAS(pwm_led2))
-#endif

@@ -21,6 +21,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af-types.h>
+#include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -55,8 +56,6 @@
 
 #define REPORT_FAILED 0xFF
 
-using chip::app::Clusters::ColorControl::ColorControlFeature;
-
 /**
  * @brief color-control-server class
  */
@@ -69,6 +68,7 @@ public:
     using HueStepMode  = chip::app::Clusters::ColorControl::HueStepMode;
     using HueMoveMode  = chip::app::Clusters::ColorControl::HueMoveMode;
     using HueDirection = chip::app::Clusters::ColorControl::HueDirection;
+    using Feature      = chip::app::Clusters::ColorControl::Feature;
 
     enum ColorMode
     {
@@ -102,6 +102,9 @@ public:
         uint8_t finalHue;
         uint16_t stepsRemaining;
         uint16_t stepsTotal;
+        // The amount of time remaining until the transition completes. Measured in tenths of a second.
+        // When the transition repeats indefinitely, this will hold the maximum value possible.
+        uint16_t timeRemaining;
         uint16_t initialEnhancedHue;
         uint16_t currentEnhancedHue;
         uint16_t finalEnhancedHue;
@@ -118,6 +121,8 @@ public:
         uint16_t finalValue;
         uint16_t stepsRemaining;
         uint16_t stepsTotal;
+        // The amount of time remaining until the transition completes. Measured in tenths of a second.
+        uint16_t timeRemaining;
         uint16_t lowLimit;
         uint16_t highLimit;
         chip::EndpointId endpoint;
@@ -128,7 +133,7 @@ public:
      *********************************************************/
     static ColorControlServer & Instance();
 
-    bool HasFeature(chip::EndpointId endpoint, ColorControlFeature feature);
+    bool HasFeature(chip::EndpointId endpoint, Feature feature);
     chip::Protocols::InteractionModel::Status stopAllColorTransitions(chip::EndpointId endpoint);
     bool stopMoveStepCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                              uint8_t optionsMask, uint8_t optionsOverride);
@@ -238,22 +243,25 @@ private:
      * Attributes Declaration
      *********************************************************/
     static ColorControlServer instance;
+    static constexpr size_t kColorControlClusterServerMaxEndpointCount =
+        EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    static_assert(kColorControlClusterServerMaxEndpointCount <= kEmberInvalidEndpointIndex, "ColorControl endpoint count error");
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
-    ColorHueTransitionState colorHueTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
-    Color16uTransitionState colorSatTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    ColorHueTransitionState colorHueTransitionStates[kColorControlClusterServerMaxEndpointCount];
+    Color16uTransitionState colorSatTransitionStates[kColorControlClusterServerMaxEndpointCount];
 #endif
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
-    Color16uTransitionState colorXtransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
-    Color16uTransitionState colorYtransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    Color16uTransitionState colorXtransitionStates[kColorControlClusterServerMaxEndpointCount];
+    Color16uTransitionState colorYtransitionStates[kColorControlClusterServerMaxEndpointCount];
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-    Color16uTransitionState colorTempTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    Color16uTransitionState colorTempTransitionStates[kColorControlClusterServerMaxEndpointCount];
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-    EmberEventControl eventControls[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    EmberEventControl eventControls[kColorControlClusterServerMaxEndpointCount];
 };
 
 /**********************************************************

@@ -63,7 +63,7 @@ tests:
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
           ./chip-tool generalcommissioning  arm-fail-safe   60 1 1 0
-          On TH1 Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as "OK"(0) and DebugText argument is of type string with max length 512 or empty
+          On TH1 Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0) and DebugText argument is of type string with max length 512 or empty
 
           [1658482454.092676][27036:27041] CHIP:DMG: },
           [1658482454.092739][27036:27041] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
@@ -213,7 +213,7 @@ tests:
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
           ./chip-tool generalcommissioning  arm-fail-safe  0 1 1 0
-          On TH1 Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as "OK"(0) and DebugText argument is of type string with max length 512 or empty
+          On TH1 Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0) and DebugText argument is of type string with max length 512 or empty
           [1658483503.637026][27397:27402] CHIP:DMG: },
           [1658483503.637054][27397:27402] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1658483503.637074][27397:27402] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -453,7 +453,7 @@ tests:
 
 
           For Attestation - To get attestation nonce give below command Raspi platform on TH
-           echo hex:$(hexdump -vn32 -e"4/4 "%08X" " /dev/urandom)
+           echo hex:$(hexdump -vn32 -e'4/4 "%08X" ' /dev/urandom)
 
           Use the above generated Nonce to send below mentioned request
 
@@ -469,7 +469,7 @@ tests:
 
 
           For CSR-To get csr nonce give below command 2 times
-           echo hex:$(hexdump -vn32 -e"4/4 "%08X" " /dev/urandom)
+           echo hex:$(hexdump -vn32 -e'4/4 "%08X" ' /dev/urandom)
           Use the above generated Nonce to send below mentioned request
 
           operationalcredentials csrrequest hex:C11D6EAA00A54066220DA7F3FC5DC0F684C13D8B8FD3758B51163C2AEDD6F10F  2 0 --commissioner-name beta  --IsForUpdateNOC 0
@@ -585,9 +585,9 @@ tests:
           While pairing between DUT and TH2, On TH2 verify that commissioning completes successfully
           [1660748637.271112][21572:21577] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
           [1660748637.271128][21572:21577] CHIP:CTL: Received CommissioningComplete response, errorCode=0
-          [1660748637.271139][21572:21577] CHIP:CTL: Successfully finished commissioning step "SendComplete"
-          [1660748637.271146][21572:21577] CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1660748637.271156][21572:21577] CHIP:CTL: Performing next commissioning step "Cleanup"
+          [1660748637.271139][21572:21577] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          [1660748637.271146][21572:21577] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1660748637.271156][21572:21577] CHIP:CTL: Performing next commissioning step 'Cleanup'
       disabled: true
 
     - label:
@@ -650,7 +650,7 @@ tests:
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
           ./chip-tool generalcommissioning  arm-fail-safe   900 1 1 0
-          On TH1 Verify that  DUT responds with ArmFailSafeResponse with ErrorCode as "OK"(0) and DebugText argument is of type string with max length 512 or empty
+          On TH1 Verify that  DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0) and DebugText argument is of type string with max length 512 or empty
           [1658485224.066397][28732:28737] CHIP:DMG:         InteractionModelRevision = 1
           [1658485224.066407][28732:28737] CHIP:DMG: },
           [1658485224.066441][28732:28737] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
@@ -787,7 +787,7 @@ tests:
       PICS: CGEN.S.C00.Rsp
       verification: |
           ./chip-tool generalcommissioning  arm-fail-safe 900 1 1 0
-          On TH1 Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as "OK"(0) and DebugText argument is of type string with max length 512 or empty
+          On TH1 Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0) and DebugText argument is of type string with max length 512 or empty
           [1658486418.024554][29343:29348] CHIP:DMG:         InteractionModelRevision = 1
           [1658486418.024559][29343:29348] CHIP:DMG: },
           [1658486418.024588][29343:29348] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
@@ -860,7 +860,7 @@ tests:
       PICS: CGEN.S.C00.Rsp
       verification: |
           ./chip-tool generalcommissioning  arm-fail-safe   900 0 1  0
-          On TH1 Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as "OK"(0) and DebugText argument is of type string with max length 512 or empty
+          On TH1 Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0) and DebugText argument is of type string with max length 512 or empty
 
           [1658487663.593485][30268:30273] CHIP:DMG:         InteractionModelRevision = 1
           [1658487663.593506][30268:30273] CHIP:DMG: },

@@ -63,34 +63,6 @@ enum EmberAfEnhancedColorMode : uint8_t
     EMBER_ZCL_ENHANCED_COLOR_MODE_ENHANCED_CURRENT_HUE_AND_CURRENT_SATURATION = 3,
 };
 
-// Enum for IdentifyEffectIdentifier
-enum EmberAfIdentifyEffectIdentifier : uint8_t
-{
-    EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK          = 0,
-    EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE        = 1,
-    EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY           = 2,
-    EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE = 11,
-    EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT  = 254,
-    EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT    = 255,
-};
-
-// Enum for IdentifyEffectVariant
-enum EmberAfIdentifyEffectVariant : uint8_t
-{
-    EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT = 0,
-};
-
-// Enum for IdentifyIdentifyType
-enum EmberAfIdentifyIdentifyType : uint8_t
-{
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_NONE          = 0,
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LIGHT = 1,
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED   = 2,
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_AUDIBLE_BEEP  = 3,
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_DISPLAY       = 4,
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_ACTUATOR      = 5,
-};
-
 // Enum for InterfaceTypeEnum
 enum EmberAfInterfaceTypeEnum : uint8_t
 {
@@ -106,15 +78,6 @@ enum EmberAfMoveMode : uint8_t
 {
     EMBER_ZCL_MOVE_MODE_UP   = 0,
     EMBER_ZCL_MOVE_MODE_DOWN = 1,
-};
-
-// Enum for NetworkFaultEnum
-enum EmberAfNetworkFaultEnum : uint8_t
-{
-    EMBER_ZCL_NETWORK_FAULT_ENUM_UNSPECIFIED       = 0,
-    EMBER_ZCL_NETWORK_FAULT_ENUM_HARDWARE_FAILURE  = 1,
-    EMBER_ZCL_NETWORK_FAULT_ENUM_NETWORK_JAMMED    = 2,
-    EMBER_ZCL_NETWORK_FAULT_ENUM_CONNECTION_FAILED = 3,
 };
 
 // Enum for PHYRateEnum
@@ -142,18 +105,6 @@ enum EmberAfRadioFaultEnum : uint8_t
     EMBER_ZCL_RADIO_FAULT_ENUM_NFC_FAULT      = 4,
     EMBER_ZCL_RADIO_FAULT_ENUM_BLE_FAULT      = 5,
     EMBER_ZCL_RADIO_FAULT_ENUM_ETHERNET_FAULT = 6,
-};
-
-// Enum for RoutingRole
-enum EmberAfRoutingRole : uint8_t
-{
-    EMBER_ZCL_ROUTING_ROLE_UNSPECIFIED       = 0,
-    EMBER_ZCL_ROUTING_ROLE_UNASSIGNED        = 1,
-    EMBER_ZCL_ROUTING_ROLE_SLEEPY_END_DEVICE = 2,
-    EMBER_ZCL_ROUTING_ROLE_END_DEVICE        = 3,
-    EMBER_ZCL_ROUTING_ROLE_REED              = 4,
-    EMBER_ZCL_ROUTING_ROLE_ROUTER            = 5,
-    EMBER_ZCL_ROUTING_ROLE_LEADER            = 6,
 };
 
 // Enum for StepMode

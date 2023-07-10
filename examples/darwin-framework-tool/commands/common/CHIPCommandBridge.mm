@@ -137,15 +137,19 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
     ipk = [gNocSigner getIPK];
 
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
+    std::string commissionerName = mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha;
     for (size_t i = 0; i < ArraySize(identities); ++i) {
         auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithIPK:ipk fabricID:@(i + 1) nocSigner:gNocSigner];
 
+        if (commissionerName.compare(identities[i]) == 0 && mCommissionerNodeId.HasValue()) {
+            controllerParams.nodeId = @(mCommissionerNodeId.Value());
+        }
         // We're not sure whether we're creating a new fabric or using an
         // existing one, so just try both.
         auto controller = [factory createControllerOnExistingFabric:controllerParams error:&error];
         if (controller == nil) {
             // Maybe we didn't have this fabric yet.
-            controllerParams.vendorID = @(chip::VendorId::TestVendor1);
+            controllerParams.vendorID = @(mCommissionerVendorId.ValueOr(chip::VendorId::TestVendor1));
             controller = [factory createControllerOnNewFabric:controllerParams error:&error];
         }
         if (controller == nil) {

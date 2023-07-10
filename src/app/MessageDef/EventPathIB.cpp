@@ -89,7 +89,7 @@ CHIP_ERROR EventPathIB::Parser::PrettyPrint() const
             {
                 EventId event;
                 reader.Get(event);
-                PRETTY_PRINT("\tEvent = 0x%x,", event);
+                PRETTY_PRINT("\tEvent = 0x%" PRIx32 ",", event);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -251,10 +251,10 @@ EventPathIB::Builder & EventPathIB::Builder::IsUrgent(const bool aIsUrgent)
     return *this;
 }
 
-EventPathIB::Builder & EventPathIB::Builder::EndOfEventPathIB()
+CHIP_ERROR EventPathIB::Builder::EndOfEventPathIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 
 CHIP_ERROR EventPathIB::Builder::Encode(const EventPathParams & aEventPathParams)
@@ -278,8 +278,7 @@ CHIP_ERROR EventPathIB::Builder::Encode(const EventPathParams & aEventPathParams
     {
         IsUrgent(aEventPathParams.mIsUrgentEvent);
     }
-    EndOfEventPathIB();
-    return GetError();
+    return EndOfEventPathIB();
 }
 } // namespace app
 } // namespace chip

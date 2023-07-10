@@ -27,10 +27,18 @@ config:
 tests:
     - label: "Preconditions"
       verification: |
-          1 - 5.1.4.2 - Manual Pairing Code is printed on the device or in additional provided materials (ex: manual)"
+          Manual Pairing Code is printed on the Commissionee device or in additional provided materials (ex: manual, companion app, web service).
       disabled: true
 
     - label: "Verify using instruments"
       verification: |
-          Vendor specific field testcase that should be manually verified using the requirements in the Expected Outcome.
+          The Manual Pairing Code shall meet the following requirements:
+
+          - Printed using a minimum font size of 6 points, typically producing a typeface height of 2.1 mm (6/72 inches)
+
+          - Include dashes between the groups of Manual Pairing Code digits (e.g. "MATTER 1234-5678-901")
+
+          - If the code is presented in audio format it SHOULD be read in groups of 4 digits, with the last group being only 3 or 1 digits depending on overall size.
+
+          - If a Matter logo cannot be printed alongside the code then the code SHOULD be prefixed with MATTER (e.g. "MATTER 1234-5678-901")
       disabled: true

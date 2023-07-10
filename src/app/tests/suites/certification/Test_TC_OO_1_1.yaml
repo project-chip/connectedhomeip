@@ -63,7 +63,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 65528, 65529, 65531, 65532, 65533]
+              contains: [0, 65528, 65529, 65530, 65531, 65532, 65533]
 
     - label: "Read the feature dependent(OO.S.F00) attribute in AttributeList"
       PICS: OO.S.F00
@@ -99,18 +99,28 @@ tests:
           value: []
           constraints:
               type: list
-    #Commenting out the step EventList attribute which is out of scope for matter V1.0
-    #- label:
-    #      "Read EventList attribute from the DUT and Verify that the DUT
-    #      response provides a list of supported events."
-    #  verification: |
-    #      Not implemented in chip-tool
-    #  cluster: "LogCommands"
-    #  command: "UserPrompt"
-    #  PICS: PICS_USER_PROMPT
-    #  arguments:
-    #      values:
-    #          - name: "message"
-    #            value: "Please enter 'y' for success"
-    #          - name: "expectedValue"
-    #            value: "y"
+
+    #Manufacturer specific event IDs check not possible
+    - label:
+          "Read EventList attribute from the DUT.For this cluster the list is
+          usually empty but it can contain manufacturer specific event IDs."
+      verification: |
+          ./chip-tool onoff read event-list 1 1
+
+
+           Verify " EventList is empty" on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+
+           [1676352490.164738][6271:6273] CHIP:DMG:         SuppressResponse = true,
+           [1676352490.164742][6271:6273] CHIP:DMG:         InteractionModelRevision = 1
+           [1676352490.164745][6271:6273] CHIP:DMG: }
+           [1676352490.164804][6271:6273] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_FFFA DataVersion: 2406349519
+           [1676352490.164822][6271:6273] CHIP:TOO:   EventList: 0 entries
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

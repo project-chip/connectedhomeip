@@ -30,6 +30,7 @@ class Device:
         Base Device runner class containing device handling functions and logging
         :param name: Logging name for the client
         """
+        self.verbose = True
         self.iq = queue.Queue()
         self.oq = queue.Queue()
         if name is None:
@@ -37,7 +38,7 @@ class Device:
         else:
             self.name = name
 
-    def send(self, command, expected_output=None, wait_before_read=None, wait_for_response=10, assert_output=True):
+    def send(self, command, expected_output=None, wait_before_read=None, wait_for_response=30, assert_output=True):
         """
         Send command for client
         :param command: Command
@@ -72,7 +73,7 @@ class Device:
             except queue.Empty:
                 return lines
 
-    def wait_for_output(self, search: str, timeout: float = 10, assert_timeout: bool = True) -> [str]:
+    def wait_for_output(self, search: str, timeout: float = 30, assert_timeout: bool = True, verbose: bool = False) -> [str]:
         """
         Wait for expected output response
         :param search: Expected response string
@@ -108,7 +109,7 @@ class Device:
                     else:
                         log.warning(timeout_error_msg)
                         return []
-                if now - last > 1:
+                if verbose and (now - last > 1):
                     log.info('{}: Waiting for "{}" string... Timeout in {:.0f} s'.format(self.name, search,
                                                                                          abs(now - start - timeout)))
 
@@ -117,3 +118,6 @@ class Device:
 
     def _read_line(self, timeout):
         return self.iq.get(timeout=timeout)
+
+    def set_verbose(self, state: bool):
+        self.verbose = state

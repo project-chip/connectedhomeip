@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/scenes/ExtensionFieldSetsImpl.h>
+#include <app/clusters/scenes-server/ExtensionFieldSetsImpl.h>
 #include <lib/core/TLV.h>
 #include <lib/support/Span.h>
 #include <lib/support/UnitTestRegistration.h>

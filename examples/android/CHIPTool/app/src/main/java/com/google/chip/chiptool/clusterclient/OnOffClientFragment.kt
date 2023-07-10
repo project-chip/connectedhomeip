@@ -12,13 +12,24 @@ import android.widget.SeekBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import chip.devicecontroller.ChipClusters
-import chip.devicecontroller.ChipClusters.OnOffCluster
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ClusterIDMapping.*
+import chip.devicecontroller.InvokeCallback
+import chip.devicecontroller.ReportCallback
+import chip.devicecontroller.ResubscriptionAttemptCallback
+import chip.devicecontroller.SubscriptionEstablishedCallback
+import chip.devicecontroller.model.ChipAttributePath
+import chip.devicecontroller.model.ChipEventPath
+import chip.devicecontroller.model.InvokeElement
+import chip.devicecontroller.model.NodeState
+import chip.tlv.AnonymousTag
+import chip.tlv.ContextSpecificTag
+import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.OnOffClientFragmentBinding
+import com.google.chip.chiptool.util.TlvParseUtil
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -34,7 +45,8 @@ class OnOffClientFragment : Fragment() {
   private lateinit var addressUpdateFragment: AddressUpdateFragment
 
   private var _binding: OnOffClientFragmentBinding? = null
-  private val binding get() = _binding!!
+  private val binding
+    get() = _binding!!
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -49,29 +61,33 @@ class OnOffClientFragment : Fragment() {
     addressUpdateFragment =
       childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
 
-    binding.onBtn.setOnClickListener { scope.launch { sendOnCommandClick() } }
-    binding.offBtn.setOnClickListener { scope.launch { sendOffCommandClick() } }
-    binding.toggleBtn.setOnClickListener { scope.launch { sendToggleCommandClick() } }
+    binding.onBtn.setOnClickListener { scope.launch { sendOnOffClusterCommand(OnOff.Command.On) } }
+    binding.offBtn.setOnClickListener {
+      scope.launch { sendOnOffClusterCommand(OnOff.Command.Off) }
+    }
+    binding.toggleBtn.setOnClickListener {
+      scope.launch { sendOnOffClusterCommand(OnOff.Command.Toggle) }
+    }
     binding.readBtn.setOnClickListener { scope.launch { sendReadOnOffClick() } }
     binding.showSubscribeDialogBtn.setOnClickListener { showSubscribeDialog() }
 
-    binding.levelBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-      override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
+    binding.levelBar.setOnSeekBarChangeListener(
+      object : SeekBar.OnSeekBarChangeListener {
+        override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {}
 
-      }
+        override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
-      override fun onStartTrackingTouch(seekBar: SeekBar?) {
+        override fun onStopTrackingTouch(seekBar: SeekBar?) {
+          Toast.makeText(
+              requireContext(),
+              "Level is: " + binding.levelBar.progress,
+              Toast.LENGTH_SHORT
+            )
+            .show()
+          scope.launch { sendLevelCommandClick() }
+        }
       }
-
-      override fun onStopTrackingTouch(seekBar: SeekBar?) {
-        Toast.makeText(
-          requireContext(),
-          "Level is: " + binding.levelBar.progress,
-          Toast.LENGTH_SHORT
-        ).show()
-        scope.launch { sendLevelCommandClick() }
-      }
-    })
+    )
 
     return binding.root
   }
@@ -82,23 +98,46 @@ class OnOffClientFragment : Fragment() {
   }
 
   private suspend fun sendReadOnOffClick() {
-    getOnOffClusterForDevice().readOnOffAttribute(object : ChipClusters.BooleanAttributeCallback {
-      override fun onSuccess(on: Boolean) {
-        Log.v(TAG, "On/Off attribute value: $on")
-        showMessage("On/Off attribute value: $on")
-      }
+    val endpointId = addressUpdateFragment.endpointId
+    val clusterId = OnOff.ID
+    val attributeId = OnOff.Attribute.OnOff.id
 
-      override fun onError(ex: Exception) {
-        Log.e(TAG, "Error reading onOff attribute", ex)
-      }
-    })
+    val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
+
+    ChipClient.getDeviceController(requireContext())
+      .readPath(
+        object : ReportCallback {
+          override fun onError(
+            attributePath: ChipAttributePath?,
+            eventPath: ChipEventPath?,
+            ex: java.lang.Exception
+          ) {
+            Log.e(TAG, "Error reading onOff attribute", ex)
+          }
+
+          override fun onReport(nodeState: NodeState?) {
+            val value =
+              nodeState
+                ?.getEndpointState(endpointId)
+                ?.getClusterState(clusterId)
+                ?.getAttributeState(attributeId)
+                ?.value
+                ?: "null"
+            Log.v(TAG, "On/Off attribute value: $value")
+            showMessage("On/Off attribute value: $value")
+          }
+        },
+        getConnectedDevicePointer(),
+        listOf(attributePath),
+        null,
+        false,
+        0 /* imTimeoutMs */
+      )
   }
 
   private fun showSubscribeDialog() {
     val dialogView = requireActivity().layoutInflater.inflate(R.layout.subscribe_dialog, null)
-    val dialog = AlertDialog.Builder(requireContext()).apply {
-      setView(dialogView)
-    }.create()
+    val dialog = AlertDialog.Builder(requireContext()).apply { setView(dialogView) }.create()
 
     val minIntervalEd = dialogView.findViewById<EditText>(R.id.minIntervalEd)
     val maxIntervalEd = dialogView.findViewById<EditText>(R.id.maxIntervalEd)
@@ -108,38 +147,78 @@ class OnOffClientFragment : Fragment() {
           minIntervalEd.text.toString().toInt(),
           maxIntervalEd.text.toString().toInt()
         )
-        requireActivity().runOnUiThread {
-          dialog.dismiss()
-        }
+        requireActivity().runOnUiThread { dialog.dismiss() }
       }
     }
     dialog.show()
   }
 
   private suspend fun sendSubscribeOnOffClick(minInterval: Int, maxInterval: Int) {
-    val onOffCluster = getOnOffClusterForDevice()
+    val endpointId = addressUpdateFragment.endpointId
+    val clusterId = OnOff.ID
+    val attributeId = OnOff.Attribute.OnOff.id
 
-    val subscribeCallback = object : ChipClusters.BooleanAttributeCallback {
-      override fun onSuccess(value: Boolean) {
-        val formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-        val time = formatter.format(Calendar.getInstance(Locale.getDefault()).time)
-        val message = "Subscribed on/off value at $time: ${if (value) "ON" else "OFF"}"
+    val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
 
-        Log.v(TAG, message)
-        showReportMessage(message)
-      }
-
-      override fun onSubscriptionEstablished(subscriptionId: Long) {
-        val message = "Subscription for on/off established with subscriptionId: $subscriptionId"
-        Log.v(TAG, message)
-        showMessage(message)
-      }
-
-      override fun onError(ex: Exception) {
-        Log.e(TAG, "Error configuring on/off attribute", ex)
+    val subscriptionEstablishedCallback = SubscriptionEstablishedCallback { subscriptionId ->
+      Log.i(TAG, "Subscription to device established : ${subscriptionId.toULong()}")
+      requireActivity().runOnUiThread {
+        Toast.makeText(
+            requireActivity(),
+            "${getString(R.string.wildcard_subscribe_established_toast_message)} : $subscriptionId",
+            Toast.LENGTH_SHORT
+          )
+          .show()
       }
     }
-    onOffCluster.subscribeOnOffAttribute(subscribeCallback, minInterval, maxInterval)
+
+    val resubscriptionAttemptCallback =
+      ResubscriptionAttemptCallback { terminationCause, nextResubscribeIntervalMsec ->
+        Log.i(
+          TAG,
+          "ResubscriptionAttempt terminationCause:$terminationCause, nextResubscribeIntervalMsec:$nextResubscribeIntervalMsec"
+        )
+      }
+
+    deviceController.subscribeToPath(
+      subscriptionEstablishedCallback,
+      resubscriptionAttemptCallback,
+      object : ReportCallback {
+        override fun onError(
+          attributePath: ChipAttributePath?,
+          eventPath: ChipEventPath?,
+          ex: Exception
+        ) {
+          Log.e(TAG, "Error configuring on/off attribute", ex)
+        }
+
+        override fun onReport(nodeState: NodeState?) {
+          val tlv =
+            nodeState
+              ?.getEndpointState(endpointId)
+              ?.getClusterState(clusterId)
+              ?.getAttributeState(attributeId)
+              ?.tlv
+              ?: return
+          // TODO : Need to be implement poj-to-tlv
+          val value = TlvParseUtil.decodeBoolean(tlv)
+          val formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+          val time = formatter.format(Calendar.getInstance(Locale.getDefault()).time)
+          val message = "Subscribed on/off value at $time: ${if (value) "ON" else "OFF"}"
+
+          Log.v(TAG, message)
+          showReportMessage(message)
+        }
+      },
+      getConnectedDevicePointer(),
+      listOf(attributePath),
+      null,
+      minInterval,
+      maxInterval,
+      false,
+      false,
+      /* imTimeoutMs= */ 0
+    )
   }
 
   inner class ChipControllerCallback : GenericChipDeviceListener() {
@@ -164,87 +243,94 @@ class OnOffClientFragment : Fragment() {
   }
 
   private suspend fun sendLevelCommandClick() {
-    val cluster = ChipClusters.LevelControlCluster(
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
-      addressUpdateFragment.endpointId
+    // TODO : Need to be implement poj-to-tlv
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+    tlvWriter.put(
+      ContextSpecificTag(LevelControl.MoveToLevelCommandField.Level.id),
+      binding.levelBar.progress.toUInt()
     )
-    cluster.moveToLevel(object : ChipClusters.DefaultClusterCallback {
-      override fun onSuccess() {
-        showMessage("MoveToLevel command success")
-      }
+    tlvWriter.put(ContextSpecificTag(LevelControl.MoveToLevelCommandField.OptionsMask.id), 0u)
+    tlvWriter.put(ContextSpecificTag(LevelControl.MoveToLevelCommandField.OptionsOverride.id), 0u)
+    tlvWriter.put(ContextSpecificTag(LevelControl.MoveToLevelCommandField.TransitionTime.id), 0u)
+    tlvWriter.endStructure()
 
-      override fun onError(ex: Exception) {
-        showMessage("MoveToLevel command failure $ex")
-        Log.e(TAG, "MoveToLevel command failure", ex)
-      }
+    val invokeElement =
+      InvokeElement.newInstance(
+        addressUpdateFragment.endpointId,
+        LevelControl.ID,
+        LevelControl.Command.MoveToLevel.id,
+        tlvWriter.getEncoded(),
+        null
+      )
 
-    }, binding.levelBar.progress, 0, 0, 0)
-  }
+    deviceController.invoke(
+      object : InvokeCallback {
+        override fun onError(ex: Exception?) {
+          showMessage("MoveToLevel command failure $ex")
+          Log.e(TAG, "MoveToLevel command failure", ex)
+        }
 
-  private suspend fun sendOnCommandClick() {
-    getOnOffClusterForDevice().on(object : ChipClusters.DefaultClusterCallback {
-      override fun onSuccess() {
-        showMessage("ON command success")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("ON command failure $ex")
-        Log.e(TAG, "ON command failure", ex)
-      }
-
-    })
-  }
-
-  private suspend fun sendOffCommandClick() {
-    getOnOffClusterForDevice().off(object : ChipClusters.DefaultClusterCallback {
-      override fun onSuccess() {
-        showMessage("OFF command success")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("OFF command failure $ex")
-        Log.e(TAG, "OFF command failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendToggleCommandClick() {
-    getOnOffClusterForDevice().toggle(object : ChipClusters.DefaultClusterCallback {
-      override fun onSuccess() {
-        showMessage("TOGGLE command success")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("TOGGLE command failure $ex")
-        Log.e(TAG, "TOGGLE command failure", ex)
-      }
-    })
-  }
-
-  private suspend fun getOnOffClusterForDevice(): OnOffCluster {
-    return OnOffCluster(
-
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
-      addressUpdateFragment.endpointId
+        override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
+          Log.e(TAG, "onResponse : $invokeElement, Code : $successCode")
+          showMessage("MoveToLevel command success")
+        }
+      },
+      getConnectedDevicePointer(),
+      invokeElement,
+      0,
+      0
     )
+  }
+
+  private suspend fun sendOnOffClusterCommand(commandId: OnOff.Command) {
+    // TODO : Need to be implement poj-to-tlv
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+    tlvWriter.endStructure()
+    val invokeElement =
+      InvokeElement.newInstance(
+        addressUpdateFragment.endpointId,
+        OnOff.ID,
+        commandId.id,
+        tlvWriter.getEncoded(),
+        null
+      )
+
+    deviceController.invoke(
+      object : InvokeCallback {
+        override fun onError(ex: Exception?) {
+          showMessage("${commandId.name} command failure $ex")
+          Log.e(TAG, "${commandId.name} command failure", ex)
+        }
+
+        override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
+          Log.e(TAG, "onResponse : $invokeElement, Code : $successCode")
+          showMessage("${commandId.name} command success")
+        }
+      },
+      getConnectedDevicePointer(),
+      invokeElement,
+      0,
+      0
+    )
+  }
+
+  private suspend fun getConnectedDevicePointer(): Long {
+    return ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
   }
 
   private fun showMessage(msg: String) {
-    requireActivity().runOnUiThread {
-      binding.commandStatusTv.text = msg
-    }
+    requireActivity().runOnUiThread { binding.commandStatusTv.text = msg }
   }
 
   private fun showReportMessage(msg: String) {
-    requireActivity().runOnUiThread {
-      binding.reportStatusTv.text = msg
-    }
+    requireActivity().runOnUiThread { binding.reportStatusTv.text = msg }
   }
 
   override fun onResume() {
     super.onResume()
     addressUpdateFragment.endpointId = ON_OFF_CLUSTER_ENDPOINT
-
   }
 
   companion object {

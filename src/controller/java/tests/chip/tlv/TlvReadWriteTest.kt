@@ -19,7 +19,6 @@
 package chip.tlv
 
 import com.google.common.truth.Truth.assertThat
-import com.google.protobuf.ByteString
 import kotlin.test.assertFailsWith
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -429,7 +428,8 @@ class TlvReadWriteTest {
     // Signed Integer (Long), 8-octet
     val encoding = "03 00 90 2f 50 09 00 00 00".octetsToByteArray()
 
-    // Throws exception because the encoded value is Long and not ULong as requested by getULong()
+    // Throws exception because the encoded value is Long and not ULong as requested by
+    // getULong()
     assertFailsWith<IllegalArgumentException> { TlvReader(encoding).getULong(AnonymousTag) }
   }
 
@@ -484,7 +484,7 @@ class TlvReadWriteTest {
   @Test
   fun encodeOctetString() {
     // Octet String, 1-octet length, octets 00 01 02 03 04
-    val value = ByteString.fromHex("00 01 02 03 04".replace(" ", ""))
+    val value = "00 01 02 03 04".octetsToByteArray()
     val encoding = "10 05 00 01 02 03 04".octetsToByteArray()
 
     TlvWriter().apply {
@@ -1009,9 +1009,12 @@ class TlvReadWriteTest {
 
   @Test
   fun encodeFullyQualifiedTags_withStructure() {
-    // Structure with the fully qualified tag, Vendor ID 0xFFF1/65521, profile number 0xDEED/57069,
-    // 2-octet tag 1. The structure contains a single element labeled using a fully qualified tag
-    // under the same profile, with 2-octet tag 0xAA55/43605.65521::57069:1 = {65521::57069:43605 =
+    // Structure with the fully qualified tag, Vendor ID 0xFFF1/65521, profile number
+    // 0xDEED/57069,
+    // 2-octet tag 1. The structure contains a single element labeled using a fully qualified
+    // tag
+    // under the same profile, with 2-octet tag 0xAA55/43605.65521::57069:1 =
+    // {65521::57069:43605 =
     // 42U}
     val value = 42U
     val structTag = FullyQualifiedTag(6, 0xFFF1u, 0xDEEDu, 1u)
@@ -1093,10 +1096,10 @@ class TlvReadWriteTest {
   fun putByteStringArray() {
     // Anonumous Array of Signed Integers, [{00 01 02 03 04}, {FF}, {4A EF 88}]
     val values =
-      listOf<ByteString>(
-        ByteString.fromHex("0001020304"),
-        ByteString.fromHex("FF"),
-        ByteString.fromHex("4AEF88")
+      listOf<ByteArray>(
+        "0001020304".octetsToByteArray(),
+        "FF".octetsToByteArray(),
+        "4AEF88".octetsToByteArray()
       )
     val encoding = "16 10 05 00 01 02 03 04 10 01 FF 10 03 4A EF 88 18".octetsToByteArray()
 

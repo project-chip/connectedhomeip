@@ -15,13 +15,10 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_codegen.gni")
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/python.gni")
 
-import("${chip_root}/src/lib/core/core.gni")
-
 _app_root = get_path_info(".", "abspath")
-
-_zap_cluster_list_script = get_path_info("zap_cluster_list.py", "abspath")
 
 # Defines a source_set for CHIP data model.
 #
@@ -72,7 +69,6 @@ template("chip_data_model") {
       "zap-generated/access.h",
       "zap-generated/gen_config.h",
       "zap-generated/endpoint_config.h",
-      "zap-generated/CHIPClientCallbacks.h",
     ]
 
     if (chip_code_pre_generated_directory == "") {
@@ -156,34 +152,27 @@ template("chip_data_model") {
     sources += [
       "${_app_root}/clusters/barrier-control-server/barrier-control-server.h",
       "${_app_root}/clusters/basic-information/basic-information.h",
-      "${_app_root}/clusters/client-monitoring-server/client-monitoring-server.h",
       "${_app_root}/clusters/color-control-server/color-control-server.h",
       "${_app_root}/clusters/door-lock-server/door-lock-server.h",
       "${_app_root}/clusters/groups-server/groups-server.h",
+      "${_app_root}/clusters/icd-management-server/icd-management-server.h",
       "${_app_root}/clusters/identify-server/identify-server.h",
       "${_app_root}/clusters/level-control/level-control.h",
       "${_app_root}/clusters/on-off-server/on-off-server.h",
-      "${_app_root}/clusters/scenes/ExtensionFieldSets.h",
-      "${_app_root}/clusters/scenes/ExtensionFieldSetsImpl.cpp",
-      "${_app_root}/clusters/scenes/ExtensionFieldSetsImpl.h",
-      "${_app_root}/clusters/scenes/SceneTable.h",
-      "${_app_root}/clusters/scenes/SceneTableImpl.cpp",
-      "${_app_root}/clusters/scenes/SceneTableImpl.h",
-      "${_app_root}/clusters/scenes/scenes-tokens.h",
-      "${_app_root}/clusters/scenes/scenes.h",
-
-      # Disable CM cluster table tests until update is done
-      # https://github.com/project-chip/connectedhomeip/issues/24425
-      # "${_app_root}/util/ClientMonitoringRegistrationTable.cpp",
-      # "${_app_root}/util/ClientMonitoringRegistrationTable.h",
+      "${_app_root}/clusters/scenes-server/ExtensionFieldSets.h",
+      "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.h",
+      "${_app_root}/clusters/scenes-server/SceneTable.h",
+      "${_app_root}/clusters/scenes-server/SceneTableImpl.h",
+      "${_app_root}/clusters/scenes-server/scenes-server.h",
       "${_app_root}/util/DataModelHandler.cpp",
+      "${_app_root}/util/IcdMonitoringTable.cpp",
+      "${_app_root}/util/IcdMonitoringTable.h",
       "${_app_root}/util/attribute-size-util.cpp",
       "${_app_root}/util/attribute-storage.cpp",
       "${_app_root}/util/attribute-table.cpp",
       "${_app_root}/util/binding-table.cpp",
       "${_app_root}/util/binding-table.h",
       "${_app_root}/util/ember-compatibility-functions.cpp",
-      "${_app_root}/util/ember-print.cpp",
       "${_app_root}/util/error-mapping.cpp",
       "${_app_root}/util/generic-callback-stubs.cpp",
       "${_app_root}/util/message.cpp",
@@ -193,12 +182,9 @@ template("chip_data_model") {
     ]
 
     if (defined(invoker.zap_file)) {
-      _zap_path = rebase_path(invoker.zap_file, root_build_dir)
-      _script_path = rebase_path(_zap_cluster_list_script, root_build_dir)
-      _script_args = [ "--zap_file=" + _zap_path ]
-
-      _cluster_sources = exec_script("${build_root}/gn_run_binary.py",
-                                     [ _script_path ] + _script_args,
+      _zap_file = rebase_path(invoker.zap_file, root_build_dir)
+      _cluster_sources = exec_script("${_app_root}/zap_cluster_list.py",
+                                     [ "--zap_file=" + _zap_file ],
                                      "list lines",
                                      [ invoker.zap_file ])
     }
@@ -263,6 +249,18 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/BindingManager.h",
           "${_app_root}/clusters/${cluster}/PendingNotificationMap.cpp",
           "${_app_root}/clusters/${cluster}/PendingNotificationMap.h",
+        ]
+      } else if (cluster == "time-synchronization-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/DefaultTimeSyncDelegate.cpp",
+          "${_app_root}/clusters/${cluster}/TimeSyncDataProvider.cpp",
+        ]
+      } else if (cluster == "scenes-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
+          "${_app_root}/clusters/scenes-server/SceneTableImpl.cpp",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]

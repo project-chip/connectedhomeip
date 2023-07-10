@@ -56,14 +56,18 @@
 #include <openthread/ip6.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #include <net/if.h>
 #include <netinet/in.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 #include <sys/socket.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
+#include <zephyr/net/socket.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT && INET_CONFIG_ENABLE_IPV4
 #error Forbidden : native Open Thread implementation with IPV4 enabled
@@ -107,12 +111,33 @@ enum class IPv6MulticastFlag : uint8_t
 using IPv6MulticastFlags = BitFlags<IPv6MulticastFlag>;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+/**
+ * SockAddr should be used when calling any API that returns (by copying into
+ * it) a sockaddr, because that will need enough storage that it can hold data
+ * for any socket type.
+ *
+ * It can also be used when calling an API that accepts a sockaddr, to simplify
+ * the type-punning needed.
+ */
 union SockAddr
 {
     sockaddr any;
     sockaddr_in in;
     sockaddr_in6 in6;
     sockaddr_storage storage;
+};
+
+/**
+ * SockAddrWithoutStorage can be used any time we want to do the sockaddr
+ * type-punning but will not store the data ourselves (e.g. we're working with
+ * an existing sockaddr pointer, and reintepret it as a
+ * pointer-to-SockAddrWithoutStorage).
+ */
+union SockAddrWithoutStorage
+{
+    sockaddr any;
+    sockaddr_in in;
+    sockaddr_in6 in6;
 };
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -550,10 +575,10 @@ public:
     /**
      * Get the IP address from a SockAddr.
      */
-    static CHIP_ERROR GetIPAddressFromSockAddr(const SockAddr & sockaddr, IPAddress & outIPAddress);
+    static CHIP_ERROR GetIPAddressFromSockAddr(const SockAddrWithoutStorage & sockaddr, IPAddress & outIPAddress);
     static CHIP_ERROR GetIPAddressFromSockAddr(const sockaddr & sockaddr, IPAddress & outIPAddress)
     {
-        return GetIPAddressFromSockAddr(reinterpret_cast<const SockAddr &>(sockaddr), outIPAddress);
+        return GetIPAddressFromSockAddr(reinterpret_cast<const SockAddrWithoutStorage &>(sockaddr), outIPAddress);
     }
     static IPAddress FromSockAddr(const sockaddr_in6 & sockaddr) { return IPAddress(sockaddr.sin6_addr); }
 #if INET_CONFIG_ENABLE_IPV4
@@ -673,6 +698,14 @@ public:
      *  not be modified by users of the CHIP Inet Layer.
      */
     static IPAddress Any;
+
+    /**
+     * Creates a loopback of the specified type. Type MUST be IPv6/v4.
+     *
+     * If type is anything else (or IPv4 is not available) an IPv6
+     * loopback will be created.
+     */
+    static IPAddress Loopback(IPAddressType type);
 };
 
 static_assert(std::is_trivial<IPAddress>::value, "IPAddress is not trivial");

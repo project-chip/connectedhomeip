@@ -121,14 +121,6 @@ DataVersion fixedEndpointDataVersions[ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT];
 app::AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
 } // anonymous namespace
 
-//------------------------------------------------------------------------------
-// Forward declarations
-
-// Returns endpoint index within a given cluster
-static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterId, uint8_t mask);
-
-//------------------------------------------------------------------------------
-
 // Initial configuration
 void emberAfEndpointConfigure()
 {
@@ -825,40 +817,6 @@ const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(EndpointId e
     return nullptr;
 }
 
-// Server wrapper for findClusterEndpointIndex
-uint16_t emberAfFindClusterServerEndpointIndex(EndpointId endpoint, ClusterId clusterId)
-{
-    return findClusterEndpointIndex(endpoint, clusterId, CLUSTER_MASK_SERVER);
-}
-
-// Returns the endpoint index within a given cluster
-static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterId, uint8_t mask)
-{
-    uint16_t i, epi = 0;
-
-    if (emberAfFindServerCluster(endpoint, clusterId) == nullptr)
-    {
-        return kEmberInvalidEndpointIndex;
-    }
-
-    for (i = 0; i < emberAfEndpointCount(); i++)
-    {
-        if (emAfEndpoints[i].endpoint == endpoint)
-        {
-            break;
-        }
-        if (emAfEndpoints[i].endpoint == kInvalidEndpointId)
-        {
-            // Not actually a configured endpoint.
-            continue;
-        }
-        epi = static_cast<uint16_t>(
-            epi + ((emberAfFindClusterIncludingDisabledEndpoints(emAfEndpoints[i].endpoint, clusterId, mask) != nullptr) ? 1 : 0));
-    }
-
-    return epi;
-}
-
 static uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEndpoints)
 {
     if (endpoint == kInvalidEndpointId)
@@ -876,6 +834,53 @@ static uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEn
         }
     }
     return kEmberInvalidEndpointIndex;
+}
+
+uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId cluster, uint16_t fixedClusterServerEndpointCount)
+{
+    VerifyOrDie(fixedClusterServerEndpointCount <= FIXED_ENDPOINT_COUNT);
+    uint16_t epIndex = findIndexFromEndpoint(endpoint, true /*ignoreDisabledEndpoints*/);
+
+    // Endpoint must be configured and enabled
+    if (epIndex == kEmberInvalidEndpointIndex)
+    {
+        return kEmberInvalidEndpointIndex;
+    }
+
+    if (emberAfFindClusterInType(emAfEndpoints[epIndex].endpointType, cluster, CLUSTER_MASK_SERVER) == nullptr)
+    {
+        // The provided endpoint does not contain the given cluster server.
+        return kEmberInvalidEndpointIndex;
+    }
+
+    if (epIndex < FIXED_ENDPOINT_COUNT)
+    {
+        // This endpoint is a fixed one.
+        // Return the index of this endpoint in the list of fixed endpoints that support the given cluster.
+        uint16_t adjustedEndpointIndex = 0;
+        for (uint16_t i = 0; i < epIndex; i++)
+        {
+            // Increase adjustedEndpointIndex for every endpoint containing the cluster server
+            // before our endpoint of interest
+            if (emAfEndpoints[i].endpoint != kInvalidEndpointId &&
+                (emberAfFindClusterInType(emAfEndpoints[i].endpointType, cluster, CLUSTER_MASK_SERVER) != nullptr))
+            {
+                adjustedEndpointIndex++;
+            }
+        }
+
+        // If this asserts, the provided fixedClusterServerEndpointCount doesn't match the app data model.
+        VerifyOrDie(adjustedEndpointIndex < fixedClusterServerEndpointCount);
+        epIndex = adjustedEndpointIndex;
+    }
+    else
+    {
+        // This is a dynamic endpoint.
+        // Its index is just its index in the dynamic endpoint list, offset by fixedClusterServerEndpointCount.
+        epIndex = static_cast<uint16_t>(fixedClusterServerEndpointCount + (epIndex - FIXED_ENDPOINT_COUNT));
+    }
+
+    return epIndex;
 }
 
 bool emberAfEndpointIsEnabled(EndpointId endpoint)
@@ -1210,8 +1215,9 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                 {
                     VerifyOrDie(attrStorage && "Attribute persistence needs a persistence provider");
                     MutableByteSpan bytes(attrData);
-                    CHIP_ERROR err = attrStorage->ReadValue(
-                        app::ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId), am, bytes);
+                    CHIP_ERROR err =
+                        attrStorage->ReadValue(app::ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId),
+                                               am->attributeType, am->size, bytes);
                     if (err == CHIP_NO_ERROR)
                     {
                         ptr = attrData;
