@@ -260,7 +260,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         }
 
         auto unauthenticated = sessionHandle->AsUnauthenticatedSession();
-        destination_address = unauthenticated->GetPeerAddress();
+        destination_address  = unauthenticated->GetPeerAddress();
 
         // Trace after all headers are settled.
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kUnauthenticated, &payloadHeader, &packetHeader,
