@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "laundry-washer-controls-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 
 namespace chip {
@@ -25,7 +24,32 @@ namespace app {
 namespace Clusters {
 namespace LaundryWasherControls {
 
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+class LaundryWasherManager
+{
+public:
+    template <typename T>
+    struct AttributeProvider
+    {
+        using pointer = const T *;
+
+        inline pointer begin() const { return mBegin; }
+        inline pointer end() const { return mEnd; }
+
+        AttributeProvider() : mBegin(nullptr), mEnd(nullptr) {}
+
+        AttributeProvider(const pointer aBegin, const pointer aEnd) : mBegin(aBegin), mEnd(aEnd) {}
+
+        pointer mBegin;
+        pointer mEnd;
+    };
+
+    virtual AttributeProvider<CharSpan> getSpinSpeedProvider(EndpointId endpointId) const = 0;
+    virtual AttributeProvider<NumberOfRinsesEnum> getSupportedRinseProvider(EndpointId endpointId) const = 0;
+
+    virtual ~LaundryWasherManager() {}
+};
+
+const LaundryWasherManager * getLaundryWasherManager();
 
 } // namespace LaundryWasherControls
 } // namespace Clusters

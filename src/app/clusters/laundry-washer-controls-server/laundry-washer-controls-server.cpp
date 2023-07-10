@@ -29,7 +29,6 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-delegate.h>
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
@@ -41,57 +40,7 @@ using namespace chip::app::Clusters::LaundryWasherControls;
 using namespace chip::app::Clusters::LaundryWasherControls::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-static constexpr size_t kLaundryWasherControlsDelegateTableSize =
-    EMBER_AF_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
-// -----------------------------------------------------------------------------
-// Delegate Implementation
-//
 namespace {
-Delegate * gDelegateTable[kLaundryWasherControlsDelegateTableSize] = { nullptr };
-}
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace LaundryWasherControls {
-
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
-{
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LaundryWasherControls::Id,
-                                                       EMBER_AF_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
-    // if endpoint is found
-    if (ep < kLaundryWasherControlsDelegateTableSize)
-    {
-        gDelegateTable[ep] = delegate;
-    }
-    else
-    {
-    }
-}
-} // namespace LaundryWasherControls
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-namespace {
-Delegate * GetDelegate(EndpointId endpoint)
-{
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LaundryWasherControls::Id,
-                                                       EMBER_AF_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kLaundryWasherControlsDelegateTableSize ? nullptr : gDelegateTable[ep]);
-}
-
-bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
-{
-    if (delegate == nullptr)
-    {
-        ChipLogProgress(Zcl, "Laundry Washer Control has no delegate set for endpoint:%u", endpoint);
-        return true;
-    }
-    return false;
-}
-
 class LaundryWasherControlsAttrAccess : public AttributeAccessInterface
 {
 public:
@@ -99,48 +48,58 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
-    CHIP_ERROR ReadSpinSpeeds(AttributeValueEncoder & aEncoder, Delegate * delegate);
-    CHIP_ERROR ReadSpinSpeedCurrent(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadNumberOfRinses(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadSupportedRinses(AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadSpinSpeeds(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadSupportedRinses(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
 };
 
-CHIP_ERROR LaundryWasherControlsAttrAccess::ReadSpinSpeeds(AttributeValueEncoder & aEncoder, Delegate * delegate)
+CHIP_ERROR LaundryWasherControlsAttrAccess::ReadSpinSpeeds(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    return delegate->HandleGetSpinSpeedsList(aEncoder);
-}
-
-CHIP_ERROR LaundryWasherControlsAttrAccess::ReadSpinSpeedCurrent(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    DataModel::Nullable<uint8_t> speedSetting;
-    SpinSpeedCurrent::Get(endpoint, speedSetting);
-    uint8_t ret = 0;
-    if (!speedSetting.IsNull())
+    const LaundryWasherControls::LaundryWasherManager * gLaundryWasherManager = LaundryWasherControls::getLaundryWasherManager();
+    const LaundryWasherControls::LaundryWasherManager::AttributeProvider<CharSpan> attrProvider =
+            gLaundryWasherManager->getSpinSpeedProvider(aPath.mEndpointId);
+    if (attrProvider.begin() == nullptr)
     {
-        ret = speedSetting.Value();
+        aEncoder.EncodeEmptyList();
+        return CHIP_NO_ERROR;
     }
-
-    return aEncoder.Encode(ret);
+    CHIP_ERROR err;
+    err = aEncoder.EncodeList([attrProvider](const auto & encoder) -> CHIP_ERROR {
+        const auto * end = attrProvider.end();
+        for (auto * it = attrProvider.begin(); it != end; ++it)
+        {
+            auto & spinSpeed = *it;
+            ReturnErrorOnFailure(encoder.Encode(spinSpeed));
+        }
+        return CHIP_NO_ERROR;
+    });
+    return err;
 }
 
-CHIP_ERROR LaundryWasherControlsAttrAccess::ReadNumberOfRinses(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+CHIP_ERROR LaundryWasherControlsAttrAccess::ReadSupportedRinses(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    LaundryWasherControls::NumberOfRinsesEnum numOfRinses;
-    NumberOfRinses::Get(endpoint, &numOfRinses);
-
-    return aEncoder.Encode(numOfRinses);
-}
-
-CHIP_ERROR LaundryWasherControlsAttrAccess::ReadSupportedRinses(AttributeValueEncoder & aEncoder, Delegate * delegate)
-{
-    return delegate->HandleGetSupportedRinses(aEncoder);
+    const LaundryWasherControls::LaundryWasherManager * gLaundryWasherManager = LaundryWasherControls::getLaundryWasherManager();
+    const LaundryWasherControls::LaundryWasherManager::AttributeProvider<NumberOfRinsesEnum> attrProvider =
+            gLaundryWasherManager->getSupportedRinseProvider(aPath.mEndpointId);
+    if (attrProvider.begin() == nullptr)
+    {
+        aEncoder.EncodeEmptyList();
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR err;
+    err = aEncoder.EncodeList([attrProvider](const auto & encoder) -> CHIP_ERROR {
+        const auto * end = attrProvider.end();
+        for (auto * it = attrProvider.begin(); it != end; ++it)
+        {
+            auto & rinse = *it;
+            ReturnErrorOnFailure(encoder.Encode(rinse));
+        }
+        return CHIP_NO_ERROR;
+    });
+    return err;
 }
 
 CHIP_ERROR LaundryWasherControlsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    EndpointId endpoint = aPath.mEndpointId;
-    Delegate * delegate = GetDelegate(endpoint);
-
     if (aPath.mClusterId != LaundryWasherControls::Id)
     {
         // We shouldn't have been called at all.
@@ -149,21 +108,9 @@ CHIP_ERROR LaundryWasherControlsAttrAccess::Read(const ConcreteReadAttributePath
     switch (aPath.mAttributeId)
     {
     case Attributes::SpinSpeeds::Id:
-        if (isDelegateNull(delegate, endpoint))
-        {
-            return aEncoder.EncodeEmptyList();
-        }
-        return ReadSpinSpeeds(aEncoder, delegate);
-    case Attributes::SpinSpeedCurrent::Id:
-        return ReadSpinSpeedCurrent(endpoint, aEncoder);
-    case Attributes::NumberOfRinses::Id:
-        return ReadNumberOfRinses(endpoint, aEncoder);
+        return ReadSpinSpeeds(aPath, aEncoder);
     case Attributes::SupportedRinses::Id:
-        if (isDelegateNull(delegate, endpoint))
-        {
-            return aEncoder.EncodeEmptyList();
-        }
-        return ReadSupportedRinses(aEncoder, delegate);
+        return ReadSupportedRinses(aPath, aEncoder);
     default:
         break;
     }
@@ -174,21 +121,6 @@ CHIP_ERROR LaundryWasherControlsAttrAccess::Read(const ConcreteReadAttributePath
 void emberAfLaundryWasherControlsClusterInitCallback(chip::EndpointId endpoint)
 {
     return;
-}
-
-using imcode = Protocols::InteractionModel::Status;
-
-void MatterLaundryWasherControlsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
-{
-    // ToDo
-    return;
-}
-
-Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                                           EmberAfAttributeType attributeType, uint16_t size,
-                                                                           uint8_t * value)
-{
-    return imcode::Success;
 }
 
 LaundryWasherControlsAttrAccess gAttrAccess;
