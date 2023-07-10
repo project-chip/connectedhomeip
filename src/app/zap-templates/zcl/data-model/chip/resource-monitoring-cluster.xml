@@ -30,6 +30,7 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
     <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
     <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -51,6 +52,7 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
     <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
     <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -72,6 +74,7 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="CERAMIC_FILTER_MONITORING" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false">DegradationDirection</attribute>
     <attribute side="server" code="0x0002" define="CERAMIC_FILTER_MONITORING" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
     <attribute side="server" code="0x0003" define="CERAMIC_FILTER_MONITORING" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -93,6 +96,7 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
     <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
     <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -114,6 +118,7 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
     <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
     <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -135,6 +140,7 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
     <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
     <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -156,6 +162,7 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
     <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
     <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -177,6 +184,7 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
     <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
     <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -198,6 +206,7 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
     <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
     <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -219,6 +228,7 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
     <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
     <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -240,6 +250,7 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
     <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
     <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -261,6 +272,7 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
     <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
     <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">

@@ -22,7 +22,7 @@ import kotlin.experimental.and
 import kotlin.experimental.or
 
 private const val TAG_MASK = 0b11100000.toByte()
-private const val ANONYMOUS = 0b0.toByte()
+private const val ANONYMOUS = 0.toByte()
 private const val CONTEXT_SPECIFIC = 0b00100000.toByte()
 private const val COMMON_PROFILE_2 = 0b01000000.toByte()
 private const val COMMON_PROFILE_4 = 0b01100000.toByte()

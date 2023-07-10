@@ -26,6 +26,12 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#define ENABLE_OTA_TESTS 0
+#else
+#define ENABLE_OTA_TESTS 1
+#endif
+
 // TODO: Disable test006_DoBDXTransferAllowUpdateRequest,
 // test007_DoBDXTransferWithTwoOTARequesters and
 // test008_DoBDXTransferIncrementalOtaUpdate until PR #26040 is merged.
@@ -370,6 +376,7 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
     NSString * imageToolPath = [NSString
         pathWithComponents:@[ [pwd substringToIndex:(pwd.length - @"darwin/Framework".length)], @"app", @"ota_image_tool.py" ]];
 
+#if ENABLE_OTA_TESTS
     NSTask * task = [[NSTask alloc] init];
     [task setLaunchPath:imageToolPath];
     [task setArguments:@[
@@ -381,6 +388,7 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
     XCTAssertNil(launchError);
     [task waitUntilExit];
     XCTAssertEqual([task terminationStatus], 0);
+#endif
 
     NSData * updateToken = [sOTAProviderDelegate generateUpdateToken];
 
@@ -617,6 +625,8 @@ static BOOL sNeedsStackShutdown = YES;
 
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
 }
+
+#if ENABLE_OTA_TESTS
 
 - (void)test000_SetUp
 {
@@ -1411,5 +1421,7 @@ static BOOL sNeedsStackShutdown = YES;
     ResetCommissionee(device, dispatch_get_main_queue(), self, kTimeoutInSeconds);
     [[self class] shutdownStack];
 }
+
+#endif
 
 @end

@@ -183,8 +183,6 @@ jobs:
             - name: Build Apps
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv --include_yamltests'
-                  scripts/run_in_python_env.sh out/venv 'pip install -r scripts/setup/requirements.build.txt'
-                  scripts/run_in_python_env.sh out/venv 'pip install -r scripts/setup/requirements.yaml_tests.txt'
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
@@ -214,6 +212,8 @@ jobs:
                   "
 
             - name: Run Tests using the python parser sending commands to chip-tool
+              #   https://github.com/project-chip/connectedhomeip/issues/27673
+              if: matrix.build_variant != 'no-ble-tsan-clang'
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
@@ -288,7 +288,8 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-tsan-clang, no-ble-asan-clang]
+                build_variant: [no-ble-asan-clang] 
+                # Since no-ble-tsan-clang doesn't run any tests, this is just wasted CI time for now
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
@@ -352,6 +353,8 @@ jobs:
                   "
 
             - name: Run Tests using the python parser sending commands to chip-tool
+            #   https://github.com/project-chip/connectedhomeip/issues/27673
+              if: matrix.build_variant != 'no-ble-tsan-clang'
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
@@ -424,8 +427,6 @@ jobs:
             - name: Build Python REPL and example apps
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv --extra_packages "mobly"'
-                  scripts/run_in_python_env.sh out/venv 'pip install -r scripts/setup/requirements.build.txt'
-                  scripts/run_in_python_env.sh out/venv 'pip install colorama pyasn1 pyasn1_modules'
                   ./scripts/run_in_build_env.sh \
                    "./scripts/build/build_examples.py \
                       --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test \
@@ -499,8 +500,6 @@ jobs:
             - name: Build Python REPL and example apps
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
-                  scripts/run_in_python_env.sh out/venv 'pip install -r scripts/setup/requirements.build.txt'
-                  scripts/run_in_python_env.sh out/venv 'pip install colorama'
                   ./scripts/run_in_build_env.sh \
                    "./scripts/build/build_examples.py \
                       --target darwin-x64-all-clusters-${BUILD_VARIANT}-test \

@@ -144,7 +144,12 @@ public:
 
     // After work callback, processed in the main Matter task via `PlatformManager::ScheduleWork`.
     // This is a member function to be called on the associated session after the work callback.
-    // The `status` value is the result of the work callback (called beforehand).
+    // The `status` value is the result of the work callback (called beforehand), or the status of
+    // queueing the after work callback back to the Matter thread, if the work callback succeeds
+    // but queueing fails.
+    //
+    // When this callback is called asynchronously (i.e. via ScheduleWork), the helper guarantees
+    // that it will keep itself (and hence `data`) alive until the callback completes.
     typedef CHIP_ERROR (CASESession::*AfterWorkCallback)(DATA & data, CHIP_ERROR status);
 
 public:
@@ -169,8 +174,14 @@ public:
 
     // Do the work immediately.
     // No scheduling, no outstanding work, no shared lifetime management.
+    //
+    // The caller must guarantee that it keeps the helper alive across this call, most likely by
+    // holding a reference to it on the stack.
     CHIP_ERROR DoWork()
     {
+        // Ensure that this function is being called from main Matter thread
+        assertChipStackLockedByCurrentThread();
+
         VerifyOrReturnError(mSession && mWorkCallback && mAfterWorkCallback, CHIP_ERROR_INCORRECT_STATE);
         auto * helper   = this;
         bool cancel     = false;
@@ -192,7 +203,7 @@ public:
         auto status = DeviceLayer::PlatformMgr().ScheduleBackgroundWork(WorkHandler, reinterpret_cast<intptr_t>(this));
         if (status != CHIP_NO_ERROR)
         {
-            // Release strong ptr since scheduling failed
+            // Release strong ptr since scheduling failed.
             mStrongPtr.reset();
         }
         return status;
@@ -202,6 +213,17 @@ public:
     void CancelWork() { mSession.store(nullptr); }
 
     bool IsCancelled() const { return mSession.load() == nullptr; }
+
+    // This API returns true when background thread fails to schedule the AfterWorkCallback
+    bool UnableToScheduleAfterWorkCallback() { return mScheduleAfterWorkFailed.load(); }
+
+    // Do after work immediately.
+    // No scheduling, no outstanding work, no shared lifetime management.
+    void DoAfterWork()
+    {
+        VerifyOrDie(UnableToScheduleAfterWorkCallback());
+        AfterWorkHandler(reinterpret_cast<intptr_t>(this));
+    }
 
 private:
     // Create a work helper using the specified session, work callback, after work callback, and data (template arg).
@@ -221,22 +243,53 @@ private:
         // Execute callback in background thread; data must be OK with this
         helper->mStatus = helper->mWorkCallback(helper->mData, cancel);
         VerifyOrReturn(!cancel && !helper->IsCancelled());
-        // Hold strong ptr while work is outstanding
+        // Hold strong ptr to ourselves while work is outstanding
         helper->mStrongPtr.swap(strongPtr);
         auto status = DeviceLayer::PlatformMgr().ScheduleWork(AfterWorkHandler, reinterpret_cast<intptr_t>(helper));
         if (status != CHIP_NO_ERROR)
         {
-            // Release strong ptr since scheduling failed
-            helper->mStrongPtr.reset();
+            ChipLogError(SecureChannel, "Failed to Schedule the AfterWorkCallback on foreground thread: %" CHIP_ERROR_FORMAT,
+                         status.Format());
+
+            // We failed to schedule after work callback, so setting mScheduleAfterWorkFailed flag to true
+            // This can be checked from foreground thread and after work callback can be retried
+            helper->mStatus = status;
+
+            // Release strong ptr to self since scheduling failed, because nothing guarantees
+            // that AfterWorkHandler will get called at this point to release the reference,
+            // and we don't want to leak.  That said, we want to ensure that "helper" stays
+            // alive through the end of this function (so we can set mScheduleAfterWorkFailed
+            // on it), but also want to avoid racing on the single SharedPtr instance in
+            // helper->mStrongPtr.  That means we need to not touch helper->mStrongPtr after
+            // writing to mScheduleAfterWorkFailed.
+            //
+            // The simplest way to do this is to move the reference in helper->mStrongPtr to
+            // our stack, where it outlives all our accesses to "helper".
+            strongPtr.swap(helper->mStrongPtr);
+
+            // helper and any of its state should not be touched after storing mScheduleAfterWorkFailed.
+            helper->mScheduleAfterWorkFailed.store(true);
         }
     }
 
     // Handler for the after work callback.
     static void AfterWorkHandler(intptr_t arg)
     {
+        // Ensure that this function is being called from main Matter thread
+        assertChipStackLockedByCurrentThread();
+
         auto * helper = reinterpret_cast<WorkHelper *>(arg);
-        // Hold strong ptr while work is handled
+        // Hold strong ptr while work is handled, and ensure that helper->mStrongPtr does not keep
+        // holding a reference.
         auto strongPtr(std::move(helper->mStrongPtr));
+        if (!strongPtr)
+        {
+            // This can happen if scheduling AfterWorkHandler failed.  Just grab a strong ref
+            // to handler directly, to fulfill our API contract of holding a strong reference
+            // across the after-work callback.  At this point, we are guaranteed that the
+            // background thread is not touching the helper anymore.
+            strongPtr = helper->mWeakPtr.lock();
+        }
         if (auto * session = helper->mSession.load())
         {
             // Execute callback in Matter thread; session should be OK with this
@@ -262,6 +315,13 @@ private:
 
     // Return value of `mWorkCallback`, passed to `mAfterWorkCallback`.
     CHIP_ERROR mStatus;
+
+    // If background thread fails to schedule AfterWorkCallback then this flag is set to true
+    // and CASEServer then can check this one and run the AfterWorkCallback for us.
+    //
+    // When this happens, the write to this boolean _must_ be the last code that touches this
+    // object on the background thread.  After that, the Matter thread owns the object.
+    std::atomic<bool> mScheduleAfterWorkFailed{ false };
 
 public:
     // Data passed to `mWorkCallback` and `mAfterWorkCallback`.
@@ -2177,6 +2237,27 @@ System::Clock::Timeout CASESession::ComputeSigma2ResponseTimeout(const ReliableM
                                     // Assume peer is idle, as a worst-case assumption.
                                     System::Clock::kZero, Transport::kMinActiveTime) +
         kExpectedHighProcessingTime;
+}
+
+bool CASESession::InvokeBackgroundWorkWatchdog()
+{
+    bool watchdogFired = false;
+
+    if (mSendSigma3Helper && mSendSigma3Helper->UnableToScheduleAfterWorkCallback())
+    {
+        ChipLogError(SecureChannel, "SendSigma3Helper was unable to schedule the AfterWorkCallback");
+        mSendSigma3Helper->DoAfterWork();
+        watchdogFired = true;
+    }
+
+    if (mHandleSigma3Helper && mHandleSigma3Helper->UnableToScheduleAfterWorkCallback())
+    {
+        ChipLogError(SecureChannel, "HandleSigma3Helper was unable to schedule the AfterWorkCallback");
+        mHandleSigma3Helper->DoAfterWork();
+        watchdogFired = true;
+    }
+
+    return watchdogFired;
 }
 
 } // namespace chip

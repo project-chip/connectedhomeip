@@ -1677,9 +1677,10 @@ endpoint 1 {
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x0;
+    ram      attribute identifyType default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -1689,9 +1690,10 @@ endpoint 1 {
     ram      attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster OnOff {
@@ -1702,6 +1704,7 @@ endpoint 1 {
     ram      attribute startUpOnOff;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -1715,6 +1718,7 @@ endpoint 1 {
     ram      attribute startUpCurrentLevel;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 5;
@@ -1727,6 +1731,7 @@ endpoint 1 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -1735,7 +1740,7 @@ endpoint 1 {
   server cluster ColorControl {
     ram      attribute remainingTime default = 0x0000;
     ram      attribute colorTemperatureMireds default = 0x00FA;
-    ram      attribute colorMode default = 0x01;
+    ram      attribute colorMode default = 0x02;
     ram      attribute options default = 0x00;
     ram      attribute numberOfPrimaries;
     ram      attribute primary1X;
@@ -1757,7 +1762,7 @@ endpoint 1 {
     ram      attribute primary6Y;
     ram      attribute primary6Intensity;
     ram      attribute enhancedCurrentHue default = 0x0000;
-    ram      attribute enhancedColorMode default = 0x01;
+    ram      attribute enhancedColorMode default = 0x02;
     ram      attribute colorCapabilities default = 0x0000;
     ram      attribute colorTempPhysicalMinMireds default = 0x0000;
     ram      attribute colorTempPhysicalMaxMireds default = 0xFEFF;
@@ -1765,8 +1770,9 @@ endpoint 1 {
     ram      attribute startUpColorTemperatureMireds;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x0010;
     ram      attribute clusterRevision default = 5;
   }
 }

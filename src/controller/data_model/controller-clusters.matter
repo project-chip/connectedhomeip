@@ -3176,8 +3176,8 @@ client cluster SmokeCoAlarm = 92 {
   }
 
   enum EndOfServiceEnum : ENUM8 {
-    kExpired = 0;
-    kNormal = 1;
+    kNormal = 0;
+    kExpired = 1;
   }
 
   enum ExpressedStateEnum : ENUM8 {
@@ -3461,6 +3461,7 @@ client cluster HepaFilterMonitoring = 113 {
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3494,6 +3495,7 @@ client cluster ActivatedCarbonFilterMonitoring = 114 {
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3527,6 +3529,7 @@ client cluster CeramicFilterMonitoring = 115 {
   readonly attribute DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3560,6 +3563,7 @@ client cluster ElectrostaticFilterMonitoring = 116 {
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3593,6 +3597,7 @@ client cluster UvFilterMonitoring = 117 {
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3626,6 +3631,7 @@ client cluster IonizingFilterMonitoring = 118 {
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3659,6 +3665,7 @@ client cluster ZeoliteFilterMonitoring = 119 {
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3692,6 +3699,7 @@ client cluster OzoneFilterMonitoring = 120 {
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3725,6 +3733,7 @@ client cluster WaterTankMonitoring = 121 {
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3758,6 +3767,7 @@ client cluster FuelTankMonitoring = 122 {
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3791,6 +3801,7 @@ client cluster InkCartridgeMonitoring = 123 {
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3824,6 +3835,7 @@ client cluster TonerCartridgeMonitoring = 124 {
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -5484,8 +5496,8 @@ client cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -5539,8 +5551,8 @@ client cluster CarbonDioxideConcentrationMeasurement = 1037 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -5594,8 +5606,8 @@ client cluster EthyleneConcentrationMeasurement = 1038 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -5649,8 +5661,8 @@ client cluster EthyleneOxideConcentrationMeasurement = 1039 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -5704,8 +5716,8 @@ client cluster HydrogenConcentrationMeasurement = 1040 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -5759,8 +5771,8 @@ client cluster HydrogenSulfideConcentrationMeasurement = 1041 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -5814,8 +5826,8 @@ client cluster NitricOxideConcentrationMeasurement = 1042 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -5869,8 +5881,8 @@ client cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -5924,8 +5936,8 @@ client cluster OxygenConcentrationMeasurement = 1044 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -5979,8 +5991,8 @@ client cluster OzoneConcentrationMeasurement = 1045 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6034,8 +6046,8 @@ client cluster SulfurDioxideConcentrationMeasurement = 1046 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6089,8 +6101,8 @@ client cluster DissolvedOxygenConcentrationMeasurement = 1047 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6144,8 +6156,8 @@ client cluster BromateConcentrationMeasurement = 1048 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6199,8 +6211,8 @@ client cluster ChloraminesConcentrationMeasurement = 1049 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6254,8 +6266,8 @@ client cluster ChlorineConcentrationMeasurement = 1050 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6309,8 +6321,8 @@ client cluster FecalColiformEColiConcentrationMeasurement = 1051 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6364,8 +6376,8 @@ client cluster FluorideConcentrationMeasurement = 1052 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6419,8 +6431,8 @@ client cluster HaloaceticAcidsConcentrationMeasurement = 1053 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6474,8 +6486,8 @@ client cluster TotalTrihalomethanesConcentrationMeasurement = 1054 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6529,8 +6541,8 @@ client cluster TotalColiformBacteriaConcentrationMeasurement = 1055 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6584,8 +6596,8 @@ client cluster TurbidityConcentrationMeasurement = 1056 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6639,8 +6651,8 @@ client cluster CopperConcentrationMeasurement = 1057 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6694,8 +6706,8 @@ client cluster LeadConcentrationMeasurement = 1058 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6749,8 +6761,8 @@ client cluster ManganeseConcentrationMeasurement = 1059 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6804,8 +6816,8 @@ client cluster SulfateConcentrationMeasurement = 1060 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6859,8 +6871,8 @@ client cluster BromodichloromethaneConcentrationMeasurement = 1061 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6914,8 +6926,8 @@ client cluster BromoformConcentrationMeasurement = 1062 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -6969,8 +6981,8 @@ client cluster ChlorodibromomethaneConcentrationMeasurement = 1063 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -7024,8 +7036,8 @@ client cluster ChloroformConcentrationMeasurement = 1064 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -7079,8 +7091,8 @@ client cluster SodiumConcentrationMeasurement = 1065 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -7134,8 +7146,8 @@ client cluster Pm25ConcentrationMeasurement = 1066 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -7189,8 +7201,8 @@ client cluster FormaldehydeConcentrationMeasurement = 1067 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -7244,8 +7256,8 @@ client cluster Pm1ConcentrationMeasurement = 1068 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -7299,8 +7311,8 @@ client cluster Pm10ConcentrationMeasurement = 1069 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -7354,8 +7366,8 @@ client cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -7409,8 +7421,8 @@ client cluster RadonConcentrationMeasurement = 1071 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 

@@ -25,6 +25,21 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
+static void on_eth_event(void * esp_netif, esp_event_base_t event_base, int32_t event_id, void * event_data)
+{
+    switch (event_id)
+    {
+    case ETHERNET_EVENT_CONNECTED: {
+        esp_netif_t * eth_netif = (esp_netif_t *) esp_netif;
+        ChipLogProgress(DeviceLayer, "Ethernet Connected");
+        ESP_ERROR_CHECK(esp_netif_create_ip6_linklocal(eth_netif));
+    }
+    break;
+    default:
+        break;
+    }
+}
+
 CHIP_ERROR ESPEthernetDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     /* Currently default ethernet board supported is IP101, if you want to use other types of
@@ -49,6 +64,8 @@ CHIP_ERROR ESPEthernetDriver::Init(NetworkStatusChangeCallback * networkStatusCh
     ESP_ERROR_CHECK(esp_eth_driver_install(&config, &eth_handle));
     /* attach Ethernet driver to TCP/IP stack */
     ESP_ERROR_CHECK(esp_netif_attach(eth_netif, esp_eth_new_netif_glue(eth_handle)));
+
+    ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ETHERNET_EVENT_CONNECTED, &on_eth_event, eth_netif));
 
     ESP_ERROR_CHECK(esp_eth_start(eth_handle));
 

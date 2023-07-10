@@ -127,6 +127,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mSubscriptionResumptionStorage = initParams.subscriptionResumptionStorage;
     mOperationalKeystore           = initParams.operationalKeystore;
     mOpCertStore                   = initParams.opCertStore;
+    mSessionKeystore               = initParams.sessionKeystore;
 
     if (initParams.certificateValidityPolicy)
     {
@@ -205,7 +206,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err);
 
     err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, mDeviceStorage, &GetFabricTable(),
-                         *initParams.sessionKeystore);
+                         *mSessionKeystore);
     SuccessOrExit(err);
 
     err = mFabricDelegate.Init(this);

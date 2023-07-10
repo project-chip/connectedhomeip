@@ -1686,7 +1686,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     MTRClusterStateCacheContainer * clusterStateCacheContainer = [[MTRClusterStateCacheContainer alloc] init];
     NSLog(@"Setting up attribute cache subscription...");
-    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(60)];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(60)];
     [device subscribeWithQueue:queue
         params:params
         clusterStateCacheContainer:clusterStateCacheContainer
