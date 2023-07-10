@@ -57,6 +57,22 @@
                                      sizeof(_trace_data));                                                                         \
     } while (0)
 
+#define CHIP_TRACE_PREPARED_MESSAGE_SENT(destination, packetBuffer)                                                                \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        const ::chip::trace::TracePreparedSecureMessageData _trace_data{ destination, packetBuffer };                              \
+        _CHIP_TRACE_MESSAGE_INTERNAL(::chip::trace::kTracePreparedMessageSentDataFormat,                                           \
+                                     reinterpret_cast<const char *>(&_trace_data), sizeof(_trace_data));                           \
+    } while (0)
+
+#define CHIP_TRACE_PREPARED_MESSAGE_RECEIVED(source, packetBuffer)                                                                 \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        const ::chip::trace::TracePreparedSecureMessageData _trace_data{ source, packetBuffer };                                   \
+        _CHIP_TRACE_MESSAGE_INTERNAL(::chip::trace::kTracePreparedMessageReceivedDataFormat,                                       \
+                                     reinterpret_cast<const char *>(&_trace_data), sizeof(_trace_data));                           \
+    } while (0)
+
 #else // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED || CHIP_CONFIG_TRANSPORT_PW_TRACE_ENABLED
 #define CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, data, dataLen)                                                        \
     do                                                                                                                             \
@@ -68,14 +84,25 @@
     {                                                                                                                              \
     } while (0)
 
+#define CHIP_TRACE_PREPARED_MESSAGE_SENT(destination, packetBuffer)                                                                \
+    do                                                                                                                             \
+    {                                                                                                                              \
+    } while (0)
+
+#define CHIP_TRACE_PREPARED_MESSAGE_RECEIVED(source, packetBuffer)                                                                 \
+    do                                                                                                                             \
+    {                                                                                                                              \
+    } while (0)
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED || CHIP_CONFIG_TRANSPORT_PW_TRACE_ENABLED
 
 namespace chip {
 namespace trace {
 
-constexpr const char * kTraceMessageEvent              = "SecureMsg";
-constexpr const char * kTraceMessageSentDataFormat     = "SecMsgSent";
-constexpr const char * kTraceMessageReceivedDataFormat = "SecMsgReceived";
+constexpr const char * kTraceMessageEvent                      = "SecureMsg";
+constexpr const char * kTraceMessageSentDataFormat             = "SecMsgSent";
+constexpr const char * kTraceMessageReceivedDataFormat         = "SecMsgReceived";
+constexpr const char * kTracePreparedMessageSentDataFormat     = "PreparedMsgSent";
+constexpr const char * kTracePreparedMessageReceivedDataFormat = "PreparedMsgReceived";
 
 struct TraceSecureMessageSentData
 {
@@ -93,6 +120,12 @@ struct TraceSecureMessageReceivedData
     const Transport::PeerAddress * peerAddress;
     const uint8_t * packetPayload;
     size_t packetSize;
+};
+
+struct TracePreparedSecureMessageData
+{
+    const Transport::PeerAddress * peerAddress;
+    const System::PacketBufferHandle * packetBuffer;
 };
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
