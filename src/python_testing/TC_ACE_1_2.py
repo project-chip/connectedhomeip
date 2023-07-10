@@ -111,7 +111,7 @@ class TC_ACE_1_2(MatterBaseTest):
             await self.TH2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AccessControl.Attributes.Acl)], reportInterval=(1, 5), fabricFiltered=False, keepSubscriptions=False, autoResubscribe=False)
             asserts.fail("Incorrectly subscribed to attribute with invalid permissions")
         except ChipStackError as e:
-            asserts.assert_equal(e.err, 0x580, "Incorrect error message received from subcription with no permission")
+            asserts.assert_equal(e.err, 0x580, "Incorrect error message received from subscription with no permission")
 
         if print_steps:
             self.print_step(14, "Subscribe to the AccessControlEntryChanged event, expect INVALID_ACTION")
@@ -120,7 +120,7 @@ class TC_ACE_1_2(MatterBaseTest):
                 1, 5), fabricFiltered=False, keepSubscriptions=False, autoResubscribe=False)
             asserts.fail("Incorrectly subscribed to event with invalid permissions")
         except ChipStackError as e:
-            asserts.assert_equal(e.err, 0x580, "Incorrect error message received from subcription with no permission")
+            asserts.assert_equal(e.err, 0x580, "Incorrect error message received from subscription with no permission")
 
     @async_test_body
     async def test_TC_ACE_1_2(self):
@@ -265,7 +265,7 @@ class TC_ACE_1_2(MatterBaseTest):
             await self.TH2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.GeneralCommissioning.Attributes.Breadcrumb)], reportInterval=(1, 5), keepSubscriptions=False, autoResubscribe=False)
             asserts.fail("Incorrectly subscribed to attribute with invalid permissions")
         except ChipStackError as e:
-            asserts.assert_equal(e.err, 0x580, "Incorrect error message received from subcription with no permission")
+            asserts.assert_equal(e.err, 0x580, "Incorrect error message received from subscription with no permission")
 
 
 if __name__ == "__main__":
