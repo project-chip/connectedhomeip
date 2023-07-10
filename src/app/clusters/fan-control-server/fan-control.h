@@ -38,6 +38,7 @@ public:
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aFanModeSequence The FanModeSequence attribute value, this is fixed in the cluster.
      * @param aFeature The bitmask value that identifies which features are supported by this instance.
+     * @param aDelegate The delegate object that will receive callbacks from this cluster.
      */
     Instance(EndpointId aEndpointId, FanModeSequenceEnum aFanModeSequence, uint32_t aFeature, Delegate * aDelegate);
 
@@ -46,24 +47,26 @@ public:
      * called by the interaction model at the appropriate times.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aFanModeSequence The FanModeSequence attribute value, this is fixed in the cluster.
-     * @param aSpeedMax The SpeedMax attribute value, this is fixed in the cluster.
      * @param aFeature The bitmask value that identifies which features are supported by this instance.
+     * @param aDelegate The delegate object that will receive callbacks from this cluster.
+     * @param aSpeedMax The SpeedMax attribute value, this is fixed in the cluster.
      */
-    Instance(EndpointId aEndpointId, FanModeSequenceEnum aFanModeSequence, uint8_t aSpeedMax, uint32_t aFeature,
-             Delegate * aDelegate);
+    Instance(EndpointId aEndpointId, FanModeSequenceEnum aFanModeSequence, uint32_t aFeature, Delegate * aDelegate,
+             uint8_t aSpeedMax);
 
     /**
      * Creates a FanCOntrol cluster instance. The Init() function needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aFanModeSequence The FanModeSequence attribute value, this is fixed in the cluster.
+     * @param aFeature The bitmask value that identifies which features are supported by this instance.
+     * @param aDelegate The delegate object that will receive callbacks from this cluster.
      * @param aSpeedMax The SpeedMax attribute value, this is fixed in the cluster.
      * @param aRockSupport The RockerSupport attribute value, this is fixed in the cluster. If unused, set to 0.
      * @param aWindSupport The WindSupport attribute value, this is fixed in the cluster. If unused, set to 0.
-     * @param aFeature The bitmask value that identifies which features are supported by this instance.
      */
-    Instance(EndpointId aEndpointId, FanModeSequenceEnum aFanModeSequence, uint8_t aSpeedMax, BitMask<RockBitmap> aRockSupport,
-             BitMask<WindBitmap> aWindSupport, uint32_t aFeature, Delegate * aDelegate);
+    Instance(EndpointId aEndpointId, FanModeSequenceEnum aFanModeSequence, uint32_t aFeature, Delegate * aDelegate,
+             uint8_t aSpeedMax, BitMask<RockBitmap> aRockSupport, BitMask<WindBitmap> aWindSupport);
 
     /**
      * Initialise the FanControl server instance.
@@ -79,9 +82,6 @@ public:
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-
-    template <typename RequestT, typename FuncT>
-    void HandleCommand(HandlerContext & handlerContext, FuncT func);
 
     // Attribute setters
     chip::Protocols::InteractionModel::Status UpdateFanMode(FanModeEnum fanMode);
@@ -142,14 +142,24 @@ public:
      */
     bool SupportsAirflowDirection() const { return hasFeature(Feature::kAirflowDirection); }
 
+    /**
+     * Function to convert percentage into speed
+     */
+    static uint8_t GetSpeedFromPercent(uint8_t percent, uint8_t speedMax);
+
+    /**
+     * Function to convert speed into percentage
+     */
+    static Percent GetPercentFromSpeed(uint8_t speed, uint8_t speedMax);
+
 private:
     static const Percent mPercentMax = 100;
 
     EndpointId mEndpointId{};
 
     // Attribute data store
-    FanModeEnum mFanMode = FanModeEnum::kOff;
-    FanModeSequenceEnum mFanModeSequence;
+    FanModeEnum mFanMode                         = FanModeEnum::kOff;
+    FanModeSequenceEnum mFanModeSequence         = FanModeSequenceEnum::kOffLowMedHigh;
     DataModel::Nullable<Percent> mPercentSetting = (DataModel::Nullable<Percent>) 0;
     Percent mPercentCurrent                      = 0;
     uint8_t mSpeedMax                            = 0;
@@ -218,16 +228,6 @@ private:
      * Internal step command handler function.
      */
     void handleStep(HandlerContext & ctx, const Commands::Step::DecodableType & commandData);
-
-    /**
-     * Internal function to convert percentage into speed
-     */
-    static uint8_t getSpeedFromPercent(float percent, uint8_t speedMax);
-
-    /**
-     * Internal function to convert speed into percentage
-     */
-    static Percent getPercentFromSpeed(uint8_t speed, uint8_t speedMax);
 };
 
 class Delegate
@@ -269,7 +269,7 @@ public:
     virtual CHIP_ERROR HandleFanModeAuto(DataModel::Nullable<Percent> newPercentSetting,
                                          DataModel::Nullable<uint8_t> newSpeedSetting)
     {
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
     /**
@@ -286,21 +286,21 @@ public:
      * @param newRockSetting The new RockSetting value.
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
-    virtual CHIP_ERROR HandleRockSettingChange(BitMask<RockBitmap> newRockSetting) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR HandleRockSettingChange(BitMask<RockBitmap> newRockSetting) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * This function will be called when the WindSetting attribute is changed.
      * @param newWindSetting The new WindSetting value.
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
-    virtual CHIP_ERROR HandleWindSettingChange(BitMask<WindBitmap> newWindSetting) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR HandleWindSettingChange(BitMask<WindBitmap> newWindSetting) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * This function will be called when the AirflowDirection attribute is changed.
      * @param newAirflowDirection The new AirflowDirection value.
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
-    virtual CHIP_ERROR HandleAirflowDirectionChange(AirflowDirectionEnum newAirflowDirection) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR HandleAirflowDirectionChange(AirflowDirectionEnum newAirflowDirection) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * This function will be called when the Step Command is received and the STEP feature is enabled in the Feature Map

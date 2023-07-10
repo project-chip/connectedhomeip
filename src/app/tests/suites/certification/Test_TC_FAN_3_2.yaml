@@ -24,7 +24,7 @@ config:
     endpoint: 1
     ConfigSpeedSetting:
         type: int8u
-        defaultValue: 50
+        defaultValue: 5
 
 tests:
     - label: "Step 1: Wait for the commissioned device to be retrieved"

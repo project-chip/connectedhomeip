@@ -93,7 +93,10 @@ CHIP_ERROR FanManager::HandleFanModeOff(DataModel::Nullable<Percent> newPercentS
                                         DataModel::Nullable<uint8_t> newSpeedSetting)
 {
     ChipLogProgress(NotSpecified, "FanManager::HandleFanModeOff()");
-    doUpdateSpeedSetting(newSpeedSetting.Value());
+
+    // Update SpeedCurrent & PercentageCurrent as if Fan has changed...
+    UpdateClusterSpeedAndPercentageCurrent(newSpeedSetting.Value());
+
     return CHIP_NO_ERROR;
 }
 
@@ -101,7 +104,10 @@ CHIP_ERROR FanManager::HandleFanModeAuto(DataModel::Nullable<Percent> newPercent
                                          DataModel::Nullable<uint8_t> newSpeedSetting)
 {
     ChipLogProgress(NotSpecified, "FanManager::HandleFanModeAuto()");
-    doUpdateSpeedSetting(5);
+
+    // Update SpeedCurrent & PercentageCurrent as if Fan has changed...
+    UpdateClusterSpeedAndPercentageCurrent(5);
+
     return CHIP_NO_ERROR;
 }
 
@@ -109,7 +115,33 @@ CHIP_ERROR FanManager::HandlePercentSpeedSettingChange(DataModel::Nullable<Perce
                                                        DataModel::Nullable<uint8_t> newSpeedSetting)
 {
     ChipLogProgress(NotSpecified, "FanManager::HandlePercentSpeedSettingChange()");
-    UpdateClusterPercentageAndSpeedCurrent(newPercentSetting.Value());
+
+    // Update SpeedCurrent & PercentageCurrent as if Fan has changed...
+    UpdateClusterSpeedAndPercentageCurrent(newSpeedSetting.Value());
+
+    switch (newSpeedSetting.Value())
+    {
+    case 0:
+        UpdateClusterFanMode(FanModeEnum::kOff);
+        break;
+    case 1:
+    case 2:
+    case 3:
+        UpdateClusterFanMode(FanModeEnum::kLow);
+        break;
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+        UpdateClusterFanMode(FanModeEnum::kMedium);
+        break;
+    case 9:
+    case 10:
+        UpdateClusterFanMode(FanModeEnum::kHigh);
+        break;
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -251,7 +283,7 @@ Status FanManager::doUpdateSpeedSetting(uint8_t newSpeedSetting)
 
 void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 {
-    ChipLogProgress(NotSpecified, "FanControl Cluster init: endpoint %" PRIx16, endpoint);
+    ChipLogProgress(Zcl, "FanControl Cluster initialised at endpoint %" PRIx16, endpoint);
 
     // Maximum speed is 10
     uint8_t speedMax = 10;
@@ -270,6 +302,6 @@ void emberAfFanControlClusterInitCallback(EndpointId endpoint)
     // All features are on
     uint32_t featureMap = 0b111111;
 
-    gFanControlInstance = new Instance(endpoint, FanModeSequenceEnum::kOffLowMedHighAuto, speedMax, rockSupport, windSupport,
-                                       featureMap, &gFanManager);
+    gFanControlInstance = new Instance(endpoint, FanModeSequenceEnum::kOffLowMedHighAuto, featureMap, &gFanManager, speedMax,
+                                       rockSupport, windSupport);
 }

@@ -60,8 +60,8 @@ Instance::Instance(EndpointId aEndpointId, FanModeSequenceEnum aFanModeSequence,
     Init();
 }
 
-Instance::Instance(EndpointId aEndpointId, FanModeSequenceEnum aFanModeSequence, uint8_t aSpeedMax, uint32_t aFeature,
-                   Delegate * aDelegate) :
+Instance::Instance(EndpointId aEndpointId, FanModeSequenceEnum aFanModeSequence, uint32_t aFeature, Delegate * aDelegate,
+                   uint8_t aSpeedMax) :
     AttributeAccessInterface(Optional<EndpointId>(aEndpointId), FanControl::Id),
     CommandHandlerInterface(Optional<EndpointId>(aEndpointId), FanControl::Id), mEndpointId(aEndpointId),
     mFanModeSequence(aFanModeSequence), mSpeedMax(aSpeedMax), mFeatureMap(aFeature), mDelegate(aDelegate)
@@ -69,8 +69,8 @@ Instance::Instance(EndpointId aEndpointId, FanModeSequenceEnum aFanModeSequence,
     Init();
 }
 
-Instance::Instance(EndpointId aEndpointId, FanModeSequenceEnum aFanModeSequence, uint8_t aSpeedMax,
-                   BitMask<RockBitmap> aRockSupport, BitMask<WindBitmap> aWindSupport, uint32_t aFeature, Delegate * aDelegate) :
+Instance::Instance(EndpointId aEndpointId, FanModeSequenceEnum aFanModeSequence, uint32_t aFeature, Delegate * aDelegate,
+                   uint8_t aSpeedMax, BitMask<RockBitmap> aRockSupport, BitMask<WindBitmap> aWindSupport) :
     AttributeAccessInterface(Optional<EndpointId>(aEndpointId), FanControl::Id),
     CommandHandlerInterface(Optional<EndpointId>(aEndpointId), FanControl::Id), mEndpointId(aEndpointId),
     mFanModeSequence(aFanModeSequence), mSpeedMax(aSpeedMax), mRockSupport(aRockSupport), mWindSupport(aWindSupport),
@@ -92,6 +92,7 @@ CHIP_ERROR Instance::Init()
     }
     else
     {
+        // Register this instance of the server with the delegate so that application can update the cluster
         mDelegate->SetParent(this);
 
         ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
@@ -101,6 +102,7 @@ CHIP_ERROR Instance::Init()
         // Init the delegate
         mDelegate->Init();
 
+        // Check on the FanMode which was loaded from persistence
         if (mFanMode == FanModeEnum::kOff)
         {
             status = UpdatePercentageAndSpeedSetting((DataModel::Nullable<Percent>) 0);
@@ -328,31 +330,6 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
         break;
     }
     return StatusIB(status).ToChipError();
-}
-
-template <typename RequestT, typename FuncT>
-void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
-{
-    if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
-    {
-        RequestT requestPayload;
-
-        // If the command matches what the caller is looking for, let's mark this as being handled
-        // even if errors happen after this. This ensures that we don't execute any fall-back strategies
-        // to handle this command since at this point, the caller is taking responsibility for handling
-        // the command in its entirety, warts and all.
-        //
-        handlerContext.SetCommandHandled();
-
-        if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
-                                                     Protocols::InteractionModel::Status::InvalidCommand);
-            return;
-        }
-
-        func(handlerContext, requestPayload);
-    }
 }
 
 // This function is called by the interaction model engine when a command destined for this instance is received.
@@ -601,15 +578,13 @@ Status Instance::UpdatePercentageAndSpeedSetting(DataModel::Nullable<Percent> pe
 {
     Status status;
     status = UpdatePercentSetting(percentSetting);
-    if (status == Status::Success)
+    if ((status == Status::Success) && SupportsMultiSpeed())
     {
-        if ((status == Status::Success) && SupportsMultiSpeed())
-        {
-            DataModel::Nullable<uint8_t> speedSetting =
-                (DataModel::Nullable<uint8_t>) getSpeedFromPercent(percentSetting.Value(), mSpeedMax);
-            status = UpdateSpeedSetting(speedSetting);
-        }
+        DataModel::Nullable<uint8_t> speedSetting =
+            (DataModel::Nullable<uint8_t>) GetSpeedFromPercent(percentSetting.Value(), mSpeedMax);
+        status = UpdateSpeedSetting(speedSetting);
     }
+
     return status;
 }
 
@@ -619,12 +594,9 @@ Status Instance::UpdateSpeedAndPercentageSetting(DataModel::Nullable<uint8_t> sp
     status = UpdateSpeedSetting(speedSetting);
     if (status == Status::Success)
     {
-        if (status == Status::Success)
-        {
-            DataModel::Nullable<Percent> percentSetting =
-                (DataModel::Nullable<Percent>) getPercentFromSpeed(speedSetting.Value(), mSpeedMax);
-            status = UpdatePercentSetting(percentSetting);
-        }
+        DataModel::Nullable<Percent> percentSetting =
+            (DataModel::Nullable<Percent>) GetPercentFromSpeed(speedSetting.Value(), mSpeedMax);
+        status = UpdatePercentSetting(percentSetting);
     }
     return status;
 }
@@ -633,12 +605,9 @@ Status Instance::UpdatePercentageAndSpeedCurrent(Percent percentCurrent)
 {
     Status status;
     status = UpdatePercentCurrent(percentCurrent);
-    if (status == Status::Success)
+    if ((status == Status::Success) && SupportsMultiSpeed())
     {
-        if ((status == Status::Success) && SupportsMultiSpeed())
-        {
-            status = UpdateSpeedCurrent(getSpeedFromPercent(percentCurrent, mSpeedMax));
-        }
+        status = UpdateSpeedCurrent(GetSpeedFromPercent(percentCurrent, mSpeedMax));
     }
     return status;
 }
@@ -651,10 +620,22 @@ Status Instance::UpdateSpeedAndPercentageCurrent(uint8_t speedCurrent)
     {
         if (status == Status::Success)
         {
-            status = UpdatePercentCurrent(getPercentFromSpeed(speedCurrent, mSpeedMax));
+            status = UpdatePercentCurrent(GetPercentFromSpeed(speedCurrent, mSpeedMax));
         }
     }
     return status;
+}
+
+uint8_t Instance::GetSpeedFromPercent(uint8_t percent, uint8_t speedMax)
+{
+    float fPercent = static_cast<float>(percent);
+    return static_cast<uint8_t>(ceil(speedMax * (fPercent * 0.01)));
+}
+
+Percent Instance::GetPercentFromSpeed(uint8_t speed, uint8_t speedMax)
+{
+    float fSpeed = static_cast<float>(speed);
+    return static_cast<Percent>(fSpeed / speedMax * 100);
 }
 
 void Instance::loadPersistentAttributes()
@@ -666,7 +647,7 @@ void Instance::loadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "FanControl: Loaded FanMode as %u", rawFanMode);
-        mFanMode = static_cast<FanModeEnum>(rawFanMode);
+        UpdateFanMode(static_cast<FanModeEnum>(rawFanMode));
     }
     else
     {
@@ -680,6 +661,7 @@ void Instance::loadPersistentAttributes()
 Status Instance::nullifyPercentSetting()
 {
     mPercentSetting.SetNull();
+    // TODO need to report this change and check if not already null
     return Status::Success;
 }
 
@@ -702,51 +684,62 @@ Status Instance::handleFanModeWrite(AttributeValueDecoder & aDecoder)
     {
         if (mFanMode != fanMode)
         {
-            status = UpdateFanMode(fanMode);
-            if (status == Status::Success)
+            // Setting the FanMode value to Off SHALL set the values of PercentSetting and
+            // SpeedSetting attributes to 0 (zero).
+            if (fanMode == FanModeEnum::kOff)
             {
-                // Setting the FanMode value to Off SHALL set the values of PercentSetting and
-                // SpeedSetting attributes to 0 (zero).
-                if (fanMode == FanModeEnum::kOff)
-                {
-                    status = UpdatePercentageAndSpeedSetting((DataModel::Nullable<Percent>) 0);
+                status = UpdatePercentageAndSpeedSetting((DataModel::Nullable<Percent>) 0);
 
-                    if (status == Status::Success)
-                    {
-                        // Call into Delegate to handle updates
-                        if (mDelegate->HandleFanModeOff(mPercentSetting, mSpeedSetting) != CHIP_NO_ERROR)
-                        {
-                            status = Status::Failure;
-                        }
-                    }
-                }
-                // Setting the FanMode value to Auto SHALL set the values of PercentSetting and
-                // SpeedSetting attributes to null.
-                else if (fanMode == FanModeEnum::kAuto)
+                if (status == Status::Success)
                 {
-                    status = nullifyPercentSetting();
-
-                    if (status == Status::Success)
-                    {
-                        status = nullifySpeedSetting();
-                    }
-
-                    if (status == Status::Success)
-                    {
-                        // Call into Delegate to handle updates
-                        if (mDelegate->HandleFanModeAuto(mPercentSetting, mSpeedSetting) != CHIP_NO_ERROR)
-                        {
-                            status = Status::Failure;
-                        }
-                    }
-                }
-                else
-                {
-                    // Call into Delegate to handle updates
-                    if (mDelegate->HandleFanModeChange(fanMode) != CHIP_NO_ERROR)
+                    // Call into Delegate to attempt to handle the update
+                    if (mDelegate->HandleFanModeOff(mPercentSetting, mSpeedSetting) != CHIP_NO_ERROR)
                     {
                         status = Status::Failure;
                     }
+                    else
+                    {
+                        // Finally update the FanMode
+                        status = UpdateFanMode(fanMode);
+                    }
+                }
+            }
+            // Setting the FanMode value to Auto SHALL set the values of PercentSetting and
+            // SpeedSetting attributes to null.
+            else if (fanMode == FanModeEnum::kAuto)
+            {
+                status = nullifyPercentSetting();
+
+                if ((status == Status::Success) && SupportsMultiSpeed())
+                {
+                    status = nullifySpeedSetting();
+                }
+
+                if (status == Status::Success)
+                {
+                    // Call into Delegate to handle updates
+                    if (mDelegate->HandleFanModeAuto(mPercentSetting, mSpeedSetting) != CHIP_NO_ERROR)
+                    {
+                        status = Status::Failure;
+                    }
+                    else
+                    {
+                        // Finally update the FanMode
+                        status = UpdateFanMode(fanMode);
+                    }
+                }
+            }
+            else
+            {
+                // Call into Delegate to handle updates
+                if (mDelegate->HandleFanModeChange(fanMode) != CHIP_NO_ERROR)
+                {
+                    status = Status::Failure;
+                }
+                else
+                {
+                    // Finally update the FanMode
+                    status = UpdateFanMode(fanMode);
                 }
             }
         }
@@ -768,13 +761,17 @@ Status Instance::handlePercentSettingWrite(AttributeValueDecoder & aDecoder)
     {
         if (mPercentSetting != percentSetting)
         {
-            status = UpdatePercentageAndSpeedSetting(percentSetting);
-
             // Call into Delegate to handle updates
-            if ((status == Status::Success) &&
-                (mDelegate->HandlePercentSpeedSettingChange(mPercentSetting, mSpeedSetting) != CHIP_NO_ERROR))
+            DataModel::Nullable<uint8_t> speedSetting =
+                static_cast<DataModel::Nullable<uint8_t>>(GetSpeedFromPercent(percentSetting.Value(), mSpeedMax));
+            if (mDelegate->HandlePercentSpeedSettingChange(percentSetting, speedSetting) != CHIP_NO_ERROR)
             {
                 status = Status::Failure;
+            }
+            else
+            {
+                // Finally, update the PercentSetting and SpeedSetting
+                status = UpdatePercentageAndSpeedSetting(percentSetting);
             }
         }
     }
@@ -795,13 +792,17 @@ Status Instance::handleSpeedSettingWrite(AttributeValueDecoder & aDecoder)
     {
         if (mSpeedSetting != speedSetting)
         {
-            status = UpdateSpeedAndPercentageSetting(speedSetting);
-
             // Call into Delegate to handle updates
-            if ((status == Status::Success) &&
-                (mDelegate->HandlePercentSpeedSettingChange(mPercentSetting, mSpeedSetting) != CHIP_NO_ERROR))
+            DataModel::Nullable<Percent> percentSetting =
+                static_cast<DataModel::Nullable<Percent>>(GetPercentFromSpeed(speedSetting.Value(), mSpeedMax));
+            if (mDelegate->HandlePercentSpeedSettingChange(percentSetting, speedSetting) != CHIP_NO_ERROR)
             {
                 status = Status::Failure;
+            }
+            else
+            {
+                // Finally, update the PercentSetting and SpeedSetting
+                status = UpdateSpeedAndPercentageSetting(speedSetting);
             }
         }
     }
@@ -822,14 +823,14 @@ Status Instance::handleRockSettingWrite(AttributeValueDecoder & aDecoder)
     {
         if (mRockSetting != rockSetting)
         {
-            status = UpdateRockSetting(rockSetting);
-            if (status == Status::Success)
+            // Call into Delegate to handle updates
+            if (mDelegate->HandleRockSettingChange(mRockSetting) != CHIP_NO_ERROR)
             {
-                // Call into Delegate to handle updates
-                if (mDelegate->HandleRockSettingChange(mRockSetting) != CHIP_NO_ERROR)
-                {
-                    status = Status::Failure;
-                }
+                status = Status::Failure;
+            }
+            else
+            {
+                status = UpdateRockSetting(rockSetting);
             }
         }
     }
@@ -851,13 +852,14 @@ Status Instance::handleWindSettingWrite(AttributeValueDecoder & aDecoder)
         if (mWindSetting != windSetting)
         {
             status = UpdateWindSetting(windSetting);
-            if (status == Status::Success)
+            // Call into Delegate to handle updates
+            if (mDelegate->HandleWindSettingChange(mWindSetting) != CHIP_NO_ERROR)
             {
-                // Call into Delegate to handle updates
-                if (mDelegate->HandleWindSettingChange(mWindSetting) != CHIP_NO_ERROR)
-                {
-                    status = Status::Failure;
-                }
+                status = Status::Failure;
+            }
+            else
+            {
+                status = UpdateWindSetting(windSetting);
             }
         }
     }
@@ -878,14 +880,14 @@ Status Instance::handleAirflowDirectionWrite(AttributeValueDecoder & aDecoder)
     {
         if (mAirflowDirection != airflowDirection)
         {
-            status = UpdateAirflowDirection(airflowDirection);
-            if (status == Status::Success)
+            // Call into Delegate to handle updates
+            if (mDelegate->HandleAirflowDirectionChange(mAirflowDirection) != CHIP_NO_ERROR)
             {
-                // Call into Delegate to handle updates
-                if (mDelegate->HandleAirflowDirectionChange(mAirflowDirection) != CHIP_NO_ERROR)
-                {
-                    status = Status::Failure;
-                }
+                status = Status::Failure;
+            }
+            else
+            {
+                status = UpdateAirflowDirection(airflowDirection);
             }
         }
     }
@@ -910,16 +912,6 @@ void Instance::handleStep(HandlerContext & ctx, const Commands::Step::DecodableT
         status = mDelegate->HandleStep(direction, wrap, lowestOff);
     }
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-uint8_t Instance::getSpeedFromPercent(float percent, uint8_t speedMax)
-{
-    return static_cast<uint8_t>(ceil(speedMax * (percent * 0.01)));
-}
-
-Percent Instance::getPercentFromSpeed(uint8_t speed, uint8_t speedMax)
-{
-    return static_cast<Percent>(ceil(speed / speedMax * 100));
 }
 
 } // namespace FanControl
