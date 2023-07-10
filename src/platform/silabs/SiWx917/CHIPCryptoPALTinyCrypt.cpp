@@ -1658,24 +1658,53 @@ CHIP_ERROR ExtractCRLDistributionPointURIFromX509Cert(const ByteSpan & certifica
 
         if (isCurrentExtCDP)
         {
+            // Only one CRL Distribution Point Extension is allowed.
             cdpExtCount++;
             VerifyOrExit(cdpExtCount <= 1, error = CHIP_ERROR_NOT_FOUND);
 
+            // CRL Distribution Point Extension is encoded as a secuense of DistributionPoint:
+            //     CRLDistributionPoints ::= SEQUENCE SIZE (1..MAX) OF DistributionPoint
+            //
+            // This implementation only supports a single DistributionPoint (sequence of size 1),
+            // which is verified by comparing (p + len == end_of_ext)
             result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
             VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
             VerifyOrExit(p + len == end_of_ext, error = CHIP_ERROR_NOT_FOUND);
 
+            // The DistributionPoint is a sequence of three optional elements:
+            //     DistributionPoint ::= SEQUENCE {
+            //         distributionPoint       [0]     DistributionPointName OPTIONAL,
+            //         reasons                 [1]     ReasonFlags OPTIONAL,
+            //         cRLIssuer               [2]     GeneralNames OPTIONAL }
             result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
             VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
             VerifyOrExit(p + len == end_of_ext, error = CHIP_ERROR_NOT_FOUND);
 
+            // The DistributionPointName is:
+            //     DistributionPointName ::= CHOICE {
+            //         fullName                [0]     GeneralNames,
+            //         nameRelativeToCRLIssuer [1]     RelativeDistinguishedName }
+            //
+            // The URI should be encoded in the fullName element.
             result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED | 0);
             VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
 
-            result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED | 0);
+            //     GeneralNames ::= SEQUENCE SIZE (1..MAX) OF GeneralName
+            result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED);
             VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
 
-            result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | 6);
+            // The CDP URI is encoded as a uniformResourceIdentifier field of the GeneralName:
+            //     GeneralName ::= CHOICE {
+            //         otherName                       [0]     OtherName,
+            //         rfc822Name                      [1]     IA5String,
+            //         dNSName                         [2]     IA5String,
+            //         x400Address                     [3]     ORAddress,
+            //         directoryName                   [4]     Name,
+            //         ediPartyName                    [5]     EDIPartyName,
+            //         uniformResourceIdentifier       [6]     IA5String,
+            //         iPAddress                       [7]     OCTET STRING,
+            //         registeredID                    [8]     OBJECT IDENTIFIER }
+            result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_X509_SAN_UNIFORM_RESOURCE_IDENTIFIER);
             VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
 
             const char * urlptr = reinterpret_cast<const char *>(p);
