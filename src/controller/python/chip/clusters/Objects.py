@@ -52457,3 +52457,4 @@ class FaultInjection(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = 0
+

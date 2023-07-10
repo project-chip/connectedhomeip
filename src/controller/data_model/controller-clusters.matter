@@ -8772,3 +8772,4 @@ client cluster FaultInjection = 4294048774 {
   /** Configure a fault to be triggered randomly, with a given probability defined as a percentage */
   command access(invoke: manage) FailRandomlyAtFault(FailRandomlyAtFaultRequest): DefaultSuccess = 1;
 }
+
