@@ -56,16 +56,18 @@ CHIP_ERROR DishwasherModeInstance::GetModeValueByIndex(uint8_t modeIndex, uint8_
 
 CHIP_ERROR DishwasherModeInstance::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex < NumberOfModes())
+    if (modeIndex >= NumberOfModes())
     {
-        if (tags.size() >= kModeOptions[modeIndex].modeTags.size())
-        {
-            std::copy(kModeOptions[modeIndex].modeTags.begin(), kModeOptions[modeIndex].modeTags.end(), tags.begin());
-            tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
+        return CHIP_ERROR_NOT_FOUND;
+    }
 
-            return CHIP_NO_ERROR;
-        }
+    if (tags.size() < kModeOptions[modeIndex].modeTags.size())
+    {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    return CHIP_ERROR_NOT_FOUND;
+
+    std::copy(kModeOptions[modeIndex].modeTags.begin(), kModeOptions[modeIndex].modeTags.end(), tags.begin());
+    tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
+
+    return CHIP_NO_ERROR;
 }

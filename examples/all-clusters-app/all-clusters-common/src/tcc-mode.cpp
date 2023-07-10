@@ -56,16 +56,18 @@ CHIP_ERROR TccModeInstance::GetModeValueByIndex(uint8_t modeIndex, uint8_t & val
 
 CHIP_ERROR TccModeInstance::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex < NumberOfModes())
+    if (modeIndex >= NumberOfModes())
     {
-        if (tags.size() >= kModeOptions[modeIndex].modeTags.size())
-        {
-            std::copy(kModeOptions[modeIndex].modeTags.begin(), kModeOptions[modeIndex].modeTags.end(), tags.begin());
-            tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
+        return CHIP_ERROR_NOT_FOUND;
+    }
 
-            return CHIP_NO_ERROR;
-        }
+    if (tags.size() < kModeOptions[modeIndex].modeTags.size())
+    {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    return CHIP_ERROR_NOT_FOUND;
+
+    std::copy(kModeOptions[modeIndex].modeTags.begin(), kModeOptions[modeIndex].modeTags.end(), tags.begin());
+    tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
+
+    return CHIP_NO_ERROR;
 }
