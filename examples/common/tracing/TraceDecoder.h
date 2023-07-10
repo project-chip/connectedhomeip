@@ -44,7 +44,8 @@ public:
         snprintf(buffer, sizeof(buffer), "    %s\t %s", tag.c_str(), data.c_str());
         CHIP_ERROR err = ReadString(buffer);
 
-        if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR)
+        {
             ChipLogError(Automation, "Failed to add field: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }

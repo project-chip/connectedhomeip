@@ -185,9 +185,12 @@ CHIP_ERROR TraceDecoder::LogAndConsumeProtocol(Json::Value & json)
 
     builder.Add(IsInbound(json) ? "<< from " : ">> to ");
 
-    if (json.isMember("peer")) {
+    if (json.isMember("peer"))
+    {
         builder.Add(json["peer"].asCString());
-    } else {
+    }
+    else
+    {
         builder.Add("UNKNOWN");
     }
 
