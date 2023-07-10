@@ -43,7 +43,7 @@ public:
         pointer mEnd;
     };
 
-    virtual AttributeProvider<CharSpan> getSpinSpeedProvider(EndpointId endpointId) const = 0;
+    virtual AttributeProvider<CharSpan> getSpinSpeedProvider(EndpointId endpointId) const                = 0;
     virtual AttributeProvider<NumberOfRinsesEnum> getSupportedRinseProvider(EndpointId endpointId) const = 0;
 
     virtual ~LaundryWasherManager() {}

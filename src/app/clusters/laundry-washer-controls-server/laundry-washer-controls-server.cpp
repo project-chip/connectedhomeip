@@ -52,11 +52,12 @@ private:
     CHIP_ERROR ReadSupportedRinses(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
 };
 
-CHIP_ERROR LaundryWasherControlsAttrAccess::ReadSpinSpeeds(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR LaundryWasherControlsAttrAccess::ReadSpinSpeeds(const ConcreteReadAttributePath & aPath,
+                                                           AttributeValueEncoder & aEncoder)
 {
     const LaundryWasherControls::LaundryWasherManager * gLaundryWasherManager = LaundryWasherControls::getLaundryWasherManager();
     const LaundryWasherControls::LaundryWasherManager::AttributeProvider<CharSpan> attrProvider =
-            gLaundryWasherManager->getSpinSpeedProvider(aPath.mEndpointId);
+        gLaundryWasherManager->getSpinSpeedProvider(aPath.mEndpointId);
     if (attrProvider.begin() == nullptr)
     {
         aEncoder.EncodeEmptyList();
@@ -75,11 +76,12 @@ CHIP_ERROR LaundryWasherControlsAttrAccess::ReadSpinSpeeds(const ConcreteReadAtt
     return err;
 }
 
-CHIP_ERROR LaundryWasherControlsAttrAccess::ReadSupportedRinses(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR LaundryWasherControlsAttrAccess::ReadSupportedRinses(const ConcreteReadAttributePath & aPath,
+                                                                AttributeValueEncoder & aEncoder)
 {
     const LaundryWasherControls::LaundryWasherManager * gLaundryWasherManager = LaundryWasherControls::getLaundryWasherManager();
     const LaundryWasherControls::LaundryWasherManager::AttributeProvider<NumberOfRinsesEnum> attrProvider =
-            gLaundryWasherManager->getSupportedRinseProvider(aPath.mEndpointId);
+        gLaundryWasherManager->getSupportedRinseProvider(aPath.mEndpointId);
     if (attrProvider.begin() == nullptr)
     {
         aEncoder.EncodeEmptyList();
