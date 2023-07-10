@@ -67,7 +67,7 @@ bool FormatOpenThreadError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 
 #if CHIP_CONFIG_SHORT_ERROR_STR
     const char * desc = NULL;
-#else // CHIP_CONFIG_SHORT_ERROR_STR
+#else  // CHIP_CONFIG_SHORT_ERROR_STR
     otError otErr     = (otError) err.GetValue();
     const char * desc = otThreadErrorToString(otErr);
 #endif // CHIP_CONFIG_SHORT_ERROR_STR
