@@ -255,8 +255,8 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
 - (void)respondAvailableWithDelay:(NSNumber *)delay
                               uri:(NSString *)uri
                       updateToken:(NSData *)updateToken
-                      softwareVersion:(NSNumber *)softwareVersion
-                      softwareVersionString:(NSString *)softwareVersionString
+                  softwareVersion:(NSNumber *)softwareVersion
+            softwareVersionString:(NSString *)softwareVersionString
                        completion:(QueryImageCompletion)completion
 {
     __auto_type * responseParams = [[MTROTASoftwareUpdateProviderClusterQueryImageResponseParams alloc] init];
@@ -380,8 +380,8 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
     NSTask * task = [[NSTask alloc] init];
     [task setLaunchPath:imageToolPath];
     [task setArguments:@[
-        @"create", @"-v", @"0xFFF1", @"-p", @"0x8001", @"-vn", [softwareVersion stringValue], @"-vs",
-        softwareVersionString, @"-da", @"sha256", rawImagePath, imagePath
+        @"create", @"-v", @"0xFFF1", @"-p", @"0x8001", @"-vn", [softwareVersion stringValue], @"-vs", softwareVersionString, @"-da",
+        @"sha256", rawImagePath, imagePath
     ]];
     NSError * launchError = nil;
     [task launchAndReturnError:&launchError];
@@ -402,8 +402,12 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
         XCTAssertEqual(controller, sController);
 
         sOTAProviderDelegate.queryImageHandler = nil;
-        [sOTAProviderDelegate respondAvailableWithDelay:@(0) uri:imagePath updateToken:updateToken softwareVersion:softwareVersion
-                      softwareVersionString:softwareVersionString completion:completion];
+        [sOTAProviderDelegate respondAvailableWithDelay:@(0)
+                                                    uri:imagePath
+                                            updateToken:updateToken
+                                        softwareVersion:softwareVersion
+                                  softwareVersionString:softwareVersionString
+                                             completion:completion];
         [self.queryExpectation fulfill];
     };
     sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSString * fileDesignator,
@@ -663,49 +667,62 @@ static BOOL sNeedsStackShutdown = YES;
 /**
  * Helper that checks if the OTA provider locations match.
  */
-- (bool)AreEqual:(MTROtaSoftwareUpdateRequestorClusterProviderLocation *)pl1 providerLocation:(MTROtaSoftwareUpdateRequestorClusterProviderLocation *)pl2
+- (bool)AreEqual:(MTROtaSoftwareUpdateRequestorClusterProviderLocation *)pl1
+    providerLocation:(MTROtaSoftwareUpdateRequestorClusterProviderLocation *)pl2
 {
-   return [pl1.providerNodeID isEqualToNumber:pl2.providerNodeID] && [pl1.endpoint isEqualToNumber:pl2.endpoint] && [pl1.fabricIndex isEqualToNumber:pl2.fabricIndex];
+    return [pl1.providerNodeID isEqualToNumber:pl2.providerNodeID] && [pl1.endpoint isEqualToNumber:pl2.endpoint] &&
+        [pl1.fabricIndex isEqualToNumber:pl2.fabricIndex];
 }
-
 
 - (void)test001_UpdateDefaultOTAProviderAndVerify
 {
     // Test to update the default OTA provider for a device and verify that it's updated correctly.
 
-    MTROtaSoftwareUpdateRequestorClusterProviderLocation * providerLocation = [[MTROtaSoftwareUpdateRequestorClusterProviderLocation alloc] init];
+    MTROtaSoftwareUpdateRequestorClusterProviderLocation * providerLocation =
+        [[MTROtaSoftwareUpdateRequestorClusterProviderLocation alloc] init];
     providerLocation.providerNodeID = @(kOTAProviderNodeId);
     providerLocation.endpoint = @(kOTAProviderEndpointId);
     providerLocation.fabricIndex = @(kOTAProviderFabricIndex);
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    XCTestExpectation * updateDefaultOTAProviderExpectation = [self expectationWithDescription:@"UpdateDefaultOTAProvider verified"];
+    XCTestExpectation * updateDefaultOTAProviderExpectation =
+        [self expectationWithDescription:@"UpdateDefaultOTAProvider verified"];
 
-    [sController getBaseDevice:kDeviceId1
-                        queue:queue
-            completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                XCTAssertEqual(error.code, 0);
-                XCTAssertNotNil(device);
+    [sController
+            getBaseDevice:kDeviceId1
+                    queue:queue
+        completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+            XCTAssertEqual(error.code, 0);
+            XCTAssertNotNil(device);
 
-                MTRBaseClusterOtaSoftwareUpdateRequestor * cluster = [[MTRBaseClusterOtaSoftwareUpdateRequestor alloc] initWithDevice:device endpointID:@(0) queue:queue];
-                NSArray * value = [NSArray arrayWithObject:providerLocation];
-                [cluster writeAttributeDefaultOTAProvidersWithValue:value completion:^(NSError * _Nullable error) {
-                                    XCTAssertNil(error);
-                                    MTRReadParams * params = [[MTRReadParams alloc] init];
-                                    params.filterByFabric = true;
-                                    [cluster readAttributeDefaultOTAProvidersWithParams:params
-                                        completion:^(NSArray * _Nullable readValue, NSError * _Nullable err) {
-                                           XCTAssertEqual(error.code, 0);
-                                           XCTAssertNotNil(readValue);
-                                           XCTAssertTrue([self AreEqual:[readValue objectAtIndex:0] providerLocation:providerLocation]);
-                                           [updateDefaultOTAProviderExpectation fulfill];
-                                         }];
-                }];
-            }];
+            MTRBaseClusterOtaSoftwareUpdateRequestor * cluster =
+                [[MTRBaseClusterOtaSoftwareUpdateRequestor alloc] initWithDevice:device endpointID:@(0) queue:queue];
+            NSArray * value = [NSArray arrayWithObject:providerLocation];
+            [cluster
+                writeAttributeDefaultOTAProvidersWithValue:value
+                                                completion:^(NSError * _Nullable error) {
+                                                    XCTAssertNil(error);
+                                                    MTRReadParams * params = [[MTRReadParams alloc] init];
+                                                    params.filterByFabric = true;
+                                                    [cluster
+                                                        readAttributeDefaultOTAProvidersWithParams:params
+                                                                                        completion:^(NSArray * _Nullable readValue,
+                                                                                            NSError * _Nullable err) {
+                                                                                            XCTAssertEqual(error.code, 0);
+                                                                                            XCTAssertNotNil(readValue);
+                                                                                            XCTAssertTrue(
+                                                                                                [self AreEqual:[readValue
+                                                                                                                   objectAtIndex:0]
+                                                                                                    providerLocation:
+                                                                                                        providerLocation]);
+                                                                                            [updateDefaultOTAProviderExpectation
+                                                                                                fulfill];
+                                                                                        }];
+                                                }];
+        }];
 
-            [self waitForExpectations:@[ updateDefaultOTAProviderExpectation] timeout:kPairingTimeoutInSeconds];
+    [self waitForExpectations:@[ updateDefaultOTAProviderExpectation ] timeout:kPairingTimeoutInSeconds];
 }
-
 
 - (void)test002_ReceiveQueryImageRequest_RespondUpdateNotAvailable
 {
@@ -799,8 +816,8 @@ static BOOL sNeedsStackShutdown = YES;
         [sOTAProviderDelegate respondAvailableWithDelay:@(0)
                                                     uri:fakeImageURI
                                             updateToken:[sOTAProviderDelegate generateUpdateToken]
-                                             softwareVersion:kUpdatedSoftwareVersion1
-                                       softwareVersionString:kUpdatedSoftwareVersionString1
+                                        softwareVersion:kUpdatedSoftwareVersion1
+                                  softwareVersionString:kUpdatedSoftwareVersionString1
                                              completion:completion];
         [queryExpectation1 fulfill];
     };
@@ -826,8 +843,8 @@ static BOOL sNeedsStackShutdown = YES;
             [sOTAProviderDelegate respondAvailableWithDelay:@(busyDelay)
                                                         uri:fakeImageURI
                                                 updateToken:[sOTAProviderDelegate generateUpdateToken]
-                                                 softwareVersion:kUpdatedSoftwareVersion1
-                                           softwareVersionString:kUpdatedSoftwareVersionString1
+                                            softwareVersion:kUpdatedSoftwareVersion1
+                                      softwareVersionString:kUpdatedSoftwareVersionString1
                                                  completion:innerCompletion];
             [sOTAProviderDelegate respondErrorWithCompletion:outerCompletion];
             [queryExpectation2 fulfill];
@@ -917,9 +934,9 @@ static BOOL sNeedsStackShutdown = YES;
     [self waitForExpectations:@[ checker.notifyUpdateAppliedExpectation ] timeout:kTimeoutInSeconds];
 }
 
-// TODO: Enable the test 006, 007 and 008 when PR #26040 is merged. Currently the poll interval causes delays in the BDX transfer and
-// results in the test taking a long time. With PR #26040 we eliminate the poll interval completely and hence the test
-// can run in a short time.
+// TODO: Enable the test 006, 007 and 008 when PR #26040 is merged. Currently the poll interval causes delays in the BDX transfer
+// and results in the test taking a long time. With PR #26040 we eliminate the poll interval completely and hence the test can run
+// in a short time.
 #ifdef ENABLE_TESTS
 - (void)test006_DoBDXTransferAllowUpdateRequest
 {
@@ -978,24 +995,27 @@ static BOOL sNeedsStackShutdown = YES;
     //
     // 1) Check if the ota image files and raw image files required for this test exist for both OTA requestors
     // 2) Advertise ourselves to the first OTA requestor.
-    // 3) When device1 queries for an image, pass the image path for the ota file generated beforehand as a pre-requisite for first OTA requestor
-    // 4) When device1 tries to start a bdx transfer, respond with success for the first OTA requestor
+    // 3) When device1 queries for an image, pass the image path for the ota file generated beforehand as a pre-requisite for first
+    // OTA requestor 4) When device1 tries to start a bdx transfer, respond with success for the first OTA requestor
     //    Set queryHandler to return busy with a busy delay of 30 secs and advertise ourselves to the second OTA requestor
     // 5) When second OTA requestor queries send image available with busy delay of 30 secs indicating the provider is busy.
     // 6) Send the data as the BDX transfer proceeds for the first OTA requestor
-    // 7) When BDX transfer ends, set up the query handler to return available for second OTA requestor and populate all the other BDX handlers
+    // 7) When BDX transfer ends, set up the query handler to return available for second OTA requestor and populate all the other
+    // BDX handlers
     //    to handle BDX for the second requestor.
-    // 8) When device2 queries for an image, pass the image path for the ota file generated beforehand as a pre-requisite for second OTA requestor
-    // 9) Send the data as the BDX transfer proceeds for second OTA requestor
-    // 8) Confirm the downloaded ota image matches the raw image file that was generated before the test was run as a pre-requisite for the first OTA requestor
-    // 9) When device1 invokes ApplyUpdateRequest, respond with Proceed so that the update proceeds for the first OTA requestor
-    // 10) Wait for the app to restart and wait for the NotifyUpdateApplied message to confirm the app has updated to the new version for the first OTA requestor
-    // 11) Update the handlers for ApplyUpdateRequest and NotifyUpdateApplied for the second OTA requestor
-    // 12) Confirm the downloaded ota image matches the raw image file that was generated before the test was run as a pre-requisite for the second OTA requestor
-    // 13) When device2 invokes ApplyUpdateRequest, respond with Proceed so that the update proceeds for the second OTA requestor
-    // 14) Wait for the app to restart and wait for the NotifyUpdateApplied message to confirm the app has updated to the new version for the second OTA requestor
+    // 8) When device2 queries for an image, pass the image path for the ota file generated beforehand as a pre-requisite for second
+    // OTA requestor 9) Send the data as the BDX transfer proceeds for second OTA requestor 8) Confirm the downloaded ota image
+    // matches the raw image file that was generated before the test was run as a pre-requisite for the first OTA requestor 9) When
+    // device1 invokes ApplyUpdateRequest, respond with Proceed so that the update proceeds for the first OTA requestor 10) Wait for
+    // the app to restart and wait for the NotifyUpdateApplied message to confirm the app has updated to the new version for the
+    // first OTA requestor 11) Update the handlers for ApplyUpdateRequest and NotifyUpdateApplied for the second OTA requestor 12)
+    // Confirm the downloaded ota image matches the raw image file that was generated before the test was run as a pre-requisite for
+    // the second OTA requestor 13) When device2 invokes ApplyUpdateRequest, respond with Proceed so that the update proceeds for
+    // the second OTA requestor 14) Wait for the app to restart and wait for the NotifyUpdateApplied message to confirm the app has
+    // updated to the new version for the second OTA requestor
 
-    // This test expects a pre-generated raw image at otaRawImagePath1 for ota requestor 1 and at otaRawImagePath2 for ota requestor 2.
+    // This test expects a pre-generated raw image at otaRawImagePath1 for ota requestor 1 and at otaRawImagePath2 for ota
+    // requestor 2.
     NSString * otaRawImagePath1 = @"/tmp/ota-test007-raw-image";
     NSString * otaRawImagePath2 = @"/tmp/ota-test006-raw-image";
 
@@ -1003,24 +1023,37 @@ static BOOL sNeedsStackShutdown = YES;
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath1]);
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath2]);
 
-    XCTestExpectation * queryExpectation1 = [self expectationWithDescription:@"handleQueryImageForNodeID called for first OTA requestor"];
-    XCTestExpectation * queryExpectation2 = [self expectationWithDescription:@"handleQueryImageForNodeID called for second OTA requestor - busy"];
-    XCTestExpectation * queryExpectation3 = [self expectationWithDescription:@"handleQueryImageForNodeID called for second OTA requestor - available"];
+    XCTestExpectation * queryExpectation1 =
+        [self expectationWithDescription:@"handleQueryImageForNodeID called for first OTA requestor"];
+    XCTestExpectation * queryExpectation2 =
+        [self expectationWithDescription:@"handleQueryImageForNodeID called for second OTA requestor - busy"];
+    XCTestExpectation * queryExpectation3 =
+        [self expectationWithDescription:@"handleQueryImageForNodeID called for second OTA requestor - available"];
 
-    XCTestExpectation * bdxBeginExpectation1 = [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called for first OTA requestor"];
-    XCTestExpectation * bdxBeginExpectation2 = [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called for second OTA requestor"];
+    XCTestExpectation * bdxBeginExpectation1 =
+        [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called for first OTA requestor"];
+    XCTestExpectation * bdxBeginExpectation2 =
+        [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called for second OTA requestor"];
 
-    XCTestExpectation * bdxQueryExpectation1 = [self expectationWithDescription:@"handleBDXQueryForNodeID called for first OTA requestor"];
-    XCTestExpectation * bdxQueryExpectation2 = [self expectationWithDescription:@"handleBDXQueryForNodeID called for second OTA requestor"];
+    XCTestExpectation * bdxQueryExpectation1 =
+        [self expectationWithDescription:@"handleBDXQueryForNodeID called for first OTA requestor"];
+    XCTestExpectation * bdxQueryExpectation2 =
+        [self expectationWithDescription:@"handleBDXQueryForNodeID called for second OTA requestor"];
 
-    XCTestExpectation * bdxEndExpectation1 = [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called for first OTA requestor"];
-    XCTestExpectation * bdxEndExpectation2 = [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called for second OTA requestor"];
+    XCTestExpectation * bdxEndExpectation1 =
+        [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called for first OTA requestor"];
+    XCTestExpectation * bdxEndExpectation2 =
+        [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called for second OTA requestor"];
 
-    XCTestExpectation * applyUpdateRequestExpectation1 = [self expectationWithDescription:@"handleApplyUpdateRequestForNodeID called for first OTA requestor"];
-    XCTestExpectation * applyUpdateRequestExpectation2 = [self expectationWithDescription:@"handleApplyUpdateRequestForNodeID called for second OTA requestor"];
+    XCTestExpectation * applyUpdateRequestExpectation1 =
+        [self expectationWithDescription:@"handleApplyUpdateRequestForNodeID called for first OTA requestor"];
+    XCTestExpectation * applyUpdateRequestExpectation2 =
+        [self expectationWithDescription:@"handleApplyUpdateRequestForNodeID called for second OTA requestor"];
 
-    XCTestExpectation * notifyUpdateAppliedExpectation1 = [self expectationWithDescription:@"handleNotifyUpdateAppliedForNodeID called for first OTA requestor"];
-    XCTestExpectation * notifyUpdateAppliedExpectation2 = [self expectationWithDescription:@"handleNotifyUpdateAppliedForNodeID called for second OTA requestor"];
+    XCTestExpectation * notifyUpdateAppliedExpectation1 =
+        [self expectationWithDescription:@"handleNotifyUpdateAppliedForNodeID called for first OTA requestor"];
+    XCTestExpectation * notifyUpdateAppliedExpectation2 =
+        [self expectationWithDescription:@"handleNotifyUpdateAppliedForNodeID called for second OTA requestor"];
 
     __block XCTestExpectation * announceResponseExpectation2;
 
@@ -1076,8 +1109,12 @@ static BOOL sNeedsStackShutdown = YES;
         XCTAssertEqual(controller, sController);
 
         sOTAProviderDelegate.queryImageHandler = nil;
-        [sOTAProviderDelegate respondAvailableWithDelay:@(0) uri:imagePath1 updateToken:updateToken  softwareVersion:kUpdatedSoftwareVersion2
-                      softwareVersionString:kUpdatedSoftwareVersionString2 completion:completion];
+        [sOTAProviderDelegate respondAvailableWithDelay:@(0)
+                                                    uri:imagePath1
+                                            updateToken:updateToken
+                                        softwareVersion:kUpdatedSoftwareVersion2
+                                  softwareVersionString:kUpdatedSoftwareVersionString2
+                                             completion:completion];
         [queryExpectation1 fulfill];
     };
 
@@ -1097,15 +1134,19 @@ static BOOL sNeedsStackShutdown = YES;
 
         // Set up the query handler to return busy for the second OTA requestor as BDX has begun with first OTA requestor
         sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
-                MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
-                    XCTAssertEqualObjects(nodeID, @(kDeviceId2));
-                    XCTAssertEqual(controller, sController);
+            MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+            XCTAssertEqualObjects(nodeID, @(kDeviceId2));
+            XCTAssertEqual(controller, sController);
 
-                    sOTAProviderDelegate.queryImageHandler = nil;
-                    [sOTAProviderDelegate respondAvailableWithDelay:@(busyDelay) uri:imagePath2 updateToken:updateToken1  softwareVersion:kUpdatedSoftwareVersion1
-                      softwareVersionString:kUpdatedSoftwareVersionString1 completion:completion];
-                    [queryExpectation2 fulfill];
-                };
+            sOTAProviderDelegate.queryImageHandler = nil;
+            [sOTAProviderDelegate respondAvailableWithDelay:@(busyDelay)
+                                                        uri:imagePath2
+                                                updateToken:updateToken1
+                                            softwareVersion:kUpdatedSoftwareVersion1
+                                      softwareVersionString:kUpdatedSoftwareVersionString1
+                                                 completion:completion];
+            [queryExpectation2 fulfill];
+        };
         sOTAProviderDelegate.transferBeginHandler = nil;
         [sOTAProviderDelegate respondSuccess:completion];
         [bdxBeginExpectation1 fulfill];
@@ -1158,75 +1199,80 @@ static BOOL sNeedsStackShutdown = YES;
         // BDX transfer with first OTA requestor has completed
         // Set up the query handlers and BDX transfer handlers for the second OTA requestor
         sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
-                MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
-                    XCTAssertEqualObjects(nodeID, @(kDeviceId2));
-                    XCTAssertEqual(controller, sController);
-
-                    sOTAProviderDelegate.queryImageHandler = nil;
-                    [sOTAProviderDelegate respondAvailableWithDelay:@(0) uri:imagePath2 updateToken:updateToken1  softwareVersion:kUpdatedSoftwareVersion1
-                      softwareVersionString:kUpdatedSoftwareVersionString1 completion:completion];
-                    [queryExpectation3 fulfill];
-                };
-        sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSString * fileDesignator,
-            NSNumber * offset, MTRStatusCompletion completion) {
-                XCTAssertEqualObjects(nodeID, @(kDeviceId2));
-                XCTAssertEqual(controller, sController);
-                XCTAssertEqualObjects(fileDesignator, imagePath2);
-                XCTAssertEqualObjects(offset, @(0));
-
-                readHandle = [NSFileHandle fileHandleForReadingAtPath:fileDesignator];
-                XCTAssertNotNil(readHandle);
-
-                NSError * endSeekError;
-                XCTAssertTrue([readHandle seekToEndReturningOffset:&imageSize error:&endSeekError]);
-                XCTAssertNil(endSeekError);
-                sOTAProviderDelegate.transferBeginHandler = nil;
-                [sOTAProviderDelegate respondSuccess:completion];
-                lastBlockIndex = UINT32_MAX;
-                [bdxBeginExpectation2 fulfill];
-            };
-        sOTAProviderDelegate.blockQueryHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSNumber * blockSize,
-            NSNumber * blockIndex, NSNumber * bytesToSkip, BlockQueryCompletion completion) {
-                XCTAssertEqualObjects(nodeID, @(kDeviceId2));
-                XCTAssertEqual(controller, sController);
-                XCTAssertEqualObjects(blockSize, @(1024)); // Seems to always be 1024.
-                XCTAssertEqualObjects(blockIndex, @(lastBlockIndex + 1));
-                XCTAssertEqualObjects(bytesToSkip, @(0)); // Don't expect to see skips here.
-                // Make sure we actually end up with multiple blocks.
-                XCTAssertTrue(blockSize.unsignedLongLongValue < imageSize);
-
-                XCTAssertNotNil(readHandle);
-                uint64_t offset = blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
-                NSError * seekError = nil;
-                [readHandle seekToOffset:offset error:&seekError];
-                XCTAssertNil(seekError);
-
-                NSError * readError = nil;
-                NSData * data = [readHandle readDataUpToLength:blockSize.unsignedLongValue error:&readError];
-                XCTAssertNil(readError);
-                XCTAssertNotNil(data);
-
-                BOOL isEOF = offset + blockSize.unsignedLongValue >= imageSize;
-
-                ++lastBlockIndex;
-
-                if (isEOF) {
-                    sOTAProviderDelegate.blockQueryHandler = nil;
-                }
-
-                completion(data, isEOF);
-
-                if (isEOF) {
-                    [bdxQueryExpectation2 fulfill];
-                }
-        };
-        sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSError * _Nullable error) {
+            MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
             XCTAssertEqualObjects(nodeID, @(kDeviceId2));
             XCTAssertEqual(controller, sController);
-            XCTAssertNil(error);
-            sOTAProviderDelegate.transferEndHandler = nil;
-            [bdxEndExpectation2 fulfill];
+
+            sOTAProviderDelegate.queryImageHandler = nil;
+            [sOTAProviderDelegate respondAvailableWithDelay:@(0)
+                                                        uri:imagePath2
+                                                updateToken:updateToken1
+                                            softwareVersion:kUpdatedSoftwareVersion1
+                                      softwareVersionString:kUpdatedSoftwareVersionString1
+                                                 completion:completion];
+            [queryExpectation3 fulfill];
         };
+        sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+            NSString * fileDesignator, NSNumber * offset, MTRStatusCompletion completion) {
+            XCTAssertEqualObjects(nodeID, @(kDeviceId2));
+            XCTAssertEqual(controller, sController);
+            XCTAssertEqualObjects(fileDesignator, imagePath2);
+            XCTAssertEqualObjects(offset, @(0));
+
+            readHandle = [NSFileHandle fileHandleForReadingAtPath:fileDesignator];
+            XCTAssertNotNil(readHandle);
+
+            NSError * endSeekError;
+            XCTAssertTrue([readHandle seekToEndReturningOffset:&imageSize error:&endSeekError]);
+            XCTAssertNil(endSeekError);
+            sOTAProviderDelegate.transferBeginHandler = nil;
+            [sOTAProviderDelegate respondSuccess:completion];
+            lastBlockIndex = UINT32_MAX;
+            [bdxBeginExpectation2 fulfill];
+        };
+        sOTAProviderDelegate.blockQueryHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSNumber * blockSize,
+            NSNumber * blockIndex, NSNumber * bytesToSkip, BlockQueryCompletion completion) {
+            XCTAssertEqualObjects(nodeID, @(kDeviceId2));
+            XCTAssertEqual(controller, sController);
+            XCTAssertEqualObjects(blockSize, @(1024)); // Seems to always be 1024.
+            XCTAssertEqualObjects(blockIndex, @(lastBlockIndex + 1));
+            XCTAssertEqualObjects(bytesToSkip, @(0)); // Don't expect to see skips here.
+            // Make sure we actually end up with multiple blocks.
+            XCTAssertTrue(blockSize.unsignedLongLongValue < imageSize);
+
+            XCTAssertNotNil(readHandle);
+            uint64_t offset = blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
+            NSError * seekError = nil;
+            [readHandle seekToOffset:offset error:&seekError];
+            XCTAssertNil(seekError);
+
+            NSError * readError = nil;
+            NSData * data = [readHandle readDataUpToLength:blockSize.unsignedLongValue error:&readError];
+            XCTAssertNil(readError);
+            XCTAssertNotNil(data);
+
+            BOOL isEOF = offset + blockSize.unsignedLongValue >= imageSize;
+
+            ++lastBlockIndex;
+
+            if (isEOF) {
+                sOTAProviderDelegate.blockQueryHandler = nil;
+            }
+
+            completion(data, isEOF);
+
+            if (isEOF) {
+                [bdxQueryExpectation2 fulfill];
+            }
+        };
+        sOTAProviderDelegate.transferEndHandler
+            = ^(NSNumber * nodeID, MTRDeviceController * controller, NSError * _Nullable error) {
+                  XCTAssertEqualObjects(nodeID, @(kDeviceId2));
+                  XCTAssertEqual(controller, sController);
+                  XCTAssertNil(error);
+                  sOTAProviderDelegate.transferEndHandler = nil;
+                  [bdxEndExpectation2 fulfill];
+              };
     };
     sOTAProviderDelegate.applyUpdateRequestHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
         MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams * params, ApplyUpdateRequestCompletion completion) {
@@ -1238,47 +1284,49 @@ static BOOL sNeedsStackShutdown = YES;
         XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:otaRawImagePath1 andPath:kOtaDownloadedFilePath1]);
 
         sOTAProviderDelegate.applyUpdateRequestHandler = nil;
-        [sOTAProviderDelegate respondToApplyUpdateRequestWithAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed completion:completion];
+        [sOTAProviderDelegate respondToApplyUpdateRequestWithAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed
+                                                         completion:completion];
         [applyUpdateRequestExpectation1 fulfill];
     };
 
     sOTAProviderDelegate.notifyUpdateAppliedHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
-            MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * params, MTRStatusCompletion completion) {
-            XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+        MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * params, MTRStatusCompletion completion) {
+        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+        XCTAssertEqual(controller, sController);
+        XCTAssertEqualObjects(params.updateToken, updateToken);
+        XCTAssertEqualObjects(params.softwareVersion, kUpdatedSoftwareVersion2);
+        sOTAProviderDelegate.notifyUpdateAppliedHandler = nil;
+        [sOTAProviderDelegate respondSuccess:completion];
+        [notifyUpdateAppliedExpectation1 fulfill];
+
+        // Update has been applied for the first OTA requestor
+        // Set up the applyUpdate and notifyUpdateApplied handlers for the second OTA requestor
+        sOTAProviderDelegate.applyUpdateRequestHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+            MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams * params, ApplyUpdateRequestCompletion completion) {
+            XCTAssertEqualObjects(nodeID, @(kDeviceId2));
             XCTAssertEqual(controller, sController);
-            XCTAssertEqualObjects(params.updateToken, updateToken);
-            XCTAssertEqualObjects(params.softwareVersion, kUpdatedSoftwareVersion2);
+            XCTAssertEqualObjects(params.updateToken, updateToken1);
+            XCTAssertEqualObjects(params.newVersion, kUpdatedSoftwareVersion1); // TODO: Factor this out better!
+
+            XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:otaRawImagePath2 andPath:kOtaDownloadedFilePath2]);
+
+            sOTAProviderDelegate.applyUpdateRequestHandler = nil;
+            [sOTAProviderDelegate respondToApplyUpdateRequestWithAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed
+                                                             completion:completion];
+            [applyUpdateRequestExpectation2 fulfill];
+        };
+
+        sOTAProviderDelegate.notifyUpdateAppliedHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+            MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * params, MTRStatusCompletion completion) {
+            XCTAssertEqualObjects(nodeID, @(kDeviceId2));
+            XCTAssertEqual(controller, sController);
+            XCTAssertEqualObjects(params.updateToken, updateToken1);
+            XCTAssertEqualObjects(params.softwareVersion, kUpdatedSoftwareVersion1);
+
             sOTAProviderDelegate.notifyUpdateAppliedHandler = nil;
             [sOTAProviderDelegate respondSuccess:completion];
-            [notifyUpdateAppliedExpectation1 fulfill];
-
-            // Update has been applied for the first OTA requestor
-            // Set up the applyUpdate and notifyUpdateApplied handlers for the second OTA requestor
-            sOTAProviderDelegate.applyUpdateRequestHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
-            MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams * params, ApplyUpdateRequestCompletion completion) {
-                XCTAssertEqualObjects(nodeID, @(kDeviceId2));
-                XCTAssertEqual(controller, sController);
-                XCTAssertEqualObjects(params.updateToken, updateToken1);
-                XCTAssertEqualObjects(params.newVersion, kUpdatedSoftwareVersion1); // TODO: Factor this out better!
-
-                XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:otaRawImagePath2 andPath:kOtaDownloadedFilePath2]);
-
-                sOTAProviderDelegate.applyUpdateRequestHandler = nil;
-                [sOTAProviderDelegate respondToApplyUpdateRequestWithAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed completion:completion];
-                [applyUpdateRequestExpectation2 fulfill];
-            };
-
-            sOTAProviderDelegate.notifyUpdateAppliedHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
-            MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * params, MTRStatusCompletion completion) {
-                XCTAssertEqualObjects(nodeID, @(kDeviceId2));
-                XCTAssertEqual(controller, sController);
-                XCTAssertEqualObjects(params.updateToken, updateToken1);
-                XCTAssertEqualObjects(params.softwareVersion, kUpdatedSoftwareVersion1);
-
-                sOTAProviderDelegate.notifyUpdateAppliedHandler = nil;
-                [sOTAProviderDelegate respondSuccess:completion];
-                [notifyUpdateAppliedExpectation2 fulfill];
-            };
+            [notifyUpdateAppliedExpectation2 fulfill];
+        };
     };
 
     // Advertise ourselves as an OTA provider.
@@ -1286,9 +1334,7 @@ static BOOL sNeedsStackShutdown = YES;
 
     // Make sure we get our callbacks in order.  Give it a bit more time, because
     // we want to allow time for the BDX download.
-    [self waitForExpectations:@[
-        queryExpectation1, bdxBeginExpectation1, bdxQueryExpectation1, bdxEndExpectation1
-    ]
+    [self waitForExpectations:@[ queryExpectation1, bdxBeginExpectation1, bdxQueryExpectation1, bdxEndExpectation1 ]
                       timeout:(kTimeoutWithUpdateInSeconds) enforceOrder:YES];
 
     // Nothing really defines the ordering of bdxEndExpectation and
@@ -1322,21 +1368,20 @@ static BOOL sNeedsStackShutdown = YES;
     // 1) Check if the ota image file and raw image file required for this test exist.
     //    Two versions must be present with one version greater than the other.
     // 2) Advertise ourselves to device.
-    // 3) When device queries for an image, pass the image path for the ota file generated beforehand as a pre-requisite with a lower version number.
-    // 4) When device tries to start a bdx transfer, respond with success.
-    // 5) Send the data as the BDX transfer proceeds.
-    // 6) Confirm the downloaded ota image matches the raw image file that was generated before the test was run as a pre-requisite with the lower version number
-    // 7) When device invokes ApplyUpdateRequest, respond with Proceed so that the update proceeds
-    // 8) Wait for the app to restart and wait for the NotifyUpdateApplied message to confirm the app has updated to the new version
-    // 9) Advertise ourselves again to device.
-    // 3) When device queries for an image, pass the image path for the ota file generated beforehand as a pre-requisite with a higher version number.
-    // 4) When device tries to start a bdx transfer, respond with success.
-    // 5) Send the data as the BDX transfer proceeds.
-    // 6) Confirm the downloaded ota image matches the raw image file that was generated before the test was run as a pre-requisite with the higher version number
-    // 7) When device invokes ApplyUpdateRequest, respond with Proceed so that the update proceeds
-    // 8) Wait for the app to restart and wait for the NotifyUpdateApplied message to confirm the app has updated to the new version
+    // 3) When device queries for an image, pass the image path for the ota file generated beforehand as a pre-requisite with a
+    // lower version number. 4) When device tries to start a bdx transfer, respond with success. 5) Send the data as the BDX
+    // transfer proceeds. 6) Confirm the downloaded ota image matches the raw image file that was generated before the test was run
+    // as a pre-requisite with the lower version number 7) When device invokes ApplyUpdateRequest, respond with Proceed so that the
+    // update proceeds 8) Wait for the app to restart and wait for the NotifyUpdateApplied message to confirm the app has updated to
+    // the new version 9) Advertise ourselves again to device. 3) When device queries for an image, pass the image path for the ota
+    // file generated beforehand as a pre-requisite with a higher version number. 4) When device tries to start a bdx transfer,
+    // respond with success. 5) Send the data as the BDX transfer proceeds. 6) Confirm the downloaded ota image matches the raw
+    // image file that was generated before the test was run as a pre-requisite with the higher version number 7) When device
+    // invokes ApplyUpdateRequest, respond with Proceed so that the update proceeds 8) Wait for the app to restart and wait for the
+    // NotifyUpdateApplied message to confirm the app has updated to the new version
 
-    // This test expects a pre-generated raw image at otaRawImagePath1 with lower version number and a raw image at otaRawImagePath2 with higher version number
+    // This test expects a pre-generated raw image at otaRawImagePath1 with lower version number and a raw image at otaRawImagePath2
+    // with higher version number
     NSString * otaRawImagePath1 = @"/tmp/ota-test006-raw-image";
     NSString * otaRawImagePath2 = @"/tmp/ota-test007-raw-image";
 
@@ -1407,10 +1452,8 @@ static BOOL sNeedsStackShutdown = YES;
     // Nothing defines the ordering of announceResponseExpectation with respect
     // to _any_ of the above expectations.
     [self waitForExpectations:@[ announceResponseExpectation1 ] timeout:kTimeoutInSeconds];
-
-
 }
-#endif //ENABLE_TESTS
+#endif // ENABLE_TESTS
 
 - (void)test999_TearDown
 {
