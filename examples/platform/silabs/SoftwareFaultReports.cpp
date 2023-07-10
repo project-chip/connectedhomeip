@@ -34,6 +34,10 @@
 #endif
 #endif // BRD4325A
 
+#ifdef BRD4325A // For SiWx917 Platform only
+#include "core_cm4.h"
+#endif
+
 // Technically FaultRecording is an octstr up to 1024 bytes.
 // We currently only report short strings. 100 char will more than enough for now.
 constexpr uint8_t kMaxFaultStringLen = 100;
