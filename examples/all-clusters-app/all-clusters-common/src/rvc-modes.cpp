@@ -51,8 +51,7 @@ CHIP_ERROR RvcRunModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::Muta
     {
         if (label.size() >= kModeOptions[modeIndex].label.size())
         {
-            CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
-            return CHIP_NO_ERROR;
+            return CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
         }
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

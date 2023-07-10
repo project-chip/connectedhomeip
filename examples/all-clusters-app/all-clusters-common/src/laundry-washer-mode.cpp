@@ -41,8 +41,7 @@ CHIP_ERROR LaundryWasherModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chi
     {
         if (label.size() >= kModeOptions[modeIndex].label.size())
         {
-            CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
-            return CHIP_NO_ERROR;
+            return CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
         }
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

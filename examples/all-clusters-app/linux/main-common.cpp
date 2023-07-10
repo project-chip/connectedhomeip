@@ -201,12 +201,12 @@ CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductPrimaryColor(Clusters::B
 
 ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
 
-Clusters::RvcRunMode::RvcRunModeInstance rvcRunModeInstance(0x1, Clusters::RvcRunMode::Id, 1);
-Clusters::RvcCleanMode::RvcCleanModeInstance rvcCleanModeInstance(0x1, Clusters::RvcCleanMode::Id, 1);
-Clusters::DishwasherMode::DishwasherModeInstance dishwasherModeInstance(0x1, Clusters::DishwasherMode::Id, 1);
-Clusters::LaundryWasherMode::LaundryWasherModeInstance laundryWasherModeInstance(0x1, Clusters::LaundryWasherMode::Id, 1);
+Clusters::RvcRunMode::RvcRunModeInstance gRvcRunModeInstance(0x1, Clusters::RvcRunMode::Id, 1);
+Clusters::RvcCleanMode::RvcCleanModeInstance gRvcCleanModeInstance(0x1, Clusters::RvcCleanMode::Id, 1);
+Clusters::DishwasherMode::DishwasherModeInstance gDishwasherModeInstance(0x1, Clusters::DishwasherMode::Id, 1);
+Clusters::LaundryWasherMode::LaundryWasherModeInstance gLaundryWasherModeInstance(0x1, Clusters::LaundryWasherMode::Id, 1);
 Clusters::RefrigeratorAndTemperatureControlledCabinetMode::TccModeInstance
-    TccModeInstance(0x1, Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id, 1);
+    gTccModeInstance(0x1, Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id, 1);
 
 } // namespace
 
@@ -264,11 +264,11 @@ void ApplicationInit()
         sEthernetNetworkCommissioningInstance.Init();
     }
 
-    rvcRunModeInstance.Init();
-    rvcCleanModeInstance.Init();
-    dishwasherModeInstance.Init();
-    laundryWasherModeInstance.Init();
-    TccModeInstance.Init();
+    gRvcRunModeInstance.Init();
+    gRvcCleanModeInstance.Init();
+    gDishwasherModeInstance.Init();
+    gLaundryWasherModeInstance.Init();
+    gTccModeInstance.Init();
 
     std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
 

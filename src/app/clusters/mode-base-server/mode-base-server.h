@@ -212,7 +212,7 @@ public:
 };
 
 // This map holds pointers to all initialised ModeBase instances. It provides a way to access all ModeBase clusters.
-// TODO(#27508)
+// todo change once there is a clear public interface for the OnOff cluster data dependencies (#27508)
 static std::map<uint32_t, Instance *> ModeBaseAliasesInstanceMap;
 
 std::map<uint32_t, Instance *> GetModeBaseInstances();
