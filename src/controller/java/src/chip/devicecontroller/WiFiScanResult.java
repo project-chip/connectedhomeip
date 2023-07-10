@@ -28,13 +28,12 @@ public class WiFiScanResult {
   public Integer rssi;
 
   public WiFiScanResult(
-    Integer security
-      , byte[] ssid
-      , byte[] bssid
-      , Integer channel
-      , Integer wiFiBand
-      , Integer rssi
-  ) {
+      Integer security,
+      byte[] ssid,
+      byte[] bssid,
+      Integer channel,
+      Integer wiFiBand,
+      Integer rssi) {
     this.security = security;
     this.ssid = ssid;
     this.bssid = bssid;

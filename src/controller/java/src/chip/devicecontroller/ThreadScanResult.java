@@ -30,15 +30,14 @@ public class ThreadScanResult {
   public Integer lqi;
 
   public ThreadScanResult(
-    Integer panId
-      , Long extendedPanId
-      , String networkName
-      , Integer channel
-      , Integer version
-      , byte[] extendedAddress
-      , Integer rssi
-      , Integer lqi
-  ) {
+      Integer panId,
+      Long extendedPanId,
+      String networkName,
+      Integer channel,
+      Integer version,
+      byte[] extendedAddress,
+      Integer rssi,
+      Integer lqi) {
     this.panId = panId;
     this.extendedPanId = extendedPanId;
     this.networkName = networkName;
