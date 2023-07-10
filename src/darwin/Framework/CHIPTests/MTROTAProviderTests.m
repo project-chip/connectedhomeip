@@ -672,21 +672,21 @@ static BOOL sNeedsStackShutdown = YES;
 - (void)test001_UpdateDefaultOTAProviderAndVerify
 {
     // Test to update the default OTA provider for a device and verify that it's updated correctly.
-    
+
     MTROtaSoftwareUpdateRequestorClusterProviderLocation * providerLocation = [[MTROtaSoftwareUpdateRequestorClusterProviderLocation alloc] init];
     providerLocation.providerNodeID = @(kOTAProviderNodeId);
     providerLocation.endpoint = @(kOTAProviderEndpointId);
     providerLocation.fabricIndex = @(kOTAProviderFabricIndex);
-    
+
     dispatch_queue_t queue = dispatch_get_main_queue();
     XCTestExpectation * updateDefaultOTAProviderExpectation = [self expectationWithDescription:@"UpdateDefaultOTAProvider verified"];
-    
+
     [sController getBaseDevice:kDeviceId1
                         queue:queue
             completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                 XCTAssertEqual(error.code, 0);
                 XCTAssertNotNil(device);
-                
+
                 MTRBaseClusterOtaSoftwareUpdateRequestor * cluster = [[MTRBaseClusterOtaSoftwareUpdateRequestor alloc] initWithDevice:device endpointID:@(0) queue:queue];
                 NSArray * value = [NSArray arrayWithObject:providerLocation];
                 [cluster writeAttributeDefaultOTAProvidersWithValue:value completion:^(NSError * _Nullable error) {
@@ -702,7 +702,7 @@ static BOOL sNeedsStackShutdown = YES;
                                          }];
                 }];
             }];
-            
+
             [self waitForExpectations:@[ updateDefaultOTAProviderExpectation] timeout:kPairingTimeoutInSeconds];
 }
 
@@ -800,7 +800,7 @@ static BOOL sNeedsStackShutdown = YES;
                                                     uri:fakeImageURI
                                             updateToken:[sOTAProviderDelegate generateUpdateToken]
                                              softwareVersion:kUpdatedSoftwareVersion1
-                                       softwareVersionString:kUpdatedSoftwareVersionString1 
+                                       softwareVersionString:kUpdatedSoftwareVersionString1
                                              completion:completion];
         [queryExpectation1 fulfill];
     };
@@ -827,7 +827,7 @@ static BOOL sNeedsStackShutdown = YES;
                                                         uri:fakeImageURI
                                                 updateToken:[sOTAProviderDelegate generateUpdateToken]
                                                  softwareVersion:kUpdatedSoftwareVersion1
-                                           softwareVersionString:kUpdatedSoftwareVersionString1 
+                                           softwareVersionString:kUpdatedSoftwareVersionString1
                                                  completion:innerCompletion];
             [sOTAProviderDelegate respondErrorWithCompletion:outerCompletion];
             [queryExpectation2 fulfill];
@@ -1025,7 +1025,7 @@ static BOOL sNeedsStackShutdown = YES;
     __block XCTestExpectation * announceResponseExpectation2;
 
     NSString * imagePath1 = [otaRawImagePath1 stringByReplacingOccurrencesOfString:@"raw-image" withString:@"image"];
-    
+
     NSString * imagePath2 = [otaRawImagePath2 stringByReplacingOccurrencesOfString:@"raw-image" withString:@"image"];
 
     // Find the right absolute path to our ota_image_tool.py script.  PWD should
@@ -1046,7 +1046,7 @@ static BOOL sNeedsStackShutdown = YES;
     XCTAssertNil(launchError);
     [task waitUntilExit];
     XCTAssertEqual([task terminationStatus], 0);
-    
+
     NSTask * task1 = [[NSTask alloc] init];
     [task1 setLaunchPath:imageToolPath];
     [task1 setArguments:@[
@@ -1109,7 +1109,7 @@ static BOOL sNeedsStackShutdown = YES;
         sOTAProviderDelegate.transferBeginHandler = nil;
         [sOTAProviderDelegate respondSuccess:completion];
         [bdxBeginExpectation1 fulfill];
-        
+
         // Announce to the second requestor
         announceResponseExpectation2 = [self announceProviderToDevice:device2];
     };
@@ -1173,10 +1173,10 @@ static BOOL sNeedsStackShutdown = YES;
                 XCTAssertEqual(controller, sController);
                 XCTAssertEqualObjects(fileDesignator, imagePath2);
                 XCTAssertEqualObjects(offset, @(0));
-        
+
                 readHandle = [NSFileHandle fileHandleForReadingAtPath:fileDesignator];
                 XCTAssertNotNil(readHandle);
-        
+
                 NSError * endSeekError;
                 XCTAssertTrue([readHandle seekToEndReturningOffset:&imageSize error:&endSeekError]);
                 XCTAssertNil(endSeekError);
@@ -1194,28 +1194,28 @@ static BOOL sNeedsStackShutdown = YES;
                 XCTAssertEqualObjects(bytesToSkip, @(0)); // Don't expect to see skips here.
                 // Make sure we actually end up with multiple blocks.
                 XCTAssertTrue(blockSize.unsignedLongLongValue < imageSize);
-        
+
                 XCTAssertNotNil(readHandle);
                 uint64_t offset = blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
                 NSError * seekError = nil;
                 [readHandle seekToOffset:offset error:&seekError];
                 XCTAssertNil(seekError);
-        
+
                 NSError * readError = nil;
                 NSData * data = [readHandle readDataUpToLength:blockSize.unsignedLongValue error:&readError];
                 XCTAssertNil(readError);
                 XCTAssertNotNil(data);
-        
+
                 BOOL isEOF = offset + blockSize.unsignedLongValue >= imageSize;
-        
+
                 ++lastBlockIndex;
-        
+
                 if (isEOF) {
                     sOTAProviderDelegate.blockQueryHandler = nil;
                 }
-        
+
                 completion(data, isEOF);
-        
+
                 if (isEOF) {
                     [bdxQueryExpectation2 fulfill];
                 }
@@ -1260,9 +1260,9 @@ static BOOL sNeedsStackShutdown = YES;
                 XCTAssertEqual(controller, sController);
                 XCTAssertEqualObjects(params.updateToken, updateToken1);
                 XCTAssertEqualObjects(params.newVersion, kUpdatedSoftwareVersion1); // TODO: Factor this out better!
-        
+
                 XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:otaRawImagePath2 andPath:kOtaDownloadedFilePath2]);
-        
+
                 sOTAProviderDelegate.applyUpdateRequestHandler = nil;
                 [sOTAProviderDelegate respondToApplyUpdateRequestWithAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed completion:completion];
                 [applyUpdateRequestExpectation2 fulfill];
@@ -1274,7 +1274,7 @@ static BOOL sNeedsStackShutdown = YES;
                 XCTAssertEqual(controller, sController);
                 XCTAssertEqualObjects(params.updateToken, updateToken1);
                 XCTAssertEqualObjects(params.softwareVersion, kUpdatedSoftwareVersion1);
-        
+
                 sOTAProviderDelegate.notifyUpdateAppliedHandler = nil;
                 [sOTAProviderDelegate respondSuccess:completion];
                 [notifyUpdateAppliedExpectation2 fulfill];
@@ -1292,7 +1292,7 @@ static BOOL sNeedsStackShutdown = YES;
                       timeout:(kTimeoutWithUpdateInSeconds) enforceOrder:YES];
 
     // Nothing really defines the ordering of bdxEndExpectation and
-    // applyUpdateRequestExpectation with respect to each other.                     
+    // applyUpdateRequestExpectation with respect to each other.
     [self waitForExpectations:@[ applyUpdateRequestExpectation1, notifyUpdateAppliedExpectation1 ]
                       timeout:kTimeoutInSeconds
                  enforceOrder:YES];
@@ -1347,7 +1347,7 @@ static BOOL sNeedsStackShutdown = YES;
     // Test that if we advertise ourselves as a provider we end up getting a
     // QueryImage callbacks that we can respond to.
     __auto_type * device = sConnectedDevice3;
-    
+
     __auto_type * checker =
         [[MTROTAProviderTransferChecker alloc] initWithRawImagePath:otaRawImagePath1
                                            otaImageDownloadFilePath:kOtaDownloadedFilePath3
@@ -1376,9 +1376,9 @@ static BOOL sNeedsStackShutdown = YES;
     // Nothing defines the ordering of announceResponseExpectation with respect
     // to _any_ of the above expectations.
     [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
-    
+
     // Provide an incremental update and makes sure the app is updated to the new version
-    
+
     __auto_type * checker1 =
         [[MTROTAProviderTransferChecker alloc] initWithRawImagePath:otaRawImagePath2
                                            otaImageDownloadFilePath:kOtaDownloadedFilePath3
@@ -1407,8 +1407,8 @@ static BOOL sNeedsStackShutdown = YES;
     // Nothing defines the ordering of announceResponseExpectation with respect
     // to _any_ of the above expectations.
     [self waitForExpectations:@[ announceResponseExpectation1 ] timeout:kTimeoutInSeconds];
-    
-    
+
+
 }
 #endif //ENABLE_TESTS
 
