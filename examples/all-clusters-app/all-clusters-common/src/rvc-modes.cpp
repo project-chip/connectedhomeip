@@ -39,7 +39,7 @@ void RvcRunModeInstance::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
     if (NewMode == RvcRunMode::ModeMapping && currentMode != RvcRunMode::ModeIdle)
     {
         response.status = static_cast<uint8_t>(ModeBase::StatusCode::kGenericFailure);
-        response.statusText.SetValue(chip::CharSpan("Change to the mapping state is only allowed from idle", 53));
+        response.statusText.SetValue(chip::CharSpan("Change to the mapping mode is only allowed from idle", 52));
     }
 
     response.status = static_cast<uint8_t>(ModeBase::StatusCode::kSuccess);
