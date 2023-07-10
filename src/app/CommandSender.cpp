@@ -62,42 +62,49 @@ CHIP_ERROR CommandSender::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout,
+                                                     bool sendTimedRequestAction)
+{
+    VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+
+    ReturnErrorOnFailure(Finalize(mPendingInvokeData));
+
+    // Create a new exchange context.
+    auto exchange = mpExchangeMgr->NewContext(session, this);
+    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    mExchangeCtx.Grab(exchange);
+    VerifyOrReturnError(!mExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
+
+    mExchangeCtx->SetResponseTimeout(timeout.ValueOr(session->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
+
+    if (sendTimedRequestAction && !mTimedInvokeTimeoutMs.HasValue())
+    {
+        ChipLogError(DataManagement, "Timed request action requested with no mTimedInteractionTimeoutMs");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (sendTimedRequestAction)
+    {
+        ReturnErrorOnFailure(TimedRequest::Send(mExchangeCtx.Get(), mTimedInvokeTimeoutMs.Value()));
+        MoveToState(State::AwaitingTimedStatus);
+        return CHIP_NO_ERROR;
+    }
+
+    return SendInvokeRequest();
+}
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 CHIP_ERROR CommandSender::TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke(const SessionHandle & session,
                                                                                  Optional<System::Clock::Timeout> timeout)
 {
     VerifyOrReturnError(mTimedRequest, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
-
-    ReturnErrorOnFailure(Finalize(mPendingInvokeData));
-
-    // Create a new exchange context.
-    auto exchange = mpExchangeMgr->NewContext(session, this);
-    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    mExchangeCtx.Grab(exchange);
-    VerifyOrReturnError(!mExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
-
-    mExchangeCtx->SetResponseTimeout(timeout.ValueOr(session->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
-
-    return SendInvokeRequest();
+    return SendCommandRequestInternal(session, timeout, false);
 }
 #endif
 
 CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Optional<System::Clock::Timeout> timeout)
 {
-    VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
-
-    ReturnErrorOnFailure(Finalize(mPendingInvokeData));
-
-    // Create a new exchange context.
-    auto exchange = mpExchangeMgr->NewContext(session, this);
-    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    mExchangeCtx.Grab(exchange);
-    VerifyOrReturnError(!mExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
-
-    mExchangeCtx->SetResponseTimeout(timeout.ValueOr(session->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
 
     if (mTimedRequest != mTimedInvokeTimeoutMs.HasValue())
     {
@@ -107,15 +114,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Opti
             mTimedRequest, mTimedInvokeTimeoutMs.HasValue());
         return CHIP_ERROR_INCORRECT_STATE;
     }
-
-    if (mTimedInvokeTimeoutMs.HasValue())
-    {
-        ReturnErrorOnFailure(TimedRequest::Send(mExchangeCtx.Get(), mTimedInvokeTimeoutMs.Value()));
-        MoveToState(State::AwaitingTimedStatus);
-        return CHIP_NO_ERROR;
-    }
-
-    return SendInvokeRequest();
+    return SendCommandRequestInternal(session, timeout, mTimedInvokeTimeoutMs.HasValue());
 }
 
 CHIP_ERROR CommandSender::SendGroupCommandRequest(const SessionHandle & session)
