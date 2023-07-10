@@ -242,13 +242,17 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             // Per the spec, we restart from after adding the NOC.
             return GetNextCommissioningStage(CommissioningStage::kSendNOC, lastErr);
         }
-        return CommissioningStage::kReadTimeSyncInfo;
-    case CommissioningStage::kReadTimeSyncInfo:
+        if (mParams.GetCheckForMatchingFabric())
+        {
+            return CommissioningStage::kCheckForMatchingFabric;
+        }
+        return CommissioningStage::kArmFailsafe;
+    case CommissioningStage::kCheckForMatchingFabric:
         return CommissioningStage::kArmFailsafe;
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kConfigRegulatory:
-        if (mTimeSyncInfo.requiresUTC)
+        if (mDeviceCommissioningInfo.requiresUTC)
         {
             return CommissioningStage::kConfigureUTCTime;
         }
@@ -258,7 +262,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             return CommissioningStage::kSendPAICertificateRequest;
         }
     case CommissioningStage::kConfigureUTCTime:
-        if (mTimeSyncInfo.requiresTimeZone && mParams.GetTimeZone().HasValue())
+        if (mDeviceCommissioningInfo.requiresTimeZone && mParams.GetTimeZone().HasValue())
         {
             return kConfigureTimeZone;
         }
@@ -276,9 +280,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             return GetNextCommissioningStageInternal(CommissioningStage::kConfigureDSTOffset, lastErr);
         }
     case CommissioningStage::kConfigureDSTOffset:
-        ChipLogProgress(Controller, "requires default NTP = %d, have params = %d", mTimeSyncInfo.requiresDefaultNTP,
-                        mParams.GetDefaultNTP().HasValue());
-        if (mTimeSyncInfo.requiresDefaultNTP && mParams.GetDefaultNTP().HasValue())
+        if (mDeviceCommissioningInfo.requiresDefaultNTP && mParams.GetDefaultNTP().HasValue())
         {
             return CommissioningStage::kConfigureDefaultNTP;
         }
@@ -305,7 +307,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kSendTrustedRootCert:
         return CommissioningStage::kSendNOC;
     case CommissioningStage::kSendNOC:
-        if (mTimeSyncInfo.requiresTrustedTimeSource && mParams.GetTrustedTimeSource().HasValue())
+        if (mDeviceCommissioningInfo.requiresTrustedTimeSource && mParams.GetTrustedTimeSource().HasValue())
         {
             return CommissioningStage::kConfigureTrustedTimeSource;
         }
@@ -630,16 +632,17 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 .SetRemoteProductId(mDeviceCommissioningInfo.basic.productId)
                 .SetDefaultRegulatoryLocation(mDeviceCommissioningInfo.general.currentRegulatoryLocation)
                 .SetLocationCapability(mDeviceCommissioningInfo.general.locationCapability);
-            if (mDeviceCommissioningInfo.nodeId != kUndefinedNodeId)
-            {
-                mParams.SetRemoteNodeId(mDeviceCommissioningInfo.nodeId);
-            }
-            break;
-        case CommissioningStage::kReadTimeSyncInfo:
-            mTimeSyncInfo = report.Get<ReadTimeSyncInfo>();
             // Don't send DST unless the device says it needs it
             mNeedsDST = false;
             break;
+        case CommissioningStage::kCheckForMatchingFabric: {
+            chip::NodeId nodeId = report.Get<MatchingFabricInfo>().nodeId;
+            if (nodeId != kUndefinedNodeId)
+            {
+                mParams.SetRemoteNodeId(nodeId);
+            }
+            break;
+        }
         case CommissioningStage::kConfigureTimeZone:
             mNeedsDST = report.Get<TimeZoneResponseInfo>().requiresDSTOffsets;
             break;
@@ -708,6 +711,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mCommissioneeDeviceProxy = nullptr;
             mOperationalDeviceProxy  = OperationalDeviceProxy();
             mDeviceCommissioningInfo = ReadCommissioningInfo();
+            mNeedsDST                = false;
             return CHIP_NO_ERROR;
         default:
             break;
@@ -754,17 +758,17 @@ CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
     switch (nextStage)
     {
     case CommissioningStage::kConfigureTimeZone:
-        if (mParams.GetTimeZone().Value().size() > mTimeSyncInfo.maxTimeZoneSize)
+        if (mParams.GetTimeZone().Value().size() > mDeviceCommissioningInfo.maxTimeZoneSize)
         {
             mParams.SetTimeZone(app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>(
-                mParams.GetTimeZone().Value().SubSpan(0, mTimeSyncInfo.maxTimeZoneSize)));
+                mParams.GetTimeZone().Value().SubSpan(0, mDeviceCommissioningInfo.maxTimeZoneSize)));
         }
         break;
     case CommissioningStage::kConfigureDSTOffset:
-        if (mParams.GetDSTOffsets().Value().size() > mTimeSyncInfo.maxDSTSize)
+        if (mParams.GetDSTOffsets().Value().size() > mDeviceCommissioningInfo.maxDSTSize)
         {
             mParams.SetDSTOffsets(app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>(
-                mParams.GetDSTOffsets().Value().SubSpan(0, mTimeSyncInfo.maxDSTSize)));
+                mParams.GetDSTOffsets().Value().SubSpan(0, mDeviceCommissioningInfo.maxDSTSize)));
         }
         break;
     default:

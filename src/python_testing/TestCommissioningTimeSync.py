@@ -26,7 +26,6 @@ from mobly import asserts
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python
 # so this is hardcoded.
 # I realize this is dodgy, not sure how to cross the enum from c++ to python cleanly
-kReadTimeSyncInfo = 3
 kConfigureUTCTime = 6
 kConfigureTimeZone = 7
 kConfigureDSTOffset = 8
@@ -37,15 +36,18 @@ kConfigureTrustedTimeSource = 19
 class TestCommissioningTimeSync(MatterBaseTest):
     def setup_class(self):
         self.commissioner = None
+        self.commissioned = False
         return super().setup_class()
 
     async def destroy_current_commissioner(self):
         if self.commissioner:
-            fabricidx = await self.read_single_attribute_check_success(dev_ctrl=self.commissioner, cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
-            cmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabricidx)
-            await self.send_single_cmd(cmd=cmd)
+            if self.commissioned:
+                fabricidx = await self.read_single_attribute_check_success(dev_ctrl=self.commissioner, cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
+                cmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabricidx)
+                await self.send_single_cmd(cmd=cmd)
             self.commissioner.Shutdown()
         self.commissioner = None
+        self.commissioned = False
 
     @async_test_body
     async def teardown_test(self):
@@ -59,6 +61,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
         asserts.assert_true(errcode.is_success, 'Commissioning did not complete successfully')
+        self.commissioned = True
 
         # Check the feature map - if we have a time cluster, we want UTC time to be set
         features = await self.read_single_attribute(dev_ctrl=self.default_controller, node_id=self.dut_node_id,
@@ -71,7 +74,6 @@ class TestCommissioningTimeSync(MatterBaseTest):
                                  f'Unexpected error response from reading time cluster feature map {features.Reason}')
             self.supports_time = False
 
-        asserts.assert_true(self.commissioner.CheckStageSuccessful(kReadTimeSyncInfo), 'Did not read time sync info')
         asserts.assert_equal(self.commissioner.CheckStageSuccessful(
             kConfigureUTCTime), self.supports_time, 'UTC time stage incorrect')
 
@@ -150,6 +152,9 @@ class TestCommissioningTimeSync(MatterBaseTest):
 
     @async_test_body
     async def test_CommissioningPreSetValues(self):
+
+        await self.create_commissioner()
+
         # If we're running this against a node that doesn't have a time cluster, this test doesn't apply
         # and the remaining cases are covered in the base case above.
         try:
@@ -162,9 +167,9 @@ class TestCommissioningTimeSync(MatterBaseTest):
             await self.send_single_cmd(cmd)
         except InteractionModelError as e:
             if e.status == Status.UnsupportedCluster:
+                await self.destroy_current_commissioner()
                 return
 
-        await self.create_commissioner()
         self.commissioner.SetTimeZone(offset=3600, validAt=0)
         six_months = 1.577e+13  # in us
         self.commissioner.SetDSTOffset(offset=3600, validStarting=0, validUntil=utc_time_in_matter_epoch() + int(six_months))

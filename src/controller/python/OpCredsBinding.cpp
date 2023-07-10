@@ -160,9 +160,9 @@ public:
                 mCompletionError = err;
             }
         }
-        if (report.stageCompleted == chip::Controller::CommissioningStage::kReadTimeSyncInfo)
+        if (report.stageCompleted == chip::Controller::CommissioningStage::kReadCommissioningInfo)
         {
-            mTimeSyncInfo = report.Get<chip::Controller::ReadTimeSyncInfo>();
+            mReadCommissioningInfo = report.Get<chip::Controller::ReadCommissioningInfo>();
         }
         if (report.stageCompleted == chip::Controller::CommissioningStage::kConfigureTimeZone)
         {
@@ -255,7 +255,7 @@ public:
         mSimulateFailureOnStage = chip::Controller::CommissioningStage::kError;
         mFailOnReportAfterStage = chip::Controller::CommissioningStage::kError;
         mPrematureCompleteAfter = chip::Controller::CommissioningStage::kError;
-        mTimeSyncInfo           = chip::Controller::ReadTimeSyncInfo();
+        mReadCommissioningInfo  = chip::Controller::ReadCommissioningInfo();
         mNeedsDST               = false;
     }
     bool GetTestCommissionerUsed() { return mTestCommissionerUsed; }
@@ -304,13 +304,15 @@ private:
     bool mIsWifi                = false;
     bool mIsThread              = false;
     CHIP_ERROR mCompletionError = CHIP_NO_ERROR;
-    // Start off assuming that there's no time support on the device, we will revise this when we read the time sync info
-    chip::Controller::ReadTimeSyncInfo mTimeSyncInfo;
+    // Contains information about whether the device needs time sync
+    chip::Controller::ReadCommissioningInfo mReadCommissioningInfo;
     bool mNeedsDST = false;
     bool ValidStage(chip::Controller::CommissioningStage stage)
     {
         switch (stage)
         {
+        case chip::Controller::CommissioningStage::kCheckForMatchingFabric:
+            return mParams.GetCheckForMatchingFabric();
         case chip::Controller::CommissioningStage::kWiFiNetworkEnable:
         case chip::Controller::CommissioningStage::kFailsafeBeforeWiFiEnable:
         case chip::Controller::CommissioningStage::kWiFiNetworkSetup:
@@ -320,13 +322,13 @@ private:
         case chip::Controller::CommissioningStage::kThreadNetworkSetup:
             return mIsThread;
         case chip::Controller::CommissioningStage::kConfigureUTCTime:
-            return mTimeSyncInfo.requiresUTC;
+            return mReadCommissioningInfo.requiresUTC;
         case chip::Controller::CommissioningStage::kConfigureTimeZone:
-            return mTimeSyncInfo.requiresTimeZone && mParams.GetTimeZone().HasValue();
+            return mReadCommissioningInfo.requiresTimeZone && mParams.GetTimeZone().HasValue();
         case chip::Controller::CommissioningStage::kConfigureTrustedTimeSource:
-            return mTimeSyncInfo.requiresTrustedTimeSource && mParams.GetTrustedTimeSource().HasValue();
+            return mReadCommissioningInfo.requiresTrustedTimeSource && mParams.GetTrustedTimeSource().HasValue();
         case chip::Controller::CommissioningStage::kConfigureDefaultNTP:
-            return mTimeSyncInfo.requiresDefaultNTP && mParams.GetDefaultNTP().HasValue();
+            return mReadCommissioningInfo.requiresDefaultNTP && mParams.GetDefaultNTP().HasValue();
         case chip::Controller::CommissioningStage::kConfigureDSTOffset:
             return mNeedsDST && mParams.GetDSTOffsets().HasValue();
         case chip::Controller::CommissioningStage::kError:

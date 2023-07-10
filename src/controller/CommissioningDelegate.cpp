@@ -37,8 +37,8 @@ const char * StageToString(CommissioningStage stage)
         return "ReadCommissioningInfo";
         break;
 
-    case kReadTimeSyncInfo:
-        return "ReadTimeSyncInfo";
+    case kCheckForMatchingFabric:
+        return "CheckForMatchingFabric";
         break;
 
     case kArmFailsafe:

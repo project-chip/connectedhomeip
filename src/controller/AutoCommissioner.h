@@ -104,7 +104,6 @@ private:
 
     bool mNeedsNetworkSetup = false;
     ReadCommissioningInfo mDeviceCommissioningInfo;
-    ReadTimeSyncInfo mTimeSyncInfo;
     bool mNeedsDST = false;
 
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?

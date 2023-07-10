@@ -34,8 +34,8 @@ enum CommissioningStage : uint8_t
 {
     kError,
     kSecurePairing,              ///< Establish a PASE session with the device
-    kReadCommissioningInfo,      ///< Query General Commissioning Attributes and Network Features
-    kReadTimeSyncInfo,           ///< Query the time sync cluster to determine what should be set
+    kReadCommissioningInfo,      ///< Query General Commissioning Attributes, Network Features and Time Synchronization Cluster
+    kCheckForMatchingFabric,     ///< Read the current fabrics on the commissionee
     kArmFailsafe,                ///< Send ArmFailSafe (0x30:0) command to the device
     kConfigRegulatory,           ///< Send SetRegulatoryConfig (0x30:2) command to the device
     kConfigureUTCTime,           ///< SetUTCTime if the DUT has a time cluster
@@ -625,16 +625,16 @@ struct ReadCommissioningInfo
     NetworkClusters network;
     BasicClusterInfo basic;
     GeneralCommissioningInfo general;
-    NodeId nodeId = kUndefinedNodeId;
-};
-struct ReadTimeSyncInfo
-{
     bool requiresUTC               = false;
     bool requiresTimeZone          = false;
     bool requiresDefaultNTP        = false;
     bool requiresTrustedTimeSource = false;
     uint8_t maxTimeZoneSize        = 1;
     uint8_t maxDSTSize             = 1;
+};
+struct MatchingFabricInfo
+{
+    NodeId nodeId = kUndefinedNodeId;
 };
 
 struct TimeZoneResponseInfo
@@ -668,7 +668,7 @@ public:
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
      * kReadCommissioningInfo - ReadCommissioningInfo
-     * kReadTimeSyncInfo = ReadTimeSyncInfo
+     * kCheckForMatchingFabric = MatchingFabricInfo
      * kArmFailsafe: CommissioningErrorInfo if there is an error
      * kConfigRegulatory: CommissioningErrorInfo if there is an error
      * kConfigureUTCTime: None
@@ -694,7 +694,7 @@ public:
      */
     struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
                                          ReadCommissioningInfo, AttestationErrorInfo, CommissioningErrorInfo,
-                                         NetworkCommissioningStatusInfo, ReadTimeSyncInfo, TimeZoneResponseInfo>
+                                         NetworkCommissioningStatusInfo, MatchingFabricInfo, TimeZoneResponseInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

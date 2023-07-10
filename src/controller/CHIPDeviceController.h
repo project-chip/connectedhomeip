@@ -685,9 +685,6 @@ public:
 
     // ClusterStateCache::Callback impl
     void OnDone(app::ReadClient *) override;
-    // Parsers for the two different read clients
-    void ParseCommissioningInfo();
-    void ParseTimeSyncInfo();
 
     // Issue an NOC chain using the associated OperationalCredentialsDelegate. The NOC chain will
     // be provided in X509 DER format.
@@ -915,6 +912,14 @@ private:
 
         return cluster.InvokeCommand(request, this, successCb, failureCb);
     }
+
+    void SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
+                                      app::AttributePathParams * readPaths, size_t readPathsSize);
+    // Parsers for the two different read clients
+    void ParseCommissioningInfo();
+    void ParseFabrics();
+    // Called by ParseCommissioningInfo
+    void ParseTimeSyncInfo(ReadCommissioningInfo & info);
 
     static CHIP_ERROR
     ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum err);
