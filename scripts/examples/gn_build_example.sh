@@ -22,7 +22,7 @@ set -e
 
 source "$(dirname "$0")/../../scripts/activate.sh"
 
-GN_ARGS=("treat_warnings_as_errors=false")
+GN_ARGS=()
 
 EXAMPLE_DIR=$1
 shift
