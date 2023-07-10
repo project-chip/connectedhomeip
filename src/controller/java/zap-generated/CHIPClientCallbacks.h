@@ -101,6 +101,9 @@ typedef void (*DescriptorClientListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::ClusterId> & data);
 typedef void (*DescriptorPartsListListAttributeCallback)(void * context,
                                                          const chip::app::DataModel::DecodableList<chip::EndpointId> & data);
+typedef void (*DescriptorRefSemListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::RefSemStruct::DecodableType> & data);
 typedef void (*DescriptorGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DescriptorAcceptedCommandListListAttributeCallback)(

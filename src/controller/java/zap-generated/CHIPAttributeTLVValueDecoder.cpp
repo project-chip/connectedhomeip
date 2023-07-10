@@ -1914,6 +1914,55 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
+        case Attributes::RefSem::Id: {
+            using TypeInfo = Attributes::RefSem::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_namespace;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.namespace, newElement_0_namespace));
+                jobject newElement_0_tag;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.tag, newElement_0_tag));
+                jobject newElement_0_vendorId;
+                std::string newElement_0_vendorIdClassName     = "java/lang/Integer";
+                std::string newElement_0_vendorIdCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_vendorIdClassName.c_str(),
+                                                                               newElement_0_vendorIdCtorSignature.c_str(),
+                                                                               entry_0.vendorId, newElement_0_vendorId);
+
+                jclass refSemStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$DescriptorClusterRefSemStruct", refSemStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$DescriptorClusterRefSemStruct");
+                    return nullptr;
+                }
+                jmethodID refSemStructStructCtor_1 = env->GetMethodID(refSemStructStructClass_1, "<init>",
+                                                                      "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;)V");
+                if (refSemStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$DescriptorClusterRefSemStruct constructor");
+                    return nullptr;
+                }
+
+                newElement_0 = env->NewObject(refSemStructStructClass_1, refSemStructStructCtor_1, newElement_0_namespace,
+                                              newElement_0_tag, newElement_0_vendorId);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;

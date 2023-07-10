@@ -2835,6 +2835,11 @@ public class ChipClusters {
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
+      public interface RefSemAttributeCallback {
+        void onSuccess( List<ChipStructs.DescriptorClusterRefSemStruct> valueList);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
       public interface GeneratedCommandListAttributeCallback {
         void onSuccess( List<Long> valueList);
         void onError(Exception ex);
@@ -2902,6 +2907,18 @@ public class ChipClusters {
       ,
       int minInterval, int maxInterval) {
       subscribePartsListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readRefSemAttribute(
+      RefSemAttributeCallback callback
+    ) {
+      readRefSemAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeRefSemAttribute(
+        RefSemAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeRefSemAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -3002,6 +3019,13 @@ public class ChipClusters {
     );
     private native void subscribePartsListAttribute(long chipClusterPtr,
         PartsListAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readRefSemAttribute(long chipClusterPtr,
+        RefSemAttributeCallback callback
+    );
+    private native void subscribeRefSemAttribute(long chipClusterPtr,
+        RefSemAttributeCallback callback
       , int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(long chipClusterPtr,

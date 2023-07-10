@@ -23,6 +23,13 @@ limitations under the License.
     <item name="Revision" type="INT16U"/>
   </struct>
 
+  <struct name="RefSemStruct">
+    <cluster code="0x001d"/>
+    <item name="Namespace" type="CHAR_STRING"/>
+    <item name="Tag" type="CHAR_STRING"/>
+    <item name="VendorId" type="INT16U"/>
+  </struct>
+
   <cluster>
     <domain>General</domain>
     <name>Descriptor</name>
@@ -33,5 +40,6 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="SERVER_LIST" type="ARRAY" entryType="CLUSTER_ID" writable="false" optional="false">ServerList</attribute>
     <attribute side="server" code="0x0002" define="CLIENT_LIST" type="ARRAY" entryType="CLUSTER_ID" writable="false" optional="false">ClientList</attribute>
     <attribute side="server" code="0x0003" define="PARTS_LIST" type="ARRAY" entryType="ENDPOINT_NO" writable="false" optional="false">PartsList</attribute>
+    <attribute side="server" code="0x0004" define="REF_SEM" type="ARRAY" entryType="RefSemStruct" writable="false" optional="true">RefSem</attribute>
   </cluster>
 </configurator>

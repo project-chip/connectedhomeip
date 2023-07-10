@@ -4170,6 +4170,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
+- (NSDictionary<NSString *, id> *)readAttributeRefSemWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDescriptorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeRefSemID)
+                                             params:params];
+}
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)

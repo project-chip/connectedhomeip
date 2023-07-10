@@ -3311,6 +3311,31 @@ public:
 using DecodableType = Type;
 
 } // namespace DeviceTypeStruct
+namespace RefSemStruct {
+enum class Fields : uint8_t
+{
+    kNamespace = 0,
+    kTag       = 1,
+    kVendorId  = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan namespace;
+    chip::CharSpan tag;
+    uint16_t vendorId = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace RefSemStruct
 } // namespace Structs
 
 namespace Attributes {
@@ -3365,6 +3390,20 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PartsList
+namespace RefSem {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::Descriptor::Structs::RefSemStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::RefSemStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::RefSemStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RefSem::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace RefSem
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -3414,6 +3453,7 @@ struct TypeInfo
         Attributes::ServerList::TypeInfo::DecodableType serverList;
         Attributes::ClientList::TypeInfo::DecodableType clientList;
         Attributes::PartsList::TypeInfo::DecodableType partsList;
+        Attributes::RefSem::TypeInfo::DecodableType refSem;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

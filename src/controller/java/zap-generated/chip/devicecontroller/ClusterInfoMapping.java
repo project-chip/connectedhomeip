@@ -1389,6 +1389,25 @@ public class ClusterInfoMapping {
           callback.onFailure(ex);
         }
       }
+      public static class DelegatedDescriptorClusterRefSemAttributeCallback implements ChipClusters.DescriptorCluster.RefSemAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<ChipStructs.DescriptorClusterRefSemStruct> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DescriptorClusterRefSemStruct>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
       public static class DelegatedDescriptorClusterGeneratedCommandListAttributeCallback implements ChipClusters.DescriptorCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override

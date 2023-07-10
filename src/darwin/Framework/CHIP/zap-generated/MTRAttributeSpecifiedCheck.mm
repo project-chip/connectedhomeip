@@ -324,6 +324,9 @@ static BOOL AttributeIsSpecifiedInDescriptorCluster(AttributeId aAttributeId)
     case Attributes::PartsList::Id: {
         return YES;
     }
+    case Attributes::RefSem::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

@@ -889,6 +889,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = 0x00000002,
     MTRAttributeIDTypeClusterDescriptorAttributePartsListID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000003,
+    MTRAttributeIDTypeClusterDescriptorAttributeRefSemID MTR_NEWLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterDescriptorAttributeGeneratedCommandListID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,

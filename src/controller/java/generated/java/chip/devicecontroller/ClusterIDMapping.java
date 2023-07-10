@@ -1789,6 +1789,7 @@ public class ClusterIDMapping {
             ServerList(1L),
             ClientList(2L),
             PartsList(3L),
+            RefSem(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

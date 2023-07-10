@@ -617,6 +617,9 @@ typedef void (*DescriptorClientListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::ClusterId> & data);
 typedef void (*DescriptorPartsListListAttributeCallback)(void * context,
                                                          const chip::app::DataModel::DecodableList<chip::EndpointId> & data);
+typedef void (*DescriptorRefSemListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::RefSemStruct::DecodableType> & data);
 typedef void (*DescriptorGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DescriptorAcceptedCommandListListAttributeCallback)(
@@ -2856,6 +2859,38 @@ public:
     void OnSubscriptionEstablished();
     using MTRDescriptorPartsListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDescriptorPartsListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDescriptorRefSemListAttributeCallbackBridge : public MTRCallbackBridge<DescriptorRefSemListAttributeCallback>
+{
+public:
+    MTRDescriptorRefSemListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DescriptorRefSemListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDescriptorRefSemListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<DescriptorRefSemListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::RefSemStruct::DecodableType> & value);
+};
+
+class MTRDescriptorRefSemListAttributeCallbackSubscriptionBridge : public MTRDescriptorRefSemListAttributeCallbackBridge
+{
+public:
+    MTRDescriptorRefSemListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               MTRActionBlock action,
+                                                               MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDescriptorRefSemListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDescriptorRefSemListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDescriptorRefSemListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

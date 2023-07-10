@@ -105,6 +105,39 @@ public Integer revision;
   }
 }
 
+public static class DescriptorClusterRefSemStruct {
+public String namespace;
+public String tag;
+public Integer vendorId;
+
+  public DescriptorClusterRefSemStruct(
+    String namespace
+      , String tag
+      , Integer vendorId
+  ) {
+    this.namespace = namespace;
+    this.tag = tag;
+    this.vendorId = vendorId;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DescriptorClusterRefSemStruct {\n");
+    output.append("\tnamespace: ");
+    output.append(namespace);
+        output.append("\n");
+    output.append("\ttag: ");
+    output.append(tag);
+        output.append("\n");
+    output.append("\tvendorId: ");
+    output.append(vendorId);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
 public static class BindingClusterTargetStruct {
 public Optional<Long> node;
 public Optional<Integer> group;

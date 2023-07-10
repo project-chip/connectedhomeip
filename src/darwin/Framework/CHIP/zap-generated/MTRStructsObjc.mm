@@ -146,6 +146,40 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic revision;
 @end
 
+@implementation MTRDescriptorClusterRefSemStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _namespace = @"";
+
+        _tag = @"";
+
+        _vendorId = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDescriptorClusterRefSemStruct alloc] init];
+
+    other.namespace = self.namespace;
+    other.tag = self.tag;
+    other.vendorId = self.vendorId;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: namespace:%@; tag:%@; vendorId:%@; >",
+                                             NSStringFromClass([self class]), _namespace, _tag, _vendorId];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRBindingClusterTargetStruct
 - (instancetype)init
 {

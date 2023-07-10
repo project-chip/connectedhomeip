@@ -478,6 +478,10 @@ namespace PartsList {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace PartsList
 
+namespace RefSem {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace RefSem
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

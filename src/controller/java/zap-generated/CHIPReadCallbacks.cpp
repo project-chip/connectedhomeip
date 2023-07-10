@@ -3112,6 +3112,101 @@ void CHIPDescriptorPartsListAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
+CHIPDescriptorRefSemAttributeCallback::CHIPDescriptorRefSemAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPDescriptorClusterRefSemAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPDescriptorRefSemAttributeCallback::~CHIPDescriptorRefSemAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPDescriptorRefSemAttributeCallback::CallbackFn(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::RefSemStruct::DecodableType> & list)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+    std::unique_ptr<CHIPDescriptorRefSemAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPDescriptorRefSemAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
+    {
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_namespace;
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.namespace, newElement_0_namespace));
+        jobject newElement_0_tag;
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.tag, newElement_0_tag));
+        jobject newElement_0_vendorId;
+        std::string newElement_0_vendorIdClassName     = "java/lang/Integer";
+        std::string newElement_0_vendorIdCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_vendorIdClassName.c_str(),
+                                                                       newElement_0_vendorIdCtorSignature.c_str(), entry_0.vendorId,
+                                                                       newElement_0_vendorId);
+
+        jclass refSemStructStructClass_1;
+        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$DescriptorClusterRefSemStruct",
+                                                             refSemStructStructClass_1);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Could not find class ChipStructs$DescriptorClusterRefSemStruct");
+            return;
+        }
+        jmethodID refSemStructStructCtor_1 =
+            env->GetMethodID(refSemStructStructClass_1, "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;)V");
+        if (refSemStructStructCtor_1 == nullptr)
+        {
+            ChipLogError(Zcl, "Could not find ChipStructs$DescriptorClusterRefSemStruct constructor");
+            return;
+        }
+
+        newElement_0 = env->NewObject(refSemStructStructClass_1, refSemStructStructCtor_1, newElement_0_namespace, newElement_0_tag,
+                                      newElement_0_vendorId);
+        chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
+    }
+
+    env->ExceptionClear();
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+}
+
 CHIPDescriptorGeneratedCommandListAttributeCallback::CHIPDescriptorGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
     chip::Callback::Callback<CHIPDescriptorClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),

@@ -1714,6 +1714,57 @@ void MTRDescriptorPartsListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
+void MTRDescriptorRefSemListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::RefSemStruct::DecodableType> & value)
+{
+    NSArray * _Nonnull objCValue;
+    { // Scope for our temporary variables
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = value.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            MTRDescriptorClusterRefSemStruct * newElement_0;
+            newElement_0 = [MTRDescriptorClusterRefSemStruct new];
+            newElement_0.namespace = AsString(entry_0.namespace);
+            if (newElement_0.namespace == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
+            newElement_0.tag = AsString(entry_0.tag);
+            if (newElement_0.tag == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
+            newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
+            [array_0 addObject:newElement_0];
+        }
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, err);
+            return;
+        }
+        objCValue = array_0;
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDescriptorRefSemListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
 void MTRDescriptorGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
