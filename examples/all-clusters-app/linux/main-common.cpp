@@ -65,10 +65,10 @@ AllClustersCommandDelegate sAllClustersCommandDelegate;
 chip::app::Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
 chip::app::Clusters::ResourceMonitoring::HepaFilterMonitoringInstance
-    gHepafilterInstance(0x1, chip::app::Clusters::HepaFilterMonitoring::Id, 1,
+    gHepafilterInstance(0x1, chip::app::Clusters::HepaFilterMonitoring::Id, 3,
                         chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);
 chip::app::Clusters::ResourceMonitoring::ActivatedCarbonFilterMonitoringInstance
-    gActivatedCarbonFilterInstance(0x1, chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id, 1,
+    gActivatedCarbonFilterInstance(0x1, chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id, 3,
                                    chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);
 
 } // namespace

@@ -123,6 +123,10 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(mCondition));
         break;
     }
+    case Attributes::FeatureMap::Id:{
+        ReturnErrorOnFailure(aEncoder.Encode(mFeature));
+        break;
+    }
     case Attributes::DegradationDirection::Id: {
         ReturnErrorOnFailure(aEncoder.Encode(mDegradationDirection));
         break;

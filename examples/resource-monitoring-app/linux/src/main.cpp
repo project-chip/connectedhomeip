@@ -51,8 +51,8 @@ Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &s
 #endif
 
 // clang-format off
-HepaFilterMonitoringInstance            HepafilterInstance              (0x1, HepaFilterMonitoring::Id,             1, DegradationDirectionEnum::kDown, true);
-ActivatedCarbonFilterMonitoringInstance ActivatedCarbonFilterInstance   (0x1, ActivatedCarbonFilterMonitoring::Id,  1, DegradationDirectionEnum::kDown, true);
+HepaFilterMonitoringInstance            HepafilterInstance              (0x1, HepaFilterMonitoring::Id,             3, DegradationDirectionEnum::kDown, true);
+ActivatedCarbonFilterMonitoringInstance ActivatedCarbonFilterInstance   (0x1, ActivatedCarbonFilterMonitoring::Id,  3, DegradationDirectionEnum::kDown, true);
 // clang-format on
 void ApplicationInit()
 {
