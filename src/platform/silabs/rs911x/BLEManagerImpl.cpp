@@ -96,9 +96,9 @@ void sl_ble_init()
     //  initializing the application events map
     rsi_ble_app_init_events();
     memcpy(randomAddrBLE, &randomAddr, 6);
-    ChipLogError(DeviceLayer,"%s: BLE : randomAddr %" PRIu64 "\n", __func__, randomAddr);
-    ChipLogError(DeviceLayer,"%s: BLE : MAC %02x:%02x:%02x %02x:%02x:%02x", __func__, randomAddrBLE[0], randomAddrBLE[1],
-               randomAddrBLE[2], randomAddrBLE[3], randomAddrBLE[4], randomAddrBLE[5]);
+    ChipLogError(DeviceLayer, "%s: BLE : randomAddr %" PRIu64 "\n", __func__, randomAddr);
+    ChipLogError(DeviceLayer, "%s: BLE : MAC %02x:%02x:%02x %02x:%02x:%02x", __func__, randomAddrBLE[0], randomAddrBLE[1],
+                 randomAddrBLE[2], randomAddrBLE[3], randomAddrBLE[4], randomAddrBLE[5]);
     rsi_ble_set_random_address_with_value(randomAddrBLE);
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleBootEvent();
 }
@@ -120,8 +120,8 @@ void sl_ble_event_handling_task(void)
         event_id = rsi_ble_app_get_event();
         if (event_id == -1)
         {
-             rsi_semaphore_wait(&sl_ble_event_sem, 0);
-             continue;
+            rsi_semaphore_wait(&sl_ble_event_sem, 0);
+            continue;
         }
         switch (event_id)
         {
@@ -594,9 +594,9 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     {
         ChipLogError(DeviceLayer, "rsi_ble_set_advertise_data() success: %ld", result);
     }
-    index = 0;
-    responseData[index++] = 0x02;                                                                    // length
-    responseData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;                                                // AD type : flags
+    index                 = 0;
+    responseData[index++] = 0x02;                     // length
+    responseData[index++] = CHIP_ADV_DATA_TYPE_FLAGS; // AD type : flags
     responseData[index++] = CHIP_ADV_DATA_FLAGS;
     responseData[index++] = CHIP_ADV_SHORT_UUID_LEN + 1;  // AD length
     responseData[index++] = CHIP_ADV_DATA_TYPE_UUID;      // AD type : uuid
@@ -824,19 +824,19 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt)
 
     if (isIndicationEnabled)
     {
-     // If indications are not already enabled for the connection...
+        // If indications are not already enabled for the connection...
         if (!bleConnState->subscribed)
         {
-           bleConnState->subscribed = 1;
-           // Post an event to the CHIP queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
-           // whether the client is enabling or disabling indications.
-           {
-               event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
-               event.CHIPoBLESubscribe.ConId = 1; // TODO:: To be replaced by device mac address
-               err                           = PlatformMgr().PostEvent(&event);
-           }
+            bleConnState->subscribed = 1;
+            // Post an event to the CHIP queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
+            // whether the client is enabling or disabling indications.
+            {
+                event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
+                event.CHIPoBLESubscribe.ConId = 1; // TODO:: To be replaced by device mac address
+                err                           = PlatformMgr().PostEvent(&event);
+            }
         }
-     }
+    }
     else
     {
         bleConnState->subscribed      = 0;
