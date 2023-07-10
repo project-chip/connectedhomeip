@@ -40,21 +40,20 @@ class TccModeInstance : public ModeBase::Instance
 {
 private:
     using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType modeTagsTccNormal[1]    = { { .value = to_underlying(
-                                                                        Clusters::ModeBase::ModeTag::kAuto) } };
+    ModeTagStructType modeTagsTccNormal[1]    = { { .value = to_underlying(ModeBase::ModeTag::kAuto) } };
     ModeTagStructType modeTagsTccRapidCool[1] = {
-        { .value = to_underlying(Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeTag::kRapidCool) }
+        { .value = to_underlying(ModeTag::kRapidCool) }
     };
     ModeTagStructType modeTagsTccRapidFreeze[1] = {
-        { .value = to_underlying(Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeTag::kRapidFreeze) }
+        { .value = to_underlying(ModeTag::kRapidFreeze) }
     };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        BuildModeOptionStruct("Normal", Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeNormal,
+        BuildModeOptionStruct("Normal", ModeNormal,
                               DataModel::List<const ModeTagStructType>(modeTagsTccNormal)),
-        BuildModeOptionStruct("Rapid Cool", Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeRapidCool,
+        BuildModeOptionStruct("Rapid Cool", ModeRapidCool,
                               DataModel::List<const ModeTagStructType>(modeTagsTccRapidCool)),
-        BuildModeOptionStruct("Rapid Freeze", Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeRapidFreeze,
+        BuildModeOptionStruct("Rapid Freeze", ModeRapidFreeze,
                               DataModel::List<const ModeTagStructType>(modeTagsTccRapidFreeze)),
     };
 
@@ -67,8 +66,8 @@ private:
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override;
 
 public:
-    TccModeInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
-        Instance(aEndpointId, aClusterId, aFeature){};
+    TccModeInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeatures) :
+        Instance(aEndpointId, aClusterId, aFeatures){};
 
     ~TccModeInstance() override = default;
 };

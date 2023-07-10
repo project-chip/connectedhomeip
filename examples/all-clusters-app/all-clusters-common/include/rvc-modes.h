@@ -40,17 +40,17 @@ class RvcRunModeInstance : public ModeBase::Instance
 private:
     using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
     ModeTagStructType ModeTagsIdle[1]     = { { .value =
-                                                                   to_underlying(Clusters::RvcRunMode::ModeTag::kIdle) } };
+                                                                   to_underlying(ModeTag::kIdle) } };
     ModeTagStructType ModeTagsCleaning[1] = { { .value = to_underlying(
-                                                                       Clusters::RvcRunMode::ModeTag::kCleaning) } };
+                                                                       ModeTag::kCleaning) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        BuildModeOptionStruct("Idle", Clusters::RvcRunMode::ModeIdle,
+        BuildModeOptionStruct("Idle", ModeIdle,
                               DataModel::List<const ModeTagStructType>(ModeTagsIdle)),
-        BuildModeOptionStruct("Cleaning", Clusters::RvcRunMode::ModeCleaning,
+        BuildModeOptionStruct("Cleaning", ModeCleaning,
                               DataModel::List<const ModeTagStructType>(ModeTagsCleaning)),
         BuildModeOptionStruct(
-            "Mapping", Clusters::RvcRunMode::ModeMapping,
+            "Mapping", ModeMapping,
             DataModel::List<const ModeTagStructType>(ModeTagsIdle)), // todo set to no mode tags
     };
 
@@ -63,8 +63,8 @@ private:
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override;
 
 public:
-    RvcRunModeInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
-        Instance(aEndpointId, aClusterId, aFeature){};
+    RvcRunModeInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeatures) :
+        Instance(aEndpointId, aClusterId, aFeatures){};
 
     ~RvcRunModeInstance() override = default;
 };
@@ -83,19 +83,19 @@ class RvcCleanModeInstance : public ModeBase::Instance
 private:
     using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
     ModeTagStructType modeTagsVac[1]   = { { .value = to_underlying(
-                                                                  Clusters::RvcCleanMode::ModeTag::kVacuum) } };
+                                                                  ModeTag::kVacuum) } };
     ModeTagStructType modeTagsMop[1]   = { { .value =
-                                                                  to_underlying(Clusters::RvcCleanMode::ModeTag::kMop) } };
-    ModeTagStructType modeTagsBoost[2] = { { .value = to_underlying(Clusters::ModeBase::ModeTag::kMax) },
+                                                                  to_underlying(ModeTag::kMop) } };
+    ModeTagStructType modeTagsBoost[2] = { { .value = to_underlying(ModeBase::ModeTag::kMax) },
                                                               { .value = to_underlying(
-                                                                    Clusters::RvcCleanMode::ModeTag::kDeepClean) } };
+                                                                    ModeTag::kDeepClean) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        BuildModeOptionStruct("Vacuum", Clusters::RvcCleanMode::ModeVacuum,
+        BuildModeOptionStruct("Vacuum", ModeVacuum,
                               DataModel::List<const ModeTagStructType>(modeTagsVac)),
-        BuildModeOptionStruct("Wash", Clusters::RvcCleanMode::ModeWash,
+        BuildModeOptionStruct("Wash", ModeWash,
                               DataModel::List<const ModeTagStructType>(modeTagsMop)),
-        BuildModeOptionStruct("Deep clean", Clusters::RvcCleanMode::ModeDeepClean,
+        BuildModeOptionStruct("Deep clean", ModeDeepClean,
                               DataModel::List<const ModeTagStructType>(modeTagsBoost)),
     };
 
@@ -108,8 +108,8 @@ private:
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override;
 
 public:
-    RvcCleanModeInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
-        Instance(aEndpointId, aClusterId, aFeature){};
+    RvcCleanModeInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeatures) :
+        Instance(aEndpointId, aClusterId, aFeatures){};
 
     ~RvcCleanModeInstance() override = default;
 };
