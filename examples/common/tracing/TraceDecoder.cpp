@@ -47,9 +47,6 @@ constexpr const char * kNeedsAckKey                  = "is_ack_requested";
 constexpr const char * kAckMsgKey                    = "acknowledged_msg_counter";
 constexpr const char * kPayloadDataKey               = "payload_hex";
 constexpr const char * kPayloadSizeKey               = "payload_size";
-constexpr const char * kPayloadEncryptedDataKey      = "payload_hex_encrypted";
-constexpr const char * kPayloadEncryptedSizeKey      = "payload_size_encrypted";
-constexpr const char * kPayloadEncryptedBufferPtrKey = "buffer_ptr";
 
 namespace chip {
 namespace trace {
