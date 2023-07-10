@@ -112,6 +112,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestAclEvent.cpp",
     "TestAttributePathExpandIterator.cpp",
+    "TestAttributePersistenceProvider.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
     "TestBindingTable.cpp",

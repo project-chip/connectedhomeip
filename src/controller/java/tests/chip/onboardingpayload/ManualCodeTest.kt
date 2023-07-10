@@ -19,38 +19,40 @@
 package chip.onboardingpayload
 
 import com.google.common.truth.Truth.assertThat
-import java.math.BigInteger
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.ceil
 import kotlin.math.log10
 import kotlin.math.pow
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.junit.Assert.assertThrows
-import org.junit.Assert.assertEquals
 
 @RunWith(JUnit4::class)
 class ManualCodeTest {
-  private fun checkGenerator(payload: OnboardingPayload, expectedResult: String, skipPayloadValidation: Boolean = false): Boolean {
+  private fun checkGenerator(
+    payload: OnboardingPayload,
+    expectedResult: String,
+    skipPayloadValidation: Boolean = false
+  ): Boolean {
     val generator = ManualOnboardingPayloadGenerator(payload)
     generator.setSkipPayloadValidation(skipPayloadValidation)
     val result = generator.payloadDecimalStringRepresentation()
     var expectedResultWithCheckChar = expectedResult
-    
-    if (expectedResult.isNotEmpty()) {    
+
+    if (expectedResult.isNotEmpty()) {
       val expectedCheckChar = Verhoeff10.computeCheckChar(expectedResult)
       expectedResultWithCheckChar += expectedCheckChar
-    }    
-    
+    }
+
     val same = result == expectedResultWithCheckChar
     if (!same) {
       println("Actual result: $result")
       println("Expected result: $expectedResultWithCheckChar")
     }
-    
+
     return same
-  }  
+  }
 
   private fun getDefaultPayload(): OnboardingPayload {
     val payload = OnboardingPayload()
@@ -59,7 +61,13 @@ class ManualCodeTest {
     return payload
   }
 
-  private fun assertPayloadValues(payload: OnboardingPayload, pinCode: Long, discriminator: Int, vendorId: Int, productId: Int) {
+  private fun assertPayloadValues(
+    payload: OnboardingPayload,
+    pinCode: Long,
+    discriminator: Int,
+    vendorId: Int,
+    productId: Int
+  ) {
     assertEquals(payload.setupPinCode, pinCode)
     assertEquals(payload.discriminator, discriminator)
     assertEquals(payload.vendorId, vendorId)
@@ -70,8 +78,8 @@ class ManualCodeTest {
     assertEquals(payload.setupPinCode, 0)
     assertEquals(payload.discriminator, 0)
     assertEquals(payload.vendorId, 0)
-    assertEquals(payload.productId, 0)                       
-  }  
+    assertEquals(payload.productId, 0)
+  }
 
   private fun computeCheckChar(str: String): Char {
     // Strip out dashes, if any, from the string before computing the checksum.
@@ -79,7 +87,7 @@ class ManualCodeTest {
     return Verhoeff10.computeCheckChar(newStr)
   }
 
-  /* 
+  /*
    * Generate Decimal Representation from Partial Payload
    */
   @Test
@@ -109,8 +117,8 @@ class ManualCodeTest {
   fun testDecimalRepresentation_fullPayloadWithZeros() {
     val payload = getDefaultPayload()
     payload.commissioningFlow = CommissioningFlow.CUSTOM.value
-    payload.vendorId          = 1
-    payload.productId         = 1
+    payload.vendorId = 1
+    payload.productId = 1
 
     val expectedResult = "64129507530000100001"
     val result = checkGenerator(payload, expectedResult)
@@ -123,8 +131,8 @@ class ManualCodeTest {
   @Test
   fun testDecimalRepresentation_fullPayloadWithoutZeros_doesNotRequireCustomFlow() {
     val payload = getDefaultPayload()
-    payload.vendorId        = 45367
-    payload.productId       = 14526
+    payload.vendorId = 45367
+    payload.productId = 14526
 
     val expectedResult = "2412950753"
     val result = checkGenerator(payload, expectedResult)
@@ -138,8 +146,8 @@ class ManualCodeTest {
   fun testDecimalRepresentation_fullPayloadWithoutZeros() {
     val payload = getDefaultPayload()
     payload.commissioningFlow = CommissioningFlow.CUSTOM.value
-    payload.vendorId          = 45367
-    payload.productId         = 14526
+    payload.vendorId = 45367
+    payload.productId = 14526
 
     val expectedResult = "64129507534536714526"
     val result = checkGenerator(payload, expectedResult)
@@ -166,9 +174,9 @@ class ManualCodeTest {
       payload.vendorId,
       payload.productId
     )
- 
-    payload.vendorId          = 1
-    payload.productId         = 1
+
+    payload.vendorId = 1
+    payload.productId = 1
     payload.commissioningFlow = CommissioningFlow.CUSTOM.value
     payload.setLongDiscriminatorValue(0xb1f)
 
@@ -195,8 +203,8 @@ class ManualCodeTest {
     payload.setupPinCode = 0x7FFFFFF
     payload.setLongDiscriminatorValue(0xFFF)
     payload.commissioningFlow = CommissioningFlow.CUSTOM.value
-    payload.vendorId          = 65535
-    payload.productId         = 65535
+    payload.vendorId = 65535
+    payload.productId = 65535
 
     val expectedResult = "76553581916553565535"
     val result = checkGenerator(payload, expectedResult, true)
@@ -210,7 +218,7 @@ class ManualCodeTest {
   fun testPayloadParser_partialPayload() {
     val payload = getDefaultPayload()
     var decimalString = "2361087535"
-    
+
     decimalString += Verhoeff10.computeCheckChar(decimalString)
     assertEquals(11, decimalString.length)
     ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
@@ -239,13 +247,7 @@ class ManualCodeTest {
     decimalString += Verhoeff10.computeCheckChar(decimalString)
     assertEquals(11, decimalString.length)
     ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
-    assertPayloadValues(
-      payload,
-      pinCode = 1,
-      discriminator = 0,
-      vendorId = 0,
-      productId = 0
-    )
+    assertPayloadValues(payload, pinCode = 1, discriminator = 0, vendorId = 0, productId = 0)
 
     decimalString = "63610875350000000000"
     decimalString += Verhoeff10.computeCheckChar(decimalString)
@@ -268,13 +270,13 @@ class ManualCodeTest {
     // no vid (= 0)
     decimalString = "63610875350000014526"
     decimalString += Verhoeff10.computeCheckChar(decimalString)
-    assertEquals(21, decimalString.length)    
+    assertEquals(21, decimalString.length)
     ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
 
     // no pid (= 0)
     decimalString = "63610875354536700000"
     decimalString += Verhoeff10.computeCheckChar(decimalString)
-    assertEquals(21, decimalString.length) 
+    assertEquals(21, decimalString.length)
     ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
   }
 
@@ -294,7 +296,7 @@ class ManualCodeTest {
       discriminator = 0xa,
       vendorId = 45367,
       productId = 14526
-    )    
+    )
 
     // The same thing, but with dashes separating digit groups.
     decimalString = "6361-0875-3545-3671-4526"
@@ -306,7 +308,7 @@ class ManualCodeTest {
       discriminator = 0xa,
       vendorId = 45367,
       productId = 14526
-    )     
+    )
 
     decimalString = "52927623630456200032"
     decimalString += Verhoeff10.computeCheckChar(decimalString)
@@ -317,18 +319,12 @@ class ManualCodeTest {
       discriminator = 0x5,
       vendorId = 4562,
       productId = 32
-    )  
+    )
 
     decimalString = "40000100000000100001"
     decimalString += Verhoeff10.computeCheckChar(decimalString)
     ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
-    assertPayloadValues(
-      payload,
-      pinCode = 1,
-      discriminator = 0,
-      vendorId = 1,
-      productId = 1
-    )  
+    assertPayloadValues(payload, pinCode = 1, discriminator = 0, vendorId = 1, productId = 1)
   }
 
   /*
@@ -381,7 +377,7 @@ class ManualCodeTest {
     // too long for short code
     decimalString = "12749875380"
     try {
-      decimalString += Verhoeff10.computeCheckChar(decimalString)  
+      decimalString += Verhoeff10.computeCheckChar(decimalString)
       ManualOnboardingPayloadParser(decimalString).populatePayload(payload)
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
@@ -428,13 +424,13 @@ class ManualCodeTest {
 
     var generator = ManualOnboardingPayloadGenerator(inPayload)
     var result = generator.payloadDecimalStringRepresentation()
-    ManualOnboardingPayloadParser(result).populatePayload(outPayload) 
+    ManualOnboardingPayloadParser(result).populatePayload(outPayload)
 
     // Override the discriminator in the input payload with the short version,
     // since that's what we will produce.
     inPayload.setShortDiscriminatorValue(inPayload.getShortDiscriminatorValue())
     assertThat(inPayload == outPayload)
-  } 
+  }
 
   /*
    * Test Long Read Write
@@ -443,24 +439,24 @@ class ManualCodeTest {
   fun testLongCodeReadWrite() {
     val inPayload = getDefaultPayload()
     inPayload.commissioningFlow = CommissioningFlow.CUSTOM.value
-    inPayload.vendorId          = 1
-    inPayload.productId         = 1
+    inPayload.vendorId = 1
+    inPayload.productId = 1
 
     val outPayload = OnboardingPayload()
     var generator = ManualOnboardingPayloadGenerator(inPayload)
     var result = generator.payloadDecimalStringRepresentation()
-    ManualOnboardingPayloadParser(result).populatePayload(outPayload)     
+    ManualOnboardingPayloadParser(result).populatePayload(outPayload)
 
     // Override the discriminator in the input payload with the short version,
     // since that's what we will produce.
     inPayload.setShortDiscriminatorValue(inPayload.getShortDiscriminatorValue())
     assertThat(inPayload == outPayload)
-  } 
+  }
 
   /*
    * Check Decimal String Validity
    */
-  @Test  
+  @Test
   fun testCheckDecimalStringValidity() {
     var outReprensation: String
     var checkDigit: Char
@@ -483,15 +479,15 @@ class ManualCodeTest {
     }
 
     representationWithoutCheckDigit = "10109"
-    checkDigit                      = Verhoeff10.computeCheckChar(representationWithoutCheckDigit)
-    decimalString                   = representationWithoutCheckDigit + checkDigit
+    checkDigit = Verhoeff10.computeCheckChar(representationWithoutCheckDigit)
+    decimalString = representationWithoutCheckDigit + checkDigit
 
     outReprensation = ManualOnboardingPayloadParser.checkDecimalStringValidity(decimalString)
     assertThat(outReprensation == representationWithoutCheckDigit)
 
     representationWithoutCheckDigit = "0000"
-    checkDigit                      = Verhoeff10.computeCheckChar(representationWithoutCheckDigit)
-    decimalString                   = representationWithoutCheckDigit + checkDigit
+    checkDigit = Verhoeff10.computeCheckChar(representationWithoutCheckDigit)
+    decimalString = representationWithoutCheckDigit + checkDigit
     outReprensation = ManualOnboardingPayloadParser.checkDecimalStringValidity(decimalString)
     assertThat(outReprensation == representationWithoutCheckDigit)
   }
@@ -499,7 +495,7 @@ class ManualCodeTest {
   /*
    * Check QR Code Length Validity
    */
-  @Test  
+  @Test
   fun testCheckCodeLengthValidity() {
     ManualOnboardingPayloadParser.checkCodeLengthValidity("01234567890123456789", true)
     ManualOnboardingPayloadParser.checkCodeLengthValidity("0123456789", false)
@@ -516,39 +512,39 @@ class ManualCodeTest {
       assertThat(false)
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
-    } 
+    }
 
     try {
       ManualOnboardingPayloadParser.checkCodeLengthValidity("012345678901234567891", true)
       assertThat(false)
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
-    } 
+    }
 
     try {
       ManualOnboardingPayloadParser.checkCodeLengthValidity("0123456789012345678", true)
       assertThat(false)
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
-    }                                    
+    }
   }
 
   /*
    * Test Decimal String to Number
    */
-  @Test 
+  @Test
   fun testDecimalStringToNumber() {
     var number = ManualOnboardingPayloadParser.toNumber("12345")
-    assertEquals(12345u, number) 
+    assertEquals(12345u, number)
 
     number = ManualOnboardingPayloadParser.toNumber("01234567890")
-    assertEquals(1234567890u, number)     
+    assertEquals(1234567890u, number)
 
     number = ManualOnboardingPayloadParser.toNumber("00000001")
-    assertEquals(1u, number)      
+    assertEquals(1u, number)
 
     number = ManualOnboardingPayloadParser.toNumber("0")
-    assertEquals(0u, number)      
+    assertEquals(0u, number)
 
     try {
       ManualOnboardingPayloadParser.toNumber("012345.123456789")
@@ -562,28 +558,32 @@ class ManualCodeTest {
       assertThat(false)
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
-    }          
-  }    
+    }
+  }
 
   /*
    * Test Short Code Character Lengths
    */
-  @Test   
+  @Test
   fun testShortCodeCharLengths() {
     val numBits = 1 + kSetupPINCodeFieldLengthInBits + kManualSetupDiscriminatorFieldLengthInBits
     val manualSetupShortCodeCharLength = ceil(log10(2.0.pow(numBits.toDouble()))).toInt()
-    assertEquals(manualSetupShortCodeCharLength, kManualSetupShortCodeCharLength) 
+    assertEquals(manualSetupShortCodeCharLength, kManualSetupShortCodeCharLength)
 
-    val manualSetupVendorIdCharLength = ceil(log10(2.0.pow(kVendorIDFieldLengthInBits.toDouble()))).toInt()
-    assertEquals(manualSetupVendorIdCharLength, kManualSetupVendorIdCharLength)     
+    val manualSetupVendorIdCharLength =
+      ceil(log10(2.0.pow(kVendorIDFieldLengthInBits.toDouble()))).toInt()
+    assertEquals(manualSetupVendorIdCharLength, kManualSetupVendorIdCharLength)
 
-    val manualSetupProductIdCharLength = ceil(log10(2.0.pow(kProductIDFieldLengthInBits.toDouble()))).toInt()
-    assertEquals(manualSetupProductIdCharLength, kManualSetupProductIdCharLength)  
+    val manualSetupProductIdCharLength =
+      ceil(log10(2.0.pow(kProductIDFieldLengthInBits.toDouble()))).toInt()
+    assertEquals(manualSetupProductIdCharLength, kManualSetupProductIdCharLength)
 
     val manualSetupLongCodeCharLength =
-        kManualSetupShortCodeCharLength + kManualSetupVendorIdCharLength + kManualSetupProductIdCharLength
-    assertEquals(manualSetupLongCodeCharLength, kManualSetupLongCodeCharLength)      
-  } 
+      kManualSetupShortCodeCharLength +
+        kManualSetupVendorIdCharLength +
+        kManualSetupProductIdCharLength
+    assertEquals(manualSetupLongCodeCharLength, kManualSetupLongCodeCharLength)
+  }
 
   /*
    * Test Read Characters from Decimal String
@@ -592,27 +592,27 @@ class ManualCodeTest {
   fun testReadCharsFromDecimalString() {
     val index = AtomicInteger(3)
     var number = ManualOnboardingPayloadParser.readDigitsFromDecimalString("12345", index, 2)
-    assertEquals(45u, number)    
+    assertEquals(45u, number)
 
     index.set(2)
     number = ManualOnboardingPayloadParser.readDigitsFromDecimalString("6256276377282", index, 7)
-    assertEquals(5627637u, number)     
+    assertEquals(5627637u, number)
 
     index.set(0)
     number = ManualOnboardingPayloadParser.readDigitsFromDecimalString("10", index, 2)
-    assertEquals(10u, number)        
+    assertEquals(10u, number)
 
     index.set(0)
     number = ManualOnboardingPayloadParser.readDigitsFromDecimalString("10", index, 2)
-    assertEquals(10u, number)      
+    assertEquals(10u, number)
 
     index.set(1)
     number = ManualOnboardingPayloadParser.readDigitsFromDecimalString("11", index, 1)
-    assertEquals(1u, number)      
+    assertEquals(1u, number)
 
     index.set(2)
     number = ManualOnboardingPayloadParser.readDigitsFromDecimalString("100001", index, 3)
-    assertEquals(0u, number)      
+    assertEquals(0u, number)
 
     try {
       index.set(1)
@@ -627,7 +627,7 @@ class ManualCodeTest {
       assertThat(false)
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
-    }        
+    }
 
     try {
       index.set(200)
@@ -635,24 +635,24 @@ class ManualCodeTest {
       assertThat(false)
     } catch (e: Exception) {
       println("Expected exception occurred: ${e.message}")
-    }                
+    }
   }
 
   /*
    * Generate Full Payload and Parse it
-   */ 
-  @Test   
+   */
+  @Test
   fun testGenerateAndParser_fullPayload() {
     val payload = getDefaultPayload()
     payload.commissioningFlow = CommissioningFlow.CUSTOM.value
-    payload.vendorId          = 1
-    payload.productId         = 1    
+    payload.vendorId = 1
+    payload.productId = 1
 
     val generator = ManualOnboardingPayloadGenerator(payload)
     val result = generator.payloadDecimalStringRepresentation()
 
     val outPayload = OnboardingPayload()
-    ManualOnboardingPayloadParser(result).populatePayload(outPayload) 
+    ManualOnboardingPayloadParser(result).populatePayload(outPayload)
 
     assertPayloadValues(
       outPayload,
@@ -660,20 +660,20 @@ class ManualCodeTest {
       discriminator = 0xa,
       vendorId = payload.vendorId,
       productId = payload.productId
-    )                         
+    )
   }
 
   /*
    * Generate Partial Payload and Parse it
-   */ 
-  @Test     
+   */
+  @Test
   fun testGenerateAndParser_partialPayload() {
     val payload = getDefaultPayload()
     val generator = ManualOnboardingPayloadGenerator(payload)
-    val result = generator.payloadDecimalStringRepresentation()    
+    val result = generator.payloadDecimalStringRepresentation()
 
     val outPayload = OnboardingPayload()
-    ManualOnboardingPayloadParser(result).populatePayload(outPayload) 
+    ManualOnboardingPayloadParser(result).populatePayload(outPayload)
 
     assertPayloadValues(
       outPayload,
@@ -681,7 +681,6 @@ class ManualCodeTest {
       discriminator = 0xa,
       vendorId = payload.vendorId,
       productId = payload.productId
-    )                         
-  }              
+    )
+  }
 }
-
