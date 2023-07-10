@@ -654,11 +654,11 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
 
             jclass wiFiInterfaceScanResultStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResultStruct",
+                env, "chip/devicecontroller/WiFiScanResult",
                 wiFiInterfaceScanResultStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResultStruct");
+                ChipLogError(Zcl, "Could not find class WiFiScanResult");
                 return;
             }
             jmethodID wiFiInterfaceScanResultStructCtor =
@@ -667,7 +667,7 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             if (wiFiInterfaceScanResultStructCtor == nullptr)
             {
                 ChipLogError(Zcl,
-                             "Could not find ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResultStruct constructor");
+                             "Could not find WiFiScanResult constructor");
                 return;
             }
 
@@ -718,11 +718,11 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
 
             jclass threadInterfaceScanResultStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResultStruct",
+                env, "chip/devicecontroller/ThreadScanResult",
                 threadInterfaceScanResultStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResultStruct");
+                ChipLogError(Zcl, "Could not find class ThreadScanResult");
                 return;
             }
             jmethodID threadInterfaceScanResultStructCtor =
@@ -732,7 +732,7 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             if (threadInterfaceScanResultStructCtor == nullptr)
             {
                 ChipLogError(Zcl,
-                             "Could not find ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResultStruct constructor");
+                             "Could not find ThreadScanResult constructor");
                 return;
             }
 

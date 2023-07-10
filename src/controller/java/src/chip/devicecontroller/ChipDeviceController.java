@@ -20,6 +20,8 @@ package chip.devicecontroller;
 import android.bluetooth.BluetoothGatt;
 import android.util.Log;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
+import chip.devicecontroller.ThreadScanResult;
+import chip.devicecontroller.WiFiScanResult;
 import chip.devicecontroller.model.AttributeWriteRequest;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
@@ -389,9 +391,9 @@ public class ChipDeviceController {
   public void onScanNetworksSuccess(
       Integer networkingStatus,
       Optional<String> debugText,
-      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResultStruct>>
+      Optional<ArrayList<WiFiScanResult>>
           wiFiScanResults,
-      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResultStruct>>
+      Optional<ArrayList<ThreadScanResult>>
           threadScanResults) {
     if (scanNetworksListener != null) {
       scanNetworksListener.onScanNetworksSuccess(
@@ -1268,9 +1270,9 @@ public class ChipDeviceController {
     void onScanNetworksSuccess(
         Integer networkingStatus,
         Optional<String> debugText,
-        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResultStruct>>
+        Optional<ArrayList<WiFiScanResult>>
             wiFiScanResults,
-        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResultStruct>>
+        Optional<ArrayList<ThreadScanResult>>
             threadScanResults);
   }
 
