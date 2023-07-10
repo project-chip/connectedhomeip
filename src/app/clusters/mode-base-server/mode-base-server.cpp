@@ -57,46 +57,78 @@ bool Instance::isAliasCluster() const
 
 void Instance::loadPersistentAttributes()
 {
+    // Load Current Mode
+    uint8_t tempCurrentMode;
     CHIP_ERROR err = GetAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), mCurrentMode);
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), tempCurrentMode);
     if (err == CHIP_NO_ERROR)
     {
-        ChipLogDetail(Zcl, "ModeBase: Loaded CurrentMode as %u", mCurrentMode);
+        Status status = UpdateCurrentMode(tempCurrentMode);
+        if (status == Status::Success)
+        {
+            ChipLogDetail(Zcl, "ModeBase: Loaded CurrentMode as %u", GetCurrentMode());
+        }
+        else
+        {
+            ChipLogError(Zcl, "ModeBase: Could not update CurrentMode to %u: %u", tempCurrentMode, to_underlying(status));
+        }
     }
     else
     {
         // If we cannot find the previous CurrentMode, we will assume it to be the first mode in the
         // list, as was initialised in the constructor.
-        ChipLogDetail(Zcl, "ModeBase: Unable to load the CurrentMode from the KVS. Assuming %u", mCurrentMode);
+        ChipLogDetail(Zcl, "ModeBase: Unable to load the CurrentMode from the KVS. Assuming %u", GetCurrentMode());
     }
+
+    // Load Start-Up Mode
+    DataModel::Nullable<uint8_t> tempStartUpMode;
     err = GetAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), mStartUpMode);
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), tempStartUpMode);
     if (err == CHIP_NO_ERROR)
     {
-        if (mStartUpMode.IsNull())
+        Status status = UpdateStartUpMode(tempStartUpMode);
+        if (status == Status::Success)
         {
-            ChipLogDetail(Zcl, "ModeBase: Loaded StartUpMode as null");
+            if (GetStartUpMode().IsNull())
+            {
+                ChipLogDetail(Zcl, "ModeBase: Loaded StartUpMode as null");
+            }
+            else
+            {
+                ChipLogDetail(Zcl, "ModeBase: Loaded StartUpMode as %u", GetStartUpMode().Value());
+            }
         }
         else
         {
-            ChipLogDetail(Zcl, "ModeBase: Loaded StartUpMode as %u", mStartUpMode.Value());
+            ChipLogError(Zcl, "ModeBase: Could not update StartUpMode: %u", to_underlying(status));
         }
     }
     else
     {
         ChipLogDetail(Zcl, "ModeBase: Unable to load the StartUpMode from the KVS. Assuming null");
     }
+
+    // Load On Mode
+    DataModel::Nullable<uint8_t> tempOnMode;
     err = GetAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id),
-                                                             mOnMode);
+                                                             tempOnMode);
     if (err == CHIP_NO_ERROR)
     {
-        if (mOnMode.IsNull())
+        Status status = UpdateOnMode(tempOnMode);
+        if (status == Status::Success)
         {
-            ChipLogDetail(Zcl, "ModeBase: Loaded OnMode as null");
+            if (GetOnMode().IsNull())
+            {
+                ChipLogDetail(Zcl, "ModeBase: Loaded OnMode as null");
+            }
+            else
+            {
+                ChipLogDetail(Zcl, "ModeBase: Loaded OnMode as %u", GetOnMode().Value());
+            }
         }
         else
         {
-            ChipLogDetail(Zcl, "ModeBase: Loaded OnMode as %u", mOnMode.Value());
+            ChipLogError(Zcl, "ModeBase: Could not update OnMode: %u", to_underlying(status));
         }
     }
     else
