@@ -25,12 +25,14 @@ namespace Dnssd {
 
 class ResolverDelegateProxy : public ReferenceCounted<ResolverDelegateProxy>,
                               public OperationalResolveDelegate,
-                              public CommissioningResolveDelegate
+                              public CommissioningResolveDelegate,
+                              public OperationalBrowseDeleagete
 
 {
 public:
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) { mOperationalDelegate = delegate; }
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) { mCommissioningDelegate = delegate; }
+    void SetOperationalBrowseDelegate(OperationalBrowseDeleagete * delegate) { mOperationalBrowseDelegate = delegate; }
 
     // OperationalResolveDelegate
     void OnOperationalNodeResolved(const ResolvedNodeData & nodeData) override
@@ -57,6 +59,19 @@ public:
         }
     }
 
+    // Opeartional Discover Delegate
+    void OnOperationalNodeDiscovered(const OperationalNodeData & nodeData) override
+    {
+        if (mOperationalBrowseDelegate != nullptr)
+        {
+            mOperationalBrowseDelegate->OnOperationalNodeDiscovered(nodeData);
+        }
+        else
+        {
+            ChipLogError(Discovery, "Missing commissioning delegate. Data discarded.");
+        }
+    }
+
     // CommissioningResolveDelegate
     void OnNodeDiscovered(const DiscoveredNodeData & nodeData) override
     {
@@ -71,8 +86,9 @@ public:
     }
 
 private:
-    OperationalResolveDelegate * mOperationalDelegate     = nullptr;
-    CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
+    OperationalResolveDelegate * mOperationalDelegate       = nullptr;
+    CommissioningResolveDelegate * mCommissioningDelegate   = nullptr;
+    OperationalBrowseDeleagete * mOperationalBrowseDelegate = nullptr;
 };
 
 class ResolverProxy : public Resolver
@@ -110,6 +126,9 @@ public:
 
     bool IsInitialized() override { return Resolver::Instance().IsInitialized(); }
 
+    /**
+     * If nullptr is passed, the previously registered delegate is unregistered.
+     */
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override
     {
         if (mDelegate != nullptr)
@@ -123,6 +142,24 @@ public:
                 ChipLogProgress(Discovery, "Delaying proxy of operational discovery: missing delegate");
             }
             mPreInitOperationalDelegate = delegate;
+        }
+    }
+    /**
+     * If nullptr is passed, the previously registered delegate is unregistered.
+     */
+    void SetOperationalBrowseDelegate(OperationalBrowseDeleagete * delegate) override
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->SetOperationalBrowseDelegate(delegate);
+        }
+        else
+        {
+            if (delegate != nullptr)
+            {
+                ChipLogProgress(Discovery, "Delaying proxy of operational discovery: missing delegate");
+            }
+            mPreInitOperationalBrowseDelegate = delegate;
         }
     }
 
@@ -155,13 +192,15 @@ public:
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
+    CHIP_ERROR DiscoverOperational(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR StopDiscovery() override;
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
 
 private:
-    ResolverDelegateProxy * mDelegate                            = nullptr;
-    OperationalResolveDelegate * mPreInitOperationalDelegate     = nullptr;
-    CommissioningResolveDelegate * mPreInitCommissioningDelegate = nullptr;
+    ResolverDelegateProxy * mDelegate                              = nullptr;
+    OperationalResolveDelegate * mPreInitOperationalDelegate       = nullptr;
+    OperationalBrowseDeleagete * mPreInitOperationalBrowseDelegate = nullptr;
+    CommissioningResolveDelegate * mPreInitCommissioningDelegate   = nullptr;
 
     // While discovery (commissionable or commissioner) is ongoing,
     // mDiscoveryContext may have a value to allow StopDiscovery to work.
