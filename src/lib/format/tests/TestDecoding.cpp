@@ -505,14 +505,14 @@ void TestEmptyClusterMetaDataDecode(nlTestSuite * inSuite, void * inContext)
                    "          endpoint_id: 0\n"
                    "          cluster_id: 31\n"
                    "          attribute_id: 0\n"
-                   "        0x1f::ATTR(0x0)\n"                 // Cluster 31, attribute 0
+                   "        0x1f::ATTR(0x0)\n"              // Cluster 31, attribute 0
                    "          AnonymousTag()\n"             // List entry (acl is a list)
-                   "            ContextTag(0x1): 5\n"     // privilege
-                   "            ContextTag(0x2): 2\n"     // authMode
-                   "            ContextTag(0x3)\n"        // subjects
+                   "            ContextTag(0x1): 5\n"       // privilege
+                   "            ContextTag(0x2): 2\n"       // authMode
+                   "            ContextTag(0x3)\n"          // subjects
                    "              AnonymousTag(): 112233\n" // List entry (subjects is a list)
-                   "            ContextTag(0x4): NULL\n"  // targets
-                   "            ContextTag(0xFE): 1\n"    // fabricIndex
+                   "            ContextTag(0x4): NULL\n"    // targets
+                   "            ContextTag(0xFE): 1\n"      // fabricIndex
                    "  suppress_response: true\n"
                    "  interaction_model_revison: 1\n");
 }
