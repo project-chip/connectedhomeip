@@ -159,10 +159,7 @@ public:
         {
             return CHIP_NO_ERROR;
         }
-        else
-        {
-            return aTerminationCause;
-        }
+        return aTerminationCause;
     }
 
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override
