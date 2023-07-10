@@ -108,8 +108,8 @@ CHIP_ERROR FanManager::HandleFanModeAuto(DataModel::Nullable<Percent> newPercent
 CHIP_ERROR FanManager::HandlePercentSpeedSettingChange(DataModel::Nullable<Percent> newPercentSetting,
                                                        DataModel::Nullable<uint8_t> newSpeedSetting)
 {
-    ChipLogProgress(NotSpecified, "FanManager::HandlePercentSpeedChange()");
-    doUpdateSpeedSetting(newSpeedSetting.Value());
+    ChipLogProgress(NotSpecified, "FanManager::HandlePercentSpeedSettingChange()");
+    UpdateClusterPercentageAndSpeedCurrent(newPercentSetting.Value());
     return CHIP_NO_ERROR;
 }
 

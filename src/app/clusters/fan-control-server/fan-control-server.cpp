@@ -30,6 +30,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributePersistenceProvider.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelEngine.h>
@@ -405,7 +406,14 @@ Status chip::app::Clusters::FanControl::Instance::UpdateFanMode(FanModeEnum fanM
         mFanMode = fanMode;
         ChipLogProgress(Zcl, "FanControl: fanMode change: %" PRIu8 "", to_underlying(fanMode));
 
-        // TODO: Write Value to Persistent Storage
+        // Write Value to Persistent Storage
+        uint8_t rawFanMode = to_underlying(mFanMode);
+        CHIP_ERROR err     = GetAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, FanControl::Id, FanMode::Id), rawFanMode);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "FanControl: failed to write fanMode to KVS");
+        }
         MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::FanMode::Id);
     }
 
@@ -484,12 +492,16 @@ Status Instance::UpdateSpeedSetting(DataModel::Nullable<uint8_t> speedSetting)
             {
                 status = Status::ConstraintError;
             }
-            else
+            else if (mSpeedSetting != speedSetting)
             {
                 mSpeedSetting = speedSetting;
                 status        = Status::Success;
                 ChipLogProgress(Zcl, "FanControl: speedSetting change: %" PRIu8 "", speedSetting.Value());
                 MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::SpeedSetting::Id);
+            }
+            else
+            {
+                status = Status::Success;
             }
         }
     }
@@ -511,12 +523,16 @@ Status Instance::UpdateSpeedCurrent(uint8_t speedCurrent)
         {
             status = Status::ConstraintError;
         }
-        else
+        else if (mSpeedCurrent != speedCurrent)
         {
             mSpeedCurrent = speedCurrent;
             status        = Status::Success;
             ChipLogProgress(Zcl, "FanControl: speedCurrent change: %" PRIu8 "", speedCurrent);
             MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::SpeedCurrent::Id);
+        }
+        else
+        {
+            status = Status::Success;
         }
     }
     else
@@ -643,7 +659,21 @@ Status Instance::UpdateSpeedAndPercentageCurrent(uint8_t speedCurrent)
 
 void Instance::loadPersistentAttributes()
 {
-    // TODO: Load persistent attributes from storage when PR for it lands
+    uint8_t rawFanMode;
+    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, FanControl::Id, FanMode::Id), rawFanMode);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "FanControl: Loaded FanMode as %u", rawFanMode);
+        mFanMode = static_cast<FanModeEnum>(rawFanMode);
+    }
+    else
+    {
+        // If we cannot find the previous FanMode, we will assume it to be kOff
+        // as was initialised in the class.
+        ChipLogDetail(Zcl, "FanControl: Unable to load the FanMode from the KVS. Assuming %u", (uint8_t) mFanMode);
+    }
     return;
 }
 
