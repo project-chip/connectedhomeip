@@ -1673,7 +1673,8 @@ CHIP_ERROR ExtractCRLDistributionPointURIFromX509Cert(const ByteSpan & certifica
             //         uniformResourceIdentifier       [6]     IA5String,
             //         iPAddress                       [7]     OCTET STRING,
             //         registeredID                    [8]     OBJECT IDENTIFIER }
-            result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_X509_SAN_UNIFORM_RESOURCE_IDENTIFIER);
+            result =
+                mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_X509_SAN_UNIFORM_RESOURCE_IDENTIFIER);
             VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
 
             const char * urlptr = reinterpret_cast<const char *>(p);
