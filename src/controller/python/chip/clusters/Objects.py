@@ -2822,12 +2822,12 @@ class Descriptor(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="namespace", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="tag", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(Label="vendorId", Tag=2, Type=uint),
                     ])
 
-            namespace: 'str' = ""
+            name: 'str' = ""
             tag: 'str' = ""
             vendorId: 'uint' = 0
 

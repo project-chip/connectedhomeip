@@ -3314,15 +3314,15 @@ using DecodableType = Type;
 namespace RefSemStruct {
 enum class Fields : uint8_t
 {
-    kNamespace = 0,
-    kTag       = 1,
-    kVendorId  = 2,
+    kName     = 0,
+    kTag      = 1,
+    kVendorId = 2,
 };
 
 struct Type
 {
 public:
-    chip::CharSpan namespace;
+    chip::CharSpan name;
     chip::CharSpan tag;
     uint16_t vendorId = static_cast<uint16_t>(0);
 

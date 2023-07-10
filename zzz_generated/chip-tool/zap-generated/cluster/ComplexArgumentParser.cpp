@@ -323,15 +323,14 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("RefSemStruct.namespace", "namespace", value.isMember("namespace")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RefSemStruct.name", "name", value.isMember("name")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RefSemStruct.tag", "tag", value.isMember("tag")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RefSemStruct.vendorId", "vendorId", value.isMember("vendorId")));
 
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "namespace");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.namespace, value["namespace"]));
-    valueCopy.removeMember("namespace");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    valueCopy.removeMember("name");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "tag");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.tag, value["tag"]));
@@ -346,7 +345,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::Descriptor::Structs::RefSemStruct::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.namespace);
+    ComplexArgumentParser::Finalize(request.name);
     ComplexArgumentParser::Finalize(request.tag);
     ComplexArgumentParser::Finalize(request.vendorId);
 }

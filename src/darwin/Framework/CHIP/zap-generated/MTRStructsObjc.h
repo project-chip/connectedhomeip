@@ -51,7 +51,7 @@ MTR_DEPRECATED(
 @end
 MTR_NEWLY_AVAILABLE
 @interface MTRDescriptorClusterRefSemStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull namespace MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull name MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nonnull tag MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull vendorId MTR_NEWLY_AVAILABLE;
 @end

@@ -1725,8 +1725,8 @@ void MTRDescriptorRefSemListAttributeCallbackBridge::OnSuccessFn(void * context,
             auto & entry_0 = iter_0.GetValue();
             MTRDescriptorClusterRefSemStruct * newElement_0;
             newElement_0 = [MTRDescriptorClusterRefSemStruct new];
-            newElement_0.namespace = AsString(entry_0.namespace);
-            if (newElement_0.namespace == nil) {
+            newElement_0.name = AsString(entry_0.name);
+            if (newElement_0.name == nil) {
                 CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                 OnFailureFn(context, err);
                 return;

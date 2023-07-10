@@ -151,7 +151,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _namespace = @"";
+        _name = @"";
 
         _tag = @"";
 
@@ -164,7 +164,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRDescriptorClusterRefSemStruct alloc] init];
 
-    other.namespace = self.namespace;
+    other.name = self.name;
     other.tag = self.tag;
     other.vendorId = self.vendorId;
 
@@ -173,8 +173,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: namespace:%@; tag:%@; vendorId:%@; >",
-                                             NSStringFromClass([self class]), _namespace, _tag, _vendorId];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: name:%@; tag:%@; vendorId:%@; >", NSStringFromClass([self class]), _name, _tag, _vendorId];
     return descriptionString;
 }
 

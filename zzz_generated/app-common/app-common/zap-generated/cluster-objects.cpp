@@ -2856,7 +2856,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kNamespace), namespace));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kName), name));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kTag), tag));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kVendorId), vendorId));
     ReturnErrorOnFailure(writer.EndContainer(outer));
@@ -2878,8 +2878,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kNamespace):
-            ReturnErrorOnFailure(DataModel::Decode(reader, namespace));
+        case to_underlying(Fields::kName):
+            ReturnErrorOnFailure(DataModel::Decode(reader, name));
             break;
         case to_underlying(Fields::kTag):
             ReturnErrorOnFailure(DataModel::Decode(reader, tag));

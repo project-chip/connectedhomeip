@@ -106,16 +106,16 @@ public Integer revision;
 }
 
 public static class DescriptorClusterRefSemStruct {
-public String namespace;
+public String name;
 public String tag;
 public Integer vendorId;
 
   public DescriptorClusterRefSemStruct(
-    String namespace
+    String name
       , String tag
       , Integer vendorId
   ) {
-    this.namespace = namespace;
+    this.name = name;
     this.tag = tag;
     this.vendorId = vendorId;
   }
@@ -124,8 +124,8 @@ public Integer vendorId;
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("DescriptorClusterRefSemStruct {\n");
-    output.append("\tnamespace: ");
-    output.append(namespace);
+    output.append("\tname: ");
+    output.append(name);
         output.append("\n");
     output.append("\ttag: ");
     output.append(tag);

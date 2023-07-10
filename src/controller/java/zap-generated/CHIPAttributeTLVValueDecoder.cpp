@@ -1930,8 +1930,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jobject newElement_0_namespace;
-                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.namespace, newElement_0_namespace));
+                jobject newElement_0_name;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.name, newElement_0_name));
                 jobject newElement_0_tag;
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.tag, newElement_0_tag));
                 jobject newElement_0_vendorId;
@@ -1957,7 +1957,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(refSemStructStructClass_1, refSemStructStructCtor_1, newElement_0_namespace,
+                newElement_0 = env->NewObject(refSemStructStructClass_1, refSemStructStructCtor_1, newElement_0_name,
                                               newElement_0_tag, newElement_0_vendorId);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

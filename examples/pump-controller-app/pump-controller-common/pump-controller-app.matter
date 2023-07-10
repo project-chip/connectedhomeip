@@ -149,7 +149,7 @@ server cluster Descriptor = 29 {
   }
 
   struct RefSemStruct {
-    char_string namespace = 0;
+    char_string name = 0;
     char_string tag = 1;
     int16u vendorId = 2;
   }

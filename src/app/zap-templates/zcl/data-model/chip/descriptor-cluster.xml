@@ -25,7 +25,7 @@ limitations under the License.
 
   <struct name="RefSemStruct">
     <cluster code="0x001d"/>
-    <item name="Namespace" type="CHAR_STRING"/>
+    <item name="Name" type="CHAR_STRING"/>
     <item name="Tag" type="CHAR_STRING"/>
     <item name="VendorId" type="INT16U"/>
   </struct>
