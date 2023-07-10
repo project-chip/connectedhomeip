@@ -19,7 +19,7 @@ import logging
 import queue
 
 import chip.clusters as Clusters
-from chip.clusters import ClusterObjects as ClustersObjects
+from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
@@ -28,7 +28,7 @@ from mobly import asserts
 
 
 class AttributeChangeCallback:
-    def __init__(self, expected_attribute: ClustersObjects.ClusterAttributeDescriptor, output: queue.Queue):
+    def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor, output: queue.Queue):
         self._output = output
         self._expected_attribute = expected_attribute
 
@@ -40,7 +40,7 @@ class AttributeChangeCallback:
 
 
 class EventChangeCallback:
-    def __init__(self, expected_event: ClustersObjects.ClusterEvent, output: queue.Queue):
+    def __init__(self, expected_event: ClusterObjects.ClusterEvent, output: queue.Queue):
         self._output = output
         self._expected_cluster_id = expected_event.cluster_id
         self._expected_event_id = expected_event.event_id
@@ -52,7 +52,7 @@ class EventChangeCallback:
             self._output.put(res)
 
 
-def WaitForAttributeReport(q: queue.Queue, expected_attribute: ClustersObjects.ClusterAttributeDescriptor):
+def WaitForAttributeReport(q: queue.Queue, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
     try:
         path, transaction = q.get(block=True, timeout=10)
     except queue.Empty:
@@ -65,7 +65,7 @@ def WaitForAttributeReport(q: queue.Queue, expected_attribute: ClustersObjects.C
         asserts.fail("Attribute not found in returned report")
 
 
-def WaitForEventReport(q: queue.Queue, expected_event: ClustersObjects.ClusterEvent):
+def WaitForEventReport(q: queue.Queue, expected_event: ClusterObjects.ClusterEvent):
     try:
         res = q.get(block=True, timeout=10)
     except queue.Empty:
