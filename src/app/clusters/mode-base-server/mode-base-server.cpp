@@ -314,33 +314,20 @@ CHIP_ERROR Instance::encodeSupportedModes(const AttributeValueEncoder::ListEncod
     for (uint8_t i = 0; i < NumberOfModes(); i++)
     {
         ModeOptionStructType mode;
-        ChipError err1 = CHIP_NO_ERROR;
 
         // Get the mode label
         char buffer[64];
         MutableCharSpan label(buffer);
-        err1 = GetModeLabelByIndex(i, label);
-        if (err1 != CHIP_NO_ERROR)
-        {
-            return err1;
-        }
+        ReturnErrorOnFailure(GetModeLabelByIndex(i, label));
         mode.label = label;
 
         // Get the mode value
-        err1 = GetModeValueByIndex(i, mode.mode);
-        if (err1 != CHIP_NO_ERROR)
-        {
-            return err1;
-        }
+        ReturnErrorOnFailure(GetModeValueByIndex(i, mode.mode));
 
         // Get the mode tags
         ModeTagStructType tagsBuffer[8];
         DataModel::List<ModeTagStructType> tags(tagsBuffer);
-        err1 = GetModeTagsByIndex(i, tags);
-        if (err1 != CHIP_NO_ERROR)
-        {
-            return err1;
-        }
+        ReturnErrorOnFailure(GetModeTagsByIndex(i, tags));
         mode.modeTags = tags;
 
         ReturnErrorOnFailure(encoder.Encode(mode));
@@ -400,7 +387,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
     ReturnErrorOnFailure(aDecoder.Decode(newMode));
     Status status;
 
-    if (!newMode.IsNull()) // This indicates that the new mode is null.
+    if (!newMode.IsNull())
     {
         if (!IsSupportedMode(newMode.Value()))
         {
@@ -434,7 +421,6 @@ Status Instance::UpdateCurrentMode(uint8_t aNewMode)
         // Write new value to persistent storage.
         GetAttributePersistenceProvider()->WriteScalarValue(
             ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), mCurrentMode);
-        // The Administrator Commissioning cluster is always on the root endpoint.
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::CurrentMode::Id);
     }
     return Protocols::InteractionModel::Status::Success;
@@ -456,7 +442,6 @@ Status Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
         // Write new value to persistent storage.
         GetAttributePersistenceProvider()->WriteScalarValue(
             ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), mStartUpMode);
-        // The Administrator Commissioning cluster is always on the root endpoint.
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::StartUpMode::Id);
     }
     return Protocols::InteractionModel::Status::Success;
@@ -478,7 +463,6 @@ Status Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
         // Write new value to persistent storage.
         GetAttributePersistenceProvider()->WriteScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id),
                                                             mOnMode);
-        // The Administrator Commissioning cluster is always on the root endpoint.
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OnMode::Id);
     }
     return Protocols::InteractionModel::Status::Success;
