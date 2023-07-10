@@ -123,12 +123,12 @@ class OpCredClientFragment : Fragment() {
                 ?.value
                 ?: "null"
             val tlv =
-               nodeState
+              nodeState
                 ?.getEndpointState(endpointId)
                 ?.getClusterState(clusterId)
                 ?.getAttributeState(attributeId)
                 ?.tlv
-            
+
             if (tlv == null) {
               Log.i(TAG, "OpCred $attributeName value: $value")
               showMessage("OpCred $attributeName value: $value")
@@ -139,12 +139,17 @@ class OpCredClientFragment : Fragment() {
             when (attribute) {
               OperationalCredentials.Attribute.Fabrics -> {
                 val ret =
-                   ChipTLVValueDecoder.decodeAttributeValue<List<ChipStructs.OperationalCredentialsClusterFabricDescriptorStruct>>(attributePath, tlv)
-                Log.i(TAG,"OpCred $attributeName value: $value")
+                  ChipTLVValueDecoder.decodeAttributeValue<
+                    List<ChipStructs.OperationalCredentialsClusterFabricDescriptorStruct>
+                  >(
+                    attributePath,
+                    tlv
+                  )
+                Log.i(TAG, "OpCred $attributeName value: $value")
                 showMessage(ret.toString())
               }
               else -> {
-                Log.i(TAG,"OpCred $attributeName value: $value")
+                Log.i(TAG, "OpCred $attributeName value: $value")
                 showMessage("OpCred $attributeName value: $value")
               }
             }
