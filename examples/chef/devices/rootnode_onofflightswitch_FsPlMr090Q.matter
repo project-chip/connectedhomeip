@@ -167,16 +167,11 @@ client cluster OnOff = 6 {
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
-<<<<<<< HEAD
-  bitmap OnOffFeature : BITMAP32 {
-    kLighting = 0x1;
-    kDeadFront = 0x2;
-=======
   bitmap OnOffControl : BITMAP8 {
     kAcceptOnlyWhenOn = 0x1;
->>>>>>> master
   }
 
   readonly attribute boolean onOff = 0;
