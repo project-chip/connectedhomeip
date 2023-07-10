@@ -2074,7 +2074,6 @@ void DeviceCommissioner::ParseTimeSyncInfo(ReadCommissioningInfo & info)
         err = mAttributeCache->Get<TimeSynchronization::Attributes::DefaultNTP::TypeInfo>(kRootEndpointId, defaultNTP);
         if (err == CHIP_NO_ERROR && (!defaultNTP.IsNull()) && (defaultNTP.Value().size() != 0))
         {
-            ChipLogProgress(Controller, "setting requires defaultNTP to false size = %d", (int) defaultNTP.Value().size());
             info.requiresDefaultNTP = false;
         }
     }
