@@ -38,22 +38,18 @@ void RvcRunModeInstance::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
     // Our business logic states that we can only switch into the mapping state from the idle state.
     if (NewMode == RvcRunMode::ModeMapping && currentMode != RvcRunMode::ModeIdle)
     {
-        response.status = static_cast<uint8_t>(ModeBase::StatusCode::kGenericFailure);
+        response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
         response.statusText.SetValue(chip::CharSpan("Change to the mapping mode is only allowed from idle", 52));
     }
 
-    response.status = static_cast<uint8_t>(ModeBase::StatusCode::kSuccess);
+    response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
 CHIP_ERROR RvcRunModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
     if (modeIndex < NumberOfModes())
     {
-        if (label.size() >= kModeOptions[modeIndex].label.size())
-        {
-            return CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
-        }
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
     }
     return CHIP_ERROR_NOT_FOUND;
 }
@@ -95,23 +91,18 @@ void RvcCleanModeInstance::HandleChangeToMode(uint8_t NewMode, ModeBase::Command
 
     if (rvcRunCurrentMode == RvcRunMode::ModeCleaning)
     {
-        response.status = static_cast<uint8_t>(RvcCleanMode::StatusCode::kCleaningInProgress);
+        response.status = to_underlying(RvcCleanMode::StatusCode::kCleaningInProgress);
         response.statusText.SetValue(chip::CharSpan("Cannot change the cleaning mode during a clean", 60));
     }
 
-    response.status = static_cast<uint8_t>(ModeBase::StatusCode::kSuccess);
+    response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
 CHIP_ERROR RvcCleanModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
     if (modeIndex < NumberOfModes())
     {
-        if (label.size() >= kModeOptions[modeIndex].label.size())
-        {
-            CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
-            return CHIP_NO_ERROR;
-        }
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
     }
     return CHIP_ERROR_NOT_FOUND;
 }

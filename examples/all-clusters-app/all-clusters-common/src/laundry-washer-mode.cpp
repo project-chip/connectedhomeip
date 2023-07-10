@@ -32,18 +32,14 @@ CHIP_ERROR LaundryWasherModeInstance::AppInit()
 
 void LaundryWasherModeInstance::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    response.status = static_cast<uint8_t>(ModeBase::StatusCode::kSuccess);
+    response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
 CHIP_ERROR LaundryWasherModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
     if (modeIndex < NumberOfModes())
     {
-        if (label.size() >= kModeOptions[modeIndex].label.size())
-        {
-            return CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
-        }
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
     }
     return CHIP_ERROR_NOT_FOUND;
 }
