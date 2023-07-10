@@ -50,11 +50,34 @@ constexpr const char * kPayloadSizeKey               = "payload_size";
 constexpr const char * kPayloadEncryptedDataKey      = "payload_hex_encrypted";
 constexpr const char * kPayloadEncryptedSizeKey      = "payload_size_encrypted";
 constexpr const char * kPayloadEncryptedBufferPtrKey = "buffer_ptr";
-constexpr const char * kSourceKey                    = "source";
-constexpr const char * kDestinationKey               = "destination";
 
 namespace chip {
 namespace trace {
+namespace {
+
+constexpr const char * kDirectionKey = "direction";
+
+bool IsOutbound(const Json::Value & json)
+{
+    if (!json.isMember(kDirectionKey))
+    {
+        return false; // unknown
+    }
+
+    return strcmp(json[kDirectionKey].asCString(), "outbound") == 0;
+}
+
+bool IsInbound(const Json::Value & json)
+{
+    if (!json.isMember(kDirectionKey))
+    {
+        return false; // unknown
+    }
+
+    return strcmp(json[kDirectionKey].asCString(), "inbound") == 0;
+}
+
+} // namespace
 
 using namespace logging;
 
@@ -83,45 +106,8 @@ CHIP_ERROR TraceDecoder::ReadString(const char * str)
     str += strlen(jsonPrefix);
 
     Json::Reader reader;
-
-    if (mJsonBuffer.empty())
-    {
-        VerifyOrReturnError(reader.parse(str, mJsonBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(mJsonBuffer.isMember(kPayloadDataKey) && mJsonBuffer.isMember(kPayloadSizeKey),
-                            CHIP_ERROR_INCORRECT_STATE);
-        return CHIP_NO_ERROR;
-    }
-
     Json::Value json;
     VerifyOrReturnError(reader.parse(str, json), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // If there is a source, then it means the previously saved payload is an encrypted to decode, otherwise
-    // the previously saved payload is the non encrypted version, and the current decoded one is the encrypted version.
-    if (mJsonBuffer.isMember(kSourceKey))
-    {
-        json[kPayloadEncryptedDataKey] = mJsonBuffer[kPayloadDataKey];
-        json[kPayloadEncryptedSizeKey] = mJsonBuffer[kPayloadSizeKey];
-    }
-    else
-    {
-        auto data                      = json[kPayloadDataKey];
-        auto size                      = json[kPayloadSizeKey];
-        json[kPayloadDataKey]          = mJsonBuffer[kPayloadDataKey];
-        json[kPayloadSizeKey]          = mJsonBuffer[kPayloadSizeKey];
-        json[kPayloadEncryptedDataKey] = data;
-        json[kPayloadEncryptedSizeKey] = size;
-    }
-    mJsonBuffer.removeMember(kPayloadDataKey);
-    mJsonBuffer.removeMember(kPayloadSizeKey);
-
-    // If there is additional data in the previously saved json copy all of it.
-    for (const auto & key : mJsonBuffer.getMemberNames())
-    {
-        json[key] = mJsonBuffer[key];
-        mJsonBuffer.removeMember(key);
-    }
-
-    VerifyOrReturnError(json.isMember(kSourceKey) || json.isMember(kDestinationKey), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(json.isMember(kProtocolIdKey), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(json.isMember(kProtocolCodeKey), CHIP_ERROR_INCORRECT_STATE);
 
@@ -138,20 +124,19 @@ CHIP_ERROR TraceDecoder::LogJSON(Json::Value & json)
         return CHIP_NO_ERROR;
     }
 
-    if (!mOptions.mEnableMessageInitiator && json.isMember(kDestinationKey))
+    if (!mOptions.mEnableMessageInitiator && IsOutbound(json))
     {
         return CHIP_NO_ERROR;
     }
 
-    if (!mOptions.mEnableMessageResponder && json.isMember(kSourceKey))
+    if (!mOptions.mEnableMessageResponder && IsInbound(json))
     {
         return CHIP_NO_ERROR;
     }
 
-    bool isResponse = json.isMember(kSourceKey) ? true : false;
+    bool isResponse = IsInbound(json);
     ReturnErrorOnFailure(LogAndConsumeProtocol(json));
     ReturnErrorOnFailure(MaybeLogAndConsumeHeaderFlags(json));
-    ReturnErrorOnFailure(MaybeLogAndConsumeEncryptedPayload(json));
     ReturnErrorOnFailure(MaybeLogAndConsumePayload(json, isResponse));
     ReturnErrorOnFailure(MaybeLogAndConsumeOthers(json));
 
@@ -165,26 +150,6 @@ CHIP_ERROR TraceDecoder::MaybeLogAndConsumeHeaderFlags(Json::Value & json)
     ReturnErrorOnFailure(MaybeLogAndConsumeMessageFlags(json));
     ReturnErrorOnFailure(MaybeLogAndConsumeExchangeFlags(json));
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR TraceDecoder::MaybeLogAndConsumeEncryptedPayload(Json::Value & json)
-{
-    if (mOptions.mEnableDataEncryptedPayload)
-    {
-        size_t size = static_cast<uint16_t>(json[kPayloadEncryptedSizeKey].asLargestUInt());
-        if (size)
-        {
-            auto payload      = json[kPayloadEncryptedDataKey].asString();
-            auto bufferPtr    = json[kPayloadEncryptedBufferPtrKey].asString();
-            auto scopedIndent = ScopedLogIndentWithSize("Encrypted Payload", size);
-            Log("data", payload.c_str());
-            Log("buffer_ptr", bufferPtr.c_str());
-        }
-    }
-    json.removeMember(kPayloadEncryptedSizeKey);
-    json.removeMember(kPayloadEncryptedDataKey);
-    json.removeMember(kPayloadEncryptedBufferPtrKey);
     return CHIP_NO_ERROR;
 }
 
@@ -218,8 +183,13 @@ CHIP_ERROR TraceDecoder::LogAndConsumeProtocol(Json::Value & json)
 
     chip::StringBuilderBase builder(protocolInfo, sizeof(protocolInfo));
 
-    builder.Add(json.isMember(kSourceKey) ? "<< from " : ">> to ");
-    builder.Add(json.isMember(kSourceKey) ? json[kSourceKey].asCString() : json[kDestinationKey].asCString());
+    builder.Add(IsInbound(json) ? "<< from " : ">> to ");
+
+    if (json.isMember("peer")) {
+        builder.Add(json["peer"].asCString());
+    } else {
+        builder.Add("UNKNOWN");
+    }
 
     builder.Add(" ");
     auto msgCounter = static_cast<uint32_t>(json[kMessageCounterKey].asLargestUInt());
@@ -258,11 +228,10 @@ CHIP_ERROR TraceDecoder::LogAndConsumeProtocol(Json::Value & json)
 
     ChipLogProgress(DataManagement, "%s", builder.c_str());
 
-    json.removeMember(kSourceKey);
-    json.removeMember(kDestinationKey);
     json.removeMember(kSessionIdKey);
     json.removeMember(kExchangeIdKey);
     json.removeMember(kMessageCounterKey);
+    json.removeMember(kDirectionKey);
 
     return CHIP_NO_ERROR;
 }

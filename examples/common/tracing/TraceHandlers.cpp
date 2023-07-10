@@ -233,7 +233,7 @@ void SecureMessageSentHandler(const TraceSecureMessageSentData * eventData)
         return;
     }
 
-    std::string jsonBody = "{";
+    std::string jsonBody = "{ \"direction\": \"outbound\", ";
     jsonBody += PacketHeaderToJson(eventData->packetHeader);
     jsonBody += ", ";
     jsonBody += PayloadHeaderToJson(eventData->payloadHeader);
@@ -255,8 +255,8 @@ void SecureMessageReceivedHandler(const TraceSecureMessageReceivedData * eventDa
         return;
     }
 
-    std::string jsonBody = "{";
-    jsonBody += AsFirstJsonKey("peer_address", AsJsonString(eventData->peerAddress));
+    std::string jsonBody = "{ \"direction\": \"inbound\", ";
+    jsonBody += AsFirstJsonKey("peer", AsJsonString(eventData->peerAddress));
     jsonBody += ", ";
     jsonBody += PacketHeaderToJson(eventData->packetHeader);
     jsonBody += ", ";
