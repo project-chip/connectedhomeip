@@ -202,7 +202,8 @@ class ClusterTablesGenerator:
                         code="ConstantValueTag(0x%X)" % entry.code,
                         name=entry.name,
                         reference=None,
-                        real_type="%s::%s::%s" % (self.cluster.name, e.name, entry.name)
+                        real_type="%s::%s::%s" % (
+                            self.cluster.name, e.name, entry.name)
                     )
                     for entry in e.entries
                 ]
@@ -216,7 +217,8 @@ class ClusterTablesGenerator:
                         code="ConstantValueTag(0x%X)" % entry.code,
                         name=entry.name,
                         reference=None,
-                        real_type="%s::%s::%s" % (self.cluster.name, e.name, entry.name)
+                        real_type="%s::%s::%s" % (
+                            self.cluster.name, e.name, entry.name)
                     )
                     for entry in e.entries
                 ]
