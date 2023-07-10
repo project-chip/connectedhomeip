@@ -119,6 +119,12 @@ private:
      */
     void loadPersistentAttributes();
 
+    /**
+     * Helper function that encodes the supported modes.
+     * @param encoder The encoder to encode the supported modes into.
+     */
+    CHIP_ERROR encodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper &encoder);
+
 public:
     /**
      * Creates a mode base cluster instance. The Init() function needs to be called for this instance to be registered and
