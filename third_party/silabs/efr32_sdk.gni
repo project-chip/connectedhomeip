@@ -17,6 +17,7 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/jlink.gni")
 import("//build_overrides/mbedtls.gni")
 
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("silabs_board.gni")
 
@@ -51,9 +52,6 @@ declare_args() {
   sl_active_mode_threshold = 1000  # 1s Active mode threshold
 
   silabs_log_enabled = true
-
-  # Enable Sleepy end device
-  enable_sleepy_device = false
 
   # Argument to enable IPv4 for wifi
   # aligning to match chip_inet_config_enable_ipv4 default configuration
@@ -326,9 +324,8 @@ template("efr32_sdk") {
       _include_dirs += [ "${efr32_sdk_root}/platform/driver/button/inc" ]
     }
 
-    if (enable_sleepy_device) {
+    if (chip_enable_icd_server) {
       defines += [
-        "CHIP_DEVICE_CONFIG_ENABLE_SED=1",
         "SL_OT_IDLE_INTERVAL=${sl_ot_idle_interval_ms}",
         "SL_OT_ACTIVE_INTERVAL=${sl_ot_active_interval_ms}",
         "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold}",
