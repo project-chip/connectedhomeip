@@ -30,7 +30,6 @@
 #include <instances/ActivatedCarbonFilterMonitoring.h>
 #include <instances/HepaFilterMonitoring.h>
 
-
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
 #include <imgui_ui/ui.h>
 #include <imgui_ui/windows/light.h>

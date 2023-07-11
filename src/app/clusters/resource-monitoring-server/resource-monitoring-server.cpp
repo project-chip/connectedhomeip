@@ -51,7 +51,9 @@ void Instance::LoadPersistentAttributes()
         }
         else
         {
-            ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as %lu", (long unsigned int) mLastChangedTime.Value()); // on some platforms uint32_t is a long, cast it to unsigned long on all platforms to prevent CI errors
+            ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as %lu",
+                          (long unsigned int) mLastChangedTime.Value()); // on some platforms uint32_t is a long, cast it to
+                                                                         // unsigned long on all platforms to prevent CI errors
         }
     }
     else
@@ -122,7 +124,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(mCondition));
         break;
     }
-    case Attributes::FeatureMap::Id:{
+    case Attributes::FeatureMap::Id: {
         ReturnErrorOnFailure(aEncoder.Encode(mFeatureMap));
         break;
     }

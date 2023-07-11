@@ -1,6 +1,7 @@
 # CHIP Linux Resource Monitoring Example
 
-This is a example app showing the use of the resource monitoring clusters (HEPA Filter Monitoring and Activated Carbon Filter Monitoring).
+This is a example app showing the use of the resource monitoring clusters (HEPA
+Filter Monitoring and Activated Carbon Filter Monitoring).
 
 ## Building
 
