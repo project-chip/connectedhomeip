@@ -27,11 +27,12 @@ CODEGEN_PY_PATH = os.path.abspath(os.path.join(
 class CodegenTarget:
     """A target that uses `scripts/codegen.py` to generate files."""
 
-    def __init__(self, idl: InputIdlFile, generator: str, sdk_root: str, runner):
+    def __init__(self, idl: InputIdlFile, generator: str, sdk_root: str, runner, options=[]):
         self.idl = idl
         self.generator = generator
         self.sdk_root = sdk_root
         self.runner = runner
+        self.options = options
 
         if idl.file_type != IdlFileType.MATTER:
             raise Exception(
@@ -51,8 +52,12 @@ class CodegenTarget:
             '--log-level', 'fatal',
             '--generator', self.generator,
             '--output-dir', output_dir,
-            self.idl.full_path
         ]
+        for option in self.options:
+            cmd.append("--option")
+            cmd.append(option)
+
+        cmd.append(self.idl.full_path)
 
         logging.debug(f"Executing {cmd}")
         self.runner.run(cmd)
@@ -97,6 +102,9 @@ class CodegenCppAppPregenerator:
         if idl.file_type != IdlFileType.MATTER:
             return False
 
+        if '/lib/format/' in idl.relative_path:
+            return False
+
         # we should not be checked for these, but verify just in case
         if '/tests/' in idl.relative_path:
             return False
@@ -105,3 +113,29 @@ class CodegenCppAppPregenerator:
 
     def CreateTarget(self, idl: InputIdlFile, runner):
         return CodegenTarget(sdk_root=self.sdk_root, idl=idl, generator="cpp-app", runner=runner)
+
+
+class CodegenCppProtocolsTLVMetaPregenerator:
+    """Pregeneration logic for "cpp-app" codegen.py outputs"""
+
+    def __init__(self, sdk_root):
+        self.sdk_root = sdk_root
+
+    def Accept(self, idl: InputIdlFile):
+        return (idl.file_type == IdlFileType.MATTER) and idl.relative_path.endswith('/protocol_messages.matter')
+
+    def CreateTarget(self, idl: InputIdlFile, runner):
+        return CodegenTarget(sdk_root=self.sdk_root, idl=idl, generator="cpp-tlvmeta", options=["table_name:protocols_meta"], runner=runner)
+
+
+class CodegenCppClustersTLVMetaPregenerator:
+    """Pregeneration logic for "cpp-app" codegen.py outputs"""
+
+    def __init__(self, sdk_root):
+        self.sdk_root = sdk_root
+
+    def Accept(self, idl: InputIdlFile):
+        return (idl.file_type == IdlFileType.MATTER) and idl.relative_path.endswith('/controller-clusters.matter')
+
+    def CreateTarget(self, idl: InputIdlFile, runner):
+        return CodegenTarget(sdk_root=self.sdk_root, idl=idl, generator="cpp-tlvmeta", options=["table_name:clusters_meta"], runner=runner)

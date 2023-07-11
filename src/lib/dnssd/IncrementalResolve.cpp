@@ -54,20 +54,12 @@ private:
     DataType & mData;
 };
 
-enum class ServiceNameType
-{
-    kInvalid, // not a matter service name
-    kOperational,
-    kCommissioner,
-    kCommissionable,
-};
-
 // Common prefix to check for all operational/commissioner/commissionable name parts
 constexpr QNamePart kOperationalSuffix[]    = { kOperationalServiceName, kOperationalProtocol, kLocalDomain };
 constexpr QNamePart kCommissionableSuffix[] = { kCommissionableServiceName, kCommissionProtocol, kLocalDomain };
 constexpr QNamePart kCommissionerSuffix[]   = { kCommissionerServiceName, kCommissionProtocol, kLocalDomain };
 
-ServiceNameType ComputeServiceNameType(SerializedQNameIterator name)
+IncrementalResolver::ServiceNameType ComputeServiceNameType(SerializedQNameIterator name)
 {
     // SRV record names look like:
     //   <compressed-fabric-id>-<node-id>._matter._tcp.local  (operational)
@@ -78,25 +70,25 @@ ServiceNameType ComputeServiceNameType(SerializedQNameIterator name)
     if (!name.Next() || !name.IsValid())
     {
         // missing required components - empty service name
-        return ServiceNameType::kInvalid;
+        return IncrementalResolver::ServiceNameType::kInvalid;
     }
 
     if (name == kOperationalSuffix)
     {
-        return ServiceNameType::kOperational;
+        return IncrementalResolver::ServiceNameType::kOperational;
     }
 
     if (name == kCommissionableSuffix)
     {
-        return ServiceNameType::kCommissionable;
+        return IncrementalResolver::ServiceNameType::kCommissionable;
     }
 
     if (name == kCommissionerSuffix)
     {
-        return ServiceNameType::kCommissioner;
+        return IncrementalResolver::ServiceNameType::kCommissioner;
     }
 
-    return ServiceNameType::kInvalid;
+    return IncrementalResolver::ServiceNameType::kInvalid;
 }
 
 /// Automatically resets a IncrementalResolver to inactive in its destructor
@@ -171,7 +163,9 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
         Platform::CopyString(mCommonResolutionData.hostName, serverName.Value());
     }
 
-    switch (ComputeServiceNameType(name))
+    mServiceNameType = ComputeServiceNameType(name);
+
+    switch (mServiceNameType)
     {
     case ServiceNameType::kOperational:
         mSpecificResolutionData.Set<OperationalNodeData>();

@@ -22,7 +22,7 @@ import websockets
 from .hooks import WebSocketRunnerHooks
 from .runner import TestRunner
 
-_KEEP_ALIVE_TIMEOUT_IN_SECONDS = 40
+_KEEP_ALIVE_TIMEOUT_IN_SECONDS = 120
 _MAX_MESSAGE_SIZE_IN_BYTES = 10485760  # 10 MB
 
 

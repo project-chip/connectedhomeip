@@ -25,12 +25,10 @@ import java.util.concurrent.atomic.AtomicLong
 /**
  * @brief Matter Controller command
  * @details The base class of all the commands the Matter Controller supports, which are actions
- * that may be performed. Commands are verb-like, such as pair a Matter device or discover
- * Matter devices from the environment.
+ *   that may be performed. Commands are verb-like, such as pair a Matter device or discover Matter
+ *   devices from the environment.
  */
-abstract class Command(
-  private val name: String,
-  private val helpText: String? = null) {
+abstract class Command(private val name: String, private val helpText: String? = null) {
   private val arguments = ArrayList<Argument>()
 
   fun getName(): String {
@@ -54,16 +52,16 @@ abstract class Command(
   }
 
   /**
-   * @brief Get attribute argument if it exists, there is at most one Attribute argument per command
    * @return A pointer to an Optional where the Attribute argument will be stored
+   * @brief Get attribute argument if it exists, there is at most one Attribute argument per command
    */
   fun getAttribute(): String? {
     return arguments.find { arg -> arg.type === ArgumentType.ATTRIBUTE }?.value as? String
   }
 
   /**
-   * @brief Get argument description if it exists
    * @return A pointer to an Optional where the argument description will be stored
+   * @brief Get argument description if it exists
    */
   fun getArgumentDescription(index: Int): String? {
     return arguments[index].desc
@@ -87,22 +85,19 @@ abstract class Command(
   }
 
   /**
-   * @brief Add a bool command argument
    * @param name The name that will be displayed in the command help
    * @param out A pointer to a AtomicBoolean where the argv value will be stored
    * @param desc The description of the argument that will be displayed in the command help
    * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
+   * @brief Add a bool command argument
    */
-  fun addArgument(
-    name: String?, out: AtomicBoolean?, desc: String?, optional: Boolean
-  ) {
+  fun addArgument(name: String?, out: AtomicBoolean?, desc: String?, optional: Boolean) {
     val arg = Argument(name!!, out!!, desc, optional)
     addArgumentToList(arg)
   }
 
   /**
-   * @brief Add a short command argument
    * @param name The name that will be displayed in the command help
    * @param min The minimum value of the argv value
    * @param max The minimum value of the argv value
@@ -110,6 +105,7 @@ abstract class Command(
    * @param desc The description of the argument that will be displayed in the command help
    * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
+   * @brief Add a short command argument
    */
   fun addArgument(
     name: String?,
@@ -124,7 +120,6 @@ abstract class Command(
   }
 
   /**
-   * @brief Add an int command argument
    * @param name The name that will be displayed in the command help
    * @param min The minimum value of the argv value
    * @param max The minimum value of the argv value
@@ -132,16 +127,21 @@ abstract class Command(
    * @param desc The description of the argument that will be displayed in the command help
    * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
+   * @brief Add an int command argument
    */
   fun addArgument(
-    name: String?, min: Int, max: Int, out: AtomicInteger?, desc: String?, optional: Boolean
+    name: String?,
+    min: Int,
+    max: Int,
+    out: AtomicInteger?,
+    desc: String?,
+    optional: Boolean
   ) {
     val arg = Argument(name!!, min, max, out!!, desc, optional)
     addArgumentToList(arg)
   }
 
   /**
-   * @brief Add a long Integer command argument
    * @param name The name that will be displayed in the command help
    * @param min The minimum value of the argv value
    * @param max The minimum value of the argv value
@@ -149,16 +149,21 @@ abstract class Command(
    * @param desc The description of the argument that will be displayed in the command help
    * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
+   * @brief Add a long Integer command argument
    */
   fun addArgument(
-    name: String?, min: Short, max: Short, out: AtomicLong?, desc: String?, optional: Boolean
+    name: String?,
+    min: Short,
+    max: Short,
+    out: AtomicLong?,
+    desc: String?,
+    optional: Boolean
   ) {
     val arg = Argument(name!!, min, max, out!!, desc, optional)
     addArgumentToList(arg)
   }
 
   /**
-   * @brief Add a long Integer command argument
    * @param name The name that will be displayed in the command help
    * @param min The minimum value of the argv value
    * @param max The minimum value of the argv value
@@ -166,20 +171,26 @@ abstract class Command(
    * @param desc The description of the argument that will be displayed in the command help
    * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
+   * @brief Add a long Integer command argument
    */
   fun addArgument(
-    name: String?, min: Long, max: Long, out: AtomicLong?, desc: String?, optional: Boolean
+    name: String?,
+    min: Long,
+    max: Long,
+    out: AtomicLong?,
+    desc: String?,
+    optional: Boolean
   ) {
     val arg = Argument(name!!, min, max, out!!, desc, optional)
     addArgumentToList(arg)
   }
 
   /**
-   * @brief Add an IP address command argument
    * @param name The name that will be displayed in the command help
    * @param out A pointer to a IPAddress where the argv value will be stored
    * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
+   * @brief Add an IP address command argument
    */
   fun addArgument(name: String?, out: IPAddress?, optional: Boolean) {
     val arg = Argument(name!!, out!!, optional)
@@ -187,23 +198,21 @@ abstract class Command(
   }
 
   /**
-   * @brief Add a String command argument
    * @param name The name that will be displayed in the command help
    * @param out A pointer to a StringBuffer where the argv value will be stored
    * @param desc The description of the argument that will be displayed in the command help
    * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
+   * @brief Add a String command argument
    */
-  fun addArgument(
-    name: String?, out: StringBuffer?, desc: String?, optional: Boolean
-  ) {
+  fun addArgument(name: String?, out: StringBuffer?, desc: String?, optional: Boolean) {
     val arg = Argument(name!!, out!!, desc, optional)
     addArgumentToList(arg)
   }
 
   /**
-   * @brief Initialize command arguments
    * @param args Supplied command-line arguments as an array of String objects.
+   * @brief Initialize command arguments
    */
   fun initArguments(args: Array<String>) {
     val argc = args.size
@@ -214,7 +223,9 @@ abstract class Command(
         mandatoryArgsCount++
       }
     }
-    require(argc >= mandatoryArgsCount) { "initArguments: Wrong arguments number: $argc instead of $mandatoryArgsCount" }
+    require(argc >= mandatoryArgsCount) {
+      "initArguments: Wrong arguments number: $argc instead of $mandatoryArgsCount"
+    }
 
     // Initialize mandatory arguments
     for (i in 0 until mandatoryArgsCount) {
@@ -228,13 +239,12 @@ abstract class Command(
 
       // optional arguments starts with OPTIONAL_ARGUMENT_PREFIX
       require(
-        !(args[i].length <= OPTIONAL_ARGUMENT_PREFIX_LENGTH
-                && !args[i].startsWith(OPTIONAL_ARGUMENT_PREFIX))
-      ) { "initArguments: Invalid optional argument: " + args[i] }
-      if (args[i]
-          .substring(OPTIONAL_ARGUMENT_PREFIX_LENGTH)
-        == arguments[currentIndex].name
+        !(args[i].length <= OPTIONAL_ARGUMENT_PREFIX_LENGTH &&
+          !args[i].startsWith(OPTIONAL_ARGUMENT_PREFIX))
       ) {
+        "initArguments: Invalid optional argument: " + args[i]
+      }
+      if (args[i].substring(OPTIONAL_ARGUMENT_PREFIX_LENGTH) == arguments[currentIndex].name) {
         require(i + 1 < argc) { "initArguments: Optional argument " + args[i] + " missing value" }
         initArgument(currentIndex++, args[i + 1])
       }
@@ -246,8 +256,7 @@ abstract class Command(
     arguments[argIndex].setValue(argValue!!)
   }
 
-  @Throws(Exception::class)
-  abstract fun run()
+  @Throws(Exception::class) abstract fun run()
 
   companion object {
     private const val OPTIONAL_ARGUMENT_PREFIX = "--"

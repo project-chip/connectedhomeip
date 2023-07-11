@@ -21,6 +21,25 @@ import("${chip_root}/build/chip/chip_codegen.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
+chip_codegen("cluster-tlv-metadata") {
+  input = "controller-clusters.matter"
+  generator = "cpp-tlvmeta"
+
+  options = [ "table_name:clusters_meta" ]
+
+  outputs = [
+    "tlv/meta/clusters_meta.cpp",
+    "tlv/meta/clusters_meta.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/format:flat-tree",
+    "${chip_root}/src/lib/format:tlv-metadata-headers",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
 chip_data_model("data_model") {
   zap_file = "controller-clusters.zap"
 
