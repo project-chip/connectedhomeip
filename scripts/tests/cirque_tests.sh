@@ -116,10 +116,7 @@ function cirquetest_bootstrap() {
 
     make NO_GRPC=1 install -j
 
-    if [[ "$GITHUB_ACTION_RUN" = "1" ]]; then
-        # Note: This script will be invoked in docker on CI, We should add CHIP repo to safe directory to silent git error messages.
-        git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
-    fi
+    git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
 
     "$REPO_DIR"/integrations/docker/ci-only-images/chip-cirque-device-base/build.sh
 
@@ -189,12 +186,12 @@ subcommand=$1
 shift
 
 case $subcommand in
-    *)
-        cirquetest_"$subcommand" "$@"
-        exitcode=$?
-        if ((exitcode == 127)); then
-            echo "Unknown command: $subcommand" >&2
-        fi
-        exit "$exitcode"
-        ;;
+*)
+    cirquetest_"$subcommand" "$@"
+    exitcode=$?
+    if ((exitcode == 127)); then
+        echo "Unknown command: $subcommand" >&2
+    fi
+    exit "$exitcode"
+    ;;
 esac
