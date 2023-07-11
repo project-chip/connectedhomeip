@@ -47,7 +47,7 @@ public class StDeviceApp {
     // called before Matter server is inited
     public native void preServerInit();
 
-    // called after Matter server is inited
+    // called after Matter server is initiated
     public native void postServerInit(int deviceTypeId);
 
     public native void setOnOffManager(int endpoint, OnOffManager manager);
