@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+
 from matter_idl.generators.types import GetDataTypeSizeInBits, IsSignedDataType
 from matter_idl.matter_idl_types import AccessPrivilege, Attribute, AttributeQuality, DataType, Field, FieldQuality
 
 
-def ParseInt(value: str, data_type: DataType = None) -> int:
+def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
     """
     Convert a string that is a known integer into an actual number.
 
