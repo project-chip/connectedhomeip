@@ -98,8 +98,6 @@ fi
         docker-squash "$GHCR_ORG"/"$ORG"/"$IMAGE":"$VERSION" -t "$GHCR_ORG"/"$ORG"/"$IMAGE":latest
 }
 
-docker login ghcr.io -u woody-apple -p "469cb8910cf8ae62937a7cc9ab5357f0ee4f8985"
-
 [[ ${*/--push//} != "${*}" ]] && {
     docker push "$GHCR_ORG"/"$ORG"/"$IMAGE":"$VERSION"
     [[ ${*/--latest//} != "${*}" ]] && {
