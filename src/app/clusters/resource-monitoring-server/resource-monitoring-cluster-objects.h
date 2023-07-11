@@ -63,15 +63,6 @@ enum class Feature : uint32_t
     kWarning   = 0x2,
 };
 
-// using Feature = HepaFilterMonitoring::Feature;
-// namespace Commands {
-// namespace ResetCondition {
-// using DecodableType           = HepaFilterMonitoring::Commands::ResetCondition::DecodableType;
-// static constexpr CommandId Id = HepaFilterMonitoring::Commands::ResetCondition::Id;
-
-// } // namespace ResetCondition
-// } // namespace Commands
-
 namespace Attributes {
 
 namespace Condition {
@@ -184,9 +175,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInf
 };
 } // namespace ClusterRevision
 
-// namespace FeatureMap {
-// static constexpr CommandId Id = HepaFilterMonitoring::Attributes::FeatureMap::Id;
-// }
 } // namespace Attributes
 
 namespace Commands {
