@@ -1900,6 +1900,51 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-air-purifier</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Air Purifier</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x002D</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Fan Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="HEPA Filter Monitoring" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Activated Carbon Filter Monitoring" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-air-quality-sensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Air Quality Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x002C</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+            <include cluster="Air Quality" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Temperature Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Relative Humidity Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Carbon Monoxide Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Carbon Dioxide Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Nitrogen Dioxide Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Ozone Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Formaldehyde Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="PM1 Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="PM2.5 Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="PM10 Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Radon Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Total Volatile Organic Compounds Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-all-clusters-app</name>
         <domain>CHIP</domain>
         <typeName>Matter All-clusters-app Server Example</typeName>
