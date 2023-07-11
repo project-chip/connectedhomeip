@@ -4,9 +4,9 @@ Device definitions reside in `examples/chef/devices` as zap and .matter files.
 
 Generally you need to follow these steps to use a new device:
 
-  - Create a zap/matter configuration (forking an existing one is the easiest)
-  - Rename to a final/stable name
-  - Test
+-   Create a zap/matter configuration (forking an existing one is the easiest)
+-   Rename to a final/stable name
+-   Test
 
 ## Creating a new zap configuration
 
@@ -14,7 +14,6 @@ The easiest way to get started is using an existing configuration. In this
 example we will use `rootnode_contactsensor_lFAGG1bfRO` as one of the smallest
 devices. Use `./examples/chef/chef.py -h | less` or view
 `./examples/chef/devices/*.zap` for a list of valid devices.
-
 
 To open the zap GUI for this device, run:
 
@@ -26,38 +25,36 @@ To open the zap GUI for this device, run:
 
 Using the ZAP UI, make the following changes:
 
-- Leave Endpoint 0 unchanged
-- Click the Edit/Pencil icon to change Endpoint 1
-  - Update the device type to the new device and click "save"
-  - In the "Filter" section select "Enabled Clusters" and validate
-    what clusters are set.
-    - Remove extra clusters clusters (e.g. remove `Boolean State`)
-    - Ensure clusters for the device type are enabled (this is generally
-      automatically the case)
-    - Click the gear icon on the cluster to further edit enabled attributes
-      and commands
+-   Leave Endpoint 0 unchanged
+-   Click the Edit/Pencil icon to change Endpoint 1
+    -   Update the device type to the new device and click "save"
+    -   In the "Filter" section select "Enabled Clusters" and validate what
+        clusters are set.
+        -   Remove extra clusters clusters (e.g. remove `Boolean State`)
+        -   Ensure clusters for the device type are enabled (this is generally
+            automatically the case)
+        -   Click the gear icon on the cluster to further edit enabled
+            attributes and commands
 
 Once all edits are done, save it under a **NEW** name inside
 `examples/chef/devices/`.
 
 NOTE: make sure you save under `examples/chef/devices` since internal paths
-inside the saved file will be relative to the save location (it cannot
-simply be moved later without manual editing).
+inside the saved file will be relative to the save location (it cannot simply be
+moved later without manual editing).
 
 It is suggested to name this `rootnode_<device_type_name>`
 
 ## Establishing a "final name"
 
-General naming convention for chef is `<ep0>_<ep1>_<hash>` where `<epN>` is
-the type of endpoint (and `<ep0>` is almost always `rootnode`).
+General naming convention for chef is `<ep0>_<ep1>_<hash>` where `<epN>` is the
+type of endpoint (and `<ep0>` is almost always `rootnode`).
 
-The hash is a one-time uniquely generated identifier to
-allow separate configurations for the same devices (e.g different features
-enabled).
+The hash is a one-time uniquely generated identifier to allow separate
+configurations for the same devices (e.g different features enabled).
 
 You can read more in `examples/chef/sample_app_util/README.md`, however the
-short version is that you can determine a recommended name
-using:
+short version is that you can determine a recommended name using:
 
 ```
 ./examples/chef/sample_app_util/sample_app_util.py zap --generate-name <saved_file_name>
@@ -77,8 +74,8 @@ To generate the matter file for your target, run
 ./scripts/tools/zap/generate.py <new_device_zap_name>
 ```
 
-This should generate the corresponding `.matter` file for the zap file
-you created.
+This should generate the corresponding `.matter` file for the zap file you
+created.
 
 ## Testing
 
@@ -90,9 +87,8 @@ Basic device availability should show when running:
 
 ### Compilation
 
-This example uses `rootnode_contactsensor_lFAGG1bfRO` for 
-commands. Substitute your own device for testing newly
-created devices.
+This example uses `rootnode_contactsensor_lFAGG1bfRO` for commands. Substitute
+your own device for testing newly created devices.
 
 ```
 ./examples/chef/chef.py                 \
@@ -102,9 +98,10 @@ created devices.
 ```
 
 Where options used are:
-  - `-t` specifies the target platform
-  - `-d` specifies the device to build
-  - `-b` asks for build to be run
+
+-   `-t` specifies the target platform
+-   `-d` specifies the device to build
+-   `-b` asks for build to be run
 
 ### Execution
 
