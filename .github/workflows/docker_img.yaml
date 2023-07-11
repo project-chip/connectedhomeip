@@ -28,40 +28,10 @@ jobs:
         name: Build Docker CHIP Build images
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
-        strategy:
-            fail-fast: false
-            matrix:
-                img:
-                    - "base/chip-build"
-                    - "base/chip-build-minimal"
-                    - "base/chip-build-crosscompile"
-
-                    - "stage-1/chip-build-ameba"
-                    - "stage-1/chip-build-cirque"
-                    - "stage-1/chip-build-crosscompile"
-                    - "stage-1/chip-build-doxygen"
-                    - "stage-1/chip-build-efr32"
-                    - "stage-1/chip-build-esp32"
-                    - "stage-1/chip-build-infineon"
-                    # chip-build imx image requires too much space for GitHub-hosted runners. It fails with:
-                    # -"stage-1/chip-build -imx"
-                    - "stage-1/chip-build-k32w"
-                    - "stage-1/chip-build-mbed-os"
-                    - "stage-1/chip-build-nrf-platform"
-                    - "stage-1/chip-build-telink"
-                    - "stage-1/chip-build-ti"
-                    - "stage-1/chip-build-tizen"
-                    - "stage-1/chip-build-openiotsdk"
-
-                    - "stage-2/chip-build-android"
-                    - "stage-2/chip-build-esp32-qemu"
-                    - "stage-2/chip-build-tizen-qemu"
-                    # NOTE: vscode image consumes ~52 GB disk space but GitHub-hosted runners provide ~10 GB free disk space(https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources)
-                    #- "last/chip-build-vscode"
         steps:
             - name: Checkout
               uses: actions/checkout@v3
             - name: Build All images using project bash script
               run: |
-                  cd integrations/docker/images/${{ matrix.img }}
+                  cd integrations/docker/images
                   ./build.sh --latest
