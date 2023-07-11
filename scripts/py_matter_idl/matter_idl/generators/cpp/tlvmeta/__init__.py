@@ -200,7 +200,8 @@ class ClusterTablesGenerator:
                         code="ConstantValueTag(0x%X)" % entry.code,
                         name=entry.name,
                         reference=None,
-                        real_type="%s::%s::%s" % (self.cluster.name, e.name, entry.name)
+                        real_type="%s::%s::%s" % (
+                            self.cluster.name, e.name, entry.name)
                     )
                     for entry in e.entries
                 ]
@@ -214,7 +215,8 @@ class ClusterTablesGenerator:
                         code="ConstantValueTag(0x%X)" % entry.code,
                         name=entry.name,
                         reference=None,
-                        real_type="%s::%s::%s" % (self.cluster.name, e.name, entry.name)
+                        real_type="%s::%s::%s" % (
+                            self.cluster.name, e.name, entry.name)
                     )
                     for entry in e.entries
                 ]
@@ -245,7 +247,7 @@ def IndexInTable(name: Optional[str], table: List[Table]) -> str:
     for idx, t in enumerate(table):
         if t.full_name == name:
             # Index skipping hard-coded items
-            return idx + 2
+            return "%d" % (idx + 2)
 
     raise Exception("Name %r not found in table" % name)
 
