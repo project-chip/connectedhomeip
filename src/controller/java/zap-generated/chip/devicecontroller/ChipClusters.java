@@ -2836,7 +2836,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
       public interface RefSemAttributeCallback {
-        void onSuccess( List<ChipStructs.DescriptorClusterRefSemStruct> valueList);
+        void onSuccess( List<ChipStructs.DescriptorClusterSemanticTagStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }

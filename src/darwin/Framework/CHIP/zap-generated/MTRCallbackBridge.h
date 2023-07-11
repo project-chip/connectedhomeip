@@ -619,7 +619,7 @@ typedef void (*DescriptorPartsListListAttributeCallback)(void * context,
                                                          const chip::app::DataModel::DecodableList<chip::EndpointId> & data);
 typedef void (*DescriptorRefSemListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::RefSemStruct::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType> & data);
 typedef void (*DescriptorGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DescriptorAcceptedCommandListListAttributeCallback)(
@@ -2875,7 +2875,8 @@ public:
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::RefSemStruct::DecodableType> & value);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType> &
+            value);
 };
 
 class MTRDescriptorRefSemListAttributeCallbackSubscriptionBridge : public MTRDescriptorRefSemListAttributeCallbackBridge

@@ -3311,31 +3311,6 @@ public:
 using DecodableType = Type;
 
 } // namespace DeviceTypeStruct
-namespace RefSemStruct {
-enum class Fields : uint8_t
-{
-    kName     = 0,
-    kTag      = 1,
-    kVendorId = 2,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan name;
-    chip::CharSpan tag;
-    uint16_t vendorId = static_cast<uint16_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace RefSemStruct
 } // namespace Structs
 
 namespace Attributes {
@@ -3393,11 +3368,11 @@ struct TypeInfo
 namespace RefSem {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::Descriptor::Structs::RefSemStruct::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::RefSemStruct::DecodableType>;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::RefSemStruct::DecodableType> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RefSem::Id; }

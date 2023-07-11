@@ -3142,7 +3142,7 @@ CHIPDescriptorRefSemAttributeCallback::~CHIPDescriptorRefSemAttributeCallback()
 
 void CHIPDescriptorRefSemAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::RefSemStruct::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3171,35 +3171,23 @@ void CHIPDescriptorRefSemAttributeCallback::CallbackFn(
     {
         auto & entry_0 = iter_arrayListObj_0.GetValue();
         jobject newElement_0;
-        jobject newElement_0_name;
-        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.name, newElement_0_name));
-        jobject newElement_0_tag;
-        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.tag, newElement_0_tag));
-        jobject newElement_0_vendorId;
-        std::string newElement_0_vendorIdClassName     = "java/lang/Integer";
-        std::string newElement_0_vendorIdCtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_vendorIdClassName.c_str(),
-                                                                       newElement_0_vendorIdCtorSignature.c_str(), entry_0.vendorId,
-                                                                       newElement_0_vendorId);
 
-        jclass refSemStructStructClass_1;
-        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$DescriptorClusterRefSemStruct",
-                                                             refSemStructStructClass_1);
+        jclass semanticTagStructStructClass_1;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$DescriptorClusterSemanticTagStruct", semanticTagStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$DescriptorClusterRefSemStruct");
+            ChipLogError(Zcl, "Could not find class ChipStructs$DescriptorClusterSemanticTagStruct");
             return;
         }
-        jmethodID refSemStructStructCtor_1 =
-            env->GetMethodID(refSemStructStructClass_1, "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;)V");
-        if (refSemStructStructCtor_1 == nullptr)
+        jmethodID semanticTagStructStructCtor_1 = env->GetMethodID(semanticTagStructStructClass_1, "<init>", "()V");
+        if (semanticTagStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$DescriptorClusterRefSemStruct constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$DescriptorClusterSemanticTagStruct constructor");
             return;
         }
 
-        newElement_0 = env->NewObject(refSemStructStructClass_1, refSemStructStructCtor_1, newElement_0_name, newElement_0_tag,
-                                      newElement_0_vendorId);
+        newElement_0 = env->NewObject(semanticTagStructStructClass_1, semanticTagStructStructCtor_1);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 

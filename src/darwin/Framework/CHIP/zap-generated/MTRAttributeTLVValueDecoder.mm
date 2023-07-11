@@ -1418,21 +1418,8 @@ static id _Nullable DecodeAttributeValueForDescriptorCluster(
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRDescriptorClusterRefSemStruct * newElement_0;
-                newElement_0 = [MTRDescriptorClusterRefSemStruct new];
-                newElement_0.name = AsString(entry_0.name);
-                if (newElement_0.name == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    *aError = err;
-                    return nil;
-                }
-                newElement_0.tag = AsString(entry_0.tag);
-                if (newElement_0.tag == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    *aError = err;
-                    return nil;
-                }
-                newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
+                MTRDescriptorClusterSemanticTagStruct * newElement_0;
+                newElement_0 = [MTRDescriptorClusterSemanticTagStruct new];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();

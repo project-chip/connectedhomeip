@@ -1715,7 +1715,7 @@ void MTRDescriptorPartsListListAttributeCallbackSubscriptionBridge::OnSubscripti
 }
 
 void MTRDescriptorRefSemListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::RefSemStruct::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1723,21 +1723,8 @@ void MTRDescriptorRefSemListAttributeCallbackBridge::OnSuccessFn(void * context,
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRDescriptorClusterRefSemStruct * newElement_0;
-            newElement_0 = [MTRDescriptorClusterRefSemStruct new];
-            newElement_0.name = AsString(entry_0.name);
-            if (newElement_0.name == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                OnFailureFn(context, err);
-                return;
-            }
-            newElement_0.tag = AsString(entry_0.tag);
-            if (newElement_0.tag == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                OnFailureFn(context, err);
-                return;
-            }
-            newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
+            MTRDescriptorClusterSemanticTagStruct * newElement_0;
+            newElement_0 = [MTRDescriptorClusterSemanticTagStruct new];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();

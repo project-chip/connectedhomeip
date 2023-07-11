@@ -570,17 +570,11 @@ client cluster Descriptor = 29 {
     int16u revision = 1;
   }
 
-  struct RefSemStruct {
-    char_string name = 0;
-    char_string tag = 1;
-    int16u vendorId = 2;
-  }
-
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;
   readonly attribute ENDPOINT_NO partsList[] = 3;
-  readonly attribute optional RefSemStruct refSem[] = 4;
+  readonly attribute optional SemanticTagStruct refSem[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

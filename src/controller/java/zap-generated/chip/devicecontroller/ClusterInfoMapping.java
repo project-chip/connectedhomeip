@@ -1397,9 +1397,9 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess( List<ChipStructs.DescriptorClusterRefSemStruct> valueList) {
+        public void onSuccess( List<ChipStructs.DescriptorClusterSemanticTagStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DescriptorClusterRefSemStruct>");
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DescriptorClusterSemanticTagStruct>");
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }

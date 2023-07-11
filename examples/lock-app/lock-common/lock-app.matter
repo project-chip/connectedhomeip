@@ -128,12 +128,6 @@ server cluster Descriptor = 29 {
     int16u revision = 1;
   }
 
-  struct RefSemStruct {
-    char_string name = 0;
-    char_string tag = 1;
-    int16u vendorId = 2;
-  }
-
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;

@@ -49,12 +49,6 @@ MTR_DEPRECATED(
 @property (nonatomic, copy) NSNumber * _Nonnull revision MTR_DEPRECATED(
     "Please use MTRDescriptorClusterDeviceTypeStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
-MTR_NEWLY_AVAILABLE
-@interface MTRDescriptorClusterRefSemStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull name MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nonnull tag MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull vendorId MTR_NEWLY_AVAILABLE;
-@end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRBindingClusterTargetStruct : NSObject <NSCopying>
