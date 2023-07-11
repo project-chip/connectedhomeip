@@ -290,7 +290,7 @@ public:
         // Test OnBecameReportable
         readHandler->ForceDirtyState();
         readHandler->mObserver->OnBecameReportable(readHandler);
-        // Should have changed the scheduled timeout to the handlers min interval, to check, we wait for the min interval to
+        // Should have changed the scheduled timeout to the handler's min interval, to check, we wait for the min interval to
         // expire
         ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1100),
                                         [&]() -> bool { return sScheduler.IsReportableNow(readHandler); });

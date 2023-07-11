@@ -176,7 +176,7 @@ public:
         /// @param[in] apReadHandler  ReadHandler that became dirty
         virtual void OnBecameReportable(ReadHandler * apReadHandler) = 0;
 
-        /// @brief Callback invoked when a Repport is sent so the next report can be scheduled
+        /// @brief Callback invoked when the read handler needs to make sure to send a message to the subscriber within the next maxInterval time period.
         /// @param[in] apReadHandler ReadHandler that has generated a report
         virtual void OnReportSent(ReadHandler * apReadHandler) = 0;
 
@@ -224,7 +224,7 @@ public:
         aMaxInterval = mMaxInterval;
     }
 
-    CHIP_ERROR SetMinReportingIntervals(uint16_t aMinInterval)
+    CHIP_ERROR SetMinReportingInterval(uint16_t aMinInterval)
     {
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(aMinInterval <= mMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
@@ -238,7 +238,7 @@ public:
      * MinIntervalFloor ≤ MaxInterval ≤ MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling)
      * Where SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT is set to 60m in the spec.
      */
-    CHIP_ERROR SetMaxReportingIntervals(uint16_t aMaxInterval)
+    CHIP_ERROR SetMaxReportingInterval(uint16_t aMaxInterval)
     {
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mMinIntervalFloorSeconds <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);

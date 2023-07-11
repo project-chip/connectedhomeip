@@ -63,7 +63,7 @@ public:
         }
         ReadHandler * GetReadHandler() const { return mReadHandler; }
         /// @brief Check if the Node is reportable now, meaning its readhandler was made reportable by attribute dirtying and
-        /// handler state, and minimal time interval last reporthas elapsed since, or the maximal time interval since last report
+        /// handler state, and minimal time interval last since last report has elapsed, or the maximal time interval since last report
         /// has elapsed
         bool IsReportableNow() const
         {
@@ -74,7 +74,7 @@ public:
                     ((now >= mMinTimestamp && mReadHandler->IsDirty()) || now >= mMaxTimestamp));
         }
 
-        void SetIntervalsTimeStamp(ReadHandler * aReadHandler)
+        void SetIntervalTimeStamps(ReadHandler * aReadHandler)
         {
             uint16_t minInterval, maxInterval;
             aReadHandler->GetReportingIntervals(minInterval, maxInterval);
@@ -124,7 +124,7 @@ public:
     virtual void UnregisterAllHandlers() = 0;
     /// @brief Check if a ReadHandler is scheduled for reporting
     virtual bool IsReportScheduled(ReadHandler * aReadHandler) = 0;
-    /// @brief Check if a ReadHandler is reportable given its minimal and maximal intervals by using the node timestamps
+    /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
     /// @param aReadHandler read handler to check
     bool IsReportableNow(ReadHandler * aReadHandler) { return FindReadHandlerNode(aReadHandler)->IsReportableNow(); };
     /// @brief Check if a ReadHandler is reportable without considering the timing
