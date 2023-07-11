@@ -44,7 +44,7 @@ public class StDeviceApp {
 
     public native void nativeInit();
 
-    // called before Matter server is inited
+    // called before Matter server is initiated
     public native void preServerInit();
 
     // called after Matter server is initiated
