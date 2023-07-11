@@ -55,7 +55,7 @@ public:
 
     /**
      * Shut down the operational state server.
-     * This function must be called before destorying a OperationalStateServer class object.
+     * This function must be called before destroying a OperationalStateServer class object.
      * @param void
      */
     void Shutdown();
