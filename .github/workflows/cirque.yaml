@@ -59,7 +59,7 @@ jobs:
 
             - name: Bootstrap Cache
               uses: ./.github/actions/bootstrap-cache
-            - name: Bootstrap
+            - name: Bootstrap Cirque
               run: |
                   integrations/docker/images/stage-2/chip-build-cirque/run.sh \
                     -- sh -c " \
