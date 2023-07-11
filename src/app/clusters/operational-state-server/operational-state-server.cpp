@@ -250,7 +250,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
         Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
         GenericOperationalState opState;
-        VerifyOrReturnError(delegate != nullptr, CHIP_NO_ERROR, ChipLogError(NotSpecified, "Delegate is nullptr"));
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(NotSpecified, "Delegate is nullptr"));
         delegate->GetCurrentOperationalState(opState);
         return aEncoder.Encode(opState);
     }
@@ -259,7 +259,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     case OperationalState::Attributes::OperationalError::Id: {
         Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
         GenericOperationalError opErr(to_underlying(ErrorStateEnum::kNoError));
-        VerifyOrReturnError(delegate != nullptr, CHIP_NO_ERROR, ChipLogError(NotSpecified, "Delegate is nullptr"));
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(NotSpecified, "Delegate is nullptr"));
         delegate->GetCurrentOperationalError(opErr);
         return aEncoder.Encode(opErr);
     }
@@ -271,7 +271,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
         GenericOperationalPhase phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
         size_t index                  = 0;
 
-        VerifyOrReturnError(delegate != nullptr, CHIP_NO_ERROR, ChipLogError(NotSpecified, "Delegate is nullptr"));
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(NotSpecified, "Delegate is nullptr"));
         err = delegate->GetOperationalPhaseAtIndex(index, phase);
         if (err == CHIP_ERROR_NOT_FOUND || phase.IsMissing())
         {
@@ -295,7 +295,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
         DataModel::Nullable<uint8_t> currentPhase;
         Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
 
-        VerifyOrReturnError(delegate != nullptr, CHIP_NO_ERROR, ChipLogError(NotSpecified, "Delegate is nullptr"));
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(NotSpecified, "Delegate is nullptr"));
         delegate->GetCurrentPhase(currentPhase);
         err = aEncoder.Encode(currentPhase);
     }
@@ -305,7 +305,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
         DataModel::Nullable<uint32_t> countdownTime;
         Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
 
-        VerifyOrReturnError(delegate != nullptr, CHIP_NO_ERROR, ChipLogError(NotSpecified, "Delegate is nullptr"));
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(NotSpecified, "Delegate is nullptr"));
         delegate->GetCountdownTime(countdownTime);
         err = aEncoder.Encode(countdownTime);
     }
