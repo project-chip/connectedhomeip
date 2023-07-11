@@ -99,7 +99,7 @@ function __cirquetest_self_hash() {
 }
 
 function cirquetest_cachekey() {
-    echo "$("$REPO_DIR"/integrations/docker/ci-only-images/chip-cirque-device-base/cachekey.sh).openthread.$OPENTHREAD_CHECKOUT.cirque_test.$(__cirquetest_self_hash)"
+    echo "$("$REPO_DIR"/integrations/docker/images/stage-2/chip-cirque-device-base/cachekey.sh).openthread.$OPENTHREAD_CHECKOUT.cirque_test.$(__cirquetest_self_hash)"
 }
 
 function cirquetest_cachekeyhash() {
@@ -118,7 +118,7 @@ function cirquetest_bootstrap() {
 
     git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
 
-    "$REPO_DIR"/integrations/docker/ci-only-images/chip-cirque-device-base/build.sh
+    "$REPO_DIR"/integrations/docker/images/stage-2/chip-cirque-device-base/build.sh
 
     __cirquetest_build_ot_lazy
     pip3 install -r requirements_nogrpc.txt
@@ -186,12 +186,12 @@ subcommand=$1
 shift
 
 case $subcommand in
-    *)
-        cirquetest_"$subcommand" "$@"
-        exitcode=$?
-        if ((exitcode == 127)); then
-            echo "Unknown command: $subcommand" >&2
-        fi
-        exit "$exitcode"
-        ;;
+*)
+    cirquetest_"$subcommand" "$@"
+    exitcode=$?
+    if ((exitcode == 127)); then
+        echo "Unknown command: $subcommand" >&2
+    fi
+    exit "$exitcode"
+    ;;
 esac
