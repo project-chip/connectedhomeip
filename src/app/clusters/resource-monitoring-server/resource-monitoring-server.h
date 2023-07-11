@@ -83,14 +83,14 @@ private:
 
     // attribute Data Store
     chip::Percent mCondition                             = 100;
-    const DegradationDirectionEnum mDegradationDirection = DegradationDirectionEnum::kDown;
+    DegradationDirectionEnum mDegradationDirection       = DegradationDirectionEnum::kDown;
     ChangeIndicationEnum mChangeIndication               = ChangeIndicationEnum::kOk;
     bool mInPlaceIndicator                               = true;
     DataModel::Nullable<uint32_t> mLastChangedTime;
 
     uint32_t mFeatureMap;
 
-    const bool mResetConditionCommandSupported = false;
+    bool mResetConditionCommandSupported = false;
 
     /**
      * This checks if the clusters instance is a valid ResourceMonitoring cluster based on the AliasedClusters list.
