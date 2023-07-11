@@ -85,7 +85,7 @@ private:
     bool mInPlaceIndicator                               = true;
     DataModel::Nullable<uint32_t> mLastChangedTime;
 
-    uint32_t mFeature;
+    uint32_t mFeatureMap;
 
     const bool mResetConditionCommandSupported = false;
 
@@ -109,7 +109,7 @@ public:
      * @param aClusterId    The ID of the ResourceMonitoring aliased cluster to be instantiated.
      * @param aDelegate     A pointer to a delegate that will handle application layer logic.
      */
-    Instance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature,
+    Instance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeatureMap,
              ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
              bool aResetConditionCommandSupported) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
@@ -118,7 +118,7 @@ public:
     {
         mEndpointId = aEndpointId;
         mClusterId  = aClusterId;
-        mFeature    = aFeature;
+        mFeatureMap = aFeatureMap;
     }
 
     ~Instance() = default;

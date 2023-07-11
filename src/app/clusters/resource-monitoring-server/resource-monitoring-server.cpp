@@ -111,7 +111,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
 bool Instance::HasFeature(ResourceMonitoring::Feature aFeature) const
 {
-    return ((mFeature & to_underlying(aFeature)) != 0);
+    return ((mFeatureMap & to_underlying(aFeature)) != 0);
 }
 
 // Implements the read functionality for non-standard attributes.
@@ -124,7 +124,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         break;
     }
     case Attributes::FeatureMap::Id:{
-        ReturnErrorOnFailure(aEncoder.Encode(mFeature));
+        ReturnErrorOnFailure(aEncoder.Encode(mFeatureMap));
         break;
     }
     case Attributes::DegradationDirection::Id: {
