@@ -6332,7 +6332,7 @@ PICS:
     - label: "Does the device implement the EndOfServiceAlert attribute?"
       id: SMCO.S.A0007
 
-    - label: "Does the device implement the InterconnectSmokeAlar attribute?"
+    - label: "Does the device implement the InterconnectSmokeAlarm attribute?"
       id: SMCO.S.A0008
 
     - label: "Does the device implement the InterconnectCOAlarm attribute?"
@@ -6346,24 +6346,6 @@ PICS:
 
     - label: "Does the device implement the ExpiryDate attribute?"
       id: SMCO.S.A00012
-
-    - label: "Does the device implement the ClusterRevision attribute?"
-      id: SMCO.S.Afffd
-
-    - label: "Does the device implement the FeatureMap attribute?"
-      id: SMCO.S.Afffc
-
-    - label: "Does the device implement the AttributeList attribute?"
-      id: SMCO.S.Afffb
-
-    - label: "Does the device implement the EventList attribute?"
-      id: SMCO.S.Afffa
-
-    - label: "Does the device implement the AcceptedCommandList attribute?"
-      id: SMCO.S.Afff9
-
-    - label: "Does the device implement the GeneratedCommandList attribute?"
-      id: SMCO.S.Afff8
 
     #
     # server / Events

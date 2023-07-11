@@ -25,9 +25,12 @@ config:
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
         defaultValue: "hex:00112233445566778899aabbccddeeff"
-    TEST_EVENT_TRIGGER_SMOKE_ALARM:
+    TEST_EVENT_TRIGGER_WARNING_SMOKE_ALARM:
         type: int64u
         defaultValue: "0xffffffff00000090"
+    TEST_EVENT_TRIGGER_CRITICAL_SMOKE_ALARM:
+        type: int64u
+        defaultValue: "0xffffffff0000009c"
     TEST_EVENT_TRIGGER_SMOKE_ALARM_CLEAR:
         type: int64u
         defaultValue: "0xffffffff000000a0"
@@ -95,7 +98,7 @@ tests:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Smoke Alarm Test Event"
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Warning Smoke Alarm Test Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -105,7 +108,7 @@ tests:
               - name: "EnableKey"
                 value: TEST_EVENT_TRIGGER_KEY
               - name: "EventTrigger"
-                value: TEST_EVENT_TRIGGER_SMOKE_ALARM
+                value: TEST_EVENT_TRIGGER_WARNING_SMOKE_ALARM
 
     - label: "TH subscribes to SmokeState attribute from DUT"
       PICS: SMCO.S.A0001
@@ -121,10 +124,9 @@ tests:
       command: "waitForReport"
       attribute: "SmokeState"
       response:
+          value: 1
           constraints:
               type: enum8
-              minValue: 1
-              maxValue: 2
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMCO.S.A0000
@@ -143,7 +145,7 @@ tests:
       event: "SmokeAlarm"
       eventNumber: eventNumber + 1
       response:
-          value: {}
+          value: { AlarmSeverityLevel: 1 }
 
     - label: "Start manually DUT self-test"
       cluster: "LogCommands"
@@ -188,6 +190,51 @@ tests:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Critical Smoke Alarm Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_CRITICAL_SMOKE_ALARM
+
+    - label: "TH waits for a report of SmokeState attribute from DUT"
+      PICS: SMCO.S.A0001
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "SmokeState"
+      response:
+          value: 2
+          constraints:
+              type: enum8
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMCO.S.A0000
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 1
+          constraints:
+              type: enum8
+
+    - label: "TH reads SmokeAlarm event from DUT"
+      PICS: SMCO.S.E0000
+      endpoint: 1
+      command: "readEvent"
+      event: "SmokeAlarm"
+      eventNumber: eventNumber + 2
+      response:
+          value: { AlarmSeverityLevel: 2 }
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Smoke Alarm Test Event Clear"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
@@ -225,6 +272,6 @@ tests:
       endpoint: 1
       command: "readEvent"
       event: "AllClear"
-      eventNumber: eventNumber + 2
+      eventNumber: eventNumber + 3
       response:
           value: {}

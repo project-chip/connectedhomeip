@@ -71,6 +71,16 @@ tests:
               minValue: 0
               maxValue: 2
 
+    - label: "TH reads from the DUT the DeviceMuted attribute"
+      PICS: SMCO.S.A0004
+      command: "readAttribute"
+      attribute: "DeviceMuted"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 1
+
     - label: "TH reads from the DUT the TestInProgress attribute"
       PICS: SMCO.S.A0005
       command: "readAttribute"

@@ -25,9 +25,12 @@ config:
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
         defaultValue: "hex:00112233445566778899aabbccddeeff"
-    TEST_EVENT_TRIGGER_BATTERY_ALERT:
+    TEST_EVENT_TRIGGER_WARNING_BATTERY_ALERT:
         type: int64u
         defaultValue: "0xffffffff00000095"
+    TEST_EVENT_TRIGGER_CRITICAL_BATTERY_ALERT:
+        type: int64u
+        defaultValue: "0xffffffff0000009e"
     TEST_EVENT_TRIGGER_BATTERY_ALERT_CLEAR:
         type: int64u
         defaultValue: "0xffffffff000000a5"
@@ -107,7 +110,7 @@ tests:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Battery Alert Test Event"
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Warning Battery Alert Test Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -117,7 +120,7 @@ tests:
               - name: "EnableKey"
                 value: TEST_EVENT_TRIGGER_KEY
               - name: "EventTrigger"
-                value: TEST_EVENT_TRIGGER_BATTERY_ALERT
+                value: TEST_EVENT_TRIGGER_WARNING_BATTERY_ALERT
 
     - label: "TH subscribes to BatteryAlert attribute from DUT"
       PICS: SMCO.S.A0003
@@ -133,10 +136,9 @@ tests:
       command: "waitForReport"
       attribute: "BatteryAlert"
       response:
+          value: 1
           constraints:
               type: enum8
-              minValue: 1
-              maxValue: 2
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMCO.S.A0000
@@ -155,7 +157,52 @@ tests:
       event: "LowBattery"
       eventNumber: eventNumber + 1
       response:
-          value: {}
+          value: { AlarmSeverityLevel: 1 }
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Critical Battery Alert Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_CRITICAL_BATTERY_ALERT
+
+    - label: "TH waits for a report of BatteryAlert attribute from DUT"
+      PICS: SMCO.S.A0003
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "BatteryAlert"
+      response:
+          value: 2
+          constraints:
+              type: enum8
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMCO.S.A0000
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 3
+          constraints:
+              type: enum8
+
+    - label: "TH reads LowBattery event from DUT"
+      PICS: SMCO.S.E0002
+      endpoint: 1
+      command: "readEvent"
+      event: "LowBattery"
+      eventNumber: eventNumber + 2
+      response:
+          value: { AlarmSeverityLevel: 2 }
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
@@ -198,7 +245,7 @@ tests:
       endpoint: 1
       command: "readEvent"
       event: "AllClear"
-      eventNumber: eventNumber + 2
+      eventNumber: eventNumber + 3
       response:
           value: {}
 
@@ -262,7 +309,7 @@ tests:
       endpoint: 1
       command: "readEvent"
       event: "HardwareFault"
-      eventNumber: eventNumber + 3
+      eventNumber: eventNumber + 4
       response:
           value: {}
 
@@ -308,7 +355,7 @@ tests:
       endpoint: 1
       command: "readEvent"
       event: "AllClear"
-      eventNumber: eventNumber + 4
+      eventNumber: eventNumber + 5
       response:
           value: {}
 
@@ -372,7 +419,7 @@ tests:
       endpoint: 1
       command: "readEvent"
       event: "EndOfService"
-      eventNumber: eventNumber + 5
+      eventNumber: eventNumber + 6
       response:
           value: {}
 
@@ -418,7 +465,7 @@ tests:
       endpoint: 1
       command: "readEvent"
       event: "AllClear"
-      eventNumber: eventNumber + 6
+      eventNumber: eventNumber + 7
       response:
           value: {}
 
@@ -498,7 +545,7 @@ tests:
       endpoint: 1
       command: "readEvent"
       event: "SelfTestComplete"
-      eventNumber: eventNumber + 7
+      eventNumber: eventNumber + 8
       response:
           value: {}
 
@@ -517,7 +564,7 @@ tests:
       endpoint: 1
       command: "readEvent"
       event: "AllClear"
-      eventNumber: eventNumber + 8
+      eventNumber: eventNumber + 9
       response:
           value: {}
 
@@ -561,7 +608,7 @@ tests:
       endpoint: 1
       command: "readEvent"
       event: "SelfTestComplete"
-      eventNumber: eventNumber + 9
+      eventNumber: eventNumber + 10
       response:
           value: {}
 
@@ -580,6 +627,6 @@ tests:
       endpoint: 1
       command: "readEvent"
       event: "AllClear"
-      eventNumber: eventNumber + 10
+      eventNumber: eventNumber + 11
       response:
           value: {}

@@ -24,21 +24,21 @@ config:
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
         defaultValue: "hex:00112233445566778899aabbccddeeff"
-    TEST_EVENT_TRIGGER_SMOKE_ALARM:
+    TEST_EVENT_TRIGGER_WARNING_SMOKE_ALARM:
         type: int64u
         defaultValue: "0xffffffff00000090"
-    TEST_EVENT_TRIGGER_SMOKE_ALARM_CRITICAL: # TODO: Temporarily added
+    TEST_EVENT_TRIGGER_CRITICAL_SMOKE_ALARM:
         type: int64u
-        defaultValue: "0xffffffff00000190"
+        defaultValue: "0xffffffff0000009c"
     TEST_EVENT_TRIGGER_SMOKE_ALARM_CLEAR:
         type: int64u
         defaultValue: "0xffffffff000000a0"
-    TEST_EVENT_TRIGGER_CO_ALARM:
+    TEST_EVENT_TRIGGER_WARNING_CO_ALARM:
         type: int64u
         defaultValue: "0xffffffff00000091"
-    TEST_EVENT_TRIGGER_CO_ALARM_CRITICAL: # TODO: Temporarily added
+    TEST_EVENT_TRIGGER_CRITICAL_CO_ALARM:
         type: int64u
-        defaultValue: "0xffffffff00000191"
+        defaultValue: "0xffffffff0000009d"
     TEST_EVENT_TRIGGER_CO_ALARM_CLEAR:
         type: int64u
         defaultValue: "0xffffffff000000a1"
@@ -169,6 +169,7 @@ tests:
       command: "waitForReport"
       attribute: "InterconnectSmokeAlarm"
       response:
+          saveAs: InterconnectSmokeAlarmSeverityLevel
           constraints:
               type: enum8
               minValue: 1
@@ -181,7 +182,7 @@ tests:
       event: "InterconnectSmokeAlarm"
       eventNumber: eventNumber + 1
       response:
-          value: {}
+          value: { AlarmSeverityLevel: InterconnectSmokeAlarmSeverityLevel }
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMCO.S.A0008 && SMCO.S.A0000
@@ -290,6 +291,7 @@ tests:
       command: "waitForReport"
       attribute: "InterconnectCOAlarm"
       response:
+          saveAs: InterconnectCOAlarmSeverityLevel
           constraints:
               type: enum8
               minValue: 1
@@ -302,7 +304,7 @@ tests:
       event: "InterconnectCOAlarm"
       eventNumber: eventNumber + 3
       response:
-          value: {}
+          value: { AlarmSeverityLevel: InterconnectCOAlarmSeverityLevel }
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMCO.S.A0009 && SMCO.S.A0000
@@ -616,14 +618,22 @@ tests:
           constraints:
               type: enum8
 
-    # TODO: The following is temporarily inconsistent with the test plan
+    - label: "TH reads FeatureMap attribute(Smoke Alarm) from DUT"
+      PICS: SMCO.S.A0004 && SMCO.S.F00
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Smoke Alarm Test Event"
-      PICS: SMCO.S.A0004 && DGGEN.S.C00.Rsp && SMCO.S.F00
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Warning Smoke Alarm Test Event"
+      PICS: SMCO.S.A0004 && SMCO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -632,10 +642,10 @@ tests:
               - name: "EnableKey"
                 value: TEST_EVENT_TRIGGER_KEY
               - name: "EventTrigger"
-                value: TEST_EVENT_TRIGGER_SMOKE_ALARM
+                value: TEST_EVENT_TRIGGER_WARNING_SMOKE_ALARM
 
     - label: "TH subscribes to SmokeState attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.A0001 && SMCO.S.F00
+      PICS: SMCO.S.A0004 && SMCO.S.F00 && SMCO.S.A0001
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "SmokeState"
@@ -643,45 +653,10 @@ tests:
       maxInterval: 60
 
     - label: "TH waits for a report of SmokeState attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.A0001 && SMCO.S.F00
+      PICS: SMCO.S.A0004 && SMCO.S.F00 && SMCO.S.A0001
       endpoint: 1
       command: "waitForReport"
       attribute: "SmokeState"
-      response:
-          value: 1
-          constraints:
-              type: enum8
-
-    - label:
-          "TH sends TestEventTrigger command to General Diagnostics Cluster on
-          Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for CO Alarm Test Event"
-      PICS: SMCO.S.A0004 && DGGEN.S.C00.Rsp && !SMCO.S.F00 && SMCO.S.F01
-      cluster: "General Diagnostics"
-      endpoint: 0
-      command: "TestEventTrigger"
-      arguments:
-          values:
-              - name: "EnableKey"
-                value: TEST_EVENT_TRIGGER_KEY
-              - name: "EventTrigger"
-                value: TEST_EVENT_TRIGGER_CO_ALARM
-
-    - label: "TH subscribes to COState attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.A0002 && !SMCO.S.F00 && SMCO.S.F01
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "COState"
-      minInterval: 3
-      maxInterval: 60
-      keepSubscriptions: true
-
-    - label: "TH waits for a report of COState attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.A0002 && !SMCO.S.F00 && SMCO.S.F01
-      endpoint: 1
-      command: "waitForReport"
-      attribute: "COState"
       response:
           value: 1
           constraints:
@@ -692,7 +667,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
-      PICS: SMCO.S.A0004 && DGGEN.S.C00.Rsp
+      PICS: SMCO.S.A0004 && SMCO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -704,7 +679,7 @@ tests:
                 value: TEST_EVENT_TRIGGER_DEVICE_MUTED
 
     - label: "TH subscribes to DeviceMuted attribute from DUT"
-      PICS: SMCO.S.A0004
+      PICS: SMCO.S.A0004 && SMCO.S.F00
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "DeviceMuted"
@@ -713,7 +688,7 @@ tests:
       keepSubscriptions: true
 
     - label: "TH waits for a report of DeviceMuted attribute from DUT"
-      PICS: SMCO.S.A0004
+      PICS: SMCO.S.A0004 && SMCO.S.F00
       endpoint: 1
       command: "waitForReport"
       attribute: "DeviceMuted"
@@ -723,7 +698,7 @@ tests:
               type: enum8
 
     - label: "TH reads AlarmMuted event from DUT"
-      PICS: SMCO.S.E0006
+      PICS: SMCO.S.A0004 && SMCO.S.F00 && SMCO.S.E0006
       endpoint: 1
       command: "readEvent"
       event: "AlarmMuted"
@@ -735,8 +710,8 @@ tests:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Smoke Alarm Critical Test Event"
-      PICS: SMCO.S.A0004 && DGGEN.S.C00.Rsp && SMCO.S.F00
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event Clear"
+      PICS: SMCO.S.A0004 && SMCO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -745,10 +720,45 @@ tests:
               - name: "EnableKey"
                 value: TEST_EVENT_TRIGGER_KEY
               - name: "EventTrigger"
-                value: TEST_EVENT_TRIGGER_SMOKE_ALARM_CRITICAL
+                value: TEST_EVENT_TRIGGER_DEVICE_MUTED_CLEAR
+
+    - label: "TH waits for a report of DeviceMuted attribute from DUT"
+      PICS: SMCO.S.A0004 && SMCO.S.F00
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "DeviceMuted"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH reads MuteEnded event from DUT"
+      PICS: SMCO.S.A0004 && SMCO.S.F00 && SMCO.S.E0007
+      endpoint: 1
+      command: "readEvent"
+      event: "MuteEnded"
+      eventNumber: eventNumber + 6
+      response:
+          value: {}
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Critical Smoke Alarm Test Event"
+      PICS: SMCO.S.A0004 && SMCO.S.F00 && DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_CRITICAL_SMOKE_ALARM
 
     - label: "TH waits for a report of SmokeState attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.A0001 && SMCO.S.F00
+      PICS: SMCO.S.A0004 && SMCO.S.F00 && SMCO.S.A0001
       endpoint: 1
       command: "waitForReport"
       attribute: "SmokeState"
@@ -761,8 +771,8 @@ tests:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for CO Alarm Critical Test Event"
-      PICS: SMCO.S.A0004 && DGGEN.S.C00.Rsp && !SMCO.S.F00 && SMCO.S.F01
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
+      PICS: SMCO.S.A0004 && SMCO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -771,20 +781,10 @@ tests:
               - name: "EnableKey"
                 value: TEST_EVENT_TRIGGER_KEY
               - name: "EventTrigger"
-                value: TEST_EVENT_TRIGGER_CO_ALARM_CRITICAL
-
-    - label: "TH waits for a report of COState attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.A0002 && !SMCO.S.F00 && SMCO.S.F01
-      endpoint: 1
-      command: "waitForReport"
-      attribute: "COState"
-      response:
-          value: 2
-          constraints:
-              type: enum8
+                value: TEST_EVENT_TRIGGER_DEVICE_MUTED
 
     - label: "TH waits for a report of DeviceMuted attribute from DUT"
-      PICS: SMCO.S.A0004
+      PICS: SMCO.S.A0004 && SMCO.S.F00
       endpoint: 1
       command: "waitForReport"
       attribute: "DeviceMuted"
@@ -793,37 +793,12 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH reads MuteEnded event from DUT"
-      PICS: SMCO.S.E0007
-      endpoint: 1
-      command: "readEvent"
-      event: "MuteEnded"
-      eventNumber: eventNumber + 6
-      response:
-          value: {}
-
-    - label:
-          "TH sends TestEventTrigger command to General Diagnostics Cluster on
-          Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event Clear"
-      PICS: SMCO.S.A0004 && DGGEN.S.C00.Rsp
-      cluster: "General Diagnostics"
-      endpoint: 0
-      command: "TestEventTrigger"
-      arguments:
-          values:
-              - name: "EnableKey"
-                value: TEST_EVENT_TRIGGER_KEY
-              - name: "EventTrigger"
-                value: TEST_EVENT_TRIGGER_DEVICE_MUTED_CLEAR
-
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Smoke Alarm Test Event Clear"
-      PICS: SMCO.S.A0004 && DGGEN.S.C00.Rsp && SMCO.S.F00
+      PICS: SMCO.S.A0004 && SMCO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -844,12 +819,189 @@ tests:
           constraints:
               type: enum8
 
+    - label: "TH reads DeviceMuted attribute from DUT"
+      PICS: SMCO.S.A0004
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "DeviceMuted"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH reads FeatureMap attribute(CO Alarm) from DUT"
+      PICS: SMCO.S.A0004 && SMCO.S.F01
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for CO Alarm Test Event"
+      PICS: SMCO.S.A0004 && SMCO.S.F01 && DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_WARNING_CO_ALARM
+
+    - label: "TH subscribes to COState attribute from DUT"
+      PICS: SMCO.S.A0004 && SMCO.S.F01 && SMCO.S.A0002
+      endpoint: 1
+      command: "subscribeAttribute"
+      attribute: "COState"
+      minInterval: 3
+      maxInterval: 60
+      keepSubscriptions: true
+
+    - label: "TH waits for a report of COState attribute from DUT"
+      PICS: SMCO.S.A0004 && SMCO.S.F01 && SMCO.S.A0002
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "COState"
+      response:
+          value: 1
+          constraints:
+              type: enum8
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
+      PICS: SMCO.S.A0004 && SMCO.S.F01 && DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_DEVICE_MUTED
+
+    - label: "TH waits for a report of DeviceMuted attribute from DUT"
+      PICS: SMCO.S.A0004 && SMCO.S.F01
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "DeviceMuted"
+      response:
+          value: 1
+          constraints:
+              type: enum8
+
+    - label: "TH reads AlarmMuted event from DUT"
+      PICS: SMCO.S.A0004 && SMCO.S.F01 && SMCO.S.E0006
+      endpoint: 1
+      command: "readEvent"
+      event: "AlarmMuted"
+      eventNumber: eventNumber + 7
+      response:
+          value: {}
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event Clear"
+      PICS: SMCO.S.A0004 && SMCO.S.F01 && DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_DEVICE_MUTED_CLEAR
+
+    - label: "TH waits for a report of DeviceMuted attribute from DUT"
+      PICS: SMCO.S.A0004 && SMCO.S.F01
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "DeviceMuted"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH reads MuteEnded event from DUT"
+      PICS: SMCO.S.A0004 && SMCO.S.F01 && SMCO.S.E0007
+      endpoint: 1
+      command: "readEvent"
+      event: "MuteEnded"
+      eventNumber: eventNumber + 8
+      response:
+          value: {}
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Critical CO Alarm Test Event"
+      PICS: SMCO.S.A0004 && SMCO.S.F01 && DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_CRITICAL_CO_ALARM
+
+    - label: "TH waits for a report of COState attribute from DUT"
+      PICS: SMCO.S.A0004 && SMCO.S.F01 && SMCO.S.A0002
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "COState"
+      response:
+          value: 2
+          constraints:
+              type: enum8
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
+      PICS: SMCO.S.A0004 && SMCO.S.F01 && DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_DEVICE_MUTED
+
+    - label: "TH waits for a report of DeviceMuted attribute from DUT"
+      PICS: SMCO.S.A0004 && SMCO.S.F01
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "DeviceMuted"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for CO Alarm Test Event Clear"
-      PICS: SMCO.S.A0004 && DGGEN.S.C00.Rsp && !SMCO.S.F00 && SMCO.S.F01
+      PICS: SMCO.S.A0004 && SMCO.S.F01 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -861,7 +1013,7 @@ tests:
                 value: TEST_EVENT_TRIGGER_CO_ALARM_CLEAR
 
     - label: "TH waits for a report of COState attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.A0002 && !SMCO.S.F00 && SMCO.S.F01
+      PICS: SMCO.S.A0004 && SMCO.S.F01 && SMCO.S.A0002
       endpoint: 1
       command: "waitForReport"
       attribute: "COState"

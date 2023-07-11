@@ -32,7 +32,6 @@ tests:
                 value: nodeId
 
     - label: "TH reads the ClusterRevision attribute from the DUT"
-      PICS: SMCO.S.Afffd
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -40,8 +39,8 @@ tests:
           constraints:
               type: int16u
 
-    - label: "TH reads from the DUT the FeatureMap attribute"
-      PICS: SMCO.S.Afffc && SMCO.S.F00
+    - label: "TH reads from the DUT the FeatureMap attribute(Smoke Alarm)"
+      PICS: SMCO.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -49,8 +48,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "TH reads from the DUT the FeatureMap attribute"
-      PICS: SMCO.S.Afffc && SMCO.S.F01
+    - label: "TH reads from the DUT the FeatureMap attribute(CO Alarm)"
+      PICS: SMCO.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -59,7 +58,6 @@ tests:
               hasMasksSet: [0x2]
 
     - label: "TH reads from the DUT the AttributeList attribute"
-      PICS: SMCO.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -67,8 +65,8 @@ tests:
               type: list
               contains: [0, 3, 5, 6, 7]
 
-    - label: "TH reads from the DUT the optional AttributeList attribute"
-      PICS: SMCO.S.Afffb && SMCO.S.A0001
+    - label: "TH reads from the DUT the AttributeList attribute(SmokeState)"
+      PICS: SMCO.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -76,8 +74,8 @@ tests:
               type: list
               contains: [1]
 
-    - label: "TH reads from the DUT the optional AttributeList attribute"
-      PICS: SMCO.S.Afffb && SMCO.S.A0002
+    - label: "TH reads from the DUT the AttributeList attribute(COState)"
+      PICS: SMCO.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -85,8 +83,8 @@ tests:
               type: list
               contains: [2]
 
-    - label: "TH reads from the DUT the optional AttributeList attribute"
-      PICS: SMCO.S.Afffb && SMCO.S.A0004
+    - label: "TH reads from the DUT the AttributeList attribute(DeviceMuted)"
+      PICS: SMCO.S.A0004
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -94,8 +92,10 @@ tests:
               type: list
               contains: [4]
 
-    - label: "TH reads from the DUT the optional AttributeList attribute"
-      PICS: SMCO.S.Afffb && SMCO.S.A0008
+    - label:
+          "TH reads from the DUT the AttributeList
+          attribute(InterconnectSmokeAlarm)"
+      PICS: SMCO.S.A0008
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -103,8 +103,10 @@ tests:
               type: list
               contains: [8]
 
-    - label: "TH reads from the DUT the optional AttributeList attribute"
-      PICS: SMCO.S.Afffb && SMCO.S.A0009
+    - label:
+          "TH reads from the DUT the AttributeList
+          attribute(InterconnectCOAlarm)"
+      PICS: SMCO.S.A0009
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -112,8 +114,9 @@ tests:
               type: list
               contains: [9]
 
-    - label: "TH reads from the DUT the optional AttributeList attribute"
-      PICS: SMCO.S.Afffb && SMCO.S.A00010
+    - label:
+          "TH reads from the DUT the AttributeList attribute(ContaminationState)"
+      PICS: SMCO.S.A00010
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -121,8 +124,9 @@ tests:
               type: list
               contains: [10]
 
-    - label: "TH reads from the DUT the optional AttributeList attribute"
-      PICS: SMCO.S.Afffb && SMCO.S.A00011
+    - label:
+          "TH reads from the DUT the AttributeList attribute(SensitivityLevel)"
+      PICS: SMCO.S.A00011
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -130,8 +134,8 @@ tests:
               type: list
               contains: [11]
 
-    - label: "TH reads from the DUT the optional AttributeList attribute"
-      PICS: SMCO.S.Afffb && SMCO.S.A00012
+    - label: "TH reads from the DUT the AttributeList attribute(ExpiryDate)"
+      PICS: SMCO.S.A00012
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -140,7 +144,6 @@ tests:
               contains: [12]
 
     - label: "TH reads from the DUT the EventList attribute"
-      PICS: SMCO.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -148,8 +151,8 @@ tests:
               type: list
               contains: [2, 3, 4, 5, 10]
 
-    - label: "TH reads from the DUT the optional EventList attribute"
-      PICS: SMCO.S.Afffa && SMCO.S.E0000
+    - label: "TH reads from the DUT the EventList attribute(SmokeAlarm)"
+      PICS: SMCO.S.E0000
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -157,8 +160,8 @@ tests:
               type: list
               contains: [0]
 
-    - label: "TH reads from the DUT the optional EventList attribute"
-      PICS: SMCO.S.Afffa && SMCO.S.E0001
+    - label: "TH reads from the DUT the EventList attribute(COAlarm)"
+      PICS: SMCO.S.E0001
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -166,8 +169,8 @@ tests:
               type: list
               contains: [1]
 
-    - label: "TH reads from the DUT the optional EventList attribute"
-      PICS: SMCO.S.Afffa && SMCO.S.E0006
+    - label: "TH reads from the DUT the EventList attribute(AlarmMuted)"
+      PICS: SMCO.S.E0006
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -175,8 +178,8 @@ tests:
               type: list
               contains: [6]
 
-    - label: "TH reads from the DUT the optional EventList attribute"
-      PICS: SMCO.S.Afffa && SMCO.S.E0007
+    - label: "TH reads from the DUT the EventList attribute(MuteEnded)"
+      PICS: SMCO.S.E0007
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -184,8 +187,9 @@ tests:
               type: list
               contains: [7]
 
-    - label: "TH reads from the DUT the optional EventList attribute"
-      PICS: SMCO.S.Afffa && SMCO.S.E0008
+    - label:
+          "TH reads from the DUT the EventList attribute(InterconnectSmokeAlarm)"
+      PICS: SMCO.S.E0008
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -193,8 +197,9 @@ tests:
               type: list
               contains: [8]
 
-    - label: "TH reads from the DUT the optional EventList attribute"
-      PICS: SMCO.S.Afffa && SMCO.S.E0009
+    - label:
+          "TH reads from the DUT the EventList attribute(InterconnectCOAlarm)"
+      PICS: SMCO.S.E0009
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -203,16 +208,16 @@ tests:
               contains: [9]
 
     - label: "TH reads from the DUT the AcceptedCommandList attribute"
-      PICS: SMCO.S.Afff9
+      PICS: "!SMCO.S.C00.Rsp"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
+          value: []
           constraints:
               type: list
-              contains: []
 
-    - label: "TH reads from the DUT the optional AcceptedCommandList attribute"
-      PICS: SMCO.S.Afff9 && SMCO.S.C00.Rsp
+    - label: "TH reads from the DUT the AcceptedCommandList attribute"
+      PICS: SMCO.S.C00.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -221,7 +226,6 @@ tests:
               contains: [0]
 
     - label: "TH reads from the DUT the GeneratedCommandList attribute"
-      PICS: SMCO.S.Afff8
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

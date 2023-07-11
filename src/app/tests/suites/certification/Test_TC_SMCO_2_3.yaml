@@ -24,9 +24,12 @@ config:
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
         defaultValue: "hex:00112233445566778899aabbccddeeff"
-    TEST_EVENT_TRIGGER_CO_ALARM:
+    TEST_EVENT_TRIGGER_WARNING_CO_ALARM:
         type: int64u
         defaultValue: "0xffffffff00000091"
+    TEST_EVENT_TRIGGER_CRITICAL_CO_ALARM:
+        type: int64u
+        defaultValue: "0xffffffff0000009d"
     TEST_EVENT_TRIGGER_CO_ALARM_CLEAR:
         type: int64u
         defaultValue: "0xffffffff000000a1"
@@ -94,7 +97,7 @@ tests:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for CO Alarm Test Event"
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Warning CO Alarm Test Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -104,7 +107,7 @@ tests:
               - name: "EnableKey"
                 value: TEST_EVENT_TRIGGER_KEY
               - name: "EventTrigger"
-                value: TEST_EVENT_TRIGGER_CO_ALARM
+                value: TEST_EVENT_TRIGGER_WARNING_CO_ALARM
 
     - label: "TH subscribes to COState attribute from DUT"
       PICS: SMCO.S.A0002
@@ -120,10 +123,9 @@ tests:
       command: "waitForReport"
       attribute: "COState"
       response:
+          value: 1
           constraints:
               type: enum8
-              minValue: 1
-              maxValue: 2
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMCO.S.A0000
@@ -142,7 +144,7 @@ tests:
       event: "COAlarm"
       eventNumber: eventNumber + 1
       response:
-          value: {}
+          value: { AlarmSeverityLevel: 1 }
 
     - label: "Start manually DUT self-test"
       cluster: "LogCommands"
@@ -187,6 +189,51 @@ tests:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Critical CO Alarm Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_CRITICAL_CO_ALARM
+
+    - label: "TH waits for a report of COState attribute from DUT"
+      PICS: SMCO.S.A0002
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "COState"
+      response:
+          value: 2
+          constraints:
+              type: enum8
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMCO.S.A0000
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 2
+          constraints:
+              type: enum8
+
+    - label: "TH reads COAlarm event from DUT"
+      PICS: SMCO.S.E0001
+      endpoint: 1
+      command: "readEvent"
+      event: "COAlarm"
+      eventNumber: eventNumber + 2
+      response:
+          value: { AlarmSeverityLevel: 2 }
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for CO Alarm Test Event Clear"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
@@ -224,6 +271,6 @@ tests:
       endpoint: 1
       command: "readEvent"
       event: "AllClear"
-      eventNumber: eventNumber + 2
+      eventNumber: eventNumber + 3
       response:
           value: {}
