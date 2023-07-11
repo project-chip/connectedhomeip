@@ -543,7 +543,7 @@ def BuildQorvoTarget():
         TargetPart('qpg6105', board=QpgBoard.QPG6105),
     ])
 
-   # apps
+    # apps
     target.AppendFixedTargets([
         TargetPart('lock', app=QpgApp.LOCK),
         TargetPart('light', app=QpgApp.LIGHT),
