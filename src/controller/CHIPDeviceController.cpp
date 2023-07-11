@@ -2151,6 +2151,12 @@ void DeviceCommissioner::ParseFabrics()
             return CHIP_NO_ERROR;
         }
     });
+
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnFabricCheck(info);
+    }
+
     CommissioningDelegate::CommissioningReport report;
     report.Set<MatchingFabricInfo>(info);
     CommissioningStageComplete(return_err, report);
