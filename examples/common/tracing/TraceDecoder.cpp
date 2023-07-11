@@ -30,6 +30,10 @@
 constexpr uint16_t kMaxLineLen    = 4096;
 constexpr const char * jsonPrefix = "    json\t";
 
+namespace chip {
+namespace trace {
+namespace {
+
 // Json keys
 constexpr const char * kProtocolIdKey         = "protocol_id";
 constexpr const char * kProtocolCodeKey       = "protocol_opcode";
@@ -47,30 +51,18 @@ constexpr const char * kNeedsAckKey           = "is_ack_requested";
 constexpr const char * kAckMsgKey             = "acknowledged_msg_counter";
 constexpr const char * kPayloadDataKey        = "payload_hex";
 constexpr const char * kPayloadSizeKey        = "payload_size";
-
-namespace chip {
-namespace trace {
-namespace {
-
 constexpr const char * kDirectionKey = "direction";
+constexpr const char * kPeerAddress = "peer_address";
 
 bool IsOutbound(const Json::Value & json)
 {
-    if (!json.isMember(kDirectionKey))
-    {
-        return false; // unknown
-    }
-
+    VerifyOrReturnValue(json.isMember(kDirectionKey), false);
     return strcmp(json[kDirectionKey].asCString(), "outbound") == 0;
 }
 
 bool IsInbound(const Json::Value & json)
 {
-    if (!json.isMember(kDirectionKey))
-    {
-        return false; // unknown
-    }
-
+    VerifyOrReturnValue(json.isMember(kDirectionKey), false);
     return strcmp(json[kDirectionKey].asCString(), "inbound") == 0;
 }
 
@@ -182,9 +174,9 @@ CHIP_ERROR TraceDecoder::LogAndConsumeProtocol(Json::Value & json)
 
     builder.Add(IsInbound(json) ? "<< from " : ">> to ");
 
-    if (json.isMember("peer_address"))
+    if (json.isMember(kPeerAddress))
     {
-        builder.Add(json["peer_address"].asCString());
+        builder.Add(json[kPeerAddress].asCString());
     }
     else
     {
