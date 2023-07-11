@@ -3909,8 +3909,8 @@
                   - OffLowHigh
                   - OffLowMedHighAuto
                   - OffLowHighAuto
-                  - OffHighAuto
-                  - OffHigh
+                  - OffOnAuto
+                  - OffOn
               FanModeType:
                   - Off
                   - Low
@@ -7218,8 +7218,8 @@
                   - OffLowHigh
                   - OffLowMedHighAuto
                   - OffLowHighAuto
-                  - OffHighAuto
-                  - OffHigh
+                  - OffOnAuto
+                  - OffOn
           NetworkCommissioning:
               # WiFiBandEnum was originally just named WiFiBand, but we generate
               # the same API for both of those names, so the name can just
