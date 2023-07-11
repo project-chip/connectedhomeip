@@ -61,11 +61,13 @@
 #define CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, peerAddress, data, dataLen)                                           \
     do                                                                                                                             \
     {                                                                                                                              \
+        (void) peerAddress;                                                                                                        \
     } while (0)
 
 #define CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, session, peerAddress, data, dataLen)                              \
     do                                                                                                                             \
     {                                                                                                                              \
+        (void) peerAddress;                                                                                                        \
     } while (0)
 
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED || CHIP_CONFIG_TRANSPORT_PW_TRACE_ENABLED
