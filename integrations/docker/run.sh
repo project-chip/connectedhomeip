@@ -82,26 +82,26 @@ runargs=()
 # extract run options
 for arg in "$@"; do
     case "$arg" in
-    --help)
-        help
-        exit
-        ;;
+        --help)
+            help
+            exit
+            ;;
 
-    --)
-        shift
-        break
-        ;;
+        --)
+            shift
+            break
+            ;;
 
-    -*)
-        runargs+=("$arg")
-        shift
-        ;;
+        -*)
+            runargs+=("$arg")
+            shift
+            ;;
 
-    *)
-        ((!${#runargs[*]})) && break
-        runargs+=("$arg")
-        shift
-        ;;
+        *)
+            ((!${#runargs[*]})) && break
+            runargs+=("$arg")
+            shift
+            ;;
 
     esac
 done
