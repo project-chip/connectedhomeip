@@ -121,6 +121,7 @@ static void DetectAndLogMismatchedDoubleQuotes(int argc, char ** argv)
 
 void Commands::Register(const char * commandSetName, commands_list commandsList, const char * helpText, bool isCluster)
 {
+    VerifyOrDieWithMsg(isCluster || helpText != nullptr, chipTool, "Non-cluster command sets must have help text");
     mCommandSets[commandSetName].isCluster = isCluster;
     mCommandSets[commandSetName].helpText  = helpText;
     for (auto & command : commandsList)
@@ -366,6 +367,7 @@ void Commands::ShowCommandSets(std::string executable)
     fprintf(stderr, "or:\n");
     fprintf(stderr, "  %s command_set_name command_name [param1 param2 ...]\n", executable.c_str());
     fprintf(stderr, "\n");
+    // Table of clusters
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | Clusters:                                                                           |\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
@@ -378,6 +380,8 @@ void Commands::ShowCommandSets(std::string executable)
     }
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "\n");
+
+    // Table of command sets
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | Command sets:                                                                       |\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
