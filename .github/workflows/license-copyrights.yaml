@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2022 Free Software Foundation Europe e.V. <https://fsfe.org>
+#
+# SPDX-License-Identifier: CC0-1.0
+
+name: License Compliance (REUSE spec)
+on:
+    push:
+    pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: REUSE Compliance Check
+      continue-on-error: true
+      uses: fsfe/reuse-action@v1
+      with:
+        args: lint
