@@ -116,7 +116,11 @@ jobs:
                      --privileged \
                      --volume /tmp:/tmp \
                      --volume /dev/pts:/dev/pts \
-                     -- scripts/tests/cirque_tests.sh run_all_tests
+                     -- sh -c " \
+                       git config --global --add safe.directory '*' \
+                       && scripts/tests/cirque_tests.sh run_all_tests \
+                      "
+                   
 
             - name: Uploading Binaries
               uses: actions/upload-artifact@v3
