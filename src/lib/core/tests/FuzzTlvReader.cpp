@@ -9,81 +9,11 @@ using namespace chip::TLV;
 
 using chip::TLV::TLVReader;
 
-static CHIP_ERROR FuzzIterator(TLVReader & aReader, size_t aDepth, void * aContext)
+static CHIP_ERROR FuzzIterator(const TLVReader & aReader, size_t aDepth, void * aContext)
 {
-    {
-        aReader.GetLength();
-    }
-    {
-        aReader.GetTag();
-    }
-    {
-        aReader.GetType();
-    }
-    {
-        size_t size;
-        aReader.CountRemainingInContainer(&size);
-    }
-    {
-        bool v;
-        aReader.Get(v);
-    }
-    {
-        int8_t v;
-        aReader.Get(v);
-    }
-    {
-        int16_t v;
-        aReader.Get(v);
-    }
-    {
-        int32_t v;
-        aReader.Get(v);
-    }
-    {
-        int64_t v;
-        aReader.Get(v);
-    }
-    {
-        uint8_t v;
-        aReader.Get(v);
-    }
-    {
-        uint16_t v;
-        aReader.Get(v);
-    }
-    {
-        uint32_t v;
-        aReader.Get(v);
-    }
-    {
-        uint64_t v;
-        aReader.Get(v);
-    }
-    {
-        double v;
-        aReader.Get(v);
-    }
-    {
-        float v;
-        aReader.Get(v);
-    }
-    {
-        chip::ByteSpan readerSpan;
-        aReader.Get(readerSpan);
-    }
-    {
-        chip::CharSpan readerSpan;
-        aReader.Get(readerSpan);
-    }
-    {
-        uint8_t bBuf[16];
-        aReader.GetBytes(bBuf, sizeof(bBuf));
-    }
-    {
-        char sBuf[16];
-        aReader.GetString(sBuf, sizeof(sBuf));
-    }
+    aReader.GetLength();
+    aReader.GetTag();
+    aReader.GetType();
 
     return CHIP_NO_ERROR;
 }

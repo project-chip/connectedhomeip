@@ -46,9 +46,6 @@ namespace TLV {
 namespace Utilities {
 
 typedef CHIP_ERROR (*IterateHandler)(const TLVReader & aReader, size_t aDepth, void * aContext);
-typedef CHIP_ERROR (*IterateHandlerMutable)(TLVReader & aReader, size_t aDepth, void * aContext);
-
-extern CHIP_ERROR Iterate(TLVReader & aReader, IterateHandlerMutable aHandler, void * aContext);
 
 extern CHIP_ERROR Iterate(const TLVReader & aReader, IterateHandler aHandler, void * aContext);
 extern CHIP_ERROR Iterate(const TLVReader & aReader, IterateHandler aHandler, void * aContext, bool aRecurse);
@@ -61,7 +58,6 @@ extern CHIP_ERROR Find(const TLVReader & aReader, const Tag & aTag, TLVReader & 
 
 extern CHIP_ERROR Find(const TLVReader & aReader, IterateHandler aHandler, void * aContext, TLVReader & aResult);
 extern CHIP_ERROR Find(const TLVReader & aReader, IterateHandler aHandler, void * aContext, TLVReader & aResult, bool aRecurse);
-
 } // namespace Utilities
 
 } // namespace TLV

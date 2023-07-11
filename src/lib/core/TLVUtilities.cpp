@@ -107,35 +107,6 @@ static CHIP_ERROR Iterate(TLVReader & aReader, size_t aDepth, IterateHandler aHa
 }
 
 /**
- *  (Mutably) Iterate through the TLV data referenced by @a aReader and invoke mutable @a aHandler
- *  for each visited TLV element in the context of @a aContext.
- *  The iteration is aborted if @a aHandler returns anything other than #CHIP_NO_ERROR
- *
- *  @param[in]     aReader      A reference to the TLV reader containing the TLV
- *                              data to iterate.
- *  @param[in]     aHandler     A mutable callback to invoke for the current TLV element
- *                              being visited.
- *  @param[in,out] aContext     An optional pointer to caller-provided context data.
- *
- *  @retval  #CHIP_END_OF_TLV  On a successful iteration to the end of a TLV encoding,
- *                              or to the end of a TLV container.
- *
- *  @retval  #CHIP_ERROR_INVALID_ARGUMENT  If @a aHandler is NULL.
- *
- *  @retval  The last value returned by @a aHandler, if different than #CHIP_NO_ERROR
- *
- */
-CHIP_ERROR Iterate(TLVReader & aReader, IterateHandlerMutable aHandler, void * aContext)
-{
-    const bool recurse = true;
-    CHIP_ERROR retval;
-
-    retval = Iterate(aReader, (IterateHandler) aHandler, aContext, recurse);
-
-    return retval;
-}
-
-/**
  *  Iterate through the TLV data referenced by @a aReader and invoke @a aHandler
  *  for each visited TLV element in the context of @a aContext.
  *  The iteration is aborted if @a aHandler returns anything other than #CHIP_NO_ERROR
