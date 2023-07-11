@@ -30,7 +30,7 @@ jobs:
 
         runs-on: ubuntu-20.04
         container:
-            image: connectedhomeip/chip-build:0.7.25
+            image: ghcr.io/project-chip/chip-build:0.8
         defaults:
             run:
                 shell: sh

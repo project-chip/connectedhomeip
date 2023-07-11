@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.7.25
+            image: ghcr.io/project-chip/chip-build:0.8
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
