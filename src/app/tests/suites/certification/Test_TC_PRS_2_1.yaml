@@ -39,8 +39,8 @@ tests:
           saveAs: MinMeasuredValue
           constraints:
               type: int16s
-              minValue: -32768
-              maxValue: 32767
+              minValue: -32767
+              maxValue: 32766
 
     - label: "Read the mandatory attribute constraints: MaxMeasuredValue"
       PICS: PRS.S.A0002
@@ -50,7 +50,7 @@ tests:
           saveAs: MaxMeasuredValue
           constraints:
               type: int16s
-              minValue: -32768
+              minValue: MinMeasuredValue
               maxValue: 32767
 
     - label: "Read the mandatory attribute constraints: MeasuredValue"
@@ -81,8 +81,8 @@ tests:
           saveAs: MinScaledValue
           constraints:
               type: int16s
-              minValue: -32768
-              maxValue: 32767
+              minValue: -32767
+              maxValue: 32766
 
     - label: "Read the optional attribute: MaxScaledValue"
       PICS: PRS.S.A0012
@@ -92,7 +92,7 @@ tests:
           saveAs: MaxScaledValue
           constraints:
               type: int16s
-              minValue: -32768
+              minValue: MinScaledValue
               maxValue: 32767
 
     - label: "Read the optional attribute: ScaledValue"

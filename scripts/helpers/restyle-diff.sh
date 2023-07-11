@@ -48,5 +48,5 @@ if [[ -z "$ref" ]]; then
     git remote | grep -qxF upstream && ref="upstream/master"
 fi
 
-declare -a paths="($(git diff --ignore-submodules --name-only --merge-base "$ref"))"
+declare -a paths=("$(git diff --ignore-submodules --name-only --merge-base "$ref")")
 restyle-paths "${paths[@]}"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# Copyright (c) 2021-2022 Project CHIP Authors
+# Copyright (c) 2021-2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -340,6 +340,59 @@ cert_lifetime=4294967295
     "$chip_cert_tool" gen-att-cert --type i --subject-cn "Matter Test PAI" --subject-vid "$vid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --ca-key "$paa_key_file".pem --ca-cert "$paa_cert_file".pem --key "$pai_key_file".pem --out "$pai_cert_file".pem
 }
 
+# Set #8:
+#   - Generate DACs with CRL Distribution Point (CDP) Extensions (Valid and Invalid cases)
+{
+    vid=FFF1
+    pid=8000
+    dac=0000
+
+    pai_key_file="$dest_dir/Chip-Test-PAI-$vid-$pid-Key"
+    pai_cert_file="$dest_dir/Chip-Test-PAI-$vid-$pid-Cert"
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Cert"
+
+    cdp_example="URI:http://example.com/crl.pem"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac CDP (HTTP)" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cpd-ext "$cdp_example" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-HTTPS-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-HTTPS-Cert"
+
+    cdp_example="URI:https://example.com/crl.pem"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac CDP (HTTPS)" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cpd-ext "$cdp_example" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-2CDPs-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-2CDPs-Cert"
+
+    cdp_example2="URI:http://example.com/crl2.pem"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac Two CDPs" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cpd-ext "$cdp_example" --cpd-ext "$cdp_example2" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-2URIs-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-2URIs-Cert"
+
+    cdp_example2in1="URI:http://example.com/crl.pem,URI:http://example.com/crl2.pem"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac CDP (Two URIs)" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cpd-ext "$cdp_example2in1" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Long-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Long-Cert"
+
+    cdp_example="URI:https://example.com/this-is-an-example-of-crl-distribution-point-extension-which-is-101-chars/crl.pem"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Long" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cpd-ext "$cdp_example" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Wrong-Prefix-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Wrong-Prefix-Cert"
+
+    cdp_example="URI:www.example.com/crl.pem"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Long" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cpd-ext "$cdp_example" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+}
+
 # In addition to PEM format also create certificates in DER form.
 for cert_file_pem in "$dest_dir"/*Cert.pem; do
     cert_file_der="${cert_file_pem/.pem/.der}"
@@ -357,7 +410,7 @@ if [ ! -z "$output_cstyle_file" ]; then
 
     copyright_note='/*
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -380,6 +433,8 @@ if [ ! -z "$output_cstyle_file" ]; then
 '
     header_includes='
 #pragma once
+
+#include <lib/support/Span.h>
 '
 
     namespaces_open='
