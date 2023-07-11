@@ -40,6 +40,12 @@ find "$(git rev-parse --show-toplevel)"/integrations/docker/images/stage-2 -name
     popd >/dev/null
 done
 
+find "$(git rev-parse --show-toplevel)"/integrations/docker/images/stage-3 -name Dockerfile | while read -r dockerfile; do
+    pushd "$(dirname "$dockerfile")" >/dev/null
+    ./build.sh "$@"
+    popd >/dev/null
+done
+
 find "$(git rev-parse --show-toplevel)"/integrations/docker/images/final -name Dockerfile | while read -r dockerfile; do
     pushd "$(dirname "$dockerfile")" >/dev/null
     ./build.sh "$@"
