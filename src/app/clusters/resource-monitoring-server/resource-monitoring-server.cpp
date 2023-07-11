@@ -51,8 +51,7 @@ void Instance::LoadPersistentAttributes()
         }
         else
         {
-
-            ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as %u", mLastChangedTime.Value());
+            ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as %lu", (long unsigned int) mLastChangedTime.Value()); // on some platforms uint32_t is a long, cast it to unsigned long on all platforms to prevent CI errors
         }
     }
     else
