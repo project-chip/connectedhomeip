@@ -43,7 +43,7 @@ MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 DEVICE_CONFIG = {
     'device0': {
         'type': 'MobileDevice',
-        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'base_image': 'project-chip/chip-cirque-device-base',
         'capability': ['TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
@@ -52,7 +52,7 @@ DEVICE_CONFIG = {
     },
     'device1': {
         'type': 'CHIPEndDevice',
-        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'base_image': 'project-chip/chip-cirque-device-base',
         'capability': ['Thread', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
@@ -61,7 +61,7 @@ DEVICE_CONFIG = {
     },
     'device2': {
         'type': 'CHIPEndDevice',
-        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'base_image': 'project-chip/chip-cirque-device-base',
         'capability': ['Thread', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
