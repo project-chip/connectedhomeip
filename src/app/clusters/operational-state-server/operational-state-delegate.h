@@ -194,8 +194,8 @@ struct GenericOperationCompletion : public app::Clusters::OperationalState::Even
 {
     GenericOperationCompletion(
         uint8_t aCompletionErrorCode,
-        const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = Optional<DataModel::Nullable<uint32_t>>::Missing(),
-        const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = Optional<DataModel::Nullable<uint32_t>>::Missing())
+        const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = NullOptional,
+        const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional)
     {
         completionErrorCode  = aCompletionErrorCode;
         totalOperationalTime = aTotalOperationalTime;
