@@ -5821,6 +5821,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PartsList", 1, value);
         }
+        case Descriptor::Attributes::TagList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TagList", 1, value);
+        }
         case Descriptor::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));

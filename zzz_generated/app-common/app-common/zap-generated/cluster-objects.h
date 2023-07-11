@@ -3365,6 +3365,20 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PartsList
+namespace TagList {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TagList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TagList
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -3414,6 +3428,7 @@ struct TypeInfo
         Attributes::ServerList::TypeInfo::DecodableType serverList;
         Attributes::ClientList::TypeInfo::DecodableType clientList;
         Attributes::PartsList::TypeInfo::DecodableType partsList;
+        Attributes::TagList::TypeInfo::DecodableType tagList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

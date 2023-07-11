@@ -2872,6 +2872,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::PartsList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, partsList));
         break;
+    case Attributes::TagList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, tagList));
+        break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
