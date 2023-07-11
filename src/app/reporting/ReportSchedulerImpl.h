@@ -22,7 +22,6 @@
 
 namespace chip {
 namespace app {
-
 namespace reporting {
 
 class ReportSchedulerImpl : public ReportScheduler
@@ -32,10 +31,10 @@ public:
     virtual ~ReportSchedulerImpl() override { UnregisterAllHandlers(); }
 
     // ReadHandlerObserver
-    virtual void OnReadHandlerAdded(ReadHandler * aReadHandler) override;
+    virtual void OnReadHandlerCreated(ReadHandler * aReadHandler) override;
     virtual void OnBecameReportable(ReadHandler * aReadHandler) override;
-    virtual void OnReportSent(ReadHandler * aReadHandler) override;
-    virtual void OnReadHandlerRemoved(ReadHandler * aReadHandler) override;
+    virtual void OnSubscriptionAction(ReadHandler * aReadHandler) override;
+    virtual void OnReadHandlerDestroyed(ReadHandler * aReadHandler) override;
 
     // ReportScheduler specific
     virtual CHIP_ERROR RegisterReadHandler(ReadHandler * aReadHandler) override;
@@ -46,7 +45,7 @@ public:
     virtual bool IsReportScheduled(ReadHandler * aReadHandler) override;
 
 protected:
-    friend class chip::app::TestReportScheduler;
+    friend class chip::app::reporting::TestReportScheduler;
 
     /// @brief Find the ReadHandlerNode for a given ReadHandler pointer
     /// @param [in] aReadHandler

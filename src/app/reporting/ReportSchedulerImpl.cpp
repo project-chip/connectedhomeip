@@ -41,7 +41,7 @@ ReportSchedulerImpl::ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : Repor
 }
 
 /// @brief When a ReadHandler is added, register it, which will schedule an engine run
-void ReportSchedulerImpl::OnReadHandlerAdded(ReadHandler * aReadHandler)
+void ReportSchedulerImpl::OnReadHandlerCreated(ReadHandler * aReadHandler)
 {
     RegisterReadHandler(aReadHandler);
 }
@@ -68,19 +68,19 @@ void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
     ScheduleReport(newTimeout, aReadHandler);
 }
 
-void ReportSchedulerImpl::OnReportSent(ReadHandler * apReadHandler)
+void ReportSchedulerImpl::OnSubscriptionAction(ReadHandler * apReadHandler)
 {
     ReadHandlerNode * node = FindReadHandlerNode(apReadHandler);
     VerifyOrReturn(nullptr != node);
     // Schedule callback for max interval by computing the difference between the max timestamp and the current timestamp
-    node->SetIntervalsTimeStamp(apReadHandler);
+    node->SetIntervalTimeStamps(apReadHandler);
     Milliseconds32 newTimeout =
         Milliseconds32(node->GetMaxTimestamp().count() - mTimerDelegate->GetCurrentMonotonicTimestamp().count());
     ScheduleReport(newTimeout, apReadHandler);
 }
 
 /// @brief When a ReadHandler is removed, unregister it, which will cancel any scheduled report
-void ReportSchedulerImpl::OnReadHandlerRemoved(ReadHandler * aReadHandler)
+void ReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aReadHandler)
 {
     UnregisterReadHandler(aReadHandler);
 }

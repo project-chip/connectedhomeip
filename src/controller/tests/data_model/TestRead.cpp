@@ -302,7 +302,7 @@ private:
 
         if (mAlterSubscriptionIntervals)
         {
-            ReturnErrorOnFailure(aReadHandler.SetMaxReportingIntervals(mMaxInterval));
+            ReturnErrorOnFailure(aReadHandler.SetMaxReportingInterval(mMaxInterval));
         }
         return CHIP_NO_ERROR;
     }

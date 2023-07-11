@@ -70,7 +70,7 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
     {
         if (CHIP_NO_ERROR == SetObserver(observer))
         {
-            mObserver->OnReadHandlerAdded(this);
+            mObserver->OnReadHandlerCreated(this);
         }
     }
 #endif
@@ -90,7 +90,7 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer) :
     {
         if (CHIP_NO_ERROR == SetObserver(observer))
         {
-            mObserver->OnReadHandlerAdded(this);
+            mObserver->OnReadHandlerCreated(this);
         }
     }
 #endif
@@ -137,6 +137,13 @@ void ReadHandler::ResumeSubscription(CASESessionManager & caseSessionManager,
 
 ReadHandler::~ReadHandler()
 {
+    // TODO (#27672): Enable when the ReportScheduler is implemented and move in Close() after testing
+#if 0
+    if (nullptr != mObserver)
+    {
+        mObserver->OnReadHandlerDestroyed(this);
+    }
+#endif
     auto * appCallback = mManagementCallback.GetAppCallback();
     if (mFlags.Has(ReadHandlerFlags::ActiveSubscription) && appCallback)
     {
@@ -159,14 +166,6 @@ ReadHandler::~ReadHandler()
     InteractionModelEngine::GetInstance()->ReleaseAttributePathList(mpAttributePathList);
     InteractionModelEngine::GetInstance()->ReleaseEventPathList(mpEventPathList);
     InteractionModelEngine::GetInstance()->ReleaseDataVersionFilterList(mpDataVersionFilterList);
-
-// TODO (#27672): Enable when the ReportScheduler is implemented
-#if 0
-    if (nullptr != mObserver)
-    {
-        mObserver->OnReadHandlerRemoved(this);
-    }
-#endif
 }
 
 void ReadHandler::Close(CloseOptions options)
@@ -354,7 +353,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 #if 0
             if (nullptr != mObserver)
             {
-                mObserver->OnReportSent(this);
+                mObserver->OnSubscriptionAction(this);
             }
 #endif
 
@@ -685,7 +684,7 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
 #if 0
     if (nullptr != mObserver)
     {
-        mObserver->OnReportSent(this);
+        mObserver->OnSubscriptionAction(this);
     }
 #endif
     ReturnErrorOnFailure(UpdateReportTimer());

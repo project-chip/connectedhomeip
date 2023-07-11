@@ -25,11 +25,10 @@
 
 namespace chip {
 namespace app {
+namespace reporting {
 
 // Forward declaration of TestReportScheduler to allow it to be friend with ReportScheduler
 class TestReportScheduler;
-
-namespace reporting {
 
 using Timestamp = System::Clock::Timestamp;
 
@@ -59,12 +58,12 @@ public:
             VerifyOrDie(aCallback != nullptr);
 
             mReadHandler = aReadHandler;
-            SetIntervalsTimeStamp(aReadHandler);
+            SetIntervalTimeStamps(aReadHandler);
         }
         ReadHandler * GetReadHandler() const { return mReadHandler; }
         /// @brief Check if the Node is reportable now, meaning its readhandler was made reportable by attribute dirtying and
-        /// handler state, and minimal time interval last since last report has elapsed, or the maximal time interval since last report
-        /// has elapsed
+        /// handler state, and minimal time interval last since last report has elapsed, or the maximal time interval since last
+        /// report has elapsed
         bool IsReportableNow() const
         {
             // TODO: Add flags to allow for test to simulate waiting for the min interval or max intrval to elapse when integrating
@@ -140,13 +139,15 @@ public:
     size_t GetNumReadHandlers() const { return mNodesPool.Allocated(); }
 
 protected:
-    friend class chip::app::TestReportScheduler;
+    friend class chip::app::reporting::TestReportScheduler;
 
     /// @brief Find the ReadHandlerNode for a given ReadHandler pointer
     /// @param [in] aReadHandler ReadHandler pointer to look for in the ReadHandler nodes list
     /// @return Node Address if node was found, nullptr otherwise
     virtual ReadHandlerNode * FindReadHandlerNode(const ReadHandler * aReadHandler) = 0;
-
+    /// @brief Start a timer for a given ReadHandlerNode, ensures that if a timer is already running for this node, it is cancelled
+    /// @param node Node of the ReadHandler list to start a timer for
+    /// @param aTimeout Delay before the timer expires
     virtual CHIP_ERROR StartTimerForHandler(ReadHandlerNode * node, System::Clock::Timeout aTimeout) = 0;
     virtual void CancelTimerForHandler(ReadHandlerNode * node)                                       = 0;
     virtual bool CheckTimerActiveForHandler(ReadHandlerNode * node)                                  = 0;

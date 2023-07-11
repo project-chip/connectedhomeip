@@ -168,7 +168,7 @@ public:
 
         /// @brief Callback invoked to notify a ReadHandler was created and can be registered
         /// @param[in] apReadHandler  ReadHandler getting added
-        virtual void OnReadHandlerAdded(ReadHandler * apReadHandler) = 0;
+        virtual void OnReadHandlerCreated(ReadHandler * apReadHandler) = 0;
 
         /// @brief Callback invoked when a ReadHandler went from a non reportable state to a reportable state so a report can be
         /// sent immediately if the minimal interval allows it. Otherwise the report should be rescheduled to the earliest time
@@ -176,13 +176,14 @@ public:
         /// @param[in] apReadHandler  ReadHandler that became dirty
         virtual void OnBecameReportable(ReadHandler * apReadHandler) = 0;
 
-        /// @brief Callback invoked when the read handler needs to make sure to send a message to the subscriber within the next maxInterval time period.
+        /// @brief Callback invoked when the read handler needs to make sure to send a message to the subscriber within the next
+        /// maxInterval time period.
         /// @param[in] apReadHandler ReadHandler that has generated a report
-        virtual void OnReportSent(ReadHandler * apReadHandler) = 0;
+        virtual void OnSubscriptionAction(ReadHandler * apReadHandler) = 0;
 
         /// @brief Callback invoked when a ReadHandler is getting removed so it can be unregistered
         /// @param[in] apReadHandler  ReadHandler getting destroyed
-        virtual void OnReadHandlerRemoved(ReadHandler * apReadHandler) = 0;
+        virtual void OnReadHandlerDestroyed(ReadHandler * apReadHandler) = 0;
     };
 
     /*
@@ -426,7 +427,7 @@ private:
 
     friend class TestReadInteraction;
     friend class chip::app::reporting::TestReportingEngine;
-    friend class TestReportScheduler;
+    friend class chip::app::reporting::TestReportScheduler;
 
     //
     // The engine needs to be able to Abort/Close a ReadHandler instance upon completion of work for a given read/subscribe
@@ -436,8 +437,8 @@ private:
     friend class chip::app::reporting::Engine;
     friend class chip::app::InteractionModelEngine;
 
-    // The report scheduler needs to be able to access StateFlag private functions to know when to schedule a run so it is declared
-    // as a friend class.
+    // The report scheduler needs to be able to access StateFlag private functions IsReadHandlerReportable and IsChunkedReport to
+    // know when to schedule a run so it is declared as a friend class.
     friend class chip::app::reporting::ReportScheduler;
 
     enum class HandlerState : uint8_t
@@ -556,7 +557,7 @@ private:
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
     EventNumber mLastScheduledEventNumber = 0;
 
-    // TODO : We should shutdown the transaction when the session expires.
+    // TODO: We should shutdown the transaction when the session expires.
     SessionHolder mSessionHandle;
 
     Messaging::ExchangeHolder mExchangeCtx;
@@ -584,8 +585,7 @@ private:
     BitFlags<ReadHandlerFlags> mFlags;
     InteractionType mInteractionType = InteractionType::Read;
 
-    // TODO (#27675): Several objects are behaving as observers for this class, there should be a single
-    // type for this and an array or a pool to store them.
+    // TODO (#27675): Merge all observers into one and that one will dispatch the callbacks to the right place.
     Observer * mObserver = nullptr;
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
