@@ -181,8 +181,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             return CHIP_ERROR_INTERNAL;
         }
 
-        PeerAddress destination_address =
-            Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
+        PeerAddress destination_address = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
 
         // Trace before any encryption
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kGroupMessage, &payloadHeader, &packetHeader,
@@ -222,7 +221,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             .SetSessionId(session->GetPeerSessionId()) //
             .SetSessionType(Header::SessionType::kUnicastSession);
 
-         PeerAddress destination_address = session->GetPeerAddress();
+        PeerAddress destination_address = session->GetPeerAddress();
 
         // Trace before any encryption
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kSecureSession, &payloadHeader, &packetHeader,
@@ -257,7 +256,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             break;
         }
 
-        auto unauthenticated                             = sessionHandle->AsUnauthenticatedSession();
+        auto unauthenticated            = sessionHandle->AsUnauthenticatedSession();
         PeerAddress destination_address = unauthenticated->GetPeerAddress();
 
         // Trace after all headers are settled.
