@@ -31,7 +31,9 @@ class CloseSessionCommand(controller: ChipDeviceController, credsIssuer: Credent
   init {
     addArgument("destination-id", 0, Long.MAX_VALUE, destinationId, null, false)
     addArgument(
-      "timeout", 0.toShort(), Short.MAX_VALUE,
+      "timeout",
+      0.toShort(),
+      Short.MAX_VALUE,
       timeoutSecs,
       "Time, in seconds, before this command is considered to have timed out.",
       false

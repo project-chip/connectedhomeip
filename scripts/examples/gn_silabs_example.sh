@@ -83,8 +83,8 @@ if [ "$#" == "0" ]; then
             Thresholds: 30 <= kvs_max_entries <= 255
         show_qr_code
             Enables QR code on LCD for devices with an LCD
-        enable_sleepy_device
-            Enable Sleepy end device. (Default false)
+        chip_enable_icd_server
+            Configure has a Intermitently connected device. (Default false)
             Must also set chip_openthread_ftd=false
         use_rs9116
             Build wifi example with extension board rs9116. (Default false)
@@ -176,7 +176,7 @@ else
                 shift
                 ;;
             --sed)
-                optArgs+="enable_sleepy_device=true chip_openthread_ftd=false "
+                optArgs+="chip_enable_icd_server=true chip_openthread_ftd=false "
                 shift
                 ;;
             --low-power)

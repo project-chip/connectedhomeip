@@ -16,7 +16,7 @@
  *
  */
 
-package com.matter.controller.commands.common;
+package com.matter.controller.commands.common
 
 /**
  * Implements a Result where an error string is associated with its failure state.
@@ -25,32 +25,26 @@ package com.matter.controller.commands.common;
  * contain either a `true` value for `Success` or a `false` value in which case the failure will
  * also have an error string explaining the reason of the failure associated with it.
  */
-public class RealResult {
-  private boolean result;
-  private String error;
+class RealResult(private val result: Boolean, private val error: String?) {
+  constructor() : this(true, null)
 
-  public RealResult() {
-    this.result = true;
+  constructor(error: String?) : this(false, error)
+
+  companion object {
+    fun success(): RealResult {
+      return RealResult()
+    }
+
+    fun error(error: String?): RealResult {
+      return RealResult(error)
+    }
   }
 
-  public RealResult(String error) {
-    this.result = false;
-    this.error = error;
+  fun getResult(): Boolean {
+    return result
   }
 
-  public static RealResult Success() {
-    return new RealResult();
-  }
-
-  public static RealResult Error(String error) {
-    return new RealResult(error);
-  }
-
-  public boolean getResult() {
-    return result;
-  }
-
-  public String getError() {
-    return error;
+  fun getError(): String? {
+    return error
   }
 }
