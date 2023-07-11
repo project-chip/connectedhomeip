@@ -114,6 +114,11 @@ public:
         return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->IsTimerActive(
             TimerCallbackInterface, context);
     }
+
+    virtual System::Clock::Timestamp GetCurrentMonotonicTimestamp() override
+    {
+        return System::SystemClock().GetMonotonicTimestamp();
+    }
 };
 
 static const size_t kNumMaxReadHandlers = 16;

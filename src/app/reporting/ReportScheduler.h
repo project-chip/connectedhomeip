@@ -31,16 +31,33 @@ class TestReportScheduler;
 
 namespace reporting {
 
+using Timestamp = System::Clock::Timestamp;
+
 class ReportScheduler : public ReadHandler::Observer
 {
 public:
+    class TimerDelegate
+    {
+    public:
+        virtual ~TimerDelegate() {}
+        virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) = 0;
+        virtual void CancelTimer(void * context)                                       = 0;
+        virtual bool IsTimerActive(void * context)                                     = 0;
+        virtual Timestamp GetCurrentMonotonicTimestamp()                               = 0;
+    };
+
     class ReadHandlerNode : public IntrusiveListNodeBase<>
     {
     public:
         using TimerCompleteCallback = void (*)();
 
-        ReadHandlerNode(ReadHandler * aReadHandler, TimerCompleteCallback aCallback) : mCallback(aCallback)
+        ReadHandlerNode(ReadHandler * aReadHandler, TimerDelegate * aTimerDelegate, TimerCompleteCallback aCallback) :
+            mTimerDelegate(aTimerDelegate), mCallback(aCallback)
         {
+            VerifyOrDie(aReadHandler != nullptr);
+            VerifyOrDie(aTimerDelegate != nullptr);
+            VerifyOrDie(aCallback != nullptr);
+
             mReadHandler = aReadHandler;
             SetIntervalsTimeStamp(aReadHandler);
         }
@@ -52,7 +69,7 @@ public:
         {
             // TODO: Add flags to allow for test to simulate waiting for the min interval or max intrval to elapse when integrating
             // the scheduler in the ReadHandler
-            System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
+            Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
             return (mReadHandler->IsGeneratingReports() &&
                     ((now >= mMinTimestamp && mReadHandler->IsDirty()) || now >= mMaxTimestamp));
         }
@@ -61,30 +78,22 @@ public:
         {
             uint16_t minInterval, maxInterval;
             aReadHandler->GetReportingIntervals(minInterval, maxInterval);
-            System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
-            mMinTimestamp                = now + System::Clock::Seconds16(minInterval);
-            mMaxTimestamp                = now + System::Clock::Seconds16(maxInterval);
+            Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+            mMinTimestamp = now + System::Clock::Seconds16(minInterval);
+            mMaxTimestamp = now + System::Clock::Seconds16(maxInterval);
         }
 
         void RunCallback() { mCallback(); }
 
-        System::Clock::Timestamp GetMinTimestamp() const { return mMinTimestamp; }
-        System::Clock::Timestamp GetMaxTimestamp() const { return mMaxTimestamp; }
+        Timestamp GetMinTimestamp() const { return mMinTimestamp; }
+        Timestamp GetMaxTimestamp() const { return mMaxTimestamp; }
 
     private:
+        TimerDelegate * mTimerDelegate;
         TimerCompleteCallback mCallback;
         ReadHandler * mReadHandler;
-        System::Clock::Timestamp mMinTimestamp;
-        System::Clock::Timestamp mMaxTimestamp;
-    };
-
-    class TimerDelegate
-    {
-    public:
-        virtual ~TimerDelegate() {}
-        virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) = 0;
-        virtual void CancelTimer(void * context)                                       = 0;
-        virtual bool IsTimerActive(void * context)                                     = 0;
+        Timestamp mMinTimestamp;
+        Timestamp mMaxTimestamp;
     };
 
     ReportScheduler(TimerDelegate * aTimerDelegate) : mTimerDelegate(aTimerDelegate) {}

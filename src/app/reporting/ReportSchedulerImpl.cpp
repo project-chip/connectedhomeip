@@ -62,7 +62,7 @@ void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
     else
     {
         // If the handler is not reportable now, schedule a report for the min interval
-        newTimeout = Milliseconds32(node->GetMinTimestamp().count() - System::SystemClock().GetMonotonicTimestamp().count());
+        newTimeout = Milliseconds32(node->GetMinTimestamp().count() - mTimerDelegate->GetCurrentMonotonicTimestamp().count());
     }
 
     ScheduleReport(newTimeout, aReadHandler);
@@ -75,7 +75,7 @@ void ReportSchedulerImpl::OnReportSent(ReadHandler * apReadHandler)
     // Schedule callback for max interval by computing the difference between the max timestamp and the current timestamp
     node->SetIntervalsTimeStamp(apReadHandler);
     Milliseconds32 newTimeout =
-        Milliseconds32(node->GetMaxTimestamp().count() - System::SystemClock().GetMonotonicTimestamp().count());
+        Milliseconds32(node->GetMaxTimestamp().count() - mTimerDelegate->GetCurrentMonotonicTimestamp().count());
     ScheduleReport(newTimeout, apReadHandler);
 }
 
@@ -90,7 +90,7 @@ CHIP_ERROR ReportSchedulerImpl::RegisterReadHandler(ReadHandler * aReadHandler)
     ReadHandlerNode * newNode = FindReadHandlerNode(aReadHandler);
     // If the handler is already registered, no need to register it again
     VerifyOrReturnValue(nullptr == newNode, CHIP_NO_ERROR);
-    newNode = mNodesPool.CreateObject(aReadHandler, ReportTimerCallback);
+    newNode = mNodesPool.CreateObject(aReadHandler, mTimerDelegate, ReportTimerCallback);
     mReadHandlerList.PushBack(newNode);
 
     ChipLogProgress(DataManagement,
@@ -98,7 +98,7 @@ CHIP_ERROR ReportSchedulerImpl::RegisterReadHandler(ReadHandler * aReadHandler)
                     " and system Timestamp %" PRIu64 ".",
                     newNode->GetMinTimestamp().count(), newNode->GetMaxTimestamp().count());
 
-    Timestamp now = System::SystemClock().GetMonotonicTimestamp();
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
     Milliseconds32 newTimeout;
     // If the handler is reportable, schedule a report for the min interval, otherwise schedule a report for the max interval
     if ((newNode->IsReportableNow()))
