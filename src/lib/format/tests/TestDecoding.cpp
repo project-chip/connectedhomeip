@@ -505,14 +505,14 @@ void TestEmptyClusterMetaDataDecode(nlTestSuite * inSuite, void * inContext)
                    "          endpoint_id: 0\n"
                    "          cluster_id: 31\n"
                    "          attribute_id: 0\n"
-                   "        0x1f::ATTR(0x0)\n"                 // Cluster 31, attribute 0
-                   "          UnknownTag(0x100)\n"             // List entry (acl is a list)
-                   "            ContextSpecific(0x1): 5\n"     // privilege
-                   "            ContextSpecific(0x2): 2\n"     // authMode
-                   "            ContextSpecific(0x3)\n"        // subjects
-                   "              UnknownTag(0x100): 112233\n" // List entry (subjects is a list)
-                   "            ContextSpecific(0x4): NULL\n"  // targets
-                   "            ContextSpecific(0xFE): 1\n"    // fabricIndex
+                   "        0x1f::ATTR(0x0)\n"              // Cluster 31, attribute 0
+                   "          AnonymousTag()\n"             // List entry (acl is a list)
+                   "            ContextTag(0x1): 5\n"       // privilege
+                   "            ContextTag(0x2): 2\n"       // authMode
+                   "            ContextTag(0x3)\n"          // subjects
+                   "              AnonymousTag(): 112233\n" // List entry (subjects is a list)
+                   "            ContextTag(0x4): NULL\n"    // targets
+                   "            ContextTag(0xFE): 1\n"      // fabricIndex
                    "  suppress_response: true\n"
                    "  interaction_model_revison: 1\n");
 }
@@ -536,24 +536,24 @@ void TestWrongDecodeData(nlTestSuite * inSuite, void * inContext)
     TestSampleData(inSuite, params, secure_channel_mrp_ack, "proto16: EMPTY\n");
     TestSampleData(inSuite, params, im_protocol_report_data_acl,
                    "proto5\n"
-                   "  ContextSpecific(0x1)\n"
-                   "    UnknownTag(0x100)\n"
-                   "      ContextSpecific(0x1)\n"
-                   "        ContextSpecific(0x0): 3420147058\n"
-                   "        ContextSpecific(0x1)\n"
-                   "          ContextSpecific(0x2): 0\n"
-                   "          ContextSpecific(0x3): 31\n"
-                   "          ContextSpecific(0x4): 0\n"
-                   "        ContextSpecific(0x2)\n"
-                   "          UnknownTag(0x100)\n"
-                   "            ContextSpecific(0x1): 5\n"
-                   "            ContextSpecific(0x2): 2\n"
-                   "            ContextSpecific(0x3)\n"
-                   "              UnknownTag(0x100): 112233\n"
-                   "            ContextSpecific(0x4): NULL\n"
-                   "            ContextSpecific(0xFE): 1\n"
-                   "  ContextSpecific(0x4): true\n"
-                   "  ContextSpecific(0xFF): 1\n");
+                   "  ContextTag(0x1)\n"
+                   "    AnonymousTag()\n"
+                   "      ContextTag(0x1)\n"
+                   "        ContextTag(0x0): 3420147058\n"
+                   "        ContextTag(0x1)\n"
+                   "          ContextTag(0x2): 0\n"
+                   "          ContextTag(0x3): 31\n"
+                   "          ContextTag(0x4): 0\n"
+                   "        ContextTag(0x2)\n"
+                   "          AnonymousTag()\n"
+                   "            ContextTag(0x1): 5\n"
+                   "            ContextTag(0x2): 2\n"
+                   "            ContextTag(0x3)\n"
+                   "              AnonymousTag(): 112233\n"
+                   "            ContextTag(0x4): NULL\n"
+                   "            ContextTag(0xFE): 1\n"
+                   "  ContextTag(0x4): true\n"
+                   "  ContextTag(0xFF): 1\n");
 }
 
 void TestNestingOverflow(nlTestSuite * inSuite, void * inContext)
@@ -629,30 +629,30 @@ void TestNestingOverflow(nlTestSuite * inSuite, void * inContext)
 
     TestSampleData(inSuite, params, fake_payload,
                    "proto5\n"
-                   "  ContextSpecific(0x0)\n"
-                   "    ContextSpecific(0x1)\n"
-                   "      ContextSpecific(0x2)\n"
-                   "        ContextSpecific(0x3)\n"
-                   "          ContextSpecific(0x4)\n"
-                   "            ContextSpecific(0x5)\n"
-                   "              ContextSpecific(0x6)\n"
-                   "                ContextSpecific(0x7)\n"
-                   "                  ContextSpecific(0x8)\n"
-                   "                    ContextSpecific(0x9)\n"
-                   "                      ContextSpecific(0xA)\n"
-                   "                        ContextSpecific(0xB)\n"
-                   "                          ContextSpecific(0xC)\n"
-                   "                            ContextSpecific(0xD)\n"
-                   "                              ContextSpecific(0xE)\n"
-                   "                                ContextSpecific(0xF): NESTING DEPTH REACHED\n"
-                   "                  ContextSpecific(0x20)\n"
-                   "                    ContextSpecific(0x21)\n"
-                   "                      ContextSpecific(0x22)\n"
-                   "                        ContextSpecific(0x23)\n"
-                   "          ContextSpecific(0x30)\n"
-                   "            ContextSpecific(0x31)\n"
-                   "              ContextSpecific(0x32)\n"
-                   "                ContextSpecific(0x33)\n");
+                   "  ContextTag(0x0)\n"
+                   "    ContextTag(0x1)\n"
+                   "      ContextTag(0x2)\n"
+                   "        ContextTag(0x3)\n"
+                   "          ContextTag(0x4)\n"
+                   "            ContextTag(0x5)\n"
+                   "              ContextTag(0x6)\n"
+                   "                ContextTag(0x7)\n"
+                   "                  ContextTag(0x8)\n"
+                   "                    ContextTag(0x9)\n"
+                   "                      ContextTag(0xA)\n"
+                   "                        ContextTag(0xB)\n"
+                   "                          ContextTag(0xC)\n"
+                   "                            ContextTag(0xD)\n"
+                   "                              ContextTag(0xE)\n"
+                   "                                ContextTag(0xF): NESTING DEPTH REACHED\n"
+                   "                  ContextTag(0x20)\n"
+                   "                    ContextTag(0x21)\n"
+                   "                      ContextTag(0x22)\n"
+                   "                        ContextTag(0x23)\n"
+                   "          ContextTag(0x30)\n"
+                   "            ContextTag(0x31)\n"
+                   "              ContextTag(0x32)\n"
+                   "                ContextTag(0x33)\n");
 }
 
 const nlTest sTests[] = {
