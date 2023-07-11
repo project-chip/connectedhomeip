@@ -51,7 +51,7 @@ All device types available (.zap files) are found inside the `devices` folder.
 
 ## Creating a new device type in your device library
 
-Follow guide in [NEW_CHEF_DEVICES.md].
+Follow guide in [NEW_CHEF_DEVICES.md](NEW_CHEF_DEVICES.md).
 
 ## Folder Structure and Guidelines
 
