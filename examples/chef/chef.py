@@ -310,11 +310,11 @@ def main() -> int:
     parser.add_option("-t", "--target", type='choice',
                       action='store',
                       dest="build_target",
-                      help="specifies target platform. Default is esp32. See info below for currently supported target platforms",
+                      help="specifies target platform. See info below for currently supported target platforms",
                       choices=['nrfconnect', 'esp32',
                                'linux', 'silabs-thread', 'ameba'],
                       metavar="TARGET",
-                      default="esp32")
+                      default="linux")
     parser.add_option("-r", "--rpc",
                       help=("enables Pigweed RPC interface. Enabling RPC disables the shell interface. "
                             "Your sdkconfig configurations will be reverted to default. Default is PW RPC off. "
