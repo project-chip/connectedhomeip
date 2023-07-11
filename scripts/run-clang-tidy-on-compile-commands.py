@@ -147,16 +147,16 @@ class ClangTidyEntry:
                     "Use -system-headers to display errors from system headers as well.",
                 ]
 
-                for l in err.decode('utf-8').split('\n'):
-                    l = l.strip()
+                for line in err.decode('utf-8').split('\n'):
+                    line = line.strip()
 
-                    if any(map(lambda s: s in l, skip_strings)):
+                    if any(map(lambda s: s in line, skip_strings)):
                         continue
 
-                    if not l:
+                    if not line:
                         continue  # no empty lines
 
-                    logging.warning('TIDY %s: %s', self.file, l)
+                    logging.warning('TIDY %s: %s', self.file, line)
 
             if proc.returncode != 0:
                 if proc.returncode < 0:
@@ -168,7 +168,7 @@ class ClangTidyEntry:
                         "Tidy %s ended with code %d", self.file, proc.returncode
                     )
                 return TidyResult(self.full_path, False)
-        except:
+        except Exception:
             traceback.print_exc()
             return TidyResult(self.full_path, False)
 
@@ -198,7 +198,7 @@ def find_darwin_gcc_sysroot():
         if not line.startswith('Path: '):
             continue
         path = line[line.find(': ')+2:]
-        if not '/MacOSX.platform/' in path:
+        if '/MacOSX.platform/' not in path:
             continue
         logging.info("Found %s" % path)
         return path
