@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -57,6 +57,7 @@ OptionDef gCmdOptionDefs[] =
     { "out-key",          kArgumentRequired, 'O' },
     { "valid-from",       kArgumentRequired, 'f' },
     { "lifetime",         kArgumentRequired, 'l' },
+    { "cpd-ext",          kArgumentRequired, 'x' },
 #if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
     { "ignore-error",     kNoArgument,       'I' },
     { "error-type",       kArgumentRequired, 'E' },
@@ -124,6 +125,11 @@ const char * const gCmdOptionHelp =
     "       The lifetime for the new certificate, in whole days. Use special value\n"
     "       4294967295 to indicate that certificate doesn't have well defined\n"
     "       expiration date\n"
+    "\n"
+    "   -x, --cpd-ext <string>\n"
+    "\n"
+    "       CRL Distribution Points (CDP) extension (NID_crl_distribution_points) extension to be added to the list\n"
+    "       of certificate extensions.\n"
     "\n"
 #if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
     "   -I, --ignore-error\n"
@@ -201,17 +207,19 @@ OptionSet *gCmdOptionSets[] =
 };
 // clang-format on
 
-AttCertType gAttCertType          = kAttCertType_NotSpecified;
-const char * gSubjectCN           = nullptr;
-uint16_t gSubjectVID              = VendorId::NotSpecified;
-uint16_t gSubjectPID              = 0;
-bool gEncodeVIDandPIDasCN         = false;
-const char * gCACertFileNameOrStr = nullptr;
-const char * gCAKeyFileNameOrStr  = nullptr;
-const char * gInKeyFileNameOrStr  = nullptr;
-const char * gOutCertFileName     = nullptr;
-const char * gOutKeyFileName      = nullptr;
-uint32_t gValidDays               = kCertValidDays_Undefined;
+AttCertType gAttCertType                 = kAttCertType_NotSpecified;
+const char * gSubjectCN                  = nullptr;
+uint16_t gSubjectVID                     = VendorId::NotSpecified;
+uint16_t gSubjectPID                     = 0;
+bool gEncodeVIDandPIDasCN                = false;
+const char * gCACertFileNameOrStr        = nullptr;
+const char * gCAKeyFileNameOrStr         = nullptr;
+const char * gInKeyFileNameOrStr         = nullptr;
+const char * gOutCertFileName            = nullptr;
+const char * gOutKeyFileName             = nullptr;
+uint32_t gValidDays                      = kCertValidDays_Undefined;
+FutureExtensionWithNID gCPDExtensions[3] = { { 0, nullptr } };
+uint8_t gCPDExtensionsCount              = 0;
 struct tm gValidFrom;
 CertStructConfig gCertConfig;
 
@@ -290,6 +298,11 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
             PrintArgError("%s: Invalid value specified for certificate lifetime: %s\n", progName, arg);
             return false;
         }
+        break;
+    case 'x':
+        gCPDExtensions[gCPDExtensionsCount].nid  = NID_crl_distribution_points;
+        gCPDExtensions[gCPDExtensionsCount].info = arg;
+        gCPDExtensionsCount++;
         break;
 #if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
     case 'I':
@@ -555,7 +568,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
     if (gAttCertType == kAttCertType_PAA)
     {
         res = MakeAttCert(gAttCertType, gSubjectCN, gSubjectVID, gSubjectPID, gEncodeVIDandPIDasCN, newCert.get(), newKey.get(),
-                          gValidFrom, gValidDays, newCert.get(), newKey.get(), gCertConfig);
+                          gValidFrom, gValidDays, newCert.get(), newKey.get(), gCertConfig, gCPDExtensions, gCPDExtensionsCount);
         VerifyTrueOrExit(res);
     }
     else
@@ -570,7 +583,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
         VerifyTrueOrExit(res);
 
         res = MakeAttCert(gAttCertType, gSubjectCN, gSubjectVID, gSubjectPID, gEncodeVIDandPIDasCN, caCert.get(), caKey.get(),
-                          gValidFrom, gValidDays, newCert.get(), newKey.get(), gCertConfig);
+                          gValidFrom, gValidDays, newCert.get(), newKey.get(), gCertConfig, gCPDExtensions, gCPDExtensionsCount);
         VerifyTrueOrExit(res);
     }
 
