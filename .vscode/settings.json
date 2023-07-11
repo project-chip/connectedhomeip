@@ -169,5 +169,6 @@
     "C_Cpp.default.cppStandard": "gnu++14",
     "C_Cpp.default.cStandard": "gnu11",
     "cmake.configureOnOpen": false,
-    "search.followSymlinks": false
+    "search.followSymlinks": false,
+    "cmake.sourceDirectory": "/Users/austinbeck/Desktop/connectedhomeip/examples/bridge-app/esp32"
 }
