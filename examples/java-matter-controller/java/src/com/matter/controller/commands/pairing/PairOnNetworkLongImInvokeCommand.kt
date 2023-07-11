@@ -21,25 +21,28 @@ import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
 import chip.devicecontroller.InvokeCallback
 import chip.devicecontroller.model.InvokeElement
+import chip.tlv.AnonymousTag
+import chip.tlv.ContextSpecificTag
+import chip.tlv.TlvWriter
 import com.matter.controller.commands.common.CredentialsIssuer
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.UShort
-import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
-import chip.tlv.TlvWriter
 
 class PairOnNetworkLongImInvokeCommand(
-  controller: ChipDeviceController, credsIssue: CredentialsIssuer?
-) : PairingCommand(
-  controller,
-  "onnetwork-long-im-invoke",
-  credsIssue,
-  PairingModeType.ON_NETWORK,
-  PairingNetworkType.NONE,
-  DiscoveryFilterType.LONG_DISCRIMINATOR
-) {
+  controller: ChipDeviceController,
+  credsIssue: CredentialsIssuer?
+) :
+  PairingCommand(
+    controller,
+    "onnetwork-long-im-invoke",
+    credsIssue,
+    PairingModeType.ON_NETWORK,
+    PairingNetworkType.NONE,
+    DiscoveryFilterType.LONG_DISCRIMINATOR
+  ) {
   private var devicePointer: Long = 0
+
   private fun setDevicePointer(devicePointer: Long) {
     this.devicePointer = devicePointer
   }
@@ -72,15 +75,20 @@ class PairOnNetworkLongImInvokeCommand(
   }
 
   override fun runCommand() {
-    val number : UShort = 1u
+    val number: UShort = 1u
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
     tlvWriter.put(ContextSpecificTag(0), number)
     tlvWriter.endStructure()
 
-    val element: InvokeElement = InvokeElement.newInstance( /* endpointId= */
-      0, CLUSTER_ID_IDENTIFY, IDENTIFY_COMMAND, tlvWriter.getEncoded(), null
-    )
+    val element: InvokeElement =
+      InvokeElement.newInstance(
+        /* endpointId= */ 0,
+        CLUSTER_ID_IDENTIFY,
+        IDENTIFY_COMMAND,
+        tlvWriter.getEncoded(),
+        null
+      )
 
     currentCommissioner()
       .pairDeviceWithAddress(
@@ -101,9 +109,7 @@ class PairOnNetworkLongImInvokeCommand(
   }
 
   companion object {
-    private val logger = Logger.getLogger(
-      PairOnNetworkLongImInvokeCommand::class.java.name
-    )
+    private val logger = Logger.getLogger(PairOnNetworkLongImInvokeCommand::class.java.name)
 
     private const val MATTER_PORT = 5540
     private const val CLUSTER_ID_IDENTIFY = 0x0003L

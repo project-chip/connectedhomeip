@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,23 +16,12 @@
  *    limitations under the License.
  */
 
-#pragma once
+namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
 
-#include "AppEvent.h"
-#include "FreeRTOS.h"
-#include "timers.h" // provides FreeRTOS timer support
-#include <stdint.h>
-#ifdef CFG_PLF_RV32
-#include "asr_gpio.h"
-#else
-#include "duet_gpio.h"
-#endif
+void OnSoftwareFaultEventHandler(const char * faultRecordString);
 
-class ButtonHandler
-{
-public:
-    static void Init(void);
-
-private:
-    static void GpioInit(void);
-};
+} // namespace Silabs
+} // namespace DeviceLayer
+} // namespace chip

@@ -26,11 +26,14 @@
 #define duet_gpio_init asr_gpio_init
 #define duet_gpio_input_get asr_gpio_input_get
 #define DUET_INPUT_PULL_UP ASR_INPUT_PULL_UP
+#elif !defined CFG_PLF_DUET
+#define duet_gpio_dev_t lega_gpio_dev_t
+#define duet_gpio_init lega_gpio_init
+#define duet_gpio_input_get lega_gpio_input_get
+#define DUET_INPUT_PULL_UP LEGA_INPUT_PULL_UP
 #endif
 
 TaskHandle_t sGpioTaskHandle;
-ButtonHandler::KeyInformation ButtonHandler::keyInfo = { 0 };
-
 static void GpioTaskMain(void * pvParameter);
 
 void ButtonHandler::Init(void)
@@ -51,67 +54,64 @@ void ButtonHandler::GpioInit(void)
     switch1_btn.config = DUET_INPUT_PULL_UP;
     switch1_btn.priv   = NULL;
     duet_gpio_init(&switch1_btn);
-
+    // generic switch2 button
     switch2_btn.port   = SWITCH2_BUTTON;
     switch2_btn.config = DUET_INPUT_PULL_UP;
     switch2_btn.priv   = NULL;
     duet_gpio_init(&switch2_btn);
 }
 
+static uint32_t btn1Value   = 1;
+static uint8_t btn1_trigger = 0;
+static uint32_t btn2Value   = 1;
+static uint8_t btn2_trigger = 0;
 void GpioTaskMain(void * pvParameter)
 {
     ASR_LOG("GPIO Task started");
     uint32_t btnValue;
-    uint8_t currentKeys = 0;
-
-    for (;;)
+    uint8_t buttonevent = 0;
+    while (true)
     {
         vTaskDelay(50 / portTICK_PERIOD_MS);
-
+        // switch button 1
         duet_gpio_input_get(&switch1_btn, &btnValue);
-
-        if (!btnValue)
+        if (btnValue != btn1Value)
         {
-            currentKeys |= 0x01;
+            if (btn1_trigger)
+            {
+                btn1Value   = btnValue;
+                buttonevent = (uint8_t) btnValue;
+                GetAppTask().ButtonEventHandler(SWITCH1_BUTTON, (buttonevent) ? BUTTON_RELEASED : BUTTON_PRESSED);
+                btn1_trigger = 0;
+            }
+            else
+            {
+                btn1_trigger = 1;
+            }
         }
         else
         {
-            currentKeys &= ~0x01;
+            btn1_trigger = 0;
         }
-
+        // switch button 2
         duet_gpio_input_get(&switch2_btn, &btnValue);
-
-        if (!btnValue)
+        if (btnValue != btn2Value)
         {
-            currentKeys |= 0x02;
+            if (btn2_trigger)
+            {
+                btn2Value   = btnValue;
+                buttonevent = (uint8_t) btnValue;
+                GetAppTask().ButtonEventHandler(SWITCH2_BUTTON, (buttonevent) ? BUTTON_RELEASED : BUTTON_PRESSED);
+                btn2_trigger = 0;
+            }
+            else
+            {
+                btn2_trigger = 1;
+            }
         }
         else
         {
-            currentKeys &= ~0x02;
-        }
-
-        ButtonHandler::keyInfo.keyImPulse      = (ButtonHandler::keyInfo.keyDown ^ currentKeys) & ~ButtonHandler::keyInfo.keyDown;
-        ButtonHandler::keyInfo.keyReleasePulse = (ButtonHandler::keyInfo.keyDown ^ currentKeys) & ButtonHandler::keyInfo.keyDown;
-        ButtonHandler::keyInfo.keyDown         = currentKeys;
-
-        if (ButtonHandler::keyInfo.keyImPulse & 0x01)
-        {
-            GetAppTask().PostButtonEvent(SWITCH1_BUTTON, APP_BUTTON_PRESSED);
-        }
-
-        if (ButtonHandler::keyInfo.keyImPulse & 0x02)
-        {
-            GetAppTask().PostButtonEvent(SWITCH2_BUTTON, APP_BUTTON_PRESSED);
-        }
-
-        if (ButtonHandler::keyInfo.keyReleasePulse & 0x01)
-        {
-            GetAppTask().PostButtonEvent(SWITCH1_BUTTON, APP_BUTTON_RELEASED);
-        }
-
-        if (ButtonHandler::keyInfo.keyReleasePulse & 0x02)
-        {
-            GetAppTask().PostButtonEvent(SWITCH2_BUTTON, APP_BUTTON_RELEASED);
+            btn2_trigger = 0;
         }
     }
 }

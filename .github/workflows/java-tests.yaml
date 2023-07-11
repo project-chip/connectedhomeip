@@ -79,7 +79,8 @@ jobs:
                    chip.tlv.TlvReadWriteTest        \
                    chip.tlv.TlvReaderTest           \
                    chip.jsontlv.JsonToTlvToJsonTest \
-                   chip.onboardingpayload.ManualCodeTest
+                   chip.onboardingpayload.ManualCodeTest \
+                   chip.onboardingpayload.QRCodeTest
             - name: Build Java Matter Controller and all clusters app
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
