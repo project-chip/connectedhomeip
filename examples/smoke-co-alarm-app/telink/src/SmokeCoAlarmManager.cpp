@@ -29,13 +29,7 @@ SmokeCoAlarmManager SmokeCoAlarmManager::sAlarm;
 
 CHIP_ERROR SmokeCoAlarmManager::Init()
 {
-    ExpressedStateEnum currentExpressedState = ExpressedStateEnum::kNormal;
-    // read current ExpressedState on endpoint one
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    SmokeCoAlarmServer::Instance().GetExpressedState(1, currentExpressedState);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    mExpressedState = currentExpressedState;
+    mExpressedState = ExpressedStateEnum::kNormal;
 
     return CHIP_NO_ERROR;
 }
