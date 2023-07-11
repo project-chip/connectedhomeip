@@ -225,24 +225,20 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
         GenericOperationalState opState;
         size_t index = 0;
 
-        VerifyOrReturnError(delegate != nullptr, CHIP_NO_ERROR, ChipLogError(NotSpecified, "Delegate is nullptr"));
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-        // operational state list is not found
-        if (delegate->GetOperationalStateAtIndex(index, opState) == CHIP_ERROR_NOT_FOUND)
-        {
-            err = aEncoder.EncodeNull();
-        }
-        else
-        {
-            return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-                while (delegate->GetOperationalStateAtIndex(index, opState) != CHIP_ERROR_NOT_FOUND)
-                {
-                    ReturnErrorOnFailure(encoder.Encode(opState));
-                    index++;
-                }
+        return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+            while ((err = delegate->GetOperationalStateAtIndex(index, opState)) == CHIP_NO_ERROR)
+            {
+                ReturnErrorOnFailure(encoder.Encode(opState));
+                index++;
+            }
+            if (err == CHIP_ERROR_NOT_FOUND)
+            {
                 return CHIP_NO_ERROR;
-            });
-        }
+            }
+            return err;
+        });
     }
     break;
 
