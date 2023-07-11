@@ -186,12 +186,12 @@ subcommand=$1
 shift
 
 case $subcommand in
-*)
-    cirquetest_"$subcommand" "$@"
-    exitcode=$?
-    if ((exitcode == 127)); then
-        echo "Unknown command: $subcommand" >&2
-    fi
-    exit "$exitcode"
-    ;;
+    *)
+        cirquetest_"$subcommand" "$@"
+        exitcode=$?
+        if ((exitcode == 127)); then
+            echo "Unknown command: $subcommand" >&2
+        fi
+        exit "$exitcode"
+        ;;
 esac
