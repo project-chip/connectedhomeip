@@ -81,7 +81,7 @@ CHIP_ERROR Instance::Init()
     return CHIP_NO_ERROR;
 }
 
-// This function is called by the interaction model engine when a command destined for this instance is received.
+// This method is called by the interaction model engine when a command destined for this instance is received.
 void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
     ChipLogDetail(Zcl, "ResourceMonitoring Instance::InvokeCommand");

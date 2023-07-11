@@ -41,7 +41,7 @@ public:
      * @return CHIP_ERROR       If the cluster ID given is not a valid Resource Monitoring cluster ID.
      * @return CHIP_ERROR       If the endpoint and cluster ID have not been enabled in zap.
      * @return CHIP_ERROR       If the CommandHandler or Attribute Handler could not be registered.
-     * @return CHIP_ERROR       If the AppInit() function returned an error.
+     * @return CHIP_ERROR       If the AppInit() method returned an error.
      *
      * @return CHIP_NO_ERROR    If the cluster was initialised successfully.
      */
@@ -52,8 +52,11 @@ public:
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
 
     /**
-     * returns true if the given feature is supported by the cluster.
+     * Checks if the given feature is supported by the cluster.
      * @param feature   The aFeature to check.
+     *
+     * @return true     If the feature is supported.
+     * @return false    If the feature is not supported.
      */
     bool HasFeature(ResourceMonitoring::Feature aFeature) const;
 
@@ -103,7 +106,7 @@ private:
 
 public:
     /**
-     * Creates a resource monitoring cluster instance. The Init() function needs to be called for this instance to be registered and
+     * Creates a resource monitoring cluster instance. The Init() method needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
      * @param aEndpointId   The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aClusterId    The ID of the ResourceMonitoring aliased cluster to be instantiated.
@@ -129,11 +132,11 @@ public:
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
 
-    // the following methods should be overridden by the SDK user to implement the business logic of their application
+    // The following methods should be overridden by the SDK user to implement the business logic of their application
 
     /**
-     * This init function will be called during Resource Monitoring Server initialization after the instance information has been
-     * validated and the instance has been registered. This function should be overridden by the SDK user to initialize the
+     * This init method will be called during Resource Monitoring Server initialization after the instance information has been
+     * validated and the instance has been registered. This method should be overridden by the SDK user to initialize the
      * application logic.
      *
      * @return CHIP_NO_ERROR    If the application was initialized successfully. All other values will cause the initialization to
@@ -142,7 +145,7 @@ public:
     virtual CHIP_ERROR AppInit() = 0;
 
     /**
-     * This function is to be overridden by a user implemented method to handle the application specifics of the ResetCondition
+     * This method is to be overridden by a user implemented method to handle the application specifics of the ResetCondition
      * command.
      *
      * @return Status::Success      If the command was handled successfully, all other will cause the command to fail.
