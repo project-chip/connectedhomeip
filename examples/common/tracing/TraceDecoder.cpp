@@ -51,8 +51,8 @@ constexpr const char * kNeedsAckKey           = "is_ack_requested";
 constexpr const char * kAckMsgKey             = "acknowledged_msg_counter";
 constexpr const char * kPayloadDataKey        = "payload_hex";
 constexpr const char * kPayloadSizeKey        = "payload_size";
-constexpr const char * kDirectionKey = "direction";
-constexpr const char * kPeerAddress = "peer_address";
+constexpr const char * kDirectionKey          = "direction";
+constexpr const char * kPeerAddress           = "peer_address";
 
 bool IsOutbound(const Json::Value & json)
 {
