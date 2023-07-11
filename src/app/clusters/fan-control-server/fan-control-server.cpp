@@ -655,7 +655,6 @@ void Instance::loadPersistentAttributes()
         // as was initialised in the class.
         ChipLogDetail(Zcl, "FanControl: Unable to load the FanMode from the KVS. Assuming %u", (uint8_t) mFanMode);
     }
-    return;
 }
 
 Status Instance::nullifyPercentSetting()
@@ -757,6 +756,10 @@ Status Instance::handlePercentSettingWrite(AttributeValueDecoder & aDecoder)
     {
         status = Status::InvalidValue;
     }
+    else if (percentSetting.IsNull())
+    {
+        status = Status::WriteIgnored;
+    }
     else
     {
         if (mPercentSetting != percentSetting)
@@ -787,6 +790,10 @@ Status Instance::handleSpeedSettingWrite(AttributeValueDecoder & aDecoder)
     if (aDecoder.Decode(speedSetting) != CHIP_NO_ERROR)
     {
         status = Status::InvalidValue;
+    }
+    else if (speedSetting.IsNull())
+    {
+        status = Status::WriteIgnored;
     }
     else
     {
