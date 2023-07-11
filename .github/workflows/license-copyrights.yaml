@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2023 Project CHIP Authors
+# SPDX-License-Identifier: Apache-2.0
+
+name: License Compliance (REUSE spec)
+on:
+    push:
+    pull_request:
+
+jobs:
+  licensing:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: REUSE.software license lint
+      uses: fsfe/reuse-action@v1
+      with:
+        args: lint
+      continue-on-error: true
