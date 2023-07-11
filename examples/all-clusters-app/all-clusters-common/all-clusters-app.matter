@@ -6627,18 +6627,18 @@ endpoint 1 {
   }
 
   server cluster FanControl {
-    ram      attribute fanMode default = 0x00;
-    ram      attribute fanModeSequence default = 0x02;
-    ram      attribute percentSetting default = 0x00;
-    ram      attribute percentCurrent default = 0x00;
-    ram      attribute speedMax default = 100;
-    ram      attribute speedSetting default = 0x00;
-    ram      attribute speedCurrent default = 0x00;
-    ram      attribute rockSupport default = 0x03;
-    ram      attribute rockSetting default = 0x00;
-    ram      attribute windSupport default = 0x03;
-    ram      attribute windSetting default = 0x00;
-    ram      attribute airflowDirection default = 0;
+    callback attribute fanMode default = 0x00;
+    callback attribute fanModeSequence default = 0x02;
+    callback attribute percentSetting default = 0x00;
+    callback attribute percentCurrent default = 0x00;
+    callback attribute speedMax default = 100;
+    callback attribute speedSetting default = 0x00;
+    callback attribute speedCurrent default = 0x00;
+    callback attribute rockSupport default = 0x03;
+    callback attribute rockSetting default = 0x00;
+    callback attribute windSupport default = 0x03;
+    callback attribute windSetting default = 0x00;
+    callback attribute airflowDirection default = 0;
     ram      attribute featureMap default = 0x3F;
     ram      attribute clusterRevision default = 2;
   }

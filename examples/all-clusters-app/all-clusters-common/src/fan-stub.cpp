@@ -283,7 +283,7 @@ Status FanManager::doUpdateSpeedSetting(uint8_t newSpeedSetting)
 
 void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "FanControl Cluster initialised at endpoint %" PRIx16, endpoint);
+    ChipLogProgress(Zcl, "FanControl Cluster initialised at endpoint %x", endpoint);
 
     // Maximum speed is 10
     uint8_t speedMax = 10;

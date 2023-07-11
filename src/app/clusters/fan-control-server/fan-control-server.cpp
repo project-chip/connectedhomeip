@@ -381,7 +381,7 @@ Status chip::app::Clusters::FanControl::Instance::UpdateFanMode(FanModeEnum fanM
     if (mFanMode != fanMode)
     {
         mFanMode = fanMode;
-        ChipLogProgress(Zcl, "FanControl: fanMode change: %" PRIu8 "", to_underlying(fanMode));
+        ChipLogProgress(Zcl, "FanControl: fanMode change: %u", to_underlying(fanMode));
 
         // Write Value to Persistent Storage
         uint8_t rawFanMode = to_underlying(mFanMode);
@@ -416,7 +416,7 @@ Status Instance::UpdatePercentSetting(DataModel::Nullable<Percent> percentSettin
             if (mPercentSetting != percentSetting)
             {
                 mPercentSetting = percentSetting;
-                ChipLogProgress(Zcl, "FanControl: percentSetting change: %" PRIu8 "", percentSetting.Value());
+                ChipLogProgress(Zcl, "FanControl: percentSetting change: %u", percentSetting.Value());
                 MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::PercentSetting::Id);
             }
             status = Status::Success;
@@ -444,7 +444,7 @@ Status Instance::UpdatePercentCurrent(Percent percentCurrent)
             if (mPercentCurrent != percentCurrent)
             {
                 mPercentCurrent = percentCurrent;
-                ChipLogProgress(Zcl, "FanControl: percentCurrent change: %" PRIu8 "", percentCurrent);
+                ChipLogProgress(Zcl, "FanControl: percentCurrent change: %u", percentCurrent);
                 MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::PercentCurrent::Id);
             }
             status = Status::Success;
@@ -473,7 +473,7 @@ Status Instance::UpdateSpeedSetting(DataModel::Nullable<uint8_t> speedSetting)
             {
                 mSpeedSetting = speedSetting;
                 status        = Status::Success;
-                ChipLogProgress(Zcl, "FanControl: speedSetting change: %" PRIu8 "", speedSetting.Value());
+                ChipLogProgress(Zcl, "FanControl: speedSetting change: %u", speedSetting.Value());
                 MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::SpeedSetting::Id);
             }
             else
@@ -504,7 +504,7 @@ Status Instance::UpdateSpeedCurrent(uint8_t speedCurrent)
         {
             mSpeedCurrent = speedCurrent;
             status        = Status::Success;
-            ChipLogProgress(Zcl, "FanControl: speedCurrent change: %" PRIu8 "", speedCurrent);
+            ChipLogProgress(Zcl, "FanControl: speedCurrent change: %u", speedCurrent);
             MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::SpeedCurrent::Id);
         }
         else
@@ -528,7 +528,7 @@ Status Instance::UpdateRockSetting(BitMask<RockBitmap> rockSetting)
         if (mRockSetting != rockSetting)
         {
             mRockSetting = rockSetting;
-            ChipLogProgress(Zcl, "FanControl: rockSetting change: %" PRIu8 "", rockSetting.Raw());
+            ChipLogProgress(Zcl, "FanControl: rockSetting change: %u", rockSetting.Raw());
             MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::RockSetting::Id);
         }
         status = Status::Success;
@@ -549,7 +549,7 @@ Status Instance::UpdateWindSetting(BitMask<WindBitmap> windSetting)
         if (mWindSetting != windSetting)
         {
             mWindSetting = windSetting;
-            ChipLogProgress(Zcl, "FanControl: windSetting change: %" PRIu8 "", windSetting.Raw());
+            ChipLogProgress(Zcl, "FanControl: windSetting change: %u", windSetting.Raw());
             MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::WindSetting::Id);
         }
         status = Status::Success;
@@ -567,7 +567,7 @@ Status Instance::UpdateAirflowDirection(AirflowDirectionEnum airflowDirection)
     if (mAirflowDirection != airflowDirection)
     {
         mAirflowDirection = airflowDirection;
-        ChipLogProgress(Zcl, "FanControl: airflowDirection change: %" PRIu8 "", to_underlying(airflowDirection));
+        ChipLogProgress(Zcl, "FanControl: airflowDirection change: %u", to_underlying(airflowDirection));
         MatterReportingAttributeChangeCallback(mEndpointId, FanControl::Id, Attributes::AirflowDirection::Id);
     }
 
