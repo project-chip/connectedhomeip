@@ -61,6 +61,7 @@ enum class Feature : uint32_t
 {
     kCondition = 0x1,
     kWarning   = 0x2,
+    // TODO(#27577): add server support for REP feature (RepalcementProductList)
 };
 
 namespace Attributes {
