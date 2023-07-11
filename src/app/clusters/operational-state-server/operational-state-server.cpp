@@ -309,5 +309,3 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     }
     return err;
 }
-
-void MatterOperationalStatePluginServerInitCallback() {}
