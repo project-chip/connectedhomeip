@@ -62,7 +62,7 @@ jobs:
               uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               run: |
-                  integrations/docker/images/chip-build-cirque/run.sh \
+                  integrations/docker/images/stage-2/chip-build-cirque/run.sh \
                     -- sh -c " \
                        git config --global --add safe.directory '*' \
                        && bash scripts/bootstrap.sh \
@@ -87,7 +87,7 @@ jobs:
                   path: ${{ env.GITHUB_CACHE_PATH }}
             - name: Cirque Bootstrap
               run: |
-                  integrations/docker/images/chip-build-cirque/run.sh \
+                  integrations/docker/images/stage-2/chip-build-cirque/run.sh \
                     --env GITHUB_ACTION_RUN=1 \
                     --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
                     --volume /tmp:/tmp \
@@ -103,14 +103,14 @@ jobs:
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Build Binaries
               run: |
-                  integrations/docker/images/chip-build-cirque/run.sh \
+                  integrations/docker/images/stage-2/chip-build-cirque/run.sh \
                     -- sh -c " \
                        git config --global --add safe.directory '*' \
                        && scripts/build/gn_gen_cirque.sh \
                       "
             - name: Run Tests
               run: |
-                  integrations/docker/images/chip-build-cirque/run.sh \
+                  integrations/docker/images/stage-2/chip-build-cirque/run.sh \
                      --env LOG_DIR=/tmp/cirque_test_output \
                      --env CLEANUP_DOCKER_FOR_CI=1 \
                      --env GITHUB_ACTION_RUN=1 \
