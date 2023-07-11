@@ -13,9 +13,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.clusterinfo.ClusterCommandCallback
 import chip.clusterinfo.ClusterInfo
-import chip.clusterinfo.InteractionInfo
 import chip.clusterinfo.CommandResponseInfo
 import chip.clusterinfo.DelegatedClusterCallback
+import chip.clusterinfo.InteractionInfo
 import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ClusterInfoMapping
@@ -25,16 +25,16 @@ import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.clusterclient.clusterinteraction.ClusterInteractionHistoryFragment.Companion.clusterInteractionHistoryList
 import com.google.chip.chiptool.databinding.ClusterDetailFragmentBinding
+import java.util.*
+import kotlin.collections.HashMap
 import kotlin.properties.Delegates
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import java.util.*
-import kotlin.collections.HashMap
 
 /**
- * ClusterDetailFragment allows user to pick cluster, command, specify parameters and see
- * the callback result.
+ * ClusterDetailFragment allows user to pick cluster, command, specify parameters and see the
+ * callback result.
  */
 class ClusterDetailFragment : Fragment() {
   private val deviceController: ChipDeviceController
@@ -52,10 +52,12 @@ class ClusterDetailFragment : Fragment() {
 
   // when user opens detail page from home page of cluster interaction, historyCommand will be
   // null, and nothing will be autocompleted. If the detail page is opened from history page,
-  // cluster name, command name and potential parameter list will be filled out based on historyCommand
+  // cluster name, command name and potential parameter list will be filled out based on
+  // historyCommand
   private var historyCommand: HistoryCommand? = null
   private var _binding: ClusterDetailFragmentBinding? = null
-  private val binding get() = _binding!!
+  private val binding
+    get() = _binding!!
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -65,9 +67,7 @@ class ClusterDetailFragment : Fragment() {
     _binding = ClusterDetailFragmentBinding.inflate(inflater, container, false)
     scope = viewLifecycleOwner.lifecycleScope
     deviceId = checkNotNull(requireArguments().getLong(DEVICE_ID))
-    scope.launch {
-      devicePtr = getConnectedDevicePointer(requireContext(), deviceId)
-    }
+    scope.launch { devicePtr = getConnectedDevicePointer(requireContext(), deviceId) }
     endpointId = checkNotNull(requireArguments().getInt(ENDPOINT_ID_KEY))
     historyCommand = requireArguments().getSerializable(HISTORY_COMMAND) as HistoryCommand?
     deviceController.setCompletionListener(GenericChipDeviceListener())
@@ -88,7 +88,12 @@ class ClusterDetailFragment : Fragment() {
         binding.parameterList,
         binding.callbackList
       )
-      commandAutoCompleteSetup(binding.commandAutoCompleteTv, inflater, binding.parameterList, binding.callbackList)
+      commandAutoCompleteSetup(
+        binding.commandAutoCompleteTv,
+        inflater,
+        binding.parameterList,
+        binding.callbackList
+      )
     }
 
     setInvokeCommandOnClickListener(
@@ -134,28 +139,33 @@ class ClusterDetailFragment : Fragment() {
 
         val parameterName = clusterParameterNameTv.text.toString()
         val parameterType = selectedInteractionInfo.commandParameters[parameterName]!!.type
-        val parameterUnderlyingType = selectedInteractionInfo.commandParameters[parameterName]!!.underlyingType
-        val data = castStringToType(clusterParameterData.text.toString(), parameterType, parameterUnderlyingType)!!
-        commandArguments[clusterParameterNameTv.text.toString()] = data
-        clusterInteractionHistoryList[0].parameterList.add(
-          HistoryParameterInfo(
-            parameterName,
-            data.toString(),
+        val parameterUnderlyingType =
+          selectedInteractionInfo.commandParameters[parameterName]!!.underlyingType
+        val data =
+          castStringToType(
+            clusterParameterData.text.toString(),
+            parameterType,
             parameterUnderlyingType
-          )
-        )
+          )!!
+        commandArguments[clusterParameterNameTv.text.toString()] = data
+        clusterInteractionHistoryList[0]
+          .parameterList
+          .add(HistoryParameterInfo(parameterName, data.toString(), parameterUnderlyingType))
       }
-      selectedInteractionInfo.getCommandFunction()
+      selectedInteractionInfo
+        .getCommandFunction()
         .invokeCommand(selectedCluster, selectedCommandCallback, commandArguments)
     }
   }
 
-  // Cluster name, command name and parameter list will be autofill based on the given historyCommand
+  // Cluster name, command name and parameter list will be autofill based on the given
+  // historyCommand
   private fun autoCompleteBasedOnHistoryCommand(
     historyCommand: HistoryCommand,
     clusterAutoComplete: AutoCompleteTextView,
     commandAutoComplete: AutoCompleteTextView,
-    parameterList: LinearLayout, inflater: LayoutInflater,
+    parameterList: LinearLayout,
+    inflater: LayoutInflater,
     callbackList: LinearLayout
   ) {
     clusterAutoComplete.setText(historyCommand.clusterName)
@@ -193,7 +203,9 @@ class ClusterDetailFragment : Fragment() {
       Boolean::class.java -> data.toBoolean()
       ByteArray::class.java -> data.encodeToByteArray()
       Long::class.java -> data.toLong()
-      Optional::class.java -> if (data.isEmpty()) Optional.empty() else Optional.of(castStringToType(data, underlyingType, underlyingType)!!)
+      Optional::class.java ->
+        if (data.isEmpty()) Optional.empty()
+        else Optional.of(castStringToType(data, underlyingType, underlyingType)!!)
       else -> data
     }
   }
@@ -247,30 +259,33 @@ class ClusterDetailFragment : Fragment() {
   }
 
   private fun setCallbackDelegate(inflater: LayoutInflater, callbackList: LinearLayout) {
-    selectedCommandCallback.setCallbackDelegate(object : ClusterCommandCallback {
-      override fun onSuccess(responseValues: Map<CommandResponseInfo, Any>) {
-        showMessage("Command success")
-        // Populate UI based on response values. We know the types from CommandInfo.getCommandResponses().
-        requireActivity().runOnUiThread {
-          populateCallbackResult(
-            responseValues,
-            inflater,
-            callbackList,
-          )
+    selectedCommandCallback.setCallbackDelegate(
+      object : ClusterCommandCallback {
+        override fun onSuccess(responseValues: Map<CommandResponseInfo, Any>) {
+          showMessage("Command success")
+          // Populate UI based on response values. We know the types from
+          // CommandInfo.getCommandResponses().
+          requireActivity().runOnUiThread {
+            populateCallbackResult(
+              responseValues,
+              inflater,
+              callbackList,
+            )
+          }
+          clusterInteractionHistoryList[0].responseValue = responseValues
+          clusterInteractionHistoryList[0].status = "Success"
+          responseValues.forEach { Log.d(TAG, it.toString()) }
         }
-        clusterInteractionHistoryList[0].responseValue = responseValues
-        clusterInteractionHistoryList[0].status = "Success"
-        responseValues.forEach { Log.d(TAG, it.toString()) }
-      }
 
-      override fun onFailure(exception: Exception) {
-        showMessage("Command failed")
-        var errorStatus = exception.toString().split(':')
-        clusterInteractionHistoryList[0].status =
-          errorStatus[errorStatus.size - 2] + " " + errorStatus[errorStatus.size - 1]
-        Log.e(TAG, exception.toString())
+        override fun onFailure(exception: Exception) {
+          showMessage("Command failed")
+          var errorStatus = exception.toString().split(':')
+          clusterInteractionHistoryList[0].status =
+            errorStatus[errorStatus.size - 2] + " " + errorStatus[errorStatus.size - 1]
+          Log.e(TAG, exception.toString())
+        }
       }
-    })
+    )
   }
 
   private fun populateCommandParameter(inflater: LayoutInflater, parameterList: LinearLayout) {
@@ -280,7 +295,8 @@ class ClusterDetailFragment : Fragment() {
       val clusterParameterTypeTv: TextView = param.findViewById(R.id.clusterParameterTypeTv)
 
       clusterParameterNameTv.text = "${paramName}"
-      // byte[].class will be output as class [B, which is not readable, so dynamically change it
+      // byte[].class will be output as class [B, which is not readable, so dynamically change
+      // it
       // to Byte[]. If more custom logic is required, should add a className field in
       // commandParameterInfo
       clusterParameterTypeTv.text = formatParameterType(paramInfo.type)
@@ -315,13 +331,14 @@ class ClusterDetailFragment : Fragment() {
     val clusterCallbackTypeTv: TextView = callbackItem.findViewById(R.id.clusterCallbackTypeTv)
 
     clusterCallbackNameTv.text = variableNameType.name
-    clusterCallbackDataTv.text = if (response == null) {
-      "null"
-    } else if (response.javaClass == ByteArray::class.java) {
-      (response as ByteArray).decodeToString()
-    } else {
-      response.toString()
-    }
+    clusterCallbackDataTv.text =
+      if (response == null) {
+        "null"
+      } else if (response.javaClass == ByteArray::class.java) {
+        (response as ByteArray).decodeToString()
+      } else {
+        response.toString()
+      }
     clusterCallbackTypeTv.text = variableNameType.type
     callbackList.addView(callbackItem)
   }
@@ -343,22 +360,27 @@ class ClusterDetailFragment : Fragment() {
       response.forEachIndexed { index, it ->
         val attributeCallbackItem =
           inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
-        val clusterCallbackNameTv: TextView = attributeCallbackItem.findViewById(R.id.clusterCallbackNameTv)
-        val clusterCallbackDataTv: TextView = attributeCallbackItem.findViewById(R.id.clusterCallbackDataTv)
-        val clusterCallbackTypeTv: TextView = attributeCallbackItem.findViewById(R.id.clusterCallbackTypeTv)
+        val clusterCallbackNameTv: TextView =
+          attributeCallbackItem.findViewById(R.id.clusterCallbackNameTv)
+        val clusterCallbackDataTv: TextView =
+          attributeCallbackItem.findViewById(R.id.clusterCallbackDataTv)
+        val clusterCallbackTypeTv: TextView =
+          attributeCallbackItem.findViewById(R.id.clusterCallbackTypeTv)
 
         clusterCallbackNameTv.text = variableNameType.name + "[$index]"
-        val objectString = if (it!!.javaClass == ByteArray::class.java) {
-          (it as ByteArray).contentToString()
-        } else {
-          it.toString()
-        }
+        val objectString =
+          if (it!!.javaClass == ByteArray::class.java) {
+            (it as ByteArray).contentToString()
+          } else {
+            it.toString()
+          }
 
-        var callbackClassName = if (it!!.javaClass == ByteArray::class.java) {
-          "Byte[]"
-        } else {
-          it!!.javaClass.toString().split('$').last()
-        }
+        var callbackClassName =
+          if (it!!.javaClass == ByteArray::class.java) {
+            "Byte[]"
+          } else {
+            it!!.javaClass.toString().split('$').last()
+          }
 
         clusterCallbackDataTv.text = callbackClassName
         clusterCallbackDataTv.setOnClickListener {
@@ -375,9 +397,7 @@ class ClusterDetailFragment : Fragment() {
     }
   }
 
-  private fun getCommandOptions(
-    clusterName: String
-  ): ArrayAdapter<String> {
+  private fun getCommandOptions(clusterName: String): ArrayAdapter<String> {
     selectedClusterInfo = clusterMap[clusterName]!!
     val commandNameList = constructHint(selectedClusterInfo.commands)
     return ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, commandNameList)
@@ -404,11 +424,12 @@ class ClusterDetailFragment : Fragment() {
       historyCommand: HistoryCommand?
     ): ClusterDetailFragment {
       return ClusterDetailFragment().apply {
-        arguments = Bundle(4).apply {
-          putLong(DEVICE_ID, deviceId)
-          putSerializable(HISTORY_COMMAND, historyCommand)
-          putInt(ENDPOINT_ID_KEY, endpointId)
-        }
+        arguments =
+          Bundle(4).apply {
+            putLong(DEVICE_ID, deviceId)
+            putSerializable(HISTORY_COMMAND, historyCommand)
+            putInt(ENDPOINT_ID_KEY, endpointId)
+          }
       }
     }
   }

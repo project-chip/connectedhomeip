@@ -238,15 +238,28 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
                 session->AsSecureSession()->MarkAsDefunct();
             }
         }
-
-        // Standalone acks are not application-level message sends.
-        if (!isStandaloneAck && err == CHIP_NO_ERROR)
+        else
         {
-            //
-            // Once we've sent the message successfully, we can clear out the WillSendMessage flag.
-            //
-            mFlags.Clear(Flags::kFlagWillSendMessage);
-            MessageHandled();
+#if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
+            DeviceLayer::ChipDeviceEvent event;
+            event.Type                       = DeviceLayer::DeviceEventType::kChipMsgSentEvent;
+            event.MessageSent.ExpectResponse = IsResponseExpected();
+            CHIP_ERROR status                = DeviceLayer::PlatformMgr().PostEvent(&event);
+            if (status != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Failed to post Message sent event %" CHIP_ERROR_FORMAT, status.Format());
+            }
+#endif // CONFIG_DEVICE_LAYER
+
+            // Standalone acks are not application-level message sends.
+            if (!isStandaloneAck)
+            {
+                //
+                // Once we've sent the message successfully, we can clear out the WillSendMessage flag.
+                //
+                mFlags.Clear(Flags::kFlagWillSendMessage);
+                MessageHandled();
+            }
         }
 
         return err;
@@ -286,6 +299,18 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     {
         // Cancel the response timer.
         CancelResponseTimer();
+#if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
+        DeviceLayer::ChipDeviceEvent event;
+        event.Type                                  = DeviceLayer::DeviceEventType::kChipMsgRxEventHandled;
+        event.RxEventContext.wasReceived            = false;
+        event.RxEventContext.clearsExpectedResponse = true;
+        CHIP_ERROR status                           = DeviceLayer::PlatformMgr().PostEvent(&event);
+        if (status != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to post Msg Handled event at ExchangeContext closure %" CHIP_ERROR_FORMAT,
+                         status.Format());
+        }
+#endif // CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
     }
 }
 
@@ -496,6 +521,18 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
 
 void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
 {
+#if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
+    DeviceLayer::ChipDeviceEvent event;
+    event.Type                                  = DeviceLayer::DeviceEventType::kChipMsgRxEventHandled;
+    event.RxEventContext.wasReceived            = false;
+    event.RxEventContext.clearsExpectedResponse = true;
+    CHIP_ERROR status                           = DeviceLayer::PlatformMgr().PostEvent(&event);
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to post Message Response Timeout event %" CHIP_ERROR_FORMAT, status.Format());
+    }
+#endif // CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
+
     SetResponseExpected(false);
 
     // Hold a ref to ourselves so we can make calls into our delegate that might
@@ -607,6 +644,18 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         ChipLogError(ExchangeManager, "Dropping message without piggyback ack when we are waiting for an ack.");
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+#if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
+    DeviceLayer::ChipDeviceEvent event;
+    event.Type                                  = DeviceLayer::DeviceEventType::kChipMsgRxEventHandled;
+    event.RxEventContext.wasReceived            = true;
+    event.RxEventContext.clearsExpectedResponse = IsResponseExpected();
+    CHIP_ERROR status                           = DeviceLayer::PlatformMgr().PostEvent(&event);
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to post Message received event %" CHIP_ERROR_FORMAT, status.Format());
+    }
+#endif // CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
 
     if (IsResponseExpected())
     {

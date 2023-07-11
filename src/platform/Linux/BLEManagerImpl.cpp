@@ -729,7 +729,12 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
 
 CHIP_ERROR BLEManagerImpl::CancelConnection()
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
+        CancelConnect(mpEndpoint);
+    // If in discovery mode, stop scan.
+    else if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
+        mDeviceScanner->StopScan();
+    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate)

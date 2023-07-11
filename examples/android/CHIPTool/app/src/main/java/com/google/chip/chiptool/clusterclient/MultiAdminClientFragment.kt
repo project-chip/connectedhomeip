@@ -33,7 +33,8 @@ class MultiAdminClientFragment : Fragment() {
   private lateinit var addressUpdateFragment: AddressUpdateFragment
 
   private var _binding: MultiAdminClientFragmentBinding? = null
-  private val binding get() = _binding!!
+  private val binding
+    get() = _binding!!
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -48,12 +49,34 @@ class MultiAdminClientFragment : Fragment() {
     addressUpdateFragment =
       childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
 
-    binding.basicCommissioningMethodBtn.setOnClickListener { scope.launch { sendBasicCommissioningCommandClick() } }
-    binding.enhancedCommissioningMethodBtn.setOnClickListener { scope.launch { sendEnhancedCommissioningCommandClick() } }
+    binding.basicCommissioningMethodBtn.setOnClickListener {
+      scope.launch { sendBasicCommissioningCommandClick() }
+    }
+    binding.enhancedCommissioningMethodBtn.setOnClickListener {
+      scope.launch { sendEnhancedCommissioningCommandClick() }
+    }
     binding.revokeBtn.setOnClickListener { scope.launch { sendRevokeCommandClick() } }
-    binding.readWindowStatusBtn.setOnClickListener { scope.launch { readAdministratorCommissioningClusterAttributeClick(AdministratorCommissioning.Attribute.WindowStatus) } }
-    binding.readAdminFabricIndexBtn.setOnClickListener { scope.launch { readAdministratorCommissioningClusterAttributeClick(AdministratorCommissioning.Attribute.AdminFabricIndex) } }
-    binding.readAdminVendorIdBtn.setOnClickListener { scope.launch { readAdministratorCommissioningClusterAttributeClick(AdministratorCommissioning.Attribute.AdminVendorId) } }
+    binding.readWindowStatusBtn.setOnClickListener {
+      scope.launch {
+        readAdministratorCommissioningClusterAttributeClick(
+          AdministratorCommissioning.Attribute.WindowStatus
+        )
+      }
+    }
+    binding.readAdminFabricIndexBtn.setOnClickListener {
+      scope.launch {
+        readAdministratorCommissioningClusterAttributeClick(
+          AdministratorCommissioning.Attribute.AdminFabricIndex
+        )
+      }
+    }
+    binding.readAdminVendorIdBtn.setOnClickListener {
+      scope.launch {
+        readAdministratorCommissioningClusterAttributeClick(
+          AdministratorCommissioning.Attribute.AdminVendorId
+        )
+      }
+    }
 
     return binding.root
   }
@@ -97,11 +120,9 @@ class MultiAdminClientFragment : Fragment() {
   private suspend fun sendBasicCommissioningCommandClick() {
     val testDuration = binding.timeoutEd.text.toString().toInt()
     deviceController.openPairingWindowCallback(
-      ChipClient.getConnectedDevicePointer(
-        requireContext(),
-        addressUpdateFragment.deviceId
-      ), testDuration,
-      object:OpenCommissioningCallback {
+      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      testDuration,
+      object : OpenCommissioningCallback {
         override fun onError(status: Int, deviceId: Long) {
           showMessage("OpenBasicCommissioning Fail! \nDevice ID : $deviceId\nErrorCode : $status")
         }
@@ -124,15 +145,20 @@ class MultiAdminClientFragment : Fragment() {
       setupPinCode = binding.setupPinCodeEd.text.toString().toULong().toLong()
     }
     deviceController.openPairingWindowWithPINCallback(
-      devicePointer, testDuration, testIteration.toLong(),
-      binding.discriminatorEd.text.toString().toInt(), setupPinCode,
-      object:OpenCommissioningCallback {
+      devicePointer,
+      testDuration,
+      testIteration.toLong(),
+      binding.discriminatorEd.text.toString().toInt(),
+      setupPinCode,
+      object : OpenCommissioningCallback {
         override fun onError(status: Int, deviceId: Long) {
           showMessage("OpenCommissioning Fail! \nDevice ID : $deviceId\nErrorCode : $status")
         }
 
         override fun onSuccess(deviceId: Long, manualPairingCode: String?, qrCode: String?) {
-          showMessage("OpenCommissioning Success! \n Node ID: $deviceId\n\tManual : $manualPairingCode\n\tQRCode : $qrCode")
+          showMessage(
+            "OpenCommissioning Success! \n Node ID: $deviceId\n\tManual : $manualPairingCode\n\tQRCode : $qrCode"
+          )
         }
       }
     )
@@ -144,42 +170,68 @@ class MultiAdminClientFragment : Fragment() {
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
     tlvWriter.endStructure()
-    val invokeElement = InvokeElement.newInstance(ADMINISTRATOR_COMMISSIONING_CLUSTER_ENDPOINT_ID
-            , AdministratorCommissioning.ID
-            , AdministratorCommissioning.Command.RevokeCommissioning.id
-            , tlvWriter.getEncoded(), null)
+    val invokeElement =
+      InvokeElement.newInstance(
+        ADMINISTRATOR_COMMISSIONING_CLUSTER_ENDPOINT_ID,
+        AdministratorCommissioning.ID,
+        AdministratorCommissioning.Command.RevokeCommissioning.id,
+        tlvWriter.getEncoded(),
+        null
+      )
 
-    deviceController.invoke(object: InvokeCallback {
-      override fun onError(ex: Exception?) {
-        showMessage("Revoke Commissioning  failure $ex")
-        Log.e(TAG, "Revoke Commissioning  failure", ex)
-      }
+    deviceController.invoke(
+      object : InvokeCallback {
+        override fun onError(ex: Exception?) {
+          showMessage("Revoke Commissioning  failure $ex")
+          Log.e(TAG, "Revoke Commissioning  failure", ex)
+        }
 
-      override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
-        Log.e(TAG, "onResponse : $invokeElement, Code : $successCode")
-        showMessage("Revoke Commissioning success")
-      }
-
-    }, getConnectedDevicePointer(), invokeElement, timedInvokeTimeout, 0)
+        override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
+          Log.e(TAG, "onResponse : $invokeElement, Code : $successCode")
+          showMessage("Revoke Commissioning success")
+        }
+      },
+      getConnectedDevicePointer(),
+      invokeElement,
+      timedInvokeTimeout,
+      0
+    )
   }
 
-  private suspend fun readAdministratorCommissioningClusterAttributeClick(attribute: AdministratorCommissioning.Attribute) {
+  private suspend fun readAdministratorCommissioningClusterAttributeClick(
+    attribute: AdministratorCommissioning.Attribute
+  ) {
     val endpointId = ADMINISTRATOR_COMMISSIONING_CLUSTER_ENDPOINT_ID
     val clusterId = AdministratorCommissioning.ID
     val attributeId = attribute.id
     val attributeName = attribute.name
     val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
-    deviceController.readAttributePath(object: ReportCallback {
-      override fun onReport(nodeState: NodeState?) {
-        val value = nodeState?.getEndpointState(endpointId)?.getClusterState(clusterId)?.getAttributeState(attributeId)?.value ?: "null"
-        Log.i(TAG,"read $attributeName: $value")
-        showMessage("read $attributeName: $value")
-      }
+    deviceController.readAttributePath(
+      object : ReportCallback {
+        override fun onReport(nodeState: NodeState?) {
+          val value =
+            nodeState
+              ?.getEndpointState(endpointId)
+              ?.getClusterState(clusterId)
+              ?.getAttributeState(attributeId)
+              ?.value
+              ?: "null"
+          Log.i(TAG, "read $attributeName: $value")
+          showMessage("read $attributeName: $value")
+        }
 
-      override fun onError(attributePath: ChipAttributePath?, eventPath: ChipEventPath?, e: Exception) {
-        showMessage("read $attributeName - error : ${e?.message}")
-      }
-    }, getConnectedDevicePointer(), listOf(attributePath), 0)
+        override fun onError(
+          attributePath: ChipAttributePath?,
+          eventPath: ChipEventPath?,
+          e: Exception
+        ) {
+          showMessage("read $attributeName - error : ${e?.message}")
+        }
+      },
+      getConnectedDevicePointer(),
+      listOf(attributePath),
+      0
+    )
   }
 
   private suspend fun getConnectedDevicePointer(): Long {
@@ -187,14 +239,13 @@ class MultiAdminClientFragment : Fragment() {
   }
 
   private fun showMessage(msg: String) {
-    requireActivity().runOnUiThread {
-      binding.multiAdminClusterCommandStatus.text = msg
-    }
+    requireActivity().runOnUiThread { binding.multiAdminClusterCommandStatus.text = msg }
   }
 
   companion object {
     private const val TAG = "MultiAdminClientFragment"
     private const val ADMINISTRATOR_COMMISSIONING_CLUSTER_ENDPOINT_ID = 0
+
     fun newInstance(): MultiAdminClientFragment = MultiAdminClientFragment()
   }
 }
