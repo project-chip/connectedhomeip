@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/util/util.h>
+#include <cstdint>
 #include <utility>
 
 namespace chip {
@@ -41,7 +42,7 @@ enum class ChangeIndicationEnum : uint8_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
+    kUnknownEnumValue = UINT8_MAX,
 };
 
 // Enum for DegradationDirectionEnum
@@ -53,7 +54,7 @@ enum class DegradationDirectionEnum : uint8_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
+    kUnknownEnumValue = UINT8_MAX,
 };
 
 // Bitmap for Feature
