@@ -32,33 +32,36 @@ jobs:
             fail-fast: false
             matrix:
                 img:
-                    - ""
-                    - "-ameba"
-                    - "-android"
-                    - "-cirque"
-                    - "-crosscompile"
-                    - "-doxygen"
-                    - "-efr32"
-                    - "-esp32"
-                    - "-esp32-qemu"
-                    - "-infineon"
-                    # NOTE: imx image requires too much space for GitHub-hosted runners. It fails with:
-                    # ApplyLayer exit status 1 stdout:  stderr: write /opt/fsl-imx-xwayland/5.15-kirkstone/sysroots/armv8a-poky-linux/opt/ltp/testcases/bin/fanotify15: no space left on device
-                    # - "-imx"
-                    - "-k32w"
-                    - "-mbed-os"
-                    - "-nrf-platform"
-                    - "-telink"
-                    - "-ti"
-                    - "-tizen"
-                    - "-tizen-qemu"
-                    - "-openiotsdk"
+                    - "base/chip-build"
+                    - "base/chip-build-minimal"
+                    - "base/chip-build-crosscompile"
+
+                    - "stage-1/chip-build-ameba"
+                    - "stage-1/chip-build-cirque"
+                    - "stage-1/chip-build-crosscompile"
+                    - "stage-1/chip-build-doxygen"
+                    - "stage-1/chip-build-efr32"
+                    - "stage-1/chip-build-esp32"
+                    - "stage-1/chip-build-infineon"
+                    # chip-build imx image requires too much space for GitHub-hosted runners. It fails with:
+                    # -"stage-1/chip-build -imx"
+                    - "stage-1/chip-build-k32w"
+                    - "stage-1/chip-build-mbed-os"
+                    - "stage-1/chip-build-nrf-platform"
+                    - "stage-1/chip-build-telink"
+                    - "stage-1/chip-build-ti"
+                    - "stage-1/chip-build-tizen"
+                    - "stage-1/chip-build-openiotsdk"
+
+                    - "stage-2/chip-build-android"
+                    - "stage-2/chip-build-esp32-qemu"
+                    - "stage-2/chip-build-tizen-qemu"
                     # NOTE: vscode image consumes ~52 GB disk space but GitHub-hosted runners provide ~10 GB free disk space(https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources)
-                    #- "-vscode"
+                    #- "last/chip-build-vscode"
         steps:
             - name: Checkout
               uses: actions/checkout@v3
             - name: Build All images using project bash script
               run: |
-                  cd integrations/docker/images/chip-build${{ matrix.img }}
+                  cd integrations/docker/images/${{ matrix.img }}
                   ./build.sh --latest
