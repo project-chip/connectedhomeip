@@ -264,7 +264,7 @@ def main() -> int:
     # Arguments parser
     #
 
-    deviceTypes = "\n  ".join(_DEVICE_LIST)
+    deviceTypes = "\n            ".join(_DEVICE_LIST)
 
     usage = textwrap.dedent(f"""\
         usage: chef.py [options]
