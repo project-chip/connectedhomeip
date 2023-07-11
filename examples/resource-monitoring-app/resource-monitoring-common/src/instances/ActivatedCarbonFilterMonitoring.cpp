@@ -19,7 +19,7 @@ CHIP_ERROR ActivatedCarbonFilterMonitoringInstance::AppInit()
 
 Status ActivatedCarbonFilterMonitoringInstance::OnResetCondition()
 {
-    ChipLogError(Zcl, "ActivatedCarbonFilterMonitoringDelegate::OnResetCondition()");
+    ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringDelegate::OnResetCondition()");
 
     if (GetDegradationDirection() == DegradationDirectionEnum::kDown)
     {

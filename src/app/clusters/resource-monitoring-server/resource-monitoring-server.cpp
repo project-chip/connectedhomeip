@@ -64,7 +64,7 @@ void Instance::LoadPersistentAttributes()
 
 CHIP_ERROR Instance::Init()
 {
-    ChipLogError(Zcl, "ResourceMonitoring: Init");
+    ChipLogDetail(Zcl, "ResourceMonitoring: Init");
     // Check that the cluster ID given is a valid mode select alias cluster ID.
     VerifyOrDie(IsValidAliasCluster());
 
@@ -75,7 +75,7 @@ CHIP_ERROR Instance::Init()
 
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-    ChipLogError(Zcl, "ResourceMonitoring: calling AppInit()");
+    ChipLogDetail(Zcl, "ResourceMonitoring: calling AppInit()");
     ReturnErrorOnFailure(AppInit());
 
     return CHIP_NO_ERROR;
