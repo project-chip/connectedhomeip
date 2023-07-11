@@ -73,7 +73,7 @@ tests:
           [1674780232627] [8807:372926] CHIP: [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           [1674780232627] [8807:372926] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
           [1674780232627] [8807:372926] CHIP: [TOO]   NOCResponse: {
-          [1674780232627] [8807:372926] CHIP: [TOO]     statusCode: 11
+          [1674780232627] [8807:372926] CHIP: [TOO]     statusCode: 0
           [1674780232627] [8807:372926] CHIP: [TOO]    }
           [1674780232627] [8807:372926] CHIP: [DMG] ICR moving to [AwaitingDe]
           [1674780232627] [8807:372926] CHIP: [EM] <<< [E:31626i M:201286751 (Ack:54014818)] (S) Msg TX to 1:0000000000000001 [1A5D] --- Type 0000:10 (SecureChannel:StandaloneAck)
@@ -84,19 +84,19 @@ tests:
           [1674780232627] [8807:372921] CHIP: [CTL] Shutting down the controller
           [1674780232627] [8807:372921] CHIP: [IN] Expiring all sessions for fabric 0x1!!
           [1674780232627] [8807:372921] CHIP: [IN] SecureSession[0x600001c041e0]: MarkForEviction Type:2 LSID:14333
-          [1674780232627] [8807:372921] CHIP: [SC] SecureSession[0x600001c041e0]: Moving from state "kActive" --> "kPendingEviction"
+          [1674780232627] [8807:372921] CHIP: [SC] SecureSession[0x600001c041e0]: Moving from state 'kActive' --> 'kPendingEviction'
           [1674780232627] [8807:372921] CHIP: [IN] SecureSession[0x600001c041e0]: Released - Type:2 LSID:14333
       disabled: true
 
     - label:
           "DUT shouldnt be discoverable via both commissionable and operational
           advertisements"
-      PICS: " !MCORE.DD.EXTENDED_DISCOVERY "
+      PICS: "!MCORE.DD.EXTENDED_DISCOVERY"
       verification: |
           Verify DUT is not discoverable over DNS-SD in both TCP and UDP
 
-          avahi-browse -rt _matter._tcp
-          avahi-browse -rt _matter._udp
+          avahi-browse -rt _matterc._tcp
+          avahi-browse -rt _matterc._udp
       disabled: true
 
     - label:
@@ -112,5 +112,5 @@ tests:
           hostname = [E45F012EED550000.local]
           address = [172.18.0.1]
           port = [5540]
-          txt = [""PI="" ""PH=33"" ""CM=0"" ""D=3840"" ""T=1"" ""DN=Test Bulb"" ""DT=257"" ""VP=65521+32769""]
+          txt = ["PI=" "PH=33" "CM=0" "D=3840" "T=1" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
       disabled: true

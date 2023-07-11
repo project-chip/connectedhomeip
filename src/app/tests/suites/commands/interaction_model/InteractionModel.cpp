@@ -318,12 +318,12 @@ CHIP_ERROR InteractionModelReports::ReportAttribute(DeviceProxy * device, std::v
                                                     std::vector<ClusterId> clusterIds, std::vector<AttributeId> attributeIds,
                                                     ReadClient::InteractionType interactionType)
 {
+    ChipLogProgress(chipTool,
+                    "Sending %sAttribute to:", interactionType == ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read");
+
     InteractionModelConfig::AttributePathsConfig pathsConfig;
     ReturnErrorOnFailure(
         InteractionModelConfig::GetAttributePaths(endpointIds, clusterIds, attributeIds, mDataVersions, pathsConfig));
-
-    ChipLogProgress(chipTool,
-                    "Sending %sAttribute to:", interactionType == ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read");
 
     ReadPrepareParams params(device->GetSecureSession().Value());
     params.mpEventPathParamsList        = nullptr;

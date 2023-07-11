@@ -31,6 +31,7 @@
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
@@ -76,7 +77,7 @@ static void TestMemAlloc_Malloc(nlTestSuite * inSuite, void * inContext)
 static void TestMemAlloc_Calloc(nlTestSuite * inSuite, void * inContext)
 {
     char * p = static_cast<char *>(MemoryCalloc(128, true));
-    NL_TEST_ASSERT(inSuite, p != nullptr);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, p != nullptr);
 
     for (int i = 0; i < 128; i++)
         NL_TEST_ASSERT(inSuite, p[i] == 0);

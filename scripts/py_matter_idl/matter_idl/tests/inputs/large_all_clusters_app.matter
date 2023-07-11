@@ -245,7 +245,7 @@ server cluster OnOff = 6 {
     kLighting = 0x1;
   }
 
-  bitmap SceneFeatures : BITMAP32 {
+  bitmap ScenesFeature : BITMAP32 {
     kSceneNames = 0x1;
   }
 
@@ -4841,6 +4841,15 @@ endpoint 2 {
 endpoint 65534 {
   device type anonymousEndpointType = 61442, version 1;
 
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    ram      attribute featureMap;
+    callback attribute clusterRevision default = 1;
+  }
+
   server cluster NetworkCommissioning {
     callback attribute maxNetworks;
     callback attribute networks;
@@ -4854,5 +4863,3 @@ endpoint 65534 {
     callback attribute clusterRevision default = 1;
   }
 }
-
-

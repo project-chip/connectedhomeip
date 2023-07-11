@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -43,13 +43,15 @@ namespace Crypto {
 
 constexpr size_t kMax_x509_Certificate_Length = 600;
 
-constexpr size_t kP256_FE_Length                  = 32;
-constexpr size_t kP256_ECDSA_Signature_Length_Raw = (2 * kP256_FE_Length);
-constexpr size_t kP256_Point_Length               = (2 * kP256_FE_Length + 1);
-constexpr size_t kSHA256_Hash_Length              = 32;
-constexpr size_t kSHA1_Hash_Length                = 20;
-constexpr size_t kSubjectKeyIdentifierLength      = kSHA1_Hash_Length;
-constexpr size_t kAuthorityKeyIdentifierLength    = kSHA1_Hash_Length;
+constexpr size_t kP256_FE_Length                        = 32;
+constexpr size_t kP256_ECDSA_Signature_Length_Raw       = (2 * kP256_FE_Length);
+constexpr size_t kP256_Point_Length                     = (2 * kP256_FE_Length + 1);
+constexpr size_t kSHA256_Hash_Length                    = 32;
+constexpr size_t kSHA1_Hash_Length                      = 20;
+constexpr size_t kSubjectKeyIdentifierLength            = kSHA1_Hash_Length;
+constexpr size_t kAuthorityKeyIdentifierLength          = kSHA1_Hash_Length;
+constexpr size_t kMaxCertificateSerialNumberLength      = 20;
+constexpr size_t kMaxCertificateDistinguishedNameLength = 200;
 
 constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
 constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
@@ -131,13 +133,13 @@ constexpr size_t kCompressedFabricIdentifierSize = 8;
  * Spake2+ parameters for P256
  * Defined in https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html#name-ciphersuites
  */
-const uint8_t spake2p_M_p256[65] = {
+const uint8_t spake2p_M_p256[] = {
     0x04, 0x88, 0x6e, 0x2f, 0x97, 0xac, 0xe4, 0x6e, 0x55, 0xba, 0x9d, 0xd7, 0x24, 0x25, 0x79, 0xf2, 0x99,
     0x3b, 0x64, 0xe1, 0x6e, 0xf3, 0xdc, 0xab, 0x95, 0xaf, 0xd4, 0x97, 0x33, 0x3d, 0x8f, 0xa1, 0x2f, 0x5f,
     0xf3, 0x55, 0x16, 0x3e, 0x43, 0xce, 0x22, 0x4e, 0x0b, 0x0e, 0x65, 0xff, 0x02, 0xac, 0x8e, 0x5c, 0x7b,
     0xe0, 0x94, 0x19, 0xc7, 0x85, 0xe0, 0xca, 0x54, 0x7d, 0x55, 0xa1, 0x2e, 0x2d, 0x20,
 };
-const uint8_t spake2p_N_p256[65] = {
+const uint8_t spake2p_N_p256[] = {
     0x04, 0xd8, 0xbb, 0xd6, 0xc6, 0x39, 0xc6, 0x29, 0x37, 0xb0, 0x4d, 0x99, 0x7f, 0x38, 0xc3, 0x77, 0x07,
     0x19, 0xc6, 0x29, 0xd7, 0x01, 0x4d, 0x49, 0xa2, 0x4b, 0x4f, 0x98, 0xba, 0xa1, 0x29, 0x2b, 0x49, 0x07,
     0xd6, 0x0a, 0xa6, 0xbf, 0xad, 0xe4, 0x50, 0x08, 0xa6, 0x36, 0x33, 0x7f, 0x51, 0x68, 0xc6, 0x4d, 0x9b,
@@ -1565,6 +1567,21 @@ CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
  * @brief Extracts the Authority Key Identifier from an X509 Certificate.
  **/
 CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid);
+
+/**
+ * @brief Extracts Serial Number from X509 Certificate.
+ **/
+CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, MutableByteSpan & serialNumber);
+
+/**
+ * @brief Extracts Subject Distinguished Name from X509 Certificate. The value is copied into buffer in a raw ASN.1 X.509 format.
+ **/
+CHIP_ERROR ExtractSubjectFromX509Cert(const ByteSpan & certificate, MutableByteSpan & subject);
+
+/**
+ * @brief Extracts Issuer Distinguished Name from X509 Certificate. The value is copied into buffer in a raw ASN.1 X.509 format.
+ **/
+CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSpan & issuer);
 
 /**
  * @brief Checks for resigned version of the certificate in the list and returns it.

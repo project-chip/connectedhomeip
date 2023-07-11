@@ -15,9 +15,11 @@
 #    limitations under the License.
 #
 
+import math
 import re
 import string
 from abc import ABC, abstractmethod
+from typing import List
 
 from .errors import TestStepError
 
@@ -114,6 +116,11 @@ class ConstraintNotValueError(ConstraintCheckError):
         super().__init__(context, 'notValue', reason)
 
 
+class ConstraintAnyOfError(ConstraintCheckError):
+    def __init__(self, context, reason):
+        super().__init__(context, 'anyOf', reason)
+
+
 class BaseConstraint(ABC):
     '''Constraint Interface'''
 
@@ -185,9 +192,11 @@ class BaseConstraint(ABC):
             raise ConstraintMaxValueError(self._context, reason)
         elif isinstance(self, _ConstraintNotValue):
             raise ConstraintNotValueError(self._context, reason)
+        elif isinstance(self, _ConstraintAnyOf):
+            raise ConstraintAnyOfError(self._context, reason)
         else:
             # This should not happens.
-            raise ConstraintParseError(f'Unknown constraint instance.')
+            raise ConstraintParseError('Unknown constraint instance.')
 
 
 class _ConstraintHasValue(BaseConstraint):
@@ -211,7 +220,7 @@ class _ConstraintHasValue(BaseConstraint):
 
     def get_reason(self, value, value_type_name) -> str:
         if self._has_value:
-            return f"The constraint expects a value but there isn't one."
+            return "The constraint expects a value but there isn't one."
         return f"The response contains the value ({value}), but wasn't expecting any value."
 
 
@@ -223,6 +232,8 @@ class _ConstraintType(BaseConstraint):
     def check_response(self, value, value_type_name) -> bool:
         success = False
         if self._type == 'boolean' and type(value) is bool:
+            success = True
+        elif self._type == 'struct' and type(value) is dict:
             success = True
         elif self._type == 'list' and type(value) is list:
             success = True
@@ -350,6 +361,10 @@ class _ConstraintType(BaseConstraint):
             success = value >= -36028797018963967 and value <= 36028797018963967
         elif self._type == 'nullable_int64s' and type(value) is int:
             success = value >= -9223372036854775807 and value <= 9223372036854775807
+        elif self._type == 'single' and type(value) is float:
+            success = self._is_single(value)
+        elif self._type == 'double' and type(value) is float:
+            success = self._is_double(value)
         else:
             success = self._type == value_type_name
         return success
@@ -359,6 +374,8 @@ class _ConstraintType(BaseConstraint):
 
         if type(value) is bool:
             types.append('boolean')
+        elif type(value) is dict:
+            types.append('struct')
         elif type(value) is list:
             types.append('list')
         elif type(value) is str:
@@ -490,6 +507,12 @@ class _ConstraintType(BaseConstraint):
             if value >= -9223372036854775807 and value <= 9223372036854775807:
                 types.append('nullable_int64s')
 
+            if self._is_single(value):
+                types.append('single')
+
+            if self._is_double(value):
+                types.append('double')
+
         types.sort(key=lambda input_type: [int(c) if c.isdigit(
         ) else c for c in re.split('([0-9]+)', input_type)])
 
@@ -497,15 +520,24 @@ class _ConstraintType(BaseConstraint):
             types.append(value_type_name)
 
         if len(types) == 1:
-            reason = f'The response type {types[0]}) does not match the constraint.'
+            reason = f'The response type ({types[0]}) does not match the constraint.'
         else:
             reason = f'The response value ({value}) is of one of those types: {types}.'
         return reason
 
+    def _is_single(self, value):
+        return (value >= -1.7976931348623157E+308 and value <= -2.2250738585072014E-308) or value == 0.0 or (
+            value >= 2.2250738585072014E-308 and value <= 1.7976931348623157E+308) or math.isnan(value) or math.isinf(value)
+
+    def _is_double(self, value):
+        return (value >= -1.7976931348623157E+308 and value <= -2.2250738585072014E-308) or value == 0.0 or (
+            value >= 2.2250738585072014E-308 and value <= 1.7976931348623157E+308) or math.isnan(value) or math.isinf(value)
+
 
 class _ConstraintMinLength(BaseConstraint):
     def __init__(self, context, min_length):
-        super().__init__(context, types=[str, bytes, list])
+        super().__init__(context, types=[
+            str, bytes, list], is_null_allowed=True)
         self._min_length = min_length
 
     def check_response(self, value, value_type_name) -> bool:
@@ -517,7 +549,8 @@ class _ConstraintMinLength(BaseConstraint):
 
 class _ConstraintMaxLength(BaseConstraint):
     def __init__(self, context, max_length):
-        super().__init__(context, types=[str, bytes, list])
+        super().__init__(context, types=[
+            str, bytes, list], is_null_allowed=True)
         self._max_length = max_length
 
     def check_response(self, value, value_type_name) -> bool:
@@ -540,7 +573,7 @@ class _ConstraintIsHexString(BaseConstraint):
             chars = []
 
             for char in value:
-                if not char in string.hexdigits:
+                if char not in string.hexdigits:
                     chars.append(char)
 
             if len(chars) == 1:
@@ -582,7 +615,9 @@ class _ConstraintIsUpperCase(BaseConstraint):
         self._is_upper_case = is_upper_case
 
     def check_response(self, value, value_type_name) -> bool:
-        return value.isupper() == self._is_upper_case
+        # Make sure we don't have any lowercase characters.
+        hasLower = any(c.islower() for c in value)
+        return hasLower != self._is_upper_case
 
     def get_reason(self, value, value_type_name) -> str:
         if self._is_upper_case:
@@ -608,7 +643,9 @@ class _ConstraintIsLowerCase(BaseConstraint):
         self._is_lower_case = is_lower_case
 
     def check_response(self, value, value_type_name) -> bool:
-        return value.islower() == self._is_lower_case
+        # Make sure we don't have any uppercase characters.
+        hasUpper = any(c.isupper() for c in value)
+        return hasUpper != self._is_lower_case
 
     def get_reason(self, value, value_type_name) -> str:
         if self._is_lower_case:
@@ -694,7 +731,7 @@ class _ConstraintHasMaskSet(BaseConstraint):
         self._has_masks_set = has_masks_set
 
     def check_response(self, value, value_type_name) -> bool:
-        return all([(value & mask) == mask for mask in self._has_masks_set])
+        return all([(value & mask) != 0 for mask in self._has_masks_set])
 
     def get_reason(self, value, value_type_name) -> str:
         expected_masks = []
@@ -736,7 +773,19 @@ class _ConstraintNotValue(BaseConstraint):
         return f'The response value "{value}" should differs from the constraint.'
 
 
-def get_constraints(constraints: dict) -> list[BaseConstraint]:
+class _ConstraintAnyOf(BaseConstraint):
+    def __init__(self, context, any_of):
+        super().__init__(context, types=[], is_null_allowed=True)
+        self._any_of = any_of
+
+    def check_response(self, value, value_type_name) -> bool:
+        return value in self._any_of
+
+    def get_reason(self, value, value_type_name) -> str:
+        return f'The response value "{value}" is not a value from {self._any_of}.'
+
+
+def get_constraints(constraints: dict) -> List[BaseConstraint]:
     _constraints = []
     context = constraints
 
@@ -788,6 +837,9 @@ def get_constraints(constraints: dict) -> list[BaseConstraint]:
         elif 'notValue' == constraint:
             _constraints.append(_ConstraintNotValue(
                 context, constraint_value))
+        elif 'anyOf' == constraint:
+            _constraints.append(_ConstraintAnyOf(
+                context, constraint_value))
         else:
             raise ConstraintParseError(f'Unknown constraint type:{constraint}')
 
@@ -812,6 +864,7 @@ def is_typed_constraint(constraint: str):
         'hasMasksSet': False,
         'hasMasksClear': False,
         'notValue': True,
+        'anyOf': True,
     }
 
     is_typed = constraints.get(constraint)

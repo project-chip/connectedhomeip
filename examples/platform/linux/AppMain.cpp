@@ -19,7 +19,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -53,18 +52,22 @@
 
 #if defined(ENABLE_CHIP_SHELL)
 #include <CommissioneeShellCommands.h>
-#include <lib/shell/Engine.h>
+#include <lib/shell/Engine.h> // nogncheck
 #include <thread>
 #endif
 
 #if defined(PW_RPC_ENABLED)
-#include <CommonRpc.h>
+#include <Rpc.h>
 #endif
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "TraceDecoder.h"
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
+#if ENABLE_TRACING
+#include <TracingCommandLineArgument.h> // nogncheck
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
@@ -361,6 +364,15 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     initParams.userDirectedCommissioningPort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+#if ENABLE_TRACING
+    chip::CommandLineApp::TracingSetup tracing_setup;
+
+    for (const auto & trace_destination : LinuxDeviceOptions::GetInstance().traceTo)
+    {
+        tracing_setup.EnableTracingFor(trace_destination.c_str());
+    }
+#endif
+
     initParams.interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
 
     if (LinuxDeviceOptions::GetInstance().mCSRResponseOptions.csrExistingKeyPair)
@@ -414,8 +426,10 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     ApplicationInit();
 
 #if !defined(ENABLE_CHIP_SHELL)
+    // NOLINTBEGIN(bugprone-signal-handler)
     signal(SIGINT, StopSignalHandler);
     signal(SIGTERM, StopSignalHandler);
+    // NOLINTEND(bugprone-signal-handler)
 #endif // !defined(ENABLE_CHIP_SHELL)
 
     if (impl != nullptr)
@@ -437,6 +451,10 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #endif
 
     Server::GetInstance().Shutdown();
+
+#if ENABLE_TRACING
+    tracing_setup.StopTracing();
+#endif
 
     DeviceLayer::PlatformMgr().Shutdown();
 

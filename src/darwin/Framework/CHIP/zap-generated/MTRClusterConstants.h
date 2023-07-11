@@ -1194,7 +1194,9 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterBasicInformationAttributeCapabilityMinimaID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000013,
-    MTRAttributeIDTypeClusterBasicInformationAttributeProductAppearanceID MTR_NEWLY_AVAILABLE = 0x00000014,
+    MTRAttributeIDTypeClusterBasicInformationAttributeProductAppearanceID API_AVAILABLE(
+        ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
+    = 0x00000014,
     MTRAttributeIDTypeClusterBasicInformationAttributeGeneratedCommandListID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
@@ -2907,11 +2909,15 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeSourceID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000002,
-    MTRAttributeIDTypeClusterTimeSynchronizationAttributeTrustedTimeSourceID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterTimeSynchronizationAttributeTrustedTimeSourceID API_AVAILABLE(
+        ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
+    = 0x00000003,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeTrustedTimeNodeIdID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeClusterTimeSynchronizationAttributeTrustedTimeSourceID,
-    MTRAttributeIDTypeClusterTimeSynchronizationAttributeDefaultNTPID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterTimeSynchronizationAttributeDefaultNTPID API_AVAILABLE(
+        ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
+    = 0x00000004,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeDefaultNtpID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeClusterTimeSynchronizationAttributeDefaultNTPID,
@@ -2928,7 +2934,9 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneDatabaseID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000008,
-    MTRAttributeIDTypeClusterTimeSynchronizationAttributeNTPServerAvailableID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterTimeSynchronizationAttributeNTPServerAvailableID API_AVAILABLE(
+        ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
+    = 0x00000009,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeNtpServerPortID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeClusterTimeSynchronizationAttributeNTPServerAvailableID,
@@ -3076,7 +3084,9 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeUniqueIDID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000012,
-    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductAppearanceID MTR_NEWLY_AVAILABLE = 0x00000014,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductAppearanceID API_AVAILABLE(
+        ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
+    = 0x00000014,
     MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeGeneratedCommandListID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
@@ -8969,6 +8979,10 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     = 0x00000002,
     MTRCommandIDTypeClusterThermostatCommandClearWeeklyScheduleID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000003,
+
+    // Cluster FanControl deprecated command id names
+
+    // Cluster FanControl commands
 
     // Cluster ColorControl deprecated command id names
     MTRClusterColorControlCommandMoveToHueID MTR_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandMoveToHueID",

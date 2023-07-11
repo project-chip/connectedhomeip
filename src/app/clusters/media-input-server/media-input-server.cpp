@@ -40,6 +40,7 @@ using Protocols::InteractionModel::Status;
 
 static constexpr size_t kMediaInputDelegateTableSize =
     EMBER_AF_MEDIA_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kMediaInputDelegateTableSize <= kEmberInvalidEndpointIndex, "MediaInput Delegate tablle size error");
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -52,8 +53,9 @@ Delegate * gDelegateTable[kMediaInputDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::MediaInput::Id);
-    return (ep == 0xFFFF ? nullptr : gDelegateTable[ep]);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, MediaInput::Id, EMBER_AF_MEDIA_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kMediaInputDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -74,8 +76,9 @@ namespace MediaInput {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::MediaInput::Id);
-    if (ep != 0xFFFF)
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, MediaInput::Id, EMBER_AF_MEDIA_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (ep < kMediaInputDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }
@@ -84,7 +87,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     }
 }
 
-bool HasFeature(chip::EndpointId endpoint, MediaInputFeature feature)
+bool HasFeature(chip::EndpointId endpoint, Feature feature)
 {
     bool hasFeature     = false;
     uint32_t featureMap = 0;
@@ -258,7 +261,7 @@ bool emberAfMediaInputClusterRenameInputCallback(app::CommandHandler * command, 
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
-    if (!HasFeature(endpoint, MediaInputFeature::kNameUpdates))
+    if (!HasFeature(endpoint, Feature::kNameUpdates))
     {
         ChipLogError(Zcl, "MediaInput no name updates feature");
         err = CHIP_ERROR_INCORRECT_STATE;

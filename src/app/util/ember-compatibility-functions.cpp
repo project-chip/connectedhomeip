@@ -24,9 +24,11 @@
 #include <access/AccessControl.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
+#include <app/att-storage.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
@@ -45,7 +47,6 @@
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/Constants.h>
 
-#include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-type.h>
 
 #include <zap-generated/endpoint_config.h>
@@ -103,6 +104,7 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_DATA_VER_ATTRIBUTE_TYPE:   // Data Version
     case ZCL_BITMAP32_ATTRIBUTE_TYPE:   // 32-bit bitmap
     case ZCL_EPOCH_S_ATTRIBUTE_TYPE:    // Epoch Seconds
+    case ZCL_ELAPSED_S_ATTRIBUTE_TYPE:  // Elapsed Seconds
         static_assert(std::is_same<chip::ClusterId, uint32_t>::value,
                       "chip::Cluster is expected to be uint32_t, change this when necessary");
         static_assert(std::is_same<chip::AttributeId, uint32_t>::value,
@@ -121,11 +123,14 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
                       "chip::DataVersion is expected to be uint32_t, change this when necessary");
         return ZCL_INT32U_ATTRIBUTE_TYPE;
 
-    case ZCL_EVENT_NO_ATTRIBUTE_TYPE:  // Event Number
-    case ZCL_FABRIC_ID_ATTRIBUTE_TYPE: // Fabric Id
-    case ZCL_NODE_ID_ATTRIBUTE_TYPE:   // Node Id
-    case ZCL_BITMAP64_ATTRIBUTE_TYPE:  // 64-bit bitmap
-    case ZCL_EPOCH_US_ATTRIBUTE_TYPE:  // Epoch Microseconds
+    case ZCL_EVENT_NO_ATTRIBUTE_TYPE:   // Event Number
+    case ZCL_FABRIC_ID_ATTRIBUTE_TYPE:  // Fabric Id
+    case ZCL_NODE_ID_ATTRIBUTE_TYPE:    // Node Id
+    case ZCL_BITMAP64_ATTRIBUTE_TYPE:   // 64-bit bitmap
+    case ZCL_EPOCH_US_ATTRIBUTE_TYPE:   // Epoch Microseconds
+    case ZCL_POSIX_MS_ATTRIBUTE_TYPE:   // POSIX Milliseconds
+    case ZCL_SYSTIME_MS_ATTRIBUTE_TYPE: // System time Milliseconds
+    case ZCL_SYSTIME_US_ATTRIBUTE_TYPE: // System time Microseconds
         static_assert(std::is_same<chip::EventNumber, uint64_t>::value,
                       "chip::EventNumber is expected to be uint64_t, change this when necessary");
         static_assert(std::is_same<chip::FabricId, uint64_t>::value,
@@ -133,6 +138,9 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
         static_assert(std::is_same<chip::NodeId, uint64_t>::value,
                       "chip::NodeId is expected to be uint64_t, change this when necessary");
         return ZCL_INT64U_ATTRIBUTE_TYPE;
+
+    case ZCL_TEMPERATURE_ATTRIBUTE_TYPE: // Temperature
+        return ZCL_INT16S_ATTRIBUTE_TYPE;
 
     default:
         return type;
@@ -275,8 +283,8 @@ void IncreaseClusterDataVersion(const ConcreteClusterPath & aConcreteClusterPath
 
 CHIP_ERROR SendSuccessStatus(AttributeReportIB::Builder & aAttributeReport, AttributeDataIB::Builder & aAttributeDataIBBuilder)
 {
-    ReturnErrorOnFailure(aAttributeDataIBBuilder.EndOfAttributeDataIB().GetError());
-    return aAttributeReport.EndOfAttributeReportIB().GetError();
+    ReturnErrorOnFailure(aAttributeDataIBBuilder.EndOfAttributeDataIB());
+    return aAttributeReport.EndOfAttributeReportIB();
 }
 
 CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
@@ -591,11 +599,11 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     AttributePathIB::Builder & attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
-    attributePathIBBuilder.Endpoint(aPath.mEndpointId)
-        .Cluster(aPath.mClusterId)
-        .Attribute(aPath.mAttributeId)
-        .EndOfAttributePathIB();
-    ReturnErrorOnFailure(attributePathIBBuilder.GetError());
+    CHIP_ERROR err = attributePathIBBuilder.Endpoint(aPath.mEndpointId)
+                         .Cluster(aPath.mClusterId)
+                         .Attribute(aPath.mAttributeId)
+                         .EndOfAttributePathIB();
+    ReturnErrorOnFailure(err);
 
     EmberAfAttributeSearchRecord record;
     record.endpoint           = aPath.mEndpointId;
@@ -950,10 +958,9 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * attributeMetadata, 
 }
 } // namespace
 
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aPath)
 {
-    return emberAfLocateAttributeMetadata(aConcreteClusterPath.mEndpointId, aConcreteClusterPath.mClusterId,
-                                          aConcreteClusterPath.mAttributeId);
+    return emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 }
 
 CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
@@ -1062,6 +1069,38 @@ bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
     }
 
     return false;
+}
+
+Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
+{
+    using Protocols::InteractionModel::Status;
+
+    const EmberAfEndpointType * type = emberAfFindEndpointType(aPath.mEndpointId);
+    if (type == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+
+    const EmberAfCluster * cluster = emberAfFindClusterInType(type, aPath.mClusterId, CLUSTER_MASK_SERVER);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedCluster;
+    }
+
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
+    for (size_t i = 0; i < cluster->eventCount; ++i)
+    {
+        if (cluster->eventList[i] == aPath.mEventId)
+        {
+            return Status::Success;
+        }
+    }
+
+    return Status::UnsupportedEvent;
+#else
+    // No way to tell. Just claim supported.
+    return Status::Success;
+#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
 }
 
 } // namespace app

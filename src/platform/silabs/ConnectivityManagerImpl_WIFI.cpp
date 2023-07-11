@@ -247,7 +247,6 @@ CHIP_ERROR ConnectivityManagerImpl::_RequestSEDActiveMode(bool onOff, bool delay
 
 void ConnectivityManagerImpl::DriveStationState()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     sl_status_t serr;
     bool stationConnected;
 
@@ -260,7 +259,7 @@ void ConnectivityManagerImpl::DriveStationState()
         // Ensure that the WFX is started.
         if ((serr = wfx_wifi_start()) != SL_STATUS_OK)
         {
-            ChipLogError(DeviceLayer, "wfx_wifi_start() failed: %s", chip::ErrorStr(err));
+            ChipLogError(DeviceLayer, "wfx_wifi_start() failed: %lx", serr);
             return;
         }
         // Ensure that station mode is enabled in the WFX WiFi layer.
@@ -295,7 +294,7 @@ void ConnectivityManagerImpl::DriveStationState()
             serr = wfx_sta_discon();
             if (serr != SL_STATUS_OK)
             {
-                ChipLogError(DeviceLayer, "wfx_wifi_disconnect() failed: %s", chip::ErrorStr(err));
+                ChipLogError(DeviceLayer, "wfx_wifi_disconnect() failed: %lx", serr);
             }
             SuccessOrExit(serr);
 
@@ -382,10 +381,6 @@ void ConnectivityManagerImpl::OnStationConnected()
     (void) PlatformMgr().PostEvent(&event);
     // Setting the rs911x in the power save mode
 #if (CHIP_DEVICE_CONFIG_ENABLE_SED && RS911X_WIFI)
-    // TODO: Remove stop advertising after BLEManagerImpl is fixed
-#if RSI_BLE_ENABLE
-    chip::DeviceLayer::Internal::BLEManagerImpl().StopAdvertising();
-#endif /* RSI_BLE_ENABLE */
     sl_status_t err = wfx_power_save();
     if (err != SL_STATUS_OK)
     {

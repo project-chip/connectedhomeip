@@ -19,6 +19,9 @@
 
 #include <inttypes.h>
 
+#include <app/util/af-types.h>
+#include <app/util/endpoint-config-api.h>
+
 // Cluster name structure
 typedef struct
 {
@@ -27,11 +30,6 @@ typedef struct
 } EmberAfClusterName;
 
 extern const EmberAfClusterName zclClusterNames[];
-
-#include <app/util/af.h>
-
-// EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH is defined in config.h
-#define EMBER_AF_RESPONSE_BUFFER_LEN EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH
 
 void emberAfInit();
 uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
@@ -44,27 +42,6 @@ uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
  * up to 4 bytes.
  */
 EmberAfDifferenceType emberAfGetDifference(uint8_t * pData, EmberAfDifferenceType value, uint8_t dataSize);
-
-/**
- * Retrieves an uint64_t from the given Zigbee payload. The integer retrieved
- * may be cast into an integer of the appropriate size depending on the
- * number of bytes requested from the message. In Zigbee, all integers are
- * passed over the air in LSB form. LSB to MSB conversion is
- * done within this function automatically before the integer is returned.
- *
- * Obviously (due to return value) this function can only handle
- * the retrieval of integers between 1 and 8 bytes in length.
- *
- */
-uint64_t emberAfGetInt(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen, uint8_t bytes);
-
-uint8_t * emberAfPutInt8uInResp(uint8_t value);
-uint16_t * emberAfPutInt16uInResp(uint16_t value);
-uint8_t * emberAfPutBlockInResp(const uint8_t * data, uint16_t length);
-uint8_t * emberAfPutStringInResp(const uint8_t * buffer);
-void emberAfPutInt16sInResp(int16_t value);
-
-bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
 /* @brief returns true if the attribute is known to be volatile (i.e. RAM
  * storage).

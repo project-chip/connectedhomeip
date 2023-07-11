@@ -26,7 +26,7 @@ limitations under the License.
     <description>This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker.</description>
 
     <globalAttribute side="server" code="0xFFFC" value="0" />
-    <attribute side="server" code="0x0000" define="MEDIA_PLAYBACK_STATE"                     type="PlaybackStateEnum" min="0x00" max="0x02" default="0x00" writable="false"                    optional="false">CurrentState</attribute>
+    <attribute side="server" code="0x0000" define="MEDIA_PLAYBACK_STATE"                     type="PlaybackStateEnum" min="0x00" max="0x03" default="0x00" writable="false"                    optional="false">CurrentState</attribute>
     <attribute side="server" code="0x0001" define="MEDIA_PLAYBACK_START_TIME"                type="EPOCH_US"          min="0x00"            default="0x00" writable="false" isNullable="true"  optional="true">StartTime</attribute>
     <attribute side="server" code="0x0002" define="MEDIA_PLAYBACK_DURATION"                  type="INT64U"            min="0x00"            default="0"    writable="false" isNullable="true"  optional="true">Duration</attribute>
     <attribute side="server" code="0x0003" define="MEDIA_PLAYBACK_PLAYBACK_POSITION"         type="PlaybackPositionStruct"                                 writable="false" isNullable="true"  optional="true">SampledPosition</attribute>
@@ -114,7 +114,7 @@ limitations under the License.
     <item name="SeekOutOfRange"         value="0x05"/>
   </enum>
 
-  <bitmap name="MediaPlaybackFeature" type="BITMAP32">
+  <bitmap name="Feature" type="BITMAP32">
     <cluster code="0x0506"/>
     <field name="AdvancedSeek" mask="0x1"/>
     <field name="VariableSpeed" mask="0x2"/>

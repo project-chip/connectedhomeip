@@ -106,11 +106,12 @@ tests:
 
 
           If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
+
           [1657881584.166241][2584:2589] CHIP:DMG: }
           [1657881584.166599][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 4079829024
-          [1657881584.166672][2584:2589] CHIP:TOO:   IdentifyTime: 0
+          [1657881584.166672][2584:2589] CHIP:TOO:   identify time: 0
           [1657881584.166734][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
-          [1657881584.166761][2584:2589] CHIP:TOO:   IdentifyType: 2
+          [1657881584.166761][2584:2589] CHIP:TOO:   identify type: 2
           [1657881584.166817][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 4079829024
           [1657881584.166844][2584:2589] CHIP:TOO:   FeatureMap: 0
           [1657881584.166900][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 4079829024
@@ -154,26 +155,25 @@ tests:
           send a report data action with the attribute value to the DUT."
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD  1 0xFFFF
 
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
 
-          [1655721447.462511][10909:10909] CHIP:EM: Handling via exchange: 28866r, Delegate: 0xaaaac37ce418
-          [1655721447.462589][10909:10909] CHIP:IM: Received Read request
-          [1655721447.462717][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655721447.462770][10909:10909] CHIP:DMG: {
-          [1655721447.462817][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655721447.462908][10909:10909] CHIP:DMG:         [
-          [1655721447.462961][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655721447.463014][10909:10909] CHIP:DMG:                 {
-          [1655721447.463066][10909:10909] CHIP:DMG:                 }
-          [1655721447.463121][10909:10909] CHIP:DMG:
-          [1655721447.463173][10909:10909] CHIP:DMG:         ],
-          [1655721447.463228][10909:10909] CHIP:DMG:
-          [1655721447.463282][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655721447.463334][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655721447.463382][10909:10909] CHIP:DMG: },
-          [1655721447.463503][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1684327544.654910][138835:138837] CHIP:DMG: ReportDataMessage =
+          [1684327544.654915][138835:138837] CHIP:DMG: {
+          [1684327544.654920][138835:138837] CHIP:DMG: 	AttributeReportIBs =
+          [1684327544.654926][138835:138837] CHIP:DMG: 	[
+          [1684327544.654929][138835:138837] CHIP:DMG: 		AttributeReportIB =
+          [1684327544.654940][138835:138837] CHIP:DMG: 		{
+          [1684327544.654949][138835:138837] CHIP:DMG: 			AttributeDataIB =
+          [1684327544.654956][138835:138837] CHIP:DMG: 			{
+          [1684327544.654964][138835:138837] CHIP:DMG: 				DataVersion = 0x91861588,
+          [1684327544.654970][138835:138837] CHIP:DMG: 				AttributePathIB =
+          [1684327544.654978][138835:138837] CHIP:DMG: 				{
+          [1684327544.654995][138835:138837] CHIP:DMG: 					Attribute = 0x0000_FFFD,
+          [1684327544.655002][138835:138837] CHIP:DMG: 				}
+
 
           If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
       disabled: true
@@ -187,6 +187,7 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0x03 0xFFFFFFFF  1 0xFFFF
+
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
 
           [1655721586.587649][10909:10909] CHIP:EM: Handling via exchange: 14559r, Delegate: 0xaaaac37ce418
@@ -211,9 +212,9 @@ tests:
           If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657881729.900518][2608:2613] CHIP:DMG: }
           [1657881729.901108][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 4079829024
-          [1657881729.901182][2608:2613] CHIP:TOO:   IdentifyTime: 0
+          [1657881729.901182][2608:2613] CHIP:TOO:   identify time: 0
           [1657881729.901245][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
-          [1657881729.901273][2608:2613] CHIP:TOO:   IdentifyType: 2
+          [1657881729.901273][2608:2613] CHIP:TOO:   identify type: 2
           [1657881729.901331][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 4079829024
           [1657881729.901359][2608:2613] CHIP:TOO:   FeatureMap: 0
           [1657881729.901431][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 4079829024
@@ -234,9 +235,9 @@ tests:
           [1657881729.902426][2608:2613] CHIP:TOO:     [6]: 65532
           [1657881729.902451][2608:2613] CHIP:TOO:     [7]: 65533
           [1657881729.902474][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3999381333
-          [1657881729.902500][2608:2613] CHIP:TOO:   IdentifyTime: 0
+          [1657881729.902500][2608:2613] CHIP:TOO:   identify time: 0
           [1657881729.902556][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3999381333
-          [1657881729.902583][2608:2613] CHIP:TOO:   IdentifyType: 2
+          [1657881729.902583][2608:2613] CHIP:TOO:   identify type: 2
           [1657881729.902640][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 3999381333
           [1657881729.902665][2608:2613] CHIP:TOO:   FeatureMap: 0
           [1657881729.902721][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3999381333
@@ -293,9 +294,9 @@ tests:
           If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657881792.350417][2616:2621] CHIP:DMG: }
           [1657881792.350641][2616:2621] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
-          [1657881792.350742][2616:2621] CHIP:TOO:   IdentifyType: 2
+          [1657881792.350742][2616:2621] CHIP:TOO:   identify type: 2
           [1657881792.350845][2616:2621] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3999381333
-          [1657881792.350891][2616:2621] CHIP:TOO:   IdentifyType: 2
+          [1657881792.350891][2616:2621] CHIP:TOO:   identify type: 2
           [1657881792.351000][2616:2621] CHIP:EM: Sending Standalone Ack for MessageCounter:222990264 on exchange 23721i
       disabled: true
 
@@ -471,6 +472,7 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool modeselect read description  1 1
+
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
 
           [1655722750.452237][10909:10909] CHIP:EM: Handling via exchange: 31886r, Delegate: 0xaaaac37ce418
@@ -536,7 +538,7 @@ tests:
           If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657882043.053353][2648:2653] CHIP:DMG: }
           [1657882043.053561][2648:2653] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
-          [1657882043.053662][2648:2653] CHIP:TOO:   IdentifyType: 2
+          [1657882043.053662][2648:2653] CHIP:TOO:   identify type: 2
           [1657882043.053774][2648:2653] CHIP:EM: Sending Standalone Ack for MessageCounter:228608905 on exchange 11019i
       disabled: true
 
@@ -586,7 +588,7 @@ tests:
       verification: |
           DUT implementation required to verify read an attribute of data type Float
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
+          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -771,7 +773,7 @@ tests:
           If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657882403.876372][2715:2720] CHIP:DMG: }
           [1657882403.876514][2715:2720] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 737072536
-          [1657882403.876595][2715:2720] CHIP:TOO:   OccupancySensorType: 0
+          [1657882403.876595][2715:2720] CHIP:TOO:   occupancy sensor type: 0
           [1657882403.876679][2715:2720] CHIP:EM: Sending Standalone Ack for MessageCounter:153370776 on exchange 37640i
       disabled: true
 

@@ -23,17 +23,7 @@
 
 LOG_MODULE_REGISTER(LEDWidget);
 
-const struct device * LEDWidget::mPort = NULL;
 static LEDWidget::LEDWidgetStateUpdateHandler sStateUpdateCallback;
-
-void LEDWidget::InitGpio(const device * port)
-{
-    mPort = port;
-    if (!device_is_ready(mPort))
-    {
-        LOG_ERR("%s is not ready\n", mPort->name);
-    }
-}
 
 void LEDWidget::SetStateUpdateCallback(LEDWidgetStateUpdateHandler stateUpdateCb)
 {
@@ -41,17 +31,17 @@ void LEDWidget::SetStateUpdateCallback(LEDWidgetStateUpdateHandler stateUpdateCb
         sStateUpdateCallback = stateUpdateCb;
 }
 
-void LEDWidget::Init(gpio_pin_t gpioNum)
+void LEDWidget::Init(gpio_dt_spec gpio)
 {
     mBlinkOnTimeMS  = 0;
     mBlinkOffTimeMS = 0;
-    mGPIONum        = gpioNum;
+    mGPIO           = gpio;
     mState          = false;
 
-    int ret = gpio_pin_configure(mPort, mGPIONum, GPIO_OUTPUT_ACTIVE);
+    int ret = gpio_pin_configure_dt(&mGPIO, GPIO_OUTPUT_ACTIVE);
     if (ret < 0)
     {
-        LOG_ERR("GPIO pin %d configure - fail. Status%d\n", mGPIONum, ret);
+        LOG_ERR("GPIO pin %d configure - fail. Status%d\n", mGPIO.pin, ret);
     }
 
     k_timer_init(&mLedTimer, &LEDWidget::LedStateTimerHandler, nullptr);
@@ -99,10 +89,10 @@ void LEDWidget::ScheduleStateChange()
 void LEDWidget::DoSet(bool state)
 {
     mState  = state;
-    int ret = gpio_pin_set(mPort, mGPIONum, state);
+    int ret = gpio_pin_set_dt(&mGPIO, state);
     if (ret < 0)
     {
-        LOG_ERR("GPIO pin %d set -fail. Status: %d\n", mGPIONum, ret);
+        LOG_ERR("GPIO pin %d set -fail. Status: %d\n", mGPIO.pin, ret);
     }
 }
 

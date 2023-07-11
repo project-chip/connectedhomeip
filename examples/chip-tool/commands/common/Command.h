@@ -72,6 +72,7 @@ enum ArgumentType
     Vector16,
     Vector32,
     VectorCustom,
+    VectorString, // comma separated string items
 };
 
 struct Argument
@@ -254,17 +255,27 @@ public:
         return AddArgument(name, min, max, reinterpret_cast<double *>(value), desc, flags | Argument::kNullable);
     }
 
+    size_t AddArgument(const char * name, std::vector<std::string> * value, const char * desc);
+    size_t AddArgument(const char * name, chip::Optional<std::vector<std::string>> * value, const char * desc);
+
     void ResetArguments();
 
     virtual CHIP_ERROR Run() = 0;
 
     bool IsInteractive() { return mIsInteractive; }
 
-    CHIP_ERROR RunAsInteractive()
+    CHIP_ERROR RunAsInteractive(const chip::Optional<char *> & interactiveStorageDirectory)
     {
-        mIsInteractive = true;
+        mStorageDirectory = interactiveStorageDirectory;
+        mIsInteractive    = true;
         return Run();
     }
+
+    const chip::Optional<char *> & GetStorageDirectory() const { return mStorageDirectory; }
+
+protected:
+    // mStorageDirectory lives here so we can just set it in RunAsInteractive.
+    chip::Optional<char *> mStorageDirectory;
 
 private:
     bool InitArgument(size_t argIndex, char * argValue);

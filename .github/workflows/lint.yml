@@ -32,40 +32,15 @@ jobs:
             image: connectedhomeip/chip-build:0.6.47
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              if: ${{ !env.ACT }}
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            # To use act like:
-            #   act -j code-lints
-            #
-            # Note you likely still need to have non submodules setup for the
-            # local machine, like:
-            #   git submodule deinit --all
-            - uses: actions/checkout@v3
-              if: ${{ env.ACT }}
-              name: Checkout (ACT for local build)
+            - name: Checkout
+              uses: actions/checkout@v3
 
             # Bootstrap and checkout for internal scripts (like idl_lint)
             # to run
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
+                platform: linux
 
             - name: Check for matter lint errors
               if: always()
@@ -211,3 +186,10 @@ jobs:
               run: |
                   git grep -n 'SuccessOrExit(CHIP_ERROR' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name: Check for use of "SuccessOrExit(something-without-assignment(", which should probably be "SuccessOrExit(err = something("
+              if: always()
+              run: |
+                  git grep -n 'SuccessOrExit([^=)]*(' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0

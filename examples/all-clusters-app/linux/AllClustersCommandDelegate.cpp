@@ -18,8 +18,8 @@
 
 #include "AllClustersCommandDelegate.h"
 
-#include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/att-storage.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
 #include <app/clusters/switch-server/switch-server.h>
@@ -214,12 +214,12 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         GeneralFaults<kMaxNetworkFaults> current;
 
         // On Linux Simulation, set following radio faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_ENUM_HARDWARE_FAILURE));
-        ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_ENUM_NETWORK_JAMMED));
+        ReturnOnFailure(previous.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kHardwareFailure)));
+        ReturnOnFailure(previous.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kNetworkJammed)));
 
-        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_ENUM_HARDWARE_FAILURE));
-        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_ENUM_NETWORK_JAMMED));
-        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_ENUM_CONNECTION_FAILED));
+        ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kHardwareFailure)));
+        ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kNetworkJammed)));
+        ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kConnectionFailed)));
         Clusters::GeneralDiagnosticsServer::Instance().OnNetworkFaultsDetect(previous, current);
     }
     else
@@ -245,8 +245,12 @@ void AllClustersAppCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
     softwareFault.name.SetValue(CharSpan::fromCharString(threadName));
 
     std::time_t result = std::time(nullptr);
-    char * asctime     = std::asctime(std::localtime(&result));
-    softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(asctime), strlen(asctime)));
+    // Using size of 50 as it is double the expected 25 characters "Www Mmm dd hh:mm:ss yyyy\n".
+    char timeChar[50];
+    if (std::strftime(timeChar, sizeof(timeChar), "%c", std::localtime(&result)))
+    {
+        softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
+    }
 
     Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
 }

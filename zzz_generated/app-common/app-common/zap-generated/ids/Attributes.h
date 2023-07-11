@@ -154,6 +154,14 @@ namespace LastConfiguredBy {
 static constexpr AttributeId Id = 0x00000005;
 } // namespace LastConfiguredBy
 
+namespace SceneTableSize {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace SceneTableSize
+
+namespace RemainingCapacity {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace RemainingCapacity
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -2351,6 +2359,60 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace BooleanState
 
+namespace IcdManagement {
+namespace Attributes {
+
+namespace IdleModeInterval {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace IdleModeInterval
+
+namespace ActiveModeInterval {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace ActiveModeInterval
+
+namespace ActiveModeThreshold {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ActiveModeThreshold
+
+namespace RegisteredClients {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace RegisteredClients
+
+namespace ICDCounter {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ICDCounter
+
+namespace ClientsSupportedPerFabric {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ClientsSupportedPerFabric
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace IcdManagement
+
 namespace ModeSelect {
 namespace Attributes {
 
@@ -2404,6 +2466,1248 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace ModeSelect
+
+namespace LaundryWasherMode {
+namespace Attributes {
+
+namespace SupportedModes {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedModes
+
+namespace CurrentMode {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentMode
+
+namespace StartUpMode {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace StartUpMode
+
+namespace OnMode {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OnMode
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace LaundryWasherMode
+
+namespace RefrigeratorAndTemperatureControlledCabinetMode {
+namespace Attributes {
+
+namespace SupportedModes {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedModes
+
+namespace CurrentMode {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentMode
+
+namespace StartUpMode {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace StartUpMode
+
+namespace OnMode {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OnMode
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace RefrigeratorAndTemperatureControlledCabinetMode
+
+namespace LaundryWasherControls {
+namespace Attributes {
+
+namespace SpinSpeeds {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace SpinSpeeds
+
+namespace SpinSpeedCurrent {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace SpinSpeedCurrent
+
+namespace NumberOfRinses {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace NumberOfRinses
+
+namespace SupportedRinses {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace SupportedRinses
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace LaundryWasherControls
+
+namespace RvcRunMode {
+namespace Attributes {
+
+namespace SupportedModes {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedModes
+
+namespace CurrentMode {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentMode
+
+namespace StartUpMode {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace StartUpMode
+
+namespace OnMode {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OnMode
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace RvcRunMode
+
+namespace RvcCleanMode {
+namespace Attributes {
+
+namespace SupportedModes {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedModes
+
+namespace CurrentMode {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentMode
+
+namespace StartUpMode {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace StartUpMode
+
+namespace OnMode {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OnMode
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace RvcCleanMode
+
+namespace TemperatureControl {
+namespace Attributes {
+
+namespace TemperatureSetpoint {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace TemperatureSetpoint
+
+namespace MinTemperature {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinTemperature
+
+namespace MaxTemperature {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxTemperature
+
+namespace Step {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Step
+
+namespace SelectedTemperatureLevel {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace SelectedTemperatureLevel
+
+namespace SupportedTemperatureLevels {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace SupportedTemperatureLevels
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace TemperatureControl
+
+namespace RefrigeratorAlarm {
+namespace Attributes {
+
+namespace Mask {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Mask
+
+namespace State {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace State
+
+namespace Supported {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Supported
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace RefrigeratorAlarm
+
+namespace DishwasherMode {
+namespace Attributes {
+
+namespace SupportedModes {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedModes
+
+namespace CurrentMode {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentMode
+
+namespace StartUpMode {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace StartUpMode
+
+namespace OnMode {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OnMode
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace DishwasherMode
+
+namespace AirQuality {
+namespace Attributes {
+
+namespace AirQuality {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace AirQuality
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace AirQuality
+
+namespace SmokeCoAlarm {
+namespace Attributes {
+
+namespace ExpressedState {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace ExpressedState
+
+namespace SmokeState {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace SmokeState
+
+namespace COState {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace COState
+
+namespace BatteryAlert {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace BatteryAlert
+
+namespace DeviceMuted {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace DeviceMuted
+
+namespace TestInProgress {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace TestInProgress
+
+namespace HardwareFaultAlert {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace HardwareFaultAlert
+
+namespace EndOfServiceAlert {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace EndOfServiceAlert
+
+namespace InterconnectSmokeAlarm {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace InterconnectSmokeAlarm
+
+namespace InterconnectCOAlarm {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace InterconnectCOAlarm
+
+namespace ContaminationState {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace ContaminationState
+
+namespace SensitivityLevel {
+static constexpr AttributeId Id = 0x0000000B;
+} // namespace SensitivityLevel
+
+namespace ExpiryDate {
+static constexpr AttributeId Id = 0x0000000C;
+} // namespace ExpiryDate
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace SmokeCoAlarm
+
+namespace DishwasherAlarm {
+namespace Attributes {
+
+namespace Mask {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Mask
+
+namespace Latch {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace Latch
+
+namespace State {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace State
+
+namespace Supported {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Supported
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace DishwasherAlarm
+
+namespace OperationalState {
+namespace Attributes {
+
+namespace PhaseList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace PhaseList
+
+namespace CurrentPhase {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentPhase
+
+namespace CountdownTime {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace CountdownTime
+
+namespace OperationalStateList {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OperationalStateList
+
+namespace OperationalState {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace OperationalState
+
+namespace OperationalError {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace OperationalError
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace OperationalState
+
+namespace RvcOperationalState {
+namespace Attributes {
+
+namespace PhaseList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace PhaseList
+
+namespace CurrentPhase {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentPhase
+
+namespace CountdownTime {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace CountdownTime
+
+namespace OperationalStateList {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OperationalStateList
+
+namespace OperationalState {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace OperationalState
+
+namespace OperationalError {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace OperationalError
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace RvcOperationalState
+
+namespace HepaFilterMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace LastChangedTime
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace HepaFilterMonitoring
+
+namespace ActivatedCarbonFilterMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace LastChangedTime
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ActivatedCarbonFilterMonitoring
+
+namespace CeramicFilterMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace LastChangedTime
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace CeramicFilterMonitoring
+
+namespace ElectrostaticFilterMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace LastChangedTime
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ElectrostaticFilterMonitoring
+
+namespace UvFilterMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace LastChangedTime
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace UvFilterMonitoring
+
+namespace IonizingFilterMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace LastChangedTime
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace IonizingFilterMonitoring
+
+namespace ZeoliteFilterMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace LastChangedTime
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ZeoliteFilterMonitoring
+
+namespace OzoneFilterMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace LastChangedTime
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace OzoneFilterMonitoring
+
+namespace WaterTankMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace LastChangedTime
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace WaterTankMonitoring
+
+namespace FuelTankMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace LastChangedTime
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace FuelTankMonitoring
+
+namespace InkCartridgeMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace LastChangedTime
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace InkCartridgeMonitoring
+
+namespace TonerCartridgeMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace LastChangedTime
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace TonerCartridgeMonitoring
 
 namespace DoorLock {
 namespace Attributes {
@@ -3162,6 +4466,10 @@ namespace WindSetting {
 static constexpr AttributeId Id = 0x0000000A;
 } // namespace WindSetting
 
+namespace AirflowDirection {
+static constexpr AttributeId Id = 0x0000000B;
+} // namespace AirflowDirection
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3886,6 +5194,2670 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace OccupancySensing
+
+namespace CarbonMonoxideConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace CarbonMonoxideConcentrationMeasurement
+
+namespace CarbonDioxideConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace CarbonDioxideConcentrationMeasurement
+
+namespace EthyleneConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace EthyleneConcentrationMeasurement
+
+namespace EthyleneOxideConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace EthyleneOxideConcentrationMeasurement
+
+namespace HydrogenConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace HydrogenConcentrationMeasurement
+
+namespace HydrogenSulfideConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace HydrogenSulfideConcentrationMeasurement
+
+namespace NitricOxideConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace NitricOxideConcentrationMeasurement
+
+namespace NitrogenDioxideConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace NitrogenDioxideConcentrationMeasurement
+
+namespace OxygenConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace OxygenConcentrationMeasurement
+
+namespace OzoneConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace OzoneConcentrationMeasurement
+
+namespace SulfurDioxideConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace SulfurDioxideConcentrationMeasurement
+
+namespace DissolvedOxygenConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace DissolvedOxygenConcentrationMeasurement
+
+namespace BromateConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace BromateConcentrationMeasurement
+
+namespace ChloraminesConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ChloraminesConcentrationMeasurement
+
+namespace ChlorineConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ChlorineConcentrationMeasurement
+
+namespace FecalColiformEColiConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace FecalColiformEColiConcentrationMeasurement
+
+namespace FluorideConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace FluorideConcentrationMeasurement
+
+namespace HaloaceticAcidsConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace HaloaceticAcidsConcentrationMeasurement
+
+namespace TotalTrihalomethanesConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace TotalTrihalomethanesConcentrationMeasurement
+
+namespace TotalColiformBacteriaConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace TotalColiformBacteriaConcentrationMeasurement
+
+namespace TurbidityConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace TurbidityConcentrationMeasurement
+
+namespace CopperConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace CopperConcentrationMeasurement
+
+namespace LeadConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace LeadConcentrationMeasurement
+
+namespace ManganeseConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ManganeseConcentrationMeasurement
+
+namespace SulfateConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace SulfateConcentrationMeasurement
+
+namespace BromodichloromethaneConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace BromodichloromethaneConcentrationMeasurement
+
+namespace BromoformConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace BromoformConcentrationMeasurement
+
+namespace ChlorodibromomethaneConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ChlorodibromomethaneConcentrationMeasurement
+
+namespace ChloroformConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ChloroformConcentrationMeasurement
+
+namespace SodiumConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace SodiumConcentrationMeasurement
+
+namespace Pm25ConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace Pm25ConcentrationMeasurement
+
+namespace FormaldehydeConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace FormaldehydeConcentrationMeasurement
+
+namespace Pm1ConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace Pm1ConcentrationMeasurement
+
+namespace Pm10ConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace Pm10ConcentrationMeasurement
+
+namespace TotalVolatileOrganicCompoundsConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace TotalVolatileOrganicCompoundsConcentrationMeasurement
+
+namespace RadonConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeakMeasuredValue
+
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeakMeasuredValueWindow
+
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AverageMeasuredValue
+
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AverageMeasuredValueWindow
+
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Uncertainty
+
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MeasurementUnit
+
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MeasurementMedium
+
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelValue
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace RadonConcentrationMeasurement
 
 namespace WakeOnLan {
 namespace Attributes {
@@ -4904,56 +8876,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace ElectricalMeasurement
-
-namespace ClientMonitoring {
-namespace Attributes {
-
-namespace IdleModeInterval {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace IdleModeInterval
-
-namespace ActiveModeInterval {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace ActiveModeInterval
-
-namespace ActiveModeThreshold {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace ActiveModeThreshold
-
-namespace ExpectedClients {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace ExpectedClients
-
-namespace ICDCounter {
-static constexpr AttributeId Id = 0x00000004;
-} // namespace ICDCounter
-
-namespace GeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-
-namespace AcceptedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-
-namespace EventList {
-static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-
-namespace AttributeList {
-static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace ClientMonitoring
 
 namespace UnitTesting {
 namespace Attributes {

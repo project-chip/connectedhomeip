@@ -17,8 +17,6 @@
  */
 
 #include "static-supported-modes-manager.h"
-#include <app/util/debug-printing.h>
-#include <app/util/ember-print.h>
 #include <platform/ESP32/ESP32Config.h>
 
 using namespace chip;
@@ -29,19 +27,35 @@ using chip::Protocols::InteractionModel::Status;
 
 using ModeOptionStructType = Structs::ModeOptionStruct::Type;
 using SemanticTag          = Structs::SemanticTagStruct::Type;
+
 template <typename T>
 using List = app::DataModel::List<T>;
 
+SupportedModesManager::ModeOptionsProvider * StaticSupportedModesManager::epModeOptionsProviderList = nullptr;
+
 const StaticSupportedModesManager StaticSupportedModesManager::instance = StaticSupportedModesManager();
 
-SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::epModeOptionsProviderList[FIXED_ENDPOINT_COUNT];
+int StaticSupportedModesManager::mSize = 0;
 
-void StaticSupportedModesManager::InitEndpointArray()
+CHIP_ERROR StaticSupportedModesManager::InitEndpointArray(int size)
 {
-    for (int i = 0; i < FIXED_ENDPOINT_COUNT; i++)
+    if (epModeOptionsProviderList != nullptr)
+    {
+        ChipLogError(Zcl, "Cannot allocate epModeOptionsProviderList");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    mSize                     = size;
+    epModeOptionsProviderList = new SupportedModesManager::ModeOptionsProvider[mSize];
+    if (epModeOptionsProviderList == nullptr)
+    {
+        ChipLogError(Zcl, "Failed to allocate memory to epModeOptionsProviderList");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    for (int i = 0; i < mSize; i++)
     {
         epModeOptionsProviderList[i] = ModeOptionsProvider();
     }
+    return CHIP_NO_ERROR;
 }
 
 SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeOptionsProvider(EndpointId endpointId) const
@@ -176,13 +190,13 @@ Status StaticSupportedModesManager::getModeOptionByMode(unsigned short endpointI
             return Status::Success;
         }
     }
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Cannot find the mode %u", mode);
+    ChipLogProgress(Zcl, "Cannot find the mode %u", mode);
     return Status::InvalidCommand;
 }
 
 const ModeSelect::SupportedModesManager * ModeSelect::getSupportedModesManager()
 {
-    return &StaticSupportedModesManager::instance;
+    return &StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
 }
 
 void StaticSupportedModesManager::FreeSupportedModes(EndpointId endpointId) const

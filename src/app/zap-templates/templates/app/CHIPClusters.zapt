@@ -1,7 +1,4 @@
 {{> header}}
-
-{{#if_enabled_clusters side='client'}}
-// Prevent multiple inclusion
 #pragma once
 
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -25,4 +22,3 @@ public:
 {{/all_user_clusters}}
 } // namespace Controller
 } // namespace chip
-{{/if_enabled_clusters}}

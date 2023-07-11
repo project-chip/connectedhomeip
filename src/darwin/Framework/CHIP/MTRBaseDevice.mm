@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#import <Matter/MTRDefines.h>
 
 #import "MTRAttributeTLVValueDecoder_Internal.h"
 #import "MTRBaseDevice_Internal.h"
@@ -28,6 +29,8 @@
 #import "MTRFramework.h"
 #import "MTRLogging_Internal.h"
 #import "MTRSetupPayload_Internal.h"
+#import "NSDataSpanConversion.h"
+#import "NSStringSpanConversion.h"
 
 #include "app/ConcreteAttributePath.h"
 #include "app/ConcreteCommandPath.h"
@@ -84,6 +87,7 @@ NSString * const MTREventTimestampDateKey = @"eventTimestampDate";
 
 class MTRDataValueDictionaryCallbackBridge;
 
+MTR_HIDDEN
 @interface MTRReadClientContainer : NSObject
 @property (nonatomic, readwrite) app::ReadClient * readClientPtr;
 @property (nonatomic, readwrite) app::AttributePathParams * pathParams;
@@ -229,6 +233,11 @@ static void CauseReadClientFailure(
         }];
 }
 #endif
+
+static bool CheckMemberOfType(NSDictionary<NSString *, id> * responseValue, NSString * memberName, Class expectedClass,
+    NSString * errorMessage, NSError * __autoreleasing * error);
+static void LogStringAndReturnError(NSString * errorStr, CHIP_ERROR errorCode, NSError * __autoreleasing * error);
+static void LogStringAndReturnError(NSString * errorStr, MTRErrorCode errorCode, NSError * __autoreleasing * error);
 
 @implementation MTRReadClientContainer
 - (void)onDone
@@ -517,26 +526,27 @@ id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data
             dictionaryWithObjectsAndKeys:MTRDoubleValueType, MTRTypeKey, [NSNumber numberWithDouble:val], MTRValueKey, nil];
     }
     case chip::TLV::kTLVType_UTF8String: {
-        uint32_t len = data->GetLength();
-        const uint8_t * ptr;
-        CHIP_ERROR err = data->GetDataPtr(ptr);
+        CharSpan stringValue;
+        CHIP_ERROR err = data->Get(stringValue);
         if (err != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Error(%s): TLV UTF8String decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:MTRUTF8StringValueType, MTRTypeKey,
-                             [[NSString alloc] initWithBytes:ptr length:len encoding:NSUTF8StringEncoding], MTRValueKey, nil];
+        NSString * stringObj = AsString(stringValue);
+        if (stringObj == nil) {
+            MTR_LOG_ERROR("Error(%s): TLV UTF8String value is not actually UTF-8", err.AsString());
+            return nil;
+        }
+        return @ { MTRTypeKey : MTRUTF8StringValueType, MTRValueKey : stringObj };
     }
     case chip::TLV::kTLVType_ByteString: {
-        uint32_t len = data->GetLength();
-        const uint8_t * ptr;
-        CHIP_ERROR err = data->GetDataPtr(ptr);
+        ByteSpan bytesValue;
+        CHIP_ERROR err = data->Get(bytesValue);
         if (err != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Error(%s): TLV ByteString decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:MTROctetStringValueType, MTRTypeKey,
-                             [NSData dataWithBytes:ptr length:len], MTRValueKey, nil];
+        return @ { MTRTypeKey : MTROctetStringValueType, MTRValueKey : AsData(bytesValue) };
     }
     case chip::TLV::kTLVType_Null: {
         return [NSDictionary dictionaryWithObjectsAndKeys:MTRNullValueType, MTRTypeKey, nil];
@@ -566,7 +576,7 @@ id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data
             chip::TLV::Tag tag = data->GetTag();
             id value = MTRDecodeDataValueDictionaryFromCHIPTLV(data);
             if (value == nullptr) {
-                MTR_LOG_ERROR("Error when decoding TLV container");
+                MTR_LOG_ERROR("Error when decoding TLV container of type %s", typeName.UTF8String);
                 return nil;
             }
             NSMutableDictionary * arrayElement = [NSMutableDictionary dictionary];
@@ -648,7 +658,7 @@ static CHIP_ERROR MTREncodeTLVFromDataValueDictionary(id object, chip::TLV::TLVW
             MTR_LOG_ERROR("Error: Object to encode has corrupt UTF8 string type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return writer.PutString(tag, [value cStringUsingEncoding:NSUTF8StringEncoding]);
+        return writer.PutString(tag, [value UTF8String]);
     }
     if ([typeName isEqualToString:MTROctetStringValueType]) {
         if (![value isKindOfClass:[NSData class]]) {
@@ -814,12 +824,14 @@ private:
         //
         VerifyOrDie(!aPath.IsListItemOperation());
 
-        VerifyOrExit(aStatus.IsSuccess(), err = aStatus.ToChipError());
         VerifyOrExit(
             std::find_if(mAttributePathParamsList, mAttributePathParamsList + mAttributePathParamsSize,
                 [aPath](app::AttributePathParams & pathParam) -> bool { return pathParam.IsAttributePathSupersetOf(aPath); })
                 != mAttributePathParamsList + mAttributePathParamsSize,
             err = CHIP_ERROR_SCHEMA_MISMATCH);
+
+        VerifyOrExit(aStatus.IsSuccess(), err = aStatus.ToChipError());
+
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         SuccessOrExit(err = app::DataModel::Decode(*apData, value));
@@ -847,6 +859,9 @@ private:
                          })
                 != mEventPathParamsList + mEventPathParamsSize,
             err = CHIP_ERROR_SCHEMA_MISMATCH);
+
+        VerifyOrExit(apStatus == nullptr, err = apStatus->ToChipError());
+
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         SuccessOrExit(err = app::DataModel::Decode(*apData, value));
@@ -1361,7 +1376,7 @@ exit:
                            ConcreteEventPath pathCopy(*eventPath);
                            dispatch_async(queue, ^{
                                reportHandler(@[ @ {
-                                   MTRAttributePathKey : [[MTREventPath alloc] initWithPath:pathCopy],
+                                   MTREventPathKey : [[MTREventPath alloc] initWithPath:pathCopy],
                                    MTRErrorKey : [MTRError errorForCHIPErrorCode:error]
                                } ],
                                    nil);
@@ -1806,6 +1821,62 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         MTREventTimeTypeKey : eventTimeType,
         timestampKey : timestampValue
     };
+}
+
++ (System::PacketBufferHandle)_responseDataForCommand:(NSDictionary<NSString *, id> *)responseValue
+                                            clusterID:(chip::ClusterId)clusterID
+                                            commandID:(chip::CommandId)commandID
+                                                error:(NSError * __autoreleasing *)error
+{
+    if (!CheckMemberOfType(responseValue, MTRCommandPathKey, [MTRCommandPath class],
+            @"response-value command path is not an MTRCommandPath.", error)) {
+        return System::PacketBufferHandle();
+    }
+
+    MTRCommandPath * path = responseValue[MTRCommandPathKey];
+
+    if (![path.cluster isEqualToNumber:@(clusterID)]) {
+        LogStringAndReturnError([NSString stringWithFormat:@"Expected cluster id %@ but got %@", path.cluster, @(clusterID)],
+            MTRErrorCodeSchemaMismatch, error);
+        return System::PacketBufferHandle();
+    }
+
+    if (![path.command isEqualToNumber:@(commandID)]) {
+        LogStringAndReturnError([NSString stringWithFormat:@"Expected command id %@ but got %@", path.command, @(commandID)],
+            MTRErrorCodeSchemaMismatch, error);
+        return System::PacketBufferHandle();
+    }
+
+    if (!CheckMemberOfType(
+            responseValue, MTRDataKey, [NSDictionary class], @"response-value data is not a data-value dictionary.", error)) {
+        return System::PacketBufferHandle();
+    }
+
+    NSDictionary * data = responseValue[MTRDataKey];
+
+    auto buffer = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        LogStringAndReturnError(@"Unable to allocate encoding buffer", CHIP_ERROR_NO_MEMORY, error);
+        return System::PacketBufferHandle();
+    }
+
+    System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    CHIP_ERROR errorCode = MTREncodeTLVFromDataValueDictionary(data, writer, TLV::AnonymousTag());
+    if (errorCode != CHIP_NO_ERROR) {
+        LogStringAndReturnError(@"Unable to encode data-value to TLV", errorCode, error);
+        return System::PacketBufferHandle();
+    }
+
+    errorCode = writer.Finalize(&buffer);
+    if (errorCode != CHIP_NO_ERROR) {
+        LogStringAndReturnError(@"Unable to encode data-value to TLV", errorCode, error);
+        return System::PacketBufferHandle();
+    }
+
+    return buffer;
 }
 @end
 

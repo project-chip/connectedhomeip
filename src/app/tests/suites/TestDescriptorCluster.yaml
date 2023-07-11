@@ -59,15 +59,14 @@ tests:
                   0x0035, # Thread Network Diagnostiscs
                   0x0036, # WiFi Network Diagnostics
                   0x0037, # Ethernet Network Diagnostics
+                  0x0038, # Time Synchronization
                   0x003C, # Administrator Commissioning
                   0x003E, # Operational Credentials
                   0x003F, # Group Key Management
                   0x0040, # Fixed Label
                   0x0041, # User Label
+                  0x0046, # ICD Management
                   0x0405, # Relative Humidity Measurement (why on EP0?)
-                  # Disable CM cluster table tests until update is done
-                  # https://github.com/project-chip/connectedhomeip/issues/24425
-                  # 0x1046, # Client Monitoring
                   0xFFF1FC06, # Fault Injection
               ]
 

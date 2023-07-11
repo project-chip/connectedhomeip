@@ -33,8 +33,13 @@ static constexpr char TAG[] = "ESP32Appserver";
 
 namespace {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+constexpr chip::EndpointId kNetworkCommissioningEndpointWiFi = 0xFFFE;
+#else
+constexpr chip::EndpointId kNetworkCommissioningEndpointWiFi = 0;
+#endif
 app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+    sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointWiFi, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
 #elif CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 static app::Clusters::NetworkCommissioning::Instance
     sEthernetNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPEthernetDriver::GetInstance()));

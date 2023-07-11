@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 3.2.4. [TC-OO-2.4] Startup functionality with server as DUT
+name: 4.2.4. [TC-OO-2.4] Startup functionality with server as DUT
 
 PICS:
     - OO.S

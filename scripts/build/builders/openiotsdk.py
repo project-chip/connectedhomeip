@@ -42,13 +42,29 @@ class OpenIotSdkApp(Enum):
             raise Exception('Unknown app type: %r' % self)
 
 
+class OpenIotSdkCryptoBackend(Enum):
+    PSA = auto()
+    MBEDTLS = auto()
+
+    @property
+    def CryptoBackendName(self):
+        if self == OpenIotSdkCryptoBackend.PSA:
+            return 'psa'
+        elif self == OpenIotSdkCryptoBackend.MBEDTLS:
+            return 'mbedtls'
+        else:
+            raise Exception('Unknown crypto backend type: %r' % self)
+
+
 class OpenIotSdkBuilder(Builder):
     def __init__(self,
                  root,
                  runner,
-                 app: OpenIotSdkApp = OpenIotSdkApp.SHELL):
+                 app: OpenIotSdkApp = OpenIotSdkApp.SHELL,
+                 crypto: OpenIotSdkCryptoBackend = OpenIotSdkCryptoBackend.MBEDTLS):
         super(OpenIotSdkBuilder, self).__init__(root, runner)
         self.app = app
+        self.crypto = crypto
         self.toolchain_path = os.path.join(
             'toolchains', 'toolchain-arm-none-eabi-gcc.cmake')
         self.system_processor = 'cortex-m55'
@@ -64,6 +80,9 @@ class OpenIotSdkBuilder(Builder):
                                shlex.quote(self.toolchain_path)),
                            '-DCMAKE_SYSTEM_PROCESSOR={}'.format(
                                self.system_processor),
+                           '-DCMAKE_BUILD_TYPE=Release',
+                           '-DCONFIG_CHIP_CRYPTO={}'.format(
+                               self.crypto.CryptoBackendName),
                            ], title='Generating ' + self.identifier)
 
     def _build(self):

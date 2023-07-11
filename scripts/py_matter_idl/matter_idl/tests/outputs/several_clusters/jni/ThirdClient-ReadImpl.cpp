@@ -2,7 +2,7 @@
 #include <jni/CHIPReadCallbacks.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <zap-generated/CHIPClusters.h>
+#include <controller/CHIPCluster.h>
 
 #include <controller/java/AndroidClusterExceptions.h>
 #include <controller/java/CHIPDefaultCallbacks.h>
@@ -23,7 +23,7 @@ JNI_METHOD(void, ThirdCluster, readSomeEnumAttribute)(JNIEnv * env, jobject self
     VerifyOrReturn(onFailure.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Controller::ThirdCluster * cppCluster = reinterpret_cast<chip::Controller::ThirdCluster *>(clusterPtr);
+    chip::Controller::ClusterBase * cppCluster = reinterpret_cast<chip::Controller::ClusterBase *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn = chip::Callback::Callback<CHIPThirdClusterSomeEnumAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
@@ -47,7 +47,7 @@ JNI_METHOD(void, ThirdCluster, readOptionsAttribute)(JNIEnv * env, jobject self,
     VerifyOrReturn(onFailure.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Controller::ThirdCluster * cppCluster = reinterpret_cast<chip::Controller::ThirdCluster *>(clusterPtr);
+    chip::Controller::ClusterBase * cppCluster = reinterpret_cast<chip::Controller::ClusterBase *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn = chip::Callback::Callback<CHIPThirdClusterOptionsAttributeCallbackType>::FromCancelable(onSuccess->Cancel());

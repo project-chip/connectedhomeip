@@ -82,11 +82,12 @@ extern "C" void K32WUartProcess(void);
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip;
+using namespace chip::app;
 
 AppTask AppTask::sAppTask;
 
 static Identify gIdentify = { chip::EndpointId{ 1 }, AppTask::OnIdentifyStart, AppTask::OnIdentifyStop,
-                              EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED };
+                              Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator };
 
 /* OTA related variables */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -96,6 +97,15 @@ static DeviceLayer::DefaultOTARequestorDriver gRequestorUser;
 static BDXDownloader gDownloader;
 
 constexpr uint16_t requestedOtaBlockSize = 1024;
+#endif
+
+#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+CHIP_ERROR CustomFactoryDataRestoreMechanism(void)
+{
+    K32W_LOG("This is a custom factory data restore mechanism.");
+
+    return CHIP_NO_ERROR;
+}
 #endif
 
 CHIP_ERROR AppTask::StartAppTask()
@@ -113,6 +123,40 @@ CHIP_ERROR AppTask::StartAppTask()
     return err;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+static void CheckOtaEntry()
+{
+    K32W_LOG("Current OTA_ENTRY_TOP_ADDR: 0x%x", OTA_ENTRY_TOP_ADDR);
+
+    CustomOtaEntries_t ota_entries;
+    if (gOtaSuccess_c == OTA_GetCustomEntries(&ota_entries) && ota_entries.ota_state != otaNoImage)
+    {
+        if (ota_entries.ota_state == otaApplied)
+        {
+            K32W_LOG("OTA successfully applied");
+#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
+            // If this point is reached, it means OTA_CommitCustomEntries was successfully called.
+            // Delete the factory data backup to stop doing a restore when the factory data provider
+            // is initialized. This ensures that both the factory data and app were updated, otherwise
+            // revert to the backed up factory data.
+            PDM_vDeleteDataRecord(kNvmId_FactoryDataBackup);
+#endif
+        }
+        else
+        {
+            K32W_LOG("OTA failed with status %d", ota_entries.ota_state);
+        }
+
+        // Clear the entry
+        OTA_ResetCustomEntries();
+    }
+    else
+    {
+        K32W_LOG("Unable to access OTA entries structure");
+    }
+}
+#endif
+
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -128,10 +172,15 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model and start server
     PlatformMgr().ScheduleWork(InitServer, 0);
 
-// Initialize device attestation config
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    CheckOtaEntry();
+#endif
+
+    // Initialize device attestation config
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
     // Initialize factory data provider
     ReturnErrorOnFailure(AppTask::FactoryDataProvider::GetDefaultInstance().Init());
+    AppTask::FactoryDataProvider::GetDefaultInstance().RegisterRestoreMechanism(CustomFactoryDataRestoreMechanism);
     SetDeviceInstanceInfoProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
     SetDeviceAttestationCredentialsProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
     SetCommissionableDataProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
@@ -723,7 +772,7 @@ void AppTask::OnStateChanged(ContactSensorManager::State aState)
 
 void AppTask::OnIdentifyStart(Identify * identify)
 {
-    if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK == identify->mCurrentEffectIdentifier)
+    if (Clusters::Identify::EffectIdentifierEnum::kBlink == identify->mCurrentEffectIdentifier)
     {
         if (Function::kNoneSelected != sAppTask.mFunction)
         {
@@ -741,7 +790,7 @@ void AppTask::OnIdentifyStart(Identify * identify)
 
 void AppTask::OnIdentifyStop(Identify * identify)
 {
-    if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK == identify->mCurrentEffectIdentifier)
+    if (Clusters::Identify::EffectIdentifierEnum::kBlink == identify->mCurrentEffectIdentifier)
     {
         K32W_LOG("Identify process has stopped.");
         sAppTask.mFunction = Function::kNoneSelected;

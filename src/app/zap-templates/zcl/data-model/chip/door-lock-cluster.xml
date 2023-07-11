@@ -37,12 +37,13 @@ limitations under the License.
         <tag name="NOT" description="Notification" />
         <tag name="YDSCH" description="Year Day Access Schedules" />
         <tag name="HDSCH" description="Holiday Schedules" />
+        <tag name="UBOLT" description="Unbolting" />
 
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
 
         <!-- Current cluster version -->
-        <globalAttribute side="either" code="0xFFFD" value="6" />
+        <globalAttribute side="either" code="0xFFFD" value="7" />
         <!-- Cluster feature map -->
         <globalAttribute side="server" code="0xFFFC" value="0x0001">
             <featureBit tag="PIN" bit="0">true</featureBit>
@@ -57,6 +58,7 @@ limitations under the License.
             <featureBit tag="NOT" bit="9">false</featureBit>
             <featureBit tag="YDSCH" bit="10">true</featureBit>
             <featureBit tag="HDSCH" bit="11">true</featureBit>
+            <featureBit tag="UBOLT" bit="12">true</featureBit>
         </globalAttribute>
 
         <!-- The principle behind  mandatory/optional is the following:
@@ -67,8 +69,8 @@ limitations under the License.
             cluster itself. Those attributes/commands are marked with a special comment. -->
 
         <!-- Attributes -->
-        <attribute side="server" code="0" define="LOCK_STATE" type="DlLockState" min="0" max="2" isNullable="true" reportable="true" writable="false">LockState</attribute>
-        <attribute side="server" code="1" define="LOCK_TYPE" type="DlLockType" min="0" max="10" writable="false">LockType</attribute>
+        <attribute side="server" code="0" define="LOCK_STATE" type="DlLockState" min="0" max="3" isNullable="true" reportable="true" writable="false">LockState</attribute>
+        <attribute side="server" code="1" define="LOCK_TYPE" type="DlLockType" min="0" max="11" writable="false">LockType</attribute>
         <attribute side="server" code="2" define="ACTUATOR_ENABLED" type="boolean" writable="false">ActuatorEnabled</attribute>
         <!-- Conformance feature DPS - for now optional -->
         <attribute side="server" code="3" define="DOOR_STATE" type="DoorStateEnum" min="0" max="5" isNullable="true" reportable="true" optional="true">DoorState</attribute>
@@ -393,6 +395,11 @@ limitations under the License.
             <access op="invoke" role="administer" />
             <arg name="Credential" type="CredentialStruct" isNullable="true"/>
         </command>
+        <command source="client" code="39" name="UnboltDoor" mustUseTimedInvoke="true" optional="true">
+            <description>This command causes the lock device to unlock the door without pulling the latch.</description>
+            <!-- Conformance feature [COTA & PIN] - for now optional -->
+            <arg name="PINCode" type="OCTET_STRING" optional="true" />
+        </command>
 
 
         <!-- Events -->
@@ -531,6 +538,7 @@ limitations under the License.
         <item value="1" name="Unlock" />
         <item value="2" name="NonAccessUserEvent" />
         <item value="3" name="ForcedUserEvent" />
+        <item value="4" name="Unlatch" />
     </enum>
 
     <enum name="OperationErrorEnum" type="ENUM8">
@@ -594,6 +602,7 @@ limitations under the License.
         <item value="0" name="Not Fully Locked" />
         <item value="1" name="Locked" />
         <item value="2" name="Unlocked" />
+        <item value="3" name="Unlatched" />
     </enum>
 
     <!-- LockType Attribute Values -->
@@ -610,6 +619,7 @@ limitations under the License.
         <item value="8" name="Interconnected Lock" />
         <item value="9" name="Dead Latch" />
         <item value="10" name="Door Furniture" />
+        <item value="11" name="Eurocylinder" />
     </enum>
 
     <!-- CredentialRulesSupport attribute bit meaning set -->
@@ -744,7 +754,7 @@ limitations under the License.
         <item value="0x8B" name="NotFound" />
     </enum>
 
-    <bitmap name="DoorLockFeature" type="BITMAP32">
+    <bitmap name="Feature" type="BITMAP32">
         <cluster code="0x0101" />
         <field name="PIN Credential" mask="0x01" />
         <field name="RFID Credential" mask="0x02" />
@@ -758,6 +768,7 @@ limitations under the License.
         <field name="Notification" mask="0x200" />
         <field name="Year Day Access Schedules" mask="0x400" />
         <field name="Holiday Schedules" mask="0x800" />
+        <field name="Unbolt" mask="0x1000" />
     </bitmap>
 
     <enum name="DoorLockSetPinOrIdStatus" type="ENUM8">

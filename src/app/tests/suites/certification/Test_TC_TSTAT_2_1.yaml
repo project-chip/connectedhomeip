@@ -47,7 +47,7 @@ tests:
       command: "readAttribute"
       attribute: "MinSetpointDeadBand"
       response:
-          saveAs: MinSetpointDeadBand
+          saveAs: MinSetpointDeadBandValue
 
     - label:
           "Saving value for comparision in step 6 read AbsMaxCoolSetpointLimit
@@ -65,7 +65,7 @@ tests:
       command: "readAttribute"
       attribute: "MinCoolSetpointLimit"
       response:
-          saveAs: MinCoolSetpointLimit
+          saveAs: MinCoolSetpointLimitValue
 
     - label:
           "Saving value for comparision in step 17 read MaxCoolSetpointLimit
@@ -74,7 +74,14 @@ tests:
       command: "readAttribute"
       attribute: "MaxCoolSetpointLimit"
       response:
-          saveAs: MaxCoolSetpointLimit
+          saveAs: MaxCoolSetpointLimitValue
+
+    - label: "Saving value for comparision in step 17 read MaxHeatSetpointLimit"
+      PICS: TSTAT.S.A0016
+      command: "readAttribute"
+      attribute: "MaxHeatSetpointLimit"
+      response:
+          saveAs: MaxHeatSetpointLimitValue
 
     - label:
           "Saving value for comparision in step 13 read attribute
@@ -83,7 +90,7 @@ tests:
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
       response:
-          saveAs: OccupiedCoolingSetpoint
+          saveAs: OccupiedCoolingSetpointValue
 
     - label:
           "Saving value for comparision in step 15 read attribute
@@ -92,7 +99,7 @@ tests:
       command: "readAttribute"
       attribute: "AbsMinHeatSetpointLimit"
       response:
-          saveAs: AbsMinHeat
+          saveAs: AbsMinHeatValue
 
     - label:
           "Saving value for comparision in step 15 read attribute
@@ -101,7 +108,7 @@ tests:
       command: "readAttribute"
       attribute: "AbsMaxHeatSetpointLimit"
       response:
-          saveAs: AbsMaxHeat
+          saveAs: AbsMaxHeatValue
 
     - label:
           "Saving value for comparision in step 16 read
@@ -110,7 +117,7 @@ tests:
       command: "readAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       response:
-          saveAs: UnoccupiedCoolingSetpoint
+          saveAs: UnoccupiedCoolingSetpointValue
 
     - label: "Reads mandatory attributes from DUT: LocalTemperature"
       command: "readAttribute"
@@ -150,7 +157,7 @@ tests:
       response:
           constraints:
               type: int16s
-              maxValue: AbsMinCoolSetpointLimitStep5 - MinSetpointDeadBand
+              maxValue: AbsMinCoolSetpointLimitStep5 - MinSetpointDeadBandValue
 
     - label:
           "Read attribute AbsMinHeatSetpointLimit if TSTAT.S.F05 feature is
@@ -250,8 +257,8 @@ tests:
       response:
           constraints:
               type: int16s
-              minValue: MinCoolSetpointLimit
-              maxValue: MaxCoolSetpointLimit
+              minValue: MinCoolSetpointLimitValue
+              maxValue: MaxCoolSetpointLimitValue
 
     - label: "Read attribute OccupiedCoolingSetpoint from the DUT"
       PICS: TSTAT.S.F01 && !TSTAT.S.A0017 && !TSTAT.S.A0018
@@ -273,7 +280,7 @@ tests:
           constraints:
               type: int16s
               minValue: AbsMinCoolSetpointLimitStep5
-              maxValue: OccupiedCoolingSetpoint - MinSetpointDeadBand
+              maxValue: OccupiedCoolingSetpointValue - MinSetpointDeadBandValue
 
     - label: "Read attribute OccupiedHeatingSetpoint from the DUT"
       PICS: TSTAT.S.F00 && !TSTAT.S.F05
@@ -292,8 +299,8 @@ tests:
       response:
           constraints:
               type: int16s
-              minValue: AbsMinHeat
-              maxValue: AbsMaxHeat
+              minValue: AbsMinHeatValue
+              maxValue: AbsMaxHeatValue
 
     - label: "Read UnoccupiedCoolingSetpoint attribute from the DUT"
       PICS: TSTAT.S.F01 && TSTAT.S.F02 && !TSTAT.S.F05
@@ -313,7 +320,8 @@ tests:
           constraints:
               type: int16s
               minValue: 700
-              maxValue: UnoccupiedCoolingSetpoint - MinSetpointDeadBand
+              maxValue:
+                  UnoccupiedCoolingSetpointValue - MinSetpointDeadBandValue
 
     - label: "Read UnoccupiedHeatingSetpoint attribute from the DUT"
       PICS: TSTAT.S.F00 && TSTAT.S.F02 && !TSTAT.S.F05
@@ -326,19 +334,34 @@ tests:
               maxValue: 3000
 
     - label: "Reads attribute from DUT: MinHeatSetpointLimit"
-      PICS: TSTAT.S.A0015 && TSTAT.S.F05 && TSTAT.S.A0017
+      PICS: TSTAT.S.A0015 && TSTAT.S.F05 && TSTAT.S.A0017 && TSTAT.S.A0003
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
       response:
           constraints:
               type: int16s
               minValue: 700
-              maxValue: MinCoolSetpointLimit - MinSetpointDeadBand
+              maxValue: MinCoolSetpointLimitValue - MinSetpointDeadBandValue
 
-    - label: "Read attribute MinHeatSetpointLimit from the DUT"
-      PICS: TSTAT.S.A0015 && !TSTAT.S.F05
+    - label:
+          "Reads MinHeatSetpointLimit attribute from Server DUT and verifies
+          that the value is within range"
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
+      PICS: TSTAT.S.A0015 && TSTAT.S.A0016 && TSTAT.S.A0003 && !TSTAT.S.F05
+      response:
+          constraints:
+              type: int16s
+              minValue: AbsMinHeatValue
+              maxValue: MaxHeatSetpointLimitValue
+
+    #Using hard coded values when optional attributes are not available
+    - label:
+          "Reads MinHeatSetpointLimit attribute from Server DUT and verifies
+          that the value is within range"
+      command: "readAttribute"
+      attribute: "MinHeatSetpointLimit"
+      PICS: TSTAT.S.A0003 && !TSTAT.S.A0015 && !TSTAT.S.A0016 && !TSTAT.S.F05
       response:
           constraints:
               type: int16s
@@ -363,7 +386,7 @@ tests:
           constraints:
               type: int16s
               minValue: 700
-              maxValue: MaxCoolSetpointLimit - MinSetpointDeadBand
+              maxValue: MaxCoolSetpointLimitValue - MinSetpointDeadBandValue
 
     - label: "Read attribute MinCoolSetpointLimit from DUT"
       PICS: TSTAT.S.A0017 && TSTAT.S.A0018 && TSTAT.S.A0005
@@ -373,7 +396,7 @@ tests:
           constraints:
               type: int16s
               minValue: AbsMinCoolSetpointLimitStep5
-              maxValue: MaxCoolSetpointLimit
+              maxValue: MaxCoolSetpointLimitValue
 
     - label: "Read attribute MinCoolSetpointLimit from DUT"
       PICS: TSTAT.S.A0017 && !TSTAT.S.A0018 && !TSTAT.S.A0005
@@ -392,7 +415,7 @@ tests:
       response:
           constraints:
               type: int16s
-              minValue: MinCoolSetpointLimit
+              minValue: MinCoolSetpointLimitValue
               maxValue: AbsMaxCoolSetpointLimitStep6
 
     - label: "Read attribute MinSetpointDeadBand from DUT"
@@ -544,7 +567,7 @@ tests:
               type: epoch_s
 
     - label: "Read OccupiedSetback attribute from the DUT"
-      PICS: TSTAT.S.F02
+      PICS: TSTAT.S.F04
       command: "readAttribute"
       attribute: "OccupiedSetback"
       response:
@@ -554,7 +577,7 @@ tests:
               maxValue: 255
 
     - label: "Read OccupiedSetbackMin attribute from the DUT"
-      PICS: TSTAT.S.F02
+      PICS: TSTAT.S.F04
       command: "readAttribute"
       attribute: "OccupiedSetbackMin"
       response:
@@ -564,7 +587,7 @@ tests:
               maxValue: 255
 
     - label: "Read OccupiedSetbackMax attribute from the DUT"
-      PICS: TSTAT.S.F02
+      PICS: TSTAT.S.F04
       command: "readAttribute"
       attribute: "OccupiedSetbackMax"
       response:

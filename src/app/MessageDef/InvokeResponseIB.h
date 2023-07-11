@@ -96,9 +96,9 @@ public:
     /**
      *  @brief Mark the end of this InvokeCommand
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    InvokeResponseIB::Builder & EndOfInvokeResponseIB();
+    CHIP_ERROR EndOfInvokeResponseIB();
 
 private:
     CommandDataIB::Builder mCommand;

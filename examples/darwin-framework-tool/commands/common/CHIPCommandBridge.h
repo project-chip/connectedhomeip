@@ -38,9 +38,16 @@ public:
         : Command(commandName)
     {
         AddArgument("commissioner-name", &mCommissionerName);
+        AddArgument("commissioner-nodeId", 0, UINT64_MAX, &mCommissionerNodeId,
+            "Sets the commisser node ID of the given "
+            "commissioner-name. Interactive mode will only set a single commissioner on the inital command. "
+            "The commissioner node ID will be persisted until a different one is specified.");
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
             "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
             "directory.");
+        AddArgument("commissioner-vendor-id", 0, UINT16_MAX, &mCommissionerVendorId,
+            "The vendor id to use for darwin-framework-tool. If not provided, chip::VendorId::TestVendor1 (65521, 0xFFF1) will be "
+            "used.");
     }
 
     /////////// Command Interface /////////
@@ -131,7 +138,9 @@ private:
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
     chip::Optional<char *> mCommissionerName;
+    chip::Optional<uint64_t> mCommissionerNodeId;
     bool mWaitingForResponse { true };
     static dispatch_queue_t mOTAProviderCallbackQueue;
     chip::Optional<char *> mPaaTrustStorePath;
+    chip::Optional<chip::VendorId> mCommissionerVendorId;
 };

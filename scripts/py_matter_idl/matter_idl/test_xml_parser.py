@@ -18,9 +18,6 @@ import unittest
 from typing import List, Union
 
 try:
-    from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command,
-                                             ConstantEntry, DataType, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
-                                             Struct, StructQuality, StructTag)
     from matter_idl.zapxml import ParseSource, ParseXmls
 except ImportError:
     import os
@@ -28,11 +25,11 @@ except ImportError:
 
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-
-    from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command,
-                                             ConstantEntry, DataType, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
-                                             Struct, StructQuality, StructTag)
     from matter_idl.zapxml import ParseSource, ParseXmls
+
+from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command,
+                                         ConstantEntry, DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality,
+                                         Idl, Struct, StructQuality, StructTag)
 
 
 def XmlToIdl(what: Union[str, List[str]]) -> Idl:
@@ -61,6 +58,9 @@ class TestXmlParser(unittest.TestCase):
                 <name>Test</name>
                 <code>0x1234</code>
                 <description>Test</description>
+
+                <attribute side="server" code="10" type="CHAR_STRING" minLength="2" length="10" isNullable="true" \
+                    reportable="true" writable="false">SomeCharStringAttribute</attribute>
 
                 <attribute side="server" code="11" type="INT32U" min="0" max="2" isNullable="true" \
                     reportable="true" writable="false">SomeIntAttribute</attribute>
@@ -96,7 +96,17 @@ class TestXmlParser(unittest.TestCase):
                                  description="Test",
                                  attributes=[
                                      Attribute(definition=Field(
-                                         data_type=DataType(name='INT32U'),
+                                         data_type=DataType(
+                                             name='CHAR_STRING', min_length=2, max_length=10),
+                                         code=10,
+                                         name='SomeCharStringAttribute',
+                                         qualities=FieldQuality.NULLABLE),
+                                         qualities=AttributeQuality.READABLE,
+                                         readacl=AccessPrivilege.VIEW, writeacl=AccessPrivilege.OPERATE),
+
+                                     Attribute(definition=Field(
+                                         data_type=DataType(
+                                             name='INT32U', min_value=0, max_value=2),
                                          code=11,
                                          name='SomeIntAttribute',
                                          qualities=FieldQuality.NULLABLE),
@@ -104,7 +114,8 @@ class TestXmlParser(unittest.TestCase):
                                          readacl=AccessPrivilege.VIEW, writeacl=AccessPrivilege.OPERATE),
 
                                      Attribute(definition=Field(
-                                         data_type=DataType(name='INT8U'),
+                                         data_type=DataType(
+                                             name='INT8U', min_value=0, max_value=10),
                                          code=22, name='AttributeWithAccess',
                                          qualities=FieldQuality.OPTIONAL),
                                          qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE,
@@ -217,11 +228,70 @@ class TestXmlParser(unittest.TestCase):
                                                     name='Field3',
                                                     qualities=FieldQuality.FABRIC_SENSITIVE),
                                               Field(data_type=DataType(name='int32u',
-                                                                       max_length=None),
+                                                                       min_length=None,
+                                                                       max_length=None,
+                                                                       min_value=None,
+                                                                       max_value=None),
                                                     code=10,
                                                     name='Field10')],
                                       qualities=StructQuality.FABRIC_SCOPED)],
                          )]))
+
+    def testEnum(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <cluster><name>Test1</name><code>10</code></cluster>
+              <cluster><name>Test2</name><code>20</code></cluster>
+
+              <enum name="GlobalEnum" type="ENUM8">
+                <item value="0" name="First" />
+                <item value="1" name="Second" />
+              </enum>
+
+              <enum name="OneCluster" type="ENUM8">
+                <cluster code="10" />
+                <item value="3" name="Three" />
+              </enum>
+
+              <enum name="TwoClusters" type="ENUM8">
+                <cluster code="10" />
+                <cluster code="20" />
+                <item value="100" name="Big" />
+                <item value="2000" name="Bigger" />
+              </enum>
+            </configurator>
+        ''')
+        e1 = Enum(
+            name='GlobalEnum',
+            base_type="ENUM8",
+            entries=[
+                ConstantEntry(name="First", code=0),
+                ConstantEntry(name="Second", code=1),
+            ]
+        )
+        e2 = Enum(
+            name='OneCluster',
+            base_type="ENUM8",
+            entries=[
+                ConstantEntry(name="Three", code=3),
+            ]
+        )
+        e3 = Enum(
+            name='TwoClusters',
+            base_type="ENUM8",
+            entries=[
+                ConstantEntry(name="Big", code=100),
+                ConstantEntry(name="Bigger", code=2000),
+            ]
+        )
+        self.assertEqual(idl,
+                         Idl(clusters=[
+                             Cluster(side=ClusterSide.CLIENT,
+                                     name='Test1', code=10, enums=[e2, e3]),
+                             Cluster(side=ClusterSide.CLIENT,
+                                     name='Test2', code=20, enums=[e3])],
+                             enums=[e1],
+                             ))
 
     def testStruct(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
@@ -316,7 +386,7 @@ Some copyright here... testing that we skip over comments
                                          Attribute(
                                              definition=Field(
                                                  data_type=DataType(
-                                                     name='Type'),
+                                                     name='Type', min_value=0, max_value=9),
                                                  code=0,
                                                  name='Type',
                                              ),

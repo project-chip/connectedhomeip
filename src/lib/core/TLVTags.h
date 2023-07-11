@@ -46,6 +46,8 @@ public:
     constexpr bool operator==(const Tag & other) const { return mVal == other.mVal; }
     constexpr bool operator!=(const Tag & other) const { return mVal != other.mVal; }
 
+    uint64_t RawValue() const { return mVal; }
+
 private:
     explicit constexpr Tag(uint64_t val) : mVal(val) {}
 

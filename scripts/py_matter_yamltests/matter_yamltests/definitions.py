@@ -18,7 +18,8 @@ import glob
 import io
 from typing import List, Optional
 
-from matter_idl.matter_idl_types import *
+from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, Command, Enum, Event, FieldQuality, Struct, StructQuality,
+                                         StructTag)
 from matter_idl.zapxml import ParseSource, ParseXmls
 
 from .pseudo_clusters.pseudo_clusters import PseudoClusters
@@ -86,6 +87,9 @@ class SpecDefinitions:
                 if struct.tag == StructTag.RESPONSE:
                     self.__responses_by_id[code][struct.code] = struct
                     self.__responses_by_name[name][struct.name] = struct.code
+
+    def get_cluster_names(self) -> List[str]:
+        return [name for name, _ in self.__clusters_by_name.items()]
 
     def get_cluster_name(self, cluster_id: int) -> str:
         cluster = self.__clusters_by_id.get(cluster_id)
@@ -161,17 +165,17 @@ class SpecDefinitions:
 
         return None
 
-    def get_command_names(self, cluster_name: str) -> list[str]:
+    def get_command_names(self, cluster_name: str) -> List[str]:
         targets = self.__get_targets_by_cluster_name(
             cluster_name, _ItemType.Request)
         return [] if targets is None else [name for name in targets]
 
-    def get_event_names(self, cluster_name: str) -> list[str]:
+    def get_event_names(self, cluster_name: str) -> List[str]:
         targets = self.__get_targets_by_cluster_name(
             cluster_name, _ItemType.Event)
         return [] if targets is None else [name for name in targets]
 
-    def get_attribute_names(self, cluster_name: str) -> list[str]:
+    def get_attribute_names(self, cluster_name: str) -> List[str]:
         targets = self.__get_targets_by_cluster_name(
             cluster_name, _ItemType.Attribute)
         return [] if targets is None else [name for name in targets]

@@ -1,0 +1,414 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 123.2.4. [TC-S-2.4] Recall scene with transition time functionality
+
+PICS:
+    - S.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Scenes"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH sends a RemoveAllGroups command to DUT."
+      PICS: G.S.C04.Rsp
+      cluster: "Groups"
+      endpoint: "1"
+      command: "RemoveAllGroups"
+
+    - label:
+          "preparation step for using commands from Groups cluster: Add KeySet"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 0,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 0,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 0,
+                    }
+
+    - label:
+          "Preparation step for using commands from Groups cluster: Write Group
+          Keys"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [{ FabricIndex: 1, GroupId: 0x0001, GroupKeySetID: 0x01a1 }]
+
+    - label:
+          "TH sends a AddGroup command to DUT with the GroupID field set to
+          0x0001."
+      PICS: G.S.C00.Rsp
+      cluster: "Groups"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+              - name: "GroupName"
+                value: "Group1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0001
+
+    - label:
+          "TH sends a RemoveAllScenes command to DUT with the GroupID field set
+          to 0x0001."
+      PICS: S.S.C03.Rsp
+      command: "RemoveAllScenes"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0001
+
+    - label:
+          "TH sends a AddScene command to DUT with the GroupID field set to
+          0x0001, the SceneID field set to 0x01, the TransitionTime field set to
+          0x0001 and a set of extension fields appropriate to AC1."
+      PICS: S.S.C00.Rsp
+      command: "AddScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+              - name: "SceneID"
+                value: 0x0001
+              - name: "TransitionTime"
+                value: 0x0014
+              - name: "SceneName"
+                value: "Scene1"
+              - name: "ExtensionFieldSets"
+                value: []
+
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: 0x0001
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "TH configures AC1 on DUT for all implemented application clusters
+          supporting scenes."
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "Level Control"
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "Level"
+                value: 100
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label:
+          "TH configures AC1 on DUT for all implemented application clusters
+          supporting scenes."
+      verification: |
+          Is DUT configured with AC1?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please configure AC1 on DUT and enter 'y' after the
+                    configuration is complete"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH sends a StoreScene command to DUT with the GroupID field set to
+          0x0001 and the SceneID field set to 0x01."
+      PICS: S.S.C04.Rsp
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+              - name: "SceneID"
+                value: 0x01
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: 0x0001
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "TH configures AC2 on DUT for all implemented application clusters
+          supporting scenes."
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "Level Control"
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "Level"
+                value: 200
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 1s for level to change"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label:
+          "TH confirm the DUT reached AC2 (on level control cluster) after 1s,
+          which is different from AC1"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "Level Control"
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          value: 200
+
+    - label:
+          "TH configures AC2 on DUT for all implemented application clusters
+          supporting scenes."
+      verification: |
+          Is DUT configured with AC2?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please configure AC2 on DUT and enter 'y' after the
+                    configuration is complete"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH sends a RecallScene command to DUT with the GroupID field set to
+          0x0001 and the SceneID field set to 0x01 and the TransitionTime field
+          omitted."
+      PICS: S.S.C05.Rsp
+      command: "RecallScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+              - name: "SceneID"
+                value: 0x01
+
+    - label: "Wait 20s"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 20000
+
+    - label:
+          "TH confirm the DUT reached AC1 (on level control cluster) after 20s"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "Level Control"
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          value: 100
+
+    - label: "DUT transitions to AC1 over 20s."
+      verification: |
+          Is the transition done over 20s?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please confirm that transition to AC1 was made over 20s"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH configures AC2 on DUT for all implemented application clusters
+          supporting scenes."
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "Level Control"
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "Level"
+                value: 200
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label:
+          "TH configures AC2 on DUT for all implemented application clusters
+          supporting scenes."
+      verification: |
+          Is DUT configured with AC2?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please configure AC2 on DUT and enter 'y' after the
+                    configuration is complete"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH sends a RecallScene command to DUT with the GroupID field set to
+          0x0001, the SceneID field set to 0x01 and the TransitionTime field set
+          to 0x0032 (5s)."
+      PICS: S.S.C05.Rsp
+      command: "RecallScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+              - name: "SceneID"
+                value: 0x01
+              - name: "TransitionTime"
+                value: 0x0032
+
+    - label: "Wait 5s"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label:
+          "TH confirm the DUT reached AC2 (on level control cluster) after 5s"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "Level Control"
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          value: 100
+
+    - label: "DUT transitions to AC1 over 5."
+      verification: |
+          Is the transition done over 5s?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please confirm that transition to AC1 was made over 5s"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH configures AC2 on DUT for all implemented application clusters
+          supporting scenes."
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "Level Control"
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "Level"
+                value: 200
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label:
+          "TH configures AC2 on DUT for all implemented application clusters
+          supporting scenes."
+      verification: |
+          Is DUT configured with AC2?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please configure AC2 on DUT and enter 'y' after the
+                    configuration is complete"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH sends a RecallScene command to DUT with the GroupID field set to
+          0x0001, the SceneID field set to 0x01 and the TransitionTime field set
+          to null (no transition time override)."
+      PICS: S.S.C05.Rsp
+      command: "RecallScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+              - name: "SceneID"
+                value: 0x01
+              - name: "TransitionTime"
+                value: null
+      response:
+          error: 0x00

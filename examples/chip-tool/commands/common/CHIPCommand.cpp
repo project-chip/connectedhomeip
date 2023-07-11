@@ -48,6 +48,7 @@ const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = null
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
 
 namespace {
+
 CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const chip::Credentials::AttestationTrustStore ** trustStore)
 {
     if (paaTrustStorePath == nullptr)
@@ -77,6 +78,7 @@ CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const chip::
     *trustStore = &attestationTrustStore;
     return CHIP_NO_ERROR;
 }
+
 } // namespace
 
 CHIP_ERROR CHIPCommand::MaybeSetUpStack()
@@ -93,7 +95,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     ReturnLogErrorOnFailure(chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(mBleAdapterId.ValueOr(0), true));
 #endif
 
-    ReturnLogErrorOnFailure(mDefaultStorage.Init());
+    ReturnLogErrorOnFailure(mDefaultStorage.Init(nullptr, GetStorageDirectory().ValueOr(nullptr)));
     ReturnLogErrorOnFailure(mOperationalKeystore.Init(&mDefaultStorage));
     ReturnLogErrorOnFailure(mOpCertStore.Init(&mDefaultStorage));
 
@@ -240,6 +242,14 @@ CHIP_ERROR CHIPCommand::Run()
 
 void CHIPCommand::StartTracing()
 {
+    if (mTraceTo.HasValue())
+    {
+        for (const auto & destination : mTraceTo.Value())
+        {
+            mTracingSetup.EnableTracingFor(destination.c_str());
+        }
+    }
+
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::trace::InitTrace();
 
@@ -266,6 +276,8 @@ void CHIPCommand::StartTracing()
 
 void CHIPCommand::StopTracing()
 {
+    mTracingSetup.StopTracing();
+
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::trace::DeInitTrace();
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
@@ -326,7 +338,7 @@ CHIP_ERROR CHIPCommand::GetIdentityNodeId(std::string identity, chip::NodeId * n
         return CHIP_NO_ERROR;
     }
 
-    ReturnLogErrorOnFailure(mCommissionerStorage.Init(identity.c_str()));
+    ReturnLogErrorOnFailure(mCommissionerStorage.Init(identity.c_str(), GetStorageDirectory().ValueOr(nullptr)));
 
     *nodeId = mCommissionerStorage.GetLocalNodeId();
 
@@ -419,7 +431,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         // TODO - OpCreds should only be generated for pairing command
         //        store the credentials in persistent storage, and
         //        generate when not available in the storage.
-        ReturnLogErrorOnFailure(mCommissionerStorage.Init(identity.mName.c_str()));
+        ReturnLogErrorOnFailure(mCommissionerStorage.Init(identity.mName.c_str(), GetStorageDirectory().ValueOr(nullptr)));
         if (mUseMaxSizedCerts.HasValue())
         {
             auto option = CredentialIssuerCommands::CredentialIssuerOptions::kMaximizeCertificateSizes;
@@ -451,7 +463,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
 
     // TODO: Initialize IPK epoch key in ExampleOperationalCredentials issuer rather than relying on DefaultIpkValue
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
-    commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;
+    commissionerParams.controllerVendorId             = mCommissionerVendorId.ValueOr(chip::VendorId::TestVendor1);
 
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *(commissioner.get())));
 

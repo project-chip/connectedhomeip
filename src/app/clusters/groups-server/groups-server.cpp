@@ -17,11 +17,11 @@
 
 #include "groups-server.h"
 
-#include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
+#include <app/att-storage.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>
@@ -29,7 +29,7 @@
 #include <lib/support/CodeUtils.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
-#include <app/clusters/scenes/scenes.h>
+#include <app/clusters/scenes-server/scenes-server.h>
 #endif // EMBER_AF_PLUGIN_SCENES
 
 using namespace chip;
@@ -118,18 +118,14 @@ static EmberAfStatus GroupRemove(FabricIndex fabricIndex, EndpointId endpointId,
 
 void emberAfGroupsClusterServerInitCallback(EndpointId endpointId)
 {
-    // The most significant bit of the NameSupport attribute indicates whether or not group names are supported
-    //
-    // According to spec, highest bit (Group Names supported) MUST match feature bit 0 (Group Names supported)
-    static constexpr uint8_t kNameSuppportFlagGroupNamesSupported = 0x80;
-
-    EmberAfStatus status = Attributes::NameSupport::Set(endpointId, kNameSuppportFlagGroupNamesSupported);
+    // According to spec, highest bit (Group Names) MUST match feature bit 0 (Group Names)
+    EmberAfStatus status = Attributes::NameSupport::Set(endpointId, NameSupportBitmap::kGroupNames);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogDetail(Zcl, "ERR: writing NameSupport %x", status);
     }
 
-    status = Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(GroupsFeature::kGroupNames));
+    status = Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(Feature::kGroupNames));
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogDetail(Zcl, "ERR: writing group feature map %x", status);
@@ -286,8 +282,8 @@ bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, c
     Groups::Commands::RemoveGroupResponse::Type response;
 
 #ifdef EMBER_AF_PLUGIN_SCENES
-    // If a group is, removed the scenes associated with that group SHOULD be removed.
-    emberAfScenesClusterRemoveScenesInGroupCallback(commandPath.mEndpointId, commandData.groupID);
+    // If a group is removed the scenes associated with that group SHOULD be removed.
+    Scenes::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId, commandData.groupID);
 #endif
     response.groupID = commandData.groupID;
     response.status  = GroupRemove(fabricIndex, commandPath.mEndpointId, commandData.groupID);
@@ -315,11 +311,11 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
         {
             if (commandPath.mEndpointId == mapping.endpoint_id)
             {
-                emberAfScenesClusterRemoveScenesInGroupCallback(mapping.endpoint_id, mapping.group_id);
+                Scenes::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, mapping.endpoint_id, mapping.group_id);
             }
         }
         iter->Release();
-        emberAfScenesClusterRemoveScenesInGroupCallback(commandPath.mEndpointId, ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
+        Scenes::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId, ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
     }
 #endif
 

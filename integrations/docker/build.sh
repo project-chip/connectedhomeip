@@ -35,8 +35,10 @@ VERSION=${DOCKER_BUILD_VERSION:-$(sed 's/ .*//' version)}
 
 if [[ $OSTYPE == 'darwin'* ]]; then
     DOCKER_VOLUME_PATH=~/Library/Containers/com.docker.docker/Data/vms/0/
+    TARGET_PLATFORM_TYPE="linux/arm64"
 else
     DOCKER_VOLUME_PATH=/var/lib/docker/
+    TARGET_PLATFORM_TYPE="linux/amd64"
 fi
 
 [[ ${*/--help//} != "${*}" ]] && {
@@ -82,7 +84,7 @@ if [[ ${*/--no-cache//} != "${*}" ]]; then
 fi
 
 [[ ${*/--skip-build//} != "${*}" ]] || {
-    docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
+    docker build "${BUILD_ARGS[@]}" --build-arg TARGETPLATFORM="$TARGET_PLATFORM_TYPE" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
     docker image prune --force
 }
 

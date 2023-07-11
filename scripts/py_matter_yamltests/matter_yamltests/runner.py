@@ -16,7 +16,7 @@
 import asyncio
 import time
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .adapter import TestAdapter
 from .hooks import TestRunnerHooks
@@ -72,7 +72,7 @@ class TestRunnerConfig:
     """
     adapter: TestAdapter = None
     pseudo_clusters: PseudoClusters = PseudoClusters([])
-    options: TestRunnerOptions = TestRunnerOptions()
+    options: TestRunnerOptions = field(default_factory=TestRunnerOptions)
     hooks: TestRunnerHooks = TestRunnerHooks()
 
 
@@ -133,7 +133,7 @@ class TestRunner(TestRunnerBase):
     async def stop(self):
         return
 
-    def run(self, parser_builder_config: TestParserBuilderConfig, runner_config: TestRunnerConfig):
+    async def run(self, parser_builder_config: TestParserBuilderConfig, runner_config: TestRunnerConfig):
         if runner_config and runner_config.hooks:
             start = time.time()
             runner_config.hooks.start(len(parser_builder_config.tests))
@@ -143,9 +143,7 @@ class TestRunner(TestRunnerBase):
             if not parser or not runner_config:
                 continue
 
-            loop = asyncio.get_event_loop()
-            result = loop.run_until_complete(asyncio.wait_for(
-                self._run(parser, runner_config), parser.timeout))
+            result = await self._run_with_timeout(parser, runner_config)
             if isinstance(result, Exception):
                 raise (result)
             elif not result:
@@ -155,13 +153,22 @@ class TestRunner(TestRunnerBase):
             duration = round((time.time() - start) * 1000)
             runner_config.hooks.stop(duration)
 
-        return True
+        return parser_builder.done
+
+    async def _run_with_timeout(self, parser: TestParser, config: TestRunnerConfig):
+        status = True
+        try:
+            await self.start()
+            status = await asyncio.wait_for(self._run(parser, config), parser.timeout)
+        except Exception as exception:
+            status = exception
+        finally:
+            await self.stop()
+            return status
 
     async def _run(self, parser: TestParser, config: TestRunnerConfig):
         status = True
         try:
-            await self.start()
-
             hooks = config.hooks
             hooks.test_start(parser.filename, parser.name, parser.tests.count)
 
@@ -171,11 +178,11 @@ class TestRunner(TestRunnerBase):
                     hooks.step_skipped(request.label, request.pics)
                     continue
                 elif not config.adapter:
-                    hooks.step_start(request.label)
+                    hooks.step_start(request)
                     hooks.step_unknown()
                     continue
                 else:
-                    hooks.step_start(request.label)
+                    hooks.step_start(request)
 
                 start = time.time()
                 if config.pseudo_clusters.supports(request):
@@ -214,5 +221,4 @@ class TestRunner(TestRunnerBase):
         except Exception as exception:
             status = exception
         finally:
-            await self.stop()
             return status

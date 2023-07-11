@@ -17,17 +17,17 @@
 
 #include "binding-handler.h"
 
-#include "app-common/zap-generated/ids/Clusters.h"
-#include "app-common/zap-generated/ids/Commands.h"
-#include "app/CommandSender.h"
-#include "app/clusters/bindings/BindingManager.h"
-#include "app/server/Server.h"
-#include "controller/InvokeInteraction.h"
-#include "lib/core/CHIPError.h"
-#include "platform/CHIPDeviceLayer.h"
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
+#include <app/CommandSender.h>
+#include <app/clusters/bindings/BindingManager.h>
+#include <app/server/Server.h>
+#include <controller/InvokeInteraction.h>
+#include <lib/core/CHIPError.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #if defined(ENABLE_CHIP_SHELL)
-#include "lib/shell/Engine.h"
+#include <lib/shell/Engine.h> // nogncheck
 
 using chip::Shell::Engine;
 using chip::Shell::shell_command_t;

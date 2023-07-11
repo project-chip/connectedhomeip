@@ -58,6 +58,10 @@ public:
     CHIP_ERROR GetLocationCapability(uint8_t & location) override;
     static ConfigurationManagerImpl & GetDefaultInstance();
 
+    // Set the country code to esp_phy layer and also store it to NVS
+    // GenericConfigurationManagerImpl::GetCountryCode() API already reads from the NVS so its not implemented here
+    CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) override;
+
 private:
     // ===== Members that implement the ConfigurationManager public interface.
 

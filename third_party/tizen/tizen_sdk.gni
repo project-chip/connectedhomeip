@@ -82,7 +82,7 @@ template("tizen_sdk_certificate") {
   assert(defined(invoker.sign_security_profile),
          "It is required to specify a `sign_security_profile` which " +
              "should be added to Tizen security profiles.")
-  stamp_file = "${root_build_dir}/.tizen_sdk_dev_certificate_stamp"
+  stamp_file = "${root_out_dir}/.tizen_sdk_dev_certificate_stamp"
   action(target_name) {
     forward_variables_from(invoker, [ "deps" ])
     script = tizen_dev_certificate
@@ -91,7 +91,7 @@ template("tizen_sdk_certificate") {
       "--author-certificate-email=" + invoker.author_certificate_email,
       "--author-certificate-password=" + invoker.author_certificate_password,
       "--sign-security-profile=" + invoker.sign_security_profile,
-      "--stamp-file=" + stamp_file,
+      "--stamp-file=" + rebase_path(stamp_file),
     ]
     outputs = [ stamp_file ]
   }
@@ -112,7 +112,7 @@ template("tizen_sdk_package") {
 
   # Extract data from Tizen XML manifest.
   manifest = exec_script(tizen_manifest_parser,
-                         [ rebase_path(invoker.manifest, root_build_dir) ],
+                         [ rebase_path(invoker.manifest) ],
                          "json")
   manifest_package = manifest["package"]
   manifest_package_name = manifest_package["name"]
@@ -123,7 +123,7 @@ template("tizen_sdk_package") {
   # for this, because Tizen Studio CLI scans "res" (resources), "shared" and
   # "lib" directories for items to pack. In our case it could include in the
   # TPK package libraries available in ${root_out_dir}/lib directory.
-  tizen_package_dir = "${root_build_dir}/${manifest_package_name}"
+  tizen_package_dir = "${root_out_dir}/${manifest_package_name}"
   tizen_package_out_dir = "${tizen_package_dir}/out"
 
   # Copy Tizen manifest from the source directory.
@@ -160,7 +160,7 @@ template("tizen_sdk_package") {
       "--sign",
       invoker.sign_security_profile,
       "--",
-      tizen_package_out_dir,
+      rebase_path(tizen_package_out_dir),
     ]
   }
 }
@@ -192,7 +192,7 @@ template("tizen_qemu_mkisofs") {
       "-JRU",  # Joliet + Rock Ridge with untranslated filenames
       "-o",
       rebase_path(image_file),
-      rebase_path(invoker.runner, root_build_dir),
+      rebase_path(invoker.runner),
     ]
     if (defined(invoker.assets)) {
       args += invoker.assets
@@ -216,7 +216,7 @@ template("tizen_qemu_run") {
          "It is required to specify ISO runner image.")
 
   # Store QEMU output in a dedicated log file.
-  output_log_file = "${root_build_dir}/tizen-qemu-" + target_name + ".log"
+  output_log_file = "${root_out_dir}/tizen-qemu-" + target_name + ".log"
 
   action(target_name) {
     forward_variables_from(invoker, [ "deps" ])

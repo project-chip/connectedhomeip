@@ -16,6 +16,7 @@
 import copy
 import time
 from dataclasses import dataclass, field
+from typing import List
 
 from .hooks import TestParserHooks
 from .parser import TestParser, TestParserConfig
@@ -50,7 +51,7 @@ class TestParserBuilderConfig:
            parsing. It may may allow the callers to gain insights about the
            current parsing state.
     """
-    tests: list[str] = field(default_factory=list)
+    tests: List[str] = field(default_factory=list)
     parser_config: TestParserConfig = field(default_factory=TestParserConfig)
     hooks: TestParserHooks = TestParserHooks()
     options: TestParserBuilderOptions = field(
@@ -66,7 +67,7 @@ class TestParserBuilder:
         self.__tests = copy.copy(config.tests)
         self.__config = config
         self.__duration = 0
-        self.__done = False
+        self.done = False
 
     def __iter__(self):
         self.__config.hooks.start(len(self.__tests))
@@ -76,9 +77,9 @@ class TestParserBuilder:
         if len(self.__tests):
             return self.__get_test_parser(self.__tests.pop(0))
 
-        if not self.__done:
+        if not self.done:
             self.__config.hooks.stop(round(self.__duration))
-        self.__done = True
+        self.done = True
 
         raise StopIteration
 

@@ -248,7 +248,6 @@ CHIP_ERROR ReadClient::SendRequest(ReadPrepareParams & aReadPrepareParams)
 
 CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 {
-    // TODO: SendRequest parameter is too long, need to have the structure to represent it
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogDetail(DataManagement, "%s ReadClient[%p]: Sending Read Request", __func__, this);
@@ -307,14 +306,14 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     ReturnErrorOnFailure(dataVersionFilterListBuilder.GetWriter()->UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
     if (encodedDataVersionList)
     {
-        ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs().GetError());
+        ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs());
     }
     else
     {
         request.Rollback(backup);
     }
 
-    ReturnErrorOnFailure(request.EndOfReadRequestMessage().GetError());
+    ReturnErrorOnFailure(request.EndOfReadRequestMessage());
     ReturnErrorOnFailure(writer.Finalize(&msgBuf));
 
     VerifyOrReturnError(aReadPrepareParams.mSessionHolder, CHIP_ERROR_MISSING_SECURE_SESSION);
@@ -352,8 +351,7 @@ CHIP_ERROR ReadClient::GenerateEventPaths(EventPathIBs::Builder & aEventPathsBui
         ReturnErrorOnFailure(path.Encode(event));
     }
 
-    aEventPathsBuilder.EndOfEventPaths();
-    return aEventPathsBuilder.GetError();
+    return aEventPathsBuilder.EndOfEventPaths();
 }
 
 CHIP_ERROR ReadClient::GenerateAttributePaths(AttributePathIBs::Builder & aAttributePathIBsBuilder,
@@ -367,8 +365,7 @@ CHIP_ERROR ReadClient::GenerateAttributePaths(AttributePathIBs::Builder & aAttri
         ReturnErrorOnFailure(path.Encode(attribute));
     }
 
-    aAttributePathIBsBuilder.EndOfAttributePathIBs();
-    return aAttributePathIBsBuilder.GetError();
+    return aAttributePathIBsBuilder.EndOfAttributePathIBs();
 }
 
 CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
@@ -400,9 +397,9 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
         ReturnErrorOnFailure(aDataVersionFilterIBsBuilder.GetError());
         ClusterPathIB::Builder & path = filterIB.CreatePath();
         ReturnErrorOnFailure(filterIB.GetError());
-        ReturnErrorOnFailure(path.Endpoint(filter.mEndpointId).Cluster(filter.mClusterId).EndOfClusterPathIB().GetError());
+        ReturnErrorOnFailure(path.Endpoint(filter.mEndpointId).Cluster(filter.mClusterId).EndOfClusterPathIB());
         VerifyOrReturnError(filter.mDataVersion.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorOnFailure(filterIB.DataVersion(filter.mDataVersion.Value()).EndOfDataVersionFilterIB().GetError());
+        ReturnErrorOnFailure(filterIB.DataVersion(filter.mDataVersion.Value()).EndOfDataVersionFilterIB());
         aEncodedDataVersionList = true;
     }
     return CHIP_NO_ERROR;
@@ -436,7 +433,7 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
     {
-        err = ProcessReportData(std::move(aPayload));
+        err = ProcessReportData(std::move(aPayload), ReportType::kContinuingTransaction);
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::SubscribeResponse))
     {
@@ -490,7 +487,7 @@ void ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchange
     //
     mReadPrepareParams.mSessionHolder.Grab(mExchange->GetSessionHandle());
 
-    CHIP_ERROR err = ProcessReportData(std::move(aPayload));
+    CHIP_ERROR err = ProcessReportData(std::move(aPayload), ReportType::kUnsolicited);
     if (err != CHIP_NO_ERROR)
     {
         if (err == CHIP_ERROR_INVALID_SUBSCRIPTION)
@@ -507,7 +504,7 @@ void ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchange
     }
 }
 
-CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload, ReportType aReportType)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReportDataMessage::Parser report;
@@ -521,7 +518,10 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     SuccessOrExit(err);
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    report.PrettyPrint();
+    if (aReportType != ReportType::kUnsolicited)
+    {
+        report.PrettyPrint();
+    }
 #endif
 
     err = report.GetSuppressResponse(&suppressResponse);
@@ -1015,14 +1015,14 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
     ReturnErrorOnFailure(dataVersionFilterListBuilder.GetWriter()->UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
     if (encodedDataVersionList)
     {
-        ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs().GetError());
+        ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs());
     }
     else
     {
         request.Rollback(backup);
     }
 
-    ReturnErrorOnFailure(request.EndOfSubscribeRequestMessage().GetError());
+    ReturnErrorOnFailure(request.EndOfSubscribeRequestMessage());
     ReturnErrorOnFailure(writer.Finalize(&msgBuf));
 
     VerifyOrReturnError(aReadPrepareParams.mSessionHolder, CHIP_ERROR_MISSING_SECURE_SESSION);

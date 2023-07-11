@@ -24,7 +24,8 @@
 
 #include "FreeRTOS.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
+
+#include <examples/platform/cc13x2_26x2/CC13X2_26X2DeviceAttestationCreds.h>
 
 #include <app/util/af-types.h>
 #include <app/util/af.h>
@@ -34,7 +35,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
+#include <platform/cc13xx_26xx/OTAImageProcessorImpl.h>
 #endif
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/identify-server/identify-server.h>
@@ -55,6 +56,7 @@
 #define APP_EVENT_QUEUE_SIZE 10
 
 using namespace ::chip;
+using namespace ::chip::app;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
@@ -92,7 +94,7 @@ static const chip::EndpointId sIdentifyEndpointId = 0;
 static const uint32_t sIdentifyBlinkRateMs        = 500;
 
 ::Identify stIdentify = { sIdentifyEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
-                          EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, AppTask::TriggerIdentifyEffectHandler };
+                          Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, AppTask::TriggerIdentifyEffectHandler };
 
 int AppTask::StartAppTask()
 {
@@ -122,7 +124,7 @@ int AppTask::Init()
     LED_Params ledParams;
     Button_Params buttonParams;
 
-    cc13x2_26x2LogInit();
+    cc13xx_26xxLogInit();
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
@@ -174,7 +176,11 @@ int AppTask::Init()
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
+#ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(CC13X2_26X2::GetCC13X2_26X2DacProvider());
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
 
     // Initialize LEDs
     PLAT_LOG("Initialize LEDs");
@@ -430,23 +436,23 @@ void AppTask::TriggerIdentifyEffectHandler(::Identify * identify)
 {
     switch (identify->mCurrentEffectIdentifier)
     {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
         PLAT_LOG("Starting blink identifier effect");
         IdentifyStartHandler(identify);
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
         PLAT_LOG("Breathe identifier effect not implemented");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
         PLAT_LOG("Okay identifier effect not implemented");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
         PLAT_LOG("Channel Change identifier effect not implemented");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
+    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
         PLAT_LOG("Finish identifier effect not implemented");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
+    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
         PLAT_LOG("Stop identifier effect");
         IdentifyStopHandler(identify);
         break;

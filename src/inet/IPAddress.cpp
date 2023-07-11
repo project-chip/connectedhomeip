@@ -237,7 +237,7 @@ struct in6_addr IPAddress::ToIPv6() const
     return ipAddr;
 }
 
-CHIP_ERROR IPAddress::GetIPAddressFromSockAddr(const SockAddr & sockaddr, IPAddress & outIPAddress)
+CHIP_ERROR IPAddress::GetIPAddressFromSockAddr(const SockAddrWithoutStorage & sockaddr, IPAddress & outIPAddress)
 {
 #if INET_CONFIG_ENABLE_IPV4
     if (sockaddr.any.sa_family == AF_INET)
@@ -506,6 +506,29 @@ IPAddress IPAddress::MakeIPv4Broadcast()
     ipAddr.Addr[2] = htonl(0xFFFF);
     ipAddr.Addr[3] = 0xFFFFFFFF;
     return ipAddr;
+}
+
+IPAddress IPAddress::Loopback(IPAddressType type)
+{
+    IPAddress address;
+#if INET_CONFIG_ENABLE_IPV4
+    if (type == IPAddressType::kIPv4)
+    {
+        address.Addr[0] = 0;
+        address.Addr[1] = 0;
+        address.Addr[2] = htonl(0xFFFF);
+        address.Addr[3] = htonl(0x7F000001);
+    }
+    else
+#endif
+    {
+        address.Addr[0] = 0;
+        address.Addr[1] = 0;
+        address.Addr[2] = 0;
+        address.Addr[3] = htonl(1);
+    }
+
+    return address;
 }
 
 } // namespace Inet

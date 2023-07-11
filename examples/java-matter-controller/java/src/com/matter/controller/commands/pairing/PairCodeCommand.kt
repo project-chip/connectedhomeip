@@ -22,5 +22,17 @@ import com.matter.controller.commands.common.CredentialsIssuer
 
 class PairCodeCommand(controller: ChipDeviceController, credsIssue: CredentialsIssuer?) :
   PairingCommand(controller, "code", credsIssue, PairingModeType.CODE, PairingNetworkType.NONE) {
-  override fun runCommand() {}
+  override fun runCommand() {
+    currentCommissioner()
+      .pairDeviceWithCode(
+        getNodeId(),
+        getOnboardingPayload(),
+        getDiscoverOnce(),
+        getUseOnlyOnNetworkDiscovery(),
+        null,
+        getWifiNetworkCredentials(),
+      )
+    currentCommissioner().setCompletionListener(this)
+    waitCompleteMs(getTimeoutMillis())
+  }
 }

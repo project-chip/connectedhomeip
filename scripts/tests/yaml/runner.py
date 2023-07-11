@@ -16,6 +16,9 @@
 
 import relative_importer  # isort: split # noqa: F401
 
+import asyncio
+import importlib
+import os
 import sys
 import traceback
 from dataclasses import dataclass
@@ -42,6 +45,21 @@ _DEFAULT_SPECIFICATIONS_DIR = 'src/app/zap-templates/zcl/data-model/chip/*.xml'
 _DEFAULT_PICS_FILE = 'src/app/tests/suites/certification/ci-pics-values'
 
 
+def get_custom_pseudo_clusters(additional_pseudo_clusters_directory: str):
+    clusters = get_default_pseudo_clusters()
+
+    if additional_pseudo_clusters_directory:
+        sys.path.insert(0, additional_pseudo_clusters_directory)
+        for filepath in os.listdir(additional_pseudo_clusters_directory):
+            if filepath != '__init__.py' and filepath[-3:] == '.py':
+                module = importlib.import_module(f'{filepath[:-3]}')
+                constructor = getattr(module, module.__name__)
+                if constructor:
+                    clusters.add(constructor())
+
+    return clusters
+
+
 def test_parser_options(f):
     f = click.option('--configuration_name', type=str, show_default=True, default=_DEFAULT_CONFIG_NAME,
                      help='Name of the collection configuration json file to use.')(f)
@@ -55,6 +73,8 @@ def test_parser_options(f):
                      help='Stop parsing on first error.')(f)
     f = click.option('--use_default_pseudo_clusters', type=bool, show_default=True, default=True,
                      help='If enable this option use the set of default clusters provided by the matter_yamltests package.')(f)
+    f = click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=None,
+                     help='Path to a directory containing additional pseudo clusters.')(f)
     return f
 
 
@@ -229,8 +249,9 @@ CONTEXT_SETTINGS = dict(
 @click.argument('test_name')
 @test_parser_options
 @click.pass_context
-def runner_base(ctx, configuration_directory: str, test_name: str, configuration_name: str, pics: str, specifications_paths: str, stop_on_error: bool, use_default_pseudo_clusters: bool, **kwargs):
-    pseudo_clusters = get_default_pseudo_clusters() if use_default_pseudo_clusters else PseudoClusters([])
+def runner_base(ctx, configuration_directory: str, test_name: str, configuration_name: str, pics: str, specifications_paths: str, stop_on_error: bool, use_default_pseudo_clusters: bool, additional_pseudo_clusters_directory: str, **kwargs):
+    pseudo_clusters = get_custom_pseudo_clusters(
+        additional_pseudo_clusters_directory) if use_default_pseudo_clusters else PseudoClusters([])
     specifications = SpecDefinitionsFromPaths(specifications_paths.split(','), pseudo_clusters)
     tests_finder = TestsFinder(configuration_directory, configuration_name)
 
@@ -249,7 +270,8 @@ def parse(parser_group: ParserGroup):
     runner_config = None
 
     runner = TestRunner()
-    return runner.run(parser_group.builder_config, runner_config)
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
 
 
 @runner_base.command()
@@ -259,7 +281,8 @@ def dry_run(parser_group: ParserGroup):
     runner_config = TestRunnerConfig(hooks=TestRunnerLogger())
 
     runner = TestRunner()
-    return runner.run(parser_group.builder_config, runner_config)
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
 
 
 @runner_base.command()
@@ -273,7 +296,8 @@ def run(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_wa
     runner_config = TestRunnerConfig(adapter, parser_group.pseudo_clusters, runner_options, runner_hooks)
 
     runner = TestRunner()
-    return runner.run(parser_group.builder_config, runner_config)
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
 
 
 @runner_base.command()
@@ -296,7 +320,8 @@ def websocket(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop
         server_address, server_port, server_path, server_arguments, websocket_runner_hooks)
 
     runner = WebSocketRunner(websocket_runner_config)
-    return runner.run(parser_group.builder_config, runner_config)
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
 
 
 @runner_base.command()
@@ -311,7 +336,8 @@ def chip_repl(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop
     runner_config = TestRunnerConfig(adapter, parser_group.pseudo_clusters, runner_options, runner_hooks)
 
     runner = __import__(runner, fromlist=[None]).Runner(repl_storage_path, commission_on_network_dut)
-    return runner.run(parser_group.builder_config, runner_config)
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
 
 
 @runner_base.command()

@@ -84,7 +84,11 @@ static_library("nrfconnect") {
     ]
 
     if (chip_mdns == "platform") {
-      sources += [ "../OpenThread/DnssdImpl.cpp" ]
+      sources += [
+        "../OpenThread/DnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.h",
+      ]
       deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }
@@ -93,6 +97,7 @@ static_library("nrfconnect") {
     sources += [
       "../Zephyr/InetUtils.cpp",
       "../Zephyr/InetUtils.h",
+      "OTAImageProcessorImplWiFi.h",
       "wifi/ConnectivityManagerImplWiFi.cpp",
       "wifi/ConnectivityManagerImplWiFi.h",
       "wifi/NrfWiFiDriver.cpp",

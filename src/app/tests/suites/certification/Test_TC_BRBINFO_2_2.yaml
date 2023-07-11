@@ -60,13 +60,13 @@ tests:
 
           1. ./chip-tool interactive start
           2. bridgeddevicebasicinformation subscribe reachable 1 60 1 4
-          3. press "u" on bridge-app to change reachable to false for endpoint 4 and see the reachable value has been changed compared with precondition
+          3. press 'u' on bridge-app to change reachable to false for endpoint 4 and see the reachable value has been changed compared with precondition
 
           [1659441181.388547][2392:2397] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_0039 Attribute 0x0000_0011 DataVersion: 2189020906
           [1659441181.388600][2392:2397] CHIP:TOO:   Reachable: FALSE
           [1659441181.388651][2392:2397] CHIP:DMG: MoveToState ReadClient[0xffff7c005ac0]: Moving to [AwaitingSu]
 
-          4. press "v"  on bridge-app to change reachable to true for endpoint 4
+          4. press 'v'  on bridge-app to change reachable to true for endpoint 4
 
           [1659441193.443232][2392:2397] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_0039 Attribute 0x0000_0011 DataVersion: 2189020907
           [1659441193.443267][2392:2397] CHIP:TOO:   Reachable: TRUE
