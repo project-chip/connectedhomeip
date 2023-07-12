@@ -35,11 +35,16 @@ endfunction()
 #
 # Configure ${APP_TARGET} with source files associated with clusters enabled in the ${ZAP_FILE}
 #
-function(chip_configure_zap_file APP_TARGET ZAP_FILE)
+function(chip_configure_zap_file APP_TARGET ZAP_FILE EXTERNAL_CLUSTERS)
     find_package(Python3 REQUIRED)
+    set(args --zap_file ${ZAP_FILE})
+
+    if (EXTERNAL_CLUSTERS)
+        list(APPEND args --external-clusters ${EXTERNAL_CLUSTERS})
+    endif()
 
     execute_process(
-        COMMAND ${Python3_EXECUTABLE} ${CHIP_APP_BASE_DIR}/zap_cluster_list.py --zap_file ${ZAP_FILE}
+        COMMAND ${Python3_EXECUTABLE} ${CHIP_APP_BASE_DIR}/zap_cluster_list.py ${args}
         OUTPUT_VARIABLE CLUSTER_LIST
         ERROR_VARIABLE ERROR_MESSAGE
         RESULT_VARIABLE RC
@@ -57,17 +62,20 @@ endfunction()
 #
 # Configure ${APP_TARGET} based on the selected data model configuration.
 # Available options are:
-#   SCOPE           Cmake scope keyword that defines the scope of included sources
-#                   The default is PRIVATE scope.
-#   INCLUDE_SERVER  Include source files from src/app/server directory
-#   ZAP_FILE        Path to the ZAP file, used to determine the list of clusters
-#                   supported by the application.
-#   IDL             .matter IDL file to use for codegen. Inferred from ZAP_FILE
-#                   if not provided
+#   SCOPE             CMake scope keyword that defines the scope of included sources.
+#                     The default is PRIVATE scope.
+#   INCLUDE_SERVER    Include source files from src/app/server directory.
+#   ZAP_FILE          Path to the ZAP file, used to determine the list of clusters
+#                     supported by the application.
+#   IDL               .matter IDL file to use for codegen. Inferred from ZAP_FILE
+#                     if not provided
+#   EXTERNAL_CLUSTERS Clusters with external implementations. The default implementations
+#                     will not be used nor required for these clusters.
+#                     Format: MY_CUSTOM_CLUSTER'.
 #
 function(chip_configure_data_model APP_TARGET)
     set(SCOPE PRIVATE)
-    cmake_parse_arguments(ARG "INCLUDE_SERVER" "SCOPE" "ZAP_FILE;IDL" "" ${ARGN})
+    cmake_parse_arguments(ARG "INCLUDE_SERVER" "SCOPE;ZAP_FILE;IDL" "EXTERNAL_CLUSTERS" ${ARGN})
 
     if (ARG_SCOPE)
         set(SCOPE ${ARG_SCOPE})
@@ -90,7 +98,7 @@ function(chip_configure_data_model APP_TARGET)
     endif()
 
     if (ARG_ZAP_FILE)
-        chip_configure_zap_file(${APP_TARGET} ${ARG_ZAP_FILE})
+        chip_configure_zap_file(${APP_TARGET} ${ARG_ZAP_FILE} "${ARG_EXTERNAL_CLUSTERS}")
         if (NOT ARG_IDL)
             string(REPLACE ".zap" ".matter" ARG_IDL ${ARG_ZAP_FILE})
         endif()
