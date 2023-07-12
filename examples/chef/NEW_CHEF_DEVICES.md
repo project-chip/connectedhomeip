@@ -1,6 +1,6 @@
 # CHEF devices
 
-Device definitions reside in `examples/chef/devices` as zap and .matter files.
+Device definitions reside in `examples/chef/devices` as .zap and .matter files.
 
 Generally you need to follow these steps to use a new device:
 
