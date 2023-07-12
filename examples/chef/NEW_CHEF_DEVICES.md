@@ -57,7 +57,7 @@ You can read more in `examples/chef/sample_app_util/README.md`, however the
 short version is that you can determine a recommended name using:
 
 ```
-./examples/chef/sample_app_util/sample_app_util.py zap --generate-name <saved_file_name>
+./examples/chef/sample_app_util/sample_app_util.py zap --generate-name <saved_zap_file_name>
 ```
 
 and generally you want to just rename it via:
