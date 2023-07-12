@@ -66,9 +66,9 @@ public:
      *
      * For other attributes, immediately pass the write operation to the decorated persister.
      */
-    CHIP_ERROR WriteValue(const ConcreteAttributePath & path, const ByteSpan & value) override;
-    CHIP_ERROR ReadValue(const ConcreteAttributePath & path, const EmberAfAttributeMetadata * metadata,
-                         MutableByteSpan & value) override;
+    CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
+    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, size_t aSize,
+                         MutableByteSpan & aValue) override;
 
 private:
     void FlushAndScheduleNext();

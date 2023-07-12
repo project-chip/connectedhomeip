@@ -220,28 +220,15 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
     DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-CHIP_ERROR ConnectivityManagerImpl::_GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & SEDIntervalsConfig)
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+CHIP_ERROR ConnectivityManagerImpl::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {
-    // For now Wi-Fi uses DTIM power save mode so it varies from AP to AP
-    // TODO: Change this to DTIM read from DUT once it is done. For now hardcoding it
-    SEDIntervalsConfig.ActiveIntervalMS = CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL;
-    SEDIntervalsConfig.IdleIntervalMS   = CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL;
-    return CHIP_NO_ERROR;
+    // TODO ICD
+    (void) pollingInterval;
+    ChipLogError(DeviceLayer, "Set ICD Fast Polling on Silabs Wifi platform");
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
-
-CHIP_ERROR ConnectivityManagerImpl::_SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
-{
-    // not required
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_RequestSEDActiveMode(bool onOff, bool delayIdle)
-{
-    // not required
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
+#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
 // == == == == == == == == == == ConnectivityManager Private Methods == == == == == == == == == ==
 
@@ -380,13 +367,13 @@ void ConnectivityManagerImpl::OnStationConnected()
     event.WiFiConnectivityChange.Result = kConnectivity_Established;
     (void) PlatformMgr().PostEvent(&event);
     // Setting the rs911x in the power save mode
-#if (CHIP_DEVICE_CONFIG_ENABLE_SED && RS911X_WIFI)
+#if (CHIP_CONFIG_ENABLE_ICD_SERVER && RS911X_WIFI)
     sl_status_t err = wfx_power_save();
     if (err != SL_STATUS_OK)
     {
         ChipLogError(DeviceLayer, "Power save config for Wifi failed");
     }
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED && RS911X_WIFI */
+#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER && RS911X_WIFI */
     UpdateInternetConnectivityState();
 }
 

@@ -17,21 +17,18 @@
 
 package chip.onboardingpayload
 
-import java.lang.StringBuilder
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvWriter
 
 class QRCodeOnboardingPayloadGenerator(private val onboardingPayload: OnboardingPayload) {
   private var allowInvalidPayload = false
 
   /**
-   * This function is called to encode the binary data of a payload to a
-   * base38 string.
+   * This function is called to encode the binary data of a payload to a base38 string.
    *
-   * If the payload has any optional data that needs to be TLV encoded, this
-   * function will fail.
+   * If the payload has any optional data that needs to be TLV encoded, this function will fail.
    *
    * @retval The base38 representation string.
    */
@@ -40,12 +37,11 @@ class QRCodeOnboardingPayloadGenerator(private val onboardingPayload: Onboarding
   }
 
   /**
-   * This function is called to encode the binary data of a payload to a
-   * base38 null-terminated string.
+   * This function is called to encode the binary data of a payload to a base38 null-terminated
+   * string.
    *
-   * If the payload has any optional data that needs to be TLV encoded, this
-   * function will allocate a scratch heap buffer to hold the TLV data while
-   * encoding.
+   * If the payload has any optional data that needs to be TLV encoded, this function will allocate
+   * a scratch heap buffer to hold the TLV data while encoding.
    *
    * @retval The base38 representation string.
    */
@@ -88,21 +84,17 @@ class QRCodeOnboardingPayloadGenerator(private val onboardingPayload: Onboarding
 
   fun setAllowInvalidPayload(allow: Boolean) {
     allowInvalidPayload = allow
-  }  
+  }
 
   /**
-   * This function is called to encode the binary data of a payload to a
-   * base38 string, using the caller-provided buffer as
-   * temporary scratch space for optional data that needs to be TLV-encoded.
-   * If that buffer is not big enough to hold the TLV-encoded part of the
-   * payload, the function will fail.
-   * @param[in] tlvDataStart
-   *            The start of the buffer to use as temporary scratch space
-   *            for optional data that needs to be TLV-encoded.
+   * This function is called to encode the binary data of a payload to a base38 string, using the
+   * caller-provided buffer as temporary scratch space for optional data that needs to be
+   * TLV-encoded. If that buffer is not big enough to hold the TLV-encoded part of the payload, the
+   * function will fail.
    *
-   * @param[in] tlvDataStartSize
-   *            The size of the buffer.
-   *
+   * @param[in] tlvDataStart The start of the buffer to use as temporary scratch space for optional
+   *   data that needs to be TLV-encoded.
+   * @param[in] tlvDataStartSize The size of the buffer.
    * @retval The base38 representation string.
    */
   private fun payloadBase38Representation(tlvDataStart: ByteArray?, tlvDataStartSize: Int): String {
@@ -110,13 +102,19 @@ class QRCodeOnboardingPayloadGenerator(private val onboardingPayload: Onboarding
       throw OnboardingPayloadException("Invalid argument")
     }
 
-    var tlvDataLengthInBytes = generateTLVFromOptionalData(onboardingPayload, tlvDataStart, tlvDataStartSize)
-    
+    var tlvDataLengthInBytes =
+      generateTLVFromOptionalData(onboardingPayload, tlvDataStart, tlvDataStartSize)
     val bits = ByteArray(kTotalPayloadDataSizeInBytes + tlvDataLengthInBytes)
     val buffer = CharArray(base38EncodedLength(bits.size) + kQRCodePrefix.length)
-    payloadBase38RepresentationWithTLV(onboardingPayload, buffer, bits, tlvDataStart, tlvDataLengthInBytes)
-    
-    return buffer.toString()
+    payloadBase38RepresentationWithTLV(
+      onboardingPayload,
+      buffer,
+      bits,
+      tlvDataStart,
+      tlvDataLengthInBytes
+    )
+
+    return String(buffer)
   }
 
   private fun generateTLVFromOptionalData(
@@ -148,7 +146,7 @@ class QRCodeOnboardingPayloadGenerator(private val onboardingPayload: Onboarding
     val encodedTlvData = rootWriter.getEncoded()
 
     if (tlvDataStart != null) {
-      System.arraycopy(encodedTlvData, 0, tlvDataStart, 0, tlvDataLengthInBytes)      
+      System.arraycopy(encodedTlvData, 0, tlvDataStart, 0, tlvDataLengthInBytes)
     }
 
     return tlvDataLengthInBytes
@@ -182,5 +180,5 @@ class QRCodeOnboardingPayloadGenerator(private val onboardingPayload: Onboarding
     // octet string field: 1 byte control, 1 byte context tag, 2 bytes
     // length.
     return firstFieldSize + 4 + estimateStructOverhead()
-  }  
+  }
 }

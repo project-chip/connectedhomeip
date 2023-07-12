@@ -43,6 +43,7 @@ declare chip_mdns
 declare case_retry_delta
 declare install_virtual_env
 declare clean_virtual_env=yes
+declare install_pytest_requirements=yes
 
 help() {
 
@@ -51,17 +52,19 @@ help() {
     echo "General Options:
   -h, --help                Display this information.
 Input Options:
-  -d, --chip_detail_logging ChipDetailLoggingValue          Specify ChipDetailLoggingValue as true or false.
+  -d, --chip_detail_logging <true/false>                    Specify ChipDetailLoggingValue as true or false.
                                                             By default it is false.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
                                                             By default it is minimal.
-  -p, --enable_pybindings   EnableValue                     Specify whether to enable pybindings as python controller.
+  -p, --enable_pybindings   <true/false>                    Specify whether to enable pybindings as python controller.
 
   -t --time_between_case_retries MRPActiveRetryInterval     Specify MRPActiveRetryInterval value
                                                             Default is 300 ms
   -i, --install_virtual_env <path>                          Create a virtual environment with the wheels installed
                                                             <path> represents where the virtual environment is to be created.
   -c, --clean_virtual_env  <yes|no>                         When installing a virtual environment, create/clean it first.
+                                                            Defaults to yes.
+  --include_pytest_deps  <yes|no>                           Install requirements.python_tests.txt.
                                                             Defaults to yes.
   --extra_packages PACKAGES                                 Install extra Python packages from PyPI
   --include_yamltests                                       Whether to install the matter_yamltests wheel.
@@ -79,6 +82,10 @@ while (($#)); do
             ;;
         --chip_detail_logging | -d)
             chip_detail_logging=$2
+            if [[ "$chip_detail_logging" != "true" && "$chip_detail_logging" != "false" ]]; then
+                echo "chip_detail_logging should have a true/false value, not '$chip_detail_logging'"
+                exit
+            fi
             shift
             ;;
         --chip_mdns | -m)
@@ -87,6 +94,10 @@ while (($#)); do
             ;;
         --enable_pybindings | -p)
             enable_pybindings=$2
+            if [[ "$enable_pybindings" != "true" && "$enable_pybindings" != "false" ]]; then
+                echo "enable_pybindings should have a true/false value, not '$enable_pybindings'"
+                exit
+            fi
             shift
             ;;
         --time_between_case_retries | -t)
@@ -99,6 +110,18 @@ while (($#)); do
             ;;
         --clean_virtual_env | -c)
             clean_virtual_env=$2
+            if [[ "$clean_virtual_env" != "yes" && "$clean_virtual_env" != "no" ]]; then
+                echo "clean_virtual_env should have a yes/no value, not '$clean_virtual_env'"
+                exit
+            fi
+            shift
+            ;;
+        --include_pytest_deps)
+            install_pytest_requirements=$2
+            if [[ "$install_pytest_requirements" != "yes" && "$install_pytest_requirements" != "no" ]]; then
+                echo "install_pytest_requirements should have a yes/no value, not '$install_pytest_requirements'"
+                exit
+            fi
             shift
             ;;
         --extra_packages)
@@ -178,12 +201,21 @@ if [ -n "$install_virtual_env" ]; then
 
     if [ "$clean_virtual_env" = "yes" ]; then
         # Create a virtual environment that has access to the built python tools
+        echo_blue "Creating a clear VirtualEnv in '$ENVIRONMENT_ROOT' ..."
         virtualenv --clear "$ENVIRONMENT_ROOT"
+    elif [ ! -f "$ENVIRONMENT_ROOT"/bin/activate ]; then
+        echo_blue "Creating a new VirtualEnv in '$ENVIRONMENT_ROOT' ..."
+        virtualenv "$ENVIRONMENT_ROOT"
     fi
 
     source "$ENVIRONMENT_ROOT"/bin/activate
     "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
     "$ENVIRONMENT_ROOT"/bin/pip install --upgrade "${WHEEL[@]}"
+
+    if [ "$install_pytest_requirements" = "yes" ]; then
+        echo_blue "Installing python test dependencies ..."
+        "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/setup/requirements.python_tests.txt"
+    fi
 
     echo ""
     echo_green "Compilation completed and WHL package installed in: "

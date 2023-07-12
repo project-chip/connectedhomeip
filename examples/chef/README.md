@@ -51,12 +51,7 @@ All device types available (.zap files) are found inside the `devices` folder.
 
 ## Creating a new device type in your device library
 
-1. Run `$ chef.py -g -d <device>` to open in the ZAP GUI a device to be used as
-   a starting point.
-2. Edit your cluster configurations
-3. Click on `Save As` and save the file with the name of your new device type
-   into the `devices` folder. This device is now available for the script. See
-   `chef.py -h` for a list of devices available.
+Follow guide in [NEW_CHEF_DEVICES.md](NEW_CHEF_DEVICES.md).
 
 ## Folder Structure and Guidelines
 
@@ -137,20 +132,12 @@ chef_$PLATFORM:
         options: --user root
 
     steps:
-        - uses: Wandalen/wretry.action@v1.3.0
-          name: Checkout
+        - name: Checkout
+          uses: actions/checkout@v3
+        - name: Checkout submodules & Bootstrap
+          uses: ./.github/actions/checkout-submodules-and-bootstrap
           with:
-              action: actions/checkout@v3
-              with: |
-                  token: ${{ github.token }}
-              attempt_limit: 3
-              attempt_delay: 2000
-        - name: Checkout submodules
-          run: |
-              scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform $PLATFORM
-        - name: Bootstrap
-          timeout-minutes: 25
-          run: bash scripts/bootstrap.sh
+              platform: $PLATFORM
         - name: CI Examples $PLATFORM
           shell: bash
           run: |

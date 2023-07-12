@@ -193,7 +193,7 @@ sl_status_t wfx_connect_to_ap(void)
     return SL_STATUS_OK;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
 /*********************************************************************
  * @fn  sl_status_t wfx_power_save()
  * @brief
@@ -210,7 +210,7 @@ sl_status_t wfx_power_save()
     }
     return SL_STATUS_OK;
 }
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
+#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
 /*********************************************************************
  * @fn  void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)

@@ -792,7 +792,7 @@ snippet:
 
 > **Note:** To get more information about how to use the interactive Kconfig
 > interfaces, read the
-> [Kconfig docummentation](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/build/kconfig/menuconfig.html).
+> [Kconfig documentation](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/build/kconfig/menuconfig.html).
 
 <hr>
 

@@ -25,13 +25,10 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    # XXX: Workaround for https://github.com/actions/cache/issues/1141
-    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
-
+    
 jobs:
     imx:
         name: Linux i.MX Build
-        timeout-minutes: 70
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -40,35 +37,14 @@ jobs:
             image: connectedhomeip/chip-build-imx:0.7.19.1
 
         steps:
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3.5.2
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Bootstrap cache
-              continue-on-error: true
-              timeout-minutes: 10
-              with:
-                action: buildjet/cache@v3
-                attempt_limit: 3
-                attempt_delay: 2000
-                with: |
-                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                    path: |
-                        .environment
-                        build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              run: bash scripts/bootstrap.sh
+                platform: linux
 
             - name: Build lighting-app
-              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -77,7 +53,6 @@ jobs:
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build chip-tool
-              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -86,7 +61,6 @@ jobs:
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build thermostat
-              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -95,7 +69,6 @@ jobs:
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build all-cluster
-              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -104,7 +77,6 @@ jobs:
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build all-cluster-minimal
-              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -113,7 +85,6 @@ jobs:
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build ota-provider-app
-              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \

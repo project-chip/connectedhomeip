@@ -159,7 +159,7 @@ server cluster Scenes = 5 {
   }
 
   struct AttributeValuePair {
-    optional attrib_id attributeID = 0;
+    attrib_id attributeID = 0;
     int32u attributeValue = 1;
   }
 
@@ -487,8 +487,8 @@ server cluster Descriptor = 29 {
       cluster instances. */
 server cluster AccessControl = 31 {
   enum AccessControlEntryAuthModeEnum : ENUM8 {
-    kPase = 1;
-    kCase = 2;
+    kPASE = 1;
+    kCASE = 2;
     kGroup = 3;
   }
 
@@ -654,7 +654,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
   enum OTADownloadProtocol : ENUM8 {
     kBDXSynchronous = 0;
     kBDXAsynchronous = 1;
-    kHttps = 2;
+    kHTTPS = 2;
     kVendorSpecific = 3;
   }
 
@@ -846,7 +846,7 @@ server cluster TimeFormatLocalization = 44 {
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
   enum CommissioningErrorEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
     kNoFailSafe = 3;
@@ -926,12 +926,12 @@ server cluster NetworkCommissioning = 49 {
   }
 
   enum WiFiBandEnum : ENUM8 {
-    k2g4 = 0;
-    k3g65 = 1;
-    k5g = 2;
-    k6g = 3;
-    k60g = 4;
-    k1g = 5;
+    k2G4 = 0;
+    k3G65 = 1;
+    k5G = 2;
+    k6G = 3;
+    k60G = 4;
+    k1G = 5;
   }
 
   bitmap Feature : BITMAP32 {
@@ -942,10 +942,10 @@ server cluster NetworkCommissioning = 49 {
 
   bitmap WiFiSecurityBitmap : BITMAP8 {
     kUnencrypted = 0x1;
-    kWep = 0x2;
-    kWpaPersonal = 0x4;
-    kWpa2Personal = 0x8;
-    kWpa3Personal = 0x10;
+    kWEP = 0x2;
+    kWPAPersonal = 0x4;
+    kWPA2Personal = 0x8;
+    kWPA3Personal = 0x10;
   }
 
   struct NetworkInfoStruct {
@@ -1065,7 +1065,7 @@ server cluster DiagnosticLogs = 50 {
 
   enum TransferProtocolEnum : ENUM8 {
     kResponsePayload = 0;
-    kBdx = 1;
+    kBDX = 1;
   }
 
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1242,7 +1242,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
     kUnassigned = 1;
     kSleepyEndDevice = 2;
     kEndDevice = 3;
-    kReed = 4;
+    kREED = 4;
     kRouter = 5;
     kLeader = 6;
   }
@@ -1403,10 +1403,10 @@ server cluster WiFiNetworkDiagnostics = 54 {
   enum SecurityTypeEnum : ENUM8 {
     kUnspecified = 0;
     kNone = 1;
-    kWep = 2;
-    kWpa = 3;
-    kWpa2 = 4;
-    kWpa3 = 5;
+    kWEP = 2;
+    kWPA = 3;
+    kWPA2 = 4;
+    kWPA3 = 5;
   }
 
   enum WiFiVersionEnum : ENUM8 {
@@ -1466,7 +1466,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
     kRate10M = 0;
     kRate100M = 1;
     kRate1G = 2;
-    kRate25g = 3;
+    kRate25G = 3;
     kRate5G = 4;
     kRate10G = 5;
     kRate40G = 6;
@@ -1600,7 +1600,7 @@ server cluster OperationalCredentials = 62 {
   }
 
   enum NodeOperationalCertStatusEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
     kInvalidNOC = 3;
@@ -1876,7 +1876,7 @@ server cluster ColorControl = 768 {
     kHueAndSaturation = 0x1;
     kEnhancedHue = 0x2;
     kColorLoop = 0x4;
-    kXy = 0x8;
+    kXY = 0x8;
     kColorTemperature = 0x10;
   }
 
@@ -2080,7 +2080,7 @@ server cluster ColorControl = 768 {
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 server cluster OccupancySensing = 1030 {
   enum OccupancySensorTypeEnum : ENUM8 {
-    kPir = 0;
+    kPIR = 0;
     kUltrasonic = 1;
     kPIRAndUltrasonic = 2;
     kPhysicalContact = 3;
@@ -2091,7 +2091,7 @@ server cluster OccupancySensing = 1030 {
   }
 
   bitmap OccupancySensorTypeBitmap : BITMAP8 {
-    kPir = 0x1;
+    kPIR = 0x1;
     kUltrasonic = 0x2;
     kPhysicalContact = 0x4;
   }

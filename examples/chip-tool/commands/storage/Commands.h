@@ -27,5 +27,5 @@ void registerCommandsStorage(Commands & commands)
 
     commands_list clusterCommands = { make_unique<StorageClearAll>() };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for managing persistent data stored by chip-tool.");
 }
