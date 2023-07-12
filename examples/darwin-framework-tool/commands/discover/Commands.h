@@ -32,5 +32,5 @@ void registerCommandsDiscover(Commands & commands)
         make_unique<DiscoverCommissionablesListCommand>(),
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for device discovery.");
 }

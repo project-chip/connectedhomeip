@@ -104,5 +104,5 @@ void registerCommandsSubscriptions(Commands & commands, CredentialIssuerCommands
         make_unique<ShutdownAllSubscriptions>(credsIssuerConfig),     //
     };
 
-    commands.Register(clusterName, clusterCommands, "Commands for shutting down subscriptions.");
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for shutting down subscriptions.");
 }
