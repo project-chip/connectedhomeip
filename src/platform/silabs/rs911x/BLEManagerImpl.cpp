@@ -60,8 +60,6 @@ extern "C" {
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
-extern uint16_t rsi_ble_measurement_hndl;
-extern rsi_ble_event_conn_status_t conn_event_to_app;
 extern sl_wfx_msg_t event_msg;
 
 StaticTask_t rsiBLETaskStruct;
@@ -96,9 +94,6 @@ void sl_ble_init()
     //  initializing the application events map
     rsi_ble_app_init_events();
     memcpy(randomAddrBLE, &randomAddr, 6);
-    ChipLogError(DeviceLayer, "%s: BLE : randomAddr %" PRIu64 "\n", __func__, randomAddr);
-    ChipLogError(DeviceLayer, "%s: BLE : MAC %02x:%02x:%02x %02x:%02x:%02x", __func__, randomAddrBLE[0], randomAddrBLE[1],
-                 randomAddrBLE[2], randomAddrBLE[3], randomAddrBLE[4], randomAddrBLE[5]);
     rsi_ble_set_random_address_with_value(randomAddrBLE);
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleBootEvent();
 }
@@ -116,8 +111,13 @@ void sl_ble_event_handling_task(void)
     // Application event map
     while (1)
     {
-        //! This semaphore is waiting for next ble event task
         event_id = rsi_ble_app_get_event();
+        if (event_id == RSI_FAILURE)
+        {
+            //! This semaphore is waiting for next ble event task
+            rsi_semaphore_wait(&sl_ble_event_sem, 0);
+            continue;
+        }
         switch (event_id)
         {
         case RSI_BLE_CONN_EVENT: {
@@ -155,7 +155,6 @@ void sl_ble_event_handling_task(void)
         }
         break;
         default:
-            rsi_semaphore_wait(&sl_ble_event_sem, 0);
             break;
         }
     }
@@ -606,8 +605,6 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     rsi_ble_set_scan_response_data(responseData, index);
 
-    // err = MapBLEError(result);
-
     ChipLogProgress(DeviceLayer, "ConfigureAdvertisingData End");
 exit:
     return CHIP_NO_ERROR;
@@ -826,11 +823,9 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt)
             bleConnState->subscribed = 1;
             // Post an event to the CHIP queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
             // whether the client is enabling or disabling indications.
-            {
-                event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
-                event.CHIPoBLESubscribe.ConId = 1; // TODO:: To be replaced by device mac address
-                err                           = PlatformMgr().PostEvent(&event);
-            }
+            event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
+            event.CHIPoBLESubscribe.ConId = 1; // TODO:: To be replaced by device mac address
+            err                           = PlatformMgr().PostEvent(&event);
         }
     }
     else
