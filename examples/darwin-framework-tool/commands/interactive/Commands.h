@@ -35,5 +35,5 @@ void registerCommandsInteractive(Commands & commands)
 #endif // CONFIG_USE_INTERACTIVE_MODE
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for starting long-lived interactive modes.");
 }

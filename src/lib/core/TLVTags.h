@@ -25,6 +25,7 @@
 #pragma once
 
 #include <cstdint>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/TypeTraits.h>
 #include <type_traits>
 
@@ -46,7 +47,8 @@ public:
     constexpr bool operator==(const Tag & other) const { return mVal == other.mVal; }
     constexpr bool operator!=(const Tag & other) const { return mVal != other.mVal; }
 
-    uint64_t RawValue() const { return mVal; }
+    /// Appends the text representation of the tag to the given string builder base.
+    StringBuilderBase & AppendTo(StringBuilderBase & out);
 
 private:
     explicit constexpr Tag(uint64_t val) : mVal(val) {}
