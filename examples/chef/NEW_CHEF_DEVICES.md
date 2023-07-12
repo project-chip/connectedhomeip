@@ -34,20 +34,21 @@ Using the ZAP UI, make the following changes:
     -   Update the device type to the new device and click "save"
     -   In the "Filter" section select "Enabled Clusters" and validate what
         clusters are set.
-        -   Remove extra clusters  (e.g. remove `Boolean State`)
+        -   Remove extra clusters (e.g. remove `Boolean State`)
         -   Ensure clusters for the device type are enabled (this is generally
             automatically the case)
         -   Click the gear icon on the cluster to further edit enabled
             attributes and commands
 
-Once all edits are done, click "File" => "Save as..."  to save it under a **NEW** name inside
-`examples/chef/devices/`.
+Once all edits are done, click "File" => "Save as..." to save it under a **NEW**
+name inside `examples/chef/devices/`.
 
 NOTE: make sure you save under `examples/chef/devices` since internal paths
 inside the saved file will be relative to the save location (it cannot simply be
 moved later without manual editing).
 
-It is suggested to name this `rootnode_<device_type_name>.zap` (e.g., rootnode_smokecoalarm.zap for Matter Smoke CO Alarm device type)
+It is suggested to name this `rootnode_<device_type_name>.zap` (e.g.,
+rootnode_smokecoalarm.zap for Matter Smoke CO Alarm device type)
 
 ## Establishing a "final name"
 
