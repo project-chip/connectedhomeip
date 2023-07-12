@@ -70,6 +70,8 @@ public:
     static constexpr const char * kConfigKey_ActiveLocale                = ("active-locale");
     static constexpr const char * kConfigKey_Breadcrumb                  = ("breadcrumb");
     static constexpr const char * kConfigKey_GroupKeyIndex               = ("group-key-index");
+    static constexpr const char * kConfigKey_LifeTimeCounter             = ("life-time-counter");
+
     static constexpr const char * kBLConfigKey_wifissid                  = ("blConfig_wifi-ssid");
     static constexpr const char * kBLConfigKey_wifipassword              = ("blConfig_wifi-pwd");
 

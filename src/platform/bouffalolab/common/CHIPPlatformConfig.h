@@ -26,7 +26,7 @@
 #define CHIP_CONFIG_PERSISTED_STORAGE_ENC_MSG_CNTR_ID 1
 #define CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH 2
 
-#define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY 0x01
+#define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY BLConfig::kConfigKey_LifeTimeCounter
 
 // ==================== Security Adaptations ====================
 //#define CHIP_CONFIG_SHA256_CONTEXT_SIZE sizeof(bl_sha_ctx_t)
