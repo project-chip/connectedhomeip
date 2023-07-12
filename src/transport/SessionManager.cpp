@@ -181,11 +181,13 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             return CHIP_ERROR_INTERNAL;
         }
 
+        PeerAddress destination_address = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
+
         // Trace before any encryption
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kGroupMessage, &payloadHeader, &packetHeader,
                                 chip::ByteSpan(message->Start(), message->TotalLength()));
 
-        CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, message->Start(), message->TotalLength());
+        CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, destination_address, message->Start(), message->TotalLength());
 
         Crypto::SymmetricKeyContext * keyContext =
             groups->GetKeyContext(groupSession->GetFabricIndex(), groupSession->GetGroupId());
@@ -219,10 +221,12 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             .SetSessionId(session->GetPeerSessionId()) //
             .SetSessionType(Header::SessionType::kUnicastSession);
 
+        PeerAddress destination_address = session->GetPeerAddress();
+
         // Trace before any encryption
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kSecureSession, &payloadHeader, &packetHeader,
                                 chip::ByteSpan(message->Start(), message->TotalLength()));
-        CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, message->Start(), message->TotalLength());
+        CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, destination_address, message->Start(), message->TotalLength());
 
         CryptoContext::NonceStorage nonce;
         NodeId sourceNodeId = session->GetLocalScopedNodeId().GetNodeId();
@@ -252,10 +256,13 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             break;
         }
 
+        auto unauthenticated            = sessionHandle->AsUnauthenticatedSession();
+        PeerAddress destination_address = unauthenticated->GetPeerAddress();
+
         // Trace after all headers are settled.
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kUnauthenticated, &payloadHeader, &packetHeader,
                                 chip::ByteSpan(message->Start(), message->TotalLength()));
-        CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, message->Start(), message->TotalLength());
+        CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, destination_address, message->Start(), message->TotalLength());
 
         ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
 

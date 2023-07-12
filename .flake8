@@ -3,7 +3,6 @@ max-line-length = 132
 exclude = third_party
           .*
           out/*
-          scripts/idl/*
           ./examples/common/QRCode/*
           # temporarily scan only directories with fixed files
           # TODO: Remove the paths below when all bugs are fixed
@@ -15,26 +14,6 @@ exclude = third_party
           docs/_extensions/external_content.py
           examples/common/pigweed/rpc_console/py/chip_rpc/console.py
           examples/lighting-app/python/lighting.py
-          scripts/build/build/target.py
-          scripts/build/build/targets.py
-          scripts/build/builders/android.py
-          scripts/build/builders/bouffalolab.py
-          scripts/build/builders/cc13x2x7_26x2x7.py
-          scripts/build/builders/genio.py
-          scripts/build/builders/gn.py
-          scripts/build/builders/imx.py
-          scripts/build/builders/infineon.py
-          scripts/codegen.py
-          scripts/codepregen.py
-          scripts/error_table.py
-          scripts/examples/gn_to_cmakelists.py
-          scripts/flashing/bouffalolab_firmware_utils.py
-          scripts/flashing/cyw30739_firmware_utils.py
-          scripts/gen_chip_version.py
-          scripts/helpers/bloat_check.py
-          scripts/pregenerate/using_codegen.py
-          scripts/pregenerate/using_zap.py
-          scripts/run-clang-tidy-on-compile-commands.py
           scripts/tools/check_zcl_file_sync.py
           scripts/tools/convert_ini.py
           scripts/tools/memory/memdf/__init__.py

@@ -9463,3 +9463,76 @@ PICS:
     #
     - label: "Does the device implement receiving the Step command?"
       id: FAN.S.C00.Rsp
+
+    #ICD Management
+    #
+    # Server Attribute
+    #
+    - label: "Does the device implement the IdleModeInterval attribute?"
+      id: ICDM.S.A0000
+
+    - label: "Does the device implement the ActiveModeInterval attribute?"
+      id: ICDM.S.A0001
+
+    - label: "Does the device implement the ActiveModeThreshold attribute?"
+      id: ICDM.S.A0002
+
+    - label: "Does the device implement the RegisteredClients attribute?"
+      id: ICDM.S.A0003
+
+    - label: "Does the device implement the IcdCounter attribute?"
+      id: ICDM.S.A0004
+
+    - label:
+          "Does the device implement the ClientsSupportedPerFabric attribute?"
+      id: ICDM.S.A0005
+
+    #
+    # Features
+    #
+    - label: "Does the device support this specific cluster feature?"
+      id: ICDM.S.F00
+
+    #
+    #Commands:
+    #
+    - label:
+          "Does the device implement receiving the StayActiveRequest command?"
+      id: ICDM.S.C03.Rsp
+
+    #
+    #RVC Clean Mode Select
+    #
+    #Feature
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same DUT?"
+      id: RVCCLEANMS.S.F00
+
+    - label: "Does the device support the extended status feature?"
+      id: RVCCLEANMS.S.F01
+
+    - label:
+          "Does the device implementation deprecate the ChangeToMode command?"
+      id: RVCCLEANMS.S.F02
+
+    #Server Attributes
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: RVCCLEANMS.S.A0004
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: RVCCLEANMS.S.A0005
+
+    #Server Commands recived
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: RVCCLEANMS.S.C00.Rsp
+
+    - label:
+          "Does the device implement receiving the ChangeToModeWithStatus
+          command?"
+      id: RVCCLEANMS.S.C01.Rsp
+
+    #server commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: RVCCLEANMS.S.C03.Tx
