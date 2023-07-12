@@ -37,3 +37,9 @@ declare_args() {
   matter_cd = "${chip_root}/credentials/test/certification-declaration/Chip-Test-CD-FFF2-8001-8002.der"
 }
 
+template("renesas_sdk") {
+  if (defined(invoker.renesas_sdk_root)) {
+    renesas_sdk_root = invoker.renesas_sdk_root
+  }
+}
+

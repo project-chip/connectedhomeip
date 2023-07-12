@@ -16,7 +16,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/ble/ble.gni")
 
 declare_args() {
-  # Device platform layer: cc13x2_26x2, cc13x4_26x4, cc32xx, darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w0, qpg, tizen, cyw30739, bl602, mw320, zephyr, beken, openiotsdk, none.
+  # Device platform layer: cc13x2_26x2, cc13x4_26x4, cc32xx, darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w0, qpg, tizen, cyw30739, bl602, mw320, zephyr, beken, openiotsdk, renesas, none.
 
   chip_device_platform = "auto"
   chip_platform_target = ""
@@ -221,6 +221,8 @@ declare_args() {
   chip_enable_segger_rtt = chip_device_platform != "qpg"
 }
 
+print("=========chip_device_platform: ${chip_device_platform}")
+print("=========current_os: ${current_os}")
 assert(
     (current_os != "freertos" && chip_device_platform == "none") ||
         chip_device_platform == "fake" ||
@@ -239,5 +241,6 @@ assert(
         chip_device_platform == "mw320" || chip_device_platform == "zephyr" ||
         chip_device_platform == "beken" || chip_device_platform == "bl702" ||
         chip_device_platform == "mt793x" || chip_device_platform == "SiWx917" ||
-        chip_device_platform == "openiotsdk" || chip_device_platform == "asr",
+        chip_device_platform == "openiotsdk" || chip_device_platform == "asr" ||
+	chip_device_platform == "renesas",
     "Please select a valid value for chip_device_platform")

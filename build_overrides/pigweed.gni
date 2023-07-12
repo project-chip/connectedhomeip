@@ -14,7 +14,7 @@
 
 declare_args() {
   # Location of the Pigweed repository.
-  dir_pigweed = "//third_party/pigweed/repo"
+  dir_pigweed = "//third_party/connectedhomeip/third_party/pigweed/repo"
 }
 
 import("$dir_pigweed/modules.gni")
