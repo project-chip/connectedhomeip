@@ -45,6 +45,8 @@ CHIP_ERROR BLEManagerImpl::InitHostController(BLECallbackDelegate::GapGenericCal
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    VerifyOrExit(PLATFORM_InitTimerManager() >= 0, err = CHIP_ERROR_INCORRECT_STATE);
+
     PLATFORM_InitBle();
 
     (void) RNG_Init();

@@ -23,6 +23,7 @@
 #include "RNG_Interface.h"
 #include "fwk_messaging.h"
 #include "fwk_os_abs.h"
+#include "fwk_platform.h"
 #include "fwk_platform_ble.h"
 #include "hci_transport.h"
 
