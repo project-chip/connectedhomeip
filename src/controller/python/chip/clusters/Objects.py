@@ -2816,6 +2816,23 @@ class Descriptor(Cluster):
             deviceType: 'uint' = 0
             revision: 'uint' = 0
 
+        @dataclass
+        class SemanticTagStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="namespace", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="tag", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="label", Tag=3, Type=typing.Union[None, Nullable, str]),
+                    ])
+
+            mfgCode: 'typing.Union[Nullable, uint]' = NullValue
+            namespace: 'uint' = 0
+            tag: 'uint' = 0
+            label: 'typing.Union[None, Nullable, str]' = None
+
     class Attributes:
         @dataclass
         class DeviceTypeList(ClusterAttributeDescriptor):
