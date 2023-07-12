@@ -72,8 +72,8 @@ public:
     static constexpr const char * kConfigKey_GroupKeyIndex               = ("group-key-index");
     static constexpr const char * kConfigKey_LifeTimeCounter             = ("life-time-counter");
 
-    static constexpr const char * kBLConfigKey_wifissid                  = ("blConfig_wifi-ssid");
-    static constexpr const char * kBLConfigKey_wifipassword              = ("blConfig_wifi-pwd");
+    static constexpr const char * kBLConfigKey_wifissid     = ("blConfig_wifi-ssid");
+    static constexpr const char * kBLConfigKey_wifipassword = ("blConfig_wifi-pwd");
 
     /** Counter Keys, diagnostic information  */
     static constexpr const char * kCounterKey_RebootCount           = ("reboot-count");
