@@ -14,15 +14,13 @@ Generally you need to follow these steps to use a new device:
 
 ## Creating a new zap configuration
 
-The easiest way to get started is using an existing configuration. In this
-example we will use `rootnode_contactsensor_lFAGG1bfRO` as one of the smallest
-devices. Use `./examples/chef/chef.py -h | less` or view
-`./examples/chef/devices/*.zap` for a list of valid devices.
+The easiest way to get started is using an existing configuration. A template
+is provided in `./examples/chef/devices/template.zap`.
 
 To open the zap GUI for this device, run:
 
 ```
-./examples/chef/chef.py -g -d rootnode_contactsensor_lFAGG1bfRO
+./examples/chef/chef.py -g -d template
 ```
 
 ### Editing the zap configuration:
@@ -30,15 +28,16 @@ To open the zap GUI for this device, run:
 Using the ZAP UI, make the following changes:
 
 -   Leave Endpoint 0 unchanged
--   Click the Edit/Pencil icon to change Endpoint 1
-    -   Update the device type to the new device and click "save"
+-   Click the Edit/Pencil icon to change Endpoint 1 (![Edit device type](img/endpoint1_edit_pencil.png))
+    -   Update the device type to the new device and click "save" (![edit device type](img/endpoint_edit_type.png))
     -   In the "Filter" section select "Enabled Clusters" and validate what
-        clusters are set.
-        -   Remove extra clusters (e.g. remove `Boolean State`)
+        clusters are set (![filter enabled clusters](img/select_enabled_clusters.png))
         -   Ensure clusters for the device type are enabled (this is generally
             automatically the case)
         -   Click the gear icon on the cluster to further edit enabled
             attributes and commands
+        -   You can add additional optional clusters if needed (disable filtering
+            and use the search option)
 
 Once all edits are done, click "File" => "Save as..." to save it under a **NEW**
 name inside `examples/chef/devices/`.
