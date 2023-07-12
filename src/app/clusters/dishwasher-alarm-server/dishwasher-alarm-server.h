@@ -41,6 +41,10 @@ public:
     // When State changes we are generating Notify event.
     EmberAfStatus SetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> newState);
 
+    // A change in supported value will result in a corresponding change in mask and state.
+    EmberAfStatus SetSupportedValue(chip::EndpointId endpoint,
+                      const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> supported);
+
 private:
     static DishwasherAlarmServer instance;
 
