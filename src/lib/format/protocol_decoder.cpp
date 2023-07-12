@@ -45,51 +45,6 @@ private:
     const Tag mTag;
 };
 
-const char * DecodeTagControl(const TLVTagControl aTagControl)
-{
-    switch (aTagControl)
-    {
-    case TLVTagControl::Anonymous:
-        return "Anonymous";
-    case TLVTagControl::ContextSpecific:
-        return "ContextSpecific";
-    case TLVTagControl::CommonProfile_2Bytes:
-        return "Common2B";
-    case TLVTagControl::CommonProfile_4Bytes:
-        return "Common4B";
-    case TLVTagControl::ImplicitProfile_2Bytes:
-        return "Implicit2B";
-    case TLVTagControl::ImplicitProfile_4Bytes:
-        return "Implicit4B";
-    case TLVTagControl::FullyQualified_6Bytes:
-        return "FullyQualified6B";
-    case TLVTagControl::FullyQualified_8Bytes:
-        return "FullyQualified8";
-    default:
-        return "???";
-    }
-}
-
-void FormatCurrentTag(const TLVReader & reader, chip::StringBuilderBase & out)
-{
-    chip::TLV::TLVTagControl tagControl = static_cast<TLVTagControl>(reader.GetControlByte() & kTLVTagControlMask);
-    chip::TLV::Tag tag                  = reader.GetTag();
-
-    if (IsProfileTag(tag))
-    {
-        out.AddFormat("%s(0x%X::0x%X::0x%" PRIX32 ")", DecodeTagControl(tagControl), VendorIdFromTag(tag), ProfileNumFromTag(tag),
-                      TagNumFromTag(tag));
-    }
-    else if (IsContextTag(tag))
-    {
-        out.AddFormat("%s(0x%" PRIX32 ")", DecodeTagControl(tagControl), TagNumFromTag(tag));
-    }
-    else
-    {
-        out.AddFormat("UnknownTag(0x%" PRIX64 ")", tag.RawValue());
-    }
-}
-
 CHIP_ERROR FormatCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
 {
     switch (reader.GetType())
@@ -351,6 +306,7 @@ bool PayloadDecoderBase::ReaderEnterContainer(PayloadEntry & entry)
     if (mCurrentNesting >= kMaxDecodeDepth)
     {
         mValueBuilder.AddFormat("NESTING DEPTH REACHED");
+        mReader.GetTag().AppendTo(mNameBuilder.Reset());
         entry = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
         return false;
     }
@@ -360,6 +316,7 @@ bool PayloadDecoderBase::ReaderEnterContainer(PayloadEntry & entry)
     if (err != CHIP_NO_ERROR)
     {
         mValueBuilder.AddFormat("ERROR entering container: %" CHIP_ERROR_FORMAT, err.Format());
+        mReader.GetTag().AppendTo(mNameBuilder.Reset()); // assume enter is not done, so tag is correct
         entry  = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
         mState = State::kDone;
         return false;
@@ -372,13 +329,8 @@ bool PayloadDecoderBase::ReaderEnterContainer(PayloadEntry & entry)
 
 void PayloadDecoderBase::EnterContainer(PayloadEntry & entry)
 {
-    // must be done BEFORE entering container
-    // to preserve the value and not get a 'container tag'
-    // below when data is not valid
-    //
-    // TODO: this formatting is wasteful, should really be done only
-    //       if data is NULLPTR.
-    FormatCurrentTag(mReader, mNameBuilder.Reset());
+    // Tag fetch must be done BEFORE entering container
+    chip::TLV::Tag tag = mReader.GetTag();
 
     VerifyOrReturn(ReaderEnterContainer(entry));
 
@@ -396,6 +348,7 @@ void PayloadDecoderBase::EnterContainer(PayloadEntry & entry)
 
     if (data == nullptr)
     {
+        tag.AppendTo(mNameBuilder.Reset());
         entry = PayloadEntry::NestingEnter(mNameBuilder.c_str());
     }
     else
@@ -454,7 +407,7 @@ void PayloadDecoderBase::NextFromContentRead(PayloadEntry & entry)
 
     if (data == nullptr)
     {
-        FormatCurrentTag(mReader, mNameBuilder.Reset());
+        mReader.GetTag().AppendTo(mNameBuilder.Reset());
         entry = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
         return;
     }
@@ -600,7 +553,7 @@ void PayloadDecoderBase::NextFromValueRead(PayloadEntry & entry)
 
     if (data == nullptr)
     {
-        FormatCurrentTag(mReader, mNameBuilder.Reset());
+        mReader.GetTag().AppendTo(mNameBuilder.Reset());
         PrettyPrintCurrentValue(mReader, mValueBuilder.Reset(), mPayloadPosition);
         entry = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
         mPayloadPosition.Exit();

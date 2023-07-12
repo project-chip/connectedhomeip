@@ -25,3 +25,7 @@ chip_project_config_include_dirs =
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
 chip_enable_ota_requestor = true
+matter_enable_tracing_support = true
+
+# Perfetto requires C++17
+cpp_standard = "gnu++17"

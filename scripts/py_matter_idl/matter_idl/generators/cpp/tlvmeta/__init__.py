@@ -249,7 +249,7 @@ def IndexInTable(name: Optional[str], table: List[Table]) -> str:
     for idx, t in enumerate(table):
         if t.full_name == name:
             # Index skipping hard-coded items
-            return idx + 2
+            return "%d" % (idx + 2)
 
     raise Exception("Name %r not found in table" % name)
 

@@ -149,10 +149,17 @@ public:
 
     CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
     {
-        ReturnErrorOnFailure(ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause));
+        if (mAutoResubscribe)
+        {
+            ReturnErrorOnFailure(ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause));
+        }
         gOnResubscriptionAttemptedCallback(mAppContext, ToPyChipError(aTerminationCause),
                                            apReadClient->ComputeTimeTillNextSubscription());
-        return CHIP_NO_ERROR;
+        if (mAutoResubscribe)
+        {
+            return CHIP_NO_ERROR;
+        }
+        return aTerminationCause;
     }
 
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override
@@ -226,12 +233,15 @@ public:
 
     void AdoptReadClient(std::unique_ptr<ReadClient> apReadClient) { mReadClient = std::move(apReadClient); }
 
+    void SetAutoResubscribe(bool autoResubscribe) { mAutoResubscribe = autoResubscribe; }
+
 private:
     BufferedReadCallback mBufferedReadCallback;
 
     PyObject * mAppContext;
 
     std::unique_ptr<ReadClient> mReadClient;
+    bool mAutoResubscribe = true;
 };
 
 extern "C" {
@@ -243,6 +253,7 @@ struct __attribute__((packed)) PyReadAttributeParams
     bool isSubscription;
     bool isFabricFiltered;
     bool keepSubscriptions;
+    bool autoResubscribe;
 };
 
 // Encodes n attribute write requests, follows 3 * n arguments, in the (AttributeWritePath*=void *, uint8_t*, size_t) order.
@@ -564,6 +575,7 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
             params.mMinIntervalFloorSeconds   = pyParams.minInterval;
             params.mMaxIntervalCeilingSeconds = pyParams.maxInterval;
             params.mKeepSubscriptions         = pyParams.keepSubscriptions;
+            callback->SetAutoResubscribe(pyParams.autoResubscribe);
 
             dataVersionFilters.release();
             attributePaths.release();
