@@ -110,10 +110,10 @@ tests:
           add Manage privileges for group 0x0103 and maintain the current
           administrative privileges for the TH on the Access Control cluster.
           The following access control list shall be used: List item 1 (TH
-          admin): Privilege: Administer (5), AuthMode: CASE (2), Subjects: [N1],
-          Targets: [{Cluster: AccessControl (0x001f), Endpoint: 0}]. List item 2
-          (group Manage access): Privilege: Manage (4), AuthMode: Group (3),
-          Subjects: group 0x0103 ([0x0103]), Targets: {Cluster: Groups (0x0004),
+          admin): Privilege: Administer (5) AuthMode: CASE (2) Subjects: [N1]
+          Targets: [{Cluster: AccessControl (0x001f), Endpoint: 0}] List item 2
+          (group Manage access): Privilege: Manage (4) AuthMode: Group (3)
+          Subjects: group 0x0103 ([0x0103]) Targets: {Cluster: Groups (0x0004),
           Endpoint: PIXIT.G.ENDPOINT}"
       command: "writeAttribute"
       attribute: "ACL"
@@ -272,7 +272,7 @@ tests:
           [1685009398.600944][39795:39797] CHIP:TOO: ViewGroupResponse: {
           [1685009398.600949][39795:39797] CHIP:TOO: status: 139
           [1685009398.600952][39795:39797] CHIP:TOO: groupID: 261
-          [1685009398.600955][39795:39797] CHIP:TOO: groupName:
+          [1685009398.600955][39795:39797] CHIP:TOO: groupName: 
           [1685009398.600957][39795:39797] CHIP:TOO: }
           [1685009398.600964][39795:39797] CHIP:DMG: ICR moving to [AwaitingDe]
       cluster: "LogCommands"

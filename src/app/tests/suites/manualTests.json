@@ -64,6 +64,7 @@
     ],
     "DeviceManagement": [
         "Test_TC_BINFO_2_4",
+        "Test_TC_BINFO_3_1",
         "Test_TC_OPCREDS_3_1",
         "Test_TC_OPCREDS_3_2",
         "Test_TC_OPCREDS_3_3",
@@ -273,7 +274,8 @@
     "UserLabel": [],
     "BridgedDeviceBasicInformation": [
         "Test_TC_BRBINFO_2_2",
-        "Test_TC_BRBINFO_2_3"
+        "Test_TC_BRBINFO_2_3",
+        "Test_TC_BRBINFO_3_1"
     ],
     "AccessControlEnforcement": [],
     "collection": [

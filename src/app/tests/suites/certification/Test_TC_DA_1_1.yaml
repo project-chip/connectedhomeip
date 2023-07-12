@@ -26,9 +26,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH1s Fabric"
+    - label: "Step 1: Commission DUT to TH1s Fabric"
       verification: |
-          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+          Execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
            ./chip-all-clusters-app
 
           Once DUT reach the  commissionable state pls send below mentioned command on TH2. Pls use equivalent command on the respective DUT
@@ -39,12 +39,12 @@ tests:
       disabled: true
 
     - label:
-          "TH1 does a non-fabric filtered read of the NOCs attribute from the
-          Node Operational Credentials cluster and saves the returned list as
-          noc_th1"
+          "Step 2a: TH1 does a non-fabric filtered read of the NOCs attribute
+          from the Node Operational Credentials cluster and saves the returned
+          list as noc_th1"
       verification: |
+          TH1(Chip-tool) does a non-fabric filtered read of the NOCs attribute from the Node Operational Credentials cluster and saves the returned list as noc_th1 AND Verify that there is a single entry in the list
           ./chip-tool operationalcredentials read nocs 1  0 --fabric-filtered 0
-          On TH1, Verify that there is a single entry in the list
           [1662389708.822977][17489:17494] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 4085201480
           [1662389708.823012][17489:17494] CHIP:TOO:   NOCs: 1 entries
           [1662389708.823044][17489:17494] CHIP:TOO:     [1]: {
@@ -56,8 +56,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 does a non-fabric-filtered read of the Fabrics attribute from the
-          Node Operational Credentials cluster"
+          "Step 2b: TH1 does a non-fabric-filtered read of the Fabrics attribute
+          from the Node Operational Credentials cluster"
       verification: |
           ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
 
@@ -69,15 +69,15 @@ tests:
           [1662387410.014782][16876:16881] CHIP:TOO:       VendorId: 65521
           [1662387410.014790][16876:16881] CHIP:TOO:       FabricId: 1
           [1662387410.014796][16876:16881] CHIP:TOO:       NodeId: 1
-          [1662387410.014803][16876:16881] CHIP:TOO:       Label:
+          [1662387410.014803][16876:16881] CHIP:TOO:       Label: 
           [1662387410.014810][16876:16881] CHIP:TOO:       FabricIndex: 1
           [1662387410.014817][16876:16881] CHIP:TOO:      }
           [1662387410.014869][16876:16881] CHIP:EM: Sending Standalone Ack for MessageCounter:194332495 on exchange 18746i
       disabled: true
 
     - label:
-          "Factory reset DUT and perform the necessary actions to put the DUT
-          into a commissionable state"
+          "Step 3: Factory reset DUT and perform the necessary actions to put
+          the DUT into a commissionable state"
       PICS: MCORE.UI.FACTORYRESET
       verification: |
           To perform Factory reset on DUT  follow the below commands in RPI, And use equivalent command on the respective DUT
@@ -91,7 +91,7 @@ tests:
           ./chip-all-clusters-app
       disabled: true
 
-    - label: "Commission DUT to TH2s Fabric"
+    - label: "Step 4: Commission DUT to TH2s Fabric"
       verification: |
           Once DUT reach the  commissionable state as explaiend in step 3, send below mentioned command on TH2 to commission the DUT.  And use equivalent command on the respective DUT (Refer step 3)
 
@@ -101,8 +101,8 @@ tests:
       disabled: true
 
     - label:
-          "TH2 does a non-fabric-filtered read of Fabrics attribute list from
-          DUT"
+          "Step 5: TH2 does a non-fabric-filtered read of Fabrics attribute list
+          from DUT"
       verification: |
           ./chip-tool operationalcredentials read fabrics 2 0   --commissioner-name beta  --fabric-filtered 0
 
@@ -116,16 +116,17 @@ tests:
           [1662390246.661036][17644:17649] CHIP:TOO:       VendorId: 65521
           [1662390246.661044][17644:17649] CHIP:TOO:       FabricId: 2
           [1662390246.661051][17644:17649] CHIP:TOO:       NodeId: 2
-          [1662390246.661058][17644:17649] CHIP:TOO:       Label:
+          [1662390246.661058][17644:17649] CHIP:TOO:       Label: 
           [1662390246.661066][17644:17649] CHIP:TOO:       FabricIndex: 2
           [1662390246.661074][17644:17649] CHIP:TOO:      }
           [1662390246.661123][17644:17649] CHIP:EM: Sending Standalone Ack for MessageCounter:28113052 on exchange 4807i
       disabled: true
 
     - label:
-          "TH2 does a non-fabric-filtered read of NOCs attribute list from DUT"
+          "Step 6: TH2 does a non-fabric-filtered read of NOCs attribute list
+          from DUT"
       verification: |
-          ./chip-tool operationalcredentials read nocs 2  0  --commissioner-name beta --fabric-filtered 0
+          ./chip-tool operationalcredentials read nocs 2  0  --commissioner-name beta --fabric-filtered 0 
 
           On TH2(chip-tool) Verify that there is only one entry in the 'NOCs' List and the NOC for that entry is different than the NOC entry in noc_th1
 

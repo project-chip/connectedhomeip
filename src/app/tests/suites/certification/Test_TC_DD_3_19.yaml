@@ -38,8 +38,8 @@ tests:
       disabled: true
 
     - label:
-          "Place DUT into commissioning mode using the DUTs manufacturers means
-          to be discovered by the TH Commissioner"
+          "Step 1: Place DUT into commissioning mode using the DUTs
+          manufacturers means to be discovered by the TH Commissioner"
       verification: |
           Verify on DUT (All-cluster-app):
           ./chip-all-clusters-app --discriminator 3841
@@ -55,9 +55,9 @@ tests:
           [1651111142.369573][32024:32024] CHIP:DL:   Device Type: 65535 (0xFFFF)
           [1651111142.370760][32024:32024] CHIP:SVR: SetupQRCode: [MT:-24J0ALY01KA0648G00]
 
-          Verify on TH (Chip-tool):
+          Verify on TH (Chip-tool): 
           For devices already on the network:
-           ./chip-tool discover commissionables
+           ./chip-tool discover commissionables 
 
           [1651111150395] [95835:65674062] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
           [1651111150395] [95835:65674062] CHIP: [DIS]         Vendor ID: 65521
@@ -76,38 +76,38 @@ tests:
 
 
           For devices not on the network (i.e. BLE discovery):
-          1. Discover commissionables over BLE using a BLE discovery tool of choice.
-          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
-          OR
+          1. Discover commissionables over BLE using a BLE discovery tool of choice. 
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop) 
+          OR 
           HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
           Observe the DUT advertising in a commissionable state
       disabled: true
 
     - label:
-          "Scan DUTs QR code using the TH Commissioner. Follow any steps needed
-          for the Commissioner/Commissionee to complete the commissioning
+          "Step 2: Scan DUTs QR code using the TH Commissioner. Follow any steps
+          needed for the Commissioner/Commissionee to complete the commissioning
           process over the DUT Commissionees method of device discovery"
       verification: |
           Verify on DUT (All-cluster-app):
           [1651111335.475159][32130:32130] CHIP:SVR: Commissioning completed successfully
           [1651111335.475204][32130:32130] CHIP:DIS: Updating services using commissioning mode 0
 
-          Verify on TH (Chip-tool):
+          Verify on TH (Chip-tool): 
            ./chip-tool pairing code 1 MT:-24J0ALY01KA0648G00
 
           [1651111335378] [95843:65675989] CHIP: [CTL] Received CommissioningComplete response
-          [1651111335378] [95843:65675989] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
-          [1651111335378] [95843:65675989] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1651111335378] [95843:65675989] CHIP: [CTL] Performing next commissioning step "Cleanup"
-          [1651111335378] [95843:65675989] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
+          [1651111335378] [95843:65675989] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651111335378] [95843:65675989] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651111335378] [95843:65675989] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651111335378] [95843:65675989] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
           [1651111335378] [95843:65675989] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label:
-          "Using TH Commissioner, unpair the DUT Commissionee from the Matter
-          network."
+          "Step 3: Using TH Commissioner, unpair the DUT Commissionee from the
+          Matter network."
       verification: |
-          Verify on TH (Chip-tool):
+          Verify on TH (Chip-tool): 
           ./chip-tool operationalcredentials remove-fabric 1 1 0
 
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
@@ -120,15 +120,15 @@ tests:
       disabled: true
 
     - label:
-          "Place DUT Commissionee back into commissioning mode using the DUT
-          manufacturers means to be discovered by the TH Commissioner"
+          "Step 4: Place DUT Commissionee back into commissioning mode using the
+          DUT manufacturers means to be discovered by the TH Commissioner"
       verification: |
           1. On RasPi DUT  rm -rf /tmp/chip*
           2. On RasPi DUT ./chip-all-clusters-app --discriminator 3841
 
-          Verify on TH (Chip-tool):
+          Verify on TH (Chip-tool): 
           For devices already on the network:
-           ./chip-tool discover commissionables
+           ./chip-tool discover commissionables 
           [1651111576350] [95850:65678872] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
           [1651111576350] [95850:65678872] CHIP: [DIS]         Vendor ID: 65521
           [1651111576350] [95850:65678872] CHIP: [DIS]         Product ID: 32769
@@ -146,29 +146,29 @@ tests:
 
 
           For devices not on the network (i.e. BLE discovery):
-          1. Discover commissionables over BLE using a BLE discovery tool of choice.
-          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
-          OR
+          1. Discover commissionables over BLE using a BLE discovery tool of choice. 
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop) 
+          OR 
           HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
           Observe the DUT advertising in a commissionable state
       disabled: true
 
     - label:
-          "Scan DUTs QR code using the TH Commissioner. Follow any steps needed
-          for the Commissioner/Commissionee to complete the commissioning
+          "Step 5: Scan DUTs QR code using the TH Commissioner. Follow any steps
+          needed for the Commissioner/Commissionee to complete the commissioning
           process over the DUT Commissionees method of device discovery"
       verification: |
           Verify on DUT (All-cluster-app):
           [1651111614.006849][32259:32259] CHIP:SVR: Commissioning completed successfully
           [1651111614.006893][32259:32259] CHIP:DIS: Updating services using commissioning mode 0
 
-          Verify on TH (Chip-tool):
+          Verify on TH (Chip-tool): 
            ./chip-tool pairing code 1 MT:-24J0ALY01KA0648G00
 
           [1651111613912] [95856:65679504] CHIP: [CTL] Received CommissioningComplete response
-          [1651111613912] [95856:65679504] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
-          [1651111613912] [95856:65679504] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1651111613912] [95856:65679504] CHIP: [CTL] Performing next commissioning step "Cleanup"
-          [1651111613912] [95856:65679504] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
+          [1651111613912] [95856:65679504] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651111613912] [95856:65679504] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651111613912] [95856:65679504] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651111613912] [95856:65679504] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
           [1651111613912] [95856:65679504] CHIP: [TOO] Device commissioning completed with success
       disabled: true

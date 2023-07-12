@@ -35,25 +35,25 @@ tests:
           2. DUT subscribes to the events it supports
       disabled: true
 
-    - label: "Simulate a Reachable attribute change on the TH"
+    - label: "Step 2: Simulate a Reachable attribute change on the TH"
       PICS: BINFO.C.E03
       verification: |
-          "reachable-changed" Event is an Optional event
+          "reachable-changed" Event is an Optional event 
 
           As its an optional event we cannot generate the event as of now , hence no example logs provided.
 
           ./chip-tool  basicinformation read-event  reachable-changed 1 0
       disabled: true
 
-    - label: "Simulate a shutdown on the TH"
+    - label: "Step 3: Simulate a shutdown on the TH"
       PICS: BINFO.C.E01
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) and TH as all-clusters-app.
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) and TH as all-clusters-app. 
 
 
-          To verify shutdown event follow the below commands,
+          To verify shutdown event follow the below commands, 
 
-          1. Launch chip-tool into interactive mode with using the below command
+          1. Launch chip-tool into interactive mode with using the below command 
           ./chip-tool interactive start
 
 
@@ -86,13 +86,13 @@ tests:
           [1666095661.199694][16788:16788] CHIP:DMG:         NeedsAck = true
           [1666095661.199739][16788:16788] CHIP:DMG:     }
           [1666095661.199802][16788:16788] CHIP:DMG: }
-          [1666095661.199858][16788:16788] CHIP:DMG:
+          [1666095661.199858][16788:16788] CHIP:DMG:  
           [1666095661.199921][16788:16788] CHIP:DMG: Encrypted Payload (76 bytes) =
           [1666095661.199967][16788:16788] CHIP:DMG: {
           [1666095661.200011][16788:16788] CHIP:DMG:     data = 00d7320062d7810003c31589377980d0f605ee088487c6447c4af8c6c81ca99435840ff42595614bb74bdc5fd0f637a32f55ea9fe14602448c8e6249a76e2b39c0b18ee6a2af4b2ca820e664
           [1666095661.200062][16788:16788] CHIP:DMG:     buffer_ptr = 187651017181200
           [1666095661.200123][16788:16788] CHIP:DMG: }
-          [1666095661.200322][16788:16788] CHIP:DMG:
+          [1666095661.200322][16788:16788] CHIP:DMG:  
           [1666095661.200502][16788:16788] CHIP:DMG: ReportDataMessage =
           [1666095661.200563][16788:16788] CHIP:DMG: {
           [1666095661.200618][16788:16788] CHIP:DMG:         SubscriptionId = 0xba47e717,
@@ -108,21 +108,22 @@ tests:
           [1666095661.201435][16788:16788] CHIP:DMG:                                         Cluster = 0x28,
           [1666095661.201535][16788:16788] CHIP:DMG:                                         Event = 0x1,
           [1666095661.201629][16788:16788] CHIP:DMG:                                 },
-          [1666095661.201728][16788:16788] CHIP:DMG:
+          [1666095661.201728][16788:16788] CHIP:DMG:                                 
           [1666095661.201798][16788:16788] CHIP:DMG:                                 EventNumber = 0x4,
           [1666095661.201918][16788:16788] CHIP:DMG:                                 PriorityLevel = 0x2,
           [1666095661.201998][16788:16788] CHIP:DMG:                                 SystemTimestamp = 0x6c599da,
-          [1666095661.202071][16788:16788] CHIP:DMG:                                 EventData =
+          [1666095661.202071][16788:16788] CHIP:DMG:                                 EventData = 
           [1666095661.202155][16788:16788] CHIP:DMG:                                 {
           [1666095661.202251][16788:16788] CHIP:DMG:                                 },
           [1666095661.202345][16788:16788] CHIP:DMG:                         },
-          [1666095661.202435][16788:16788] CHIP:DMG:
+          [1666095661.202435][16788:16788] CHIP:DMG:                         
           [1666095661.202508][16788:16788] CHIP:DMG:                 },
-          [1666095661.202596][16788:16788] CHIP:DMG:
+          [1666095661.202596][16788:16788] CHIP:DMG:                 
           [1666095661.202660][16788:16788] CHIP:DMG:         ],
       disabled: true
 
-    - label: "Simulate a (re)start on the TH after the previous shutdown"
+    - label:
+          "Step 4: Simulate a (re)start on the TH after the previous shutdown"
       PICS: BINFO.C.E00
       verification: |
           ./chip-tool  basicinformation read-event start-up 1 0
@@ -141,10 +142,10 @@ tests:
           [1666095714.121667][16801:16801] CHIP:DMG:                         Cluster = 0x28,
           [1666095714.121756][16801:16801] CHIP:DMG:                         Event = 0x0,
           [1666095714.121840][16801:16801] CHIP:DMG:                 },
-          [1666095714.122028][16801:16801] CHIP:DMG:
+          [1666095714.122028][16801:16801] CHIP:DMG:                 
           [1666095714.122094][16801:16801] CHIP:DMG:         ],
-          [1666095714.122170][16801:16801] CHIP:DMG:
-          [1666095714.122234][16801:16801] CHIP:DMG:         isFabricFiltered = true,
+          [1666095714.122170][16801:16801] CHIP:DMG:         
+          [1666095714.122234][16801:16801] CHIP:DMG:         isFabricFiltered = true, 
           [1666095714.122299][16801:16801] CHIP:DMG:         InteractionModelRevision = 1
           [1666095714.122361][16801:16801] CHIP:DMG: },
           [1666095714.122526][16801:16801] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -166,13 +167,13 @@ tests:
           [1666095714.125436][16801:16801] CHIP:DMG:         NeedsAck = true
           [1666095714.125491][16801:16801] CHIP:DMG:     }
           [1666095714.125559][16801:16801] CHIP:DMG: }
-          [1666095714.125615][16801:16801] CHIP:DMG:
+          [1666095714.125615][16801:16801] CHIP:DMG:  
           [1666095714.125681][16801:16801] CHIP:DMG: Encrypted Payload (79 bytes) =
           [1666095714.125737][16801:16801] CHIP:DMG: {
           [1666095714.125784][16801:16801] CHIP:DMG:     data = 00941a001f202d08fd6e34f74dcff1465a672c4c21f744f37ff898ebedf0afe4dc318d0fabb2ab1a235f77b70644801a87b621538403c586d44b81d596af74f7da65f18b461ef8ee4cedb3b86177f1
           [1666095714.125842][16801:16801] CHIP:DMG:     buffer_ptr = 187651174387456
           [1666095714.125949][16801:16801] CHIP:DMG: }
-          [1666095714.126003][16801:16801] CHIP:DMG:
+          [1666095714.126003][16801:16801] CHIP:DMG:  
           [1666095714.126171][16801:16801] CHIP:DMG: ReportDataMessage =
           [1666095714.126247][16801:16801] CHIP:DMG: {
           [1666095714.126304][16801:16801] CHIP:DMG:         EventReportIBs =
@@ -187,25 +188,25 @@ tests:
           [1666095714.127079][16801:16801] CHIP:DMG:                                         Cluster = 0x28,
           [1666095714.127171][16801:16801] CHIP:DMG:                                         Event = 0x0,
           [1666095714.127270][16801:16801] CHIP:DMG:                                 },
-          [1666095714.127369][16801:16801] CHIP:DMG:
+          [1666095714.127369][16801:16801] CHIP:DMG:                                 
           [1666095714.127463][16801:16801] CHIP:DMG:                                 EventNumber = 0x2,
           [1666095714.127561][16801:16801] CHIP:DMG:                                 PriorityLevel = 0x2,
           [1666095714.127660][16801:16801] CHIP:DMG:                                 SystemTimestamp = 0x6c60dde,
-          [1666095714.127746][16801:16801] CHIP:DMG:                                 EventData =
+          [1666095714.127746][16801:16801] CHIP:DMG:                                 EventData = 
           [1666095714.127828][16801:16801] CHIP:DMG:                                 {
-          [1666095714.127930][16801:16801] CHIP:DMG:                                         0x0 = 1,
+          [1666095714.127930][16801:16801] CHIP:DMG:                                         0x0 = 1, 
           [1666095714.128031][16801:16801] CHIP:DMG:                                 },
           [1666095714.128123][16801:16801] CHIP:DMG:                         },
-          [1666095714.128200][16801:16801] CHIP:DMG:
+          [1666095714.128200][16801:16801] CHIP:DMG:                         
           [1666095714.128267][16801:16801] CHIP:DMG:                 },
-          [1666095714.128339][16801:16801] CHIP:DMG:
+          [1666095714.128339][16801:16801] CHIP:DMG:                 
           [1666095714.128414][16801:16801] CHIP:DMG:         ],
       disabled: true
 
-    - label: "Simulate a leave current fabric operation on the TH"
+    - label: "Step 5: Simulate a 'leave current fabric' operation on the TH"
       PICS: BINFO.C.E02
       verification: |
-          To verify leave event follow the below commands
+          To verify leave event follow the below commands 
 
           1. ./chip-tool interactive start
           2. basicinformation subscribe-event leave 1 100 1 0
@@ -216,8 +217,8 @@ tests:
           [1666095741.182466][16801:16801] CHIP:EM: Handling via exchange: 6250r, Delegate: 0xaaaabb940288
           [1666095741.182603][16801:16801] CHIP:DMG: InvokeRequestMessage =
           [1666095741.182674][16801:16801] CHIP:DMG: {
-          [1666095741.182735][16801:16801] CHIP:DMG:         suppressResponse = false,
-          [1666095741.182803][16801:16801] CHIP:DMG:         timedRequest = false,
+          [1666095741.182735][16801:16801] CHIP:DMG:         suppressResponse = false, 
+          [1666095741.182803][16801:16801] CHIP:DMG:         timedRequest = false, 
           [1666095741.182875][16801:16801] CHIP:DMG:         InvokeRequests =
           [1666095741.182954][16801:16801] CHIP:DMG:         [
           [1666095741.183015][16801:16801] CHIP:DMG:                 CommandDataIB =
@@ -228,15 +229,15 @@ tests:
           [1666095741.183377][16801:16801] CHIP:DMG:                                 ClusterId = 0x3e,
           [1666095741.183457][16801:16801] CHIP:DMG:                                 CommandId = 0xa,
           [1666095741.183529][16801:16801] CHIP:DMG:                         },
-          [1666095741.183605][16801:16801] CHIP:DMG:
-          [1666095741.183672][16801:16801] CHIP:DMG:                         CommandFields =
+          [1666095741.183605][16801:16801] CHIP:DMG:                         
+          [1666095741.183672][16801:16801] CHIP:DMG:                         CommandFields = 
           [1666095741.183743][16801:16801] CHIP:DMG:                         {
-          [1666095741.183818][16801:16801] CHIP:DMG:                                 0x0 = 1,
+          [1666095741.183818][16801:16801] CHIP:DMG:                                 0x0 = 1, 
           [1666095741.183898][16801:16801] CHIP:DMG:                         },
           [1666095741.183967][16801:16801] CHIP:DMG:                 },
-          [1666095741.184041][16801:16801] CHIP:DMG:
+          [1666095741.184041][16801:16801] CHIP:DMG:                 
           [1666095741.184102][16801:16801] CHIP:DMG:         ],
-          [1666095741.184172][16801:16801] CHIP:DMG:
+          [1666095741.184172][16801:16801] CHIP:DMG:         
           [1666095741.184231][16801:16801] CHIP:DMG:         InteractionModelRevision = 1
           [1666095741.184290][16801:16801] CHIP:DMG: },
           [1666095741.184438][16801:16801] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003E e=0 p=a
@@ -253,13 +254,13 @@ tests:
           [1666095741.186423][16801:16801] CHIP:DMG:         AckMsg = 245528765
           [1666095741.186478][16801:16801] CHIP:DMG:     }
           [1666095741.186550][16801:16801] CHIP:DMG: }
-          [1666095741.186605][16801:16801] CHIP:DMG:
+          [1666095741.186605][16801:16801] CHIP:DMG:  
           [1666095741.186668][16801:16801] CHIP:DMG: Encrypted Payload (34 bytes) =
           [1666095741.186723][16801:16801] CHIP:DMG: {
           [1666095741.186771][16801:16801] CHIP:DMG:     data = 00751a003bd2a50d9cd081c206fbd887adb06448183f58abac5fe703921498ff907c
           [1666095741.186824][16801:16801] CHIP:DMG:     buffer_ptr = 187651174355296
           [1666095741.186877][16801:16801] CHIP:DMG: }
-          [1666095741.186928][16801:16801] CHIP:DMG:
+          [1666095741.186928][16801:16801] CHIP:DMG:  
           [1666095741.187240][16801:16801] CHIP:EM: Flushed pending ack for MessageCounter:245528765 on exchange 6250r
           [1666095741.187395][16801:16801] CHIP:EVL: LogEvent event number: 0x0000000000000004 priority: 1, endpoint id:  0x0 cluster id: 0x0000_0028 event id: 0x2 Sys timestamp: 0x0000000006C6D251
           [1666095741.187518][16801:16801] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 34 DirtyGeneration = 0
@@ -281,13 +282,13 @@ tests:
           [1666095741.190106][16801:16801] CHIP:DMG:         NeedsAck = true
           [1666095741.190159][16801:16801] CHIP:DMG:     }
           [1666095741.190229][16801:16801] CHIP:DMG: }
-          [1666095741.190278][16801:16801] CHIP:DMG:
+          [1666095741.190278][16801:16801] CHIP:DMG:  
           [1666095741.190342][16801:16801] CHIP:DMG: Encrypted Payload (79 bytes) =
           [1666095741.190396][16801:16801] CHIP:DMG: {
           [1666095741.190444][16801:16801] CHIP:DMG:     data = 00751a003cd2a50da5a4f51eb09603921cca9183807f8325f3787bbdbc974fe0c64b2797805fc13dd4fbfbbf46633bc2223ca949a306dc3946f2e3d1bfe9b63b6d027228362b95d169f9459cf7fecd
           [1666095741.190505][16801:16801] CHIP:DMG:     buffer_ptr = 187651174391040
           [1666095741.190559][16801:16801] CHIP:DMG: }
-          [1666095741.190604][16801:16801] CHIP:DMG:
+          [1666095741.190604][16801:16801] CHIP:DMG:  
           [1666095741.190760][16801:16801] CHIP:DMG: ReportDataMessage =
           [1666095741.190827][16801:16801] CHIP:DMG: {
           [1666095741.190888][16801:16801] CHIP:DMG:         SubscriptionId = 0x48ce933e,
@@ -303,17 +304,17 @@ tests:
           [1666095741.191966][16801:16801] CHIP:DMG:                                         Cluster = 0x28,
           [1666095741.192047][16801:16801] CHIP:DMG:                                         Event = 0x2,
           [1666095741.192187][16801:16801] CHIP:DMG:                                 },
-          [1666095741.192270][16801:16801] CHIP:DMG:
+          [1666095741.192270][16801:16801] CHIP:DMG:                                 
           [1666095741.192355][16801:16801] CHIP:DMG:                                 EventNumber = 0x4,
           [1666095741.192445][16801:16801] CHIP:DMG:                                 PriorityLevel = 0x1,
           [1666095741.192580][16801:16801] CHIP:DMG:                                 SystemTimestamp = 0x6c6d251,
-          [1666095741.192719][16801:16801] CHIP:DMG:                                 EventData =
+          [1666095741.192719][16801:16801] CHIP:DMG:                                 EventData = 
           [1666095741.192798][16801:16801] CHIP:DMG:                                 {
-          [1666095741.192914][16801:16801] CHIP:DMG:                                         0x0 = 1,
+          [1666095741.192914][16801:16801] CHIP:DMG:                                         0x0 = 1, 
           [1666095741.193061][16801:16801] CHIP:DMG:                                 },
           [1666095741.193206][16801:16801] CHIP:DMG:                         },
-          [1666095741.193333][16801:16801] CHIP:DMG:
+          [1666095741.193333][16801:16801] CHIP:DMG:                         
           [1666095741.193395][16801:16801] CHIP:DMG:                 },
-          [1666095741.193569][16801:16801] CHIP:DMG:
+          [1666095741.193569][16801:16801] CHIP:DMG:                 
           [1666095741.193636][16801:16801] CHIP:DMG:         ],
       disabled: true
