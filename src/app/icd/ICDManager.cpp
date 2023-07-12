@@ -19,11 +19,13 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/icd/ICDManager.h>
+#include <app/icd/IcdMonitoringTable.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/LockTracker.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <stdlib.h>
 
 namespace chip {
 namespace app {
@@ -32,8 +34,13 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 
-void ICDManager::ICDManager::Init()
+void ICDManager::ICDManager::Init(PersistentStorageDelegate * pStorage, FabricTable * pFabricTable)
 {
+    VerifyOrDie(pStorage != nullptr);
+    VerifyOrDie(pFabricTable != nullptr);
+    mpStorage     = pStorage;
+    mpFabricTable = pFabricTable;
+
     uint32_t activeModeInterval;
     if (Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval) != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -51,6 +58,8 @@ void ICDManager::ICDManager::Shutdown()
     DeviceLayer::SystemLayer().CancelTimer(OnActiveModeDone, this);
     mIcdMode          = ICDMode::SIT;
     mOperationalState = OperationalState::IdleMode;
+    mpStorage         = nullptr;
+    mpFabricTable     = nullptr;
 }
 
 bool ICDManager::SupportsCheckInProtocol()
@@ -58,7 +67,6 @@ bool ICDManager::SupportsCheckInProtocol()
     bool success;
     uint32_t featureMap;
     success = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
-
     return success ? ((featureMap & to_underlying(Feature::kCheckInProtocolSupport)) != 0) : false;
 }
 
@@ -68,24 +76,23 @@ void ICDManager::UpdateIcdMode()
 
     ICDMode tempMode = ICDMode::SIT;
 
-    // TODO ICD LIT FIX DEPENDENCY ISSUE with app/util/IcdMonitoringTable.h and app/server:server
     // The Check In Protocol Feature is required and the slow polling interval shall also be greater than 15 seconds
     // to run an ICD in LIT mode.
-    // if (kSlowPollingInterval > kICDSitModePollingThreashold && SupportsCheckInProtocol())
-    // {
-    //     // We can only get to LIT Mode, if at least one client is registered to the ICD device
-    //     const auto & fabricTable = Server::GetInstance().GetFabricTable();
-    //     for (const auto & fabricInfo : fabricTable)
-    //     {
-    //         PersistentStorageDelegate & storage = Server::GetInstance().GetPersistentStorage();
-    //         IcdMonitoringTable table(storage, fabricInfo.GetFabricIndex(), 1);
-    //         if (!table.IsEmpty())
-    //         {
-    //             tempMode = ICDMode::LIT;
-    //             break;
-    //         }
-    //     }
-    // }
+    if (GetSlowPollingInterval() > GetSitModePollingThreshold() && SupportsCheckInProtocol())
+    {
+        VerifyOrDie(mpStorage != nullptr);
+        VerifyOrDie(mpFabricTable != nullptr);
+        // We can only get to LIT Mode, if at least one client is registered to the ICD device
+        for (const auto & fabricInfo : *mpFabricTable)
+        {
+            IcdMonitoringTable table(*mpStorage, fabricInfo.GetFabricIndex(), 1);
+            if (!table.IsEmpty())
+            {
+                tempMode = ICDMode::LIT;
+                break;
+            }
+        }
+    }
     mIcdMode = tempMode;
 }
 
@@ -105,7 +112,14 @@ void ICDManager::UpdateOperationState(OperationalState state)
         }
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(idleModeInterval), OnIdleModeDone, this);
 
-        CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(GetSlowPollingInterval());
+        System::Clock::Milliseconds32 slowPollInterval = GetSlowPollingInterval();
+        // When in SIT mode, the slow poll interval cannot be greater than kICDSitModePollingThreshold
+        if (mIcdMode == ICDMode::SIT && slowPollInterval > GetSitModePollingThreshold())
+        {
+            slowPollInterval = GetSitModePollingThreshold();
+        }
+
+        CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(slowPollInterval);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());

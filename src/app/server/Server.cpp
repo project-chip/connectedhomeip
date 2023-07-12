@@ -249,7 +249,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    mICDManager.Init();
+    mICDManager.Init(mDeviceStorage, &GetFabricTable());
     mICDEventManager.Init(&mICDManager);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 

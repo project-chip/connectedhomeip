@@ -54,18 +54,6 @@ source_set("binding-test-srcs") {
   ]
 }
 
-source_set("icd-management-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/util/IcdMonitoringTable.cpp",
-    "${chip_root}/src/app/util/IcdMonitoringTable.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/lib/core",
-  ]
-}
-
 source_set("ota-requestor-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp",
@@ -181,7 +169,6 @@ chip_test_suite("tests") {
 
   public_deps = [
     ":binding-test-srcs",
-    ":icd-management-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
     ":scenes-table-test-srcs",

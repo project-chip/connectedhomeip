@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <credentials/FabricTable.h>
 #include <lib/support/BitFlags.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -50,7 +51,7 @@ public:
     };
 
     ICDManager() {}
-    void Init();
+    void Init(PersistentStorageDelegate * pStorage, FabricTable * pFabricTable);
     void Shutdown();
     void UpdateIcdMode();
     void UpdateOperationState(OperationalState state);
@@ -59,6 +60,7 @@ public:
     ICDMode GetIcdMode() { return mIcdMode; }
     OperationalState GetOperationalState() { return mOperationalState; }
 
+    static System::Clock::Milliseconds32 GetSitModePollingThreshold() { return kICDSitModePollingThreshold; }
     static System::Clock::Milliseconds32 GetSlowPollingInterval() { return kSlowPollingInterval; }
     static System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
 
@@ -67,9 +69,9 @@ protected:
     static void OnActiveModeDone(System::Layer * aLayer, void * appState);
 
 private:
-    static constexpr System::Clock::Milliseconds32 kICDSitModePollingThreashold = System::Clock::Milliseconds32(15000);
-    static constexpr System::Clock::Milliseconds32 kSlowPollingInterval         = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
-    static constexpr System::Clock::Milliseconds32 kFastPollingInterval         = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
+    static constexpr System::Clock::Milliseconds32 kICDSitModePollingThreshold = System::Clock::Milliseconds32(15000);
+    static constexpr System::Clock::Milliseconds32 kSlowPollingInterval        = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+    static constexpr System::Clock::Milliseconds32 kFastPollingInterval        = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
 
     // Minimal constraint value of the the ICD attributes.
     static constexpr uint32_t kMinIdleModeInterval    = 500;
@@ -79,8 +81,10 @@ private:
     bool SupportsCheckInProtocol();
 
     BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };
-    OperationalState mOperationalState = OperationalState::IdleMode;
-    ICDMode mIcdMode                   = ICDMode::SIT;
+    OperationalState mOperationalState    = OperationalState::IdleMode;
+    ICDMode mIcdMode                      = ICDMode::SIT;
+    PersistentStorageDelegate * mpStorage = nullptr;
+    FabricTable * mpFabricTable           = nullptr;
 };
 
 } // namespace app

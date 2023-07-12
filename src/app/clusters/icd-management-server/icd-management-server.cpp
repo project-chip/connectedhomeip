@@ -26,7 +26,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/util/IcdMonitoringTable.h>
+#include <app/icd/IcdMonitoringTable.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 
