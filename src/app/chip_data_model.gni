@@ -261,8 +261,7 @@ template("chip_data_model") {
       } else if (cluster == "icd-management-server") {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
 
-        # need this public dep for the IcdMonitoringTable
-        public_deps += [ "${chip_root}/src/app/icd:manager-srcs" ]
+        public_deps += [ "${chip_root}/src/app/icd:monitoring-table" ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
