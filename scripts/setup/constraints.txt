@@ -127,6 +127,8 @@ intelhex==2.3.0
     #   mbed-os-tools
 ipython==8.11.0
     # via -r requirements.all.txt
+itsdangerous==2.0.1
+    # via -r requirements.esp32.txt
 jedi==0.18.2
     # via ipython
 jinja2==3.0.3
