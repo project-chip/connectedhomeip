@@ -273,8 +273,7 @@ private:
 
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
 
-    CHIP_ERROR SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout,
-                                          bool sendTimedRequestAction);
+    CHIP_ERROR SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout);
 
     Messaging::ExchangeHolder mExchangeCtx;
     Callback * mpCallback                      = nullptr;

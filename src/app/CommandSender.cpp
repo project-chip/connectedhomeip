@@ -62,8 +62,7 @@ CHIP_ERROR CommandSender::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout,
-                                                     bool sendTimedRequestAction)
+CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout)
 {
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
 
@@ -78,13 +77,7 @@ CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & sessi
 
     mExchangeCtx->SetResponseTimeout(timeout.ValueOr(session->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
 
-    if (sendTimedRequestAction && !mTimedInvokeTimeoutMs.HasValue())
-    {
-        ChipLogError(DataManagement, "Timed request action requested with no mTimedInteractionTimeoutMs");
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    if (sendTimedRequestAction)
+    if (mTimedInvokeTimeoutMs.HasValue())
     {
         ReturnErrorOnFailure(TimedRequest::Send(mExchangeCtx.Get(), mTimedInvokeTimeoutMs.Value()));
         MoveToState(State::AwaitingTimedStatus);
@@ -99,7 +92,7 @@ CHIP_ERROR CommandSender::TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke
                                                                                  Optional<System::Clock::Timeout> timeout)
 {
     VerifyOrReturnError(mTimedRequest, CHIP_ERROR_INCORRECT_STATE);
-    return SendCommandRequestInternal(session, timeout, false);
+    return SendCommandRequestInternal(session, timeout);
 }
 #endif
 
@@ -114,7 +107,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Opti
             mTimedRequest, mTimedInvokeTimeoutMs.HasValue());
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    return SendCommandRequestInternal(session, timeout, mTimedInvokeTimeoutMs.HasValue());
+    return SendCommandRequestInternal(session, timeout);
 }
 
 CHIP_ERROR CommandSender::SendGroupCommandRequest(const SessionHandle & session)
