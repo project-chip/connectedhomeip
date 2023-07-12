@@ -214,8 +214,16 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
 
     switch (eventTrigger)
     {
-    case kTriggeredEvent_SmokeAlarm:
+    case kTriggeredEvent_WarningSmokeAlarm:
         success = SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kWarning);
+        if (success)
+        {
+            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kSmokeAlarm, true);
+        }
+        break;
+
+    case kTriggeredEvent_CriticalSmokeAlarm:
+        success = SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kCritical);
         if (success)
         {
             success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kSmokeAlarm, true);
@@ -230,8 +238,16 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         }
         break;
 
-    case kTriggeredEvent_COAlarm:
+    case kTriggeredEvent_WarningCOAlarm:
         success = SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kWarning);
+        if (success)
+        {
+            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kCOAlarm, true);
+        }
+        break;
+
+    case kTriggeredEvent_CriticalCOAlarm:
+        success = SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kCritical);
         if (success)
         {
             success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kCOAlarm, true);
@@ -246,8 +262,16 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         }
         break;
 
-    case kTriggeredEvent_BatteryAlert:
+    case kTriggeredEvent_WarningBatteryAlert:
         success = SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kWarning);
+        if (success)
+        {
+            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kBatteryAlert, true);
+        }
+        break;
+
+    case kTriggeredEvent_CriticalBatteryAlert:
+        success = SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kCritical);
         if (success)
         {
             success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kBatteryAlert, true);

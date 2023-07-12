@@ -35,11 +35,14 @@ public:
 
     enum TriggeredEvent_t
     {
-        kTriggeredEvent_SmokeAlarm                  = 0xffffffff00000090,
+        kTriggeredEvent_WarningSmokeAlarm           = 0xffffffff00000090,
+        kTriggeredEvent_CriticalSmokeAlarm          = 0xffffffff0000009c,
         kTriggeredEvent_SmokeAlarmClear             = 0xffffffff000000a0,
-        kTriggeredEvent_COAlarm                     = 0xffffffff00000091,
+        kTriggeredEvent_WarningCOAlarm              = 0xffffffff00000091,
+        kTriggeredEvent_CriticalCOAlarm             = 0xffffffff0000009d,
         kTriggeredEvent_COAlarmClear                = 0xffffffff000000a1,
-        kTriggeredEvent_BatteryAlert                = 0xffffffff00000095,
+        kTriggeredEvent_WarningBatteryAlert         = 0xffffffff00000095,
+        kTriggeredEvent_CriticalBatteryAlert        = 0xffffffff0000009e,
         kTriggeredEvent_BatteryAlertClear           = 0xffffffff000000a5,
         kTriggeredEvent_HardwareFaultAlert          = 0xffffffff00000093,
         kTriggeredEvent_HardwareFaultAlertClear     = 0xffffffff000000a3,
