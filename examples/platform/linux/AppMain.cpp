@@ -347,7 +347,7 @@ private:
 };
 
 int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
-                     const EndpointId * secondaryNetworkCommissioningEndpoint)
+                     const Optional<EndpointId> secondaryNetworkCommissioningEndpoint)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 #if CONFIG_NETWORK_LAYER_BLE
@@ -366,10 +366,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     err = ParseArguments(argc, argv, customOptions);
     SuccessOrExit(err);
 
-    if (secondaryNetworkCommissioningEndpoint != nullptr)
-    {
-        sSecondaryNetworkCommissioningEndpoint.Emplace(*secondaryNetworkCommissioningEndpoint);
-    }
+    sSecondaryNetworkCommissioningEndpoint = secondaryNetworkCommissioningEndpoint;
 
 #ifdef CHIP_CONFIG_KVS_PATH
     if (LinuxDeviceOptions::GetInstance().KVS == nullptr)

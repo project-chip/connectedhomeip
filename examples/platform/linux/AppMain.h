@@ -23,6 +23,7 @@
 #include <controller/CommissionerDiscoveryController.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/Optional.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 #include <transport/TransportMgr.h>
@@ -32,7 +33,7 @@
 // Applications can optionally provide the endpoint id of a secondary network
 // commissioning endpoint, if one is supported.
 int ChipLinuxAppInit(int argc, char * const argv[], chip::ArgParser::OptionSet * customOptions = nullptr,
-                     const chip::EndpointId * secondaryNetworkCommissioningEndpoit = nullptr);
+                     const chip::Optional<chip::EndpointId> secondaryNetworkCommissioningEndpoit = chip::NullOptional);
 
 /**
  * A main loop implementation describes how an application main loop is to be

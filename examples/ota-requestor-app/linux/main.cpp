@@ -257,7 +257,7 @@ void ApplicationInit()
 
 int main(int argc, char * argv[])
 {
-    VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions, &kNetworkCommissioningEndpointSecondary) == 0);
+    VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions, MakeOptional(kNetworkCommissioningEndpointSecondary)) == 0);
     ChipLinuxAppMainLoop();
 
     // If the event loop had been stopped due to an update being applied, boot into the new image
