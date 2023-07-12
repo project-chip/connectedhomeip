@@ -43,7 +43,7 @@ NOTE: make sure you save under `examples/chef/devices` since internal paths
 inside the saved file will be relative to the save location (it cannot simply be
 moved later without manual editing).
 
-It is suggested to name this `rootnode_<device_type_name>`
+It is suggested to name this `rootnode_<device_type_name>.zap` (e.g., rootnode_smokecoalarm.zap for Matter Smoke CO Alarm device type)
 
 ## Establishing a "final name"
 
