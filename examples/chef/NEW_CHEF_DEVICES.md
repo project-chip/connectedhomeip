@@ -30,7 +30,7 @@ Using the ZAP UI, make the following changes:
     -   Update the device type to the new device and click "save"
     -   In the "Filter" section select "Enabled Clusters" and validate what
         clusters are set.
-        -   Remove extra clusters clusters (e.g. remove `Boolean State`)
+        -   Remove extra clusters  (e.g. remove `Boolean State`)
         -   Ensure clusters for the device type are enabled (this is generally
             automatically the case)
         -   Click the gear icon on the cluster to further edit enabled
