@@ -117,7 +117,7 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, BitMask<
         return status;
     }
 
-    ChipLogProgress(Zcl, "Dishwasher Alarm: State ep%d value: %" PRIx32"", endpoint, newState.Raw());
+    ChipLogProgress(Zcl, "Dishwasher Alarm: State ep%d value: %" PRIx32 "", endpoint, newState.Raw());
 
     // Generate Notify event.
     BitMask<AlarmMap> becameActive;

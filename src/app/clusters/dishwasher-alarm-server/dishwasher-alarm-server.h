@@ -43,7 +43,7 @@ public:
 
     // A change in supported value will result in a corresponding change in mask and state.
     EmberAfStatus SetSupportedValue(chip::EndpointId endpoint,
-                      const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> supported);
+                                    const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> supported);
 
 private:
     static DishwasherAlarmServer instance;
