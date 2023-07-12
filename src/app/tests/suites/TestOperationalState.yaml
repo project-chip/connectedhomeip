@@ -74,7 +74,7 @@ tests:
       command: "Start"
       response:
           values:
-              - name: "commandResponseState"
+              - name: "CommandResponseState"
                 value: [{ ErrorStateID: 0 }]
 
     - label: "Read current Operational State"
@@ -87,7 +87,7 @@ tests:
       command: "Pause"
       response:
           values:
-              - name: "commandResponseState"
+              - name: "CommandResponseState"
                 value: [{ ErrorStateID: 0 }]
 
     - label: "Read current Operational State"
@@ -100,7 +100,7 @@ tests:
       command: "Resume"
       response:
           values:
-              - name: "commandResponseState"
+              - name: "CommandResponseState"
                 value: [{ ErrorStateID: 0 }]
 
     - label: "Read current Operational State"
@@ -113,7 +113,7 @@ tests:
       command: "Stop"
       response:
           values:
-              - name: "commandResponseState"
+              - name: "CommandResponseState"
                 value: [{ ErrorStateID: 0 }]
 
     - label: "Read current Operational State"
