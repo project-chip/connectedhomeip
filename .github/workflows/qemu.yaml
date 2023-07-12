@@ -76,7 +76,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-tizen-qemu:0.7.25
+            image: connectedhomeip/chip-build-tizen-qemu:0.7.18
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
