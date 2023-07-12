@@ -45,10 +45,10 @@ import chip.CertificateAuthority
 
 # isort: on
 import chip.clusters as Clusters
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 import chip.logging
 import chip.native
 from chip.ChipStack import ChipStack
+from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.interaction_model import InteractionModelError, Status
 from chip.storage import PersistentStorage
 from mobly import asserts, base_test, signals, utils
