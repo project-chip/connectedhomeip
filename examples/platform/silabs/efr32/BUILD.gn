@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
@@ -40,7 +41,7 @@ declare_args() {
   chip_default_wifi_psk = ""
 
   # Use default handler to negotiate subscription max interval
-  chip_config_use_icd_subscription_callbacks = enable_sleepy_device
+  chip_config_use_icd_subscription_callbacks = chip_enable_icd_server
 
   # Enable TestEventTrigger in GeneralDiagnostics cluster
   silabs_test_event_trigger_enabled = false
