@@ -63,7 +63,7 @@ short version is that you can determine a recommended name using:
 and generally you want to just rename it via:
 
 ```
-./examples/chef/sample_app_util/sample_app_util.py zap --rename-file <saved_file_name>
+./examples/chef/sample_app_util/sample_app_util.py zap --rename-file <saved_zap_file_name>
 ```
 
 ## Running code generation (to generate .matter file)
