@@ -25,7 +25,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     nrfconnect:
         name: nRF Connect SDK
@@ -131,7 +131,7 @@ jobs:
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK All Clusters App on nRF52840 DK
               run: |
-                  scripts/examples/nrfconnect_example.sh all-clusters-app nrf52840dk_nrf52840 -DCONF_FILE=prj_dfu.conf
+                  scripts/examples/nrfconnect_example.sh all-clusters-app nrf52840dk_nrf52840
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dk_nrf52840 all-clusters-app \
                     examples/all-clusters-app/nrfconnect/build/zephyr/zephyr.elf \
