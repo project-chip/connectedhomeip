@@ -36,7 +36,7 @@ Using the ZAP UI, make the following changes:
         -   Click the gear icon on the cluster to further edit enabled
             attributes and commands
 
-Once all edits are done, save it under a **NEW** name inside
+Once all edits are done, click "File" => "Save as..."  to save it under a **NEW** name inside
 `examples/chef/devices/`.
 
 NOTE: make sure you save under `examples/chef/devices` since internal paths
