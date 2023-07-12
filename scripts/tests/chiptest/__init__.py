@@ -134,6 +134,7 @@ def _GetInDevelopmentTests() -> Set[str]:
         "TestEqualities.yaml",              # chip-repl does not support pseudo-cluster commands that return a value
         "TestExampleCluster.yaml",          # chip-repl does not load custom pseudo clusters
         "Test_TC_TIMESYNC_1_1.yaml",         # Time sync SDK is not yet ready
+        "Test_TC_TIMESYNC_2_3.yaml",         # Time sync SDK is not yet ready
         "TestAttributesById.yaml",           # chip-repl does not support AnyCommands (06/06/2023)
         "TestCommandsById.yaml",             # chip-repl does not support AnyCommands (06/06/2023)
         "TestEventsById.yaml",               # chip-repl does not support AnyCommands (06/06/2023)

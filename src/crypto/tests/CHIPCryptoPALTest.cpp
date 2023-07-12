@@ -2106,6 +2106,54 @@ static void TestAKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+static void TestCDPExtension_x509Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    struct CDPTestCase
+    {
+        ByteSpan Cert;
+        CHIP_ERROR mExpectedError;
+        CharSpan mExpectedResult;
+    };
+
+    constexpr const char * exampleHttpURI  = "http://example.com/crl.pem";
+    constexpr const char * exampleHttpsURI = "https://example.com/crl.pem";
+
+    // clang-format off
+    static CDPTestCase sCDPTestCases[] = {
+        // Cert                                                Expected Error               Expected Output
+        // ===============================================================================================
+        {  ByteSpan(),                                         CHIP_ERROR_INVALID_ARGUMENT, CharSpan() },
+        {  sTestCert_PAA_FFF1_Cert,                            CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_PAI_FFF2_8001_Cert,                       CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF2_8003_0019_FB_Cert,               CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Cert,              CHIP_NO_ERROR,               CharSpan::fromCharString(exampleHttpURI) },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert,        CHIP_NO_ERROR,               CharSpan::fromCharString(exampleHttpsURI) },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert,            CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert,        CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert, CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert,         CHIP_ERROR_BUFFER_TOO_SMALL, CharSpan() },
+    };
+    // clang-format on
+
+    for (auto & testCase : sCDPTestCases)
+    {
+        char cdpBuf[kMaxCRLDistributionPointURLLength] = { '\0' };
+        MutableCharSpan cdp(cdpBuf);
+        err = ExtractCRLDistributionPointURIFromX509Cert(testCase.Cert, cdp);
+        NL_TEST_ASSERT(inSuite, err == testCase.mExpectedError);
+        if (err == CHIP_NO_ERROR)
+        {
+            NL_TEST_ASSERT(inSuite, cdp.size() == testCase.mExpectedResult.size());
+            NL_TEST_ASSERT(inSuite, cdp.data_equal(testCase.mExpectedResult));
+        }
+    }
+}
+
 static void TestSerialNumber_x509Extraction(nlTestSuite * inSuite, void * inContext)
 {
     using namespace TestCerts;
@@ -2703,6 +2751,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test x509 Certificate Timestamp Validation", TestX509_IssuingTimestampValidation),
     NL_TEST_DEF("Test Subject Key Id Extraction from x509 Certificate", TestSKID_x509Extraction),
     NL_TEST_DEF("Test Authority Key Id Extraction from x509 Certificate", TestAKID_x509Extraction),
+    NL_TEST_DEF("Test CRL Distribution Point Extension Extraction from x509 Certificate", TestCDPExtension_x509Extraction),
     NL_TEST_DEF("Test Serial Number Extraction from x509 Certificate", TestSerialNumber_x509Extraction),
     NL_TEST_DEF("Test Subject Extraction from x509 Certificate", TestSubject_x509Extraction),
     NL_TEST_DEF("Test Issuer Extraction from x509 Certificate", TestIssuer_x509Extraction),

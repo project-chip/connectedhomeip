@@ -1016,7 +1016,7 @@ class ChipDeviceControllerBase():
         ]] = None,
             eventNumberFilter: typing.Optional[int] = None,
             returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None,
-            fabricFiltered: bool = True, keepSubscriptions: bool = False):
+            fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True):
         '''
         Read a list of attributes and/or events from a target node
 
@@ -1076,7 +1076,7 @@ class ChipDeviceControllerBase():
                               subscriptionParameters=ClusterAttribute.SubscriptionParameters(
                                   reportInterval[0], reportInterval[1]) if reportInterval else None,
                               fabricFiltered=fabricFiltered,
-                              keepSubscriptions=keepSubscriptions).raise_on_error()
+                              keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe).raise_on_error()
         return await future
 
     async def ReadAttribute(self, nodeid: int, attributes: typing.List[typing.Union[
@@ -1093,7 +1093,7 @@ class ChipDeviceControllerBase():
     ]], dataVersionFilters: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]] = None,
             returnClusterObject: bool = False,
             reportInterval: typing.Tuple[int, int] = None,
-            fabricFiltered: bool = True, keepSubscriptions: bool = False):
+            fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True):
         '''
         Read a list of attributes from a target node, this is a wrapper of DeviceController.Read()
 
@@ -1125,7 +1125,8 @@ class ChipDeviceControllerBase():
                               returnClusterObject=returnClusterObject,
                               reportInterval=reportInterval,
                               fabricFiltered=fabricFiltered,
-                              keepSubscriptions=keepSubscriptions)
+                              keepSubscriptions=keepSubscriptions,
+                              autoResubscribe=autoResubscribe)
         if isinstance(res, ClusterAttribute.SubscriptionTransaction):
             return res
         else:
@@ -1146,7 +1147,8 @@ class ChipDeviceControllerBase():
     ]], eventNumberFilter: typing.Optional[int] = None,
             fabricFiltered: bool = True,
             reportInterval: typing.Tuple[int, int] = None,
-            keepSubscriptions: bool = False):
+            keepSubscriptions: bool = False,
+            autoResubscribe: bool = True):
         '''
         Read a list of events from a target node, this is a wrapper of DeviceController.Read()
 
@@ -1174,7 +1176,8 @@ class ChipDeviceControllerBase():
             When not provided, a read request will be sent.
         '''
         res = await self.Read(nodeid=nodeid, events=events, eventNumberFilter=eventNumberFilter,
-                              fabricFiltered=fabricFiltered, reportInterval=reportInterval, keepSubscriptions=keepSubscriptions)
+                              fabricFiltered=fabricFiltered, reportInterval=reportInterval, keepSubscriptions=keepSubscriptions,
+                              autoResubscribe=autoResubscribe)
         if isinstance(res, ClusterAttribute.SubscriptionTransaction):
             return res
         else:
