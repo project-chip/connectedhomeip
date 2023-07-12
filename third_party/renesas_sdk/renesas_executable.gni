@@ -18,9 +18,9 @@ import("//build_overrides/renesas_sdk.gni")
 
 
 template("renesas_executable") {
-  if (!defined(invoker.output_dir)) {
-    invoker.output_dir = root_out_dir
-  }
+ # if (!defined(invoker.output_dir)) {
+ #   invoker.output_dir = root_out_dir
+ # }
 
   output_base_name = get_path_info(invoker.output_name, "name")
   ldscript_file = "${root_build_dir}/${output_base_name}.ld"

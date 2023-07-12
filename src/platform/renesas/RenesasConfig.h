@@ -28,7 +28,6 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform_nvram.h>
 
 namespace chip {
 namespace DeviceLayer {

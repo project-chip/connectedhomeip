@@ -20,8 +20,8 @@ import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
   # Location of the Renesas SDK.
-  ##cyw30739_sdk_root = "${renesas_sdk_build_root}/repos"
-  cyw30739_sdk_verbose = false
+  ##renesas_sdk_root = "${renesas_sdk_build_root}/repos"
+  renesas_sdk_verbose = false
   _sdk_debug = 0
 
   # Matter DAC in the DER format.
@@ -38,8 +38,85 @@ declare_args() {
 }
 
 template("renesas_sdk") {
-  if (defined(invoker.renesas_sdk_root)) {
-    renesas_sdk_root = invoker.renesas_sdk_root
+ # if (defined(invoker.renesas_sdk_root)) {
+  #  renesas_sdk_root = invoker.renesas_sdk_root
+  #}
+
+  #assert(renesas_sdk_root != "", "renesas_sdk_root must be specified")
+
+  config("${target_name}_config") {
+    include_dirs = []
+    defines = []
+    libs = []
+
+    if (defined(invoker.include_dirs)) {
+      include_dirs += invoker.include_dirs
+    }
+
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    }
+
+    include_dirs += [
+  
+    ]
+
+    cflags = [ "--specs=nano.specs" ]
+    if (is_debug) {
+      cflags += [ "-Wno-unused" ]
+    }
+
+    ldflags = [
+      "--specs=nano.specs",
+    #  "-Wl,--entry=${renesas_sdk_crt_entry}",
+    #  "-Wl,--just-symbols=" +
+     #     rebase_path(renesas_sdk_patch_sym_file, root_build_dir),
+      "-nostartfiles",
+    ]
+  }
+
+ # renesas_sdk_script("${target_name}_gen_lib_installer") {
+ #   script_file_name = "bt_gen_lib_installer.bash"
+
+ #   lib_installer_file = "${root_gen_dir}/lib_installer.c"
+
+ #   args = [ "--out=" + rebase_path(lib_installer_file, root_build_dir) ]
+
+ #   outputs = [ lib_installer_file ]
+ # }
+
+  source_set(target_name) {
+    sources = [
+      
+    ]
+
+    if (chip_enable_ota_requestor) {
+      sources += [
+   
+      ]
+    }
+
+    #sources += get_target_outputs(":${target_name}_gen_lib_installer")
+
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+
+    defines = [
+      "CHIP_HAVE_CONFIG_H=1",
+      "CHIP_SYSTEM_CONFIG_USE_LWIP=1"
+      #"ENABLE_DEBUG=${renesas_sdk_debug}",
+      #"SPAR_CRT_SETUP=${renesas_sdk_crt_entry}",
+      #"XS_LOCATION_ACTIVE=${btp.ConfigXS1Location}",
+      #"XS_LOCATION_UPGRADE=${btp.ConfigXS2Location}",
+    ]
+    #if (chip_enable_ota_requestor) {
+    #  defines += [ "BLE_OTA_FW_UPGRADE=1" ]
+    #}
+
+    public_configs = [ ":${target_name}_config" ]
+
+    deps = [ ]
   }
 }
 

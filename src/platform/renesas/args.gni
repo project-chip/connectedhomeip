@@ -21,7 +21,7 @@ import("${chip_root}/examples/platform/renesas/args.gni")
 
 custom_toolchain = "${build_root}/toolchain/arm_gcc"
 
-arm_platform_config = "${renesas_sdk_build_root}/cyw30739_arm.gni"
+arm_platform_config = "${renesas_sdk_build_root}/renesas_arm.gni"
 
 chip_target_style = "embedded"
 chip_crypto = "mbedtls"

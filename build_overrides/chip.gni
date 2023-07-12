@@ -16,3 +16,4 @@ declare_args() {
   # Root directory for CHIP.
   chip_root = "//third_party/connectedhomeip"
 }
+

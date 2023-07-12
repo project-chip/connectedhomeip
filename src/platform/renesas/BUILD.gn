@@ -20,7 +20,7 @@ assert(chip_device_platform == "renesas")
 
 static_library("renesas") {
   sources = [
-    "../../SingletonConfigurationManager.cpp",
+    "../SingletonConfigurationManager.cpp",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPPlatformConfig.h",
@@ -51,7 +51,7 @@ static_library("renesas") {
   public = [
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
     "FactoryDataProvider.h",
-    "OTAImageProcessorImpl.h",
+    #"OTAImageProcessorImpl.h",
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
