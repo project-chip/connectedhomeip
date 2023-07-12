@@ -22,12 +22,15 @@
 
 #pragma once
 
+#include <lib/core/CHIPError.h>
+
 class AppDelegate
 {
 public:
     virtual ~AppDelegate() {}
+    virtual void OnCommissioningSessionEstablishmentStarted() {}
     virtual void OnCommissioningSessionStarted() {}
-    virtual void OnCommissioningSessionStopped() {}
+    virtual void OnCommissioningSessionStopped(CHIP_ERROR err) {}
 
     /*
      * This is called anytime a basic or enhanced commissioning window is opened.
