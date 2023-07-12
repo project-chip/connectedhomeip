@@ -5584,7 +5584,7 @@ PICS:
     - label: "Level Control for Lighting"
       id: OO.S.F00
 
-    - label: "Device has Deadfront behaviour" 
+    - label: "Device has Deadfront behaviour"
       id: OO.S.F01
 
     #
