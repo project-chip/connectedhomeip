@@ -19,6 +19,9 @@
 #include <esp_wifi.h>
 #include <platform/NetworkCommissioning.h>
 
+using chip::BitFlags;
+using chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
+
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
@@ -27,6 +30,8 @@ constexpr uint8_t kMaxWiFiNetworks                  = 1;
 constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
 constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 30;
 } // namespace
+
+BitFlags<WiFiSecurityBitmap> ConvertSecurityType(wifi_auth_mode_t authMode);
 
 class ESPScanResponseIterator : public Iterator<WiFiScanResponse>
 {
@@ -40,7 +45,7 @@ public:
             return false;
         }
 
-        item.security.SetRaw(mpScanResults[mIternum].authmode);
+        item.security = ConvertSecurityType(mpScanResults[mIternum].authmode);
         static_assert(chip::DeviceLayer::Internal::kMaxWiFiSSIDLength <= UINT8_MAX, "SSID length might not fit in item.ssidLen");
         item.ssidLen = static_cast<uint8_t>(
             strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
