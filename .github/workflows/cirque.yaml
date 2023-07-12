@@ -32,6 +32,7 @@ jobs:
         name: Cirque
 
         env:
+            DOCKER_RUN_VERSION: 0.8
             GITHUB_CACHE_PATH: /tmp/cirque-cache
 
         runs-on: ubuntu-latest
