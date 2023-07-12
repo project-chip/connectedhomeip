@@ -24,8 +24,6 @@
 #define MATTER_DEVICE_NAME "ASR-Bridge"
 #define APP_TASK_STACK_SIZE (1024 * 4)
 
-#define LIGHT_LED PWM_OUTPUT_CH4
-
 // ASR Logging
 #ifdef __cplusplus
 extern "C" {

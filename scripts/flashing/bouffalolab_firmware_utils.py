@@ -207,7 +207,7 @@ class Flasher(firmware_utils.Flasher):
                 continue
 
             if value:
-                if value == True:
+                if value is True:
                     arg = ("--{}".format(key)).strip()
                 elif isinstance(value, pathlib.Path):
                     arg = ("--{}={}".format(key, os.path.join(os.getcwd(), str(value)))).strip()

@@ -21,13 +21,15 @@
 #import "MTRLogging_Internal.h"
 #import "NSDataSpanConversion.h"
 
+#include <lib/support/TypeTraits.h>
+
 void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner,
     chip::DeviceProxy * device, const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
     chip::Credentials::AttestationVerificationResult attestationResult)
 {
     dispatch_async(mQueue, ^{
-        MTR_LOG_DEFAULT(
-            "MTRDeviceAttestationDelegateBridge::OnDeviceAttestationFailed completed with result: %hu", attestationResult);
+        MTR_LOG_DEFAULT("MTRDeviceAttestationDelegateBridge::OnDeviceAttestationFailed completed with result: %hu",
+            chip::to_underlying(attestationResult));
 
         mResult = attestationResult;
 

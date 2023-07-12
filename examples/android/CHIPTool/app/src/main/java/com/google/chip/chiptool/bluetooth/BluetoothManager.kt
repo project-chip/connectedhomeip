@@ -39,14 +39,16 @@ class BluetoothManager : BleCallback {
     val version = 0
     val versionDiscriminator = ((version and 0xf) shl 12) or (discriminator and 0xfff)
     return intArrayOf(opcode, versionDiscriminator, versionDiscriminator shr 8)
-        .map { it.toByte() }
-        .toByteArray()
+      .map { it.toByte() }
+      .toByteArray()
   }
 
   private fun getServiceDataMask(isShortDiscriminator: Boolean): ByteArray {
-    val shortDiscriminatorMask = when(isShortDiscriminator) {
-      true -> 0x00     false -> 0xff
-    }
+    val shortDiscriminatorMask =
+      when (isShortDiscriminator) {
+        true -> 0x00
+        false -> 0xff
+      }
     return intArrayOf(0xff, shortDiscriminatorMask, 0xff).map { it.toByte() }.toByteArray()
   }
 
@@ -54,52 +56,59 @@ class BluetoothManager : BleCallback {
     return getBluetoothDevice(context, discriminator, false)
   }
 
-  suspend fun getBluetoothDevice(context: Context, discriminator: Int, isShortDiscriminator: Boolean): BluetoothDevice? {
-    if (! bluetoothAdapter.isEnabled) {
-      bluetoothAdapter.enable();
+  suspend fun getBluetoothDevice(
+    context: Context,
+    discriminator: Int,
+    isShortDiscriminator: Boolean
+  ): BluetoothDevice? {
+    if (!bluetoothAdapter.isEnabled) {
+      bluetoothAdapter.enable()
     }
 
-    val scanner = bluetoothAdapter.bluetoothLeScanner ?: run {
-      Log.e(TAG, "No bluetooth scanner found")
-      return null
-    }
+    val scanner =
+      bluetoothAdapter.bluetoothLeScanner
+        ?: run {
+          Log.e(TAG, "No bluetooth scanner found")
+          return null
+        }
 
     return withTimeoutOrNull(10000) {
       callbackFlow {
-        val scanCallback = object : ScanCallback() {
-          override fun onScanResult(callbackType: Int, result: ScanResult) {
-            val device = result.device
-            Log.i(TAG, "Bluetooth Device Scanned Addr: ${device.address}, Name ${device.name}")
+          val scanCallback =
+            object : ScanCallback() {
+              override fun onScanResult(callbackType: Int, result: ScanResult) {
+                val device = result.device
+                Log.i(TAG, "Bluetooth Device Scanned Addr: ${device.address}, Name ${device.name}")
 
-            val producerScope: ProducerScope<BluetoothDevice> = this@callbackFlow
-            if (producerScope.channel.isClosedForSend) {
-              Log.w(TAG, "Bluetooth device was scanned, but channel is already closed")
-            } else {
-              offer(device)
+                val producerScope: ProducerScope<BluetoothDevice> = this@callbackFlow
+                if (producerScope.channel.isClosedForSend) {
+                  Log.w(TAG, "Bluetooth device was scanned, but channel is already closed")
+                } else {
+                  offer(device)
+                }
+              }
+
+              override fun onScanFailed(errorCode: Int) {
+                Log.e(TAG, "Scan failed $errorCode")
+              }
             }
-          }
 
-          override fun onScanFailed(errorCode: Int) {
-            Log.e(TAG, "Scan failed $errorCode")
-          }
-        }
+          val serviceData = getServiceData(discriminator)
+          val serviceDataMask = getServiceDataMask(isShortDiscriminator)
 
-        val serviceData = getServiceData(discriminator)
-        val serviceDataMask = getServiceDataMask(isShortDiscriminator)
-
-        val scanFilter =
+          val scanFilter =
             ScanFilter.Builder()
-                .setServiceData(ParcelUuid(UUID.fromString(CHIP_UUID)), serviceData, serviceDataMask)
-                .build()
+              .setServiceData(ParcelUuid(UUID.fromString(CHIP_UUID)), serviceData, serviceDataMask)
+              .build()
 
-        val scanSettings = ScanSettings.Builder()
-            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-            .build()
+          val scanSettings =
+            ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
 
-        Log.i(TAG, "Starting Bluetooth scan")
-        scanner.startScan(listOf(scanFilter), scanSettings, scanCallback)
-        awaitClose { scanner.stopScan(scanCallback) }
-      }.first()
+          Log.i(TAG, "Starting Bluetooth scan")
+          scanner.startScan(listOf(scanFilter), scanSettings, scanCallback)
+          awaitClose { scanner.stopScan(scanCallback) }
+        }
+        .first()
     }
   }
 
@@ -125,16 +134,16 @@ class BluetoothManager : BleCallback {
     continuation: CancellableContinuation<BluetoothGatt?>
   ): BluetoothGattCallback {
     return object : BluetoothGattCallback() {
-      private val wrappedCallback = ChipClient.getAndroidChipPlatform(context).bleManager.callback;
+      private val wrappedCallback = ChipClient.getAndroidChipPlatform(context).bleManager.callback
+
       private val coroutineContinuation = continuation
 
-      override fun onConnectionStateChange(
-          gatt: BluetoothGatt?,
-          status: Int,
-          newState: Int
-      ) {
+      override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
         super.onConnectionStateChange(gatt, status, newState)
-        Log.i(TAG, "${gatt?.device?.name}.onConnectionStateChange status = $status, newState=$newState")
+        Log.i(
+          TAG,
+          "${gatt?.device?.name}.onConnectionStateChange status = $status, newState=$newState"
+        )
         wrappedCallback.onConnectionStateChange(gatt, status, newState)
 
         if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
@@ -148,7 +157,7 @@ class BluetoothManager : BleCallback {
         wrappedCallback.onServicesDiscovered(gatt, status)
 
         Log.i("$TAG|onServicesDiscovered", "Services Discovered")
-        gatt?.requestMtu(247);
+        gatt?.requestMtu(247)
       }
 
       override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
@@ -161,44 +170,44 @@ class BluetoothManager : BleCallback {
       }
 
       override fun onCharacteristicChanged(
-          gatt: BluetoothGatt,
-          characteristic: BluetoothGattCharacteristic
+        gatt: BluetoothGatt,
+        characteristic: BluetoothGattCharacteristic
       ) {
         Log.d(TAG, "${gatt.device.name}.onCharacteristicChanged: ${characteristic.uuid}")
         wrappedCallback.onCharacteristicChanged(gatt, characteristic)
       }
 
       override fun onCharacteristicRead(
-          gatt: BluetoothGatt,
-          characteristic: BluetoothGattCharacteristic,
-          status: Int
+        gatt: BluetoothGatt,
+        characteristic: BluetoothGattCharacteristic,
+        status: Int
       ) {
         Log.d(TAG, "${gatt.device.name}.onCharacteristicRead: ${characteristic.uuid} -> $status")
         wrappedCallback.onCharacteristicRead(gatt, characteristic, status)
       }
 
       override fun onCharacteristicWrite(
-          gatt: BluetoothGatt,
-          characteristic: BluetoothGattCharacteristic,
-          status: Int
+        gatt: BluetoothGatt,
+        characteristic: BluetoothGattCharacteristic,
+        status: Int
       ) {
         Log.d(TAG, "${gatt.device.name}.onCharacteristicWrite: ${characteristic.uuid} -> $status")
         wrappedCallback.onCharacteristicWrite(gatt, characteristic, status)
       }
 
       override fun onDescriptorRead(
-          gatt: BluetoothGatt,
-          descriptor: BluetoothGattDescriptor,
-          status: Int
+        gatt: BluetoothGatt,
+        descriptor: BluetoothGattDescriptor,
+        status: Int
       ) {
         Log.d(TAG, "${gatt.device.name}.onDescriptorRead: ${descriptor.uuid} -> $status")
         wrappedCallback.onDescriptorRead(gatt, descriptor, status)
       }
 
       override fun onDescriptorWrite(
-          gatt: BluetoothGatt,
-          descriptor: BluetoothGattDescriptor,
-          status: Int
+        gatt: BluetoothGatt,
+        descriptor: BluetoothGattDescriptor,
+        status: Int
       ) {
         Log.d(TAG, "${gatt.device.name}.onDescriptorWrite: ${descriptor.uuid} -> $status")
         wrappedCallback.onDescriptorWrite(gatt, descriptor, status)
@@ -227,7 +236,7 @@ class BluetoothManager : BleCallback {
   }
 
   override fun onNotifyChipConnectionClosed(connId: Int) {
-    bleGatt?.close();
+    bleGatt?.close()
     connectionId = 0
     Log.d(TAG, "onNotifyChipConnectionClosed")
   }

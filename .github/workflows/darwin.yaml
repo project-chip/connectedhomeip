@@ -119,12 +119,15 @@ jobs:
                   # And a different port from the test harness too; the test harness uses port 5541.
                   ../../../out/debug/chip-ota-requestor-app --interface-id -1 --secured-device-port 5542 --discriminator 1111 --KVS /tmp/chip-ota-requestor-kvs1 --otaDownloadPath /tmp/chip-ota-requestor-downloaded-image1 --autoApplyImage > >(tee /tmp/darwin/framework-tests/ota-requestor-app-1.log) 2> >(tee /tmp/darwin/framework-tests/ota-requestor-app-err-1.log >&2) &
                   ../../../out/debug/chip-ota-requestor-app --interface-id -1 --secured-device-port 5543 --discriminator 1112 --KVS /tmp/chip-ota-requestor-kvs2 --otaDownloadPath /tmp/chip-ota-requestor-downloaded-image2 --autoApplyImage > >(tee /tmp/darwin/framework-tests/ota-requestor-app-2.log) 2> >(tee /tmp/darwin/framework-tests/ota-requestor-app-err-2.log >&2) &
+                  # Disable BLE because the app does not have the permission to use
+                  # it and that may crash the CI.
+                  #
                   # -enableUndefinedBehaviorSanitizer instruments the code in Matter.framework,
                   # but to instrument the code in the underlying libCHIP we need to pass CHIP_IS_UBSAN=YES
-                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_UBSAN=YES > >(tee /tmp/darwin/framework-tests/darwin-tests-asan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-err.log >&2)
+                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_UBSAN=YES CHIP_IS_BLE=NO > >(tee /tmp/darwin/framework-tests/darwin-tests-asan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-err.log >&2)
                   # -enableThreadSanitizer instruments the code in Matter.framework,
                   # but to instrument the code in the underlying libCHIP we need to pass CHIP_IS_TSAN=YES
-                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableThreadSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_TSAN=YES > >(tee /tmp/darwin/framework-tests/darwin-tests-tsan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-tsan-err.log >&2)
+                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableThreadSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_TSAN=YES CHIP_IS_BLE=NO > >(tee /tmp/darwin/framework-tests/darwin-tests-tsan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-tsan-err.log >&2)
               working-directory: src/darwin/Framework
             - name: Build Matter TV Casting Bridge
               run: |
