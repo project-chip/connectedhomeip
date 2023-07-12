@@ -6,7 +6,6 @@ exclude = third_party
           ./examples/common/QRCode/*
           # temporarily scan only directories with fixed files
           # TODO: Remove the paths below when all bugs are fixed
-          src/tools/chip-cert/*
           build/chip/java/tests/*
           build/chip/linux/*
           build/config/linux/*
@@ -14,17 +13,6 @@ exclude = third_party
           docs/_extensions/external_content.py
           examples/common/pigweed/rpc_console/py/chip_rpc/console.py
           examples/lighting-app/python/lighting.py
-          scripts/tools/check_zcl_file_sync.py
-          scripts/tools/convert_ini.py
-          scripts/tools/memory/memdf/__init__.py
-          scripts/tools/memory/report_summary.py
-          scripts/tools/silabs/FactoryDataProvider.py
-          scripts/tools/zap/generate.py
-          scripts/tools/zap/prune_outputs.py
-          scripts/tools/zap/version_update.py
-          scripts/tools/zap/zap_download.py
-          scripts/tools/zap_convert_all.py
-          src/app/ota_image_tool.py
           src/app/zap_cluster_list.py
           src/controller/python/chip/yaml/__init__.py
           src/controller/python/chip/yaml/format_converter.py
