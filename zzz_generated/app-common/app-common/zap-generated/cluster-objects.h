@@ -3311,6 +3311,33 @@ public:
 using DecodableType = Type;
 
 } // namespace DeviceTypeStruct
+namespace SemanticTagStruct {
+enum class Fields : uint8_t
+{
+    kMfgCode   = 0,
+    kNamespace = 1,
+    kTag       = 2,
+    kLabel     = 3,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<chip::VendorId> mfgCode;
+    uint8_t namespace = static_cast<uint8_t>(0);
+    uint8_t tag       = static_cast<uint8_t>(0);
+    Optional<DataModel::Nullable<chip::CharSpan>> label;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace SemanticTagStruct
 } // namespace Structs
 
 namespace Attributes {
