@@ -438,7 +438,7 @@ private:
     friend class chip::app::reporting::Engine;
     friend class chip::app::InteractionModelEngine;
 
-    // The report scheduler needs to be able to access StateFlag private functions IsReadHandlerReportable and IsChunkedReport to
+    // The report scheduler needs to be able to access StateFlag private functions IsGeneratingReports() and IsDirty() to
     // know when to schedule a run so it is declared as a friend class.
     friend class chip::app::reporting::ReportScheduler;
 
