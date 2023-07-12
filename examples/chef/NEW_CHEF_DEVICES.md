@@ -1,3 +1,7 @@
+---
+orphan: true
+---
+
 # CHEF devices
 
 Device definitions reside in `examples/chef/devices` as .zap and .matter files.
