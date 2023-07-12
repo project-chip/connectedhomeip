@@ -473,13 +473,13 @@ class ChipDeviceControllerBase():
                 self.devCtrl, setupPinCode, discriminator, nodeid)
         )
 
-    def EstablishPASESessionIP(self, ipaddr: str, setupPinCode: int, nodeid: int):
+    def EstablishPASESessionIP(self, ipaddr: str, setupPinCode: int, nodeid: int, port: int = 0):
         self.CheckIsActive()
 
         self.state = DCState.RENDEZVOUS_ONGOING
         return self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionIP(
-                self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid)
+                self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid, port)
         )
 
     def GetTestCommissionerUsed(self):
@@ -779,9 +779,30 @@ class ChipDeviceControllerBase():
             device.deviceProxy, upperLayerProcessingTimeoutMs))
         return res
 
+    async def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(self, nodeid: int, endpoint: int,
+                                                                   payload: ClusterObjects.ClusterCommand, responseType=None):
+        '''
+
+        Please see SendCommand for description.
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        device = self.GetConnectedDeviceSync(nodeid, timeoutMs=None)
+        ClusterCommand.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(
+            future, eventLoop, responseType, device.deviceProxy, ClusterCommand.CommandPath(
+                EndpointId=endpoint,
+                ClusterId=payload.cluster_id,
+                CommandId=payload.command_id,
+            ), payload).raise_on_error()
+        return await future
+
     async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None,
                           timedRequestTimeoutMs: typing.Union[None, int] = None,
-                          interactionTimeoutMs: typing.Union[None, int] = None, busyWaitMs: typing.Union[None, int] = None):
+                          interactionTimeoutMs: typing.Union[None, int] = None, busyWaitMs: typing.Union[None, int] = None,
+                          suppressResponse: typing.Union[None, bool] = None):
         '''
         Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive
         the response. If a valid responseType is passed in, that will be used to deserialize the object. If not,
@@ -803,7 +824,7 @@ class ChipDeviceControllerBase():
                 ClusterId=payload.cluster_id,
                 CommandId=payload.command_id,
             ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs,
-            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
+            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse).raise_on_error()
         return await future
 
     def SendGroupCommand(self, groupid: int, payload: ClusterObjects.ClusterCommand, busyWaitMs: typing.Union[None, int] = None):
@@ -1338,7 +1359,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_EstablishPASESessionIP.argtypes = [
-                c_void_p, c_char_p, c_uint32, c_uint64]
+                c_void_p, c_char_p, c_uint32, c_uint64, c_uint16]
             self._dmLib.pychip_DeviceController_EstablishPASESessionIP.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.argtypes = [
