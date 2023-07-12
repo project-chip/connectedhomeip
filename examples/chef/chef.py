@@ -564,8 +564,6 @@ def main() -> int:
         shell.run_cmd(
             f"{_REPO_BASE_PATH}/scripts/tools/zap/generate.py "
             f"{_CHEF_SCRIPT_PATH}/devices/{options.sample_device_type_name}.zap -o {gen_dir}")
-        # af-gen-event.h is not generated
-        shell.run_cmd(f"touch {gen_dir}/af-gen-event.h")
 
     #
     # Setup environment
