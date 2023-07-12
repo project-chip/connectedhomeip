@@ -28,33 +28,34 @@ class ReportSchedulerImpl : public ReportScheduler
 {
 public:
     ReportSchedulerImpl(TimerDelegate * aTimerDelegate);
-    virtual ~ReportSchedulerImpl() override { UnregisterAllHandlers(); }
+    ~ReportSchedulerImpl() override { UnregisterAllHandlers(); }
 
     // ReadHandlerObserver
-    virtual void OnReadHandlerCreated(ReadHandler * aReadHandler) override;
-    virtual void OnBecameReportable(ReadHandler * aReadHandler) override;
-    virtual void OnSubscriptionAction(ReadHandler * aReadHandler) override;
-    virtual void OnReadHandlerDestroyed(ReadHandler * aReadHandler) override;
-
-    // ReportScheduler specific
-    virtual CHIP_ERROR RegisterReadHandler(ReadHandler * aReadHandler) override;
-    virtual CHIP_ERROR ScheduleReport(System::Clock::Timeout timeout, ReadHandler * aReadHandler) override;
-    virtual void CancelReport(ReadHandler * aReadHandler) override;
-    virtual void UnregisterReadHandler(ReadHandler * aReadHandler) override;
-    virtual void UnregisterAllHandlers() override;
-    virtual bool IsReportScheduled(ReadHandler * aReadHandler) override;
+    void OnReadHandlerCreated(ReadHandler * aReadHandler) override;
+    void OnBecameReportable(ReadHandler * aReadHandler) override;
+    void OnSubscriptionAction(ReadHandler * aReadHandler) override;
+    void OnReadHandlerDestroyed(ReadHandler * aReadHandler) override;
 
 protected:
+    virtual CHIP_ERROR RegisterReadHandler(ReadHandler * aReadHandler);
+    virtual CHIP_ERROR ScheduleReport(System::Clock::Timeout timeout, ReadHandlerNode * node);
+    virtual void CancelReport(ReadHandler * aReadHandler);
+    virtual void UnregisterReadHandler(ReadHandler * aReadHandler);
+    virtual void UnregisterAllHandlers();
+
+private:
     friend class chip::app::reporting::TestReportScheduler;
 
-    /// @brief Find the ReadHandlerNode for a given ReadHandler pointer
-    /// @param [in] aReadHandler
-    /// @return Node Address if node was found, nullptr otherwise
-    virtual ReadHandlerNode * FindReadHandlerNode(const ReadHandler * aReadHandler) override;
+    bool IsReportScheduled(ReadHandler * aReadHandler) override;
 
-    virtual CHIP_ERROR StartTimerForHandler(ReadHandlerNode * node, System::Clock::Timeout aTimeout) override;
-    virtual void CancelTimerForHandler(ReadHandlerNode * node) override;
-    virtual bool CheckTimerActiveForHandler(ReadHandlerNode * node) override;
+    /// @brief Start a timer for a given ReadHandlerNode, ensures that if a timer is already running for this node, it is cancelled
+    /// @param node Node of the ReadHandler list to start a timer for
+    /// @param aTimeout Delay before the timer expires
+    virtual CHIP_ERROR StartSchedulerTimer(ReadHandlerNode * node, System::Clock::Timeout aTimeout);
+    /// @brief Cancel the timer for a given ReadHandlerNode
+    virtual void CancelSchedulerTimer(ReadHandlerNode * node);
+    /// @brief Check if the timer for a given ReadHandlerNode is active
+    virtual bool CheckSchedulerTimerActive(ReadHandlerNode * node);
 };
 
 } // namespace reporting

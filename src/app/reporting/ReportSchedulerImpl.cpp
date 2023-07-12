@@ -62,10 +62,10 @@ void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
     else
     {
         // If the handler is not reportable now, schedule a report for the min interval
-        newTimeout = Milliseconds32(node->GetMinTimestamp().count() - mTimerDelegate->GetCurrentMonotonicTimestamp().count());
+        newTimeout = node->GetMinTimestamp() - mTimerDelegate->GetCurrentMonotonicTimestamp();
     }
 
-    ScheduleReport(newTimeout, aReadHandler);
+    ScheduleReport(newTimeout, node);
 }
 
 void ReportSchedulerImpl::OnSubscriptionAction(ReadHandler * apReadHandler)
@@ -74,9 +74,8 @@ void ReportSchedulerImpl::OnSubscriptionAction(ReadHandler * apReadHandler)
     VerifyOrReturn(nullptr != node);
     // Schedule callback for max interval by computing the difference between the max timestamp and the current timestamp
     node->SetIntervalTimeStamps(apReadHandler);
-    Milliseconds32 newTimeout =
-        Milliseconds32(node->GetMaxTimestamp().count() - mTimerDelegate->GetCurrentMonotonicTimestamp().count());
-    ScheduleReport(newTimeout, apReadHandler);
+    Milliseconds32 newTimeout = node->GetMaxTimestamp() - mTimerDelegate->GetCurrentMonotonicTimestamp();
+    ScheduleReport(newTimeout, node);
 }
 
 /// @brief When a ReadHandler is removed, unregister it, which will cancel any scheduled report
@@ -89,7 +88,9 @@ CHIP_ERROR ReportSchedulerImpl::RegisterReadHandler(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * newNode = FindReadHandlerNode(aReadHandler);
     // If the handler is already registered, no need to register it again
-    VerifyOrReturnValue(nullptr == newNode, CHIP_NO_ERROR);
+    VerifyOrDie(nullptr == newNode);
+    // The NodePool is the same size as the ReadHandler pool from the IM Engine, so we don't need a check for size here since if a
+    // ReadHandler was created, space should be available.
     newNode = mNodesPool.CreateObject(aReadHandler, mTimerDelegate, ReportTimerCallback);
     mReadHandlerList.PushBack(newNode);
 
@@ -110,33 +111,23 @@ CHIP_ERROR ReportSchedulerImpl::RegisterReadHandler(ReadHandler * aReadHandler)
     {
         // If the handler is reportable now, but the min interval is not elapsed, schedule a report for the moment the min interval
         // has elapsed
-        newTimeout = Milliseconds32(newNode->GetMinTimestamp().count() - now.count());
-
-        ReturnErrorOnFailure(ScheduleReport(newTimeout, aReadHandler));
+        newTimeout = newNode->GetMinTimestamp() - now;
     }
     else
     {
         // If the handler is not reportable now, schedule a report for the max interval
-        newTimeout = Milliseconds32(newNode->GetMaxTimestamp().count() - now.count());
+        newTimeout = newNode->GetMaxTimestamp() - now;
     }
 
-    ReturnErrorOnFailure(ScheduleReport(newTimeout, aReadHandler));
+    ReturnErrorOnFailure(ScheduleReport(newTimeout, newNode));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandler * aReadHandler)
+CHIP_ERROR ReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode * node)
 {
-    // Verify the handler is still registered
-    ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
-    VerifyOrReturnError(nullptr != node, CHIP_ERROR_NOT_FOUND);
-
     // Cancel Report if it is currently scheduled
-    CancelTimerForHandler(node);
-
-    if (!IsChunkedReport(aReadHandler))
-    {
-        StartTimerForHandler(node, timeout);
-    }
+    CancelSchedulerTimer(node);
+    StartSchedulerTimer(node, timeout);
 
     return CHIP_NO_ERROR;
 }
@@ -145,13 +136,11 @@ void ReportSchedulerImpl::CancelReport(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
     VerifyOrReturn(nullptr != node);
-    CancelTimerForHandler(node);
+    CancelSchedulerTimer(node);
 }
 
 void ReportSchedulerImpl::UnregisterReadHandler(ReadHandler * aReadHandler)
 {
-    // Verify list is populated and handler is not null
-    VerifyOrReturn((!mReadHandlerList.Empty() || (nullptr == aReadHandler)));
     CancelReport(aReadHandler);
 
     ReadHandlerNode * removeNode = FindReadHandlerNode(aReadHandler);
@@ -175,33 +164,21 @@ bool ReportSchedulerImpl::IsReportScheduled(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
     VerifyOrReturnValue(nullptr != node, false);
-    return CheckTimerActiveForHandler(node);
+    return CheckSchedulerTimerActive(node);
 }
 
-ReportSchedulerImpl::ReadHandlerNode * ReportSchedulerImpl::FindReadHandlerNode(const ReadHandler * aReadHandler)
-{
-    for (auto & iter : mReadHandlerList)
-    {
-        if (iter.GetReadHandler() == aReadHandler)
-        {
-            return &iter;
-        }
-    }
-    return nullptr;
-}
-
-CHIP_ERROR ReportSchedulerImpl::StartTimerForHandler(ReadHandlerNode * node, System::Clock::Timeout aTimeout)
+CHIP_ERROR ReportSchedulerImpl::StartSchedulerTimer(ReadHandlerNode * node, System::Clock::Timeout aTimeout)
 {
     // Schedule Report
     return mTimerDelegate->StartTimer(node, aTimeout);
 }
 
-void ReportSchedulerImpl::CancelTimerForHandler(ReadHandlerNode * node)
+void ReportSchedulerImpl::CancelSchedulerTimer(ReadHandlerNode * node)
 {
     mTimerDelegate->CancelTimer(node);
 }
 
-bool ReportSchedulerImpl::CheckTimerActiveForHandler(ReadHandlerNode * node)
+bool ReportSchedulerImpl::CheckSchedulerTimerActive(ReadHandlerNode * node)
 {
     return mTimerDelegate->IsTimerActive(node);
 }

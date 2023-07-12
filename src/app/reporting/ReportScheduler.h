@@ -35,14 +35,22 @@ using Timestamp = System::Clock::Timestamp;
 class ReportScheduler : public ReadHandler::Observer
 {
 public:
+    /// @brief This class acts as an interface between the report scheduler and the system timer to reduce dependencies on the
+    /// system layer.
     class TimerDelegate
     {
     public:
         virtual ~TimerDelegate() {}
+        /// @brief Start a timer for a given context, the report scheduler will always start by trying to cancel an existing timer
+        /// before starting a new one
+        /// @param context context to pass to the timer callback, in this case, a read handler node is passed
+        /// @param aTimeout time in miliseconds before the timer expires
         virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) = 0;
-        virtual void CancelTimer(void * context)                                       = 0;
-        virtual bool IsTimerActive(void * context)                                     = 0;
-        virtual Timestamp GetCurrentMonotonicTimestamp()                               = 0;
+        /// @brief Cancel a timer for a given context
+        /// @param context used to identify the timer to cancel
+        virtual void CancelTimer(void * context)         = 0;
+        virtual bool IsTimerActive(void * context)       = 0;
+        virtual Timestamp GetCurrentMonotonicTimestamp() = 0;
     };
 
     class ReadHandlerNode : public IntrusiveListNodeBase<>
@@ -101,26 +109,6 @@ public:
      */
     virtual ~ReportScheduler() = default;
 
-    /// @brief Register a ReadHandler to the scheduler, will schedule report
-    /// @param aReadHandler read handler to register
-    virtual CHIP_ERROR RegisterReadHandler(ReadHandler * aReadHandler) = 0;
-    /// @brief Schedule a report for a given ReadHandler
-    /// @param timeout time in seconds before the next engine run is scheduled
-    /// @param aReadHandler read handler to schedule a report for
-    /// @return CHIP_ERROR not found if the ReadHandler is not registered in the scheduler, specific timer error if the timer
-    /// couldn't be started
-    virtual CHIP_ERROR ScheduleReport(System::Clock::Timeout timeout, ReadHandler * aReadHandler) = 0;
-    /// @brief Cancel a scheduled report for a given ReadHandler
-    /// @param aReadHandler readhandler to look for in the ReadHandler nodes list. If found, the timer started for this report will
-    /// be cancelled.
-    virtual void CancelReport(ReadHandler * aReadHandler) = 0;
-    /// @brief Unregister a ReadHandler from the scheduler
-    /// @param aReadHandler read handler to unregister
-    /// @return CHIP_NO_ERROR if the ReadHandler was successfully unregistered or not found, specific error otherwise
-    virtual void UnregisterReadHandler(ReadHandler * aReadHandler) = 0;
-    /// @brief Unregister all ReadHandlers from the scheduler
-    /// @return CHIP_NO_ERROR if all ReadHandlers were successfully unregistered, specific error otherwise
-    virtual void UnregisterAllHandlers() = 0;
     /// @brief Check if a ReadHandler is scheduled for reporting
     virtual bool IsReportScheduled(ReadHandler * aReadHandler) = 0;
     /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
@@ -131,9 +119,6 @@ public:
     {
         return aReadHandler->IsGeneratingReports() && aReadHandler->IsDirty();
     }
-    /// @brief Check the ReadHandler's ChunkedReport flag to prevent rescheduling if the Schedule is called when the engine is
-    /// processing a chunked report
-    bool IsChunkedReport(ReadHandler * aReadHandler) const { return aReadHandler->IsChunkedReport(); }
 
     /// @brief Get the number of ReadHandlers registered in the scheduler's node pool
     size_t GetNumReadHandlers() const { return mNodesPool.Allocated(); }
@@ -144,13 +129,17 @@ protected:
     /// @brief Find the ReadHandlerNode for a given ReadHandler pointer
     /// @param [in] aReadHandler ReadHandler pointer to look for in the ReadHandler nodes list
     /// @return Node Address if node was found, nullptr otherwise
-    virtual ReadHandlerNode * FindReadHandlerNode(const ReadHandler * aReadHandler) = 0;
-    /// @brief Start a timer for a given ReadHandlerNode, ensures that if a timer is already running for this node, it is cancelled
-    /// @param node Node of the ReadHandler list to start a timer for
-    /// @param aTimeout Delay before the timer expires
-    virtual CHIP_ERROR StartTimerForHandler(ReadHandlerNode * node, System::Clock::Timeout aTimeout) = 0;
-    virtual void CancelTimerForHandler(ReadHandlerNode * node)                                       = 0;
-    virtual bool CheckTimerActiveForHandler(ReadHandlerNode * node)                                  = 0;
+    ReadHandlerNode * FindReadHandlerNode(const ReadHandler * aReadHandler)
+    {
+        for (auto & iter : mReadHandlerList)
+        {
+            if (iter.GetReadHandler() == aReadHandler)
+            {
+                return &iter;
+            }
+        }
+        return nullptr;
+    }
 
     IntrusiveList<ReadHandlerNode> mReadHandlerList;
     ObjectPool<ReadHandlerNode, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> mNodesPool;

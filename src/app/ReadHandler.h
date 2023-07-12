@@ -229,7 +229,8 @@ public:
     {
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(aMinInterval <= mMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
-        mMinIntervalFloorSeconds = aMinInterval;
+        // Ensures the new min interval is higher than the subscriber established one.
+        mMinIntervalFloorSeconds = std::max(mMinIntervalFloorSeconds, aMinInterval);
         return CHIP_NO_ERROR;
     }
 

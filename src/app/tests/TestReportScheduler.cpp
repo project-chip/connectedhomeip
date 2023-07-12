@@ -25,11 +25,6 @@
 
 namespace {
 
-uint8_t gDebugEventBuffer[128];
-uint8_t gInfoEventBuffer[128];
-uint8_t gCritEventBuffer[128];
-chip::app::CircularEventBuffer gCircularEventBuffer[3];
-
 class TestContext : public chip::Test::AppContext
 {
 public:
@@ -44,15 +39,6 @@ public:
         {
             return FAILURE;
         }
-
-        chip::app::LogStorageResources logStorageResources[] = {
-            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
-            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
-            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
-        };
-
-        chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(), ArraySize(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
 
         return SUCCESS;
     }
