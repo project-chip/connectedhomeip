@@ -17459,6 +17459,31 @@ public:
 } // namespace Events
 } // namespace RvcOperationalState
 namespace HepaFilterMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct {
+enum class Fields : uint8_t
+{
+    kProductIdentifierType  = 0,
+    kProductIdentifierValue = 1,
+};
+
+struct Type
+{
+public:
+    ProductIdentifierTypeEnum productIdentifierType = static_cast<ProductIdentifierTypeEnum>(0);
+    chip::CharSpan productIdentifierValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ReplacementProductStruct
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -17563,6 +17588,21 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastChangedTime
+namespace ReplacementProductList {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReplacementProductList
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -17615,6 +17655,7 @@ struct TypeInfo
             static_cast<chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum>(0);
         Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
         Attributes::LastChangedTime::TypeInfo::DecodableType lastChangedTime;
+        Attributes::ReplacementProductList::TypeInfo::DecodableType replacementProductList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -17626,6 +17667,31 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace HepaFilterMonitoring
 namespace ActivatedCarbonFilterMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct {
+enum class Fields : uint8_t
+{
+    kProductIdentifierType  = 0,
+    kProductIdentifierValue = 1,
+};
+
+struct Type
+{
+public:
+    ProductIdentifierTypeEnum productIdentifierType = static_cast<ProductIdentifierTypeEnum>(0);
+    chip::CharSpan productIdentifierValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ReplacementProductStruct
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -17730,6 +17796,21 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastChangedTime
+namespace ReplacementProductList {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<
+        const chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReplacementProductList
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -17782,6 +17863,7 @@ struct TypeInfo
             static_cast<chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum>(0);
         Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
         Attributes::LastChangedTime::TypeInfo::DecodableType lastChangedTime;
+        Attributes::ReplacementProductList::TypeInfo::DecodableType replacementProductList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -17793,6 +17875,31 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ActivatedCarbonFilterMonitoring
 namespace CeramicFilterMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct {
+enum class Fields : uint8_t
+{
+    kProductIdentifierType  = 0,
+    kProductIdentifierValue = 1,
+};
+
+struct Type
+{
+public:
+    ProductIdentifierTypeEnum productIdentifierType = static_cast<ProductIdentifierTypeEnum>(0);
+    chip::CharSpan productIdentifierValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ReplacementProductStruct
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -17897,6 +18004,21 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastChangedTime
+namespace ReplacementProductList {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReplacementProductList
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -17949,6 +18071,7 @@ struct TypeInfo
             static_cast<chip::app::Clusters::CeramicFilterMonitoring::ChangeIndicationEnum>(0);
         Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
         Attributes::LastChangedTime::TypeInfo::DecodableType lastChangedTime;
+        Attributes::ReplacementProductList::TypeInfo::DecodableType replacementProductList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -17960,6 +18083,31 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace CeramicFilterMonitoring
 namespace ElectrostaticFilterMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct {
+enum class Fields : uint8_t
+{
+    kProductIdentifierType  = 0,
+    kProductIdentifierValue = 1,
+};
+
+struct Type
+{
+public:
+    ProductIdentifierTypeEnum productIdentifierType = static_cast<ProductIdentifierTypeEnum>(0);
+    chip::CharSpan productIdentifierValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ReplacementProductStruct
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -18064,6 +18212,21 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastChangedTime
+namespace ReplacementProductList {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<
+        const chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReplacementProductList
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -18116,6 +18279,7 @@ struct TypeInfo
             static_cast<chip::app::Clusters::ElectrostaticFilterMonitoring::ChangeIndicationEnum>(0);
         Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
         Attributes::LastChangedTime::TypeInfo::DecodableType lastChangedTime;
+        Attributes::ReplacementProductList::TypeInfo::DecodableType replacementProductList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -18127,6 +18291,31 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ElectrostaticFilterMonitoring
 namespace UvFilterMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct {
+enum class Fields : uint8_t
+{
+    kProductIdentifierType  = 0,
+    kProductIdentifierValue = 1,
+};
+
+struct Type
+{
+public:
+    ProductIdentifierTypeEnum productIdentifierType = static_cast<ProductIdentifierTypeEnum>(0);
+    chip::CharSpan productIdentifierValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ReplacementProductStruct
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -18231,6 +18420,20 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastChangedTime
+namespace ReplacementProductList {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReplacementProductList
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -18283,6 +18486,7 @@ struct TypeInfo
             static_cast<chip::app::Clusters::UvFilterMonitoring::ChangeIndicationEnum>(0);
         Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
         Attributes::LastChangedTime::TypeInfo::DecodableType lastChangedTime;
+        Attributes::ReplacementProductList::TypeInfo::DecodableType replacementProductList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -18294,6 +18498,31 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace UvFilterMonitoring
 namespace IonizingFilterMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct {
+enum class Fields : uint8_t
+{
+    kProductIdentifierType  = 0,
+    kProductIdentifierValue = 1,
+};
+
+struct Type
+{
+public:
+    ProductIdentifierTypeEnum productIdentifierType = static_cast<ProductIdentifierTypeEnum>(0);
+    chip::CharSpan productIdentifierValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ReplacementProductStruct
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -18398,6 +18627,21 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastChangedTime
+namespace ReplacementProductList {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReplacementProductList
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -18450,6 +18694,7 @@ struct TypeInfo
             static_cast<chip::app::Clusters::IonizingFilterMonitoring::ChangeIndicationEnum>(0);
         Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
         Attributes::LastChangedTime::TypeInfo::DecodableType lastChangedTime;
+        Attributes::ReplacementProductList::TypeInfo::DecodableType replacementProductList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -18461,6 +18706,31 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace IonizingFilterMonitoring
 namespace ZeoliteFilterMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct {
+enum class Fields : uint8_t
+{
+    kProductIdentifierType  = 0,
+    kProductIdentifierValue = 1,
+};
+
+struct Type
+{
+public:
+    ProductIdentifierTypeEnum productIdentifierType = static_cast<ProductIdentifierTypeEnum>(0);
+    chip::CharSpan productIdentifierValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ReplacementProductStruct
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -18565,6 +18835,21 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastChangedTime
+namespace ReplacementProductList {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReplacementProductList
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -18617,6 +18902,7 @@ struct TypeInfo
             static_cast<chip::app::Clusters::ZeoliteFilterMonitoring::ChangeIndicationEnum>(0);
         Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
         Attributes::LastChangedTime::TypeInfo::DecodableType lastChangedTime;
+        Attributes::ReplacementProductList::TypeInfo::DecodableType replacementProductList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -18628,6 +18914,31 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ZeoliteFilterMonitoring
 namespace OzoneFilterMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct {
+enum class Fields : uint8_t
+{
+    kProductIdentifierType  = 0,
+    kProductIdentifierValue = 1,
+};
+
+struct Type
+{
+public:
+    ProductIdentifierTypeEnum productIdentifierType = static_cast<ProductIdentifierTypeEnum>(0);
+    chip::CharSpan productIdentifierValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ReplacementProductStruct
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -18732,6 +19043,21 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastChangedTime
+namespace ReplacementProductList {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReplacementProductList
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -18784,6 +19110,7 @@ struct TypeInfo
             static_cast<chip::app::Clusters::OzoneFilterMonitoring::ChangeIndicationEnum>(0);
         Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
         Attributes::LastChangedTime::TypeInfo::DecodableType lastChangedTime;
+        Attributes::ReplacementProductList::TypeInfo::DecodableType replacementProductList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -18795,6 +19122,31 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace OzoneFilterMonitoring
 namespace WaterTankMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct {
+enum class Fields : uint8_t
+{
+    kProductIdentifierType  = 0,
+    kProductIdentifierValue = 1,
+};
+
+struct Type
+{
+public:
+    ProductIdentifierTypeEnum productIdentifierType = static_cast<ProductIdentifierTypeEnum>(0);
+    chip::CharSpan productIdentifierValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ReplacementProductStruct
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -18899,6 +19251,21 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastChangedTime
+namespace ReplacementProductList {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReplacementProductList
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -18951,6 +19318,7 @@ struct TypeInfo
             static_cast<chip::app::Clusters::WaterTankMonitoring::ChangeIndicationEnum>(0);
         Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
         Attributes::LastChangedTime::TypeInfo::DecodableType lastChangedTime;
+        Attributes::ReplacementProductList::TypeInfo::DecodableType replacementProductList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -18962,6 +19330,31 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace WaterTankMonitoring
 namespace FuelTankMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct {
+enum class Fields : uint8_t
+{
+    kProductIdentifierType  = 0,
+    kProductIdentifierValue = 1,
+};
+
+struct Type
+{
+public:
+    ProductIdentifierTypeEnum productIdentifierType = static_cast<ProductIdentifierTypeEnum>(0);
+    chip::CharSpan productIdentifierValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ReplacementProductStruct
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -19066,6 +19459,20 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastChangedTime
+namespace ReplacementProductList {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReplacementProductList
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -19118,6 +19525,7 @@ struct TypeInfo
             static_cast<chip::app::Clusters::FuelTankMonitoring::ChangeIndicationEnum>(0);
         Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
         Attributes::LastChangedTime::TypeInfo::DecodableType lastChangedTime;
+        Attributes::ReplacementProductList::TypeInfo::DecodableType replacementProductList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -19129,6 +19537,31 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace FuelTankMonitoring
 namespace InkCartridgeMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct {
+enum class Fields : uint8_t
+{
+    kProductIdentifierType  = 0,
+    kProductIdentifierValue = 1,
+};
+
+struct Type
+{
+public:
+    ProductIdentifierTypeEnum productIdentifierType = static_cast<ProductIdentifierTypeEnum>(0);
+    chip::CharSpan productIdentifierValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ReplacementProductStruct
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -19233,6 +19666,21 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastChangedTime
+namespace ReplacementProductList {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReplacementProductList
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -19285,6 +19733,7 @@ struct TypeInfo
             static_cast<chip::app::Clusters::InkCartridgeMonitoring::ChangeIndicationEnum>(0);
         Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
         Attributes::LastChangedTime::TypeInfo::DecodableType lastChangedTime;
+        Attributes::ReplacementProductList::TypeInfo::DecodableType replacementProductList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -19296,6 +19745,31 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace InkCartridgeMonitoring
 namespace TonerCartridgeMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct {
+enum class Fields : uint8_t
+{
+    kProductIdentifierType  = 0,
+    kProductIdentifierValue = 1,
+};
+
+struct Type
+{
+public:
+    ProductIdentifierTypeEnum productIdentifierType = static_cast<ProductIdentifierTypeEnum>(0);
+    chip::CharSpan productIdentifierValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ReplacementProductStruct
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -19400,6 +19874,21 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastChangedTime
+namespace ReplacementProductList {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReplacementProductList
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -19452,6 +19941,7 @@ struct TypeInfo
             static_cast<chip::app::Clusters::TonerCartridgeMonitoring::ChangeIndicationEnum>(0);
         Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
         Attributes::LastChangedTime::TypeInfo::DecodableType lastChangedTime;
+        Attributes::ReplacementProductList::TypeInfo::DecodableType replacementProductList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

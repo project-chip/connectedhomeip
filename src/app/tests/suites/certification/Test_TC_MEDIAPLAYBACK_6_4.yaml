@@ -142,20 +142,11 @@ tests:
 
     #Issue 19800
     - label: "Reads the PlaybackSpeed attribute from the DUT"
-      verification: |
-          ./chip-tool mediaplayback read playback-speed 1 3
-          [1655114487.018204][41855:41860] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Attribute 0x0000_0004 DataVersion: 4174921750
-          [1655114487.018302][41855:41860] CHIP:TOO:   PlaybackSpeed: -1.000000
-          [1655114487.018421][41855:41860] CHIP:EM: Sending Standalone Ack for MessageCounter:163883813 on exchange 24959
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C06.Rsp
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' if PlaybackSpeed value is -1"
-              - name: "expectedValue"
-                value: "y"
+      PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C06.Rsp
+      command: "readAttribute"
+      attribute: "PlaybackSpeed"
+      response:
+          value: -1
 
     - label: "Sends a Rewind command to the DUT"
       PICS: MEDIAPLAYBACK.S.C06.Rsp
@@ -182,20 +173,11 @@ tests:
 
     #Issue 19800
     - label: "Reads the PlaybackSpeed attribute from the DUT"
-      verification: |
-          ./chip-tool mediaplayback read playback-speed 1 3
-          [1655114711.400529][41871:41876] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Attribute 0x0000_0004 DataVersion: 4174921750
-          [1655114711.400683][41871:41876] CHIP:TOO:   PlaybackSpeed: -2.000000
-          [1655114711.400853][41871:41876] CHIP:EM: Sending Standalone Ack for MessageCounter:17386470 on exchange 38376
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C06.Rsp
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' if PlaybackSpeed value is -2"
-              - name: "expectedValue"
-                value: "y"
+      PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C06.Rsp
+      command: "readAttribute"
+      attribute: "PlaybackSpeed"
+      response:
+          value: -2
 
     - label: "Sends a Play command"
       PICS: MEDIAPLAYBACK.S.C00.Rsp
