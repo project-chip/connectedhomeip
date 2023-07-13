@@ -308,7 +308,7 @@ public:
     virtual ~Delegate() = default;
 };
 
-// @brief Instance getter for the default global delegate for operational state alias cluster
+// @brief Instance getter for the delegate for the given operational state alias cluster on the given endpoint.
 // The delegate API assumes there will be separate delegate objects for each cluster instance.
 // (i.e. each separate operational state cluster derivation, on each separate endpoint)
 // @note This API should always be called prior to using the delegate and the return pointer should never be cached.
