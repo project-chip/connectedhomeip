@@ -181,6 +181,4 @@ void DishwasherAlarmServer::SendNotifyEvent(EndpointId endpointId, BitMask<Alarm
  * Callbacks Implementation
  *********************************************************/
 
-void emberAfDishwasherAlarmClusterServerInitCallback(EndpointId endpoint) {}
-
 void MatterDishwasherAlarmPluginServerInitCallback() {}
