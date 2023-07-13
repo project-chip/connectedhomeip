@@ -62,14 +62,14 @@ constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_all_clusters_fifo_"
 LowPowerManager sLowPowerManager;
 NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
-chip::app::Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
+Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
-chip::app::Clusters::ResourceMonitoring::HepaFilterMonitoringInstance
-    gHepafilterInstance(0x1, chip::app::Clusters::HepaFilterMonitoring::Id, 3,
-                        chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);
-chip::app::Clusters::ResourceMonitoring::ActivatedCarbonFilterMonitoringInstance
-    gActivatedCarbonFilterInstance(0x1, chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id, 3,
-                                   chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);
+Clusters::ResourceMonitoring::HepaFilterMonitoringInstance
+    gHepafilterInstance(0x1, Clusters::HepaFilterMonitoring::Id, 3,
+                        Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);
+Clusters::ResourceMonitoring::ActivatedCarbonFilterMonitoringInstance
+    gActivatedCarbonFilterInstance(0x1, Clusters::ActivatedCarbonFilterMonitoring::Id, 3,
+                                   Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);
 
 } // namespace
 
@@ -292,12 +292,12 @@ void ApplicationExit()
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(NotSpecified, "Setting LowPower default delegate to global manager");
-    chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &sLowPowerManager);
+    Clusters::LowPower::SetDefaultDelegate(endpoint, &sLowPowerManager);
 }
 
 void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
 {
     sWindowCoveringManager.Init(endpoint);
-    chip::app::Clusters::WindowCovering::SetDefaultDelegate(endpoint, &sWindowCoveringManager);
-    chip::app::Clusters::WindowCovering::ConfigStatusUpdateFeatures(endpoint);
+    Clusters::WindowCovering::SetDefaultDelegate(endpoint, &sWindowCoveringManager);
+    Clusters::WindowCovering::ConfigStatusUpdateFeatures(endpoint);
 }
