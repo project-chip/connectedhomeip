@@ -5736,6 +5736,9 @@ PICS:
     - label: "Does the device implement the ActiveBatChargeFaults attribute?"
       id: PS.S.A001e
 
+    - label: "Does the device implement the EndpointList attribute?"
+      id: PS.S.A001f
+
     #
     # server / Events
     #

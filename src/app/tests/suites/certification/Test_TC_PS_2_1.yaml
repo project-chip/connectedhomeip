@@ -58,6 +58,7 @@ tests:
       response:
           constraints:
               type: char_string
+              maxLength: 60
 
     - label:
           "Test Harness Client reads WiredAssessedInputVoltage attribue from
@@ -329,6 +330,15 @@ tests:
       PICS: PS.S.A001e
       command: "readAttribute"
       attribute: "ActiveBatChargeFaults"
+      response:
+          constraints:
+              type: list
+              maxLength: 16
+
+    - label: "Test Harness Client reads EndpointList from Server DUT"
+      PICS: PS.S.A001f
+      command: "readAttribute"
+      attribute: "EndpointList"
       response:
           constraints:
               type: list
