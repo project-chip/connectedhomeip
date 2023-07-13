@@ -56,13 +56,9 @@ CHIP_ERROR LaundryWasherControlsAttrAccess::ReadSpinSpeeds(const ConcreteReadAtt
                                                            AttributeValueEncoder & aEncoder)
 {
     const LaundryWasherControls::LaundryWasherManager * gLaundryWasherManager = LaundryWasherControls::getLaundryWasherManager();
-    const LaundryWasherControls::LaundryWasherManager::AttributeProvider<CharSpan> attrProvider =
+    const LaundryWasherControls::LaundryWasherManager::AttributeProvider<const CharSpan> attrProvider =
         gLaundryWasherManager->getSpinSpeedProvider(aPath.mEndpointId);
-    if (attrProvider.begin() == nullptr)
-    {
-        aEncoder.EncodeEmptyList();
-        return CHIP_NO_ERROR;
-    }
+    aEncoder.EncodeEmptyList();
     CHIP_ERROR err;
     err = aEncoder.EncodeList([attrProvider](const auto & encoder) -> CHIP_ERROR {
         const auto * end = attrProvider.end();
@@ -80,13 +76,9 @@ CHIP_ERROR LaundryWasherControlsAttrAccess::ReadSupportedRinses(const ConcreteRe
                                                                 AttributeValueEncoder & aEncoder)
 {
     const LaundryWasherControls::LaundryWasherManager * gLaundryWasherManager = LaundryWasherControls::getLaundryWasherManager();
-    const LaundryWasherControls::LaundryWasherManager::AttributeProvider<NumberOfRinsesEnum> attrProvider =
+    const LaundryWasherControls::LaundryWasherManager::AttributeProvider<const NumberOfRinsesEnum> attrProvider =
         gLaundryWasherManager->getSupportedRinseProvider(aPath.mEndpointId);
-    if (attrProvider.begin() == nullptr)
-    {
-        aEncoder.EncodeEmptyList();
-        return CHIP_NO_ERROR;
-    }
+    aEncoder.EncodeEmptyList();
     CHIP_ERROR err;
     err = aEncoder.EncodeList([attrProvider](const auto & encoder) -> CHIP_ERROR {
         const auto * end = attrProvider.end();
@@ -119,11 +111,6 @@ CHIP_ERROR LaundryWasherControlsAttrAccess::Read(const ConcreteReadAttributePath
     return CHIP_NO_ERROR;
 }
 } // namespace
-
-void emberAfLaundryWasherControlsClusterInitCallback(chip::EndpointId endpoint)
-{
-    return;
-}
 
 LaundryWasherControlsAttrAccess gAttrAccess;
 
