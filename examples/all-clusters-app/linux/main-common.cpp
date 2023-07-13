@@ -51,6 +51,10 @@ chip::app::Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManage
 
 } // namespace
 
+#ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
+extern void MatterOperationalStateServerInit();
+#endif
+
 void OnIdentifyStart(::Identify *)
 {
     ChipLogProgress(Zcl, "OnIdentifyStart");
@@ -167,6 +171,9 @@ void ApplicationInit()
         gExampleDeviceInstanceInfoProvider.Init(defaultProvider);
         SetDeviceInstanceInfoProvider(&gExampleDeviceInstanceInfoProvider);
     }
+#ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
+    MatterOperationalStateServerInit();
+#endif
 }
 
 void ApplicationExit()
