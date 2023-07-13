@@ -226,6 +226,7 @@ struct ResolveContext : public GenericContext
     DnssdResolveCallback callback;
     std::map<uint32_t, InterfaceInfo> interfaces;
     DNSServiceProtocol protocol;
+    DnssdServiceProtocol protocolType;
     std::string instanceName;
     std::shared_ptr<uint32_t> consumerCounter;
     BrowseContext * const browseThatCausedResolve; // Can be null
@@ -235,6 +236,8 @@ struct ResolveContext : public GenericContext
                    const char * instanceNameToResolve, BrowseContext * browseCausingResolve,
                    std::shared_ptr<uint32_t> && consumerCounterToUse);
     ResolveContext(CommissioningResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
+                   const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse);
+    ResolveContext(OperationalResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
                    const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse);
     virtual ~ResolveContext();
 

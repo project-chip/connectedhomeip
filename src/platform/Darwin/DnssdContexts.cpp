@@ -29,22 +29,41 @@ namespace {
 constexpr uint8_t kDnssdKeyMaxSize          = 32;
 constexpr uint8_t kDnssdTxtRecordMaxEntries = 20;
 constexpr const char * kLocalDot            = "local.";
+constexpr const char * kDotLocalDot         = ".local.";
+constexpr const char * kUdpSuffix           = "_matterc._udp";
+constexpr const char * kTcpSuffix           = "_matter._tcp";
 
 bool IsLocalDomain(const char * domain)
 {
     return strcmp(kLocalDot, domain) == 0;
 }
 
-std::string GetHostNameWithoutDomain(const char * hostnameWithDomain)
+std::string GetStrWithoutDomain(const char * strWithDomain)
 {
-    std::string hostname(hostnameWithDomain);
-    size_t position = hostname.find(".");
+    std::string str(strWithDomain);
+    size_t position = str.find(kDotLocalDot);
     if (position != std::string::npos)
     {
-        hostname.erase(position);
+        str.erase(position);
     }
 
-    return hostname;
+    return str;
+}
+
+DnssdServiceProtocol GetProtocolType(std::string fullname)
+{
+    DnssdServiceProtocol protocol = DnssdServiceProtocol::kDnssdProtocolUnknown;
+
+    if (fullname.find(kUdpSuffix) != std::string::npos)
+    {
+        protocol = DnssdServiceProtocol::kDnssdProtocolUdp;
+    }
+    else if (fullname.find(kTcpSuffix) != std::string::npos)
+    {
+        protocol = DnssdServiceProtocol::kDnssdProtocolTcp;
+    }
+
+    return protocol;
 }
 
 void GetTextEntries(DnssdService & service, const unsigned char * data, uint16_t len)
@@ -470,6 +489,7 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
     context         = cbContext;
     callback        = cb;
     protocol        = GetProtocol(cbAddressType);
+    protocolType    = DnssdServiceProtocol::kDnssdProtocolUnknown;
     instanceName    = instanceNameToResolve;
     consumerCounter = std::move(consumerCounterToUse);
 }
@@ -482,6 +502,20 @@ ResolveContext::ResolveContext(CommissioningResolveDelegate * delegate, chip::In
     context         = delegate;
     callback        = nullptr;
     protocol        = GetProtocol(cbAddressType);
+    protocolType    = DnssdServiceProtocol::kDnssdProtocolUdp;
+    instanceName    = instanceNameToResolve;
+    consumerCounter = std::move(consumerCounterToUse);
+}
+
+ResolveContext::ResolveContext(OperationalResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
+                               const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse) :
+    browseThatCausedResolve(nullptr)
+{
+    type            = ContextType::Resolve;
+    context         = delegate;
+    callback        = nullptr;
+    protocol        = GetProtocol(cbAddressType);
+    protocolType    = DnssdServiceProtocol::kDnssdProtocolTcp;
     instanceName    = instanceNameToResolve;
     consumerCounter = std::move(consumerCounterToUse);
 }
@@ -532,10 +566,32 @@ void ResolveContext::DispatchSuccess()
         auto addresses = Span<Inet::IPAddress>(ips.data(), ips.size());
         if (nullptr == callback)
         {
-            auto delegate = static_cast<CommissioningResolveDelegate *>(context);
-            DiscoveredNodeData nodeData;
-            service.ToDiscoveredNodeData(addresses, nodeData);
-            delegate->OnNodeDiscovered(nodeData);
+            VerifyOrDie(protocolType == service.mProtocol);
+            if (protocolType == DnssdServiceProtocol::kDnssdProtocolUdp)
+            {
+                auto delegate = static_cast<CommissioningResolveDelegate *>(context);
+                DiscoveredNodeData nodeData;
+                service.ToDiscoveredNodeData(addresses, nodeData);
+                delegate->OnNodeDiscovered(nodeData);
+            }
+            else if (protocolType == DnssdServiceProtocol::kDnssdProtocolTcp)
+            {
+                auto delegate = static_cast<OperationalResolveDelegate *>(context);
+                ResolvedNodeData nodeData;
+                auto error = service.ToResolvedNodeData(addresses, nodeData);
+                if (CHIP_NO_ERROR == error)
+                {
+                    delegate->OnOperationalNodeResolved(nodeData);
+                }
+                else
+                {
+                    delegate->OnOperationalNodeResolutionFailed(PeerId(), error);
+                }
+            }
+            else
+            {
+                chipDie(); // This should not happens.
+            }
         }
         else
         {
@@ -640,6 +696,9 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     InterfaceInfo interface;
     interface.service.mPort = ntohs(port);
 
+    auto nameWithoutDomain      = GetStrWithoutDomain(fullname);
+    interface.service.mProtocol = GetProtocolType(nameWithoutDomain);
+
     if (kDNSServiceInterfaceIndexLocalOnly == interfaceId)
     {
         // Set interface to ANY (0) - network stack can decide how to route this.
@@ -652,7 +711,7 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
 
     // The hostname parameter contains the hostname followed by the domain. But the mHostName field is sized
     // to contain either a 12 bytes mac address or an extended address of at most 16 bytes, not the domain name.
-    auto hostname = GetHostNameWithoutDomain(hostnameWithDomain);
+    auto hostname = GetStrWithoutDomain(hostnameWithDomain);
     Platform::CopyString(interface.service.mHostName, hostname.c_str());
     Platform::CopyString(interface.service.mName, fullname);
 

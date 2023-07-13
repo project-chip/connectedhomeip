@@ -82,6 +82,7 @@ struct DnssdService
     uint32_t mTtlSeconds = 120;
 
     void ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData);
+    CHIP_ERROR ToResolvedNodeData(const Span<Inet::IPAddress> & addresses, ResolvedNodeData & nodeData);
 };
 
 /**
@@ -277,7 +278,7 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
 /**
- * This function resolves the services published by mDNS
+ * This function resolves the commissionable services published by mDNS
  *
  * @param[in] browseResult  The service entry returned by @ref ChipDnssdBrowse
  * @param[in] interface     The interface to send queries.
@@ -290,6 +291,20 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
  */
 CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId interface,
                             CommissioningResolveDelegate * delegate);
+
+/**
+ * This function resolves the operational services published by mDNS
+ *
+ * @param[in] browseResult  The service entry returned by @ref ChipDnssdBrowse
+ * @param[in] interface     The interface to send queries.
+ * @param[in] delegate      The delegate to notify when a service is resolved.
+ *
+ * @retval CHIP_NO_ERROR                The resolve succeeds.
+ * @retval CHIP_ERROR_INVALID_ARGUMENT  The name, type or delegate is nullptr.
+ * @retval Error code                   The resolve fails.
+ *
+ */
+CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId interface, OperationalResolveDelegate * delegate);
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
 /**
