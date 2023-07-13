@@ -69,10 +69,10 @@ constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(Clusters::
 constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Clusters::ResourceMonitoring::Feature::kCondition) |
                                                      static_cast<uint32_t>(Clusters::ResourceMonitoring::Feature::kWarning) };
 
-Clusters::ResourceMonitoring::HepaFilterMonitoringInstance
+static Clusters::ResourceMonitoring::HepaFilterMonitoringInstance
     gHepafilterInstance(0x1, Clusters::HepaFilterMonitoring::Id, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                         Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);
-Clusters::ResourceMonitoring::ActivatedCarbonFilterMonitoringInstance
+static Clusters::ResourceMonitoring::ActivatedCarbonFilterMonitoringInstance
     gActivatedCarbonFilterInstance(0x1, Clusters::ActivatedCarbonFilterMonitoring::Id, static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()),
                                    Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);
 
