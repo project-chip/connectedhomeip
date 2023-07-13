@@ -29,8 +29,7 @@ namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
 
-static constexpr std::array<ClusterId, 12> AliasedClusters = { 0x0071, 0x0072, 0x0073, 0x0074, 0x0075, 0x0076,
-                                                               0x0077, 0x0078, 0x0079, 0x007a, 0x007b, 0x007c };
+static constexpr std::array<ClusterId, 12> AliasedClusters = { 0x0071, 0x0072 };
 
 // Enum for ChangeIndicationEnum
 enum class ChangeIndicationEnum : uint8_t
