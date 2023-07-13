@@ -257,15 +257,8 @@ void Instance::HandleResetCondition(HandlerContext & ctx,
                                     const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData)
 {
 
-    Status resetConditionSuccessful = OnResetCondition();
-    if (Status::Success != resetConditionSuccessful)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, resetConditionSuccessful);
-        return;
-    }
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
-    ChipLogProgress(Zcl, "ResourceMonitoring: HandleResetCondition reset done");
+    Status resetConditionStatus = OnResetCondition();
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, resetConditionStatus);
 }
 
 template <typename RequestT, typename FuncT>
