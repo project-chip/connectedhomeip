@@ -16120,10 +16120,11 @@ struct TypeInfo
 } // namespace Attributes
 namespace Events {
 namespace SmokeAlarm {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
 enum class Fields : uint8_t
 {
+    kAlarmSeverityLevel = 0,
 };
 
 struct Type
@@ -16134,6 +16135,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
+
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
@@ -16143,15 +16146,18 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SmokeAlarm::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace SmokeAlarm
 namespace COAlarm {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
 enum class Fields : uint8_t
 {
+    kAlarmSeverityLevel = 0,
 };
 
 struct Type
@@ -16162,6 +16168,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
+
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
@@ -16171,6 +16179,8 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::COAlarm::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -16180,6 +16190,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
+    kAlarmSeverityLevel = 0,
 };
 
 struct Type
@@ -16190,6 +16201,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
+
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
@@ -16199,6 +16212,8 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LowBattery::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -16344,10 +16359,11 @@ public:
 };
 } // namespace MuteEnded
 namespace InterconnectSmokeAlarm {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
 enum class Fields : uint8_t
 {
+    kAlarmSeverityLevel = 0,
 };
 
 struct Type
@@ -16358,6 +16374,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
+
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
@@ -16367,15 +16385,18 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::InterconnectSmokeAlarm::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace InterconnectSmokeAlarm
 namespace InterconnectCOAlarm {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
 enum class Fields : uint8_t
 {
+    kAlarmSeverityLevel = 0,
 };
 
 struct Type
@@ -16386,6 +16407,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
+
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
@@ -16395,6 +16418,8 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::InterconnectCOAlarm::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

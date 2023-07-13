@@ -3208,13 +3208,16 @@ client cluster SmokeCoAlarm = 92 {
     kCOAlarm = 0x2;
   }
 
-  info event SmokeAlarm = 0 {
+  critical event SmokeAlarm = 0 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
-  info event COAlarm = 1 {
+  critical event COAlarm = 1 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
   info event LowBattery = 2 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
   info event HardwareFault = 3 {
@@ -3232,10 +3235,12 @@ client cluster SmokeCoAlarm = 92 {
   info event MuteEnded = 7 {
   }
 
-  info event InterconnectSmokeAlarm = 8 {
+  critical event InterconnectSmokeAlarm = 8 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
-  info event InterconnectCOAlarm = 9 {
+  critical event InterconnectCOAlarm = 9 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
   info event AllClear = 10 {
