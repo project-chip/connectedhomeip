@@ -138,7 +138,7 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-              
+
 
     - label: "TH send a ChangeToMode command to the DUT with NewMode set to new_mode_th"
       verification: |
@@ -191,4 +191,3 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-              

@@ -36,7 +36,7 @@ tests:
 
           ./chip-tool dishwashermodeselect write on-mode 4 1 1
       disabled: true
-    
+
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -271,4 +271,3 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-              

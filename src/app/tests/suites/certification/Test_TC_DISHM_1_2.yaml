@@ -106,8 +106,8 @@ tests:
               - name: "message"
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
-                value: "y"   
-              
+                value: "y"
+
 
     - label: "TH reads the OnMode attribute from the DUT"
       verification: |
@@ -127,7 +127,7 @@ tests:
               - name: "message"
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
-                value: "y"              
+                value: "y"
 
     - label: "TH reads the StartUpMode attribute from the DUT"
       verification: |
@@ -146,7 +146,7 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-              
+
 
     - label: "TH reads the Description attribute from the DUT"
       verification: |

@@ -67,9 +67,9 @@ tests:
                 value: old_current_mode_dut
       response:
           value: ""
-          constraints:    
+          constraints:
               type: char_string
-              
+
 
     - label: "TH send a ChangeToMode command to the DUT with NewMode set to new_mode_th"
       PICS: DISHM.S.C01.Rsp
@@ -85,14 +85,14 @@ tests:
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
-          values: 
+          values:
             - name: "new_mode_th"
               value: new_mode_th
           constraints:
               type: int16u
-              
 
-  
+
+
     - label: "TH send a ChangeToMode command to the DUT with NewMode set to new_mode_th"
       PICS: DISHM.S.C01.Rsp
       command: "writeAttribute"
@@ -105,4 +105,3 @@ tests:
           value: 1
           constraints:
               type: int16u
-              
