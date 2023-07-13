@@ -188,10 +188,11 @@ def compare_time(received: int, offset: timedelta = timedelta(), utc: int = None
     if utc is None:
         utc = utc_time_in_matter_epoch()
 
-    expected = utc + offset.microseconds
+    # total seconds includes fractional for microseconds
+    expected = utc + offset.total_seconds()*1000000
     delta_us = abs(expected - received)
     delta = timedelta(microseconds=delta_us)
-    asserts.assert_less(delta, tolerance, "Received time is out of tolerance")
+    asserts.assert_less_equal(delta, tolerance, "Received time is out of tolerance")
 
 
 @dataclass
@@ -509,8 +510,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs)
         return result
 
-    def print_step(self, stepnum: int, title: str) -> None:
-        logging.info('***** Test Step %d : %s', stepnum, title)
+    def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
+        logging.info(f'***** Test Step {stepnum} : {title}')
 
     def record_error(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation], problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.ERROR, problem, spec_location))
@@ -573,14 +574,15 @@ def byte_string_from_hex(s: str) -> bytes:
     return unhexlify(s.replace(":", "").replace(" ", "").replace("0x", ""))
 
 
-def int_from_manual_code(s: str) -> int:
-    s = s.replace('-', '')
+def str_from_manual_code(s: str) -> str:
+    """Enforces legal format for manual codes and removes spaces/dashes."""
+    s = s.replace("-", "").replace(" ", "")
     regex = r"^([0-9]{11}|[0-9]{21})$"
     match = re.match(regex, s)
     if not match:
         raise ValueError("Invalid manual code format, does not match %s" % regex)
 
-    return int(s, 10)
+    return s
 
 
 def int_named_arg(s: str) -> Tuple[str, int]:
@@ -700,7 +702,7 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     # TODO: this should also allow multiple once QR and manual codes are supported.
     config.qr_code_content = args.qr_code
     if args.manual_code:
-        config.manual_code = "%d" % args.manual_code
+        config.manual_code = args.manual_code
     else:
         config.manual_code = None
 
@@ -884,7 +886,7 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
 
     code_group.add_argument('-q', '--qr-code', type=str,
                             metavar="QR_CODE", help="QR setup code content (overrides passcode and discriminator)")
-    code_group.add_argument('--manual-code', type=int_from_manual_code,
+    code_group.add_argument('--manual-code', type=str_from_manual_code,
                             metavar="MANUAL_CODE", help="Manual setup code content (overrides passcode and discriminator)")
 
     fabric_group = parser.add_argument_group(

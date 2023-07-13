@@ -198,9 +198,8 @@ public class ClusterInfoMapping {
     }
   }
   {{#zcl_clusters}}
-    {{#all_user_cluster_generated_commands}}
-      {{#if_compare clusterId ../id operator='=='}}
-        {{#if (is_str_equal commandSource 'server')}}
+    {{#zcl_commands}}
+        {{#if (is_str_equal source 'server')}}
       public static class Delegated{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Callback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}Callback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
@@ -235,8 +234,7 @@ public class ClusterInfoMapping {
       }
 
         {{/if}}
-    {{/if_compare}}
-  {{/all_user_cluster_generated_commands}}
+  {{/zcl_commands}}
       {{#zcl_attributes_server removeKeys='isOptional'}}
       {{#if_unsupported_attribute_callback type isArray ../id}}
       {{else}}
@@ -311,9 +309,8 @@ public class ClusterInfoMapping {
      Map<String, Map<String, InteractionInfo>> commandMap = new HashMap<>();
      {{#zcl_clusters}}
      Map<String, InteractionInfo> {{asLowerCamelCase name}}ClusterInteractionInfoMap = new LinkedHashMap<>();
-      {{#all_user_cluster_generated_commands}}
-        {{#if_compare clusterId ../id operator='=='}}
-          {{#if (is_str_equal commandSource 'client')}}
+      {{#zcl_commands}}
+          {{#if (is_str_equal source 'client')}}
      Map<String, CommandParameterInfo> {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
      {{! TODO: fill out parameter types }}
      {{#if hasArguments}}
@@ -362,8 +359,7 @@ public class ClusterInfoMapping {
      {{/if}}
        {{asLowerCamelCase ../name}}ClusterInteractionInfoMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}InteractionInfo);
           {{/if}}
-        {{/if_compare}}
-      {{/all_user_cluster_generated_commands}}
+      {{/zcl_commands}}
      commandMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}ClusterInteractionInfoMap);
      {{/zcl_clusters}}
      return commandMap;

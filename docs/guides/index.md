@@ -47,6 +47,8 @@ esp32/README
 -   [Python Matter-Repl](./matter-repl.md)
 -   [python-chip-controller - Advanced](./python_chip_controller_advanced_usage.md)
 -   [python-chip-controller - Building](./python_chip_controller_building.md)
+-   [CHEF test devices](../../examples/chef/README.md)
+    -   [New device type adding](../../examples/chef/NEW_CHEF_DEVICES.md)
 
 ## Development Guides
 

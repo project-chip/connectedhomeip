@@ -23,6 +23,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/concentration-measurement-clu
 load "../src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/dishwasher-alarm-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/dishwasher-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml";
@@ -65,6 +66,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/relative-humidity-measurement
 load "../src/app/zap-templates/zcl/data-model/chip/rvc-clean-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/rvc-run-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/scene.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/smoke-co-alarm-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/switch-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/target-navigator-cluster.xml";
@@ -120,7 +122,7 @@ endpoint 0 {
   // reject server cluster Scenes;
   // reject server cluster Groups;
 
-  // Required only if !CustomNetworkConfig. 
+  // Required only if !CustomNetworkConfig.
   // require server cluster NetworkCommissioning;
 
   // If Ethernet

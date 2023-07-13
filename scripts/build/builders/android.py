@@ -210,7 +210,6 @@ class AndroidBuilder(Builder):
         #   If we unify the JNI libraries, libc++_shared.so may not be needed anymore, which could
         # be another path of resolving this inconsistency.
         for libName in [
-            "libOnboardingPayload.so",
             "libCHIPController.so",
             "libc++_shared.so",
         ]:
@@ -397,8 +396,6 @@ class AndroidBuilder(Builder):
                     title="Accepting NDK licenses @ tools",
                 )
 
-            app_dir = os.path.join(self.root, "examples/", self.app.AppName())
-
     def stripSymbols(self):
         output_libs_dir = os.path.join(
             self.output_dir,
@@ -478,8 +475,7 @@ class AndroidBuilder(Builder):
                     self.root, "examples/", self.app.ExampleName(), "android/App/app/libs"
                 )
 
-                libs = ["libOnboardingPayload.so",
-                        "libc++_shared.so", "libTvApp.so"]
+                libs = ["libc++_shared.so", "libTvApp.so"]
 
                 jars = {
                     "OnboardingPayload.jar": "third_party/connectedhomeip/src/controller/java/OnboardingPayload.jar",
@@ -539,14 +535,6 @@ class AndroidBuilder(Builder):
                     self.output_dir,
                     "lib",
                     "src/controller/java/OnboardingPayload.jar",
-                ),
-                "jni/%s/libOnboardingPayload.so"
-                % self.board.AbiName(): os.path.join(
-                    self.output_dir,
-                    "lib",
-                    "jni",
-                    self.board.AbiName(),
-                    "libOnboardingPayload.so",
                 ),
                 "jni/%s/libCHIPController.so"
                 % self.board.AbiName(): os.path.join(

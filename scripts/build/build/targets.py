@@ -28,7 +28,7 @@ from builders.k32w import K32WApp, K32WBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
-from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder
+from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.ti import TIApp, TIBoard, TIBuilder
@@ -349,6 +349,7 @@ def BuildMbedTarget():
         TargetPart('all-clusters', app=MbedApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=MbedApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('pigweed', app=MbedApp.PIGWEED),
+        TargetPart('ota-requestor', app=MbedApp.OTA_REQUESTOR),
         TargetPart('shell', app=MbedApp.SHELL),
     ])
 
@@ -542,7 +543,7 @@ def BuildQorvoTarget():
         TargetPart('qpg6105', board=QpgBoard.QPG6105),
     ])
 
-   # apps
+    # apps
     target.AppendFixedTargets([
         TargetPart('lock', app=QpgApp.LOCK),
         TargetPart('light', app=QpgApp.LIGHT),
@@ -584,18 +585,13 @@ def BuildBouffalolabTarget():
 
     # Boards
     target.AppendFixedTargets([
-        TargetPart('BL602-IoT-Matter-V1',
-                   board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
-        TargetPart('BL602-IOT-DVK-3S',
-                   board=BouffalolabBoard.BL602_IOT_DVK_3S, module_type="BL602"),
-        TargetPart('BL602-NIGHT-LIGHT',
-                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
-        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit,
-                   module_type="BL706C-22"),
-        TargetPart('BL706-IoT-DVK', board=BouffalolabBoard.BL706_IoT_DVK,
-                   module_type="BL706C-22"),
-        TargetPart('BL706-NIGHT-LIGHT',
-                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
+        TargetPart('BL602-IoT-Matter-V1', board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
+        TargetPart('BL602-IOT-DVK-3S', board=BouffalolabBoard.BL602_IOT_DVK_3S, module_type="BL602"),
+        TargetPart('BL602-NIGHT-LIGHT', board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
+        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit, module_type="BL706C-22"),
+        TargetPart('BL706-IoT-DVK', board=BouffalolabBoard.BL706_IoT_DVK, module_type="BL706C-22"),
+        TargetPart('BL706-NIGHT-LIGHT', board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
+        TargetPart('BL704L-DVK', board=BouffalolabBoard.BL704L_DVK, module_type="BL704L"),
     ])
 
     # Apps
@@ -678,6 +674,10 @@ def BuildOpenIotSdkTargets():
         TargetPart('shell', app=OpenIotSdkApp.SHELL),
         TargetPart('lock', app=OpenIotSdkApp.LOCK),
     ])
+
+    # Modifiers
+    target.AppendModifier('mbedtls', crypto=OpenIotSdkCryptoBackend.MBEDTLS).ExceptIfRe('-(psa)')
+    target.AppendModifier('psa', crypto=OpenIotSdkCryptoBackend.PSA).ExceptIfRe('-(mbedtls)')
 
     return target
 

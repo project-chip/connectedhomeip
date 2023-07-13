@@ -51,6 +51,7 @@ class DeviceCommissioner;
 class SetUpCodePairerParameters : public RendezvousParameters
 {
 public:
+    SetUpCodePairerParameters() = default;
     SetUpCodePairerParameters(const Dnssd::CommonResolutionData & data, size_t index);
 #if CONFIG_NETWORK_LAYER_BLE
     SetUpCodePairerParameters(BLE_CONNECTION_OBJECT connObj, bool connected = true);

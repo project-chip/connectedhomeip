@@ -6,18 +6,10 @@ temperature from local sensor.
 ---
 
 -   [Matter ASR Thermostat Example](#matter-asr-thermostat-example)
-    -   [Supported Chips](#supported-chips)
     -   [Building and Commissioning](#building-and-commissioning)
     -   [Cluster Control](#cluster-control)
 
 ---
-
-## Supported Chips
-
-The Matter demo application is supported on:
-
--   ASR582X
--   ASR595X
 
 ## Building and Commissioning
 

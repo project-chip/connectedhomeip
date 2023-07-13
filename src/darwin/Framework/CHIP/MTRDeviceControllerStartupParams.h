@@ -17,6 +17,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRCertificates.h>
+#import <Matter/MTRDefines.h>
 #import <Matter/MTROperationalCertificateIssuer.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -154,7 +155,8 @@ NS_ASSUME_NONNULL_BEGIN
  * If not nil, must contain at most 3 numbers, which are expected to be 32-bit
  * unsigned Case Authenticated Tag values.
  */
-@property (nonatomic, copy, nullable) NSSet<NSNumber *> * caseAuthenticatedTags MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, nullable)
+    NSSet<NSNumber *> * caseAuthenticatedTags API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Root certificate, in X.509 DER form, to use.

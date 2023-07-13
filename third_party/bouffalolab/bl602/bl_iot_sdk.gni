@@ -856,6 +856,8 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_lwip") {
+    include_dirs = [ "${bl_iot_sdk_root}/components/network/lwip_dhcpd" ]
+
     sources = [
       "${bl_iot_sdk_root}/components/network/lwip/lwip-port/FreeRTOS/ethernetif.c",
       "${bl_iot_sdk_root}/components/network/lwip/lwip-port/FreeRTOS/sys_arch.c",

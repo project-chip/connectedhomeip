@@ -22,11 +22,7 @@
 namespace chip {
 namespace Crypto {
 
-#ifdef ENABLE_HSM_HKDF
-using HKDF_sha_crypto = HKDF_shaHSM;
-#else
 using HKDF_sha_crypto = HKDF_sha;
-#endif
 
 CHIP_ERROR RawKeySessionKeystore::CreateKey(const Aes128KeyByteArray & keyMaterial, Aes128KeyHandle & key)
 {
