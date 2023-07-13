@@ -363,9 +363,8 @@ public:
      * available in the ReadPrepareParams.  When this is used, the ReadClient is
      * responsible for setting up the CASE session itself.
      *
-     * When using this version of SendAutoResubscribeRequest, the
-     * ReadPrepareParams should have a reference to a session, and if it does
-     * have one that session will be ignored.
+     * When using this version of SendAutoResubscribeRequest, any session to
+     * which ReadPrepareParams has a reference will be ignored.
      */
     CHIP_ERROR SendAutoResubscribeRequest(const ScopedNodeId & aPublisherId, ReadPrepareParams && aReadPrepareParams);
 
