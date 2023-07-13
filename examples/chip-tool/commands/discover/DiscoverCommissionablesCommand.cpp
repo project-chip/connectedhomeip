@@ -40,7 +40,7 @@ CHIP_ERROR DiscoverCommissionablesStartCommand::RunCommand()
 {
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
     VerifyOrReturnError(IsInteractive(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(GetDeviceScanner().Start());
+    ReturnErrorOnFailure(GetDeviceScanner().StartCommissionableDiscovery());
 
     SetCommandExitStatus(CHIP_NO_ERROR);
     return CHIP_NO_ERROR;
