@@ -19,7 +19,7 @@
 
 #include "tracing/enabled_features.h"
 
-#include <tracing/log_json/log_json_tracing.h>
+#include <tracing/json/json_tracing.h>
 
 #if ENABLE_PERFETTO_TRACING
 #include <tracing/perfetto/file_output.h>      // nogncheck
@@ -29,9 +29,9 @@
 /// A string with supported command line tracing targets
 /// to be pretty-printed in help strings if needed
 #if ENABLE_PERFETTO_TRACING
-#define SUPPORTED_COMMAND_LINE_TRACING_TARGETS "log, perfetto, perfetto:<path>"
+#define SUPPORTED_COMMAND_LINE_TRACING_TARGETS "json:log, json:<path>, perfetto, perfetto:<path>"
 #else
-#define SUPPORTED_COMMAND_LINE_TRACING_TARGETS "log"
+#define SUPPORTED_COMMAND_LINE_TRACING_TARGETS "json:log, json:<path>"
 #endif
 
 namespace chip {
@@ -44,7 +44,7 @@ public:
     ~TracingSetup() { StopTracing(); }
 
     /// Enable tracing based on the given command line argument
-    /// like "log" or "log,perfetto" or similar
+    /// like "json:log" or "json:/tmp/foo.txt,perfetto" or similar
     ///
     /// Single arguments as well as comma separated ones are accepted.
     ///
@@ -57,7 +57,7 @@ public:
     void StopTracing();
 
 private:
-    ::chip::Tracing::LogJson::LogJsonBackend mLogJsonBackend;
+    ::chip::Tracing::Json::JsonBackend mJsonBackend;
 
 #if ENABLE_PERFETTO_TRACING
     chip::Tracing::Perfetto::FileTraceOutput mPerfettoFileOutput;

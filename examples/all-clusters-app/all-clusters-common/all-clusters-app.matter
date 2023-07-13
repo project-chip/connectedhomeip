@@ -2542,6 +2542,66 @@ server cluster AirQuality = 91 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
+server cluster OperationalState = 96 {
+  enum ErrorStateEnum : ENUM8 {
+    kNoError = 0;
+    kUnableToStartOrResume = 1;
+    kUnableToCompleteOperation = 2;
+    kCommandInvalidInState = 3;
+  }
+
+  enum OperationalStateEnum : ENUM8 {
+    kStopped = 0;
+    kRunning = 1;
+    kPaused = 2;
+    kError = 3;
+  }
+
+  struct ErrorStateStruct {
+    enum8 errorStateID = 0;
+    optional char_string<64> errorStateLabel = 1;
+    optional char_string<64> errorStateDetails = 2;
+  }
+
+  struct OperationalStateStruct {
+    enum8 operationalStateID = 0;
+    optional char_string<64> operationalStateLabel = 1;
+  }
+
+  critical event OperationalError = 0 {
+    ErrorStateStruct errorState = 0;
+  }
+
+  info event OperationCompletion = 1 {
+    ENUM8 completionErrorCode = 0;
+    optional nullable elapsed_s totalOperationalTime = 1;
+    optional nullable elapsed_s pausedTime = 2;
+  }
+
+  readonly attribute nullable CHAR_STRING phaseList[] = 0;
+  readonly attribute nullable int8u currentPhase = 1;
+  readonly attribute nullable elapsed_s countdownTime = 2;
+  readonly attribute OperationalStateStruct operationalStateList[] = 3;
+  readonly attribute OperationalStateStruct operationalState = 4;
+  readonly attribute ErrorStateStruct operationalError = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct OperationalCommandResponse = 4 {
+    ErrorStateStruct commandResponseState = 0;
+  }
+
+  command Pause(): OperationalCommandResponse = 0;
+  command Stop(): OperationalCommandResponse = 1;
+  command Start(): OperationalCommandResponse = 2;
+  command Resume(): OperationalCommandResponse = 3;
+}
+
 /** Attributes and commands for monitoring HEPA filters in a device */
 server cluster HepaFilterMonitoring = 113 {
   enum ChangeIndicationEnum : ENUM8 {
@@ -2555,9 +2615,22 @@ server cluster HepaFilterMonitoring = 113 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2585,9 +2658,22 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2615,9 +2701,22 @@ server cluster CeramicFilterMonitoring = 115 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2645,9 +2744,22 @@ server cluster ElectrostaticFilterMonitoring = 116 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2675,9 +2787,22 @@ server cluster UvFilterMonitoring = 117 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2705,9 +2830,22 @@ server cluster IonizingFilterMonitoring = 118 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2735,9 +2873,22 @@ server cluster ZeoliteFilterMonitoring = 119 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2765,9 +2916,22 @@ server cluster OzoneFilterMonitoring = 120 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2795,9 +2959,22 @@ server cluster WaterTankMonitoring = 121 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2825,9 +3002,22 @@ server cluster FuelTankMonitoring = 122 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2855,9 +3045,22 @@ server cluster InkCartridgeMonitoring = 123 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2885,9 +3088,22 @@ server cluster TonerCartridgeMonitoring = 124 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -6338,6 +6554,23 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 15;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OperationalState {
+    emits event OperationalError;
+    emits event OperationCompletion;
+    callback attribute phaseList;
+    callback attribute currentPhase;
+    callback attribute countdownTime;
+    callback attribute operationalStateList;
+    callback attribute operationalState;
+    callback attribute operationalError;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 

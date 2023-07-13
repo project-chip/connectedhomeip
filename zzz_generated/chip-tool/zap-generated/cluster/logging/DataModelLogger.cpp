@@ -1827,6 +1827,318 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierType", indent + 1, value.productIdentifierType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierValue", indent + 1, value.productIdentifierValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierValue'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierType", indent + 1, value.productIdentifierType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierValue", indent + 1, value.productIdentifierValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierValue'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierType", indent + 1, value.productIdentifierType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierValue", indent + 1, value.productIdentifierValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierValue'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierType", indent + 1, value.productIdentifierType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierValue", indent + 1, value.productIdentifierValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierValue'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierType", indent + 1, value.productIdentifierType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierValue", indent + 1, value.productIdentifierValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierValue'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierType", indent + 1, value.productIdentifierType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierValue", indent + 1, value.productIdentifierValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierValue'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierType", indent + 1, value.productIdentifierType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierValue", indent + 1, value.productIdentifierValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierValue'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierType", indent + 1, value.productIdentifierType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierValue", indent + 1, value.productIdentifierValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierValue'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierType", indent + 1, value.productIdentifierType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierValue", indent + 1, value.productIdentifierValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierValue'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierType", indent + 1, value.productIdentifierType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierValue", indent + 1, value.productIdentifierValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierValue'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierType", indent + 1, value.productIdentifierType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierValue", indent + 1, value.productIdentifierValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierValue'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierType", indent + 1, value.productIdentifierType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProductIdentifierValue", indent + 1, value.productIdentifierValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductIdentifierValue'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::DoorLock::Structs::CredentialStruct::DecodableType & value)
 {
@@ -8748,6 +9060,18 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
         }
+        case HepaFilterMonitoring::Attributes::LastChangedTime::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastChangedTime", 1, value);
+        }
+        case HepaFilterMonitoring::Attributes::ReplacementProductList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReplacementProductList", 1, value);
+        }
         case HepaFilterMonitoring::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -8803,6 +9127,18 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
+        }
+        case ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastChangedTime", 1, value);
+        }
+        case ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReplacementProductList", 1, value);
         }
         case ActivatedCarbonFilterMonitoring::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -8860,6 +9196,18 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
         }
+        case CeramicFilterMonitoring::Attributes::LastChangedTime::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastChangedTime", 1, value);
+        }
+        case CeramicFilterMonitoring::Attributes::ReplacementProductList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReplacementProductList", 1, value);
+        }
         case CeramicFilterMonitoring::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -8915,6 +9263,18 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
+        }
+        case ElectrostaticFilterMonitoring::Attributes::LastChangedTime::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastChangedTime", 1, value);
+        }
+        case ElectrostaticFilterMonitoring::Attributes::ReplacementProductList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReplacementProductList", 1, value);
         }
         case ElectrostaticFilterMonitoring::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -8972,6 +9332,18 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
         }
+        case UvFilterMonitoring::Attributes::LastChangedTime::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastChangedTime", 1, value);
+        }
+        case UvFilterMonitoring::Attributes::ReplacementProductList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReplacementProductList", 1, value);
+        }
         case UvFilterMonitoring::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -9027,6 +9399,18 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
+        }
+        case IonizingFilterMonitoring::Attributes::LastChangedTime::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastChangedTime", 1, value);
+        }
+        case IonizingFilterMonitoring::Attributes::ReplacementProductList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReplacementProductList", 1, value);
         }
         case IonizingFilterMonitoring::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -9084,6 +9468,18 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
         }
+        case ZeoliteFilterMonitoring::Attributes::LastChangedTime::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastChangedTime", 1, value);
+        }
+        case ZeoliteFilterMonitoring::Attributes::ReplacementProductList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReplacementProductList", 1, value);
+        }
         case ZeoliteFilterMonitoring::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -9139,6 +9535,18 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
+        }
+        case OzoneFilterMonitoring::Attributes::LastChangedTime::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastChangedTime", 1, value);
+        }
+        case OzoneFilterMonitoring::Attributes::ReplacementProductList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReplacementProductList", 1, value);
         }
         case OzoneFilterMonitoring::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -9196,6 +9604,18 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
         }
+        case WaterTankMonitoring::Attributes::LastChangedTime::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastChangedTime", 1, value);
+        }
+        case WaterTankMonitoring::Attributes::ReplacementProductList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReplacementProductList", 1, value);
+        }
         case WaterTankMonitoring::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -9251,6 +9671,18 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
+        }
+        case FuelTankMonitoring::Attributes::LastChangedTime::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastChangedTime", 1, value);
+        }
+        case FuelTankMonitoring::Attributes::ReplacementProductList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReplacementProductList", 1, value);
         }
         case FuelTankMonitoring::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -9308,6 +9740,18 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
         }
+        case InkCartridgeMonitoring::Attributes::LastChangedTime::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastChangedTime", 1, value);
+        }
+        case InkCartridgeMonitoring::Attributes::ReplacementProductList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReplacementProductList", 1, value);
+        }
         case InkCartridgeMonitoring::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -9363,6 +9807,18 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InPlaceIndicator", 1, value);
+        }
+        case TonerCartridgeMonitoring::Attributes::LastChangedTime::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastChangedTime", 1, value);
+        }
+        case TonerCartridgeMonitoring::Attributes::ReplacementProductList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReplacementProductList", 1, value);
         }
         case TonerCartridgeMonitoring::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

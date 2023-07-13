@@ -42,25 +42,25 @@ void DeferredAttribute::Flush(AttributePersistenceProvider & persister)
     mValue.Release();
 }
 
-CHIP_ERROR DeferredAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & path, const ByteSpan & value)
+CHIP_ERROR DeferredAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
 {
     for (DeferredAttribute & da : mDeferredAttributes)
     {
-        if (da.Matches(path))
+        if (da.Matches(aPath))
         {
-            ReturnErrorOnFailure(da.PrepareWrite(System::SystemClock().GetMonotonicTimestamp() + mWriteDelay, value));
+            ReturnErrorOnFailure(da.PrepareWrite(System::SystemClock().GetMonotonicTimestamp() + mWriteDelay, aValue));
             FlushAndScheduleNext();
             return CHIP_NO_ERROR;
         }
     }
 
-    return mPersister.WriteValue(path, value);
+    return mPersister.WriteValue(aPath, aValue);
 }
 
-CHIP_ERROR DeferredAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & path,
-                                                           const EmberAfAttributeMetadata * metadata, MutableByteSpan & value)
+CHIP_ERROR DeferredAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType,
+                                                           size_t aSize, MutableByteSpan & aValue)
 {
-    return mPersister.ReadValue(path, metadata, value);
+    return mPersister.ReadValue(aPath, aType, aSize, aValue);
 }
 
 void DeferredAttributePersistenceProvider::FlushAndScheduleNext()

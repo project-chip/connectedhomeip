@@ -542,62 +542,67 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
     SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kThreadScanResults),
                                                TLV::TLVType::kTLVType_Array, listContainerType));
 
-    VerifyOrExit(scanResponseArray.Alloc(chip::min(networks->Count(), kMaxNetworksInScanResponse)), err = CHIP_ERROR_NO_MEMORY);
-    for (; networks != nullptr && networks->Next(scanResponse);)
+    // If no network was found, we encode an empty list, don't call a zero-sized alloc.
+    if (networks->Count() > 0)
     {
-        if ((scanResponseArrayLength == kMaxNetworksInScanResponse) &&
-            (scanResponseArray[scanResponseArrayLength - 1].rssi > scanResponse.rssi))
+        VerifyOrExit(scanResponseArray.Alloc(chip::min(networks->Count(), kMaxNetworksInScanResponse)), err = CHIP_ERROR_NO_MEMORY);
+        for (; networks != nullptr && networks->Next(scanResponse);)
         {
-            continue;
-        }
+            if ((scanResponseArrayLength == kMaxNetworksInScanResponse) &&
+                (scanResponseArray[scanResponseArrayLength - 1].rssi > scanResponse.rssi))
+            {
+                continue;
+            }
 
-        bool isDuplicated = false;
+            bool isDuplicated = false;
+
+            for (size_t i = 0; i < scanResponseArrayLength; i++)
+            {
+                if ((scanResponseArray[i].panId == scanResponse.panId) &&
+                    (scanResponseArray[i].extendedPanId == scanResponse.extendedPanId))
+                {
+                    if (scanResponseArray[i].rssi < scanResponse.rssi)
+                    {
+                        scanResponseArray[i] = scanResponseArray[--scanResponseArrayLength];
+                    }
+                    else
+                    {
+                        isDuplicated = true;
+                    }
+                    break;
+                }
+            }
+
+            if (isDuplicated)
+            {
+                continue;
+            }
+
+            if (scanResponseArrayLength < kMaxNetworksInScanResponse)
+            {
+                scanResponseArrayLength++;
+            }
+            scanResponseArray[scanResponseArrayLength - 1] = scanResponse;
+            Sorting::InsertionSort(
+                scanResponseArray.Get(), scanResponseArrayLength,
+                [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
+        }
 
         for (size_t i = 0; i < scanResponseArrayLength; i++)
         {
-            if ((scanResponseArray[i].panId == scanResponse.panId) &&
-                (scanResponseArray[i].extendedPanId == scanResponse.extendedPanId))
-            {
-                if (scanResponseArray[i].rssi < scanResponse.rssi)
-                {
-                    scanResponseArray[i] = scanResponseArray[--scanResponseArrayLength];
-                }
-                else
-                {
-                    isDuplicated = true;
-                }
-                break;
-            }
+            Structs::ThreadInterfaceScanResultStruct::Type result;
+            Encoding::BigEndian::Put64(extendedAddressBuffer, scanResponseArray[i].extendedAddress);
+            result.panId           = scanResponseArray[i].panId;
+            result.extendedPanId   = scanResponseArray[i].extendedPanId;
+            result.networkName     = CharSpan(scanResponseArray[i].networkName, scanResponseArray[i].networkNameLen);
+            result.channel         = scanResponseArray[i].channel;
+            result.version         = scanResponseArray[i].version;
+            result.extendedAddress = ByteSpan(extendedAddressBuffer);
+            result.rssi            = scanResponseArray[i].rssi;
+            result.lqi             = scanResponseArray[i].lqi;
+
+            SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), result));
         }
-
-        if (isDuplicated)
-        {
-            continue;
-        }
-
-        if (scanResponseArrayLength < kMaxNetworksInScanResponse)
-        {
-            scanResponseArrayLength++;
-        }
-        scanResponseArray[scanResponseArrayLength - 1] = scanResponse;
-        Sorting::InsertionSort(scanResponseArray.Get(), scanResponseArrayLength,
-                               [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
-    }
-
-    for (size_t i = 0; i < scanResponseArrayLength; i++)
-    {
-        Structs::ThreadInterfaceScanResultStruct::Type result;
-        Encoding::BigEndian::Put64(extendedAddressBuffer, scanResponseArray[i].extendedAddress);
-        result.panId           = scanResponseArray[i].panId;
-        result.extendedPanId   = scanResponseArray[i].extendedPanId;
-        result.networkName     = CharSpan(scanResponseArray[i].networkName, scanResponseArray[i].networkNameLen);
-        result.channel         = scanResponseArray[i].channel;
-        result.version         = scanResponseArray[i].version;
-        result.extendedAddress = ByteSpan(extendedAddressBuffer);
-        result.rssi            = scanResponseArray[i].rssi;
-        result.lqi             = scanResponseArray[i].lqi;
-
-        SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), result));
     }
 
     SuccessOrExit(err = writer->EndContainer(listContainerType));

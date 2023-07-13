@@ -5,19 +5,11 @@ This example demonstrates the Matter Lighting application on ASR platform.
 ---
 
 -   [Matter ASR Lighting Example](#matter-asr-lighting-example)
-    -   [Supported Chips](#supported-chips)
     -   [Building and Commissioning](#building-and-commissioning)
     -   [Cluster Control](#cluster-control)
     -   [Indicate current state of lightbulb](#indicate-current-state-of-lightbulb)
 
 ---
-
-## Supported Chips
-
-The Matter demo application is supported on:
-
--   ASR582X
--   ASR595X
 
 ## Building and Commissioning
 

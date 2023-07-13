@@ -240,6 +240,7 @@
         "ON_OFF_CLUSTER": ["on-off-server"],
         "ON_OFF_SWITCH_CONFIGURATION_CLUSTER": [],
         "OPERATIONAL_CREDENTIALS_CLUSTER": ["operational-credentials-server"],
+        "OPERATIONAL_STATE_CLUSTER": ["operational-state-server"],
         "OTA_BOOTLOAD_CLUSTER": [],
         "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER": ["ota-provider"],
         "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER": ["ota-requestor"],
@@ -305,7 +306,6 @@
         "WATER_TANK_MONITORING_CLUSTER": [],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
         "WINDOW_COVERING_CLUSTER": ["window-covering-server"],
-        "TEMPERATURE_CONTROL_CLUSTER": ["temperature-control-server"],
         "ZEOLITE_FILTER_MONITORING_CLUSTER": [],
         "ZLL_COMMISSIONING_CLUSTER": []
     }

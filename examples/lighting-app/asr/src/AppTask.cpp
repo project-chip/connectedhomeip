@@ -150,12 +150,16 @@ void AppTask::AppTaskMain(void * pvParameter)
     ConfigurationMgr().LogDeviceConfig();
 
     // Print setup info
+#if CONFIG_NETWORK_LAYER_BLE
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+#else
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
+#endif /* CONFIG_NETWORK_LAYER_BLE */
 
-#if (LIGHT_SELECT == LIGHT_SELECT_LED)
-    lightLED.Init(LIGHT_LED); // embedded board light
-#elif (LIGHT_SELECT == LIGHT_SELECT_RGB)
+#ifdef LIGHT_SELECT_RGB
     lightLED.RGB_init();
+#else
+    lightLED.Init(LIGHT_LED);
 #endif
 
     /* get led onoff status and level value */
