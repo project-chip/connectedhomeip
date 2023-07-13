@@ -244,7 +244,7 @@ public:
     }
 
     /*
-     * Set the maximum reporting intervals for the subscription. This SHALL only be called
+     * Set the maximum reporting interval for the subscription. This SHALL only be called
      * from the OnSubscriptionRequested callback above. The restriction is as below
      * MinIntervalFloor ≤ MaxInterval ≤ MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling)
      * Where SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT is set to 60m in the spec.

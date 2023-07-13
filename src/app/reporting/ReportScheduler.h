@@ -41,9 +41,9 @@ public:
     {
     public:
         virtual ~TimerDelegate() {}
-        /// @brief Start a timer for a given context, the report scheduler will always start by trying to cancel an existing timer
-        /// before starting a new one
-        /// @param context context to pass to the timer callback, in this case, a read handler node is passed
+        /// @brief Start a timer for a given context. The report scheduler must always cancel an existing timer for a context (using CancelTimer)
+        /// before starting a new one for that context.
+        /// @param context context to pass to the timer callback.
         /// @param aTimeout time in miliseconds before the timer expires
         virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) = 0;
         /// @brief Cancel a timer for a given context
@@ -70,7 +70,7 @@ public:
         }
         ReadHandler * GetReadHandler() const { return mReadHandler; }
         /// @brief Check if the Node is reportable now, meaning its readhandler was made reportable by attribute dirtying and
-        /// handler state, and minimal time interval last since last report has elapsed, or the maximal time interval since last
+        /// handler state, and minimal time interval since last report has elapsed, or the maximal time interval since last
         /// report has elapsed
         bool IsReportableNow() const
         {

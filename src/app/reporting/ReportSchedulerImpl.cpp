@@ -87,7 +87,7 @@ void ReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aReadHandler)
 CHIP_ERROR ReportSchedulerImpl::RegisterReadHandler(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * newNode = FindReadHandlerNode(aReadHandler);
-    // If the handler is already registered, no need to register it again
+    // Handler must not be registered yet; it's just being constructed.
     VerifyOrDie(nullptr == newNode);
     // The NodePool is the same size as the ReadHandler pool from the IM Engine, so we don't need a check for size here since if a
     // ReadHandler was created, space should be available.
@@ -102,7 +102,7 @@ CHIP_ERROR ReportSchedulerImpl::RegisterReadHandler(ReadHandler * aReadHandler)
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
     Milliseconds32 newTimeout;
     // If the handler is reportable, schedule a report for the min interval, otherwise schedule a report for the max interval
-    if ((newNode->IsReportableNow()))
+    if (newNode->IsReportableNow())
     {
         // If the handler is reportable now, just schedule a report immediately
         newTimeout = Milliseconds32(0);
