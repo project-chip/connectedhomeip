@@ -70,10 +70,10 @@ constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Clust
                                                      static_cast<uint32_t>(Clusters::ResourceMonitoring::Feature::kWarning) };
 
 static Clusters::ResourceMonitoring::HepaFilterMonitoringInstance
-    gHepafilterInstance(0x1, Clusters::HepaFilterMonitoring::Id, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
+    gHepafilterInstance(0x1, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                         Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);
 static Clusters::ResourceMonitoring::ActivatedCarbonFilterMonitoringInstance
-    gActivatedCarbonFilterInstance(0x1, Clusters::ActivatedCarbonFilterMonitoring::Id, static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()),
+    gActivatedCarbonFilterInstance(0x1, static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()),
                                    Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);
 
 } // namespace

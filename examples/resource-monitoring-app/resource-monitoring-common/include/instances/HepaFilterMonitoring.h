@@ -35,10 +35,10 @@ private:
     chip::Protocols::InteractionModel::Status OnResetCondition() override;
 
 public:
-    HepaFilterMonitoringInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature,
+    HepaFilterMonitoringInstance(EndpointId aEndpointId, uint32_t aFeature,
                                  ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
                                  bool aResetConditionCommandSupported) :
-        Instance(aEndpointId, aClusterId, aFeature, aDegradationDirection, aResetConditionCommandSupported){};
+        Instance(aEndpointId, HepaFilterMonitoring::Id, aFeature, aDegradationDirection, aResetConditionCommandSupported){};
 };
 
 } // namespace ResourceMonitoring

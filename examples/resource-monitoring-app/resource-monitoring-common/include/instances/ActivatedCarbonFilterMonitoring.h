@@ -37,10 +37,10 @@ private:
 
 public:
     ActivatedCarbonFilterMonitoringInstance(
-        EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature,
+        EndpointId aEndpointId, uint32_t aFeature,
         ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
         bool aResetConditionCommandSupported) :
-        Instance(aEndpointId, aClusterId, aFeature, aDegradationDirection, aResetConditionCommandSupported){};
+        Instance(aEndpointId, ActivatedCarbonFilterMonitoring::Id, aFeature, aDegradationDirection, aResetConditionCommandSupported){};
 };
 
 } // namespace ResourceMonitoring
