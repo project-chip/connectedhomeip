@@ -17,12 +17,12 @@ name:
     Server
 
 PICS:
-    - SMCO.S
+    - SMOKECO.S
 
 config:
     nodeId: 0x12344321
     cluster: "Smoke CO Alarm"
-    timeout: 300
+    timeout: 3100
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
         defaultValue: "hex:00112233445566778899aabbccddeeff"
@@ -83,7 +83,7 @@ tests:
                 value: nodeId
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -120,15 +120,17 @@ tests:
                 value: TEST_EVENT_TRIGGER_WARNING_BATTERY_ALERT
 
     - label: "TH subscribes to BatteryAlert attribute from DUT"
-      PICS: SMCO.S.A0003
+      PICS: SMOKECO.S.A0003
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "BatteryAlert"
       minInterval: 3
       maxInterval: 60
 
-    - label: "TH waits for a report of BatteryAlert attribute from DUT"
-      PICS: SMCO.S.A0003
+    - label:
+          "TH waits for a report of BatteryAlert attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0003
       endpoint: 1
       command: "waitForReport"
       attribute: "BatteryAlert"
@@ -154,7 +156,7 @@ tests:
                 value: TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM
 
     - label: "TH subscribes to InterconnectSmokeAlarm attribute from DUT"
-      PICS: SMCO.S.A0008
+      PICS: SMOKECO.S.A0008
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "InterconnectSmokeAlarm"
@@ -163,8 +165,9 @@ tests:
       keepSubscriptions: true
 
     - label:
-          "TH waits for a report of InterconnectSmokeAlarm attribute from DUT"
-      PICS: SMCO.S.A0008
+          "TH waits for a report of InterconnectSmokeAlarm attribute from DUT
+          with a timeout of 300 seconds"
+      PICS: SMOKECO.S.A0008
       endpoint: 1
       command: "waitForReport"
       attribute: "InterconnectSmokeAlarm"
@@ -191,7 +194,7 @@ tests:
                 value: TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM
 
     - label: "TH subscribes to InterconnectCOAlarm attribute from DUT"
-      PICS: SMCO.S.A0009
+      PICS: SMOKECO.S.A0009
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "InterconnectCOAlarm"
@@ -199,8 +202,10 @@ tests:
       maxInterval: 60
       keepSubscriptions: true
 
-    - label: "TH waits for a report of InterconnectCOAlarm attribute from DUT"
-      PICS: SMCO.S.A0009
+    - label:
+          "TH waits for a report of InterconnectCOAlarm attribute from DUT with
+          a timeout of 300 seconds"
+      PICS: SMOKECO.S.A0009
       endpoint: 1
       command: "waitForReport"
       attribute: "InterconnectCOAlarm"
@@ -227,7 +232,7 @@ tests:
                 value: TEST_EVENT_TRIGGER_WARNING_CO_ALARM
 
     - label: "TH subscribes to COState attribute from DUT"
-      PICS: SMCO.S.A0002
+      PICS: SMOKECO.S.A0002
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "COState"
@@ -235,8 +240,10 @@ tests:
       maxInterval: 60
       keepSubscriptions: true
 
-    - label: "TH waits for a report of COState attribute from DUT"
-      PICS: SMCO.S.A0002
+    - label:
+          "TH waits for a report of COState attribute from DUT with a timeout of
+          300 seconds"
+      PICS: SMOKECO.S.A0002
       endpoint: 1
       command: "waitForReport"
       attribute: "COState"
@@ -262,7 +269,7 @@ tests:
                 value: TEST_EVENT_TRIGGER_WARNING_SMOKE_ALARM
 
     - label: "TH subscribes to SmokeState attribute from DUT"
-      PICS: SMCO.S.A0001
+      PICS: SMOKECO.S.A0001
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "SmokeState"
@@ -270,8 +277,10 @@ tests:
       maxInterval: 60
       keepSubscriptions: true
 
-    - label: "TH waits for a report of SmokeState attribute from DUT"
-      PICS: SMCO.S.A0001
+    - label:
+          "TH waits for a report of SmokeState attribute from DUT with a timeout
+          of 300 seconds"
+      PICS: SMOKECO.S.A0001
       endpoint: 1
       command: "waitForReport"
       attribute: "SmokeState"
@@ -281,7 +290,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -306,8 +315,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_SMOKE_ALARM_CLEAR
 
-    - label: "TH waits for a report of SmokeState attribute from DUT"
-      PICS: SMCO.S.A0001
+    - label:
+          "TH waits for a report of SmokeState attribute from DUT with a timeout
+          of 300 seconds"
+      PICS: SMOKECO.S.A0001
       endpoint: 1
       command: "waitForReport"
       attribute: "SmokeState"
@@ -317,7 +328,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -342,8 +353,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_CO_ALARM_CLEAR
 
-    - label: "TH waits for a report of COState attribute from DUT"
-      PICS: SMCO.S.A0002
+    - label:
+          "TH waits for a report of COState attribute from DUT with a timeout of
+          300 seconds"
+      PICS: SMOKECO.S.A0002
       endpoint: 1
       command: "waitForReport"
       attribute: "COState"
@@ -353,7 +366,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -379,8 +392,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM_CLEAR
 
-    - label: "TH waits for a report of InterconnectCOAlarm attribute from DUT"
-      PICS: SMCO.S.A0009
+    - label:
+          "TH waits for a report of InterconnectCOAlarm attribute from DUT with
+          a timeout of 300 seconds"
+      PICS: SMOKECO.S.A0009
       endpoint: 1
       command: "waitForReport"
       attribute: "InterconnectCOAlarm"
@@ -390,7 +405,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -417,8 +432,9 @@ tests:
                 value: TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM_CLEAR
 
     - label:
-          "TH waits for a report of InterconnectSmokeAlarm attribute from DUT"
-      PICS: SMCO.S.A0008
+          "TH waits for a report of InterconnectSmokeAlarm attribute from DUT
+          with a timeout of 300 seconds"
+      PICS: SMOKECO.S.A0008
       endpoint: 1
       command: "waitForReport"
       attribute: "InterconnectSmokeAlarm"
@@ -428,7 +444,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -453,8 +469,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_BATTERY_ALERT_CLEAR
 
-    - label: "TH waits for a report of BatteryAlert attribute from DUT"
-      PICS: SMCO.S.A0003
+    - label:
+          "TH waits for a report of BatteryAlert attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0003
       endpoint: 1
       command: "waitForReport"
       attribute: "BatteryAlert"
@@ -464,7 +482,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"

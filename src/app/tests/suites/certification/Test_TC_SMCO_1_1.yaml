@@ -15,7 +15,7 @@
 name: 4.1.1. [TC-SMCO-1.1] Global Attributes with DUT as Server
 
 PICS:
-    - SMCO.S
+    - SMOKECO.S
 
 config:
     nodeId: 0x12344321
@@ -40,7 +40,7 @@ tests:
               type: int16u
 
     - label: "TH reads from the DUT the FeatureMap attribute(Smoke Alarm)"
-      PICS: SMCO.S.F00
+      PICS: SMOKECO.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -49,7 +49,7 @@ tests:
               hasMasksSet: [0x1]
 
     - label: "TH reads from the DUT the FeatureMap attribute(CO Alarm)"
-      PICS: SMCO.S.F01
+      PICS: SMOKECO.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -66,7 +66,7 @@ tests:
               contains: [0, 3, 5, 6, 7]
 
     - label: "TH reads from the DUT the AttributeList attribute(SmokeState)"
-      PICS: SMCO.S.A0001
+      PICS: SMOKECO.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -75,7 +75,7 @@ tests:
               contains: [1]
 
     - label: "TH reads from the DUT the AttributeList attribute(COState)"
-      PICS: SMCO.S.A0002
+      PICS: SMOKECO.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -84,7 +84,7 @@ tests:
               contains: [2]
 
     - label: "TH reads from the DUT the AttributeList attribute(DeviceMuted)"
-      PICS: SMCO.S.A0004
+      PICS: SMOKECO.S.A0004
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -95,7 +95,7 @@ tests:
     - label:
           "TH reads from the DUT the AttributeList
           attribute(InterconnectSmokeAlarm)"
-      PICS: SMCO.S.A0008
+      PICS: SMOKECO.S.A0008
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -106,7 +106,7 @@ tests:
     - label:
           "TH reads from the DUT the AttributeList
           attribute(InterconnectCOAlarm)"
-      PICS: SMCO.S.A0009
+      PICS: SMOKECO.S.A0009
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -116,7 +116,7 @@ tests:
 
     - label:
           "TH reads from the DUT the AttributeList attribute(ContaminationState)"
-      PICS: SMCO.S.A00010
+      PICS: SMOKECO.S.A000a
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -126,7 +126,7 @@ tests:
 
     - label:
           "TH reads from the DUT the AttributeList attribute(SensitivityLevel)"
-      PICS: SMCO.S.A00011
+      PICS: SMOKECO.S.A000b
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -135,7 +135,7 @@ tests:
               contains: [11]
 
     - label: "TH reads from the DUT the AttributeList attribute(ExpiryDate)"
-      PICS: SMCO.S.A00012
+      PICS: SMOKECO.S.A000c
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -152,7 +152,7 @@ tests:
               contains: [2, 3, 4, 5, 10]
 
     - label: "TH reads from the DUT the EventList attribute(SmokeAlarm)"
-      PICS: SMCO.S.E0000
+      PICS: SMOKECO.S.E00
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -161,7 +161,7 @@ tests:
               contains: [0]
 
     - label: "TH reads from the DUT the EventList attribute(COAlarm)"
-      PICS: SMCO.S.E0001
+      PICS: SMOKECO.S.E01
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -170,7 +170,7 @@ tests:
               contains: [1]
 
     - label: "TH reads from the DUT the EventList attribute(AlarmMuted)"
-      PICS: SMCO.S.E0006
+      PICS: SMOKECO.S.E06
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -179,7 +179,7 @@ tests:
               contains: [6]
 
     - label: "TH reads from the DUT the EventList attribute(MuteEnded)"
-      PICS: SMCO.S.E0007
+      PICS: SMOKECO.S.E07
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -189,7 +189,7 @@ tests:
 
     - label:
           "TH reads from the DUT the EventList attribute(InterconnectSmokeAlarm)"
-      PICS: SMCO.S.E0008
+      PICS: SMOKECO.S.E08
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -199,7 +199,7 @@ tests:
 
     - label:
           "TH reads from the DUT the EventList attribute(InterconnectCOAlarm)"
-      PICS: SMCO.S.E0009
+      PICS: SMOKECO.S.E09
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -208,7 +208,7 @@ tests:
               contains: [9]
 
     - label: "TH reads from the DUT the AcceptedCommandList attribute"
-      PICS: "!SMCO.S.C00.Rsp"
+      PICS: "!SMOKECO.S.C00.Rsp"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -217,7 +217,7 @@ tests:
               type: list
 
     - label: "TH reads from the DUT the AcceptedCommandList attribute"
-      PICS: SMCO.S.C00.Rsp
+      PICS: SMOKECO.S.C00.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:

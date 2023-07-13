@@ -15,12 +15,12 @@
 name: 4.2.5. [TC-SMCO-2.5] Secondary Functionality - Optional with DUT as Server
 
 PICS:
-    - SMCO.S
+    - SMOKECO.S
 
 config:
     nodeId: 0x12344321
     cluster: "Smoke CO Alarm"
-    timeout: 300
+    timeout: 7300
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
         defaultValue: "hex:00112233445566778899aabbccddeeff"
@@ -108,7 +108,7 @@ tests:
                 saveAs: eventNumber
 
     - label: "TH reads InterconnectSmokeAlarm attribute from DUT"
-      PICS: SMCO.S.A0008
+      PICS: SMOKECO.S.A0008
       endpoint: 1
       command: "readAttribute"
       attribute: "InterconnectSmokeAlarm"
@@ -118,7 +118,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0008 && SMCO.S.A0000
+      PICS: SMOKECO.S.A0008 && SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -130,7 +130,7 @@ tests:
     - label:
           "TH reads TestEventTriggersEnabled attribute from General Diagnostics
           Cluster"
-      PICS: SMCO.S.A0008 && DGGEN.S.A0008
+      PICS: SMOKECO.S.A0008 && DGGEN.S.A0008
       cluster: "General Diagnostics"
       endpoint: 0
       command: "readAttribute"
@@ -143,7 +143,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test Event"
-      PICS: SMCO.S.A0008 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0008 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -155,7 +155,7 @@ tests:
                 value: TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM
 
     - label: "TH subscribes to InterconnectSmokeAlarm attribute from DUT"
-      PICS: SMCO.S.A0008
+      PICS: SMOKECO.S.A0008
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "InterconnectSmokeAlarm"
@@ -163,8 +163,9 @@ tests:
       maxInterval: 60
 
     - label:
-          "TH waits for a report of InterconnectSmokeAlarm attribute from DUT"
-      PICS: SMCO.S.A0008
+          "TH waits for a report of InterconnectSmokeAlarm attribute from DUT
+          with a timeout of 300 seconds"
+      PICS: SMOKECO.S.A0008
       endpoint: 1
       command: "waitForReport"
       attribute: "InterconnectSmokeAlarm"
@@ -176,7 +177,7 @@ tests:
               maxValue: 2
 
     - label: "TH reads InterconnectSmokeAlarm event from DUT"
-      PICS: SMCO.S.A0008 && SMCO.S.E0008
+      PICS: SMOKECO.S.A0008 && SMOKECO.S.E08
       endpoint: 1
       command: "readEvent"
       event: "InterconnectSmokeAlarm"
@@ -185,7 +186,7 @@ tests:
           value: { AlarmSeverityLevel: InterconnectSmokeAlarmSeverityLevel }
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0008 && SMCO.S.A0000
+      PICS: SMOKECO.S.A0008 && SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -200,7 +201,7 @@ tests:
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test Event
           Clear"
-      PICS: SMCO.S.A0008 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0008 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -212,8 +213,9 @@ tests:
                 value: TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM_CLEAR
 
     - label:
-          "TH waits for a report of InterconnectSmokeAlarm attribute from DUT"
-      PICS: SMCO.S.A0008
+          "TH waits for a report of InterconnectSmokeAlarm attribute from DUT
+          with a timeout of 300 seconds"
+      PICS: SMOKECO.S.A0008
       endpoint: 1
       command: "waitForReport"
       attribute: "InterconnectSmokeAlarm"
@@ -223,7 +225,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0008 && SMCO.S.A0000
+      PICS: SMOKECO.S.A0008 && SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -233,7 +235,7 @@ tests:
               type: enum8
 
     - label: "TH reads AllClear event from DUT"
-      PICS: SMCO.S.A0008 && SMCO.S.E00010
+      PICS: SMOKECO.S.A0008 && SMOKECO.S.E0a
       endpoint: 1
       command: "readEvent"
       event: "AllClear"
@@ -242,7 +244,7 @@ tests:
           value: {}
 
     - label: "TH reads InterconnectCOAlarm attribute from DUT"
-      PICS: SMCO.S.A0009
+      PICS: SMOKECO.S.A0009
       endpoint: 1
       command: "readAttribute"
       attribute: "InterconnectCOAlarm"
@@ -252,7 +254,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0009 && SMCO.S.A0000
+      PICS: SMOKECO.S.A0009 && SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -266,7 +268,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event"
-      PICS: SMCO.S.A0009 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0009 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -278,15 +280,17 @@ tests:
                 value: TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM
 
     - label: "TH subscribes to InterconnectCOAlarm attribute from DUT"
-      PICS: SMCO.S.A0009
+      PICS: SMOKECO.S.A0009
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "InterconnectCOAlarm"
       minInterval: 3
       maxInterval: 60
 
-    - label: "TH waits for a report of InterconnectCOAlarm attribute from DUT"
-      PICS: SMCO.S.A0009
+    - label:
+          "TH waits for a report of InterconnectCOAlarm attribute from DUT with
+          a timeout of 300 seconds"
+      PICS: SMOKECO.S.A0009
       endpoint: 1
       command: "waitForReport"
       attribute: "InterconnectCOAlarm"
@@ -298,7 +302,7 @@ tests:
               maxValue: 2
 
     - label: "TH reads InterconnectCOAlarm event from DUT"
-      PICS: SMCO.S.A0009 && SMCO.S.E0009
+      PICS: SMOKECO.S.A0009 && SMOKECO.S.E09
       endpoint: 1
       command: "readEvent"
       event: "InterconnectCOAlarm"
@@ -307,7 +311,7 @@ tests:
           value: { AlarmSeverityLevel: InterconnectCOAlarmSeverityLevel }
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0009 && SMCO.S.A0000
+      PICS: SMOKECO.S.A0009 && SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -322,7 +326,7 @@ tests:
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event
           Clear"
-      PICS: SMCO.S.A0009 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0009 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -333,8 +337,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM_CLEAR
 
-    - label: "TH waits for a report of InterconnectCOAlarm attribute from DUT"
-      PICS: SMCO.S.A0009
+    - label:
+          "TH waits for a report of InterconnectCOAlarm attribute from DUT with
+          a timeout of 300 seconds"
+      PICS: SMOKECO.S.A0009
       endpoint: 1
       command: "waitForReport"
       attribute: "InterconnectCOAlarm"
@@ -344,7 +350,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0009 && SMCO.S.A0000
+      PICS: SMOKECO.S.A0009 && SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -354,7 +360,7 @@ tests:
               type: enum8
 
     - label: "TH reads AllClear event from DUT"
-      PICS: SMCO.S.E00010
+      PICS: SMOKECO.S.E0a
       endpoint: 1
       command: "readEvent"
       event: "AllClear"
@@ -363,7 +369,7 @@ tests:
           value: {}
 
     - label: "TH reads ContaminationState attribute from DUT"
-      PICS: SMCO.S.A00010
+      PICS: SMOKECO.S.A000a
       endpoint: 1
       command: "readAttribute"
       attribute: "ContaminationState"
@@ -378,7 +384,7 @@ tests:
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Contamination State (High) Test
           Event"
-      PICS: SMCO.S.A00010 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A000a && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -390,15 +396,17 @@ tests:
                 value: TEST_EVENT_TRIGGER_CONTAMINATION_STATE_HIGH
 
     - label: "TH subscribes to ContaminationState attribute from DUT"
-      PICS: SMCO.S.A00010
+      PICS: SMOKECO.S.A000a
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "ContaminationState"
       minInterval: 3
       maxInterval: 60
 
-    - label: "TH waits for a report of ContaminationState attribute from DUT"
-      PICS: SMCO.S.A00010
+    - label:
+          "TH waits for a report of ContaminationState attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A000a
       endpoint: 1
       command: "waitForReport"
       attribute: "ContaminationState"
@@ -413,7 +421,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Contamination State Test Event Clear"
-      PICS: SMCO.S.A00010 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A000a && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -424,8 +432,10 @@ tests:
               - name: "EventTrigger"
                 value: TTEST_EVENT_TRIGGER_CONTAMINATION_STATE_CLEAR
 
-    - label: "TH waits for a report of ContaminationState attribute from DUT"
-      PICS: SMCO.S.A00010
+    - label:
+          "TH waits for a report of ContaminationState attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A000a
       endpoint: 1
       command: "waitForReport"
       attribute: "ContaminationState"
@@ -439,7 +449,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Contamination State (Low) Test Event"
-      PICS: SMCO.S.A00010 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A000a && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -450,8 +460,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_CONTAMINATION_STATE_LOW
 
-    - label: "TH waits for a report of ContaminationState attribute from DUT"
-      PICS: SMCO.S.A00010
+    - label:
+          "TH waits for a report of ContaminationState attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A000a
       endpoint: 1
       command: "waitForReport"
       attribute: "ContaminationState"
@@ -465,7 +477,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Contamination State Test Event Clear"
-      PICS: SMCO.S.A00010 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A000a && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -476,8 +488,10 @@ tests:
               - name: "EventTrigger"
                 value: TTEST_EVENT_TRIGGER_CONTAMINATION_STATE_CLEAR
 
-    - label: "TH waits for a report of ContaminationState attribute from DUT"
-      PICS: SMCO.S.A00010
+    - label:
+          "TH waits for a report of ContaminationState attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A000a
       endpoint: 1
       command: "waitForReport"
       attribute: "ContaminationState"
@@ -487,7 +501,7 @@ tests:
               type: enum8
 
     - label: "TH reads SensitivityLevel attribute from DUT"
-      PICS: SMCO.S.A00011
+      PICS: SMOKECO.S.A000b
       endpoint: 1
       command: "readAttribute"
       attribute: "SensitivityLevel"
@@ -501,7 +515,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Sensitivity Level (High) Test Event"
-      PICS: SMCO.S.A00011 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A000b && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -513,15 +527,17 @@ tests:
                 value: TEST_EVENT_TRIGGER_SENSITIVITY_LEVEL_HIGH
 
     - label: "TH subscribes to SensitivityLevel attribute from DUT"
-      PICS: SMCO.S.A00011
+      PICS: SMOKECO.S.A000b
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "SensitivityLevel"
       minInterval: 3
       maxInterval: 60
 
-    - label: "TH waits for a report of SensitivityLevel attribute from DUT"
-      PICS: SMCO.S.A00011
+    - label:
+          "TH waits for a report of SensitivityLevel attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A000b
       endpoint: 1
       command: "waitForReport"
       attribute: "SensitivityLevel"
@@ -535,7 +551,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Sensitivity Level Test Event Clear"
-      PICS: SMCO.S.A00011 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A000b && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -546,8 +562,10 @@ tests:
               - name: "EventTrigger"
                 value: TTEST_EVENT_TRIGGER_SENSITIVITY_LEVEL_CLEAR
 
-    - label: "TH waits for a report of SensitivityLevel attribute from DUT"
-      PICS: SMCO.S.A00011
+    - label:
+          "TH waits for a report of SensitivityLevel attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A000b
       endpoint: 1
       command: "waitForReport"
       attribute: "SensitivityLevel"
@@ -561,7 +579,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Sensitivity Level (Low) Test Event"
-      PICS: SMCO.S.A00011 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A000b && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -572,8 +590,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_SENSITIVITY_LEVEL_LOW
 
-    - label: "TH waits for a report of SensitivityLevel attribute from DUT"
-      PICS: SMCO.S.A00011
+    - label:
+          "TH waits for a report of SensitivityLevel attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A000b
       endpoint: 1
       command: "waitForReport"
       attribute: "SensitivityLevel"
@@ -587,7 +607,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Sensitivity Level Test Event Clear"
-      PICS: SMCO.S.A00011 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A000b && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -598,8 +618,10 @@ tests:
               - name: "EventTrigger"
                 value: TTEST_EVENT_TRIGGER_SENSITIVITY_LEVEL_CLEAR
 
-    - label: "TH waits for a report of SensitivityLevel attribute from DUT"
-      PICS: SMCO.S.A00011
+    - label:
+          "TH waits for a report of SensitivityLevel attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A000b
       endpoint: 1
       command: "waitForReport"
       attribute: "SensitivityLevel"
@@ -609,7 +631,7 @@ tests:
               type: enum8
 
     - label: "TH reads DeviceMuted attribute from DUT"
-      PICS: SMCO.S.A0004
+      PICS: SMOKECO.S.A0004
       endpoint: 1
       command: "readAttribute"
       attribute: "DeviceMuted"
@@ -619,7 +641,7 @@ tests:
               type: enum8
 
     - label: "TH reads FeatureMap attribute(Smoke Alarm) from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F00
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00
       endpoint: 1
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -633,7 +655,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Warning Smoke Alarm Test Event"
-      PICS: SMCO.S.A0004 && SMCO.S.F00 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -645,15 +667,17 @@ tests:
                 value: TEST_EVENT_TRIGGER_WARNING_SMOKE_ALARM
 
     - label: "TH subscribes to SmokeState attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F00 && SMCO.S.A0001
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.A0001
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "SmokeState"
       minInterval: 3
       maxInterval: 60
 
-    - label: "TH waits for a report of SmokeState attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F00 && SMCO.S.A0001
+    - label:
+          "TH waits for a report of SmokeState attribute from DUT with a timeout
+          of 300 seconds"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.A0001
       endpoint: 1
       command: "waitForReport"
       attribute: "SmokeState"
@@ -667,7 +691,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
-      PICS: SMCO.S.A0004 && SMCO.S.F00 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -679,7 +703,7 @@ tests:
                 value: TEST_EVENT_TRIGGER_DEVICE_MUTED
 
     - label: "TH subscribes to DeviceMuted attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F00
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "DeviceMuted"
@@ -687,8 +711,10 @@ tests:
       maxInterval: 60
       keepSubscriptions: true
 
-    - label: "TH waits for a report of DeviceMuted attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F00
+    - label:
+          "TH waits for a report of DeviceMuted attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00
       endpoint: 1
       command: "waitForReport"
       attribute: "DeviceMuted"
@@ -698,7 +724,7 @@ tests:
               type: enum8
 
     - label: "TH reads AlarmMuted event from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F00 && SMCO.S.E0006
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.E06
       endpoint: 1
       command: "readEvent"
       event: "AlarmMuted"
@@ -711,7 +737,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event Clear"
-      PICS: SMCO.S.A0004 && SMCO.S.F00 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -722,8 +748,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_DEVICE_MUTED_CLEAR
 
-    - label: "TH waits for a report of DeviceMuted attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F00
+    - label:
+          "TH waits for a report of DeviceMuted attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00
       endpoint: 1
       command: "waitForReport"
       attribute: "DeviceMuted"
@@ -733,7 +761,7 @@ tests:
               type: enum8
 
     - label: "TH reads MuteEnded event from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F00 && SMCO.S.E0007
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.E07
       endpoint: 1
       command: "readEvent"
       event: "MuteEnded"
@@ -746,7 +774,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Critical Smoke Alarm Test Event"
-      PICS: SMCO.S.A0004 && SMCO.S.F00 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -757,8 +785,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_CRITICAL_SMOKE_ALARM
 
-    - label: "TH waits for a report of SmokeState attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F00 && SMCO.S.A0001
+    - label:
+          "TH waits for a report of SmokeState attribute from DUT with a timeout
+          of 300 seconds"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && SMOKECO.S.A0001
       endpoint: 1
       command: "waitForReport"
       attribute: "SmokeState"
@@ -772,7 +802,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
-      PICS: SMCO.S.A0004 && SMCO.S.F00 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -783,8 +813,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_DEVICE_MUTED
 
-    - label: "TH waits for a report of DeviceMuted attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F00
+    - label:
+          "TH waits for a report of DeviceMuted attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00
       endpoint: 1
       command: "waitForReport"
       attribute: "DeviceMuted"
@@ -798,7 +830,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Smoke Alarm Test Event Clear"
-      PICS: SMCO.S.A0004 && SMCO.S.F00 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -809,8 +841,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_SMOKE_ALARM_CLEAR
 
-    - label: "TH waits for a report of SmokeState attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.A0001 && SMCO.S.F00
+    - label:
+          "TH waits for a report of SmokeState attribute from DUT with a timeout
+          of 300 seconds"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.A0001 && SMOKECO.S.F00
       endpoint: 1
       command: "waitForReport"
       attribute: "SmokeState"
@@ -820,7 +854,7 @@ tests:
               type: enum8
 
     - label: "TH reads DeviceMuted attribute from DUT"
-      PICS: SMCO.S.A0004
+      PICS: SMOKECO.S.A0004
       endpoint: 1
       command: "readAttribute"
       attribute: "DeviceMuted"
@@ -830,7 +864,7 @@ tests:
               type: enum8
 
     - label: "TH reads FeatureMap attribute(CO Alarm) from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F01
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01
       endpoint: 1
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -844,7 +878,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for CO Alarm Test Event"
-      PICS: SMCO.S.A0004 && SMCO.S.F01 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -856,7 +890,7 @@ tests:
                 value: TEST_EVENT_TRIGGER_WARNING_CO_ALARM
 
     - label: "TH subscribes to COState attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F01 && SMCO.S.A0002
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.A0002
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "COState"
@@ -864,8 +898,10 @@ tests:
       maxInterval: 60
       keepSubscriptions: true
 
-    - label: "TH waits for a report of COState attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F01 && SMCO.S.A0002
+    - label:
+          "TH waits for a report of COState attribute from DUT with a timeout of
+          300 seconds"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.A0002
       endpoint: 1
       command: "waitForReport"
       attribute: "COState"
@@ -879,7 +915,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
-      PICS: SMCO.S.A0004 && SMCO.S.F01 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -890,8 +926,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_DEVICE_MUTED
 
-    - label: "TH waits for a report of DeviceMuted attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F01
+    - label:
+          "TH waits for a report of DeviceMuted attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01
       endpoint: 1
       command: "waitForReport"
       attribute: "DeviceMuted"
@@ -901,7 +939,7 @@ tests:
               type: enum8
 
     - label: "TH reads AlarmMuted event from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F01 && SMCO.S.E0006
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.E06
       endpoint: 1
       command: "readEvent"
       event: "AlarmMuted"
@@ -914,7 +952,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event Clear"
-      PICS: SMCO.S.A0004 && SMCO.S.F01 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -925,8 +963,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_DEVICE_MUTED_CLEAR
 
-    - label: "TH waits for a report of DeviceMuted attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F01
+    - label:
+          "TH waits for a report of DeviceMuted attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01
       endpoint: 1
       command: "waitForReport"
       attribute: "DeviceMuted"
@@ -936,7 +976,7 @@ tests:
               type: enum8
 
     - label: "TH reads MuteEnded event from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F01 && SMCO.S.E0007
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.E07
       endpoint: 1
       command: "readEvent"
       event: "MuteEnded"
@@ -949,7 +989,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Critical CO Alarm Test Event"
-      PICS: SMCO.S.A0004 && SMCO.S.F01 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -960,8 +1000,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_CRITICAL_CO_ALARM
 
-    - label: "TH waits for a report of COState attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F01 && SMCO.S.A0002
+    - label:
+          "TH waits for a report of COState attribute from DUT with a timeout of
+          300 seconds"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.A0002
       endpoint: 1
       command: "waitForReport"
       attribute: "COState"
@@ -975,7 +1017,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
-      PICS: SMCO.S.A0004 && SMCO.S.F01 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -986,8 +1028,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_DEVICE_MUTED
 
-    - label: "TH waits for a report of DeviceMuted attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F01
+    - label:
+          "TH waits for a report of DeviceMuted attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01
       endpoint: 1
       command: "waitForReport"
       attribute: "DeviceMuted"
@@ -1001,7 +1045,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMCO.TEST_EVENT_TRIGGER for CO Alarm Test Event Clear"
-      PICS: SMCO.S.A0004 && SMCO.S.F01 && DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -1012,8 +1056,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_CO_ALARM_CLEAR
 
-    - label: "TH waits for a report of COState attribute from DUT"
-      PICS: SMCO.S.A0004 && SMCO.S.F01 && SMCO.S.A0002
+    - label:
+          "TH waits for a report of COState attribute from DUT with a timeout of
+          300 seconds"
+      PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && SMOKECO.S.A0002
       endpoint: 1
       command: "waitForReport"
       attribute: "COState"

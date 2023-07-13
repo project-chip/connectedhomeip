@@ -16,12 +16,12 @@ name:
     4.2.4. [TC-SMCO-2.4] Secondary Functionality - Mandatory with DUT as Server
 
 PICS:
-    - SMCO.S
+    - SMOKECO.S
 
 config:
     nodeId: 0x12344321
     cluster: "Smoke CO Alarm"
-    timeout: 300
+    timeout: 3400
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
         defaultValue: "hex:00112233445566778899aabbccddeeff"
@@ -76,7 +76,7 @@ tests:
                 saveAs: eventNumber
 
     - label: "TH reads BatteryAlert attribute from DUT"
-      PICS: SMCO.S.A0003
+      PICS: SMOKECO.S.A0003
       endpoint: 1
       command: "readAttribute"
       attribute: "BatteryAlert"
@@ -86,7 +86,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -123,15 +123,17 @@ tests:
                 value: TEST_EVENT_TRIGGER_WARNING_BATTERY_ALERT
 
     - label: "TH subscribes to BatteryAlert attribute from DUT"
-      PICS: SMCO.S.A0003
+      PICS: SMOKECO.S.A0003
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "BatteryAlert"
       minInterval: 3
       maxInterval: 60
 
-    - label: "TH waits for a report of BatteryAlert attribute from DUT"
-      PICS: SMCO.S.A0003
+    - label:
+          "TH waits for a report of BatteryAlert attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0003
       endpoint: 1
       command: "waitForReport"
       attribute: "BatteryAlert"
@@ -141,7 +143,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -151,7 +153,7 @@ tests:
               type: enum8
 
     - label: "TH reads LowBattery event from DUT"
-      PICS: SMCO.S.E0002
+      PICS: SMOKECO.S.E02
       endpoint: 1
       command: "readEvent"
       event: "LowBattery"
@@ -175,8 +177,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_CRITICAL_BATTERY_ALERT
 
-    - label: "TH waits for a report of BatteryAlert attribute from DUT"
-      PICS: SMCO.S.A0003
+    - label:
+          "TH waits for a report of BatteryAlert attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0003
       endpoint: 1
       command: "waitForReport"
       attribute: "BatteryAlert"
@@ -186,7 +190,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -196,7 +200,7 @@ tests:
               type: enum8
 
     - label: "TH reads LowBattery event from DUT"
-      PICS: SMCO.S.E0002
+      PICS: SMOKECO.S.E02
       endpoint: 1
       command: "readEvent"
       event: "LowBattery"
@@ -220,8 +224,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_BATTERY_ALERT_CLEAR
 
-    - label: "TH waits for a report of BatteryAlert attribute from DUT"
-      PICS: SMCO.S.A0003
+    - label:
+          "TH waits for a report of BatteryAlert attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0003
       endpoint: 1
       command: "waitForReport"
       attribute: "BatteryAlert"
@@ -231,7 +237,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -241,7 +247,7 @@ tests:
               type: enum8
 
     - label: "TH reads AllClear event from DUT"
-      PICS: SMCO.S.E00010
+      PICS: SMOKECO.S.E0a
       endpoint: 1
       command: "readEvent"
       event: "AllClear"
@@ -250,7 +256,7 @@ tests:
           value: {}
 
     - label: "TH reads HardwareFaultAlert attribute from DUT"
-      PICS: SMCO.S.A0006
+      PICS: SMOKECO.S.A0006
       endpoint: 1
       command: "readAttribute"
       attribute: "HardwareFaultAlert"
@@ -276,7 +282,7 @@ tests:
                 value: TEST_EVENT_TRIGGER_HARDWARE_FAULT_ALERT
 
     - label: "TH subscribes to HardwareFaultAlert attribute from DUT"
-      PICS: SMCO.S.A0006
+      PICS: SMOKECO.S.A0006
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "HardwareFaultAlert"
@@ -284,8 +290,10 @@ tests:
       maxInterval: 60
       keepSubscriptions: true
 
-    - label: "TH waits for a report of HardwareFaultAlert attribute from DUT"
-      PICS: SMCO.S.A0006
+    - label:
+          "TH waits for a report of HardwareFaultAlert attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0006
       endpoint: 1
       command: "waitForReport"
       attribute: "HardwareFaultAlert"
@@ -295,7 +303,7 @@ tests:
               type: boolean
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -305,7 +313,7 @@ tests:
               type: enum8
 
     - label: "TH reads HardwareFault event from DUT"
-      PICS: SMCO.S.E0003
+      PICS: SMOKECO.S.E03
       endpoint: 1
       command: "readEvent"
       event: "HardwareFault"
@@ -330,8 +338,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_HARDWARE_FAULT_ALERT_CLEAR
 
-    - label: "TH waits for a report of HardwareFaultAlert attribute from DUT"
-      PICS: SMCO.S.A0006
+    - label:
+          "TH waits for a report of HardwareFaultAlert attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0006
       endpoint: 1
       command: "waitForReport"
       attribute: "HardwareFaultAlert"
@@ -341,7 +351,7 @@ tests:
               type: boolean
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -351,7 +361,7 @@ tests:
               type: enum8
 
     - label: "TH reads AllClear event from DUT"
-      PICS: SMCO.S.E00010
+      PICS: SMOKECO.S.E0a
       endpoint: 1
       command: "readEvent"
       event: "AllClear"
@@ -360,7 +370,7 @@ tests:
           value: {}
 
     - label: "TH reads EndOfServiceAlert attribute from DUT"
-      PICS: SMCO.S.A0007
+      PICS: SMOKECO.S.A0007
       endpoint: 1
       command: "readAttribute"
       attribute: "EndOfServiceAlert"
@@ -386,7 +396,7 @@ tests:
                 value: TEST_EVENT_TRIGGER_END_OF_SERVICE_ALERT
 
     - label: "TH subscribes to EndOfServiceAlert attribute from DUT"
-      PICS: SMCO.S.A0007
+      PICS: SMOKECO.S.A0007
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "EndOfServiceAlert"
@@ -394,8 +404,10 @@ tests:
       maxInterval: 60
       keepSubscriptions: true
 
-    - label: "TH waits for a report of EndOfServiceAlert attribute from DUT"
-      PICS: SMCO.S.A0007
+    - label:
+          "TH waits for a report of EndOfServiceAlert attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0007
       endpoint: 1
       command: "waitForReport"
       attribute: "EndOfServiceAlert"
@@ -405,7 +417,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -415,7 +427,7 @@ tests:
               type: enum8
 
     - label: "TH reads EndOfService event from DUT"
-      PICS: SMCO.S.E0004
+      PICS: SMOKECO.S.E04
       endpoint: 1
       command: "readEvent"
       event: "EndOfService"
@@ -440,8 +452,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_END_OF_SERVICE_ALERT_CLEAR
 
-    - label: "TH waits for a report of EndOfServiceAlert attribute from DUT"
-      PICS: SMCO.S.A0007
+    - label:
+          "TH waits for a report of EndOfServiceAlert attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0007
       endpoint: 1
       command: "waitForReport"
       attribute: "EndOfServiceAlert"
@@ -451,7 +465,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -461,7 +475,7 @@ tests:
               type: enum8
 
     - label: "TH reads AllClear event from DUT"
-      PICS: SMCO.S.E00010
+      PICS: SMOKECO.S.E0a
       endpoint: 1
       command: "readEvent"
       event: "AllClear"
@@ -470,7 +484,7 @@ tests:
           value: {}
 
     - label: "TH reads TestInProgress attribute from DUT"
-      PICS: SMCO.S.A0005
+      PICS: SMOKECO.S.A0005
       endpoint: 1
       command: "readAttribute"
       attribute: "TestInProgress"
@@ -480,7 +494,7 @@ tests:
               type: boolean
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -502,7 +516,7 @@ tests:
                 value: "y"
 
     - label: "TH subscribes to TestInProgress attribute from DUT"
-      PICS: SMCO.S.A0005
+      PICS: SMOKECO.S.A0005
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "TestInProgress"
@@ -510,8 +524,10 @@ tests:
       maxInterval: 60
       keepSubscriptions: true
 
-    - label: "TH waits for a report of TestInProgress attribute from DUT"
-      PICS: SMCO.S.A0005
+    - label:
+          "TH waits for a report of TestInProgress attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0005
       endpoint: 1
       command: "waitForReport"
       attribute: "TestInProgress"
@@ -521,7 +537,7 @@ tests:
               type: boolean
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -530,8 +546,10 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH waits for a report of TestInProgress attribute from DUT"
-      PICS: SMCO.S.A0005
+    - label:
+          "TH waits for a report of TestInProgress attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0005
       endpoint: 1
       command: "waitForReport"
       attribute: "TestInProgress"
@@ -541,7 +559,7 @@ tests:
               type: boolean
 
     - label: "TH reads SelfTestComplete event from DUT"
-      PICS: SMCO.S.E0005
+      PICS: SMOKECO.S.E05
       endpoint: 1
       command: "readEvent"
       event: "SelfTestComplete"
@@ -550,7 +568,7 @@ tests:
           value: {}
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -560,7 +578,7 @@ tests:
               type: enum8
 
     - label: "TH reads AllClear event from DUT"
-      PICS: SMCO.S.E00010
+      PICS: SMOKECO.S.E0a
       endpoint: 1
       command: "readEvent"
       event: "AllClear"
@@ -569,12 +587,14 @@ tests:
           value: {}
 
     - label: "TH sends SelfTestRequest command to DUT"
-      PICS: SMCO.S.C00.Rsp
+      PICS: SMOKECO.S.C00.Rsp
       endpoint: 1
       command: "SelfTestRequest"
 
-    - label: "TH waits for a report of TestInProgress attribute from DUT"
-      PICS: SMCO.S.A0005
+    - label:
+          "TH waits for a report of TestInProgress attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0005
       endpoint: 1
       command: "waitForReport"
       attribute: "TestInProgress"
@@ -584,7 +604,7 @@ tests:
               type: boolean
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -593,8 +613,10 @@ tests:
           constraints:
               type: enum8
 
-    - label: "TH waits for a report of TestInProgress attribute from DUT"
-      PICS: SMCO.S.A0005
+    - label:
+          "TH waits for a report of TestInProgress attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: SMOKECO.S.A0005
       endpoint: 1
       command: "waitForReport"
       attribute: "TestInProgress"
@@ -604,7 +626,7 @@ tests:
               type: boolean
 
     - label: "TH reads SelfTestComplete event from DUT"
-      PICS: SMCO.S.E0005
+      PICS: SMOKECO.S.E05
       endpoint: 1
       command: "readEvent"
       event: "SelfTestComplete"
@@ -613,7 +635,7 @@ tests:
           value: {}
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -623,7 +645,7 @@ tests:
               type: enum8
 
     - label: "TH reads AllClear event from DUT"
-      PICS: SMCO.S.E00010
+      PICS: SMOKECO.S.E0a
       endpoint: 1
       command: "readEvent"
       event: "AllClear"

@@ -15,12 +15,12 @@
 name: 4.2.3. [TC-SMCO-2.3] Primary Functionality - CO Alarm with DUT as Server
 
 PICS:
-    - SMCO.S
+    - SMOKECO.S
 
 config:
     nodeId: 0x12344321
     cluster: "Smoke CO Alarm"
-    timeout: 300
+    timeout: 1000
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
         defaultValue: "hex:00112233445566778899aabbccddeeff"
@@ -63,7 +63,7 @@ tests:
                 saveAs: eventNumber
 
     - label: "TH reads COState attribute from DUT"
-      PICS: SMCO.S.A0002
+      PICS: SMOKECO.S.A0002
       endpoint: 1
       command: "readAttribute"
       attribute: "COState"
@@ -73,7 +73,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -110,15 +110,17 @@ tests:
                 value: TEST_EVENT_TRIGGER_WARNING_CO_ALARM
 
     - label: "TH subscribes to COState attribute from DUT"
-      PICS: SMCO.S.A0002
+      PICS: SMOKECO.S.A0002
       endpoint: 1
       command: "subscribeAttribute"
       attribute: "COState"
       minInterval: 3
       maxInterval: 60
 
-    - label: "TH waits for a report of COState attribute from DUT"
-      PICS: SMCO.S.A0002
+    - label:
+          "TH waits for a report of COState attribute from DUT with a timeout of
+          300 seconds"
+      PICS: SMOKECO.S.A0002
       endpoint: 1
       command: "waitForReport"
       attribute: "COState"
@@ -128,7 +130,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -138,7 +140,7 @@ tests:
               type: enum8
 
     - label: "TH reads COAlarm event from DUT"
-      PICS: SMCO.S.E0001
+      PICS: SMOKECO.S.E01
       endpoint: 1
       command: "readEvent"
       event: "COAlarm"
@@ -159,7 +161,7 @@ tests:
                 value: "y"
 
     - label: "TH reads TestInProgress attribute from DUT"
-      PICS: SMCO.S.A0005
+      PICS: SMOKECO.S.A0005
       endpoint: 1
       command: "readAttribute"
       attribute: "TestInProgress"
@@ -169,14 +171,14 @@ tests:
               type: boolean
 
     - label: "TH sends SelfTestRequest command to DUT"
-      PICS: SMCO.S.C00.Rsp
+      PICS: SMOKECO.S.C00.Rsp
       endpoint: 1
       command: "SelfTestRequest"
       response:
           error: BUSY
 
     - label: "TH reads TestInProgress attribute from DUT"
-      PICS: SMCO.S.A0005
+      PICS: SMOKECO.S.A0005
       endpoint: 1
       command: "readAttribute"
       attribute: "TestInProgress"
@@ -201,8 +203,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_CRITICAL_CO_ALARM
 
-    - label: "TH waits for a report of COState attribute from DUT"
-      PICS: SMCO.S.A0002
+    - label:
+          "TH waits for a report of COState attribute from DUT with a timeout of
+          300 seconds"
+      PICS: SMOKECO.S.A0002
       endpoint: 1
       command: "waitForReport"
       attribute: "COState"
@@ -212,7 +216,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -222,7 +226,7 @@ tests:
               type: enum8
 
     - label: "TH reads COAlarm event from DUT"
-      PICS: SMCO.S.E0001
+      PICS: SMOKECO.S.E01
       endpoint: 1
       command: "readEvent"
       event: "COAlarm"
@@ -246,8 +250,10 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_CO_ALARM_CLEAR
 
-    - label: "TH waits for a report of COState attribute from DUT"
-      PICS: SMCO.S.A0002
+    - label:
+          "TH waits for a report of COState attribute from DUT with a timeout of
+          300 seconds"
+      PICS: SMOKECO.S.A0002
       endpoint: 1
       command: "waitForReport"
       attribute: "COState"
@@ -257,7 +263,7 @@ tests:
               type: enum8
 
     - label: "TH reads ExpressedState attribute from DUT"
-      PICS: SMCO.S.A0000
+      PICS: SMOKECO.S.A0000
       endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
@@ -267,7 +273,7 @@ tests:
               type: enum8
 
     - label: "TH reads AllClear event from DUT"
-      PICS: SMCO.S.E00010
+      PICS: SMOKECO.S.E0a
       endpoint: 1
       command: "readEvent"
       event: "AllClear"
