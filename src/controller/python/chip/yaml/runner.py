@@ -129,7 +129,7 @@ class DefaultPseudoCluster(BaseAction):
             raise ActionCreationError(f'Default cluster {test_step.cluster} {test_step.command}, not supported')
 
     async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
-        resp = await _PSEUDO_CLUSTERS.execute(self._test_step)
+        _ = await _PSEUDO_CLUSTERS.execute(self._test_step)
         return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
 
 
