@@ -21,16 +21,16 @@ config:
 tests:
     - label: "Note"
       verification: |
-              To Execute the TC-DISHM-3.2 test case using reboot in raspi device we followed the below suggested way:
+          To Execute the TC-DISHM-3.2 test case using reboot in raspi device we followed the below suggested way:
 
-              To run a reboot test case on raspi, run the app with --KVS flag with a file in local directory and pass that file to the command to launch the app. Steps
+          To run a reboot test case on raspi, run the app with --KVS flag with a file in local directory and pass that file to the command to launch the app. Steps
 
 
-                step-1:  create a file using touch command , something like touch mytest.txt
-                step-2:  chmod 777 mytest.txt
-                step-3:  launch the app ./chip-all-clusters-app --KVS ./mytest.txt
+            step-1:  create a file using touch command , something like touch mytest.txt
+            step-2:  chmod 777 mytest.txt
+            step-3:  launch the app ./chip-all-clusters-app --KVS ./mytest.txt
 
-              if you launch the app with the above commands and provision the app, even when you reboot the app with 'sudo reboot' , next time you launch the app with 'sudo ./out/all-clusters-app/chip-all-clusters-app --KVS ./mytest.txt' , you can run read/write attribs and commands without reprovisioning the device.
+          if you launch the app with the above commands and provision the app, even when you reboot the app with 'sudo reboot' , next time you launch the app with 'sudo ./out/all-clusters-app/chip-all-clusters-app --KVS ./mytest.txt' , you can run read/write attribs and commands without reprovisioning the device.
       disabled: true
 
     - label: "Wait for the commissioned device to be retrieved"
@@ -139,8 +139,9 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-
-    - label: "TH send a ChangeToMode command to the DUT with NewMode set to new_mode_th"
+    - label:
+          "TH send a ChangeToMode command to the DUT with NewMode set to
+          new_mode_th"
       verification: |
           ./chip-tool dishwashermodeselect change-to-mode 2 1 1
 

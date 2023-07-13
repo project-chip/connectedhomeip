@@ -13,7 +13,9 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 263.3.1. [TC-DISHM-2.1] ChangeToModeWithStatus Verification with DUT as Server
+name:
+    263.3.1. [TC-DISHM-2.1] ChangeToModeWithStatus Verification with DUT as
+    Server
 
 PICS:
     - DISHM.S
@@ -32,16 +34,16 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-# TODO: find better way to access SupportedModes structs
+    # TODO: find better way to access SupportedModes structs
     - label: "TH reads the SupportedModes attribute from DUT"
       PICS: DISHM.S.A0002
       command: "readAttribute"
       attribute: "SupportedModes"
       response:
           values:
-             - name: "Mode"
-               saveAs: supported_modes_dut
-               value: [0, 1, 2]
+              - name: "Mode"
+                saveAs: supported_modes_dut
+                value: [0, 1, 2]
           constraints:
               type: list
 
@@ -57,7 +59,9 @@ tests:
           constraints:
               type: int16u
 
-    - label: "TH send a ChangeToMode command to the DUT with NewMode set to old_current_mode_dut"
+    - label:
+          "TH send a ChangeToMode command to the DUT with NewMode set to
+          old_current_mode_dut"
       PICS: DISHM.S.C01.Rsp
       command: "writeAttribute"
       attribute: "ChangeToMode"
@@ -70,8 +74,9 @@ tests:
           constraints:
               type: char_string
 
-
-    - label: "TH send a ChangeToMode command to the DUT with NewMode set to new_mode_th"
+    - label:
+          "TH send a ChangeToMode command to the DUT with NewMode set to
+          new_mode_th"
       PICS: DISHM.S.C01.Rsp
       command: "writeAttribute"
       attribute: "ChangeToMode"
@@ -86,14 +91,14 @@ tests:
       attribute: "CurrentMode"
       response:
           values:
-            - name: "new_mode_th"
-              value: new_mode_th
+              - name: "new_mode_th"
+                value: new_mode_th
           constraints:
               type: int16u
 
-
-
-    - label: "TH send a ChangeToMode command to the DUT with NewMode set to new_mode_th"
+    - label:
+          "TH send a ChangeToMode command to the DUT with NewMode set to
+          new_mode_th"
       PICS: DISHM.S.C01.Rsp
       command: "writeAttribute"
       attribute: "ChangeToMode"

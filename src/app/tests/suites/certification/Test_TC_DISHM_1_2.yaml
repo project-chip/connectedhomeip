@@ -34,51 +34,51 @@ tests:
 
     - label: "TH reads the SupportedModes attribute from DUT"
       verification: |
-            ./chip-tool dishwashermodeselect read supported-modes 1 1
+          ./chip-tool dishwashermodeselect read supported-modes 1 1
 
-            On TH(chip-tool) log, Verify SupportedModes attribute should contains atleast two ModeOptionsStruct entries with unique mode field value and label field value below is the sample log provided for the raspi platform:
+          On TH(chip-tool) log, Verify SupportedModes attribute should contains atleast two ModeOptionsStruct entries with unique mode field value and label field value below is the sample log provided for the raspi platform:
 
-            [1687687925.438666][18054:18056] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0002 DataVersion: 4148960394
-            [1687687925.438838][18054:18056] CHIP:TOO: SupportedModes: 3 entries
-            [1687687925.444452][18054:18056] CHIP:TOO: [1]: {
-            [1687687925.444485][18054:18056] CHIP:TOO: Label: Normal
-            [1687687925.444506][18054:18056] CHIP:TOO: Mode: 0
-            [1687687925.444532][18054:18056] CHIP:TOO: SemanticTags: 1 entries
-            [1687687925.444575][18054:18056] CHIP:TOO: [1]: {
-            [1687687925.444598][18054:18056] CHIP:TOO: MfgCode: 0
-            [1687687925.444632][18054:18056] CHIP:TOO: Value: 16384
-            [1687687925.444654][18054:18056] CHIP:TOO: }
-            [1687687925.444674][18054:18056] CHIP:TOO: }
-            [1687687925.444702][18054:18056] CHIP:TOO: [2]: {
-            [1687687925.444723][18054:18056] CHIP:TOO: Label: Heavy
-            [1687687925.444742][18054:18056] CHIP:TOO: Mode: 1
-            [1687687925.444764][18054:18056] CHIP:TOO: SemanticTags: 2 entries
-            [1687687925.444787][18054:18056] CHIP:TOO: [1]: {
-            [1687687925.444808][18054:18056] CHIP:TOO: MfgCode: 0
-            [1687687925.444828][18054:18056] CHIP:TOO: Value: 7
-            [1687687925.444847][18054:18056] CHIP:TOO: }
-            [1687687925.444869][18054:18056] CHIP:TOO: [2]: {
-            [1687687925.444928][18054:18056] CHIP:TOO: MfgCode: 0
-            [1687687925.444952][18054:18056] CHIP:TOO: Value: 16385
-            [1687687925.444971][18054:18056] CHIP:TOO: }
-            [1687687925.444991][18054:18056] CHIP:TOO: }
-            [1687687925.445016][18054:18056] CHIP:TOO: [3]: {
-            [1687687925.445036][18054:18056] CHIP:TOO: Label: Light
-            [1687687925.445056][18054:18056] CHIP:TOO: Mode: 2
-            [1687687925.445106][18054:18056] CHIP:TOO: SemanticTags: 3 entries
-            [1687687925.445133][18054:18056] CHIP:TOO: [1]: {
-            [1687687925.445154][18054:18056] CHIP:TOO: MfgCode: 0
-            [1687687925.445174][18054:18056] CHIP:TOO: Value: 16386
-            [1687687925.445194][18054:18056] CHIP:TOO: }
-            [1687687925.445216][18054:18056] CHIP:TOO: [2]: {
-            [1687687925.445236][18054:18056] CHIP:TOO: MfgCode: 0
-            [1687687925.445256][18054:18056] CHIP:TOO: Value: 8
-            [1687687925.445275][18054:18056] CHIP:TOO: }
-            [1687687925.445297][18054:18056] CHIP:TOO: [3]: {
-            [1687687925.445342][18054:18056] CHIP:TOO: MfgCode: 0
-            [1687687925.445365][18054:18056] CHIP:TOO: Value: 2
-            [1687687925.445385][18054:18056] CHIP:TOO: }
-            [1687687925.445405][18054:18056] CHIP:TOO: }
+          [1687687925.438666][18054:18056] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0002 DataVersion: 4148960394
+          [1687687925.438838][18054:18056] CHIP:TOO: SupportedModes: 3 entries
+          [1687687925.444452][18054:18056] CHIP:TOO: [1]: {
+          [1687687925.444485][18054:18056] CHIP:TOO: Label: Normal
+          [1687687925.444506][18054:18056] CHIP:TOO: Mode: 0
+          [1687687925.444532][18054:18056] CHIP:TOO: SemanticTags: 1 entries
+          [1687687925.444575][18054:18056] CHIP:TOO: [1]: {
+          [1687687925.444598][18054:18056] CHIP:TOO: MfgCode: 0
+          [1687687925.444632][18054:18056] CHIP:TOO: Value: 16384
+          [1687687925.444654][18054:18056] CHIP:TOO: }
+          [1687687925.444674][18054:18056] CHIP:TOO: }
+          [1687687925.444702][18054:18056] CHIP:TOO: [2]: {
+          [1687687925.444723][18054:18056] CHIP:TOO: Label: Heavy
+          [1687687925.444742][18054:18056] CHIP:TOO: Mode: 1
+          [1687687925.444764][18054:18056] CHIP:TOO: SemanticTags: 2 entries
+          [1687687925.444787][18054:18056] CHIP:TOO: [1]: {
+          [1687687925.444808][18054:18056] CHIP:TOO: MfgCode: 0
+          [1687687925.444828][18054:18056] CHIP:TOO: Value: 7
+          [1687687925.444847][18054:18056] CHIP:TOO: }
+          [1687687925.444869][18054:18056] CHIP:TOO: [2]: {
+          [1687687925.444928][18054:18056] CHIP:TOO: MfgCode: 0
+          [1687687925.444952][18054:18056] CHIP:TOO: Value: 16385
+          [1687687925.444971][18054:18056] CHIP:TOO: }
+          [1687687925.444991][18054:18056] CHIP:TOO: }
+          [1687687925.445016][18054:18056] CHIP:TOO: [3]: {
+          [1687687925.445036][18054:18056] CHIP:TOO: Label: Light
+          [1687687925.445056][18054:18056] CHIP:TOO: Mode: 2
+          [1687687925.445106][18054:18056] CHIP:TOO: SemanticTags: 3 entries
+          [1687687925.445133][18054:18056] CHIP:TOO: [1]: {
+          [1687687925.445154][18054:18056] CHIP:TOO: MfgCode: 0
+          [1687687925.445174][18054:18056] CHIP:TOO: Value: 16386
+          [1687687925.445194][18054:18056] CHIP:TOO: }
+          [1687687925.445216][18054:18056] CHIP:TOO: [2]: {
+          [1687687925.445236][18054:18056] CHIP:TOO: MfgCode: 0
+          [1687687925.445256][18054:18056] CHIP:TOO: Value: 8
+          [1687687925.445275][18054:18056] CHIP:TOO: }
+          [1687687925.445297][18054:18056] CHIP:TOO: [3]: {
+          [1687687925.445342][18054:18056] CHIP:TOO: MfgCode: 0
+          [1687687925.445365][18054:18056] CHIP:TOO: Value: 2
+          [1687687925.445385][18054:18056] CHIP:TOO: }
+          [1687687925.445405][18054:18056] CHIP:TOO: }
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT
@@ -107,7 +107,6 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
 
     - label: "TH reads the OnMode attribute from the DUT"
       verification: |
@@ -146,7 +145,6 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
 
     - label: "TH reads the Description attribute from the DUT"
       verification: |

@@ -49,7 +49,8 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Given DISHM.S.F00(DEPONOFF) ensure featuremap has the correct bit set"
+    - label:
+          "Given DISHM.S.F00(DEPONOFF) ensure featuremap has the correct bit set"
       PICS: DISHM.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -67,7 +68,8 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Given DISHM.S.F02(DEPCTM) ensure featuremap has the correct bit set"
+    - label:
+          "Given DISHM.S.F02(DEPCTM) ensure featuremap has the correct bit set"
       PICS: DISHM.S.F02
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -83,21 +85,11 @@ tests:
       response:
           constraints:
               type: list
-              contains:
-                  [
-                      0,
-                      1,
-                      2,
-                      3,
-                      65528,
-                      65529,
-                      65530,
-                      65531,
-                      65532,
-                      65533,
-                  ]
+              contains: [0, 1, 2, 3, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "TH reads optional attribute (DISHM.S.A0004(StartUpMode)) in AttributeList"
+    - label:
+          "TH reads optional attribute (DISHM.S.A0004(StartUpMode)) in
+          AttributeList"
       PICS: DISHM.S.A0004
       command: "readAttribute"
       attribute: "AttributeList"
@@ -106,7 +98,8 @@ tests:
               type: list
               contains: [4]
 
-    - label: "TH reads optional attribute (DISHM.S.F00(DEPONOFF)) in AttributeList"
+    - label:
+          "TH reads optional attribute (DISHM.S.F00(DEPONOFF)) in AttributeList"
       PICS: DISHM.S.F00
       command: "readAttribute"
       attribute: "AttributeList"

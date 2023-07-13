@@ -124,7 +124,9 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH send a ChangeToMode command to the DUT with NewMode set to new_mode_th"
+    - label:
+          "TH send a ChangeToMode command to the DUT with NewMode set to
+          new_mode_th"
       verification: |
           ./chip-tool dishwashermodeselect change-to-mode 2 1 1
 
