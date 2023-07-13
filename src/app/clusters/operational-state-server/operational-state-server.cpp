@@ -216,18 +216,16 @@ void OperationalStateServer::HandleCommand(HandlerContext & handlerContext, Func
 
 CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     switch (aPath.mAttributeId)
     {
     case OperationalState::Attributes::OperationalStateList::Id: {
         Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
-        GenericOperationalState opState;
-        size_t index = 0;
-
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
 
-        return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+            GenericOperationalState opState;
+            size_t index = 0;
+            CHIP_ERROR err = CHIP_NO_ERROR;
             while ((err = delegate->GetOperationalStateAtIndex(index, opState)) == CHIP_NO_ERROR)
             {
                 ReturnErrorOnFailure(encoder.Encode(opState));
@@ -266,12 +264,11 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
         GenericOperationalPhase phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
         size_t index                  = 0;
-
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
-        err = delegate->GetOperationalPhaseAtIndex(index, phase);
-        if (err == CHIP_ERROR_NOT_FOUND || phase.IsMissing())
+
+        if (delegate->GetOperationalPhaseAtIndex(index, phase) == CHIP_ERROR_NOT_FOUND || phase.IsMissing())
         {
-            err = aEncoder.EncodeNull();
+            return aEncoder.EncodeNull();
         }
         else
         {
@@ -293,7 +290,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
         delegate->GetCurrentPhase(currentPhase);
-        err = aEncoder.Encode(currentPhase);
+        return aEncoder.Encode(currentPhase);
     }
     break;
 
@@ -303,9 +300,9 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
         delegate->GetCountdownTime(countdownTime);
-        err = aEncoder.Encode(countdownTime);
+        return aEncoder.Encode(countdownTime);
     }
     break;
     }
-    return err;
+    return CHIP_NO_ERROR;
 }
