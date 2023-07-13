@@ -38,6 +38,8 @@ executable("chip-dishwasher-app") {
   sources = [
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
+    "${chip_root}/examples/dishwasher-app/dishwasher-common/src/operational-state-delegates.cpp",
+    "${chip_root}/examples/dishwasher-app/dishwasher-common/src/operational-state-delegate-impl.cpp",
   ]
 
   deps = [
@@ -56,7 +58,9 @@ executable("chip-dishwasher-app") {
     ]
   }
 
-  include_dirs = [ "include" ]
+  include_dirs = [ "include",
+     "${chip_root}/examples/dishwasher-app/dishwasher-common/include",
+  ]
 
   if (chip_enable_pw_rpc) {
     defines = [

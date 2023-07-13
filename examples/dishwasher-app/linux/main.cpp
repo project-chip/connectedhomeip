@@ -17,6 +17,7 @@
  */
 
 #include "DishwasherManager.h"
+#include "operational-state-delegates.h"
 #include <AppMain.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -80,6 +81,8 @@ void ApplicationInit()
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     sWiFiNetworkCommissioningInstance.Init();
 #endif
+
+    MatterOperationalStateServerInit();
 }
 
 int main(int argc, char * argv[])
