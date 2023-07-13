@@ -92,12 +92,12 @@ class QrcodeFragment : Fragment() {
                     binding.vendorIdText.text = getString(
                         R.string.qrcode_vendor_id_text,
                         MatterConstants.DEFAULT_VENDOR_ID.toString(),
-                        MatterConstants.DEFAULT_VENDOR_ID.toString(16).uppercase()
+                        MatterConstants.DEFAULT_VENDOR_ID
                     )
                     binding.productIdText.text = getString(
                         R.string.qrcode_product_id_text,
                         matterSettings.device.productId.toString(),
-                        matterSettings.device.productId.toString(16).uppercase()
+                        matterSettings.device.productId
                     )
                     binding.commissioningFlowText.text = getString(
                         R.string.qrcode_commissioning_flow_text,
@@ -115,7 +115,7 @@ class QrcodeFragment : Fragment() {
                     binding.discriminatorText.text = getString(
                         R.string.qrcode_discriminator_text,
                         matterSettings.discriminator.toString(),
-                        matterSettings.discriminator.toString(16).uppercase()
+                        matterSettings.discriminator
                     )
                 }
             }
