@@ -78,6 +78,7 @@ public:
     DegradationDirectionEnum GetDegradationDirection() const;
     bool GetInPlaceIndicator() const;
     DataModel::Nullable<uint32_t> GetLastChangedTime() const;
+    EndpointId GetEndpointId() const { return mEndpointId; }
 
 private:
     EndpointId mEndpointId{};

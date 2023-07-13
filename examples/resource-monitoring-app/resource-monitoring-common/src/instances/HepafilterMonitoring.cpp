@@ -30,7 +30,7 @@ Status HepaFilterMonitoringInstance::OnResetCondition()
         UpdateCondition(0);
     }
     UpdateChangeIndication(ChangeIndicationEnum::kOk);
-    if (emberAfContainsAttribute(0x1, Clusters::HepaFilterMonitoring::Id, Attributes::LastChangedTime::Id))
+    if (emberAfContainsAttribute(GetEndpointId(), Clusters::HepaFilterMonitoring::Id, Attributes::LastChangedTime::Id))
     {
         System::Clock::Milliseconds64 currentUnixTimeMS;
         System::Clock::ClockImpl clock;
