@@ -206,9 +206,6 @@ server cluster LevelControl = 8 {
   readonly attribute int16u remainingTime = 1;
   readonly attribute int8u minLevel = 2;
   readonly attribute int8u maxLevel = 3;
-  readonly attribute int16u currentFrequency = 4;
-  readonly attribute int16u minFrequency = 5;
-  readonly attribute int16u maxFrequency = 6;
   attribute LevelControlOptions options = 15;
   attribute nullable int8u onLevel = 17;
   attribute access(write: manage) nullable int8u startUpCurrentLevel = 16384;
@@ -957,7 +954,6 @@ server cluster GeneralDiagnostics = 51 {
   readonly attribute NetworkInterface networkInterfaces[] = 0;
   readonly attribute int16u rebootCount = 1;
   readonly attribute int64u upTime = 2;
-  readonly attribute int32u totalOperationalHours = 3;
   readonly attribute BootReasonEnum bootReason = 4;
   readonly attribute HardwareFaultEnum activeHardwareFaults[] = 5;
   readonly attribute RadioFaultEnum activeRadioFaults[] = 6;
@@ -1867,7 +1863,6 @@ endpoint 0 {
     callback attribute networkInterfaces;
     callback attribute rebootCount default = 0x0000;
     callback attribute upTime default = 0x0000000000000000;
-    callback attribute totalOperationalHours default = 0x00000000;
     callback attribute bootReason;
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
@@ -2107,9 +2102,6 @@ endpoint 1 {
     ram      attribute remainingTime default = 0x0000;
     ram      attribute minLevel default = 0x01;
     ram      attribute maxLevel default = 0xFE;
-    ram      attribute currentFrequency default = 0x0000;
-    ram      attribute minFrequency default = 0x0000;
-    ram      attribute maxFrequency default = 0x0000;
     ram      attribute options default = 0x00;
     ram      attribute onLevel default = 0xFF;
     persist  attribute startUpCurrentLevel default = 255;
@@ -2139,24 +2131,6 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
-  }
-
-  server cluster FixedLabel {
-    callback attribute labelList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster UserLabel {
-    callback attribute labelList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
   }
 
   server cluster ColorControl {
