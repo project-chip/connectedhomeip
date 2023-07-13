@@ -270,17 +270,14 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
         {
             return aEncoder.EncodeNull();
         }
-        else
-        {
-            return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-                while (delegate->GetOperationalPhaseAtIndex(index, phase) != CHIP_ERROR_NOT_FOUND)
-                {
-                    ReturnErrorOnFailure(encoder.Encode(phase.mPhaseName));
-                    index++;
-                }
-                return CHIP_NO_ERROR;
-            });
-        }
+        return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+            while (delegate->GetOperationalPhaseAtIndex(index, phase) != CHIP_ERROR_NOT_FOUND)
+            {
+                ReturnErrorOnFailure(encoder.Encode(phase.mPhaseName));
+                index++;
+            }
+            return CHIP_NO_ERROR;
+        });
     }
     break;
 
