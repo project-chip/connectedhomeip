@@ -26,7 +26,7 @@ limitations under the License.
    <struct name="SemanticTagStruct">
     <cluster code="0x001d"/>
     <item name="MfgCode" type="VENDOR_ID" isNullable="true"/>
-    <item name="Namespace" type="ENUM8"/>
+    <item name="NamespaceID" type="ENUM8"/>
     <item name="Tag" type="ENUM8"/>
     <item name="Label" type="CHAR_STRING" isNullable="true" optional="true"/>
   </struct>
