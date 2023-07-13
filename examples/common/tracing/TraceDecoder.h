@@ -42,7 +42,12 @@ public:
     {
         char buffer[2048] = {};
         snprintf(buffer, sizeof(buffer), "    %s\t %s", tag.c_str(), data.c_str());
-        ReadString(buffer);
+        CHIP_ERROR err = ReadString(buffer);
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Automation, "Failed to add field: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 
     void FinishEvent() override {}
@@ -55,12 +60,10 @@ private:
     CHIP_ERROR MaybeLogAndConsumeMessageFlags(Json::Value & value);
     CHIP_ERROR MaybeLogAndConsumeExchangeFlags(Json::Value & value);
     CHIP_ERROR MaybeLogAndConsumePayload(Json::Value & value, bool isResponse);
-    CHIP_ERROR MaybeLogAndConsumeEncryptedPayload(Json::Value & value);
     CHIP_ERROR MaybeLogAndConsumeOthers(Json::Value & value);
 
 private:
     TraceDecoderOptions mOptions;
-    Json::Value mJsonBuffer;
 };
 
 } // namespace trace

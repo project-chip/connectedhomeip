@@ -136,9 +136,9 @@ template("chip_data_model") {
                            "*",
                            [
                              "zap_pregenerated_dir",
-                             "zap_clusters_with_custom_implementation",
                              "zap_file",
                              "is_server",
+                             "external_clusters",
                            ])
 
     if (!defined(sources)) {
@@ -183,34 +183,22 @@ template("chip_data_model") {
 
     if (defined(invoker.zap_file)) {
       _zap_file = rebase_path(invoker.zap_file, root_build_dir)
+      _script_args = [
+        "--zap_file",
+        _zap_file,
+      ]
+      if (defined(invoker.external_clusters)) {
+        _script_args += [ "--external-clusters" ]
+        _script_args += invoker.external_clusters
+      }
       _cluster_sources = exec_script("${_app_root}/zap_cluster_list.py",
-                                     [ "--zap_file=" + _zap_file ],
+                                     _script_args,
                                      "list lines",
                                      [ invoker.zap_file ])
     }
 
-    _custom_impl_clusters = []
-    if (defined(invoker.zap_clusters_with_custom_implementation)) {
-      _custom_impl_clusters = invoker.zap_clusters_with_custom_implementation
-    }
-
-    if (_cluster_sources == []) {
-      # The variable is only used within the nested foreach-loop and will be
-      # unused before it goes out of scope when the outter-loop is not entered.
-      not_needed([ "_custom_impl_clusters" ])
-    }
-
     foreach(cluster, _cluster_sources) {
-      _custom_impl = false
-      foreach(ci, _custom_impl_clusters) {
-        if (cluster == ci) {
-          _custom_impl = true
-        }
-      }
-
-      if (_custom_impl) {
-        # do not include any sources, we have a custom implementation for this cluster
-      } else if (cluster == "door-lock-server") {
+      if (cluster == "door-lock-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/door-lock-server-callback.cpp",
           "${_app_root}/clusters/${cluster}/door-lock-server.cpp",
@@ -261,6 +249,12 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
           "${_app_root}/clusters/scenes-server/SceneTableImpl.cpp",
+        ]
+      } else if (cluster == "operational-state-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/operational-state-delegate.h",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]

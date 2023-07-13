@@ -64,6 +64,8 @@ namespace app {
 namespace reporting {
 class Engine;
 class TestReportingEngine;
+class ReportScheduler;
+class TestReportScheduler;
 } // namespace reporting
 
 class InteractionModelEngine;
@@ -152,6 +154,38 @@ public:
         virtual ApplicationCallback * GetAppCallback() = 0;
     };
 
+    // TODO (#27675) : Merge existing callback and observer into one class and have an observer pool in the Readhandler to notify
+    // every
+    /*
+     * Observer class for ReadHandler, meant to allow multiple objects to observe the ReadHandler. Currently only one observer is
+     * supported but all above callbacks should be merged into observer type and an observer pool should be added to allow multiple
+     * objects to observe ReadHandler
+     */
+    class Observer
+    {
+    public:
+        virtual ~Observer() = default;
+
+        /// @brief Callback invoked to notify a ReadHandler was created and can be registered
+        /// @param[in] apReadHandler  ReadHandler getting added
+        virtual void OnReadHandlerCreated(ReadHandler * apReadHandler) = 0;
+
+        /// @brief Callback invoked when a ReadHandler went from a non reportable state to a reportable state so a report can be
+        /// sent immediately if the minimal interval allows it. Otherwise the report should be rescheduled to the earliest time
+        /// allowed.
+        /// @param[in] apReadHandler  ReadHandler that became dirty
+        virtual void OnBecameReportable(ReadHandler * apReadHandler) = 0;
+
+        /// @brief Callback invoked when the read handler needs to make sure to send a message to the subscriber within the next
+        /// maxInterval time period.
+        /// @param[in] apReadHandler ReadHandler that has generated a report
+        virtual void OnSubscriptionAction(ReadHandler * apReadHandler) = 0;
+
+        /// @brief Callback invoked when a ReadHandler is getting removed so it can be unregistered
+        /// @param[in] apReadHandler  ReadHandler getting destroyed
+        virtual void OnReadHandlerDestroyed(ReadHandler * apReadHandler) = 0;
+    };
+
     /*
      * Destructor - as part of destruction, it will abort the exchange context
      * if a valid one still exists.
@@ -167,7 +201,8 @@ public:
      *  The callback passed in has to outlive this handler object.
      *
      */
-    ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType);
+    ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType,
+                Observer * observer = nullptr);
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
@@ -177,7 +212,7 @@ public:
      *  The callback passed in has to outlive this handler object.
      *
      */
-    ReadHandler(ManagementCallback & apCallback);
+    ReadHandler(ManagementCallback & apCallback, Observer * observer = nullptr);
 #endif
 
     const ObjectList<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
@@ -190,19 +225,40 @@ public:
         aMaxInterval = mMaxInterval;
     }
 
+    CHIP_ERROR SetMinReportingIntervalForTests(uint16_t aMinInterval)
+    {
+        VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(aMinInterval <= mMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
+        // Ensures the new min interval is higher than the subscriber established one.
+        mMinIntervalFloorSeconds = std::max(mMinIntervalFloorSeconds, aMinInterval);
+        return CHIP_NO_ERROR;
+    }
+
     /*
-     * Set the reporting intervals for the subscription. This SHALL only be called
+     * Set the maximum reporting interval for the subscription. This SHALL only be called
      * from the OnSubscriptionRequested callback above. The restriction is as below
      * MinIntervalFloor ≤ MaxInterval ≤ MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling)
      * Where SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT is set to 60m in the spec.
      */
-    CHIP_ERROR SetReportingIntervals(uint16_t aMaxInterval)
+    CHIP_ERROR SetMaxReportingInterval(uint16_t aMaxInterval)
     {
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mMinIntervalFloorSeconds <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(aMaxInterval <= std::max(kSubscriptionMaxIntervalPublisherLimit, mMaxInterval),
                             CHIP_ERROR_INVALID_ARGUMENT);
         mMaxInterval = aMaxInterval;
+        return CHIP_NO_ERROR;
+    }
+
+    /// @brief Add an observer to the read handler, currently only one observer is supported but all other callbacks should be
+    /// merged with a general observer type to allow multiple object to observe readhandlers
+    /// @param aObserver observer to be added
+    /// @return CHIP_ERROR_INVALID_ARGUMENT if passing in nullptr
+    CHIP_ERROR SetObserver(Observer * aObserver)
+    {
+        VerifyOrReturnError(nullptr != aObserver, CHIP_ERROR_INVALID_ARGUMENT);
+        // TODO (#27675) : After merging the callbacks and observer, change so the method adds a new observer to an observer pool
+        mObserver = aObserver;
         return CHIP_NO_ERROR;
     }
 
@@ -214,13 +270,13 @@ private:
     {
         // WaitingUntilMinInterval is used to prevent subscription data delivery while we are
         // waiting for the min reporting interval to elapse.
-        WaitingUntilMinInterval = (1 << 0),
+        WaitingUntilMinInterval = (1 << 0), // TODO (#27672): Remove once ReportScheduler is implemented or change to test flag
 
         // WaitingUntilMaxInterval is used to prevent subscription empty report delivery while we
         // are waiting for the max reporting interval to elaps.  When WaitingUntilMaxInterval
         // becomes false, we are allowed to send an empty report to keep the
         // subscription alive on the client.
-        WaitingUntilMaxInterval = (1 << 1),
+        WaitingUntilMaxInterval = (1 << 1), // TODO (#27672): Remove once ReportScheduler is implemented
 
         // The flag indicating we are in the middle of a series of chunked report messages, this flag will be cleared during
         // sending last chunked message.
@@ -291,6 +347,8 @@ private:
 
     bool IsIdle() const { return mState == HandlerState::Idle; }
 
+    // TODO (#27672): Change back to IsReportable once ReportScheduler is implemented so this can assess reportability without
+    // considering timing. The ReporScheduler will handle timing.
     /// @brief Returns whether the ReadHandler is in a state where it can immediately send a report. This function
     /// is used to determine whether a report generation should be scheduled for the handler.
     bool IsReportableNow() const
@@ -370,6 +428,7 @@ private:
 
     friend class TestReadInteraction;
     friend class chip::app::reporting::TestReportingEngine;
+    friend class chip::app::reporting::TestReportScheduler;
 
     //
     // The engine needs to be able to Abort/Close a ReadHandler instance upon completion of work for a given read/subscribe
@@ -378,6 +437,10 @@ private:
     //
     friend class chip::app::reporting::Engine;
     friend class chip::app::InteractionModelEngine;
+
+    // The report scheduler needs to be able to access StateFlag private functions IsGeneratingReports() and IsDirty() to
+    // know when to schedule a run so it is declared as a friend class.
+    friend class chip::app::reporting::ReportScheduler;
 
     enum class HandlerState : uint8_t
     {
@@ -404,10 +467,13 @@ private:
 
     /// @brief This function is called when the min interval timer has expired, it restarts the timer on a timeout equal to the
     /// difference between the max interval and the min interval.
-    static void MinIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState);
-    static void MaxIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState);
+    static void MinIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState); // TODO (#27672): Remove once
+                                                                                              // ReportScheduler is implemented.
+    static void MaxIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState); // TODO (#27672): Remove once
+                                                                                              // ReportScheduler is implemented.
     /// @brief This function is called when a report is sent and it restarts the min interval timer.
-    CHIP_ERROR UpdateReportTimer();
+    CHIP_ERROR UpdateReportTimer(); // TODO (#27672) : Remove once ReportScheduler is implemented.
+
     CHIP_ERROR SendSubscribeResponse();
     CHIP_ERROR ProcessSubscribeRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload);
@@ -519,6 +585,9 @@ private:
     PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
     BitFlags<ReadHandlerFlags> mFlags;
     InteractionType mInteractionType = InteractionType::Read;
+
+    // TODO (#27675): Merge all observers into one and that one will dispatch the callbacks to the right place.
+    Observer * mObserver = nullptr;
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     // Callbacks to handle server-initiated session success/failure

@@ -358,5 +358,6 @@ void registerCommandsGroup(Commands & commands, CredentialIssuerCommands * creds
         make_unique<RemoveKeySet>(credsIssuerConfig),
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands,
+                                "Commands for manipulating group keys and memberships for chip-tool itself.");
 }

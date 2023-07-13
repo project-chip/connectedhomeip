@@ -428,7 +428,8 @@ class TlvReadWriteTest {
     // Signed Integer (Long), 8-octet
     val encoding = "03 00 90 2f 50 09 00 00 00".octetsToByteArray()
 
-    // Throws exception because the encoded value is Long and not ULong as requested by getULong()
+    // Throws exception because the encoded value is Long and not ULong as requested by
+    // getULong()
     assertFailsWith<IllegalArgumentException> { TlvReader(encoding).getULong(AnonymousTag) }
   }
 
@@ -1008,9 +1009,12 @@ class TlvReadWriteTest {
 
   @Test
   fun encodeFullyQualifiedTags_withStructure() {
-    // Structure with the fully qualified tag, Vendor ID 0xFFF1/65521, profile number 0xDEED/57069,
-    // 2-octet tag 1. The structure contains a single element labeled using a fully qualified tag
-    // under the same profile, with 2-octet tag 0xAA55/43605.65521::57069:1 = {65521::57069:43605 =
+    // Structure with the fully qualified tag, Vendor ID 0xFFF1/65521, profile number
+    // 0xDEED/57069,
+    // 2-octet tag 1. The structure contains a single element labeled using a fully qualified
+    // tag
+    // under the same profile, with 2-octet tag 0xAA55/43605.65521::57069:1 =
+    // {65521::57069:43605 =
     // 42U}
     val value = 42U
     val structTag = FullyQualifiedTag(6, 0xFFF1u, 0xDEEDu, 1u)

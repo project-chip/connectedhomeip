@@ -147,7 +147,7 @@ PyChipError pychip_DeviceController_SetTrustedTimeSource(chip::NodeId nodeId, ch
 PyChipError pychip_DeviceController_ResetCommissioningParameters();
 PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
-                                                           uint32_t setupPINCode, chip::NodeId nodeid);
+                                                           uint32_t setupPINCode, chip::NodeId nodeid, uint16_t port);
 PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::DeviceCommissioner * devCtrl, uint32_t setupPINCode,
                                                             uint16_t discriminator, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
@@ -561,13 +561,17 @@ PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommiss
 }
 
 PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
-                                                           uint32_t setupPINCode, chip::NodeId nodeid)
+                                                           uint32_t setupPINCode, chip::NodeId nodeid, uint16_t port)
 {
     chip::Inet::IPAddress peerAddr;
     chip::Transport::PeerAddress addr;
     RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
     VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
+    if (port != 0)
+    {
+        addr.SetPort(port);
+    }
     params.SetPeerAddress(addr).SetDiscriminator(0);
     sPairingDelegate.SetExpectingPairingComplete(true);
     return ToPyChipError(devCtrl->EstablishPASEConnection(nodeid, params));

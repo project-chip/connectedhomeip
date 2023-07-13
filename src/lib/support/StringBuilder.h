@@ -63,6 +63,13 @@ public:
     /// not fit, this replaces the last 3 characters with "."
     StringBuilderBase & AddMarkerIfOverflow();
 
+    StringBuilderBase & Reset()
+    {
+        mWriter.Reset();
+        NullTerminate();
+        return *this;
+    }
+
     /// access the underlying value
     const char * c_str() const { return reinterpret_cast<const char *>(mWriter.Buffer()); }
 

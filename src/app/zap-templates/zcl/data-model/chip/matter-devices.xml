@@ -1181,8 +1181,8 @@ limitations under the License.
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
             <include cluster="Boolean State" client="false" server="true" clientLocked="true" serverLocked="true">
-	        <requireAttribute>STATE_VALUE</requireAttribute>
-	    </include>
+                <requireAttribute>STATE_VALUE</requireAttribute>
+            </include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -1618,7 +1618,7 @@ limitations under the License.
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
             <include cluster="Thermostat" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-	    <include cluster="Time Synchronization" client="false" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Time Synchronization" client="false" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="Thermostat User Interface Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Fan Control" client="false" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="false" serverLocked="true"></include>
@@ -1897,6 +1897,67 @@ limitations under the License.
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Carbon Monoxide" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-air-purifier</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Air Purifier</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x002D</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Fan Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="HEPA Filter Monitoring" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Activated Carbon Filter Monitoring" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-air-quality-sensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Air Quality Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x002C</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+            <include cluster="Air Quality" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Temperature Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Relative Humidity Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Carbon Monoxide Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Carbon Dioxide Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Nitrogen Dioxide Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Ozone Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Formaldehyde Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="PM1 Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="PM2.5 Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="PM10 Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Radon Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Total Volatile Organic Compounds Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-dishwasher</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Dishwasher</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0075</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Temperature Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Dishwasher Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Dishwasher Alarm" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>

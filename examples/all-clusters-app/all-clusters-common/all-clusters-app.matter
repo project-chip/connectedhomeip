@@ -2542,6 +2542,175 @@ server cluster AirQuality = 91 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface for observing and managing the state of smoke and CO alarms. */
+server cluster SmokeCoAlarm = 92 {
+  enum AlarmStateEnum : ENUM8 {
+    kNormal = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum ContaminationStateEnum : ENUM8 {
+    kNormal = 0;
+    kLow = 1;
+    kWarning = 2;
+    kCritical = 3;
+  }
+
+  enum EndOfServiceEnum : ENUM8 {
+    kNormal = 0;
+    kExpired = 1;
+  }
+
+  enum ExpressedStateEnum : ENUM8 {
+    kNormal = 0;
+    kSmokeAlarm = 1;
+    kCOAlarm = 2;
+    kBatteryAlert = 3;
+    kTesting = 4;
+    kHardwareFault = 5;
+    kEndOfService = 6;
+    kInterconnectSmoke = 7;
+    kInterconnectCO = 8;
+  }
+
+  enum MuteStateEnum : ENUM8 {
+    kNotMuted = 0;
+    kMuted = 1;
+  }
+
+  enum SensitivityEnum : ENUM8 {
+    kHigh = 0;
+    kStandard = 1;
+    kLow = 2;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kSmokeAlarm = 0x1;
+    kCOAlarm = 0x2;
+  }
+
+  critical event SmokeAlarm = 0 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  critical event COAlarm = 1 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  info event LowBattery = 2 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  info event HardwareFault = 3 {
+  }
+
+  info event EndOfService = 4 {
+  }
+
+  info event SelfTestComplete = 5 {
+  }
+
+  info event AlarmMuted = 6 {
+  }
+
+  info event MuteEnded = 7 {
+  }
+
+  critical event InterconnectSmokeAlarm = 8 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  critical event InterconnectCOAlarm = 9 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  info event AllClear = 10 {
+  }
+
+  readonly attribute ExpressedStateEnum expressedState = 0;
+  readonly attribute AlarmStateEnum smokeState = 1;
+  readonly attribute AlarmStateEnum COState = 2;
+  readonly attribute AlarmStateEnum batteryAlert = 3;
+  readonly attribute MuteStateEnum deviceMuted = 4;
+  readonly attribute boolean testInProgress = 5;
+  readonly attribute boolean hardwareFaultAlert = 6;
+  readonly attribute EndOfServiceEnum endOfServiceAlert = 7;
+  readonly attribute AlarmStateEnum interconnectSmokeAlarm = 8;
+  readonly attribute AlarmStateEnum interconnectCOAlarm = 9;
+  readonly attribute ContaminationStateEnum contaminationState = 10;
+  attribute SensitivityEnum sensitivityLevel = 11;
+  readonly attribute epoch_s expiryDate = 12;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  command SelfTestRequest(): DefaultSuccess = 0;
+}
+
+/** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
+server cluster OperationalState = 96 {
+  enum ErrorStateEnum : ENUM8 {
+    kNoError = 0;
+    kUnableToStartOrResume = 1;
+    kUnableToCompleteOperation = 2;
+    kCommandInvalidInState = 3;
+  }
+
+  enum OperationalStateEnum : ENUM8 {
+    kStopped = 0;
+    kRunning = 1;
+    kPaused = 2;
+    kError = 3;
+  }
+
+  struct ErrorStateStruct {
+    enum8 errorStateID = 0;
+    optional char_string<64> errorStateLabel = 1;
+    optional char_string<64> errorStateDetails = 2;
+  }
+
+  struct OperationalStateStruct {
+    enum8 operationalStateID = 0;
+    optional char_string<64> operationalStateLabel = 1;
+  }
+
+  critical event OperationalError = 0 {
+    ErrorStateStruct errorState = 0;
+  }
+
+  info event OperationCompletion = 1 {
+    ENUM8 completionErrorCode = 0;
+    optional nullable elapsed_s totalOperationalTime = 1;
+    optional nullable elapsed_s pausedTime = 2;
+  }
+
+  readonly attribute nullable CHAR_STRING phaseList[] = 0;
+  readonly attribute nullable int8u currentPhase = 1;
+  readonly attribute nullable elapsed_s countdownTime = 2;
+  readonly attribute OperationalStateStruct operationalStateList[] = 3;
+  readonly attribute OperationalStateStruct operationalState = 4;
+  readonly attribute ErrorStateStruct operationalError = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct OperationalCommandResponse = 4 {
+    ErrorStateStruct commandResponseState = 0;
+  }
+
+  command Pause(): OperationalCommandResponse = 0;
+  command Stop(): OperationalCommandResponse = 1;
+  command Start(): OperationalCommandResponse = 2;
+  command Resume(): OperationalCommandResponse = 3;
+}
+
 /** Attributes and commands for monitoring HEPA filters in a device */
 server cluster HepaFilterMonitoring = 113 {
   enum ChangeIndicationEnum : ENUM8 {
@@ -2555,9 +2724,22 @@ server cluster HepaFilterMonitoring = 113 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2585,9 +2767,22 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2615,9 +2810,22 @@ server cluster CeramicFilterMonitoring = 115 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2645,9 +2853,22 @@ server cluster ElectrostaticFilterMonitoring = 116 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2675,9 +2896,22 @@ server cluster UvFilterMonitoring = 117 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2705,9 +2939,22 @@ server cluster IonizingFilterMonitoring = 118 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2735,9 +2982,22 @@ server cluster ZeoliteFilterMonitoring = 119 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2765,9 +3025,22 @@ server cluster OzoneFilterMonitoring = 120 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2795,9 +3068,22 @@ server cluster WaterTankMonitoring = 121 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2825,9 +3111,22 @@ server cluster FuelTankMonitoring = 122 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2855,9 +3154,22 @@ server cluster InkCartridgeMonitoring = 123 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -2885,9 +3197,22 @@ server cluster TonerCartridgeMonitoring = 124 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -6338,6 +6663,52 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 15;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster SmokeCoAlarm {
+    emits event SmokeAlarm;
+    emits event COAlarm;
+    emits event LowBattery;
+    emits event HardwareFault;
+    emits event EndOfService;
+    emits event SelfTestComplete;
+    emits event AlarmMuted;
+    emits event MuteEnded;
+    emits event InterconnectSmokeAlarm;
+    emits event InterconnectCOAlarm;
+    emits event AllClear;
+    persist  attribute expressedState default = 0;
+    persist  attribute smokeState default = 0;
+    persist  attribute COState default = 0;
+    persist  attribute batteryAlert default = 0;
+    persist  attribute deviceMuted default = 0;
+    ram      attribute testInProgress default = 0;
+    persist  attribute hardwareFaultAlert default = 0;
+    persist  attribute endOfServiceAlert default = 0;
+    ram      attribute interconnectSmokeAlarm default = 0;
+    ram      attribute interconnectCOAlarm default = 0;
+    ram      attribute contaminationState default = 0;
+    ram      attribute sensitivityLevel default = 1;
+    ram      attribute expiryDate default = 0;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OperationalState {
+    emits event OperationalError;
+    emits event OperationCompletion;
+    callback attribute phaseList;
+    callback attribute currentPhase;
+    callback attribute countdownTime;
+    callback attribute operationalStateList;
+    callback attribute operationalState;
+    callback attribute operationalError;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 

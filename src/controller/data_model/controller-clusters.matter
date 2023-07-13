@@ -3208,13 +3208,16 @@ client cluster SmokeCoAlarm = 92 {
     kCOAlarm = 0x2;
   }
 
-  info event SmokeAlarm = 0 {
+  critical event SmokeAlarm = 0 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
-  info event COAlarm = 1 {
+  critical event COAlarm = 1 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
   info event LowBattery = 2 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
   info event HardwareFault = 3 {
@@ -3232,10 +3235,12 @@ client cluster SmokeCoAlarm = 92 {
   info event MuteEnded = 7 {
   }
 
-  info event InterconnectSmokeAlarm = 8 {
+  critical event InterconnectSmokeAlarm = 8 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
-  info event InterconnectCOAlarm = 9 {
+  critical event InterconnectCOAlarm = 9 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
   info event AllClear = 10 {
@@ -3452,9 +3457,22 @@ client cluster HepaFilterMonitoring = 113 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
@@ -3462,6 +3480,7 @@ client cluster HepaFilterMonitoring = 113 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3486,9 +3505,22 @@ client cluster ActivatedCarbonFilterMonitoring = 114 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
@@ -3496,6 +3528,7 @@ client cluster ActivatedCarbonFilterMonitoring = 114 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3520,9 +3553,22 @@ client cluster CeramicFilterMonitoring = 115 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
@@ -3530,6 +3576,7 @@ client cluster CeramicFilterMonitoring = 115 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3554,9 +3601,22 @@ client cluster ElectrostaticFilterMonitoring = 116 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
@@ -3564,6 +3624,7 @@ client cluster ElectrostaticFilterMonitoring = 116 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3588,9 +3649,22 @@ client cluster UvFilterMonitoring = 117 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
@@ -3598,6 +3672,7 @@ client cluster UvFilterMonitoring = 117 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3622,9 +3697,22 @@ client cluster IonizingFilterMonitoring = 118 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
@@ -3632,6 +3720,7 @@ client cluster IonizingFilterMonitoring = 118 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3656,9 +3745,22 @@ client cluster ZeoliteFilterMonitoring = 119 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
@@ -3666,6 +3768,7 @@ client cluster ZeoliteFilterMonitoring = 119 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3690,9 +3793,22 @@ client cluster OzoneFilterMonitoring = 120 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
@@ -3700,6 +3816,7 @@ client cluster OzoneFilterMonitoring = 120 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3724,9 +3841,22 @@ client cluster WaterTankMonitoring = 121 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
@@ -3734,6 +3864,7 @@ client cluster WaterTankMonitoring = 121 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3758,9 +3889,22 @@ client cluster FuelTankMonitoring = 122 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
@@ -3768,6 +3912,7 @@ client cluster FuelTankMonitoring = 122 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3792,9 +3937,22 @@ client cluster InkCartridgeMonitoring = 123 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
@@ -3802,6 +3960,7 @@ client cluster InkCartridgeMonitoring = 123 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3826,9 +3985,22 @@ client cluster TonerCartridgeMonitoring = 124 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
@@ -3836,6 +4008,7 @@ client cluster TonerCartridgeMonitoring = 124 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

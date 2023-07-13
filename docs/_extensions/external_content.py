@@ -81,7 +81,7 @@ def adjust_includes(
 
     def _adjust_path(path):
         # ignore absolute paths, section links, hyperlinks and same folder
-        if path.startswith(("/", "#", "http", "www")) or not "/" in path:
+        if path.startswith(("/", "#", "http", "www")) or "/" not in path:
             return path
 
         # for files that are being copied modify reference to and out of /docs

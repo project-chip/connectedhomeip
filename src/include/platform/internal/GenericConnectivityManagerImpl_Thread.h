@@ -68,6 +68,9 @@ protected:
     CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
     CHIP_ERROR _RequestSEDActiveMode(bool onOff, bool delayIdle = false);
 #endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
+#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
     bool _IsThreadAttached();
     bool _IsThreadProvisioned();
     void _ErasePersistentInfo();
@@ -162,6 +165,15 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_RequestSEDA
     return ThreadStackMgrImpl().RequestSEDActiveMode(onOff, delayIdle);
 }
 #endif
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+template <class ImplClass>
+inline CHIP_ERROR
+GenericConnectivityManagerImpl_Thread<ImplClass>::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
+{
+    return ThreadStackMgrImpl().SetPollingInterval(pollingInterval);
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl_Thread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts()
