@@ -105,6 +105,7 @@ class YamlLoader:
             'response': (dict, list, str),  # Can be a variable
             'minInterval': int,
             'maxInterval': int,
+            'timeout': int,
             'timedInteractionTimeoutMs': int,
             'dataVersion': (list, int, str),  # Can be a variable
             'busyWaitMs': int,

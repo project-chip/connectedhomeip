@@ -65,6 +65,7 @@ struct InteractiveServerResult
 {
     bool mEnabled       = false;
     bool mIsAsyncReport = false;
+    uint16_t mTimeout   = 0;
     int mStatus         = EXIT_SUCCESS;
     std::vector<std::string> mResults;
     std::vector<InteractiveServerResultLog> mLogs;
@@ -92,18 +93,31 @@ struct InteractiveServerResult
     // protected by a mutex.
     std::mutex mMutex;
 
-    void Setup(bool isAsyncReport)
+    void Setup(bool isAsyncReport, uint16_t timeout)
     {
         auto lock      = ScopedLock(mMutex);
         mEnabled       = true;
         mIsAsyncReport = isAsyncReport;
+        mTimeout       = timeout;
+
+        if (mIsAsyncReport && mTimeout)
+        {
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(StartAsyncTimeout, reinterpret_cast<intptr_t>(this));
+        }
     }
 
     void Reset()
     {
-        auto lock      = ScopedLock(mMutex);
+        auto lock = ScopedLock(mMutex);
+
+        if (mIsAsyncReport && mTimeout)
+        {
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(StopAsyncTimeout, reinterpret_cast<intptr_t>(this));
+        }
+
         mEnabled       = false;
         mIsAsyncReport = false;
+        mTimeout       = 0;
         mStatus        = EXIT_SUCCESS;
         mResults.clear();
         mLogs.clear();
@@ -204,6 +218,24 @@ struct InteractiveServerResult
         content << "}";
         return content.str();
     }
+
+    static void StartAsyncTimeout(intptr_t arg)
+    {
+        auto self    = reinterpret_cast<InteractiveServerResult *>(arg);
+        auto timeout = chip::System::Clock::Seconds16(self->mTimeout);
+        chip::DeviceLayer::SystemLayer().StartTimer(timeout, OnAsyncTimeout, self);
+    }
+
+    static void StopAsyncTimeout(intptr_t arg)
+    {
+        auto self = reinterpret_cast<InteractiveServerResult *>(arg);
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnAsyncTimeout, self);
+    }
+
+    static void OnAsyncTimeout(chip::System::Layer *, void * appState)
+    {
+        RemoteDataModelLogger::LogErrorAsJSON(CHIP_ERROR_TIMEOUT);
+    }
 };
 
 InteractiveServerResult gInteractiveServerResult;
@@ -263,7 +295,19 @@ CHIP_ERROR InteractiveServerCommand::RunCommand()
 bool InteractiveServerCommand::OnWebSocketMessageReceived(char * msg)
 {
     bool isAsyncReport = strlen(msg) == 0;
-    gInteractiveServerResult.Setup(isAsyncReport);
+    uint16_t timeout   = 0;
+    if (!isAsyncReport && strlen(msg) <= 5 /* Only look for numeric values <= 65535 */)
+    {
+        std::stringstream ss;
+        ss << msg;
+        ss >> timeout;
+        if (!ss.fail())
+        {
+            isAsyncReport = true;
+        }
+    }
+
+    gInteractiveServerResult.Setup(isAsyncReport, timeout);
     VerifyOrReturnValue(!isAsyncReport, true);
 
     auto shouldStop = ParseCommand(msg, &gInteractiveServerResult.mStatus);
