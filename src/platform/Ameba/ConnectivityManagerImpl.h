@@ -141,9 +141,8 @@ private:
     static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState);
 
     void UpdateInternetConnectivityState(void);
-    void OnStationIPv4AddressAvailable(void);
-    void OnStationIPv4AddressLost(void);
-    void OnIPv6AddressAvailable(void);
+    void OnStationIPv4v6AddressAvailable(void);
+    void OnStationIPv4v6AddressLost(void);
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
