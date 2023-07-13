@@ -123,9 +123,7 @@ tests:
               contains: [0, 3]
 
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS:
-          (OPSTATE.S.C00 || OPSTATE.S.C01 || OPSTATE.S.C02 ||
-          OPSTATE.S.C03)
+      PICS: (OPSTATE.S.C00 || OPSTATE.S.C01 || OPSTATE.S.C02 || OPSTATE.S.C03)
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
