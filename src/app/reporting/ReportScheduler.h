@@ -41,8 +41,8 @@ public:
     {
     public:
         virtual ~TimerDelegate() {}
-        /// @brief Start a timer for a given context. The report scheduler must always cancel an existing timer for a context (using CancelTimer)
-        /// before starting a new one for that context.
+        /// @brief Start a timer for a given context. The report scheduler must always cancel an existing timer for a context (using
+        /// CancelTimer) before starting a new one for that context.
         /// @param context context to pass to the timer callback.
         /// @param aTimeout time in miliseconds before the timer expires
         virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) = 0;
