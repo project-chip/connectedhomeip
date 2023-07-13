@@ -224,7 +224,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
         return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
             GenericOperationalState opState;
-            size_t index = 0;
+            size_t index   = 0;
             CHIP_ERROR err = CHIP_NO_ERROR;
             while ((err = delegate->GetOperationalStateAtIndex(index, opState)) == CHIP_NO_ERROR)
             {
