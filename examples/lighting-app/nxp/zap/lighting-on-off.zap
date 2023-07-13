@@ -9113,6 +9113,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 256
     }
-  ],
-  "log": []
+  ]
 }
