@@ -21,6 +21,7 @@
 #include <app/tests/AppTestContext.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <nlunit-test.h>
 
 namespace {
@@ -74,10 +75,64 @@ using InteractionModelEngine = InteractionModelEngine;
 using ReportScheduler        = reporting::ReportScheduler;
 using ReportSchedulerImpl    = reporting::ReportSchedulerImpl;
 using ReadHandlerNode        = reporting::ReportScheduler::ReadHandlerNode;
+using Milliseconds64         = System::Clock::Milliseconds64;
+
+static const size_t kNumMaxReadHandlers = 16;
 
 class TestTimerDelegate : public ReportScheduler::TimerDelegate
 {
 public:
+    struct NodeTimeoutPair
+    {
+        ReadHandlerNode * node;
+        System::Clock::Timeout timeout;
+    };
+
+    NodeTimeoutPair mPairArray[kNumMaxReadHandlers];
+    size_t mPairArraySize                         = 0;
+    System::Clock::Timestamp mMockSystemTimestamp = System::Clock::Milliseconds64(0);
+
+    NodeTimeoutPair * FindPair(ReadHandlerNode * node, size_t & position)
+    {
+        for (size_t i = 0; i < mPairArraySize; i++)
+        {
+            if (mPairArray[i].node == node)
+            {
+                position = i;
+                return &mPairArray[i];
+            }
+        }
+        return nullptr;
+    }
+
+    CHIP_ERROR insertPair(ReadHandlerNode * node, System::Clock::Timeout timeout)
+    {
+        VerifyOrReturnError(mPairArraySize < kNumMaxReadHandlers, CHIP_ERROR_NO_MEMORY);
+        mPairArray[mPairArraySize].node    = node;
+        mPairArray[mPairArraySize].timeout = timeout;
+        mPairArraySize++;
+
+        return CHIP_NO_ERROR;
+    }
+
+    void removePair(ReadHandlerNode * node)
+    {
+        size_t position;
+        NodeTimeoutPair * pair = FindPair(node, position);
+        VerifyOrReturn(pair != nullptr);
+
+        size_t nextPos = static_cast<size_t>(position + 1);
+        size_t moveNum = static_cast<size_t>(mPairArraySize - nextPos);
+
+        // Compress array after removal, if the removed position is not the last
+        if (moveNum)
+        {
+            memmove(&mPairArray[position], &mPairArray[nextPos], sizeof(NodeTimeoutPair) * moveNum);
+        }
+
+        mPairArraySize--;
+    }
+
     static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
     {
         // Normaly we would call the callback here, thus scheduling an engine run, but we don't need it for this test as we simulate
@@ -85,30 +140,39 @@ public:
         //
         // ReadHandlerNode * node = static_cast<ReadHandlerNode *>(aAppState);
         // node->RunCallback();
+        ChipLogProgress(DataManagement, "Simluating engine run for Handler: %p", aAppState);
     }
     virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) override
     {
-        return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-            aTimeout, TimerCallbackInterface, context);
+        return insertPair(static_cast<ReadHandlerNode *>(context), aTimeout + mMockSystemTimestamp);
     }
-    virtual void CancelTimer(void * context) override
-    {
-        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-            TimerCallbackInterface, context);
-    }
+    virtual void CancelTimer(void * context) override { removePair(static_cast<ReadHandlerNode *>(context)); }
     virtual bool IsTimerActive(void * context) override
     {
-        return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->IsTimerActive(
-            TimerCallbackInterface, context);
+        size_t position;
+        NodeTimeoutPair * pair = FindPair(static_cast<ReadHandlerNode *>(context), position);
+        VerifyOrReturnValue(pair != nullptr, false);
+
+        return pair->timeout > mMockSystemTimestamp;
     }
 
-    virtual System::Clock::Timestamp GetCurrentMonotonicTimestamp() override
+    virtual System::Clock::Timestamp GetCurrentMonotonicTimestamp() override { return mMockSystemTimestamp; }
+
+    void SetMockSystemTimestamp(System::Clock::Timestamp aMockTimestamp) { mMockSystemTimestamp = aMockTimestamp; }
+
+    // Increment the mock timestamp one milisecond at a time for a total of aTime miliseconds. Checks if
+    void IncrementMockTimestamp(System::Clock::Milliseconds64 aTime)
     {
-        return System::SystemClock().GetMonotonicTimestamp();
+        mMockSystemTimestamp = mMockSystemTimestamp + aTime;
+        for (size_t i = 0; i < mPairArraySize; i++)
+        {
+            if (mPairArray[i].timeout <= mMockSystemTimestamp)
+            {
+                TimerCallbackInterface(nullptr, mPairArray[i].node);
+            }
+        }
     }
 };
-
-static const size_t kNumMaxReadHandlers = 16;
 
 TestTimerDelegate sTestTimerDelegate;
 ReportSchedulerImpl sScheduler(&sTestTimerDelegate);
@@ -125,6 +189,9 @@ public:
 
         // Read handler pool
         ObjectPool<ReadHandler, kNumMaxReadHandlers> readHandlerPool;
+
+        // Initialize mock timestamp
+        sTestTimerDelegate.SetMockSystemTimestamp(Milliseconds64(0));
 
         for (size_t i = 0; i < kNumMaxReadHandlers; i++)
         {
@@ -188,11 +255,14 @@ public:
         // Read handler pool
         ObjectPool<ReadHandler, kNumMaxReadHandlers> readHandlerPool;
 
+        // Initialize mock timestamp
+        sTestTimerDelegate.SetMockSystemTimestamp(Milliseconds64(0));
+
         // Dirty read handler, will be triggered at min interval
         ReadHandler * readHandler1 =
             readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMaxReportingInterval(2));
-        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMinReportingInterval(1));
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMinReportingIntervalForTests(1));
         readHandler1->ForceDirtyState();
         readHandler1->MoveToState(ReadHandler::HandlerState::GeneratingReports);
 
@@ -200,14 +270,14 @@ public:
         ReadHandler * readHandler2 =
             readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler2->SetMaxReportingInterval(3));
-        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler2->SetMinReportingInterval(0));
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler2->SetMinReportingIntervalForTests(0));
         readHandler2->MoveToState(ReadHandler::HandlerState::GeneratingReports);
 
         // Clean read handler, will be triggered at max interval, but will be cancelled before
         ReadHandler * readHandler3 =
             readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler3->SetMaxReportingInterval(3));
-        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler3->SetMinReportingInterval(0));
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler3->SetMinReportingIntervalForTests(0));
         readHandler3->MoveToState(ReadHandler::HandlerState::GeneratingReports);
 
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sScheduler.RegisterReadHandler(readHandler1));
@@ -219,8 +289,9 @@ public:
         NL_TEST_ASSERT(aSuite, !sScheduler.IsReportableNow(readHandler2));
         NL_TEST_ASSERT(aSuite, !sScheduler.IsReportableNow(readHandler3));
 
-        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1100),
-                                        [&]() -> bool { return sScheduler.IsReportableNow(readHandler1); });
+        // Simulate system clock increment
+        sTestTimerDelegate.IncrementMockTimestamp(Milliseconds64(1100));
+
         // Checks that the first ReadHandler is reportable after 1 second since it is dirty and min interval has expired
         NL_TEST_ASSERT(aSuite, sScheduler.IsReportableNow(readHandler1));
         NL_TEST_ASSERT(aSuite, !sScheduler.IsReportableNow(readHandler2));
@@ -230,9 +301,8 @@ public:
         sScheduler.CancelReport(readHandler3);
         NL_TEST_ASSERT(aSuite, !sScheduler.IsReportScheduled(readHandler3));
 
-        // Wait another 3 seconds to let the second ReadHandler become reportable
-        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(3100),
-                                        [&]() -> bool { return sScheduler.IsReportableNow(readHandler2); });
+        // Simulate system clock increment
+        sTestTimerDelegate.IncrementMockTimestamp(Milliseconds64(2000));
 
         // Checks that all ReadHandlers are reportable
         NL_TEST_ASSERT(aSuite, sScheduler.IsReportableNow(readHandler1));
@@ -257,10 +327,13 @@ public:
         // Read handler pool
         ObjectPool<ReadHandler, kNumMaxReadHandlers> readHandlerPool;
 
+        // Initialize mock timestamp
+        sTestTimerDelegate.SetMockSystemTimestamp(Milliseconds64(0));
+
         ReadHandler * readHandler =
             readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler->SetMaxReportingInterval(2));
-        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler->SetMinReportingInterval(1));
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler->SetMinReportingIntervalForTests(1));
         readHandler->MoveToState(ReadHandler::HandlerState::GeneratingReports);
         readHandler->SetObserver(&sScheduler);
 
@@ -279,8 +352,9 @@ public:
         readHandler->mObserver->OnBecameReportable(readHandler);
         // Should have changed the scheduled timeout to the handler's min interval, to check, we wait for the min interval to
         // expire
-        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1100),
-                                        [&]() -> bool { return sScheduler.IsReportableNow(readHandler); });
+        // Simulate system clock increment
+        sTestTimerDelegate.IncrementMockTimestamp(Milliseconds64(1100));
+
         // Check that no report is scheduled since the min interval has expired, the timer should now be stopped
         NL_TEST_ASSERT(aSuite, !sScheduler.IsReportScheduled(readHandler));
 
@@ -289,13 +363,16 @@ public:
         readHandler->mObserver->OnSubscriptionAction(readHandler);
         // Should have changed the scheduled timeout to the handlers max interval, to check, we wait for the min interval to
         // confirm it is not expired yet so the report should still be scheduled
+
         NL_TEST_ASSERT(aSuite, sScheduler.IsReportScheduled(readHandler));
-        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1100),
-                                        [&]() -> bool { return sScheduler.IsReportableNow(readHandler); });
+        // Simulate system clock increment
+        sTestTimerDelegate.IncrementMockTimestamp(Milliseconds64(1100));
+
         // Check that the report is still scheduled as the max interval has not expired yet and the dirty flag was cleared
         NL_TEST_ASSERT(aSuite, sScheduler.IsReportScheduled(readHandler));
-        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2100),
-                                        [&]() -> bool { return sScheduler.IsReportableNow(readHandler); });
+        // Simulate system clock increment
+        sTestTimerDelegate.IncrementMockTimestamp(Milliseconds64(2100));
+
         // Check that no report is scheduled since the max interval should have expired, the timer should now be stopped
         NL_TEST_ASSERT(aSuite, !sScheduler.IsReportScheduled(readHandler));
 
