@@ -31,21 +31,22 @@ print("=========chip_device_platform: ${chip_device_platform}")
 chip_mdns = "platform"
 
 chip_enable_openthread = false
+chip_config_network_layer_ble = false
 
-lwip_platform = "renesas"
+lwip_platform = "external"
 
 chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_tcp_endpoint = false
 chip_system_config_use_open_thread_inet_endpoints = false
-chip_with_lwip = false
+chip_with_lwip = true
 
 chip_system_config_locking = "none"
 chip_system_config_use_sockets = false
+chip_build_default_attestation_verifier = true
+
 
 optimize_debug_level = "s"
 lwip_debug = false
 default_configs_optimize = [ "$dir_pw_build:optimize_size" ]
 
 chip_build_tests = false
-
-

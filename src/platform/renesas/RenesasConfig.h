@@ -33,6 +33,9 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+#define PLATFORM_NVRAM_SSID_MATTER_BASE 0
+#define PLATFORM_NVRAM_VSID_MATTER_BASE 0x100
+
 constexpr inline uint32_t RenesasConfigKey(uint16_t keyBaseOffset, uint8_t id)
 {
     return keyBaseOffset | id;
@@ -49,7 +52,6 @@ public:
     static constexpr uint16_t kChipFactory_KeyBase  = PLATFORM_NVRAM_SSID_MATTER_BASE;
     static constexpr uint16_t kChipConfig_KeyBase   = PLATFORM_NVRAM_VSID_MATTER_BASE + 0x0000;
     static constexpr uint16_t kChipKvsValue_KeyBase = PLATFORM_NVRAM_VSID_MATTER_BASE + 0x0100;
-    static constexpr uint16_t kChipKvsKey_KeyBase   = PLATFORM_NVRAM_VSID_MATTER_BASE + 0x0200;
 
     // Key definitions for well-known keys.
     static constexpr uint16_t kChipKvsKey_KeyBase   = PLATFORM_NVRAM_VSID_MATTER_BASE + 0x0200;
@@ -98,8 +100,6 @@ public:
     static constexpr Key kMaxConfigKey_ChipFactory = RenesasConfigKey(kChipFactory_KeyBase, 0xff);
     static constexpr Key kMinConfigKey_ChipConfig  = RenesasConfigKey(kChipConfig_KeyBase, 0x00);
     static constexpr Key kMaxConfigKey_ChipConfig  = RenesasConfigKey(kChipConfig_KeyBase, 0xff);
-
-    kConfigKey_RebootCount
 
     static CHIP_ERROR Init(void);
 

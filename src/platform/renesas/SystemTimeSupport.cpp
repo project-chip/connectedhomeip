@@ -25,7 +25,6 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <internal/clock_timer.h>
 #include <lib/support/TimeUtils.h>
 
 namespace chip {

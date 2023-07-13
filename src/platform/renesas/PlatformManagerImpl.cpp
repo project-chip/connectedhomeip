@@ -34,7 +34,6 @@
 #include <lwip/tcpip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#include "AppConfig.h"
 #include "FreeRTOS.h"
 
 namespace chip {

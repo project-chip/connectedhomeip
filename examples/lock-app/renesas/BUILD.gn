@@ -14,117 +14,25 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/renesas_sdk.gni")
 import("//build_overrides/lwip.gni")
 
-import("${renesas_sdk_build_root}/renesas_executable.gni")
-import("${renesas_sdk_build_root}/renesas_sdk.gni")
-
+import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/lib/lib.gni")
-print("=========chip_device_platform: ${chip_root}")
-
-renesas_project_dir = "${chip_root}/examples/lock-app/renesas"
-examples_plat_dir = "${chip_root}/examples/platform/renesas"
 
 declare_args() {
   setupPinCode = 20202021
   setupDiscriminator = 3840
 }
 
-renesas_sdk("sdk") {
-  sources = [ "${renesas_project_dir}/include/CHIPProjectConfig.h" ]
 
-  include_dirs = [
-    "${renesas_project_dir}/include",
-    "${examples_plat_dir}",
-  ]
-
-  defines = [
-    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
-    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
+group("chip-lock-app")
+{
+  deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/jsoncpp",
   ]
 }
 
-#renesas_executable("lock_app") {
- # output_name = "chip-renesas-lock-example.elf"
-
-  #sources = [
-  #  "src/main.cpp",
-  #]
-
-  #deps = [
-   # ":sdk",
-   # "${chip_root}/examples/lock-app/lock-common",
-   # "${chip_root}/examples/providers:device_info_provider",
-   # "${chip_root}/examples/shell/shell_common:shell_common",
-   # "${chip_root}/src/lib",
-  #]
-
-  #include_dirs = [ "include123456" ]
-
-#}
-
-
-config("includes") {
-  include_dirs = [
-    "include",
-    ".",
-    "${root_gen_dir}/include",
-  ]
-
-  # TODO: generated file dependency should be a lib NOT an include
-  include_dirs += [ "${chip_root}/zzz_generated/app-common" ]
-
-  defines = [ "CHIP_1111111111_CONFIG_H=1"
-   ]
+group("renesas") {
+  deps = [ ":chip-lock-app" ]
 }
-
-
-static_library("lib") {
-   
-  public_deps = [
-    "${chip_root}/src/app",
-    "${chip_root}/src/ble",
-    "${chip_root}/src/controller",
-    "${chip_root}/src/crypto",
-    "${chip_root}/src/inet",
-    "${chip_root}/src/lib/asn1",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/dnssd",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/messaging",
-    "${chip_root}/src/platform",
-    "${chip_root}/src/setup_payload",
-    "${chip_root}/src/system",
-    "${chip_root}/src/transport",
-  ]
-
-  include_dirs = [ "//include", "../../../../../lwip-tcpip/lwip/src/include" ]
-  
-  # Only include the shell if it is being used. The shell is
-  # a debug feature mostly useful for embedded examples.
-  # See src/lib/lib.gni for declaration of this build arg.
-  if (chip_build_libshell) {
-    public_deps += [ "${chip_root}/src/lib/shell" ]
-  }
-
-  # Only include the DefaultAttestationVerifier if needed in the build.
-  # See src/lib/lib.gni for declaration of this build arg.
-  if (chip_build_default_attestation_verifier) {
-    public_deps +=
-        [ "${chip_root}/src/credentials:default_attestation_verifier" ]
-  }
-
-  cflags = [ "-Wconversion" ,
-            "-I include", "-I../../../../../lwip-tcpip/lwip/src/include", "-DCHIP_SYSTEM_CONFIG_USE_LWIP=1"
-  ]
-  
-
-
-  output_name = "libCHIP"
-
-  output_dir = "${root_out_dir}/lib"
-
-  complete_static_lib = true
-}
-

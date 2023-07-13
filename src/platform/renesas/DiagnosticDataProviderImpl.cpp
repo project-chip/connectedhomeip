@@ -24,7 +24,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/Renesas/DiagnosticDataProviderImpl.h> /// @Neethu, please adapt path depending on where you store it.
+#include <platform/renesas/DiagnosticDataProviderImpl.h>
 
 #include "FreeRTOS.h"
 

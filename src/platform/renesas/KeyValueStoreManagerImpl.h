@@ -31,6 +31,8 @@ namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
 
+#define KVS_MAX_ENTRIES 50
+
 class KeyValueStoreManagerImpl final : public KeyValueStoreManager
 {
     // Allow the KeyValueStoreManager interface class to delegate method calls to
@@ -52,8 +54,6 @@ private:
     static void OnScheduledKeyMapSave(System::Layer * systemLayer, void * appState);
 
     void ScheduleKeyMapSave(void);
-    bool IsValidKvsNvm3Key(const uint32_t nvm3Key) const;
-    CHIP_ERROR MapKvsKeyToNvm3(const char * key, uint32_t & nvm3Key, bool isSlotNeeded = false) const;
 
     //  ===== Members for internal use by the following friends.
     friend KeyValueStoreManager & KeyValueStoreMgr();
