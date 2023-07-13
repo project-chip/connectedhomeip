@@ -18,7 +18,10 @@ RUN set -x \
 
 
 #Clone Gecko SDK 4.2.0 (ef05eb6)
-RUN git clone --depth=1 --branch=v4.2.3 https://github.com/SiliconLabs/gecko_sdk.git
+RUN git clone --depth=1 --branch=v4.2.3 https://github.com/SiliconLabs/gecko_sdk.git && \
+    cd gecko_sdk && \
+    rm -rf .git \
+    && : # last line
 
 ENV GSDK_ROOT=/gecko_sdk/
 
