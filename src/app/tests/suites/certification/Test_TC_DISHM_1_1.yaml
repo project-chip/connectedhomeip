@@ -13,14 +13,14 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 263.1.1. [TC-DISHM-1.1] Global Attributes [DUT-Server]
+name: 267.1.1. [TC-DISHM-1.1] Global Attributes [DUT-Server]
 
 PICS:
     - DISHM.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Dishwasher Mode Select"
+    cluster: "Dishwasher Mode"
     endpoint: 1
 
 tests:
@@ -116,6 +116,7 @@ tests:
               contains: [5]
 
     - label: "TH reads AcceptedCommandList from DUT"
+      PICS: "!DISHM.S.F02"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -123,10 +124,29 @@ tests:
               type: list
               contains: [0]
 
+    - label: "TH reads AcceptedCommandList from DUT"
+      PICS: DISHM.S.F01
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
     - label: "Read the global attribute: GeneratedCommandList"
+      PICS: "!DISHM.S.F01"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
           value: []
           constraints:
               type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      PICS: DISHM.S.F01
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [2]

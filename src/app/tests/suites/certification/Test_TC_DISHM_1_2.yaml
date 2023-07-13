@@ -13,13 +13,13 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 263.1.2. [TC-DISHM-1.2] Cluster attributes with server as DUT
+name: 267.1.2. [TC-DISHM-1.2] Cluster attributes with server as DUT
 
 PICS:
     - DISHM.S
 
 config:
-    nodeId: 0x0059
+    nodeId: 0x12344321
     cluster: "Dishwasher Mode"
     endpoint: 1
 
@@ -33,52 +33,135 @@ tests:
                 value: nodeId
 
     - label: "TH reads the SupportedModes attribute from DUT"
-      PICS: DISHM.S.A0002 && DISHM.S.ST4000
-      command: "readAttribute"
-      attribute: "SupportedModes"
-      response:
+      verification: |
+            ./chip-tool dishwashermodeselect read supported-modes 1 1
+
+            On TH(chip-tool) log, Verify SupportedModes attribute should contains atleast two ModeOptionsStruct entries with unique mode field value and label field value below is the sample log provided for the raspi platform:
+
+            [1687687925.438666][18054:18056] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0002 DataVersion: 4148960394
+            [1687687925.438838][18054:18056] CHIP:TOO: SupportedModes: 3 entries
+            [1687687925.444452][18054:18056] CHIP:TOO: [1]: {
+            [1687687925.444485][18054:18056] CHIP:TOO: Label: Normal
+            [1687687925.444506][18054:18056] CHIP:TOO: Mode: 0
+            [1687687925.444532][18054:18056] CHIP:TOO: SemanticTags: 1 entries
+            [1687687925.444575][18054:18056] CHIP:TOO: [1]: {
+            [1687687925.444598][18054:18056] CHIP:TOO: MfgCode: 0
+            [1687687925.444632][18054:18056] CHIP:TOO: Value: 16384
+            [1687687925.444654][18054:18056] CHIP:TOO: }
+            [1687687925.444674][18054:18056] CHIP:TOO: }
+            [1687687925.444702][18054:18056] CHIP:TOO: [2]: {
+            [1687687925.444723][18054:18056] CHIP:TOO: Label: Heavy
+            [1687687925.444742][18054:18056] CHIP:TOO: Mode: 1
+            [1687687925.444764][18054:18056] CHIP:TOO: SemanticTags: 2 entries
+            [1687687925.444787][18054:18056] CHIP:TOO: [1]: {
+            [1687687925.444808][18054:18056] CHIP:TOO: MfgCode: 0
+            [1687687925.444828][18054:18056] CHIP:TOO: Value: 7
+            [1687687925.444847][18054:18056] CHIP:TOO: }
+            [1687687925.444869][18054:18056] CHIP:TOO: [2]: {
+            [1687687925.444928][18054:18056] CHIP:TOO: MfgCode: 0
+            [1687687925.444952][18054:18056] CHIP:TOO: Value: 16385
+            [1687687925.444971][18054:18056] CHIP:TOO: }
+            [1687687925.444991][18054:18056] CHIP:TOO: }
+            [1687687925.445016][18054:18056] CHIP:TOO: [3]: {
+            [1687687925.445036][18054:18056] CHIP:TOO: Label: Light
+            [1687687925.445056][18054:18056] CHIP:TOO: Mode: 2
+            [1687687925.445106][18054:18056] CHIP:TOO: SemanticTags: 3 entries
+            [1687687925.445133][18054:18056] CHIP:TOO: [1]: {
+            [1687687925.445154][18054:18056] CHIP:TOO: MfgCode: 0
+            [1687687925.445174][18054:18056] CHIP:TOO: Value: 16386
+            [1687687925.445194][18054:18056] CHIP:TOO: }
+            [1687687925.445216][18054:18056] CHIP:TOO: [2]: {
+            [1687687925.445236][18054:18056] CHIP:TOO: MfgCode: 0
+            [1687687925.445256][18054:18056] CHIP:TOO: Value: 8
+            [1687687925.445275][18054:18056] CHIP:TOO: }
+            [1687687925.445297][18054:18056] CHIP:TOO: [3]: {
+            [1687687925.445342][18054:18056] CHIP:TOO: MfgCode: 0
+            [1687687925.445365][18054:18056] CHIP:TOO: Value: 2
+            [1687687925.445385][18054:18056] CHIP:TOO: }
+            [1687687925.445405][18054:18056] CHIP:TOO: }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
           values:
-             - name: "Mode"
-               saveAs: supported_modes_dut
-               value: [0, 1, 2]
-          constraints:
-              type: list
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads the CurrentMode attribute from the DUT"
-      PICS: DISHM.S.A0003
-      command: "readAttribute"
-      attribute: "CurrentMode"
-      response:
-          value: 0
-          constraints:
-              type: int16u
+      verification: |
+          ./chip-tool dishwashermodeselect read current-mode 1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer and the value is from supported_modes_dut, below is the sample log provided for the raspi platform:
+
+          [1645776767.611140][4667:4672] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469718
+
+          [1645776767.611214][4667:4672] CHIP:TOO: CurrentMode: 0
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"   
               
 
     - label: "TH reads the OnMode attribute from the DUT"
-      PICS: DISHM.S.A0005
-      command: "readAttribute"
-      attribute: "OnMode"
-      response:
-          value: supported_modes_dut
-          constraints:
-              type: int16u
-              
+      verification: |
+          ./chip-tool dishwashermodeselect read on-mode 1 1
+
+          Verify on TH(chip-tool) logs, OnMode attribute value is an integer and the value is from supported_modes_dut (As per spec default value is null) , below is the sample log provided for the raspi platform:
+
+
+          [1649676072.465968][10754:10759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065072
+
+          [1649676072.466094][10754:10759] CHIP:TOO: OnMode: null
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"              
 
     - label: "TH reads the StartUpMode attribute from the DUT"
-      PICS: DISHM.S.A0004
-      command: "readAttribute"
-      attribute: "StartUpMode"
-      response:
-          value: supported_modes_dut
-          constraints:
-              type: int16u
+      verification: |
+          ./chip-tool dishwashermodeselect read start-up-mode 1 1
+
+          Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer and value is from supported_modes_dut, below is the sample log provided for the raspi platform:
+
+          [1649677014.496348][10778:10784] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004 DataVersion: 4277065072
+          [1649677014.496469][10778:10784] CHIP:TOO: StartUpMode: 0
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
               
 
     - label: "TH reads the Description attribute from the DUT"
-      PICS: DISHM.S.A0000
-      command: "readAttribute"
-      attribute: "Description"
-      response:
-          value: ""
-          constraints:
-              type: char_string
+      verification: |
+          ./chip-tool dishwashermodeselect read description 1 1
+
+          Verify on TH(chip-tool) logs , Description value is human readable text string and below is the sample log provided for the raspi platform:
+
+          [1649677114.614974][10787:10792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000 DataVersion: 4277065072
+          [1649677114.615110][10787:10792] CHIP:TOO: Description: Dishwasher
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
