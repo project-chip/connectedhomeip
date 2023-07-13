@@ -264,7 +264,7 @@ def main() -> int:
     # Arguments parser
     #
 
-    deviceTypes = "\n  ".join(_DEVICE_LIST)
+    deviceTypes = "\n            ".join(_DEVICE_LIST)
 
     usage = textwrap.dedent(f"""\
         usage: chef.py [options]
@@ -310,11 +310,11 @@ def main() -> int:
     parser.add_option("-t", "--target", type='choice',
                       action='store',
                       dest="build_target",
-                      help="specifies target platform. Default is esp32. See info below for currently supported target platforms",
+                      help="specifies target platform. See info below for currently supported target platforms",
                       choices=['nrfconnect', 'esp32',
                                'linux', 'silabs-thread', 'ameba'],
                       metavar="TARGET",
-                      default="esp32")
+                      default="linux")
     parser.add_option("-r", "--rpc",
                       help=("enables Pigweed RPC interface. Enabling RPC disables the shell interface. "
                             "Your sdkconfig configurations will be reverted to default. Default is PW RPC off. "
@@ -475,8 +475,10 @@ def main() -> int:
         zephyr_sdk_dir = config['nrfconnect']['ZEPHYR_SDK_INSTALL_DIR']
         shell.run_cmd("export ZEPHYR_TOOLCHAIN_VARIANT=zephyr")
         shell.run_cmd(f"export ZEPHYR_SDK_INSTALL_DIR={zephyr_sdk_dir}")
-        shell.run_cmd(f"export ZEPHYR_BASE={config['nrfconnect']['ZEPHYR_BASE']}")
-        shell.run_cmd(f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
+        shell.run_cmd(
+            f"export ZEPHYR_BASE={config['nrfconnect']['ZEPHYR_BASE']}")
+        shell.run_cmd(
+            f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
         # QUIRK:
         # When the Zephyr SDK is installed as a part of the NCS toolchain, the build system will use
         # build tools from the NCS toolchain, but it will not update the PATH and LD_LIBRARY_PATH
@@ -485,8 +487,10 @@ def main() -> int:
         ncs_toolchain_dir = os.path.abspath(f"{zephyr_sdk_dir}/../..")
         if os.path.exists(os.path.join(ncs_toolchain_dir, 'manifest.json')):
             shell.run_cmd(f"export PATH=$PATH:{ncs_toolchain_dir}/usr/bin")
-            shell.run_cmd(f"export PATH=$PATH:{ncs_toolchain_dir}/usr/local/bin")
-            shell.run_cmd(f"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{ncs_toolchain_dir}/usr/lib")
+            shell.run_cmd(
+                f"export PATH=$PATH:{ncs_toolchain_dir}/usr/local/bin")
+            shell.run_cmd(
+                f"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{ncs_toolchain_dir}/usr/lib")
             shell.run_cmd(
                 f"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{ncs_toolchain_dir}/usr/local/lib")
     elif options.build_target == "linux":
@@ -560,8 +564,6 @@ def main() -> int:
         shell.run_cmd(
             f"{_REPO_BASE_PATH}/scripts/tools/zap/generate.py "
             f"{_CHEF_SCRIPT_PATH}/devices/{options.sample_device_type_name}.zap -o {gen_dir}")
-        # af-gen-event.h is not generated
-        shell.run_cmd(f"touch {gen_dir}/af-gen-event.h")
 
     #
     # Setup environment

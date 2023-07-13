@@ -304,11 +304,11 @@ def write_to_output(data: bytes,
 
 def _read_raw_serial(read: Callable[[], bytes], output):
     """Continuously read and pass to output."""
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor() as _:
         while True:
             try:
                 data = read()
-            except Exception as exc:  # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 continue
             if data:
                 output(data)
