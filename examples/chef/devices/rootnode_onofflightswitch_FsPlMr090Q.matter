@@ -298,8 +298,8 @@ client cluster Binding = 30 {
       cluster instances. */
 server cluster AccessControl = 31 {
   enum AccessControlEntryAuthModeEnum : ENUM8 {
-    kPase = 1;
-    kCase = 2;
+    kPASE = 1;
+    kCASE = 2;
     kGroup = 3;
   }
 
@@ -465,7 +465,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
   enum OTADownloadProtocol : ENUM8 {
     kBDXSynchronous = 0;
     kBDXAsynchronous = 1;
-    kHttps = 2;
+    kHTTPS = 2;
     kVendorSpecific = 3;
   }
 
@@ -657,7 +657,7 @@ server cluster TimeFormatLocalization = 44 {
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
   enum CommissioningErrorEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
     kNoFailSafe = 3;
@@ -737,12 +737,12 @@ server cluster NetworkCommissioning = 49 {
   }
 
   enum WiFiBandEnum : ENUM8 {
-    k2g4 = 0;
-    k3g65 = 1;
-    k5g = 2;
-    k6g = 3;
-    k60g = 4;
-    k1g = 5;
+    k2G4 = 0;
+    k3G65 = 1;
+    k5G = 2;
+    k6G = 3;
+    k60G = 4;
+    k1G = 5;
   }
 
   bitmap Feature : BITMAP32 {
@@ -753,10 +753,10 @@ server cluster NetworkCommissioning = 49 {
 
   bitmap WiFiSecurityBitmap : BITMAP8 {
     kUnencrypted = 0x1;
-    kWep = 0x2;
-    kWpaPersonal = 0x4;
-    kWpa2Personal = 0x8;
-    kWpa3Personal = 0x10;
+    kWEP = 0x2;
+    kWPAPersonal = 0x4;
+    kWPA2Personal = 0x8;
+    kWPA3Personal = 0x10;
   }
 
   struct NetworkInfoStruct {
@@ -876,7 +876,7 @@ server cluster DiagnosticLogs = 50 {
 
   enum TransferProtocolEnum : ENUM8 {
     kResponsePayload = 0;
-    kBdx = 1;
+    kBDX = 1;
   }
 
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1135,7 +1135,7 @@ server cluster OperationalCredentials = 62 {
   }
 
   enum NodeOperationalCertStatusEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
     kInvalidNOC = 3;

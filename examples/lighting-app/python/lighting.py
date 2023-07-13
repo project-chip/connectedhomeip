@@ -21,11 +21,9 @@ import sys
 import textwrap
 import threading
 from cmd import Cmd
-from ctypes import CFUNCTYPE, c_char_p, c_int32, c_uint8
 
-from chip.exceptions import ChipStackError
-from chip.server import GetLibraryHandle, NativeLibraryHandleMethodArguments, PostAttributeChangeCallback
-from dali.address import Broadcast, Short
+from chip.server import GetLibraryHandle, PostAttributeChangeCallback
+from dali.address import Broadcast
 from dali.driver.hid import tridonic
 from dali.gear.general import DAPC, Off, RecallMaxLevel
 
@@ -206,7 +204,7 @@ class Lighting:
 
 
 if __name__ == "__main__":
-    l = Lighting()
+    lighting = Lighting()
 
     lightMgrCmd = LightingMgrCmd()
     print("Chip Lighting Device Shell")

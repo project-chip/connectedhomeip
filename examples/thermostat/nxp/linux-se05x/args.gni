@@ -13,5 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+
 import("${chip_root}/config/standalone/args.gni")
-chip_with_se05x = 1
+
+# Include to define nxp_crypto_impl
+import("${chip_root}/src/platform/nxp/crypto/se05x/args.gni")

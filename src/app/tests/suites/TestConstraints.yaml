@@ -359,6 +359,34 @@ tests:
       arguments:
           value: ""
 
+    # Tests for NULLABLE_CHAR_STRING attribute
+
+    - label: "Write attribute NULLABLE_CHAR_STRING Value"
+      command: "writeAttribute"
+      attribute: "nullable_char_string"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_CHAR_STRING Value MinLength Constraints"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          constraints:
+              minLength: 5
+
+    - label: "Read attribute NULLABLE_CHAR_STRING Value MaxLength Constraints"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          constraints:
+              maxLength: 20
+
+    - label: "Write attribute NULLABLE_CHAR_STRING Value Back to Default Value"
+      command: "writeAttribute"
+      attribute: "nullable_char_string"
+      arguments:
+          value: ""
+
     # Tests for hasValue attribute
 
     - label: "Read attribute NULLABLE_INT8U Default Value"

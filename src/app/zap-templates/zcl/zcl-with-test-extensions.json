@@ -35,6 +35,7 @@
         "content-launch-cluster.xml",
         "descriptor-cluster.xml",
         "diagnostic-logs-cluster.xml",
+        "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
         "door-lock-cluster.xml",
         "electrical-measurement-cluster.xml",
@@ -299,11 +300,24 @@
             "TimeZone",
             "DSTOffset",
             "UTCTime",
-            "LocalTime"
+            "LocalTime",
+            "Granularity",
+            "TimeZoneListMaxSize",
+            "DSTOffsetListMaxSize"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
-        "Operational State": ["OperationalState", "OperationalError"],
-        "RVC Operational State": ["OperationalState", "OperationalError"]
+        "Operational State": [
+            "OperationalState",
+            "OperationalError",
+            "CurrentPhase",
+            "CountdownTime"
+        ],
+        "RVC Operational State": [
+            "OperationalState",
+            "OperationalError",
+            "CurrentPhase",
+            "CountdownTime"
+        ]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],

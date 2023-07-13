@@ -18,17 +18,17 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
+      "path": "../../../../../src/app/zap-templates/app-templates.json",
+      "type": "gen-templates-json",
+      "version": "chip-v1"
+    },
+    {
+      "pathRelativity": "relativeToZap",
       "path": "../../../../../src/app/zap-templates/zcl/zcl-with-test-extensions.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data with some extensions"
-    },
-    {
-      "pathRelativity": "relativeToZap",
-      "path": "../../../../../src/app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
@@ -15214,7 +15214,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "FanModeType",
+              "type": "FanModeEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15230,7 +15230,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "FanModeSequenceType",
+              "type": "FanModeSequenceEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15246,7 +15246,7 @@
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "int8u",
+              "type": "Percent",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15262,7 +15262,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "type": "int8u",
+              "type": "Percent",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15326,7 +15326,7 @@
               "code": 7,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "RockBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15342,7 +15342,7 @@
               "code": 8,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "RockBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15358,7 +15358,7 @@
               "code": 9,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "WindBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15374,7 +15374,7 @@
               "code": 10,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "WindBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -24544,6 +24544,138 @@
       "deviceTypeProfileId": 259,
       "clusters": [
         {
+          "name": "Descriptor",
+          "code": 29,
+          "mfgCode": null,
+          "define": "DESCRIPTOR_CLUSTER",
+          "side": "client",
+          "enabled": 0,
+          "attributes": [
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Descriptor",
+          "code": 29,
+          "mfgCode": null,
+          "define": "DESCRIPTOR_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "attributes": [
+            {
+              "name": "DeviceTypeList",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "ServerList",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClientList",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "PartsList",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
           "name": "Network Commissioning",
           "code": 49,
           "mfgCode": null,
@@ -24919,5 +25051,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 61442
     }
-  ]
+  ],
+  "log": []
 }

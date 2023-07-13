@@ -55,6 +55,8 @@ using namespace ::chip::DeviceLayer;
 // If building with the SiWx917-provided crypto backend, we can use the
 
 #include "SilabsDeviceDataProvider.h"
+#include "SilabsTestEventTriggerDelegate.h"
+#include <lib/support/BytesToHex.h>
 
 #if SILABS_OTA_ENABLED
 void SilabsMatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
@@ -65,7 +67,8 @@ void SilabsMatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, vo
 }
 #endif
 
-void SilabsMatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg){
+void SilabsMatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg)
+{
     // Initialize OTA only when Thread or WiFi connectivity is established
     /*if (((event->Type == DeviceEventType::kThreadConnectivityChange) &&
          (event->ThreadConnectivityChange.Result == kConnectivity_Established)) ||
@@ -78,6 +81,12 @@ void SilabsMatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event
     }*/
     SILABS_LOG("Scheduling OTA Requestor initialization")
 }
+
+#if SILABS_TEST_EVENT_TRIGGER_ENABLED
+static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
+                                                                                          0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
+                                                                                          0xcc, 0xdd, 0xee, 0xff };
+#endif // SILABS_TEST_EVENT_TRIGGER_ENABLED
 
 CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 {
@@ -130,6 +139,18 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     // Create initParams with SDK example defaults here
     static chip::CommonCaseDeviceServerInitParams initParams;
+
+#if SILABS_TEST_EVENT_TRIGGER_ENABLED
+    if (Encoding::HexToBytes(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY, strlen(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY),
+                             sTestEventTriggerEnableKey,
+                             TestEventTriggerDelegate::kEnableKeyLength) != TestEventTriggerDelegate::kEnableKeyLength)
+    {
+        SILABS_LOG("Failed to convert the EnableKey string to octstr type value");
+        memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
+    }
+    static SilabsTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+#endif // SILABS_TEST_EVENT_TRIGGER_ENABLED
 
     // Initialize the remaining (not overridden) providers to the SDK example defaults
     (void) initParams.InitializeStaticResourcesBeforeServerInit();

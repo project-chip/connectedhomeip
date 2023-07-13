@@ -18,7 +18,6 @@
 
 #include "CHIPCommand.h"
 
-#include <TracingCommandLineArgument.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <core/CHIPBuildConfig.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
@@ -247,7 +246,7 @@ void CHIPCommand::StartTracing()
     {
         for (const auto & destination : mTraceTo.Value())
         {
-            chip::CommandLineApp::EnableTracingFor(destination.c_str());
+            mTracingSetup.EnableTracingFor(destination.c_str());
         }
     }
 
@@ -277,7 +276,7 @@ void CHIPCommand::StartTracing()
 
 void CHIPCommand::StopTracing()
 {
-    chip::CommandLineApp::StopTracing();
+    mTracingSetup.StopTracing();
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::trace::DeInitTrace();

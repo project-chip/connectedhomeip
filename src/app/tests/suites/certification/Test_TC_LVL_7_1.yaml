@@ -23,204 +23,213 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Level Control"
+    endpoint: 1
+    RandomLevelValue:
+        type: int8u
+        defaultValue: 100
+    RandomFrequencyValue:
+        type: int16u
+        defaultValue: 30000
 
 tests:
-    - label: "TH writes 0x00 to the Options attribute"
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    #Adding below step resolve the issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/499
+    - label:
+          "Precondition: write default value of OnOffTransitionTime attribute"
+      PICS: LVL.S.A0010
+      command: "writeAttribute"
+      attribute: "OnOffTransitionTime"
+      arguments:
+          value: 0
+
+    - label: "Step 0a: TH writes 0 to the Options attribute"
       PICS: LVL.S.A000f
-      verification: |
-          ./chip-tool levelcontrol write  options 0x00 1 1
-           verify that DUT sends a success response On TH(chip-tool)
-          [1658732283.094610][3087:3092] CHIP:DMG: WriteResponseMessage =
-          [1658732283.094656][3087:3092] CHIP:DMG: {
-          [1658732283.094696][3087:3092] CHIP:DMG:         AttributeStatusIBs =
-          [1658732283.094863][3087:3092] CHIP:DMG:         [
-          [1658732283.094914][3087:3092] CHIP:DMG:                 AttributeStatusIB =
-          [1658732283.094965][3087:3092] CHIP:DMG:                 {
-          [1658732283.095012][3087:3092] CHIP:DMG:                         AttributePathIB =
-          [1658732283.095068][3087:3092] CHIP:DMG:                         {
-          [1658732283.095129][3087:3092] CHIP:DMG:                                 Endpoint = 0x1,
-          [1658732283.095197][3087:3092] CHIP:DMG:                                 Cluster = 0x8,
-          [1658732283.095259][3087:3092] CHIP:DMG:                                 Attribute = 0x0000_000F,
-          [1658732283.095322][3087:3092] CHIP:DMG:                         }
-          [1658732283.095385][3087:3092] CHIP:DMG:
-          [1658732283.095446][3087:3092] CHIP:DMG:                         StatusIB =
-          [1658732283.095505][3087:3092] CHIP:DMG:                         {
-          [1658732283.095564][3087:3092] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1658732283.095626][3087:3092] CHIP:DMG:                         },
-          [1658732283.095682][3087:3092] CHIP:DMG:
-          [1658732283.095731][3087:3092] CHIP:DMG:                 },
-          [1658732283.095786][3087:3092] CHIP:DMG:
-          [1658732283.095830][3087:3092] CHIP:DMG:         ],
-          [1658732283.095883][3087:3092] CHIP:DMG:
-          [1658732283.095927][3087:3092] CHIP:DMG:         InteractionModelRevision = 1
-          [1658732283.095970][3087:3092] CHIP:DMG: }
-      disabled: true
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
 
-    - label: "TH sends On command to DUT"
+    - label: "Step 0b: TH sends On command to DUT"
+      cluster: "On/Off"
       PICS: OO.S.C01.Rsp
-      verification: |
-          ./chip-tool onoff on 1 1
-           verify that DUT sends a success response On TH(chip-tool)
-          [1658731148.428641][2894:2899] CHIP:DMG:         InteractionModelRevision = 1
-          [1658731148.428665][2894:2899] CHIP:DMG: },
-          [1658731148.428723][2894:2899] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
-          [1658731148.428766][2894:2899] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1658731148.428828][2894:2899] CHIP:EM: Sending Standalone Ack for MessageCounter:77812182 on exchange 38946i
-      disabled: true
+      command: "On"
 
-    - label: "TH reads the MinLevel attribute from the DUT"
+    - label: "Step 1a: TH reads the MinLevel attribute from the DUT"
       PICS: LVL.S.A0002
-      verification: |
-          ./chip-tool levelcontrol read min-level 1 1
+      command: "readAttribute"
+      attribute: "MinLevel"
+      response:
+          saveAs: minLevelValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
 
-          Record the MinLevel attribute value for usage in later steps, this is optional attribute implemented in RPI, may vary based on DUT implementation on TH(chip-tool) log
-
-          [1658919507.800574][3717:3722] CHIP:DMG: }
-          [1658919507.800774][3717:3722] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0002 DataVersion: 3233313015
-          [1658919507.800931][3717:3722] CHIP:TOO:   min level: 1
-          [1658919507.801058][3717:3722] CHIP:EM: Sending Standalone Ack for MessageCounter:165803473 on exchange 38651i
-      disabled: true
-
-    - label: "TH reads the MaxLevel attribute from the DUT"
+    - label: "Step 1b: TH reads the MaxLevel attribute from the DUT"
       PICS: LVL.S.A0003
-      verification: |
-          ./chip-tool levelcontrol read max-level 1 1
-          Record the MaxLevel attribute value for usage in later steps, this is optional attribute implemented in RPI, may vary based on DUT implementation on TH(chip-tool) log
-
-
-          [1654065684.869569][10048:10053] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0003 DataVersion: 540248549
-          [1654065684.869621][10048:10053] CHIP:TOO:   max level: 254
-          [1654065684.869737][10048:10053] CHIP:EM: Sending Standalone Ack for MessageCounter:9018536 on exchange 12814i
-      disabled: true
+      command: "readAttribute"
+      attribute: "MaxLevel"
+      response:
+          saveAs: maxLevelValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
 
     - label:
-          "TH sends a MoveToLevel command to DUT, with the Level field set to a
-          value between the MinLevel and MaxLevel values (if present, otherwise
-          between 0x01 and 0xFE) and the TransitionTime field set to 0x0000
-          (move immediately)."
+          "Step 1c: TH sends a MoveToLevel command to DUT, with the Level field
+          set to a value between the MinLevel and MaxLevel values (if present,
+          otherwise between 0x01 and 0xFE) and the TransitionTime field set to
+          0x0000 (move immediately)."
       PICS: LVL.S.C00.Rsp
-      verification: |
-          ./chip-tool levelcontrol move-to-level  253 0 0 0 1 1
-          verify that DUT sends a  successful (value 0x00) status response on TH(chip-tool) log
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "Level"
+                value: RandomLevelValue
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
 
-          [1661759404.121731][104632:104637] CHIP:DMG: InvokeResponseMessage =
-          [1661759404.121739][104632:104637] CHIP:DMG: {
-          [1661759404.121750][104632:104637] CHIP:DMG:         suppressResponse = false,
-          [1661759404.121759][104632:104637] CHIP:DMG:         InvokeResponseIBs =
-          [1661759404.121774][104632:104637] CHIP:DMG:         [
-          [1661759404.121782][104632:104637] CHIP:DMG:                 InvokeResponseIB =
-          [1661759404.121797][104632:104637] CHIP:DMG:                 {
-          [1661759404.121805][104632:104637] CHIP:DMG:                         CommandStatusIB =
-          [1661759404.121817][104632:104637] CHIP:DMG:                         {
-          [1661759404.121826][104632:104637] CHIP:DMG:                                 CommandPathIB =
-          [1661759404.121838][104632:104637] CHIP:DMG:                                 {
-          [1661759404.121849][104632:104637] CHIP:DMG:                                         EndpointId = 0x1,
-          [1661759404.121862][104632:104637] CHIP:DMG:                                         ClusterId = 0x8,
-          [1661759404.121871][104632:104637] CHIP:DMG:                                         CommandId = 0x0,
-          [1661759404.121878][104632:104637] CHIP:DMG:                                 },
-          [1661759404.121889][104632:104637] CHIP:DMG:
-          [1661759404.121896][104632:104637] CHIP:DMG:                                 StatusIB =
-          [1661759404.121906][104632:104637] CHIP:DMG:                                 {
-          [1661759404.121914][104632:104637] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1661759404.121922][104632:104637] CHIP:DMG:                                 },
-          [1661759404.121930][104632:104637] CHIP:DMG:
-          [1661759404.121937][104632:104637] CHIP:DMG:                         },
-          [1661759404.121947][104632:104637] CHIP:DMG:
-          [1661759404.121954][104632:104637] CHIP:DMG:                 },
-          [1661759404.121964][104632:104637] CHIP:DMG:
-          [1661759404.121970][104632:104637] CHIP:DMG:         ],
-          [1661759404.121981][104632:104637] CHIP:DMG:
-          [1661759404.121988][104632:104637] CHIP:DMG:         InteractionModelRevision = 1
-          [1661759404.121995][104632:104637] CHIP:DMG: },
-          [1661759404.122021][104632:104637] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0008 Command=0x0000_0000 Status=0x0
-          [1661759404.122040][104632:104637] CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
-
-    - label: "TH reads CurrentLevel attribute from DUT"
+    - label: "Step 1d: TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
-      verification: |
-          ./chip-tool levelcontrol read current-level 1 1
-          verify that the CurrentLevel attribute has the value given in 1c On TH(chip-tool)
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          value: RandomLevelValue
 
-          [1654065859.401140][10188:10193] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0000 DataVersion: 540248551
-          [1654065859.401197][10188:10193] CHIP:TOO:   current level: 253
-          [1654065859.401268][10188:10193] CHIP:EM: Sending Standalone Ack for MessageCounter:2942065 on exchange 21982i
-      disabled: true
-
-    - label: "TH reads the CurrentFrequency attribute."
+    - label: "Step 2a: TH reads the CurrentFrequency attribute."
       PICS: LVL.S.A0004
-      verification: |
-          ./chip-tool levelcontrol read current-frequency 1 1
-          verify the CurrentFrequency attribute value On TH(chip-tool)
-          [1654065889.927185][10196:10201] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0004 DataVersion: 540248551
-          [1654065889.927213][10196:10201] CHIP:TOO:   current frequency: 0
-          [1654065889.927247][10196:10201] CHIP:EM: Sending Standalone Ack for MessageCounter:9499985 on exchange 53579i
-      disabled: true
+      command: "readAttribute"
+      attribute: "CurrentFrequency"
+      response:
+          saveAs: CurrentFrequencyValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
-    - label: "TH reads the MinFrequency attribute."
+    - label: "Step 2b: TH reads the MinFrequency attribute."
       PICS: LVL.S.A0005
-      verification: |
-          ./chip-tool levelcontrol read min-frequency 1 1
-          verify the MinFrequency attribute value On TH(chip-tool)
+      command: "readAttribute"
+      attribute: "MinFrequency"
+      response:
+          saveAs: MinFrequencyValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
-          [1654066011.412756][10228:10233] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0005 DataVersion: 540248551
-          [1654066011.412814][10228:10233] CHIP:TOO:   min frequency: 0
-          [1654066011.412890][10228:10233] CHIP:EM: Sending Standalone Ack for MessageCounter:4631273 on exchange 37550i
-      disabled: true
-
-    - label: "TH reads the MaxFrequency attribute."
+    - label:
+          "Step 2c: TH reads the MaxFrequency attribute and check, if fmax <
+          fmin, FAIL the test."
       PICS: LVL.S.A0006
-      verification: |
-          ./chip-tool levelcontrol read max-frequency 1 1
-          verify the MaxFrequency attribute value On TH(chip-tool)
-
-          [1654066035.586373][10241:10246] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0006 DataVersion: 540248551
-          [1654066035.586435][10241:10246] CHIP:TOO:   max frequency: 0
-          [1654066035.586512][10241:10246] CHIP:EM: Sending Standalone Ack for MessageCounter:13631899 on exchange 38194i
-      disabled: true
+      command: "readAttribute"
+      attribute: "MaxFrequency"
+      response:
+          saveAs: MaxFrequencyValue
+          constraints:
+              type: int16u
+              minValue: MinFrequencyValue
+              maxValue: 65535
 
     - label:
-          "TH sends a MoveToClosestFrequency command to DUT, with the frequency
-          field set to a random value frand, chosen such that: fmin < frand <
-          fmax"
+          "Step 2d: sanity check on values read in steps 2a..2c, if fc < fmin,
+          FAIL the test and fc > fmax, FAIL the test"
+      PICS: LVL.S.A0004
+      command: "readAttribute"
+      attribute: "CurrentFrequency"
+      response:
+          constraints:
+              type: int16u
+              minValue: MinFrequencyValue
+              maxValue: MaxFrequencyValue
+
+    - label:
+          "Step 3a: TH sends a MoveToClosestFrequency command to DUT, with the
+          frequency field set to a random value frand, chosen such that: fmin <
+          frand < fmax"
       PICS: LVL.S.C08.Rsp
+      command: "MoveToClosestFrequency"
+      arguments:
+          values:
+              - name: "Frequency"
+                value: RandomFrequencyValue
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label: "Step 3b: TH reads the CurrentFrequency attribute."
+      PICS: LVL.S.C08.Rsp && LVL.S.A0004
+      command: "readAttribute"
+      attribute: "CurrentFrequency"
+      response:
+          value: RandomFrequencyValue
+
+    - label:
+          "Step 4a: TH sends a MoveToClosestFrequency command to DUT, with the
+          frequency field set to fmax + 1"
+      PICS: LVL.S.C08.Rsp && PICS_USER_PROMPT
       verification: |
           Frequency feature is Optional & is not verifiable at this moment. Please skip this step
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads the CurrentFrequency attribute."
-      PICS: LVL.S.C08.Rsp && LVL.S.A0004
-      verification: |
-          ./chip-tool levelcontrol read current-frequency 1 1
-      disabled: true
-
-    - label:
-          "TH sends a MoveToClosestFrequency command to DUT, with the frequency
-          field set to fmax + 1"
-      PICS: LVL.S.C08.Rsp
-      verification: |
-          Optional command based on Feature support
-      disabled: true
-
-    - label: "TH reads the CurrentFrequency attribute."
-      PICS: LVL.S.C08.Rsp && LVL.S.A0004
-      verification: |
-          ./chip-tool levelcontrol read current-frequency 1 1
-      disabled: true
+    - label: "Step 4b: TH reads the CurrentFrequency attribute."
+      PICS: LVL.S.C08.Rsp && LVL.S.A0004 && PICS_USER_PROMPT
+      command: "readAttribute"
+      attribute: "CurrentFrequency"
+      response:
+          value: RandomFrequencyValue
 
     - label:
-          "TH sends a MoveToClosestFrequency command to DUT, with the frequency
-          field set to fmin - 1"
-      PICS: LVL.S.C08.Rsp
+          "Step 5a: TH sends a MoveToClosestFrequency command to DUT, with the
+          frequency field set to fmin - 1"
+      PICS: LVL.S.C08.Rsp && PICS_USER_PROMPT
       verification: |
           Frequency feature is Optional & is not verifiable at this moment. Please skip this step
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads the CurrentFrequency attribute."
-      PICS: LVL.S.C08.Rsp && LVL.S.A0004
-      verification: |
-          ./chip-tool levelcontrol read current-frequency 1 1
-      disabled: true
+    - label: "Step 5b: TH reads the CurrentFrequency attribute."
+      PICS: LVL.S.C08.Rsp && LVL.S.A0004 && PICS_USER_PROMPT
+      command: "readAttribute"
+      attribute: "CurrentFrequency"
+      response:
+          value: RandomFrequencyValue

@@ -132,7 +132,6 @@ void MatterTimePluginServerInitCallback() {}
 void MatterAclPluginServerInitCallback() {}
 void MatterPollControlPluginServerInitCallback() {}
 void MatterUnitLocalizationPluginServerInitCallback() {}
-void MatterTimeSynchronizationPluginServerInitCallback() {}
 void MatterProxyValidPluginServerInitCallback() {}
 void MatterProxyDiscoveryPluginServerInitCallback() {}
 void MatterProxyConfigurationPluginServerInitCallback() {}
@@ -160,6 +159,7 @@ void MatterPm1ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterPm25ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterRadonConcentrationMeasurementPluginServerInitCallback() {}
 void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInitCallback() {}
+void MatterOperationalStatePluginServerInitCallback() {}
 // ****************************************
 // Print out information about each cluster
 // ****************************************

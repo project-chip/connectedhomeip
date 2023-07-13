@@ -54,7 +54,7 @@ choices.
    the -z argument that points to the directory of pre-generated code:
 
     ```
-    scripts/build_python.sh -m platform -i separate -z "/some/pregen/dir"
+    scripts/build_python.sh -m platform -i out/python_env -z "/some/pregen/dir"
     ```
 
     > Note: To get more details about available build configurations, run the
@@ -214,11 +214,11 @@ mobile-device-test.py provides the following options for running the tests:
   --enable-test TEXT              The tests to be executed. By default, all
                                   tests will be executed, use this option to
                                   run a specific set of tests. Use --print-
-                                  test-list for a list of appliable tests.
+                                  test-list for a list of applicable tests.
 
   --disable-test TEXT             The tests to be excluded from the set of
                                   enabled tests. Use --print-test-list for a
-                                  list of appliable tests.
+                                  list of applicable tests.
 
   --log-level [ERROR|WARN|INFO|DEBUG]
                                   The log level of the test.
@@ -241,7 +241,7 @@ Some tests provides the option to exclude them. For example, you can use
 `--disable-test ClusterObjectTests.TestTimedRequestTimeout` to exclude the
 "TestTimedRequestTimeout" test case.
 
-It is recommanded to use the test wrapper to run mobile-device-test.py, for
+It is recommended to use the test wrapper to run mobile-device-test.py, for
 example, you can run:
 
 ```

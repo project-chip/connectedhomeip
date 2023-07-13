@@ -2584,12 +2584,12 @@ JNI_METHOD(void, RefrigeratorAndTemperatureControlledCabinetModeCluster, writeOn
     onFailure.release();
 }
 
-JNI_METHOD(void, WasherControlsCluster, writeSpinSpeedCurrentAttribute)
+JNI_METHOD(void, LaundryWasherControlsCluster, writeSpinSpeedCurrentAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::WasherControls::Attributes::SpinSpeedCurrent::TypeInfo;
+    using TypeInfo = chip::app::Clusters::LaundryWasherControls::Attributes::SpinSpeedCurrent::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -2618,8 +2618,8 @@ JNI_METHOD(void, WasherControlsCluster, writeSpinSpeedCurrentAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
-    WasherControlsCluster * cppCluster = reinterpret_cast<WasherControlsCluster *>(clusterPtr);
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    LaundryWasherControlsCluster * cppCluster = reinterpret_cast<LaundryWasherControlsCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -2644,27 +2644,19 @@ JNI_METHOD(void, WasherControlsCluster, writeSpinSpeedCurrentAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, WasherControlsCluster, writeNumberOfRinsesAttribute)
+JNI_METHOD(void, LaundryWasherControlsCluster, writeNumberOfRinsesAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::WasherControls::Attributes::NumberOfRinses::TypeInfo;
+    using TypeInfo = chip::app::Clusters::LaundryWasherControls::Attributes::NumberOfRinses::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    if (value == nullptr)
-    {
-        cppValue.SetNull();
-    }
-    else
-    {
-        auto & nonNullValue_0 = cppValue.SetNonNull();
-        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
-            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
-    }
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2678,8 +2670,8 @@ JNI_METHOD(void, WasherControlsCluster, writeNumberOfRinsesAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
-    WasherControlsCluster * cppCluster = reinterpret_cast<WasherControlsCluster *>(clusterPtr);
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    LaundryWasherControlsCluster * cppCluster = reinterpret_cast<LaundryWasherControlsCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -3092,6 +3084,726 @@ JNI_METHOD(void, SmokeCoAlarmCluster, writeSensitivityLevelAttribute)
 
     CHIP_ERROR err                   = CHIP_NO_ERROR;
     SmokeCoAlarmCluster * cppCluster = reinterpret_cast<SmokeCoAlarmCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, HepaFilterMonitoringCluster, writeLastChangedTimeAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::HepaFilterMonitoring::Attributes::LastChangedTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
+    {
+        cppValue.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    HepaFilterMonitoringCluster * cppCluster = reinterpret_cast<HepaFilterMonitoringCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, ActivatedCarbonFilterMonitoringCluster, writeLastChangedTimeAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
+    {
+        cppValue.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                      = CHIP_NO_ERROR;
+    ActivatedCarbonFilterMonitoringCluster * cppCluster = reinterpret_cast<ActivatedCarbonFilterMonitoringCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, CeramicFilterMonitoringCluster, writeLastChangedTimeAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::CeramicFilterMonitoring::Attributes::LastChangedTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
+    {
+        cppValue.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                              = CHIP_NO_ERROR;
+    CeramicFilterMonitoringCluster * cppCluster = reinterpret_cast<CeramicFilterMonitoringCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, ElectrostaticFilterMonitoringCluster, writeLastChangedTimeAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::ElectrostaticFilterMonitoring::Attributes::LastChangedTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
+    {
+        cppValue.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                    = CHIP_NO_ERROR;
+    ElectrostaticFilterMonitoringCluster * cppCluster = reinterpret_cast<ElectrostaticFilterMonitoringCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, UvFilterMonitoringCluster, writeLastChangedTimeAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::UvFilterMonitoring::Attributes::LastChangedTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
+    {
+        cppValue.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    UvFilterMonitoringCluster * cppCluster = reinterpret_cast<UvFilterMonitoringCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, IonizingFilterMonitoringCluster, writeLastChangedTimeAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::IonizingFilterMonitoring::Attributes::LastChangedTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
+    {
+        cppValue.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    IonizingFilterMonitoringCluster * cppCluster = reinterpret_cast<IonizingFilterMonitoringCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, ZeoliteFilterMonitoringCluster, writeLastChangedTimeAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::ZeoliteFilterMonitoring::Attributes::LastChangedTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
+    {
+        cppValue.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                              = CHIP_NO_ERROR;
+    ZeoliteFilterMonitoringCluster * cppCluster = reinterpret_cast<ZeoliteFilterMonitoringCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, OzoneFilterMonitoringCluster, writeLastChangedTimeAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::OzoneFilterMonitoring::Attributes::LastChangedTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
+    {
+        cppValue.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    OzoneFilterMonitoringCluster * cppCluster = reinterpret_cast<OzoneFilterMonitoringCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, WaterTankMonitoringCluster, writeLastChangedTimeAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::WaterTankMonitoring::Attributes::LastChangedTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
+    {
+        cppValue.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    WaterTankMonitoringCluster * cppCluster = reinterpret_cast<WaterTankMonitoringCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, FuelTankMonitoringCluster, writeLastChangedTimeAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::FuelTankMonitoring::Attributes::LastChangedTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
+    {
+        cppValue.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    FuelTankMonitoringCluster * cppCluster = reinterpret_cast<FuelTankMonitoringCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, InkCartridgeMonitoringCluster, writeLastChangedTimeAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::InkCartridgeMonitoring::Attributes::LastChangedTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
+    {
+        cppValue.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    InkCartridgeMonitoringCluster * cppCluster = reinterpret_cast<InkCartridgeMonitoringCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, TonerCartridgeMonitoringCluster, writeLastChangedTimeAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::TonerCartridgeMonitoring::Attributes::LastChangedTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
+    {
+        cppValue.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    TonerCartridgeMonitoringCluster * cppCluster = reinterpret_cast<TonerCartridgeMonitoringCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6299,8 +7011,8 @@ JNI_METHOD(void, FanControlCluster, writeRockSettingAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -6351,8 +7063,8 @@ JNI_METHOD(void, FanControlCluster, writeWindSettingAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);

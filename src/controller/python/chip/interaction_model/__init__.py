@@ -28,7 +28,12 @@ from chip.exceptions import ChipStackException
 
 from .delegate import AttributePath, AttributePathIBstruct, DataVersionFilterIBstruct, EventPath, EventPathIBstruct
 
-__all__ = ["Status", "InteractionModelError"]
+__all__ = ["AttributePath", "AttributePathIBstruct", "DataVersionFilterIBstruct",
+           "EventPath", "EventPathIBstruct", "Status", "InteractionModelError"]
+
+
+# defined src/controller/python/chip/interaction_model/Delegate.h
+kUndefinedClusterStatus: int = 0xFF
 
 
 class Status(enum.IntEnum):
@@ -79,12 +84,24 @@ class Status(enum.IntEnum):
 
 
 class InteractionModelError(ChipStackException):
-    def __init__(self, status: Status):
+    def __init__(self, status: Status, clusterStatus: int = kUndefinedClusterStatus):
         self._status = status
+        self._clusterStatus = clusterStatus
 
     def __str__(self):
-        return f"InteractionModelError: {self._status.name} (0x{self._status.value:x})"
+        if self.hasClusterStatus:
+            return f"InteractionModelError: {self._status.name} (0x{self._status.value:x}, clusterStatus: {self._clusterStatus})"
+        else:
+            return f"InteractionModelError: {self._status.name} (0x{self._status.value:x})"
+
+    @property
+    def hasClusterStatus(self) -> bool:
+        return self._clusterStatus != kUndefinedClusterStatus
 
     @property
     def status(self) -> Status:
         return self._status
+
+    @property
+    def clusterStatus(self) -> int:
+        return self._clusterStatus

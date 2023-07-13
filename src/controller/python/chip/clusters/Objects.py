@@ -635,11 +635,11 @@ class Scenes(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="attributeID", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="attributeID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="attributeValue", Tag=1, Type=uint),
                     ])
 
-            attributeID: 'typing.Optional[uint]' = None
+            attributeID: 'uint' = 0
             attributeValue: 'uint' = 0
 
         @dataclass
@@ -15684,7 +15684,7 @@ class RefrigeratorAndTemperatureControlledCabinetMode(Cluster):
 
 
 @dataclass
-class WasherControls(Cluster):
+class LaundryWasherControls(Cluster):
     id: typing.ClassVar[int] = 0x0053
 
     @ChipUtility.classproperty
@@ -15693,8 +15693,8 @@ class WasherControls(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="spinSpeeds", Tag=0x00000000, Type=typing.Optional[typing.List[str]]),
                 ClusterObjectFieldDescriptor(Label="spinSpeedCurrent", Tag=0x00000001, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="numberOfRinses", Tag=0x00000002, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="maxRinses", Tag=0x00000003, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="numberOfRinses", Tag=0x00000002, Type=typing.Optional[LaundryWasherControls.Enums.NumberOfRinsesEnum]),
+                ClusterObjectFieldDescriptor(Label="supportedRinses", Tag=0x00000003, Type=typing.Optional[typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -15705,14 +15705,26 @@ class WasherControls(Cluster):
 
     spinSpeeds: 'typing.Optional[typing.List[str]]' = None
     spinSpeedCurrent: 'typing.Union[None, Nullable, uint]' = None
-    numberOfRinses: 'typing.Union[None, Nullable, uint]' = None
-    maxRinses: 'typing.Optional[uint]' = None
+    numberOfRinses: 'typing.Optional[LaundryWasherControls.Enums.NumberOfRinsesEnum]' = None
+    supportedRinses: 'typing.Optional[typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
+    class Enums:
+        class NumberOfRinsesEnum(MatterIntEnum):
+            kNone = 0x00
+            kNormal = 0x01
+            kExtra = 0x02
+            kMax = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 4,
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -15764,12 +15776,12 @@ class WasherControls(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[LaundryWasherControls.Enums.NumberOfRinsesEnum])
 
-            value: 'typing.Union[None, Nullable, uint]' = None
+            value: 'typing.Optional[LaundryWasherControls.Enums.NumberOfRinsesEnum]' = None
 
         @dataclass
-        class MaxRinses(ClusterAttributeDescriptor):
+        class SupportedRinses(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0053
@@ -15780,9 +15792,9 @@ class WasherControls(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Optional[typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -16711,6 +16723,7 @@ class RefrigeratorAlarm(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="mask", Tag=0x00000000, Type=uint),
                 ClusterObjectFieldDescriptor(Label="state", Tag=0x00000002, Type=uint),
+                ClusterObjectFieldDescriptor(Label="supported", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -16721,6 +16734,7 @@ class RefrigeratorAlarm(Cluster):
 
     mask: 'uint' = None
     state: 'uint' = None
+    supported: 'uint' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -16758,6 +16772,22 @@ class RefrigeratorAlarm(Cluster):
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class Supported(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0057
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -17341,6 +17371,7 @@ class SmokeCoAlarm(Cluster):
                 ClusterObjectFieldDescriptor(Label="interconnectCOAlarm", Tag=0x00000009, Type=typing.Optional[SmokeCoAlarm.Enums.AlarmStateEnum]),
                 ClusterObjectFieldDescriptor(Label="contaminationState", Tag=0x0000000A, Type=typing.Optional[SmokeCoAlarm.Enums.ContaminationStateEnum]),
                 ClusterObjectFieldDescriptor(Label="sensitivityLevel", Tag=0x0000000B, Type=typing.Optional[SmokeCoAlarm.Enums.SensitivityEnum]),
+                ClusterObjectFieldDescriptor(Label="expiryDate", Tag=0x0000000C, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -17361,6 +17392,7 @@ class SmokeCoAlarm(Cluster):
     interconnectCOAlarm: 'typing.Optional[SmokeCoAlarm.Enums.AlarmStateEnum]' = None
     contaminationState: 'typing.Optional[SmokeCoAlarm.Enums.ContaminationStateEnum]' = None
     sensitivityLevel: 'typing.Optional[SmokeCoAlarm.Enums.SensitivityEnum]' = None
+    expiryDate: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -17391,8 +17423,8 @@ class SmokeCoAlarm(Cluster):
             kUnknownEnumValue = 4,
 
         class EndOfServiceEnum(MatterIntEnum):
-            kExpired = 0x00
-            kNormal = 0x01
+            kNormal = 0x00
+            kExpired = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
@@ -17647,6 +17679,22 @@ class SmokeCoAlarm(Cluster):
             value: 'typing.Optional[SmokeCoAlarm.Enums.SensitivityEnum]' = None
 
         @dataclass
+        class ExpiryDate(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x005C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -17757,7 +17805,10 @@ class SmokeCoAlarm(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
+                        ClusterObjectFieldDescriptor(Label="alarmSeverityLevel", Tag=0, Type=SmokeCoAlarm.Enums.AlarmStateEnum),
                     ])
+
+            alarmSeverityLevel: 'SmokeCoAlarm.Enums.AlarmStateEnum' = 0
 
         @dataclass
         class COAlarm(ClusterEvent):
@@ -17773,7 +17824,10 @@ class SmokeCoAlarm(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
+                        ClusterObjectFieldDescriptor(Label="alarmSeverityLevel", Tag=0, Type=SmokeCoAlarm.Enums.AlarmStateEnum),
                     ])
+
+            alarmSeverityLevel: 'SmokeCoAlarm.Enums.AlarmStateEnum' = 0
 
         @dataclass
         class LowBattery(ClusterEvent):
@@ -17789,7 +17843,10 @@ class SmokeCoAlarm(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
+                        ClusterObjectFieldDescriptor(Label="alarmSeverityLevel", Tag=0, Type=SmokeCoAlarm.Enums.AlarmStateEnum),
                     ])
+
+            alarmSeverityLevel: 'SmokeCoAlarm.Enums.AlarmStateEnum' = 0
 
         @dataclass
         class HardwareFault(ClusterEvent):
@@ -17885,7 +17942,10 @@ class SmokeCoAlarm(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
+                        ClusterObjectFieldDescriptor(Label="alarmSeverityLevel", Tag=0, Type=SmokeCoAlarm.Enums.AlarmStateEnum),
                     ])
+
+            alarmSeverityLevel: 'SmokeCoAlarm.Enums.AlarmStateEnum' = 0
 
         @dataclass
         class InterconnectCOAlarm(ClusterEvent):
@@ -17901,7 +17961,10 @@ class SmokeCoAlarm(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
+                        ClusterObjectFieldDescriptor(Label="alarmSeverityLevel", Tag=0, Type=SmokeCoAlarm.Enums.AlarmStateEnum),
                     ])
+
+            alarmSeverityLevel: 'SmokeCoAlarm.Enums.AlarmStateEnum' = 0
 
         @dataclass
         class AllClear(ClusterEvent):
@@ -17918,6 +17981,267 @@ class SmokeCoAlarm(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                     ])
+
+
+@dataclass
+class DishwasherAlarm(Cluster):
+    id: typing.ClassVar[int] = 0x005D
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="mask", Tag=0x00000000, Type=uint),
+                ClusterObjectFieldDescriptor(Label="latch", Tag=0x00000001, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="state", Tag=0x00000002, Type=uint),
+                ClusterObjectFieldDescriptor(Label="supported", Tag=0x00000003, Type=uint),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    mask: 'uint' = None
+    latch: 'typing.Optional[uint]' = None
+    state: 'uint' = None
+    supported: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = None
+    acceptedCommandList: 'typing.List[uint]' = None
+    eventList: 'typing.List[uint]' = None
+    attributeList: 'typing.List[uint]' = None
+    featureMap: 'uint' = None
+    clusterRevision: 'uint' = None
+
+    class Bitmaps:
+        class AlarmMap(IntFlag):
+            kInflowError = 0x1
+            kDrainError = 0x2
+            kDoorError = 0x4
+            kTempTooLow = 0x8
+            kTempTooHigh = 0x10
+            kWaterLevelError = 0x20
+
+    class Commands:
+        @dataclass
+        class Reset(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x005D
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="alarms", Tag=0, Type=uint),
+                    ])
+
+            alarms: 'uint' = 0
+
+        @dataclass
+        class ModifyEnabledAlarms(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x005D
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="mask", Tag=0, Type=uint),
+                    ])
+
+            mask: 'uint' = 0
+
+    class Attributes:
+        @dataclass
+        class Mask(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x005D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class Latch(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x005D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class State(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x005D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class Supported(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x005D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x005D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x005D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class EventList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x005D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFA
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x005D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x005D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x005D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+    class Events:
+        @dataclass
+        class Notify(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x005D
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="active", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="inactive", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="state", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="mask", Tag=3, Type=uint),
+                    ])
+
+            active: 'uint' = 0
+            inactive: 'uint' = 0
+            state: 'uint' = 0
+            mask: 'uint' = 0
 
 
 @dataclass
@@ -18721,6 +19045,8 @@ class HepaFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[HepaFilterMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=HepaFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[HepaFilterMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -18733,6 +19059,8 @@ class HepaFilterMonitoring(Cluster):
     degradationDirection: 'typing.Optional[HepaFilterMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'HepaFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
+    lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
+    replacementProductList: 'typing.Optional[typing.List[HepaFilterMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -18760,10 +19088,36 @@ class HepaFilterMonitoring(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+        class ProductIdentifierTypeEnum(MatterIntEnum):
+            kUpc = 0x00
+            kGtin8 = 0x01
+            kEan = 0x02
+            kGtin14 = 0x03
+            kOem = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 5,
+
     class Bitmaps:
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+
+    class Structs:
+        @dataclass
+        class ReplacementProductStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="productIdentifierType", Tag=0, Type=HepaFilterMonitoring.Enums.ProductIdentifierTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="productIdentifierValue", Tag=1, Type=str),
+                    ])
+
+            productIdentifierType: 'HepaFilterMonitoring.Enums.ProductIdentifierTypeEnum' = 0
+            productIdentifierValue: 'str' = ""
 
     class Commands:
         @dataclass
@@ -18843,6 +19197,38 @@ class HepaFilterMonitoring(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
             value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class LastChangedTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0071
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class ReplacementProductList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0071
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[HepaFilterMonitoring.Structs.ReplacementProductStruct]])
+
+            value: 'typing.Optional[typing.List[HepaFilterMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -18953,6 +19339,8 @@ class ActivatedCarbonFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[ActivatedCarbonFilterMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=ActivatedCarbonFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[ActivatedCarbonFilterMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -18965,6 +19353,8 @@ class ActivatedCarbonFilterMonitoring(Cluster):
     degradationDirection: 'typing.Optional[ActivatedCarbonFilterMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'ActivatedCarbonFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
+    lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
+    replacementProductList: 'typing.Optional[typing.List[ActivatedCarbonFilterMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -18992,10 +19382,36 @@ class ActivatedCarbonFilterMonitoring(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+        class ProductIdentifierTypeEnum(MatterIntEnum):
+            kUpc = 0x00
+            kGtin8 = 0x01
+            kEan = 0x02
+            kGtin14 = 0x03
+            kOem = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 5,
+
     class Bitmaps:
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+
+    class Structs:
+        @dataclass
+        class ReplacementProductStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="productIdentifierType", Tag=0, Type=ActivatedCarbonFilterMonitoring.Enums.ProductIdentifierTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="productIdentifierValue", Tag=1, Type=str),
+                    ])
+
+            productIdentifierType: 'ActivatedCarbonFilterMonitoring.Enums.ProductIdentifierTypeEnum' = 0
+            productIdentifierValue: 'str' = ""
 
     class Commands:
         @dataclass
@@ -19075,6 +19491,38 @@ class ActivatedCarbonFilterMonitoring(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
             value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class LastChangedTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0072
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class ReplacementProductList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0072
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ActivatedCarbonFilterMonitoring.Structs.ReplacementProductStruct]])
+
+            value: 'typing.Optional[typing.List[ActivatedCarbonFilterMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -19185,6 +19633,8 @@ class CeramicFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=CeramicFilterMonitoring.Enums.DegradationDirectionEnum),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=CeramicFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[CeramicFilterMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -19197,6 +19647,8 @@ class CeramicFilterMonitoring(Cluster):
     degradationDirection: 'CeramicFilterMonitoring.Enums.DegradationDirectionEnum' = None
     changeIndication: 'CeramicFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
+    lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
+    replacementProductList: 'typing.Optional[typing.List[CeramicFilterMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -19224,10 +19676,36 @@ class CeramicFilterMonitoring(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+        class ProductIdentifierTypeEnum(MatterIntEnum):
+            kUpc = 0x00
+            kGtin8 = 0x01
+            kEan = 0x02
+            kGtin14 = 0x03
+            kOem = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 5,
+
     class Bitmaps:
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+
+    class Structs:
+        @dataclass
+        class ReplacementProductStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="productIdentifierType", Tag=0, Type=CeramicFilterMonitoring.Enums.ProductIdentifierTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="productIdentifierValue", Tag=1, Type=str),
+                    ])
+
+            productIdentifierType: 'CeramicFilterMonitoring.Enums.ProductIdentifierTypeEnum' = 0
+            productIdentifierValue: 'str' = ""
 
     class Commands:
         @dataclass
@@ -19307,6 +19785,38 @@ class CeramicFilterMonitoring(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
             value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class LastChangedTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0073
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class ReplacementProductList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0073
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CeramicFilterMonitoring.Structs.ReplacementProductStruct]])
+
+            value: 'typing.Optional[typing.List[CeramicFilterMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -19417,6 +19927,8 @@ class ElectrostaticFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[ElectrostaticFilterMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=ElectrostaticFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[ElectrostaticFilterMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -19429,6 +19941,8 @@ class ElectrostaticFilterMonitoring(Cluster):
     degradationDirection: 'typing.Optional[ElectrostaticFilterMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'ElectrostaticFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
+    lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
+    replacementProductList: 'typing.Optional[typing.List[ElectrostaticFilterMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -19456,10 +19970,36 @@ class ElectrostaticFilterMonitoring(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+        class ProductIdentifierTypeEnum(MatterIntEnum):
+            kUpc = 0x00
+            kGtin8 = 0x01
+            kEan = 0x02
+            kGtin14 = 0x03
+            kOem = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 5,
+
     class Bitmaps:
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+
+    class Structs:
+        @dataclass
+        class ReplacementProductStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="productIdentifierType", Tag=0, Type=ElectrostaticFilterMonitoring.Enums.ProductIdentifierTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="productIdentifierValue", Tag=1, Type=str),
+                    ])
+
+            productIdentifierType: 'ElectrostaticFilterMonitoring.Enums.ProductIdentifierTypeEnum' = 0
+            productIdentifierValue: 'str' = ""
 
     class Commands:
         @dataclass
@@ -19539,6 +20079,38 @@ class ElectrostaticFilterMonitoring(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
             value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class LastChangedTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0074
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class ReplacementProductList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0074
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ElectrostaticFilterMonitoring.Structs.ReplacementProductStruct]])
+
+            value: 'typing.Optional[typing.List[ElectrostaticFilterMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -19649,6 +20221,8 @@ class UvFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[UvFilterMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=UvFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[UvFilterMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -19661,6 +20235,8 @@ class UvFilterMonitoring(Cluster):
     degradationDirection: 'typing.Optional[UvFilterMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'UvFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
+    lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
+    replacementProductList: 'typing.Optional[typing.List[UvFilterMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -19688,10 +20264,36 @@ class UvFilterMonitoring(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+        class ProductIdentifierTypeEnum(MatterIntEnum):
+            kUpc = 0x00
+            kGtin8 = 0x01
+            kEan = 0x02
+            kGtin14 = 0x03
+            kOem = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 5,
+
     class Bitmaps:
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+
+    class Structs:
+        @dataclass
+        class ReplacementProductStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="productIdentifierType", Tag=0, Type=UvFilterMonitoring.Enums.ProductIdentifierTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="productIdentifierValue", Tag=1, Type=str),
+                    ])
+
+            productIdentifierType: 'UvFilterMonitoring.Enums.ProductIdentifierTypeEnum' = 0
+            productIdentifierValue: 'str' = ""
 
     class Commands:
         @dataclass
@@ -19771,6 +20373,38 @@ class UvFilterMonitoring(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
             value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class LastChangedTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0075
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class ReplacementProductList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0075
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[UvFilterMonitoring.Structs.ReplacementProductStruct]])
+
+            value: 'typing.Optional[typing.List[UvFilterMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -19881,6 +20515,8 @@ class IonizingFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[IonizingFilterMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=IonizingFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[IonizingFilterMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -19893,6 +20529,8 @@ class IonizingFilterMonitoring(Cluster):
     degradationDirection: 'typing.Optional[IonizingFilterMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'IonizingFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
+    lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
+    replacementProductList: 'typing.Optional[typing.List[IonizingFilterMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -19920,10 +20558,36 @@ class IonizingFilterMonitoring(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+        class ProductIdentifierTypeEnum(MatterIntEnum):
+            kUpc = 0x00
+            kGtin8 = 0x01
+            kEan = 0x02
+            kGtin14 = 0x03
+            kOem = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 5,
+
     class Bitmaps:
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+
+    class Structs:
+        @dataclass
+        class ReplacementProductStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="productIdentifierType", Tag=0, Type=IonizingFilterMonitoring.Enums.ProductIdentifierTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="productIdentifierValue", Tag=1, Type=str),
+                    ])
+
+            productIdentifierType: 'IonizingFilterMonitoring.Enums.ProductIdentifierTypeEnum' = 0
+            productIdentifierValue: 'str' = ""
 
     class Commands:
         @dataclass
@@ -20003,6 +20667,38 @@ class IonizingFilterMonitoring(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
             value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class LastChangedTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0076
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class ReplacementProductList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0076
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[IonizingFilterMonitoring.Structs.ReplacementProductStruct]])
+
+            value: 'typing.Optional[typing.List[IonizingFilterMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -20113,6 +20809,8 @@ class ZeoliteFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[ZeoliteFilterMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=ZeoliteFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[ZeoliteFilterMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -20125,6 +20823,8 @@ class ZeoliteFilterMonitoring(Cluster):
     degradationDirection: 'typing.Optional[ZeoliteFilterMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'ZeoliteFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
+    lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
+    replacementProductList: 'typing.Optional[typing.List[ZeoliteFilterMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -20152,10 +20852,36 @@ class ZeoliteFilterMonitoring(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+        class ProductIdentifierTypeEnum(MatterIntEnum):
+            kUpc = 0x00
+            kGtin8 = 0x01
+            kEan = 0x02
+            kGtin14 = 0x03
+            kOem = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 5,
+
     class Bitmaps:
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+
+    class Structs:
+        @dataclass
+        class ReplacementProductStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="productIdentifierType", Tag=0, Type=ZeoliteFilterMonitoring.Enums.ProductIdentifierTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="productIdentifierValue", Tag=1, Type=str),
+                    ])
+
+            productIdentifierType: 'ZeoliteFilterMonitoring.Enums.ProductIdentifierTypeEnum' = 0
+            productIdentifierValue: 'str' = ""
 
     class Commands:
         @dataclass
@@ -20235,6 +20961,38 @@ class ZeoliteFilterMonitoring(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
             value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class LastChangedTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0077
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class ReplacementProductList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0077
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ZeoliteFilterMonitoring.Structs.ReplacementProductStruct]])
+
+            value: 'typing.Optional[typing.List[ZeoliteFilterMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -20345,6 +21103,8 @@ class OzoneFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[OzoneFilterMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=OzoneFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[OzoneFilterMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -20357,6 +21117,8 @@ class OzoneFilterMonitoring(Cluster):
     degradationDirection: 'typing.Optional[OzoneFilterMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'OzoneFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
+    lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
+    replacementProductList: 'typing.Optional[typing.List[OzoneFilterMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -20384,10 +21146,36 @@ class OzoneFilterMonitoring(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+        class ProductIdentifierTypeEnum(MatterIntEnum):
+            kUpc = 0x00
+            kGtin8 = 0x01
+            kEan = 0x02
+            kGtin14 = 0x03
+            kOem = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 5,
+
     class Bitmaps:
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+
+    class Structs:
+        @dataclass
+        class ReplacementProductStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="productIdentifierType", Tag=0, Type=OzoneFilterMonitoring.Enums.ProductIdentifierTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="productIdentifierValue", Tag=1, Type=str),
+                    ])
+
+            productIdentifierType: 'OzoneFilterMonitoring.Enums.ProductIdentifierTypeEnum' = 0
+            productIdentifierValue: 'str' = ""
 
     class Commands:
         @dataclass
@@ -20467,6 +21255,38 @@ class OzoneFilterMonitoring(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
             value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class LastChangedTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0078
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class ReplacementProductList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0078
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[OzoneFilterMonitoring.Structs.ReplacementProductStruct]])
+
+            value: 'typing.Optional[typing.List[OzoneFilterMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -20577,6 +21397,8 @@ class WaterTankMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[WaterTankMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=WaterTankMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[WaterTankMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -20589,6 +21411,8 @@ class WaterTankMonitoring(Cluster):
     degradationDirection: 'typing.Optional[WaterTankMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'WaterTankMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
+    lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
+    replacementProductList: 'typing.Optional[typing.List[WaterTankMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -20616,10 +21440,36 @@ class WaterTankMonitoring(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+        class ProductIdentifierTypeEnum(MatterIntEnum):
+            kUpc = 0x00
+            kGtin8 = 0x01
+            kEan = 0x02
+            kGtin14 = 0x03
+            kOem = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 5,
+
     class Bitmaps:
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+
+    class Structs:
+        @dataclass
+        class ReplacementProductStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="productIdentifierType", Tag=0, Type=WaterTankMonitoring.Enums.ProductIdentifierTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="productIdentifierValue", Tag=1, Type=str),
+                    ])
+
+            productIdentifierType: 'WaterTankMonitoring.Enums.ProductIdentifierTypeEnum' = 0
+            productIdentifierValue: 'str' = ""
 
     class Commands:
         @dataclass
@@ -20699,6 +21549,38 @@ class WaterTankMonitoring(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
             value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class LastChangedTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0079
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class ReplacementProductList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0079
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[WaterTankMonitoring.Structs.ReplacementProductStruct]])
+
+            value: 'typing.Optional[typing.List[WaterTankMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -20809,6 +21691,8 @@ class FuelTankMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[FuelTankMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=FuelTankMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[FuelTankMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -20821,6 +21705,8 @@ class FuelTankMonitoring(Cluster):
     degradationDirection: 'typing.Optional[FuelTankMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'FuelTankMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
+    lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
+    replacementProductList: 'typing.Optional[typing.List[FuelTankMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -20848,10 +21734,36 @@ class FuelTankMonitoring(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+        class ProductIdentifierTypeEnum(MatterIntEnum):
+            kUpc = 0x00
+            kGtin8 = 0x01
+            kEan = 0x02
+            kGtin14 = 0x03
+            kOem = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 5,
+
     class Bitmaps:
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+
+    class Structs:
+        @dataclass
+        class ReplacementProductStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="productIdentifierType", Tag=0, Type=FuelTankMonitoring.Enums.ProductIdentifierTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="productIdentifierValue", Tag=1, Type=str),
+                    ])
+
+            productIdentifierType: 'FuelTankMonitoring.Enums.ProductIdentifierTypeEnum' = 0
+            productIdentifierValue: 'str' = ""
 
     class Commands:
         @dataclass
@@ -20931,6 +21843,38 @@ class FuelTankMonitoring(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
             value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class LastChangedTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x007A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class ReplacementProductList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x007A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[FuelTankMonitoring.Structs.ReplacementProductStruct]])
+
+            value: 'typing.Optional[typing.List[FuelTankMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -21041,6 +21985,8 @@ class InkCartridgeMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[InkCartridgeMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=InkCartridgeMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[InkCartridgeMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -21053,6 +21999,8 @@ class InkCartridgeMonitoring(Cluster):
     degradationDirection: 'typing.Optional[InkCartridgeMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'InkCartridgeMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
+    lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
+    replacementProductList: 'typing.Optional[typing.List[InkCartridgeMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -21080,10 +22028,36 @@ class InkCartridgeMonitoring(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+        class ProductIdentifierTypeEnum(MatterIntEnum):
+            kUpc = 0x00
+            kGtin8 = 0x01
+            kEan = 0x02
+            kGtin14 = 0x03
+            kOem = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 5,
+
     class Bitmaps:
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+
+    class Structs:
+        @dataclass
+        class ReplacementProductStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="productIdentifierType", Tag=0, Type=InkCartridgeMonitoring.Enums.ProductIdentifierTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="productIdentifierValue", Tag=1, Type=str),
+                    ])
+
+            productIdentifierType: 'InkCartridgeMonitoring.Enums.ProductIdentifierTypeEnum' = 0
+            productIdentifierValue: 'str' = ""
 
     class Commands:
         @dataclass
@@ -21163,6 +22137,38 @@ class InkCartridgeMonitoring(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
             value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class LastChangedTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x007B
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class ReplacementProductList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x007B
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[InkCartridgeMonitoring.Structs.ReplacementProductStruct]])
+
+            value: 'typing.Optional[typing.List[InkCartridgeMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -21273,6 +22279,8 @@ class TonerCartridgeMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[TonerCartridgeMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=TonerCartridgeMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[TonerCartridgeMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -21285,6 +22293,8 @@ class TonerCartridgeMonitoring(Cluster):
     degradationDirection: 'typing.Optional[TonerCartridgeMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'TonerCartridgeMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
+    lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
+    replacementProductList: 'typing.Optional[typing.List[TonerCartridgeMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -21312,10 +22322,36 @@ class TonerCartridgeMonitoring(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+        class ProductIdentifierTypeEnum(MatterIntEnum):
+            kUpc = 0x00
+            kGtin8 = 0x01
+            kEan = 0x02
+            kGtin14 = 0x03
+            kOem = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 5,
+
     class Bitmaps:
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+
+    class Structs:
+        @dataclass
+        class ReplacementProductStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="productIdentifierType", Tag=0, Type=TonerCartridgeMonitoring.Enums.ProductIdentifierTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="productIdentifierValue", Tag=1, Type=str),
+                    ])
+
+            productIdentifierType: 'TonerCartridgeMonitoring.Enums.ProductIdentifierTypeEnum' = 0
+            productIdentifierValue: 'str' = ""
 
     class Commands:
         @dataclass
@@ -21395,6 +22431,38 @@ class TonerCartridgeMonitoring(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
             value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class LastChangedTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x007C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class ReplacementProductList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x007C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[TonerCartridgeMonitoring.Structs.ReplacementProductStruct]])
+
+            value: 'typing.Optional[typing.List[TonerCartridgeMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -26451,8 +27519,8 @@ class FanControl(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="fanMode", Tag=0x00000000, Type=FanControl.Enums.FanModeType),
-                ClusterObjectFieldDescriptor(Label="fanModeSequence", Tag=0x00000001, Type=FanControl.Enums.FanModeSequenceType),
+                ClusterObjectFieldDescriptor(Label="fanMode", Tag=0x00000000, Type=FanControl.Enums.FanModeEnum),
+                ClusterObjectFieldDescriptor(Label="fanModeSequence", Tag=0x00000001, Type=FanControl.Enums.FanModeSequenceEnum),
                 ClusterObjectFieldDescriptor(Label="percentSetting", Tag=0x00000002, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="percentCurrent", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="speedMax", Tag=0x00000004, Type=typing.Optional[uint]),
@@ -26471,8 +27539,8 @@ class FanControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    fanMode: 'FanControl.Enums.FanModeType' = None
-    fanModeSequence: 'FanControl.Enums.FanModeSequenceType' = None
+    fanMode: 'FanControl.Enums.FanModeEnum' = None
+    fanModeSequence: 'FanControl.Enums.FanModeSequenceEnum' = None
     percentSetting: 'typing.Union[Nullable, uint]' = None
     percentCurrent: 'uint' = None
     speedMax: 'typing.Optional[uint]' = None
@@ -26500,29 +27568,7 @@ class FanControl(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
-        class DirectionEnum(MatterIntEnum):
-            kIncrease = 0x00
-            kDecrease = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 2,
-
-        class FanModeSequenceType(MatterIntEnum):
-            kOffLowMedHigh = 0x00
-            kOffLowHigh = 0x01
-            kOffLowMedHighAuto = 0x02
-            kOffLowHighAuto = 0x03
-            kOffOnAuto = 0x04
-            kOffOn = 0x05
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 6,
-
-        class FanModeType(MatterIntEnum):
+        class FanModeEnum(MatterIntEnum):
             kOff = 0x00
             kLow = 0x01
             kMedium = 0x02
@@ -26536,6 +27582,28 @@ class FanControl(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 7,
 
+        class FanModeSequenceEnum(MatterIntEnum):
+            kOffLowMedHigh = 0x00
+            kOffLowHigh = 0x01
+            kOffLowMedHighAuto = 0x02
+            kOffLowHighAuto = 0x03
+            kOffOnAuto = 0x04
+            kOffOn = 0x05
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 6,
+
+        class StepDirectionEnum(MatterIntEnum):
+            kIncrease = 0x00
+            kDecrease = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 2,
+
     class Bitmaps:
         class Feature(IntFlag):
             kMultiSpeed = 0x1
@@ -26545,16 +27613,12 @@ class FanControl(Cluster):
             kStep = 0x10
             kAirflowDirection = 0x20
 
-        class RockSupportMask(IntFlag):
+        class RockBitmap(IntFlag):
             kRockLeftRight = 0x1
             kRockUpDown = 0x2
             kRockRound = 0x4
 
-        class WindSettingMask(IntFlag):
-            kSleepWind = 0x1
-            kNaturalWind = 0x2
-
-        class WindSupportMask(IntFlag):
+        class WindBitmap(IntFlag):
             kSleepWind = 0x1
             kNaturalWind = 0x2
 
@@ -26570,12 +27634,12 @@ class FanControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="direction", Tag=0, Type=FanControl.Enums.DirectionEnum),
+                        ClusterObjectFieldDescriptor(Label="direction", Tag=0, Type=FanControl.Enums.StepDirectionEnum),
                         ClusterObjectFieldDescriptor(Label="wrap", Tag=1, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="lowestOff", Tag=2, Type=typing.Optional[bool]),
                     ])
 
-            direction: 'FanControl.Enums.DirectionEnum' = 0
+            direction: 'FanControl.Enums.StepDirectionEnum' = 0
             wrap: 'typing.Optional[bool]' = None
             lowestOff: 'typing.Optional[bool]' = None
 
@@ -26592,9 +27656,9 @@ class FanControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=FanControl.Enums.FanModeType)
+                return ClusterObjectFieldDescriptor(Type=FanControl.Enums.FanModeEnum)
 
-            value: 'FanControl.Enums.FanModeType' = 0
+            value: 'FanControl.Enums.FanModeEnum' = 0
 
         @dataclass
         class FanModeSequence(ClusterAttributeDescriptor):
@@ -26608,9 +27672,9 @@ class FanControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=FanControl.Enums.FanModeSequenceType)
+                return ClusterObjectFieldDescriptor(Type=FanControl.Enums.FanModeSequenceEnum)
 
-            value: 'FanControl.Enums.FanModeSequenceType' = 0
+            value: 'FanControl.Enums.FanModeSequenceEnum' = 0
 
         @dataclass
         class PercentSetting(ClusterAttributeDescriptor):
@@ -30527,8 +31591,8 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -30893,8 +31957,8 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -31259,8 +32323,8 @@ class EthyleneConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -31625,8 +32689,8 @@ class EthyleneOxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -31991,8 +33055,8 @@ class HydrogenConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -32357,8 +33421,8 @@ class HydrogenSulfideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -32723,8 +33787,8 @@ class NitricOxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -33089,8 +34153,8 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -33455,8 +34519,8 @@ class OxygenConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -33821,8 +34885,8 @@ class OzoneConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -34187,8 +35251,8 @@ class SulfurDioxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -34553,8 +35617,8 @@ class DissolvedOxygenConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -34919,8 +35983,8 @@ class BromateConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -35285,8 +36349,8 @@ class ChloraminesConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -35651,8 +36715,8 @@ class ChlorineConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -36017,8 +37081,8 @@ class FecalColiformEColiConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -36383,8 +37447,8 @@ class FluorideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -36749,8 +37813,8 @@ class HaloaceticAcidsConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -37115,8 +38179,8 @@ class TotalTrihalomethanesConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -37481,8 +38545,8 @@ class TotalColiformBacteriaConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -37847,8 +38911,8 @@ class TurbidityConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -38213,8 +39277,8 @@ class CopperConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -38579,8 +39643,8 @@ class LeadConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -38945,8 +40009,8 @@ class ManganeseConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -39311,8 +40375,8 @@ class SulfateConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -39677,8 +40741,8 @@ class BromodichloromethaneConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -40043,8 +41107,8 @@ class BromoformConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -40409,8 +41473,8 @@ class ChlorodibromomethaneConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -40775,8 +41839,8 @@ class ChloroformConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -41141,8 +42205,8 @@ class SodiumConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -41507,8 +42571,8 @@ class Pm25ConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -41873,8 +42937,8 @@ class FormaldehydeConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -42239,8 +43303,8 @@ class Pm1ConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -42605,8 +43669,8 @@ class Pm10ConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -42971,8 +44035,8 @@ class TotalVolatileOrganicCompoundsConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -43337,8 +44401,8 @@ class RadonConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
