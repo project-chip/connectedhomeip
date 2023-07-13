@@ -44,7 +44,6 @@ executable("chip-dishwasher-app") {
 
   deps = [
     "${chip_root}/examples/dishwasher-app/dishwasher-common",
-    "${chip_root}/examples/dishwasher-app/dishwasher-common:dishwasher-manager",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
   ]

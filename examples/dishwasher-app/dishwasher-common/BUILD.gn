@@ -26,19 +26,3 @@ chip_data_model("dishwasher-common") {
   is_server = true
 }
 
-source_set("color-format") {
-  public_configs = [ ":config" ]
-  sources = [
-    "include/ColorFormat.h",
-    "src/ColorFormat.cpp",
-  ]
-}
-
-source_set("dishwasher-manager") {
-  deps = [ "${chip_root}/src/lib" ]
-  public_configs = [ ":config" ]
-  sources = [
-    "include/DishwasherManager.h",
-    "src/DishwasherManager.cpp",
-  ]
-}
