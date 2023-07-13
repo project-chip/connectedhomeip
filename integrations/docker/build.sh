@@ -105,7 +105,14 @@ fi
     }
 }
 
+[[ ${*/--clear//} != "${*}" ]] && {
+    docker rmi -f "$GHCR_ORG"/"$ORG"/"$IMAGE":"$VERSION"
+    [[ ${*/--latest//} != "${*}" ]] && {
+        docker rmi -f "$GHCR_ORG"/"$ORG"/"$IMAGE":latest
+    }
+}
 docker images --filter=reference="$ORG/*"
+
 if [ -f "$DOCKER_VOLUME_PATH" ]; then
     df -h "$DOCKER_VOLUME_PATH"
     mb_space_after=$(df -m "$DOCKER_VOLUME_PATH" | awk 'FNR==2{print $3}')

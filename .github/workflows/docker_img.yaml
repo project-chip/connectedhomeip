@@ -34,4 +34,4 @@ jobs:
             - name: Build All images using project bash script
               run: |
                   cd integrations/docker
-                  ./build-all.sh --latest
+                  ./build-all.sh --latest --clear
