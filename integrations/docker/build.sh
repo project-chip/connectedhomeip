@@ -111,6 +111,7 @@ fi
         docker rmi -f "$GHCR_ORG"/"$ORG"/"$IMAGE":latest
     }
 }
+
 docker images --filter=reference="$ORG/*"
 
 if [ -f "$DOCKER_VOLUME_PATH" ]; then

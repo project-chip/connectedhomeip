@@ -24,8 +24,8 @@ on:
     workflow_dispatch:
 
 jobs:
-    build_images:
-        name: Build Docker CHIP Build images
+    build_images_base:
+        name: Build Docker CHIP Build images - base
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
         steps:
@@ -34,4 +34,52 @@ jobs:
             - name: Build All images using project bash script
               run: |
                   cd integrations/docker
-                  ./build-all.sh --latest --clear
+                  ./build-all.sh --latest --clear --path=base
+    build_images_stage_1:
+        needs: [build_images_base]
+        name: Build Docker CHIP Build images - stage 1
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Build All images using project bash script
+              run: |
+                  cd integrations/docker
+                  ./build-all.sh --latest --clear --path="stage-1"
+    build_images_stage_2:
+        needs: [build_images_base, build_images_stage_1]
+        name: Build Docker CHIP Build images - stage 2
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Build All images using project bash script
+              run: |
+                  cd integrations/docker
+                  ./build-all.sh --latest --clear --path="stage-1"
+    build_images_stage_3:
+        name: Build Docker CHIP Build images - stage 3
+        needs: [build_images_base, build_images_stage_1, build_images_stage_2]
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Build All images using project bash script
+              run: |
+                  cd integrations/docker
+                  ./build-all.sh --latest --clear --path="stage-1"
+    build_images_vscode:
+        name: Build Docker CHIP Build images - vscode
+        needs: [build_images_base, build_images_stage_1, build_images_stage_2, build_images_stage_3]
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Build All images using project bash script
+              run: |
+                  cd integrations/docker
+                  ./build-all.sh --latest --clear --path="vscode"
