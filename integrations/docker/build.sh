@@ -112,7 +112,7 @@ fi
     }
 }
 
-docker images --filter=reference="$ORG/*"
+docker images --filter=reference="$GHCR_ORG/$ORG/*"
 
 if [ -f "$DOCKER_VOLUME_PATH" ]; then
     df -h "$DOCKER_VOLUME_PATH"
