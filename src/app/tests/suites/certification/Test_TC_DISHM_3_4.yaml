@@ -17,9 +17,6 @@ config:
     nodeId: 0x0059
     cluster: "Dishwasher Mode"
     endpoint: 1
-    new_mode_th:
-        type: INT16U
-        defaultValue: 1
 
 tests:
     - label: "Note"
