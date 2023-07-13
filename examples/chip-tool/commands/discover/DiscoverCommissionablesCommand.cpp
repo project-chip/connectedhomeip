@@ -49,32 +49,6 @@ CHIP_ERROR DiscoverCommissionablesStartCommand::RunCommand()
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 }
 
-CHIP_ERROR DiscoverCommissionablesStopCommand::RunCommand()
-{
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-    VerifyOrReturnError(IsInteractive(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(GetDeviceScanner().Stop());
-
-    SetCommandExitStatus(CHIP_NO_ERROR);
-    return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
-}
-
-CHIP_ERROR DiscoverCommissionablesListCommand::RunCommand()
-{
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-    VerifyOrReturnError(IsInteractive(), CHIP_ERROR_INCORRECT_STATE);
-    GetDeviceScanner().Log();
-
-    SetCommandExitStatus(CHIP_NO_ERROR);
-    return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
-}
-
 CHIP_ERROR DiscoverCommissionablesCommand::RunCommand()
 {
     mCommissioner = &CurrentCommissioner();

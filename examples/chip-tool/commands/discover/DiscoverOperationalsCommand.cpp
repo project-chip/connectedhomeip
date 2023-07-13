@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2023 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,33 +16,25 @@
  *
  */
 
-#include "DiscoverCommand.h"
-
+#include "DiscoverOperationalsCommand.h"
 #include <commands/common/DeviceScanner.h>
+#include <commands/common/RemoteDataModelLogger.h>
+#include <lib/support/BytesToHex.h>
 
-CHIP_ERROR DiscoverCommand::RunCommand()
-{
-    return RunCommand(mNodeId, mFabricId);
-}
+using namespace ::chip;
 
-CHIP_ERROR DiscoverStopCommand::RunCommand()
-{
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-    VerifyOrReturnError(IsInteractive(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(GetDeviceScanner().Stop());
-
-    SetCommandExitStatus(CHIP_NO_ERROR);
-    return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
-}
-
-CHIP_ERROR DiscoverListCommand::RunCommand()
+CHIP_ERROR DiscoverOperationalsStartCommand::RunCommand()
 {
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
+    auto compressedFabricId = MakeOptional(CurrentCommissioner().GetCompressedFabricId());
+
+    if (mShowAll.ValueOr(false))
+    {
+        compressedFabricId = NullOptional;
+    }
+
     VerifyOrReturnError(IsInteractive(), CHIP_ERROR_INCORRECT_STATE);
-    GetDeviceScanner().Log();
+    ReturnErrorOnFailure(GetDeviceScanner().StartOperationalDiscovery(compressedFabricId));
 
     SetCommandExitStatus(CHIP_NO_ERROR);
     return CHIP_NO_ERROR;
