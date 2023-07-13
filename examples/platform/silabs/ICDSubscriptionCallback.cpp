@@ -61,5 +61,5 @@ CHIP_ERROR ICDSubscriptionCallback::OnSubscriptionRequested(chip::app::ReadHandl
         decidedMaxInterval = maximumMaxInterval;
     }
 
-    return aReadHandler.SetReportingIntervals(decidedMaxInterval);
+    return aReadHandler.SetMaxReportingInterval(decidedMaxInterval);
 }
