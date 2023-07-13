@@ -300,8 +300,6 @@ void MatterGroupKeyManagementPluginServerInitCallback()
 // Commands
 //
 
-void emberAfGroupKeyManagementClusterServerInitCallback(chip::EndpointId endpoint) {}
-
 bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData)
