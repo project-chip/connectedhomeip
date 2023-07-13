@@ -28,58 +28,105 @@ jobs:
         name: Build Docker CHIP Build images - base
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
+        strategy:
+            fail-fast: false
+            matrix:
+                img:
+                    - ""
+                    - "-minimal"
         steps:
             - name: Checkout
               uses: actions/checkout@v3
             - name: Build All images using project bash script
               run: |
-                  cd integrations/docker
-                  ./build-all.sh --latest --clear --path=base
+                  cd integrations/docker/images/base/chip-build${{ matrix.img }}
+                  ./build.sh --latest
     build_images_stage_1:
         needs: [build_images_base]
         name: Build Docker CHIP Build images - stage 1
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
+        strategy:
+            fail-fast: false
+            matrix:
+                img:
+                    - "-crosscompile"
         steps:
             - name: Checkout
               uses: actions/checkout@v3
             - name: Build All images using project bash script
               run: |
-                  cd integrations/docker
-                  ./build-all.sh --latest --clear --path="stage-1"
+                  cd integrations/docker/images/stage-1/chip-build${{ matrix.img }}
+                  ./build.sh --latest
     build_images_stage_2:
         needs: [build_images_base, build_images_stage_1]
         name: Build Docker CHIP Build images - stage 2
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
+        strategy:
+            fail-fast: false
+            matrix:
+                img:
+                    - "-ameba"
+                    - "-asr"
+                    - "-bouffalolab"
+                    - "-doxygen"
+                    - "-efr32"
+                    - "-esp32"
+                    - "-esp32-qemu"
+                    - "-infineon"
+                    # NOTE: imx image requires too much space for GitHub-hosted runners. It fails with:
+                    # ApplyLayer exit status 1 stdout:  stderr: write /opt/fsl-imx-xwayland/5.15-kirkstone/sysroots/armv8a-poky-linux/opt/ltp/testcases/bin/fanotify15: no space left on device
+                    # - "-imx"
+                    - "-java"
+                    - "-k32w"
+                    - "-mbed-os"
+                    - "-nrf-platform"
+                    - "-telink"
+                    - "-ti"
+                    - "-tizen"
+                    - "-openiotsdk"
         steps:
             - name: Checkout
               uses: actions/checkout@v3
             - name: Build All images using project bash script
               run: |
-                  cd integrations/docker
-                  ./build-all.sh --latest --clear --path="stage-1"
+                  cd integrations/docker/images/stage-2/chip-build${{ matrix.img }}
+                  ./build.sh --latest
+                    
     build_images_stage_3:
-        name: Build Docker CHIP Build images - stage 3
         needs: [build_images_base, build_images_stage_1, build_images_stage_2]
+        name: Build Docker CHIP Build images - stage 3
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
+        strategy:
+            fail-fast: false
+            matrix:
+                img:
+                    - "-android"
+                    - "-esp32-qemu"
+                    - "-tizen-qemu"
         steps:
             - name: Checkout
               uses: actions/checkout@v3
             - name: Build All images using project bash script
               run: |
-                  cd integrations/docker
-                  ./build-all.sh --latest --clear --path="stage-1"
+                  cd integrations/docker/images/stage-3/chip-build${{ matrix.img }}
+                  ./build.sh --latest
     build_images_vscode:
-        name: Build Docker CHIP Build images - vscode
         needs: [build_images_base, build_images_stage_1, build_images_stage_2, build_images_stage_3]
+        name: Build Docker CHIP Build images - vscode
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' || false
+        strategy:
+            fail-fast: false
+            matrix:
+                img:
+                    - "-vscode"
         steps:
             - name: Checkout
               uses: actions/checkout@v3
             - name: Build All images using project bash script
               run: |
-                  cd integrations/docker
-                  ./build-all.sh --latest --clear --path="vscode"
+                  cd integrations/docker/images/vscode/chip-build${{ matrix.img }}
+                  ./build.sh --latest
