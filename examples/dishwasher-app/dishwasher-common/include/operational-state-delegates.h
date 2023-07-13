@@ -18,5 +18,5 @@
 
 #pragma once
 
-//Operational State Server Init in application
+// Operational State Server Init in application
 void MatterOperationalStateServerInit();
