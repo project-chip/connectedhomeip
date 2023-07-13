@@ -1426,6 +1426,7 @@ client cluster PowerSource = 47 {
   readonly attribute optional boolean batFunctionalWhileCharging = 28;
   readonly attribute optional nullable int32u batChargingCurrent = 29;
   readonly attribute optional BatChargeFaultEnum activeBatChargeFaults[] = 30;
+  readonly attribute ENDPOINT_NO endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

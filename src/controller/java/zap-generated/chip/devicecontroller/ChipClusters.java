@@ -5712,6 +5712,11 @@ public class ChipClusters {
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
+      public interface EndpointListAttributeCallback {
+        void onSuccess( List<Integer> valueList);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
       public interface GeneratedCommandListAttributeCallback {
         void onSuccess( List<Long> valueList);
         void onError(Exception ex);
@@ -6105,6 +6110,18 @@ public class ChipClusters {
       subscribeActiveBatChargeFaultsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readEndpointListAttribute(
+      EndpointListAttributeCallback callback
+    ) {
+      readEndpointListAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeEndpointListAttribute(
+        EndpointListAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeEndpointListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(
       GeneratedCommandListAttributeCallback callback
     ) {
@@ -6392,6 +6409,13 @@ public class ChipClusters {
     );
     private native void subscribeActiveBatChargeFaultsAttribute(long chipClusterPtr,
         ActiveBatChargeFaultsAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readEndpointListAttribute(long chipClusterPtr,
+        EndpointListAttributeCallback callback
+    );
+    private native void subscribeEndpointListAttribute(long chipClusterPtr,
+        EndpointListAttributeCallback callback
       , int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(long chipClusterPtr,
