@@ -95,9 +95,12 @@ public:
     {}
 
     ~Instance() = default;
+
     // Not copyable or movable
-    Instance(const Instance &) = delete;
+    Instance(const Instance &)             = delete;
     Instance & operator=(const Instance &) = delete;
+    Instance(Instance &&)                  = delete;
+    Instance & operator=(Instance &&)      = delete;
 
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
