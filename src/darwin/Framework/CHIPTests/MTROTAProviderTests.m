@@ -56,7 +56,6 @@ static const uint16_t kLocalPort = 5541;
 static const uint16_t kTestVendorId = 0xFFF1u;
 static const uint16_t kOTAProviderEndpointId = 0;
 static const uint64_t kOTAProviderNodeId = 0x12341236;
-static const uint64_t kOTAProviderFabricIndex = 1;
 
 static MTRDevice * sConnectedDevice1;
 static MTRDevice * sConnectedDevice2;
@@ -476,7 +475,7 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
         XCTAssertEqualObjects(nodeID, nodeID);
         XCTAssertEqual(controller, sController);
         XCTAssertEqualObjects(params.updateToken, updateToken);
-        XCTAssertEqualObjects(params.newVersion, softwareVersion); // TODO: Factor this out better!
+        XCTAssertEqualObjects(params.newVersion, softwareVersion);
 
         XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:rawImagePath andPath:otaImageDownloadFilePath]);
 
@@ -504,7 +503,6 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
 @end
 
 @interface MTROTAProviderTests : XCTestCase
-//@property (nonatomic, readonly) XCTestExpectation * updateDefaultOTAProviderExpectation;
 @end
 
 static BOOL sStackInitRan = NO;
@@ -682,7 +680,6 @@ static BOOL sNeedsStackShutdown = YES;
         [[MTROtaSoftwareUpdateRequestorClusterProviderLocation alloc] init];
     providerLocation.providerNodeID = @(kOTAProviderNodeId);
     providerLocation.endpoint = @(kOTAProviderEndpointId);
-    providerLocation.fabricIndex = @(kOTAProviderFabricIndex);
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     XCTestExpectation * updateDefaultOTAProviderExpectation =
@@ -786,7 +783,7 @@ static BOOL sNeedsStackShutdown = YES;
     [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
 }
 
-- (void)test004_ReceiveQueryImageRequestWhileHandlingBDX__RespondImplicitBusy
+- (void)test004_ReceiveQueryImageRequestWhileHandlingBDX_RespondImplicitBusy
 {
     // In this test we do the following:
     //
@@ -934,8 +931,8 @@ static BOOL sNeedsStackShutdown = YES;
     [self waitForExpectations:@[ checker.notifyUpdateAppliedExpectation ] timeout:kTimeoutInSeconds];
 }
 
-// TODO: Enable the test 006, 007 and 008 when PR #26040 is merged. Currently the poll interval causes delays in the BDX transfer
-// and results in the test taking a long time. With PR #26040 we eliminate the poll interval completely and hence the test can run
+// TODO: Enable tests 006, 007 and 008 when PR #26040 is merged. Currently the poll interval causes delays in the BDX transfer
+// and results in the tests taking a long time. With PR #26040 we eliminate the poll interval completely and hence the tests can run
 // in a short time.
 #ifdef ENABLE_TESTS
 - (void)test006_DoBDXTransferAllowUpdateRequest
@@ -993,7 +990,7 @@ static BOOL sNeedsStackShutdown = YES;
 {
     // In this test we do the following:
     //
-    // 1) Check if the ota image files and raw image files required for this test exist for both OTA requestors
+    // 1) Check that the ota image files and raw image files required for this test exist for both OTA requestors
     // 2) Advertise ourselves to the first OTA requestor.
     // 3) When device1 queries for an image, pass the image path for the ota file generated beforehand as a pre-requisite for first
     // OTA requestor 4) When device1 tries to start a bdx transfer, respond with success for the first OTA requestor
