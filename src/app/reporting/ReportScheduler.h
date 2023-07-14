@@ -110,7 +110,8 @@ public:
         ReadHandler * mReadHandler;
         Timestamp mMinTimestamp;
         Timestamp mMaxTimestamp;
-        Timestamp mSyncTimestamp;
+        Timestamp mSyncTimestamp; // Timestamp at which the read handler will be allowed to emit a report so it can be synced with
+                                  // other handlers that have an earlier max timestamp
     };
 
     ReportScheduler(TimerDelegate * aTimerDelegate) : mTimerDelegate(aTimerDelegate) {}
@@ -135,8 +136,6 @@ public:
 
     /// @brief Get the number of ReadHandlers registered in the scheduler's node pool
     size_t GetNumReadHandlers() const { return mNodesPool.Allocated(); }
-
-    virtual void ReportTimerCallback() = 0;
 
 protected:
     friend class chip::app::reporting::TestReportScheduler;

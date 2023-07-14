@@ -36,34 +36,27 @@ public:
     SynchronizedReportSchedulerImpl(TimerDelegate * aTimerDelegate) : ReportSchedulerImpl(aTimerDelegate) {}
     ~SynchronizedReportSchedulerImpl() {}
 
-    // ReadHandlerObserver
-    void OnBecameReportable(ReadHandler * aReadHandler) override;
-    void OnSubscriptionAction(ReadHandler * aReadHandler) override;
-
     bool IsReportScheduled(ReadHandler * aReadHandler) override;
 
-    void ReportTimerCallback() override;
+    void ReportTimerCallback();
 
 protected:
-    CHIP_ERROR RegisterReadHandler(ReadHandler * aReadHandler) override;
-    virtual CHIP_ERROR ScheduleReport(System::Clock::Timeout timeout, ReadHandlerNode * node) override;
+    CHIP_ERROR ScheduleReport(System::Clock::Timeout timeout, ReadHandlerNode * node) override;
     void CancelReport(ReadHandler * aReadHandler) override;
     void UnregisterReadHandler(ReadHandler * aReadHandler) override;
 
 private:
     friend class chip::app::reporting::TestReportScheduler;
 
-    CHIP_ERROR StartSchedulerTimer(ReadHandlerNode * node, Timeout aTimeout) override;
-    void CancelSchedulerTimer(ReadHandlerNode * node) override;
-    bool CheckSchedulerTimerActive(ReadHandlerNode * node) override;
-
     CHIP_ERROR FindNextMinInterval();
     CHIP_ERROR FindNextMaxInterval();
-    CHIP_ERROR CalculateNextReportTimeout(Timeout & timeout, ReadHandlerNode * aReadHandlerNode);
+    CHIP_ERROR CalculateNextReportTimeout(Timeout & timeout, ReadHandlerNode * aReadHandlerNode) override;
 
-    Timestamp mNextMaxTimestamp    = Milliseconds64(0);
-    Timestamp mNextMinTimestamp    = Milliseconds64(0);
-    Timestamp mNextReportTimestamp = Milliseconds64(0);
+    Timestamp mNextMaxTimestamp = Milliseconds64(0);
+    Timestamp mNextMinTimestamp = Milliseconds64(0);
+
+    // Timestamp of the next report to be scheduled, only used for testing
+    Timestamp mTestNextReportTimestamp = Milliseconds64(0);
 };
 
 } // namespace reporting

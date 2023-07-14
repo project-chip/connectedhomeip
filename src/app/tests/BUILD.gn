@@ -144,7 +144,6 @@ chip_test_suite("tests") {
     "TestOperationalStateDelegate.cpp",
     "TestPendingNotificationMap.cpp",
     "TestReadInteraction.cpp",
-    "TestReportScheduler.cpp",
     "TestReportingEngine.cpp",
     "TestSceneTable.cpp",
     "TestStatusIB.cpp",
@@ -176,6 +175,16 @@ chip_test_suite("tests") {
   if (chip_device_platform != "nrfconnect" &&
       chip_device_platform != "openiotsdk" && chip_device_platform != "fake") {
     test_sources += [ "TestEventLogging.cpp" ]
+  }
+
+  # The platform manager is not properly clearing queues in test teardown, which results in
+  # DrainIO calls to not being able to run in expected time (5seconds) if unprocesses engine
+  # run are remaining, causing tests to crash in Open IoT SDK and Zephyr tests since they are
+  # running all tests in one file. We need to figure out how to properly clean the event queues
+  # before enabling this test for these platforms.
+  if (chip_device_platform != "nrfconnect" &&
+      chip_device_platform != "openiotsdk") {
+    test_sources += [ "TestReportScheduler.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]
