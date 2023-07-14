@@ -22,8 +22,8 @@ config:
     nodeId: 0x12344321
     cluster: "Access Control"
     endpoint: 0
-
-    Configurable.Endpoint: 1
+    #Configurable endpoint except 0
+    Endpoint_Except_Zero: 1
 
 tests:
     - label: "Step 1: Wait for the commissioned device to be retrieved"
@@ -48,7 +48,7 @@ tests:
     - label:
           "Step 3: TH reads DUT Descriptor cluster ServerList attribute from
           every Endpoint except 0"
-      endpoint: Configurable.Endpoint
+      endpoint: Endpoint_Except_Zero
       cluster: "Descriptor"
       command: "readAttribute"
       attribute: "ServerList"

@@ -27,8 +27,8 @@ config:
     applicationId:
         type: char_string
         defaultValue: "exampleid"
-
-    Configurable.Endpoint: 3
+    #ApplicationBasic cluster endpoint
+    ApplicationBasic.Endpoint: 3
 
 tests:
     - label: "Step 0: Wait for the commissioned device to be retrieved"
@@ -56,7 +56,7 @@ tests:
                 value: 0
 
     - label: "Step 2: Reads the Status attribute"
-      endpoint: Configurable.Endpoint
+      endpoint: ApplicationBasic.Endpoint
       cluster: "Application Basic"
       command: "readAttribute"
       attribute: "Status"
