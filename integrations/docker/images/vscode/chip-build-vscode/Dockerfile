@@ -34,7 +34,8 @@ COPY --from=android /opt/android/sdk /opt/android/sdk
 COPY --from=android /opt/android/android-ndk-r23c /opt/android/android-ndk-r23c
 COPY --from=android /usr/lib/kotlinc /usr/lib/kotlinc
 
-COPY --from=mbedos /opt/openocd/ /opt/openocd/
+# FIXME: OpenOCD was removed during the move to infineon's repo
+# COPY --from=mbedos /opt/openocd/ /opt/openocd/
 
 COPY --from=p6 /opt/ModusToolbox /opt/ModusToolbox
 
