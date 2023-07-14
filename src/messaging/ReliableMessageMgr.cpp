@@ -325,6 +325,9 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
     {
 #if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
         DeviceLayer::ChipDeviceEvent event;
+        // Here always set ExpectResponse to false.
+        // The Initial message sent from the Exchange Context will have set ExpectResponse to the correct value.
+        // If we are expecting a Response, the ICD will already be in a state waiting for the response (or timeout).
         event.Type                       = DeviceLayer::DeviceEventType::kChipMsgSentEvent;
         event.MessageSent.ExpectResponse = false;
         CHIP_ERROR status                = DeviceLayer::PlatformMgr().PostEvent(&event);
