@@ -95,7 +95,7 @@ public:
 
         void SetSyncTimestamp(System::Clock::Timestamp aSyncTimestamp)
         {
-            // Prevents the sync timestamp to be set to a value lower than the min timestamp
+            // Prevents the sync timestamp being set to a value lower than the min timestamp
             VerifyOrReturn(aSyncTimestamp >= mMinTimestamp);
             mSyncTimestamp = aSyncTimestamp;
         }

@@ -137,7 +137,7 @@ bool SynchronizedReportSchedulerImpl::CheckSchedulerTimerActive(ReadHandlerNode 
     return mTimerDelegate->IsTimerActive(this);
 }
 
-/// @brief Find the smallest maximum interval possible and sets it as the common maximum
+/// @brief Find the smallest maximum interval possible and set it as the common maximum
 /// @return NO_ERROR if the smallest maximum interval was found, error otherwise, INVALID LIST LENGTH if the list is empty
 CHIP_ERROR SynchronizedReportSchedulerImpl::FindNextMaxInterval()
 {
