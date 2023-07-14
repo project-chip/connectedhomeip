@@ -133,12 +133,139 @@ static void TestBufferReader_Skip(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
 
+static void TestBufferReader_LittleEndianScalars(nlTestSuite * inSuite, void * inContext)
+{
+    const uint8_t test_buf1[10] = { 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01 };
+
+    // Unsigned 8 bits reads
+    {
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf1 } };
+        uint8_t val1 = 0;
+        uint8_t val2 = 0;
+        NL_TEST_ASSERT(inSuite, reader.Read8(&val1).Read8(&val2).IsSuccess());
+        NL_TEST_ASSERT(inSuite, val1 == 0xfe);
+        NL_TEST_ASSERT(inSuite, val2 == 0xff);
+    }
+
+    // Unsigned 16 bits reads
+    {
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf1 } };
+        uint16_t val1 = 0;
+        uint16_t val2 = 0;
+        NL_TEST_ASSERT(inSuite, reader.Read16(&val1).Read16(&val2).IsSuccess());
+        NL_TEST_ASSERT(inSuite, val1 == 0xfffe);
+        NL_TEST_ASSERT(inSuite, val2 == 0xffff);
+    }
+
+    // Unsigned 32 bits reads
+    {
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf1 } };
+        uint32_t val1 = 0;
+        uint32_t val2 = 0;
+        NL_TEST_ASSERT(inSuite, reader.Read32(&val1).Read32(&val2).IsSuccess());
+        NL_TEST_ASSERT(inSuite, val1 == static_cast<uint32_t>(0xfffffffeUL));
+        NL_TEST_ASSERT(inSuite, val2 == static_cast<uint32_t>(0xffffffffUL));
+    }
+
+    // Unsigned 32 bits reads, unaligned
+    {
+        uint8_t test_buf2[10] = { 0x00, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01 };
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf2 } };
+
+        uint32_t val1 = 0;
+        uint32_t val2 = 0;
+        NL_TEST_ASSERT(inSuite, reader.Skip(1).Read32(&val1).Read32(&val2).IsSuccess());
+        NL_TEST_ASSERT(inSuite, reader.Remaining() == 1);
+        NL_TEST_ASSERT(inSuite, val1 == static_cast<uint32_t>(0xfffffffeUL));
+        NL_TEST_ASSERT(inSuite, val2 == static_cast<uint32_t>(0xffffffffUL));
+    }
+
+    // Unsigned 64 bits read
+    {
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf1 } };
+        uint64_t val = 0;
+        NL_TEST_ASSERT(inSuite, reader.Read64(&val).IsSuccess());
+        NL_TEST_ASSERT(inSuite, reader.Remaining() == 2);
+        NL_TEST_ASSERT(inSuite, val == static_cast<uint64_t>(0xfffffffffffffffeULL));
+    }
+
+    // Signed 8 bits reads
+    {
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf1 } };
+        int8_t val1 = 0;
+        int8_t val2 = 0;
+        NL_TEST_ASSERT(inSuite, reader.ReadSigned8(&val1).ReadSigned8(&val2).IsSuccess());
+        NL_TEST_ASSERT(inSuite, val1 == -2);
+        NL_TEST_ASSERT(inSuite, val2 == -1);
+    }
+
+    // Signed 16 bits reads
+    {
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf1 } };
+        int16_t val1 = 0;
+        int16_t val2 = 0;
+        NL_TEST_ASSERT(inSuite, reader.ReadSigned16(&val1).ReadSigned16(&val2).IsSuccess());
+        NL_TEST_ASSERT(inSuite, val1 == -2);
+        NL_TEST_ASSERT(inSuite, val2 == -1);
+    }
+
+    // Signed 32 bits reads
+    {
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf1 } };
+        int32_t val1 = 0;
+        int32_t val2 = 0;
+        NL_TEST_ASSERT(inSuite, reader.ReadSigned32(&val1).ReadSigned32(&val2).IsSuccess());
+        NL_TEST_ASSERT(inSuite, val1 == -2);
+        NL_TEST_ASSERT(inSuite, val2 == -1);
+    }
+
+    // Signed 32 bits reads, unaligned
+    {
+        uint8_t test_buf2[10] = { 0x00, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01 };
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf2 } };
+
+        int32_t val1 = 0;
+        int32_t val2 = 0;
+        NL_TEST_ASSERT(inSuite, reader.Skip(1).ReadSigned32(&val1).ReadSigned32(&val2).IsSuccess());
+        NL_TEST_ASSERT(inSuite, reader.Remaining() == 1);
+        NL_TEST_ASSERT(inSuite, val1 == static_cast<int32_t>(-2L));
+        NL_TEST_ASSERT(inSuite, val2 == static_cast<int32_t>(-1L));
+    }
+
+    // Signed 64 bits read
+    {
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf1 } };
+        int64_t val = 0;
+        NL_TEST_ASSERT(inSuite, reader.ReadSigned64(&val).IsSuccess());
+        NL_TEST_ASSERT(inSuite, reader.Remaining() == 2);
+        NL_TEST_ASSERT(inSuite, val == static_cast<int64_t>(-2LL));
+    }
+
+    // Bools
+    {
+        uint8_t test_buf2[5] = { 0x00, 0xff, 0x01, 0x04, 0x07 };
+        chip::Encoding::LittleEndian::Reader reader{ ByteSpan{ test_buf2 } };
+        bool val1 = true;
+        bool val2 = false;
+        bool val3 = false;
+
+        NL_TEST_ASSERT(inSuite, reader.ReadBool(&val1).ReadBool(&val2).ReadBool(&val3).IsSuccess());
+        NL_TEST_ASSERT(inSuite, reader.Remaining() == 2);
+        NL_TEST_ASSERT(inSuite, val1 == false);
+        NL_TEST_ASSERT(inSuite, val2 == true);
+        NL_TEST_ASSERT(inSuite, val3 == true);
+    }
+}
+
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestBufferReader_Basic), NL_TEST_DEF_FN(TestBufferReader_BasicSpan),
-                                 NL_TEST_DEF_FN(TestBufferReader_Saturation), NL_TEST_DEF_FN(TestBufferReader_Skip),
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestBufferReader_Basic),
+                                 NL_TEST_DEF_FN(TestBufferReader_BasicSpan),
+                                 NL_TEST_DEF_FN(TestBufferReader_Saturation),
+                                 NL_TEST_DEF_FN(TestBufferReader_Skip),
+                                 NL_TEST_DEF("Test Little-endian buffer Reader scalar reads", TestBufferReader_LittleEndianScalars),
                                  NL_TEST_SENTINEL() };
 
 int TestBufferReader()

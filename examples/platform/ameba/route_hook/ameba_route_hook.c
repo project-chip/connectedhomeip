@@ -140,7 +140,7 @@ static uint8_t icmp6_raw_recv_handler(void * arg, struct raw_pcb * pcb, struct p
     }
 
     icmp_payload_len = p->tot_len - sizeof(struct ip6_hdr);
-    icmp_payload     = p->payload + sizeof(struct ip6_hdr);
+    icmp_payload     = (uint8_t *) p->payload + sizeof(struct ip6_hdr);
 
     icmp6_header = (struct icmp6_hdr *) icmp_payload;
     if (icmp6_header->type == ICMP6_TYPE_RA)

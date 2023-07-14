@@ -117,7 +117,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands, CredentialIss
         {{/zcl_events}}
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 {{/zcl_clusters}}
 
@@ -136,7 +136,7 @@ void registerClusterAny(Commands & commands, CredentialIssuerCommands * credsIss
         make_unique<SubscribeAll>(credsIssuerConfig),         //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for sending IM messages based on cluster id, not cluster name.");
 }
 
 void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)

@@ -29,7 +29,6 @@ import os
 import shutil
 
 from setuptools import Distribution, setup
-from wheel.bdist_wheel import bdist_wheel
 
 parser = argparse.ArgumentParser(
     description='build the pip package for chip using chip components generated during the build and python source code')

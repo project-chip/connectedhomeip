@@ -4841,6 +4841,15 @@ endpoint 2 {
 endpoint 65534 {
   device type anonymousEndpointType = 61442, version 1;
 
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    ram      attribute featureMap;
+    callback attribute clusterRevision default = 1;
+  }
+
   server cluster NetworkCommissioning {
     callback attribute maxNetworks;
     callback attribute networks;

@@ -385,10 +385,9 @@ CHIP_ERROR
 GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#if CHIP_DEVICE_CONFIG_ENABLE_SED || CHIP_CONFIG_ENABLE_ICD_SERVER
     otLinkModeConfig linkMode;
 #endif
-
     // If there is another ongoing scan request, reject the new one.
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -402,7 +401,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCom
         SuccessOrExit(error = MapOpenThreadError(otIp6SetEnabled(mOTInst, true)));
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#if CHIP_DEVICE_CONFIG_ENABLE_SED || CHIP_CONFIG_ENABLE_ICD_SERVER
     // Thread network discovery makes Sleepy End Devices detach from a network, so temporarily disable the SED mode.
     linkMode = otThreadGetLinkMode(mOTInst);
 
@@ -440,7 +439,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
 {
     if (aResult == nullptr) // scan completed
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#if CHIP_DEVICE_CONFIG_ENABLE_SED || CHIP_CONFIG_ENABLE_ICD_SERVER
         if (mTemporaryRxOnWhenIdle)
         {
             otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
@@ -1736,8 +1735,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     ConnectivityManager::SEDIntervalsConfig sedIntervalsConfig;
     using namespace System::Clock::Literals;
-    sedIntervalsConfig.ActiveIntervalMS = CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL;
-    sedIntervalsConfig.IdleIntervalMS   = CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL;
+    sedIntervalsConfig.ActiveIntervalMS = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
+    sedIntervalsConfig.IdleIntervalMS   = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
     err                                 = _SetSEDIntervalsConfig(sedIntervalsConfig);
     if (err != CHIP_NO_ERROR)
     {
@@ -1824,7 +1823,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetSEDIntervals
     if (err == CHIP_NO_ERROR)
     {
         ChipDeviceEvent event;
-        event.Type = DeviceEventType::kSEDIntervalChange;
+        event.Type = DeviceEventType::kICDPollingIntervalChange;
         err        = chip::DeviceLayer::PlatformMgr().PostEvent(&event);
     }
 
@@ -1963,6 +1962,52 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::RequestSEDModeUpdate(c
     }
 }
 #endif
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    Impl()->LockThreadStack();
+
+// For Thread devices, the intervals are defined as:
+// * poll period for SED devices that poll the parent for data
+// * CSL period for SSED devices that listen for messages in scheduled time slots.
+#if CHIP_DEVICE_CONFIG_THREAD_SSED
+    // Get CSL period in units of 10 symbols, convert it to microseconds and divide by 1000 to get milliseconds.
+    uint32_t curIntervalMS = otLinkCslGetPeriod(mOTInst) * OT_US_PER_TEN_SYMBOLS / 1000;
+#else
+    uint32_t curIntervalMS = otLinkGetPollPeriod(mOTInst);
+#endif
+    otError otErr = OT_ERROR_NONE;
+    if (pollingInterval.count() != curIntervalMS)
+    {
+#if CHIP_DEVICE_CONFIG_THREAD_SSED
+        // Set CSL period in units of 10 symbols, convert it to microseconds and divide by 1000 to get milliseconds.
+        otErr         = otLinkCslSetPeriod(mOTInst, pollingInterval.count() * 1000 / OT_US_PER_TEN_SYMBOLS);
+        curIntervalMS = otLinkCslGetPeriod(mOTInst) * OT_US_PER_TEN_SYMBOLS / 1000;
+#else
+        otErr         = otLinkSetPollPeriod(mOTInst, pollingInterval.count());
+        curIntervalMS = otLinkGetPollPeriod(mOTInst);
+#endif
+        err = MapOpenThreadError(otErr);
+    }
+
+    Impl()->UnlockThreadStack();
+
+    if (otErr != OT_ERROR_NONE)
+    {
+        ChipLogError(DeviceLayer, "Failed to set SED interval to %" PRId32 "ms. Defaulting to %" PRId32 "ms",
+                     pollingInterval.count(), curIntervalMS);
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "OpenThread SED interval is %" PRId32 "ms", curIntervalMS);
+    }
+
+    return err;
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo(void)

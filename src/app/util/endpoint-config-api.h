@@ -33,6 +33,11 @@
 uint16_t emberAfEndpointCount(void);
 
 /**
+ * @brief Enable/disable endpoints
+ */
+bool emberAfEndpointEnableDisable(chip::EndpointId endpoint, bool enable);
+
+/**
  * Returns whether the endpoint at the specified index (which must be less than
  * emberAfEndpointCount() is enabled.  If an endpoint is disabled, it is not
  * guaranteed to have an EmberAfEndpointType.

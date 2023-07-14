@@ -21,6 +21,7 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+#include "ButtonHandler.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "LEDWidget.h"
@@ -50,9 +51,7 @@ using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::System;
 
-LEDWidget sStatusLED;
 LEDWidget sLightLED;
-LEDWidget sClusterLED;
 
 namespace {
 TaskHandle_t sAppTaskHandle;
@@ -112,7 +111,13 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
 
     // Print setup info
+#if CONFIG_NETWORK_LAYER_BLE
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+#else
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
+#endif /* CONFIG_NETWORK_LAYER_BLE */
+
+    sLightLED.Init(LIGHT_LED);
 
     return CHIP_NO_ERROR;
 }
@@ -150,7 +155,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
 
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
 {
-    if (btnIdx != APP_LIGHT_BUTTON_IDX)
+    if (btnIdx != SWITCH1_BUTTON)
     {
         return;
     }
@@ -160,7 +165,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
     button_event.ButtonEvent.ButtonIdx = btnIdx;
     button_event.ButtonEvent.Action    = btnAction;
 
-    if ((btnIdx == APP_LIGHT_BUTTON_IDX) && (btnAction == APP_BUTTON_RELEASED))
+    if (btnAction == BUTTON_RELEASED)
     {
         button_event.Handler = LightActionEventHandler;
         sAppTask.PostEvent(&button_event);

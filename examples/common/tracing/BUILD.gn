@@ -47,7 +47,7 @@ source_set("commandline") {
   deps = [
     "${chip_root}/src/lib/support",
     "${chip_root}/src/tracing",
-    "${chip_root}/src/tracing/log_json",
+    "${chip_root}/src/tracing/json",
   ]
 
   public_deps = [ ":tracing_features" ]

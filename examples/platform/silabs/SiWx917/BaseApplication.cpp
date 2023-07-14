@@ -94,14 +94,14 @@ app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif /* SL_WIFI */
 
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+#if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
 
 bool sIsProvisioned      = false;
 bool sIsEnabled          = false;
 bool sIsAttached         = false;
 bool sHaveBLEConnections = false;
 
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
 StaticQueue_t sAppEventQueueStruct;
@@ -257,9 +257,9 @@ void BaseApplication::FunctionFactoryReset(void)
     // Actually trigger Factory Reset
     mFunction = kFunction_NoneSelected;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
     StopStatusLEDTimer();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     chip::Server::GetInstance().ScheduleFactoryReset();
 }
@@ -314,7 +314,7 @@ bool BaseApplication::ActivateStatusLedPatterns()
     }
 #endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
 
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+#if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
     // Identify Patterns have priority over Status patterns
     if (!isPatternSet)
     {
@@ -340,7 +340,7 @@ bool BaseApplication::ActivateStatusLedPatterns()
         }
         isPatternSet = true;
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // ENABLE_WSTK_LEDS) && SL_CATALOG_SIMPLE_LED_LED1_PRESENT
     return isPatternSet;
 }
@@ -352,7 +352,7 @@ void BaseApplication::LightEventHandler()
     // locked while these values are queried.  However we use a non-blocking
     // lock request (TryLockCHIPStack()) to avoid blocking other UI activities
     // when the CHIP task is busy (e.g. with a long crypto operation).
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+#if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
     if (PlatformMgr().TryLockChipStack())
     {
 #ifdef SL_WIFI
@@ -368,7 +368,7 @@ void BaseApplication::LightEventHandler()
         sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
         PlatformMgr().UnlockChipStack();
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // Update the status LED if factory reset has not been initiated.
     //
@@ -441,7 +441,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
     {
         mFunction = kFunction_NoneSelected;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
         StopStatusLEDTimer();
 #endif
 
@@ -514,7 +514,7 @@ void BaseApplication::OnIdentifyStart(Identify * identify)
 {
     ChipLogProgress(Zcl, "onIdentifyStart");
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
     StartStatusLEDTimer();
 #endif
 }
@@ -523,7 +523,7 @@ void BaseApplication::OnIdentifyStop(Identify * identify)
 {
     ChipLogProgress(Zcl, "onIdentifyStop");
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
     StopStatusLEDTimer();
 #endif
 }
@@ -533,7 +533,7 @@ void BaseApplication::OnTriggerIdentifyEffectCompleted(chip::System::Layer * sys
     ChipLogProgress(Zcl, "Trigger Identify Complete");
     sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
     StopStatusLEDTimer();
 #endif
 }
@@ -547,7 +547,7 @@ void BaseApplication::OnTriggerIdentifyEffect(Identify * identify)
         ChipLogDetail(AppServer, "Identify Effect Variant unsupported. Using default");
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
     StartStatusLEDTimer();
 #endif
 

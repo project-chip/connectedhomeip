@@ -279,7 +279,8 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
 
     while (delegate.mMessageDropped)
     {
-        chip::test_utils::SleepMillis(100);
+        // Wait some time so the dropped message will be retransmitted when we drain the IO.
+        chip::test_utils::SleepMillis((100_ms + CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST).count());
         delegate.mMessageDropped = false;
         ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), ctx.GetExchangeManager().GetReliableMessageMgr());
         ctx.DrainAndServiceIO();

@@ -96,6 +96,12 @@ menu "CHIP Core"
             help
                 Link the application against CHIP interactive shell.
 
+        config ENABLE_CHIP_CONTROLLER_BUILD
+            bool "Enable chip-controller build"
+            default n
+            help
+                This option enables chip-controller building.
+
         config DISABLE_IPV4
             bool "Disable IPv4 functionality in the CHIP stack"
             default "n"

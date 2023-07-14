@@ -206,11 +206,10 @@ void CommonCheckAbortAllButOneExchange(nlTestSuite * inSuite, TestContext & ctx,
         // trigger a MRP failure due to timing out waiting for an ACK.
         //
         auto waitTimeout = System::Clock::Milliseconds32(1000);
-#ifdef CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
         // Account for the retry delay booster, so that we do not timeout our IO processing before the
         // retransmission failure is triggered.
         waitTimeout += CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS * CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
-#endif
+
         ctx.GetIOContext().DriveIOUntil(waitTimeout, [&]() { return false; });
     }
     else

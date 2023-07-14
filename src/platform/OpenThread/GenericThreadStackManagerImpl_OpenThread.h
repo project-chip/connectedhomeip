@@ -107,6 +107,9 @@ protected:
     CHIP_ERROR SEDUpdateMode();
     static void RequestSEDModeUpdate(chip::System::Layer * apSystemLayer, void * apAppState);
 #endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     bool _HaveMeshConnectivity(void);
     CHIP_ERROR _GetAndLogThreadStatsCounters(void);

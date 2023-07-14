@@ -32,7 +32,9 @@
 #include <platform/Tizen/PosixConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include "WiFiManager.h"
+#endif
 
 namespace chip {
 namespace DeviceLayer {

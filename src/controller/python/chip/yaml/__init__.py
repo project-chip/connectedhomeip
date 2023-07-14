@@ -22,3 +22,5 @@
 """Provides yaml parser Python APIs for Matter."""
 
 from . import runner
+
+__all__ = [runner]
