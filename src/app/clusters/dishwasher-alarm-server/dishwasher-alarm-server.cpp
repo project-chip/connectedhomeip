@@ -253,7 +253,7 @@ static Status modifyEnabledHandler(const app::ConcreteCommandPath & commandPath,
 	chip::BitMask<AlarmMap> support;
 
 	EmberAfStatus status = Attributes::Supported::Get(endpoint, &support);
-	
+
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: reading  supported, err:0x%x", status);
@@ -268,7 +268,7 @@ static Status modifyEnabledHandler(const app::ConcreteCommandPath & commandPath,
 	{
 		return Status::Failure;
 	}
-	status = Mask::Set(endpoint, mask);        
+	status = Mask::Set(endpoint, mask);
 	if (status != EMBER_ZCL_STATUS_SUCCESS)
 	{
 		return Status::Failure;

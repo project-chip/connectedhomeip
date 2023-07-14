@@ -29,7 +29,7 @@ class DishwasherAlarmServer
 {
 public:
     static DishwasherAlarmServer & Instance();
-	
+
     void ResetCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
 
     EmberAfStatus GetMaskValue(chip::EndpointId endpoint,      chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * mask);
@@ -44,7 +44,7 @@ public:
     EmberAfStatus SetStateValue(chip::EndpointId endpoint,
                                const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> newState);
 
-    EmberAfStatus SetLatchValue(chip::EndpointId endpoint, 
+    EmberAfStatus SetLatchValue(chip::EndpointId endpoint,
 							   const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> latch);
 
 private:
