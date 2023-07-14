@@ -20,43 +20,43 @@ package com.samsung.matter.stdeviceapp;
 import android.util.Log;
 
 public class StDeviceApp {
-    private StDeviceAppCallback mCallback;
-    private static final String TAG = "StDeviceApp";
+  private StDeviceAppCallback mCallback;
+  private static final String TAG = "StDeviceApp";
 
-    public StDeviceApp(StDeviceAppCallback callback) {
-        mCallback = callback;
-        nativeInit();
+  public StDeviceApp(StDeviceAppCallback callback) {
+    mCallback = callback;
+    nativeInit();
+  }
+
+  private void postClusterInit(int clusterId, int endpoint) {
+    Log.d(TAG, "postClusterInit for " + clusterId + " at " + endpoint);
+    if (mCallback != null) {
+      mCallback.onClusterInit(this, clusterId, endpoint);
     }
+  }
 
-    private void postClusterInit(int clusterId, int endpoint) {
-        Log.d(TAG, "postClusterInit for " + clusterId + " at " + endpoint);
-        if (mCallback != null) {
-            mCallback.onClusterInit(this, clusterId, endpoint);
-        }
+  private void postEvent(int event) {
+    Log.d(TAG, "postEvent : " + event);
+    if (mCallback != null) {
+      mCallback.onEvent(event);
     }
+  }
 
-    private void postEvent(int event) {
-        Log.d(TAG, "postEvent : " + event);
-        if (mCallback != null) {
-            mCallback.onEvent(event);
-        }
-    }
+  public native void nativeInit();
 
-    public native void nativeInit();
+  // called before Matter server is initiated
+  public native void preServerInit();
 
-    // called before Matter server is initiated
-    public native void preServerInit();
+  // called after Matter server is initiated
+  public native void postServerInit(int deviceTypeId);
 
-    // called after Matter server is initiated
-    public native void postServerInit(int deviceTypeId);
+  public native void setOnOffManager(int endpoint, OnOffManager manager);
 
-    public native void setOnOffManager(int endpoint, OnOffManager manager);
+  public native boolean setOnOff(int endpoint, boolean value);
 
-    public native boolean setOnOff(int endpoint, boolean value);
+  public native void setDACProvider(DACProvider provider);
 
-    public native void setDACProvider(DACProvider provider);
-
-    static {
-        System.loadLibrary("StDeviceApp");
-    }
+  static {
+    System.loadLibrary("StDeviceApp");
+  }
 }

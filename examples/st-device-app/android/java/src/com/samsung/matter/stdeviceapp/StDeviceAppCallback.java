@@ -18,5 +18,6 @@ package com.samsung.matter.stdeviceapp;
 
 public interface StDeviceAppCallback {
   void onClusterInit(StDeviceApp app, int clusterId, int endpoint);
+
   void onEvent(int event);
 }
