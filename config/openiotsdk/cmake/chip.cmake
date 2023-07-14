@@ -23,6 +23,7 @@ get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
 # Default CHIP build configuration
 set(CONFIG_CHIP_PROJECT_CONFIG "main/include/CHIPProjectConfig.h" CACHE STRING "")
+set(CONFIG_CHIP_PROJECT_CONFIG_INCLUDE_DIRS "" CACHE STRING "")
 set(CONFIG_CHIP_LIB_TESTS NO CACHE BOOL "")
 set(CONFIG_CHIP_LIB_SHELL NO CACHE BOOL "")
 

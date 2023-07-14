@@ -5,7 +5,7 @@ import os
 import subprocess
 import sys
 import typing
-from binascii import hexlify, unhexlify
+from binascii import unhexlify
 from enum import Enum
 
 copyrightNotice = """/*

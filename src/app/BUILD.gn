@@ -193,6 +193,9 @@ static_library("app") {
     "WriteHandler.cpp",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
+    "reporting/ReportScheduler.h",
+    "reporting/ReportSchedulerImpl.cpp",
+    "reporting/ReportSchedulerImpl.h",
     "reporting/reporting.h",
   ]
 

@@ -106,6 +106,15 @@ source_set("scenes-table-test-srcs") {
   ]
 }
 
+source_set("operational-state-test-srcs") {
+  sources = [ "${chip_root}/src/app/clusters/operational-state-server/operational-state-delegate.h" ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
 chip_test_suite("tests") {
   output_name = "libAppTests"
 
@@ -132,8 +141,10 @@ chip_test_suite("tests") {
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
+    "TestOperationalStateDelegate.cpp",
     "TestPendingNotificationMap.cpp",
     "TestReadInteraction.cpp",
+    "TestReportScheduler.cpp",
     "TestReportingEngine.cpp",
     "TestSceneTable.cpp",
     "TestStatusIB.cpp",
@@ -172,6 +183,7 @@ chip_test_suite("tests") {
   public_deps = [
     ":binding-test-srcs",
     ":icd-management-test-srcs",
+    ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
     ":scenes-table-test-srcs",
     ":time-sync-data-provider-test-srcs",

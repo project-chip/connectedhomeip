@@ -304,7 +304,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{/zcl_events}}
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 {{/if}}
 {{/zcl_clusters}}
@@ -323,7 +323,7 @@ void registerClusterAny(Commands & commands)
         make_unique<SubscribeEvent>(),     //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for sending IM messages based on cluster id, not cluster name.");
 }
 
 void registerClusters(Commands & commands)

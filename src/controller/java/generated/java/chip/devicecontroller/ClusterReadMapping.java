@@ -7671,6 +7671,17 @@ public class ClusterReadMapping {
           readHepaFilterMonitoringLastChangedTimeCommandParams
         );
         result.put("readLastChangedTimeAttribute", readHepaFilterMonitoringLastChangedTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readHepaFilterMonitoringReplacementProductListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readHepaFilterMonitoringReplacementProductListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.HepaFilterMonitoringCluster) cluster).readReplacementProductListAttribute(
+              (ChipClusters.HepaFilterMonitoringCluster.ReplacementProductListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedHepaFilterMonitoringClusterReplacementProductListAttributeCallback(),
+          readHepaFilterMonitoringReplacementProductListCommandParams
+        );
+        result.put("readReplacementProductListAttribute", readHepaFilterMonitoringReplacementProductListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readHepaFilterMonitoringGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readHepaFilterMonitoringGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -7796,6 +7807,17 @@ public class ClusterReadMapping {
           readActivatedCarbonFilterMonitoringLastChangedTimeCommandParams
         );
         result.put("readLastChangedTimeAttribute", readActivatedCarbonFilterMonitoringLastChangedTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readActivatedCarbonFilterMonitoringReplacementProductListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readActivatedCarbonFilterMonitoringReplacementProductListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ActivatedCarbonFilterMonitoringCluster) cluster).readReplacementProductListAttribute(
+              (ChipClusters.ActivatedCarbonFilterMonitoringCluster.ReplacementProductListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedActivatedCarbonFilterMonitoringClusterReplacementProductListAttributeCallback(),
+          readActivatedCarbonFilterMonitoringReplacementProductListCommandParams
+        );
+        result.put("readReplacementProductListAttribute", readActivatedCarbonFilterMonitoringReplacementProductListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readActivatedCarbonFilterMonitoringGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readActivatedCarbonFilterMonitoringGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -7921,6 +7943,17 @@ public class ClusterReadMapping {
           readCeramicFilterMonitoringLastChangedTimeCommandParams
         );
         result.put("readLastChangedTimeAttribute", readCeramicFilterMonitoringLastChangedTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCeramicFilterMonitoringReplacementProductListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCeramicFilterMonitoringReplacementProductListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CeramicFilterMonitoringCluster) cluster).readReplacementProductListAttribute(
+              (ChipClusters.CeramicFilterMonitoringCluster.ReplacementProductListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCeramicFilterMonitoringClusterReplacementProductListAttributeCallback(),
+          readCeramicFilterMonitoringReplacementProductListCommandParams
+        );
+        result.put("readReplacementProductListAttribute", readCeramicFilterMonitoringReplacementProductListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCeramicFilterMonitoringGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCeramicFilterMonitoringGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -8046,6 +8079,17 @@ public class ClusterReadMapping {
           readElectrostaticFilterMonitoringLastChangedTimeCommandParams
         );
         result.put("readLastChangedTimeAttribute", readElectrostaticFilterMonitoringLastChangedTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectrostaticFilterMonitoringReplacementProductListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectrostaticFilterMonitoringReplacementProductListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectrostaticFilterMonitoringCluster) cluster).readReplacementProductListAttribute(
+              (ChipClusters.ElectrostaticFilterMonitoringCluster.ReplacementProductListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectrostaticFilterMonitoringClusterReplacementProductListAttributeCallback(),
+          readElectrostaticFilterMonitoringReplacementProductListCommandParams
+        );
+        result.put("readReplacementProductListAttribute", readElectrostaticFilterMonitoringReplacementProductListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readElectrostaticFilterMonitoringGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readElectrostaticFilterMonitoringGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -8171,6 +8215,17 @@ public class ClusterReadMapping {
           readUvFilterMonitoringLastChangedTimeCommandParams
         );
         result.put("readLastChangedTimeAttribute", readUvFilterMonitoringLastChangedTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readUvFilterMonitoringReplacementProductListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readUvFilterMonitoringReplacementProductListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.UvFilterMonitoringCluster) cluster).readReplacementProductListAttribute(
+              (ChipClusters.UvFilterMonitoringCluster.ReplacementProductListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedUvFilterMonitoringClusterReplacementProductListAttributeCallback(),
+          readUvFilterMonitoringReplacementProductListCommandParams
+        );
+        result.put("readReplacementProductListAttribute", readUvFilterMonitoringReplacementProductListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readUvFilterMonitoringGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readUvFilterMonitoringGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -8296,6 +8351,17 @@ public class ClusterReadMapping {
           readIonizingFilterMonitoringLastChangedTimeCommandParams
         );
         result.put("readLastChangedTimeAttribute", readIonizingFilterMonitoringLastChangedTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readIonizingFilterMonitoringReplacementProductListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readIonizingFilterMonitoringReplacementProductListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.IonizingFilterMonitoringCluster) cluster).readReplacementProductListAttribute(
+              (ChipClusters.IonizingFilterMonitoringCluster.ReplacementProductListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIonizingFilterMonitoringClusterReplacementProductListAttributeCallback(),
+          readIonizingFilterMonitoringReplacementProductListCommandParams
+        );
+        result.put("readReplacementProductListAttribute", readIonizingFilterMonitoringReplacementProductListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readIonizingFilterMonitoringGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readIonizingFilterMonitoringGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -8421,6 +8487,17 @@ public class ClusterReadMapping {
           readZeoliteFilterMonitoringLastChangedTimeCommandParams
         );
         result.put("readLastChangedTimeAttribute", readZeoliteFilterMonitoringLastChangedTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readZeoliteFilterMonitoringReplacementProductListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readZeoliteFilterMonitoringReplacementProductListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ZeoliteFilterMonitoringCluster) cluster).readReplacementProductListAttribute(
+              (ChipClusters.ZeoliteFilterMonitoringCluster.ReplacementProductListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedZeoliteFilterMonitoringClusterReplacementProductListAttributeCallback(),
+          readZeoliteFilterMonitoringReplacementProductListCommandParams
+        );
+        result.put("readReplacementProductListAttribute", readZeoliteFilterMonitoringReplacementProductListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readZeoliteFilterMonitoringGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readZeoliteFilterMonitoringGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -8546,6 +8623,17 @@ public class ClusterReadMapping {
           readOzoneFilterMonitoringLastChangedTimeCommandParams
         );
         result.put("readLastChangedTimeAttribute", readOzoneFilterMonitoringLastChangedTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readOzoneFilterMonitoringReplacementProductListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readOzoneFilterMonitoringReplacementProductListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.OzoneFilterMonitoringCluster) cluster).readReplacementProductListAttribute(
+              (ChipClusters.OzoneFilterMonitoringCluster.ReplacementProductListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedOzoneFilterMonitoringClusterReplacementProductListAttributeCallback(),
+          readOzoneFilterMonitoringReplacementProductListCommandParams
+        );
+        result.put("readReplacementProductListAttribute", readOzoneFilterMonitoringReplacementProductListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readOzoneFilterMonitoringGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readOzoneFilterMonitoringGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -8671,6 +8759,17 @@ public class ClusterReadMapping {
           readWaterTankMonitoringLastChangedTimeCommandParams
         );
         result.put("readLastChangedTimeAttribute", readWaterTankMonitoringLastChangedTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWaterTankMonitoringReplacementProductListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWaterTankMonitoringReplacementProductListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WaterTankMonitoringCluster) cluster).readReplacementProductListAttribute(
+              (ChipClusters.WaterTankMonitoringCluster.ReplacementProductListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWaterTankMonitoringClusterReplacementProductListAttributeCallback(),
+          readWaterTankMonitoringReplacementProductListCommandParams
+        );
+        result.put("readReplacementProductListAttribute", readWaterTankMonitoringReplacementProductListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readWaterTankMonitoringGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readWaterTankMonitoringGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -8796,6 +8895,17 @@ public class ClusterReadMapping {
           readFuelTankMonitoringLastChangedTimeCommandParams
         );
         result.put("readLastChangedTimeAttribute", readFuelTankMonitoringLastChangedTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readFuelTankMonitoringReplacementProductListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readFuelTankMonitoringReplacementProductListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.FuelTankMonitoringCluster) cluster).readReplacementProductListAttribute(
+              (ChipClusters.FuelTankMonitoringCluster.ReplacementProductListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedFuelTankMonitoringClusterReplacementProductListAttributeCallback(),
+          readFuelTankMonitoringReplacementProductListCommandParams
+        );
+        result.put("readReplacementProductListAttribute", readFuelTankMonitoringReplacementProductListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readFuelTankMonitoringGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readFuelTankMonitoringGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -8921,6 +9031,17 @@ public class ClusterReadMapping {
           readInkCartridgeMonitoringLastChangedTimeCommandParams
         );
         result.put("readLastChangedTimeAttribute", readInkCartridgeMonitoringLastChangedTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readInkCartridgeMonitoringReplacementProductListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readInkCartridgeMonitoringReplacementProductListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.InkCartridgeMonitoringCluster) cluster).readReplacementProductListAttribute(
+              (ChipClusters.InkCartridgeMonitoringCluster.ReplacementProductListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedInkCartridgeMonitoringClusterReplacementProductListAttributeCallback(),
+          readInkCartridgeMonitoringReplacementProductListCommandParams
+        );
+        result.put("readReplacementProductListAttribute", readInkCartridgeMonitoringReplacementProductListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readInkCartridgeMonitoringGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readInkCartridgeMonitoringGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -9046,6 +9167,17 @@ public class ClusterReadMapping {
           readTonerCartridgeMonitoringLastChangedTimeCommandParams
         );
         result.put("readLastChangedTimeAttribute", readTonerCartridgeMonitoringLastChangedTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTonerCartridgeMonitoringReplacementProductListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTonerCartridgeMonitoringReplacementProductListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TonerCartridgeMonitoringCluster) cluster).readReplacementProductListAttribute(
+              (ChipClusters.TonerCartridgeMonitoringCluster.ReplacementProductListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTonerCartridgeMonitoringClusterReplacementProductListAttributeCallback(),
+          readTonerCartridgeMonitoringReplacementProductListCommandParams
+        );
+        result.put("readReplacementProductListAttribute", readTonerCartridgeMonitoringReplacementProductListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readTonerCartridgeMonitoringGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readTonerCartridgeMonitoringGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

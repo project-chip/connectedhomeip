@@ -109,6 +109,7 @@ static_library("core") {
     "TLVCircularBuffer.h",
     "TLVDebug.cpp",
     "TLVReader.cpp",
+    "TLVTags.cpp",
     "TLVTags.h",
     "TLVTypes.h",
     "TLVUpdater.cpp",

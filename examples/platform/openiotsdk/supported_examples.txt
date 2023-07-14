@@ -1,2 +1,4 @@
 shell
 lock-app
+tv-app
+all-clusters-app
