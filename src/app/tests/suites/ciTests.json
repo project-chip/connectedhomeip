@@ -266,7 +266,8 @@
         "TestLevelControlWithOnOffDependency",
         "TestCommissioningWindow",
         "TestCommissionerNodeId",
-        "TestTimeSynchronization"
+        "TestTimeSynchronization",
+        "TestOperationalState"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],

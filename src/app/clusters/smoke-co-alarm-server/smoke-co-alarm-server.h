@@ -72,7 +72,6 @@ public:
     bool SetInterconnectCOAlarm(chip::EndpointId endpointId, AlarmStateEnum newInterconnectCOAlarm);
     bool SetContaminationState(chip::EndpointId endpointId, ContaminationStateEnum newContaminationState);
     bool SetSensitivityLevel(chip::EndpointId endpointId, SensitivityEnum newSensitivityLevel);
-    // bool SetExpiryDate(chip::EndpointId endpointId, Date newExpiryDate); // TODO: Date type encoding not defined
 
     bool GetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum & expressedState);
     bool GetSmokeState(chip::EndpointId endpointId, AlarmStateEnum & smokeState);
@@ -86,7 +85,7 @@ public:
     bool GetInterconnectCOAlarm(chip::EndpointId endpointId, AlarmStateEnum & interconnectCOAlarm);
     bool GetContaminationState(chip::EndpointId endpointId, ContaminationStateEnum & contaminationState);
     bool GetSensitivityLevel(chip::EndpointId endpointId, SensitivityEnum & sensitivityLevel);
-    // bool GetExpiryDate(chip::EndpointId endpointId, Date & expiryDate); // TODO: Date type encoding not defined
+    bool GetExpiryDate(chip::EndpointId endpointId, uint32_t & expiryDate);
 
     chip::BitFlags<Feature> GetFeatures(chip::EndpointId endpointId);
 

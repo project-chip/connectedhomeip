@@ -758,53 +758,23 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
     }
 }
 
-void ConnectivityManagerImpl::OnStationIPv4AddressAvailable(void)
+void ConnectivityManagerImpl::OnStationIPv4v6AddressAvailable(void)
 {
     uint8_t * ip  = LwIP_GetIP(&xnetif[0]);
     uint8_t * gw  = LwIP_GetGW(&xnetif[0]);
     uint8_t * msk = LwIP_GetMASK(&xnetif[0]);
-#if CHIP_PROGRESS_LOGGING
-    {
-        ChipLogProgress(DeviceLayer, "\n\r\tIP              => %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
-        ChipLogProgress(DeviceLayer, "\n\r\tGW              => %d.%d.%d.%d\n\r", gw[0], gw[1], gw[2], gw[3]);
-        ChipLogProgress(DeviceLayer, "\n\r\tmsk             => %d.%d.%d.%d\n\r", msk[0], msk[1], msk[2], msk[3]);
-    }
-#endif // CHIP_PROGRESS_LOGGING
-
-    RefreshMessageLayer();
-
-    UpdateInternetConnectivityState();
-
-    ChipDeviceEvent event;
-    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
-    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Assigned;
-    PlatformMgr().PostEventOrDie(&event);
-}
-
-void ConnectivityManagerImpl::OnStationIPv4AddressLost(void)
-{
-    ChipLogProgress(DeviceLayer, "IPv4 address lost on WiFi station interface");
-
-    RefreshMessageLayer();
-
-    UpdateInternetConnectivityState();
-
-    ChipDeviceEvent event;
-    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
-    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Lost;
-    PlatformMgr().PostEventOrDie(&event);
-}
-
-void ConnectivityManagerImpl::OnIPv6AddressAvailable(void)
-{
 #if LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
 #if LWIP_IPV6
     uint8_t * ipv6_0 = LwIP_GetIPv6_linklocal(&xnetif[0]);
     uint8_t * ipv6_1 = LwIP_GetIPv6_global(&xnetif[0]);
 #endif
 #endif // LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
+
 #if CHIP_PROGRESS_LOGGING
     {
+        ChipLogProgress(DeviceLayer, "\n\r\tIP              => %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+        ChipLogProgress(DeviceLayer, "\n\r\tGW              => %d.%d.%d.%d\n\r", gw[0], gw[1], gw[2], gw[3]);
+        ChipLogProgress(DeviceLayer, "\n\r\tmsk             => %d.%d.%d.%d\n\r", msk[0], msk[1], msk[2], msk[3]);
 #if LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
 #if LWIP_IPV6
         ChipLogProgress(DeviceLayer,
@@ -827,6 +797,20 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(void)
     ChipDeviceEvent event;
     event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void ConnectivityManagerImpl::OnStationIPv4v6AddressLost(void)
+{
+    ChipLogProgress(DeviceLayer, "IPv4 address lost on WiFi station interface");
+
+    RefreshMessageLayer();
+
+    UpdateInternetConnectivityState();
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Lost;
     PlatformMgr().PostEventOrDie(&event);
 }
 
@@ -859,17 +843,14 @@ void ConnectivityManagerImpl::RtkWiFiScanCompletedHandler(void)
 void ConnectivityManagerImpl::DHCPProcessThread(void * param)
 {
     matter_lwip_dhcp();
-    PlatformMgr().LockChipStack();
-    sInstance.OnStationIPv4AddressAvailable();
-    PlatformMgr().UnlockChipStack();
 #if LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
 #if LWIP_IPV6
     matter_lwip_dhcp6();
-    PlatformMgr().LockChipStack();
-    sInstance.OnIPv6AddressAvailable();
-    PlatformMgr().UnlockChipStack();
 #endif
 #endif // LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
+    PlatformMgr().LockChipStack();
+    sInstance.OnStationIPv4v6AddressAvailable();
+    PlatformMgr().UnlockChipStack();
     vTaskDelete(NULL);
 }
 

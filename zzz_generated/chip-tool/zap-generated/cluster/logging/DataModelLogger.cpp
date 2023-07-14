@@ -3944,6 +3944,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const SmokeCoAlarm::Events::SmokeAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AlarmSeverityLevel", indent + 1, value.alarmSeverityLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AlarmSeverityLevel'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -3951,6 +3959,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const SmokeCoAlarm::Events::COAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AlarmSeverityLevel", indent + 1, value.alarmSeverityLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AlarmSeverityLevel'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -3959,6 +3975,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const SmokeCoAlarm::Events::LowBattery::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AlarmSeverityLevel", indent + 1, value.alarmSeverityLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AlarmSeverityLevel'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -4007,6 +4031,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const SmokeCoAlarm::Events::InterconnectSmokeAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AlarmSeverityLevel", indent + 1, value.alarmSeverityLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AlarmSeverityLevel'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -4015,6 +4047,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const SmokeCoAlarm::Events::InterconnectCOAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AlarmSeverityLevel", indent + 1, value.alarmSeverityLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AlarmSeverityLevel'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
