@@ -46,7 +46,7 @@ function build_image {
     echo "PARSE_PATH: $PARSE_PATH"
     echo "ARGS_TO_PASS: $ARGS_TO_PASS"
 
-    find "$(git rev-parse --show-toplevel)"/integrations/docker/images/$PARSE_PATH -name Dockerfile ! -path "*chip-cert-bins/*" | while read -r dockerfile; do
+    find "$(git rev-parse --show-toplevel)"/integrations/docker/images/"$PARSE_PATH" -name Dockerfile ! -path "*chip-cert-bins/*" | while read -r dockerfile; do
         echo "$(dirname "$dockerfile")"
         pushd "$(dirname "$dockerfile")" >/dev/null
         ./build.sh "$ARGS_TO_PASS"
