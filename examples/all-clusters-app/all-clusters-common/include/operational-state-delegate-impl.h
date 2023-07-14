@@ -35,10 +35,10 @@ class OperationalStateDelegate : public Delegate
 public:
     /**
      * Get current operational state.
-     * @param op The GenericOperationalState to fill with the current operational state value.
+     * @param op The uint8_t to fill with the current operational state value.
      * @return void.
      */
-    void GetCurrentOperationalState(GenericOperationalState & op) override;
+    void GetCurrentOperationalState(uint8_t & op) override;
 
     /**
      * Get the list of supported operational states.
@@ -86,7 +86,7 @@ public:
      * Set current operational state.
      * @param opState The operational state that should now be the current one.
      */
-    CHIP_ERROR SetOperationalState(const GenericOperationalState & opState) override;
+    CHIP_ERROR SetOperationalState(const uint8_t & opState) override;
 
     /**
      * Set operational phase.
@@ -125,7 +125,7 @@ public:
      */
     void HandleStopStateCallback(GenericOperationalError & err) override;
 
-    OperationalStateDelegate(GenericOperationalState aOperationalState, GenericOperationalError aOperationalError,
+    OperationalStateDelegate(uint8_t aOperationalState, GenericOperationalError aOperationalError,
                              Span<const GenericOperationalState> aOperationalStateList,
                              Span<const GenericOperationalPhase> aOperationalPhaseList,
                              app::DataModel::Nullable<uint8_t> aPhase          = DataModel::Nullable<uint8_t>(),
@@ -137,7 +137,7 @@ public:
     ~OperationalStateDelegate() = default;
 
 private:
-    GenericOperationalState mOperationalState;
+    uint8_t mOperationalState;
     GenericOperationalError mOperationalError;
     app::DataModel::List<const GenericOperationalState> mOperationalStateList;
     Span<const GenericOperationalPhase> mOperationalPhaseList;

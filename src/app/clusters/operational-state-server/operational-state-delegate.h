@@ -213,10 +213,10 @@ class Delegate
 public:
     /**
      * Get the current operational state.
-     * @param op The GenericOperationalState to fill with the current operational state value.
+     * @param op The uint8_t to fill with the current operational state value.
      * @return void.
      */
-    virtual void GetCurrentOperationalState(GenericOperationalState & op) = 0;
+    virtual void GetCurrentOperationalState(uint8_t & op) = 0;
 
     /**
      * Get the list of supported operational states.
@@ -258,7 +258,7 @@ public:
      * Set current operational state.
      * @param opState The operational state that should now be the current one.
      */
-    virtual CHIP_ERROR SetOperationalState(const GenericOperationalState & opState) = 0;
+    virtual CHIP_ERROR SetOperationalState(const uint8_t & opState) = 0;
 
     /**
      * Set operational error.
