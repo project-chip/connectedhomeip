@@ -119,6 +119,11 @@ set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
 )
 endif (CONFIG_ENABLE_PW_RPC)
 
+if (CONFIG_ENABLE_ICD_SERVER)
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/icd")
+    list(APPEND SRC_DIRS_LIST "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/icd")
+endif()
+
 set(PRIV_REQUIRES_LIST chip QRCode bt driver app_update nvs_flash spi_flash openthread)
 if(CONFIG_HAVE_DISPLAY)
     list(APPEND PRIV_REQUIRES_LIST tft spidrier screen-framework)
