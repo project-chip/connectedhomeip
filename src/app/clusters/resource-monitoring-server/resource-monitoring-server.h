@@ -76,24 +76,23 @@ public:
     DataModel::Nullable<uint32_t> GetLastChangedTime() const;
     EndpointId GetEndpointId() const { return mEndpointId; }
 
- /**
+    /**
      * Creates a resource monitoring cluster instance. The Init() method needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
-     * @param aEndpointId   The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aClusterId    The ID of the ResourceMonitoring aliased cluster to be instantiated.
-     * @param aDelegate     A pointer to a delegate that will handle application layer logic.
+     * @param aEndpointId                       The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param aClusterId                        The ID of the ResourceMonitoring aliased cluster to be instantiated.
+     * @param aFeatureMap                       The feature map of the cluster.
+     * @param aDegradationDirection             The degradation direction of the cluster.
+     * @param aResetConditionCommandSupported   Whether the ResetCondition command is supported by the cluster.
      */
     Instance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeatureMap,
              ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
              bool aResetConditionCommandSupported) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDegradationDirection(aDegradationDirection),
+        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mEndpointId(aEndpointId),
+        mClusterId(aClusterId), mDegradationDirection(aDegradationDirection), mFeatureMap(aFeatureMap),
         mResetConditionCommandSupported(aResetConditionCommandSupported)
-    {
-        mEndpointId = aEndpointId;
-        mClusterId  = aClusterId;
-        mFeatureMap = aFeatureMap;
-    }
+    {}
 
     ~Instance() = default;
     // Not copyable or movable
