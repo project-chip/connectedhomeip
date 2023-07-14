@@ -16,14 +16,22 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/AttributePersistenceProvider.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
+#include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
+#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/util.h>
-#include <platform/DiagnosticDataProvider.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 // using namespace std;
 using namespace chip;
@@ -31,8 +39,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
 using chip::Protocols::InteractionModel::Status;
-
-using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 
 namespace chip {
 namespace app {

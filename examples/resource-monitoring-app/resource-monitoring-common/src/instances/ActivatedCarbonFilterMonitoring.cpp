@@ -16,15 +16,19 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/util/config.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
+#include <app/data-model/Nullable.h>
+#include <app/util/endpoint-config-api.h>
 #include <instances/ActivatedCarbonFilterMonitoring.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <protocols/interaction_model/StatusCode.h>
+#include <system/SystemClock.h>
 
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::HepaFilterMonitoring;
-using chip::Protocols::InteractionModel::Status;
-
-using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::ActivatedCarbonFilterMonitoring;
 using namespace chip::app::Clusters::ResourceMonitoring;
 using chip::Protocols::InteractionModel::Status;
 

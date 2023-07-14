@@ -17,16 +17,11 @@
  */
 
 #include <AppMain.h>
-
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/server/Server.h>
-#include <lib/support/logging/CHIPLogging.h>
-
-#include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
+#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
+#include <bitset>
 #include <instances/ActivatedCarbonFilterMonitoring.h>
 #include <instances/HepaFilterMonitoring.h>
+#include <stdint.h>
 
 using namespace chip;
 using namespace chip::app;
