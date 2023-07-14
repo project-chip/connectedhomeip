@@ -21,7 +21,7 @@ PICS:
 config:
     nodeId: 0x12344321
     cluster: "Smoke CO Alarm"
-    timeout: 3400
+    timeout: 2910
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
         defaultValue: "hex:00112233445566778899aabbccddeeff"
@@ -106,6 +106,14 @@ tests:
       response:
           value: 1
 
+    - label: "TH subscribes to BatteryAlert attribute from DUT"
+      PICS: SMOKECO.S.A0003
+      endpoint: 1
+      command: "subscribeAttribute"
+      attribute: "BatteryAlert"
+      minInterval: 3
+      maxInterval: 60
+
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
@@ -122,14 +130,6 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_WARNING_BATTERY_ALERT
 
-    - label: "TH subscribes to BatteryAlert attribute from DUT"
-      PICS: SMOKECO.S.A0003
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "BatteryAlert"
-      minInterval: 3
-      maxInterval: 60
-
     - label:
           "TH waits for a report of BatteryAlert attribute from DUT with a
           timeout of 300 seconds"
@@ -137,6 +137,7 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "BatteryAlert"
+      timeout: 300
       response:
           value: 1
           constraints:
@@ -184,6 +185,7 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "BatteryAlert"
+      timeout: 300
       response:
           value: 2
           constraints:
@@ -231,6 +233,7 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "BatteryAlert"
+      timeout: 300
       response:
           value: 0
           constraints:
@@ -265,6 +268,14 @@ tests:
           constraints:
               type: boolean
 
+    - label: "TH subscribes to HardwareFaultAlert attribute from DUT"
+      PICS: SMOKECO.S.A0006
+      endpoint: 1
+      command: "subscribeAttribute"
+      attribute: "HardwareFaultAlert"
+      minInterval: 3
+      maxInterval: 60
+
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
@@ -281,15 +292,6 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_HARDWARE_FAULT_ALERT
 
-    - label: "TH subscribes to HardwareFaultAlert attribute from DUT"
-      PICS: SMOKECO.S.A0006
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "HardwareFaultAlert"
-      minInterval: 3
-      maxInterval: 60
-      keepSubscriptions: true
-
     - label:
           "TH waits for a report of HardwareFaultAlert attribute from DUT with a
           timeout of 300 seconds"
@@ -297,6 +299,7 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "HardwareFaultAlert"
+      timeout: 300
       response:
           value: 1
           constraints:
@@ -345,6 +348,7 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "HardwareFaultAlert"
+      timeout: 300
       response:
           value: 0
           constraints:
@@ -379,6 +383,14 @@ tests:
           constraints:
               type: enum8
 
+    - label: "TH subscribes to EndOfServiceAlert attribute from DUT"
+      PICS: SMOKECO.S.A0007
+      endpoint: 1
+      command: "subscribeAttribute"
+      attribute: "EndOfServiceAlert"
+      minInterval: 3
+      maxInterval: 60
+
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
@@ -395,15 +407,6 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_END_OF_SERVICE_ALERT
 
-    - label: "TH subscribes to EndOfServiceAlert attribute from DUT"
-      PICS: SMOKECO.S.A0007
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "EndOfServiceAlert"
-      minInterval: 3
-      maxInterval: 60
-      keepSubscriptions: true
-
     - label:
           "TH waits for a report of EndOfServiceAlert attribute from DUT with a
           timeout of 300 seconds"
@@ -411,6 +414,7 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "EndOfServiceAlert"
+      timeout: 300
       response:
           value: 1
           constraints:
@@ -459,6 +463,7 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "EndOfServiceAlert"
+      timeout: 300
       response:
           value: 0
           constraints:
@@ -503,6 +508,14 @@ tests:
           constraints:
               type: enum8
 
+    - label: "TH subscribes to TestInProgress attribute from DUT"
+      PICS: SMOKECO.S.A0005
+      endpoint: 1
+      command: "subscribeAttribute"
+      attribute: "TestInProgress"
+      minInterval: 3
+      maxInterval: 60
+
     - label: "Start manually DUT self-test"
       cluster: "LogCommands"
       PICS: PICS_USER_PROMPT && SMCO.M.ManuallyControlledTest
@@ -515,22 +528,14 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH subscribes to TestInProgress attribute from DUT"
-      PICS: SMOKECO.S.A0005
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "TestInProgress"
-      minInterval: 3
-      maxInterval: 60
-      keepSubscriptions: true
-
     - label:
           "TH waits for a report of TestInProgress attribute from DUT with a
-          timeout of 300 seconds"
+          timeout of 180 seconds"
       PICS: SMOKECO.S.A0005
       endpoint: 1
       command: "waitForReport"
       attribute: "TestInProgress"
+      timeout: 180
       response:
           value: 1
           constraints:
@@ -548,11 +553,12 @@ tests:
 
     - label:
           "TH waits for a report of TestInProgress attribute from DUT with a
-          timeout of 300 seconds"
+          timeout of 180 seconds"
       PICS: SMOKECO.S.A0005
       endpoint: 1
       command: "waitForReport"
       attribute: "TestInProgress"
+      timeout: 180
       response:
           value: 0
           constraints:
@@ -593,11 +599,12 @@ tests:
 
     - label:
           "TH waits for a report of TestInProgress attribute from DUT with a
-          timeout of 300 seconds"
+          timeout of 180 seconds"
       PICS: SMOKECO.S.A0005
       endpoint: 1
       command: "waitForReport"
       attribute: "TestInProgress"
+      timeout: 180
       response:
           value: 1
           constraints:
@@ -615,11 +622,12 @@ tests:
 
     - label:
           "TH waits for a report of TestInProgress attribute from DUT with a
-          timeout of 300 seconds"
+          timeout of 180 seconds"
       PICS: SMOKECO.S.A0005
       endpoint: 1
       command: "waitForReport"
       attribute: "TestInProgress"
+      timeout: 180
       response:
           value: 0
           constraints:

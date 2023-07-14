@@ -20,7 +20,7 @@ PICS:
 config:
     nodeId: 0x12344321
     cluster: "Smoke CO Alarm"
-    timeout: 1000
+    timeout: 990
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
         defaultValue: "hex:00112233445566778899aabbccddeeff"
@@ -93,6 +93,14 @@ tests:
       response:
           value: 1
 
+    - label: "TH subscribes to COState attribute from DUT"
+      PICS: SMOKECO.S.A0002
+      endpoint: 1
+      command: "subscribeAttribute"
+      attribute: "COState"
+      minInterval: 3
+      maxInterval: 60
+
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
@@ -109,14 +117,6 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_WARNING_CO_ALARM
 
-    - label: "TH subscribes to COState attribute from DUT"
-      PICS: SMOKECO.S.A0002
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "COState"
-      minInterval: 3
-      maxInterval: 60
-
     - label:
           "TH waits for a report of COState attribute from DUT with a timeout of
           300 seconds"
@@ -124,6 +124,7 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "COState"
+      timeout: 300
       response:
           value: 1
           constraints:
@@ -210,6 +211,7 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "COState"
+      timeout: 300
       response:
           value: 2
           constraints:
@@ -257,6 +259,7 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "COState"
+      timeout: 300
       response:
           value: 0
           constraints:

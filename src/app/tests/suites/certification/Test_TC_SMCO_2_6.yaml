@@ -22,7 +22,7 @@ PICS:
 config:
     nodeId: 0x12344321
     cluster: "Smoke CO Alarm"
-    timeout: 3100
+    timeout: 3090
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
         defaultValue: "hex:00112233445566778899aabbccddeeff"
@@ -103,6 +103,14 @@ tests:
       response:
           value: 1
 
+    - label: "TH subscribes to BatteryAlert attribute from DUT"
+      PICS: SMOKECO.S.A0003
+      endpoint: 1
+      command: "subscribeAttribute"
+      attribute: "BatteryAlert"
+      minInterval: 3
+      maxInterval: 60
+
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
@@ -119,14 +127,6 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_WARNING_BATTERY_ALERT
 
-    - label: "TH subscribes to BatteryAlert attribute from DUT"
-      PICS: SMOKECO.S.A0003
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "BatteryAlert"
-      minInterval: 3
-      maxInterval: 60
-
     - label:
           "TH waits for a report of BatteryAlert attribute from DUT with a
           timeout of 300 seconds"
@@ -134,10 +134,20 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "BatteryAlert"
+      timeout: 300
       response:
           value: 1
           constraints:
               type: enum8
+
+    - label: "TH subscribes to InterconnectSmokeAlarm attribute from DUT"
+      PICS: SMOKECO.S.A0008
+      endpoint: 1
+      command: "subscribeAttribute"
+      attribute: "InterconnectSmokeAlarm"
+      minInterval: 3
+      maxInterval: 60
+      keepSubscriptions: true
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
@@ -155,15 +165,6 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM
 
-    - label: "TH subscribes to InterconnectSmokeAlarm attribute from DUT"
-      PICS: SMOKECO.S.A0008
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "InterconnectSmokeAlarm"
-      minInterval: 3
-      maxInterval: 60
-      keepSubscriptions: true
-
     - label:
           "TH waits for a report of InterconnectSmokeAlarm attribute from DUT
           with a timeout of 300 seconds"
@@ -171,11 +172,21 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "InterconnectSmokeAlarm"
+      timeout: 300
       response:
           constraints:
               type: enum8
               minValue: 1
               maxValue: 2
+
+    - label: "TH subscribes to InterconnectCOAlarm attribute from DUT"
+      PICS: SMOKECO.S.A0009
+      endpoint: 1
+      command: "subscribeAttribute"
+      attribute: "InterconnectCOAlarm"
+      minInterval: 3
+      maxInterval: 60
+      keepSubscriptions: true
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
@@ -193,15 +204,6 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM
 
-    - label: "TH subscribes to InterconnectCOAlarm attribute from DUT"
-      PICS: SMOKECO.S.A0009
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "InterconnectCOAlarm"
-      minInterval: 3
-      maxInterval: 60
-      keepSubscriptions: true
-
     - label:
           "TH waits for a report of InterconnectCOAlarm attribute from DUT with
           a timeout of 300 seconds"
@@ -209,11 +211,21 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "InterconnectCOAlarm"
+      timeout: 300
       response:
           constraints:
               type: enum8
               minValue: 1
               maxValue: 2
+
+    - label: "TH subscribes to COState attribute from DUT"
+      PICS: SMOKECO.S.A0002
+      endpoint: 1
+      command: "subscribeAttribute"
+      attribute: "COState"
+      minInterval: 3
+      maxInterval: 60
+      keepSubscriptions: true
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
@@ -231,15 +243,6 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_WARNING_CO_ALARM
 
-    - label: "TH subscribes to COState attribute from DUT"
-      PICS: SMOKECO.S.A0002
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "COState"
-      minInterval: 3
-      maxInterval: 60
-      keepSubscriptions: true
-
     - label:
           "TH waits for a report of COState attribute from DUT with a timeout of
           300 seconds"
@@ -247,10 +250,20 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "COState"
+      timeout: 300
       response:
           value: 1
           constraints:
               type: enum8
+
+    - label: "TH subscribes to SmokeState attribute from DUT"
+      PICS: SMOKECO.S.A0001
+      endpoint: 1
+      command: "subscribeAttribute"
+      attribute: "SmokeState"
+      minInterval: 3
+      maxInterval: 60
+      keepSubscriptions: true
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
@@ -268,15 +281,6 @@ tests:
               - name: "EventTrigger"
                 value: TEST_EVENT_TRIGGER_WARNING_SMOKE_ALARM
 
-    - label: "TH subscribes to SmokeState attribute from DUT"
-      PICS: SMOKECO.S.A0001
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "SmokeState"
-      minInterval: 3
-      maxInterval: 60
-      keepSubscriptions: true
-
     - label:
           "TH waits for a report of SmokeState attribute from DUT with a timeout
           of 300 seconds"
@@ -284,6 +288,7 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "SmokeState"
+      timeout: 300
       response:
           value: 1
           constraints:
@@ -322,6 +327,7 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "SmokeState"
+      timeout: 300
       response:
           value: 0
           constraints:
@@ -360,6 +366,7 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "COState"
+      timeout: 300
       response:
           value: 0
           constraints:
@@ -399,6 +406,7 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "InterconnectCOAlarm"
+      timeout: 300
       response:
           value: 0
           constraints:
@@ -438,6 +446,7 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "InterconnectSmokeAlarm"
+      timeout: 300
       response:
           value: 0
           constraints:
@@ -476,6 +485,7 @@ tests:
       endpoint: 1
       command: "waitForReport"
       attribute: "BatteryAlert"
+      timeout: 300
       response:
           value: 0
           constraints:
