@@ -132,8 +132,7 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
 
     delegate->GetCurrentOperationalState(opState);
 
-    if (opState != to_underlying(OperationalStateEnum::kPaused) &&
-        opState != to_underlying(OperationalStateEnum::kRunning))
+    if (opState != to_underlying(OperationalStateEnum::kPaused) && opState != to_underlying(OperationalStateEnum::kRunning))
     {
         err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     }
