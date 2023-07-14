@@ -31,6 +31,7 @@ class TelinkApp(Enum):
     OTA_REQUESTOR = auto()
     PUMP = auto()
     PUMP_CONTROLLER = auto()
+    SMOKE_CO_ALARM = auto()
     TEMPERATURE_MEASUREMENT = auto()
     THERMOSTAT = auto()
     WINDOW_COVERING = auto()
@@ -56,6 +57,8 @@ class TelinkApp(Enum):
             return 'pump-app'
         elif self == TelinkApp.PUMP_CONTROLLER:
             return 'pump-controller-app'
+        elif self == TelinkApp.SMOKE_CO_ALARM:
+            return 'smoke-co-alarm-app'
         elif self == TelinkApp.TEMPERATURE_MEASUREMENT:
             return 'temperature-measurement-app'
         elif self == TelinkApp.THERMOSTAT:
@@ -86,6 +89,8 @@ class TelinkApp(Enum):
             return 'chip-telink-pump-example'
         elif self == TelinkApp.PUMP_CONTROLLER:
             return 'chip-telink-pump-controller-example'
+        elif self == TelinkApp.SMOKE_CO_ALARM:
+            return 'chip-telink-smoke-co-alarm-example'
         elif self == TelinkApp.TEMPERATURE_MEASUREMENT:
             return 'chip-telink-temperature-measurement-example'
         elif self == TelinkApp.THERMOSTAT:
