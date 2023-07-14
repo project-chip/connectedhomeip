@@ -21,7 +21,6 @@ import sys
 
 import Base38
 from bitarray import bitarray
-from bitarray.util import ba2int
 from stdnum.verhoeff import calc_check_digit
 
 # See section 5.1.4.1 Manual Pairing Code in the Matter specification v1.0

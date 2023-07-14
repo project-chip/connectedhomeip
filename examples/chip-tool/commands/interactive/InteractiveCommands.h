@@ -29,8 +29,10 @@ class Commands;
 class InteractiveCommand : public CHIPCommand
 {
 public:
-    InteractiveCommand(const char * name, Commands * commandsHandler, CredentialIssuerCommands * credsIssuerConfig) :
-        CHIPCommand(name, credsIssuerConfig), mHandler(commandsHandler)
+    InteractiveCommand(const char * name, Commands * commandsHandler, const char * helpText,
+                       CredentialIssuerCommands * credsIssuerConfig) :
+        CHIPCommand(name, credsIssuerConfig, helpText),
+        mHandler(commandsHandler)
     {
         AddArgument("advertise-operational", 0, 1, &mAdvertiseOperational,
                     "Advertise operational node over DNS-SD and accept incoming CASE sessions.");
@@ -51,7 +53,8 @@ class InteractiveStartCommand : public InteractiveCommand
 {
 public:
     InteractiveStartCommand(Commands * commandsHandler, CredentialIssuerCommands * credsIssuerConfig) :
-        InteractiveCommand("start", commandsHandler, credsIssuerConfig)
+        InteractiveCommand("start", commandsHandler, "Start an interactive shell that can then run other commands.",
+                           credsIssuerConfig)
     {}
 
     /////////// CHIPCommand Interface /////////
@@ -62,7 +65,8 @@ class InteractiveServerCommand : public InteractiveCommand, public WebSocketServ
 {
 public:
     InteractiveServerCommand(Commands * commandsHandler, CredentialIssuerCommands * credsIssuerConfig) :
-        InteractiveCommand("server", commandsHandler, credsIssuerConfig)
+        InteractiveCommand("server", commandsHandler, "Start a websocket server that can receive commands sent by another process.",
+                           credsIssuerConfig)
     {
         AddArgument("port", 0, UINT16_MAX, &mPort, "Port the websocket will listen to. Defaults to 9002.");
     }

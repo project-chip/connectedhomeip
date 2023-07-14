@@ -197,6 +197,4 @@ void RefrigeratorAlarmServer::SendNotifyEvent(EndpointId endpointId, BitMask<Ala
  * Callbacks Implementation
  *********************************************************/
 
-void emberAfRefrigeratorAlarmClusterServerInitCallback(EndpointId endpoint) {}
-
 void MatterRefrigeratorAlarmPluginServerInitCallback() {}

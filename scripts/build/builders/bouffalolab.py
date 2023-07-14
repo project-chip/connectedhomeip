@@ -14,7 +14,6 @@
 
 import logging
 import os
-import platform
 from enum import Enum, auto
 
 from .gn import GnBuilder

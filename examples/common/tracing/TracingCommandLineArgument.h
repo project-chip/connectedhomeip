@@ -29,7 +29,7 @@
 /// A string with supported command line tracing targets
 /// to be pretty-printed in help strings if needed
 #if ENABLE_PERFETTO_TRACING
-#define SUPPORTED_COMMAND_LINE_TRACING_TARGETS "json:log, json:<path> perfetto, perfetto:<path>"
+#define SUPPORTED_COMMAND_LINE_TRACING_TARGETS "json:log, json:<path>, perfetto, perfetto:<path>"
 #else
 #define SUPPORTED_COMMAND_LINE_TRACING_TARGETS "json:log, json:<path>"
 #endif

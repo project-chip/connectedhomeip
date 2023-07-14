@@ -32,7 +32,7 @@ import requests
 try:
     import coloredlogs
     _has_coloredlogs = True
-except:
+except ImportError:
     _has_coloredlogs = False
 
 # Supported log levels, mapping string values required for argument
@@ -58,10 +58,10 @@ def _GetDefaultExtractRoot():
 
 
 def _LogPipeLines(pipe, prefix):
-    l = logging.getLogger().getChild(prefix)
+    log = logging.getLogger().getChild(prefix)
     for line in iter(pipe.readline, b''):
         line = line.strip().decode('utf-8', errors="ignore")
-        l.info('%s' % line)
+        log.info('%s' % line)
 
 
 def _ExecuteProcess(cmd, cwd):
@@ -93,7 +93,7 @@ def _SetupSourceZap(install_directory: str, zap_version: str):
         install_directory
     )
 
-    _ExecuteProcess(f"npm ci".split(), install_directory)
+    _ExecuteProcess("npm ci".split(), install_directory)
 
 
 def _SetupReleaseZap(install_directory: str, zap_version: str):

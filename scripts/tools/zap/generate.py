@@ -24,7 +24,6 @@ import subprocess
 import sys
 import tempfile
 import traceback
-import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -195,7 +194,7 @@ def matterPathFromZapPath(zap_config_path):
     if not target_path.endswith(".matter"):
         # We expect "something.zap" and don't handle corner cases of
         # multiple extensions. This is to work with existing codebase only
-        raise Error("Unexpected input zap file  %s" % self.zap_config)
+        raise Exception("Unexpected input zap file  %s" % zap_config_path)
 
     return target_path
 
@@ -290,7 +289,7 @@ def getClangFormatBinary():
                 print('WARNING: clang-format may not be the right version:')
                 print('   PIGWEED TAG:    %s' % clang_config['tags'][0])
                 print('   ACTUAL VERSION: %s' % version_string)
-        except:
+        except Exception:
             print("Failed to validate clang version.")
             traceback.print_last()
 
@@ -318,12 +317,11 @@ def runClangPrettifier(templates_file, output_dir):
             args = [clang_format, '-i']
             args.extend(clangOutputs)
             subprocess.check_call(args)
-            err = None
             print('Formatted using %s (%s)' % (clang_format, subprocess.check_output([clang_format, '--version'])))
             for outputName in clangOutputs:
                 print('  - %s' % outputName)
-    except Exception as err:
-        print('clang-format error:', err)
+    except subprocess.CalledProcessError as err:
+        print('clang-format error: %s', err)
 
 
 class LockFileSerializer:
@@ -351,7 +349,7 @@ def main():
     checkPythonVersion()
     cmdLineArgs = runArgumentsParser()
 
-    with LockFileSerializer(cmdLineArgs.lock_file) as lock:
+    with LockFileSerializer(cmdLineArgs.lock_file) as _:
         if cmdLineArgs.runBootstrap:
             subprocess.check_call(getFilePath("scripts/tools/zap/zap_bootstrap.sh"), shell=True)
 
