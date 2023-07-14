@@ -197,7 +197,7 @@ class Encoder:
         command, command_specifier = self.__get_command_name(request)
 
         if command == 'wait-for-report':
-            return ''
+            return str(request.timeout) if request.timeout is not None else ''
 
         arguments = self.__get_arguments(request)
         base64_arguments = base64.b64encode(
@@ -270,6 +270,8 @@ class Encoder:
             arguments, request.max_interval, "max-interval")
         arguments = self.__maybe_add(arguments, request.timed_interaction_timeout_ms,
                                      "timedInteractionTimeoutMs")
+        arguments = self.__maybe_add(
+            arguments, request.timeout, "timeout")
         arguments = self.__maybe_add(
             arguments, request.event_number, "event-min")
         arguments = self.__maybe_add(
