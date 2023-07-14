@@ -31,9 +31,9 @@ private:
     friend StDeviceAppJNI & StDeviceAppJNIMgr();
 
     static StDeviceAppJNI sInstance;
-    jobject mStDeviceAppObject             = nullptr;
+    jobject mStDeviceAppObject       = nullptr;
     jmethodID mPostClusterInitMethod = nullptr;
-    jmethodID mPostEventMethod             = nullptr;
+    jmethodID mPostEventMethod       = nullptr;
 };
 
 inline class StDeviceAppJNI & StDeviceAppJNIMgr()

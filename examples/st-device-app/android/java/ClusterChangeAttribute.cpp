@@ -41,8 +41,8 @@ static void OnOffClusterAttributeChangeCallback(const app::ConcreteAttributePath
 void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-    ChipLogProgress(Zcl, "[ST Device] clusterId:%d,attributeId:%d,endpoint:%d",
-                    attributePath.mClusterId, attributePath.mAttributeId, static_cast<int>(attributePath.mEndpointId));
+    ChipLogProgress(Zcl, "[ST Device] clusterId:%d,attributeId:%d,endpoint:%d", attributePath.mClusterId,
+                    attributePath.mAttributeId, static_cast<int>(attributePath.mEndpointId));
 
     switch (attributePath.mClusterId)
     {
