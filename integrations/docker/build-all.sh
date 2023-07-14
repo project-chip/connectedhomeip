@@ -28,12 +28,12 @@ ALL_ARGS=""
 
 for i in "$@"; do
     case $i in
-    -p=* | --path=*)
-        SUB_PATH="${i#*=}"
-        ;;
-    *)
-        ALL_ARGS="$ALL_ARGS ${i#*=}"
-        ;;
+        -p=* | --path=*)
+            SUB_PATH="${i#*=}"
+            ;;
+        *)
+            ALL_ARGS="$ALL_ARGS ${i#*=}"
+            ;;
     esac
 done
 
