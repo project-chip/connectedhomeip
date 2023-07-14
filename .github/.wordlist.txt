@@ -316,6 +316,10 @@ CPROTO
 cpuapp
 cpython
 CQM
+CredentialData
+CredentialIndex
+CredentialRule
+CredentialType
 crypto
 cryptographic
 CSA
@@ -945,6 +949,8 @@ nwk
 NXP
 objcopy
 OccupancySensing
+OccupiedDisabled
+OccupiedEnabled
 OctetString
 OECORE
 ol
@@ -966,6 +972,7 @@ OpenThreadDemo
 openweave
 OperationalCredentials
 operationalDataset
+OperationType
 opkg
 optionMask
 optionOverride
@@ -1434,9 +1441,12 @@ uscif
 UserConsentNeeded
 userConsentState
 userguide
+UserIndex
 USERINTERFACE
 UserLabel
 usermod
+UserStatus
+UserUniqueID
 usr
 UTF
 util

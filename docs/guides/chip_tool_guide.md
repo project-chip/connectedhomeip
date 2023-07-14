@@ -1465,7 +1465,7 @@ In this command:
     -   `0` (Single) - One credential type is required to unlock. This value is
         selected is you set `null` for the variable.
     -   `1` (Dual) - Two credential types are required to unlock.
-    -   `2` (Tri) - Three credential types are required to unlock.
+    -   `2` (Triple) - Three credential types are required to unlock.
 
 -   _<destination-id\>_ is the ID of the door lock device.
 -   _<endpoint-id\>_ is the ID of the endpoint on the door lock device.
@@ -1518,11 +1518,11 @@ In this command:
 
     -   _<CredentialIndex\>_ is the index of the credential, between `1` and the
         maximum value you set in the `NumberOfCredentialsSupportedPerUser`
-        attribute (see the section 5.2.3.20 of the Matter Application Cluters
+        attribute (see the section 5.2.3.20 of the Matter Application Clusters
         specification for details). Setting the credential index to `0` will
         cause an error.
 
--   _<CredentialData\>_ is a string parameter with the secred credential data.
+-   _<CredentialData\>_ is a string parameter with the secret credential data.
     For example, the PIN code value (`12345` in the example below).
 -   _<UserIndex\>_ is the index of the user that will be associated with the
     credential. Can be set to `null`.
