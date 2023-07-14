@@ -24,23 +24,31 @@
 #include <app/util/basic-types.h>
 #include <platform/CHIPDeviceConfig.h>
 
+
 class DishwasherAlarmServer
 {
 public:
     static DishwasherAlarmServer & Instance();
+	
+    void ResetCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
 
-    EmberAfStatus GetMaskValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * mask);
-    EmberAfStatus GetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * state);
+    EmberAfStatus GetMaskValue(chip::EndpointId endpoint,      chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * mask);
+    EmberAfStatus GetStateValue(chip::EndpointId endpoint,     chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * state);
+	EmberAfStatus GetLatchValue(chip::EndpointId endpoint,     chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * latch);
 
     // Whenever there is change on Mask we should change State accordingly.
-    EmberAfStatus SetMaskValue(chip::EndpointId endpoint, const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> mask);
+    EmberAfStatus SetMaskValue(chip::EndpointId endpoint,
+                               const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> mask);
 
     // When State changes we are generating Notify event.
-    EmberAfStatus SetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> newState);
+    EmberAfStatus SetStateValue(chip::EndpointId endpoint,
+                               const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> newState);
 
-    // A change in supported value will result in a corresponding change in mask and state.
-    EmberAfStatus SetSupportedValue(chip::EndpointId endpoint,
-                                    const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> supported);
+    EmberAfStatus SetLatchValue(chip::EndpointId endpoint, 
+							   const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> latch);
+    EmberAfStatus SetSupportedValue(chip::EndpointId endpoint, 
+							   const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> support);
+	
 
 private:
     static DishwasherAlarmServer instance;
@@ -49,4 +57,5 @@ private:
                          chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> becameInactive,
                          chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> newState,
                          chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> mask);
+
 };
