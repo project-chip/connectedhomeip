@@ -117,6 +117,15 @@ public:
     /**
      * This method is to be overridden by a user implemented method to handle the application specifics of the ResetCondition
      * command.
+     * The cluster implementation will not handle any of the resets needed by the spec. The user of the SDK will need to implement
+     * the logic to reset:
+     * - The Condition attribute (if supported)
+     * - The ChangeIndicator attribute
+     * - The LastChangedTime attribute (if supported)
+     *
+     * Upon receipt, the device SHALL reset the Condition and ChangeIndicator attributes, indicating full resource availability and
+     * readiness for use, as initially configured. Invocation of this command MAY cause the LastChangedTime to be updated
+     * automatically based on the clock of the server, if the server supports setting the attribute.
      *
      * @return Status::Success      If the command was handled successfully, all other will cause the command to fail.
      */
