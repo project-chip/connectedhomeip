@@ -185,35 +185,6 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, BitMask<
     return status;
 }
 
-EmberAfStatus DishwasherAlarmServer::SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported)
-{
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    status               = Attributes::Supported::Set(endpoint, supported);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: writing supported, err:0x%x", status);
-        return status;
-    }
-
-    ChipLogProgress(Zcl, "Refrigerator Alarm: Supported ep%d value: %" PRIu32 "", endpoint, supported.Raw());
-
-    // Whenever there is change in Supported attribute, Mask, State should change accordingly.
-    BitMask<AlarmMap> mask;
-    status = GetMaskValue(endpoint, &mask);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    if (!supported.HasAll(mask))
-    {
-        mask   = supported & mask;
-        status = SetMaskValue(endpoint, mask);
-    }
-    return status;
-}
-
-
 void DishwasherAlarmServer::SendNotifyEvent(EndpointId endpointId, BitMask<AlarmMap> becameActive,
                                               BitMask<AlarmMap> becameInactive, BitMask<AlarmMap> newState, BitMask<AlarmMap> mask)
 {

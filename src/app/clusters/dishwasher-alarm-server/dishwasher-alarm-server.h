@@ -46,9 +46,6 @@ public:
 
     EmberAfStatus SetLatchValue(chip::EndpointId endpoint, 
 							   const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> latch);
-    EmberAfStatus SetSupportedValue(chip::EndpointId endpoint, 
-							   const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> support);
-	
 
 private:
     static DishwasherAlarmServer instance;
