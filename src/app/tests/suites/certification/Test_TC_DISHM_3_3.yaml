@@ -144,7 +144,8 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH writes to the DUT the OnMode attribute with the new_mode_th value"
+    - label:
+          "TH writes to the DUT the OnMode attribute with the new_mode_th value"
       verification: |
           ./chip-tool dishwashermodeselect write on-mode 2 1 1
 

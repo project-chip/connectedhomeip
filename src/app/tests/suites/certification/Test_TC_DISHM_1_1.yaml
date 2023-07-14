@@ -59,7 +59,6 @@ tests:
           constraints:
               type: bitmap32
 
-
     - label: "TH reads AttributeList from DUT"
       PICS: DISHM.S.Afffb
       command: "readAttribute"
