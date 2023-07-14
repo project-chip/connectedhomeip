@@ -48,12 +48,12 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v3
-            - name: Build images using project bash script
+            - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
                   cd integrations/docker/images/base/chip-build${{ matrix.img }}
                   ./build.sh --latest --push
-            - name: Build & Push images using project bash script
+            - name: Build images using project bash script
               if: ${{ inputs.push_images == false }}
               run: |
                   cd integrations/docker/images/base/chip-build${{ matrix.img }}
@@ -71,12 +71,12 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v3
-            - name: Build images using project bash script
+            - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
                   cd integrations/docker/images/stage-1/chip-build${{ matrix.img }}
                   ./build.sh --latest --push
-            - name: Build & Push images using project bash script
+            - name: Build images using project bash script
               if: ${{ inputs.push_images == false }}
               run: |
                   cd integrations/docker/images/stage-1/chip-build${{ matrix.img }}
@@ -111,12 +111,12 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v3
-            - name: Build images using project bash script
+            - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
                   cd integrations/docker/images/stage-2/chip-build${{ matrix.img }}
                   ./build.sh --latest --push
-            - name: Build & Push images using project bash script
+            - name: Build images using project bash script
               if: ${{ inputs.push_images == false }}
               run: |
                   cd integrations/docker/images/stage-2/chip-build${{ matrix.img }}
@@ -137,12 +137,12 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v3
-            - name: Build images using project bash script
+            - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
                   cd integrations/docker/images/stage-3/chip-build${{ matrix.img }}
                   ./build.sh --latest --push
-            - name: Build & Push images using project bash script
+            - name: Build images using project bash script
               if: ${{ inputs.push_images == false }}
               run: |
                   cd integrations/docker/images/stage-3/chip-build${{ matrix.img }}
@@ -160,12 +160,12 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v3
-            - name: Build images using project bash script
+            - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
                   cd integrations/docker/images/vscode/chip-build${{ matrix.img }}
                   ./build.sh --latest --push
-            - name: Build & Push images using project bash script
+            - name: Build images using project bash script
               if: ${{ inputs.push_images == false }}
               run: |
                   cd integrations/docker/images/vscode-3/chip-build${{ matrix.img }}
