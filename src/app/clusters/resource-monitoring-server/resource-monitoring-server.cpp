@@ -147,32 +147,6 @@ DataModel::Nullable<uint32_t> Instance::GetLastChangedTime() const
     return mLastChangedTime;
 }
 
-template <typename RequestT, typename FuncT>
-void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
-{
-    ChipLogDetail(Zcl, "ResourceMonitoring: HandleCommand");
-    if (handlerContext.mCommandHandled || (handlerContext.mRequestPath.mCommandId != RequestT::GetCommandId()))
-    {
-        return;
-    }
-
-    RequestT requestPayload;
-
-    // If the command matches what the caller is looking for, let's mark this as being handled
-    // even if errors happen after this. This ensures that we don't execute any fall-back strategies
-    // to handle this command since at this point, the caller is taking responsibility for handling
-    // the command in its entirety, warts and all.
-    handlerContext.SetCommandHandled();
-
-    if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
-    {
-        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
-        return;
-    }
-
-    func(handlerContext, requestPayload);
-}
-
 // This method is called by the interaction model engine when a command destined for this instance is received.
 void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
@@ -248,6 +222,33 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
     }
     }
     return CHIP_NO_ERROR;
+}
+
+
+template <typename RequestT, typename FuncT>
+void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
+{
+    ChipLogDetail(Zcl, "ResourceMonitoring: HandleCommand");
+    if (handlerContext.mCommandHandled || (handlerContext.mRequestPath.mCommandId != RequestT::GetCommandId()))
+    {
+        return;
+    }
+
+    RequestT requestPayload;
+
+    // If the command matches what the caller is looking for, let's mark this as being handled
+    // even if errors happen after this. This ensures that we don't execute any fall-back strategies
+    // to handle this command since at this point, the caller is taking responsibility for handling
+    // the command in its entirety, warts and all.
+    handlerContext.SetCommandHandled();
+
+    if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
+    {
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
+        return;
+    }
+
+    func(handlerContext, requestPayload);
 }
 
 void Instance::LoadPersistentAttributes()

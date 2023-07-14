@@ -102,9 +102,6 @@ public:
     Instance(Instance &&)                  = delete;
     Instance & operator=(Instance &&)      = delete;
 
-    template <typename RequestT, typename FuncT>
-    void HandleCommand(HandlerContext & handlerContext, FuncT func);
-
     // The following methods should be overridden by the SDK user to implement the business logic of their application
 
     /**
@@ -147,6 +144,9 @@ private:
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+
+    template <typename RequestT, typename FuncT>
+    void HandleCommand(HandlerContext & handlerContext, FuncT func);
 
     void LoadPersistentAttributes();
 
