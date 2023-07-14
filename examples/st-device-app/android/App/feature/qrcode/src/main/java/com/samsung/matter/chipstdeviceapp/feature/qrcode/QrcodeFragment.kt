@@ -18,142 +18,141 @@ import com.samsung.matter.chipstdeviceapp.core.common.MatterSettings
 import com.samsung.matter.chipstdeviceapp.core.common.QrcodeUtil
 import com.samsung.matter.chipstdeviceapp.feature.qrcode.databinding.FragmentQrcodeBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.math.abs
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import timber.log.Timber
-import kotlin.math.abs
 
 @AndroidEntryPoint
 class QrcodeFragment : Fragment() {
 
-    private lateinit var binding: FragmentQrcodeBinding
-    private val viewModel by viewModels<QrcodeViewModel>()
+  private lateinit var binding: FragmentQrcodeBinding
+  private val viewModel by viewModels<QrcodeViewModel>()
 
-    private lateinit var onBackPressedCallback: OnBackPressedCallback
+  private lateinit var onBackPressedCallback: OnBackPressedCallback
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        Timber.d("Hit")
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_qrcode, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    Timber.d("Hit")
+    binding = DataBindingUtil.inflate(inflater, R.layout.fragment_qrcode, container, false)
+    binding.lifecycleOwner = viewLifecycleOwner
+    binding.viewModel = viewModel
 
-        return binding.root
+    return binding.root
+  }
+
+  @OptIn(ExperimentalSerializationApi::class)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    Timber.d("Hit")
+    super.onViewCreated(view, savedInstanceState)
+
+    (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
+    (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+    binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+      var ratio = 0F
+      if (abs(verticalOffset) != 0) {
+        ratio = abs(verticalOffset).toFloat() / appBarLayout.totalScrollRange.toFloat()
+      }
+
+      binding.collapseTitle.alpha = 1f - ratio * 2f + 0.1f
+      binding.toolbarTitle.alpha = (ratio - 0.5f) * 2f + 0.1f
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Timber.d("Hit")
-        super.onViewCreated(view, savedInstanceState)
+    val args: QrcodeFragmentArgs by navArgs()
+    val matterSettings = Json.decodeFromString<MatterSettings>(args.setting)
 
-        (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
-        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-            var ratio = 0F
-            if (abs(verticalOffset) != 0) {
-                ratio = abs(verticalOffset).toFloat() / appBarLayout.totalScrollRange.toFloat()
-            }
-
-            binding.collapseTitle.alpha = 1f - ratio * 2f + 0.1f
-            binding.toolbarTitle.alpha = (ratio - 0.5f) * 2f + 0.1f
+    viewModel.uiState.observe(viewLifecycleOwner) {
+      when (it) {
+        QrcodeUiState.Loading -> {
+          binding.progressBar.visibility = View.VISIBLE
         }
+        is QrcodeUiState.Qrcode -> {
+          binding.progressBar.visibility = View.GONE
 
-        val args: QrcodeFragmentArgs by navArgs()
-        val matterSettings = Json.decodeFromString<MatterSettings>(args.setting)
+          binding.qrTypeImage.setImageResource(matterSettings.device.deviceIconResId)
+          binding.qrTypeTitle.text = getString(matterSettings.device.deviceNameResId)
 
-        viewModel.uiState.observe(viewLifecycleOwner) {
-            when (it) {
-                QrcodeUiState.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
-                }
-                is QrcodeUiState.Qrcode -> {
-                    binding.progressBar.visibility = View.GONE
+          val qrCodeBitmap: Bitmap? = QrcodeUtil.createQrCodeBitmap(it.qrCode, QR_WIDTH, QR_HEIGHT)
+          binding.qrImage.setImageBitmap(qrCodeBitmap)
 
-                    binding.qrTypeImage.setImageResource(matterSettings.device.deviceIconResId)
-                    binding.qrTypeTitle.text = getString(matterSettings.device.deviceNameResId)
-
-                    val qrCodeBitmap: Bitmap? =
-                        QrcodeUtil.createQrCodeBitmap(it.qrCode, QR_WIDTH, QR_HEIGHT)
-                    binding.qrImage.setImageBitmap(qrCodeBitmap)
-
-                    binding.qrText.text = getString(R.string.qrcode_qr_text, it.qrCode)
-                    binding.manualCodeText.text =
-                        getString(R.string.qrcode_manual_code_text, it.manualPairingCode)
-                    binding.versionText.text =
-                        getString(
-                            R.string.qrcode_version_text,
-                            MatterConstants.DEFAULT_VERSION.toString()
-                        )
-                    binding.vendorIdText.text = getString(
-                        R.string.qrcode_vendor_id_text,
-                        MatterConstants.DEFAULT_VENDOR_ID.toString(),
-                        MatterConstants.DEFAULT_VENDOR_ID
-                    )
-                    binding.productIdText.text = getString(
-                        R.string.qrcode_product_id_text,
-                        matterSettings.device.productId.toString(),
-                        matterSettings.device.productId
-                    )
-                    binding.commissioningFlowText.text = getString(
-                        R.string.qrcode_commissioning_flow_text,
-                        MatterConstants.DEFAULT_COMMISSIONING_FLOW.toString()
-                    )
-                    binding.onboardingTypeText.text =
-                        getString(
-                            R.string.qrcode_onboarding_type_text,
-                            matterSettings.onboardingType
-                        )
-                    binding.setupPinCodeText.text = getString(
-                        R.string.qrcode_setup_pin_code_text,
-                        MatterConstants.DEFAULT_SETUP_PINCODE.toString()
-                    )
-                    binding.discriminatorText.text = getString(
-                        R.string.qrcode_discriminator_text,
-                        matterSettings.discriminator.toString(),
-                        matterSettings.discriminator
-                    )
-                }
-            }
+          binding.qrText.text = getString(R.string.qrcode_qr_text, it.qrCode)
+          binding.manualCodeText.text =
+            getString(R.string.qrcode_manual_code_text, it.manualPairingCode)
+          binding.versionText.text =
+            getString(R.string.qrcode_version_text, MatterConstants.DEFAULT_VERSION.toString())
+          binding.vendorIdText.text =
+            getString(
+              R.string.qrcode_vendor_id_text,
+              MatterConstants.DEFAULT_VENDOR_ID.toString(),
+              MatterConstants.DEFAULT_VENDOR_ID
+            )
+          binding.productIdText.text =
+            getString(
+              R.string.qrcode_product_id_text,
+              matterSettings.device.productId.toString(),
+              matterSettings.device.productId
+            )
+          binding.commissioningFlowText.text =
+            getString(
+              R.string.qrcode_commissioning_flow_text,
+              MatterConstants.DEFAULT_COMMISSIONING_FLOW.toString()
+            )
+          binding.onboardingTypeText.text =
+            getString(R.string.qrcode_onboarding_type_text, matterSettings.onboardingType)
+          binding.setupPinCodeText.text =
+            getString(
+              R.string.qrcode_setup_pin_code_text,
+              MatterConstants.DEFAULT_SETUP_PINCODE.toString()
+            )
+          binding.discriminatorText.text =
+            getString(
+              R.string.qrcode_discriminator_text,
+              matterSettings.discriminator.toString(),
+              matterSettings.discriminator
+            )
         }
+      }
     }
+  }
 
-    override fun onResume() {
-        Timber.d("Hit")
-        super.onResume()
-    }
+  override fun onResume() {
+    Timber.d("Hit")
+    super.onResume()
+  }
 
-    override fun onAttach(context: Context) {
-        Timber.d("Hit")
-        super.onAttach(context)
+  override fun onAttach(context: Context) {
+    Timber.d("Hit")
+    super.onAttach(context)
 
-        onBackPressedCallback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                Timber.d("handleOnBackPressed()")
-                findNavController().popBackStack()
-            }
+    onBackPressedCallback =
+      object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+          Timber.d("handleOnBackPressed()")
+          findNavController().popBackStack()
         }
+      }
 
-        requireActivity().onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-    }
+    requireActivity().onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+  }
 
-    override fun onDetach() {
-        Timber.d("Hit")
-        super.onDetach()
-        onBackPressedCallback.remove()
-    }
+  override fun onDetach() {
+    Timber.d("Hit")
+    super.onDetach()
+    onBackPressedCallback.remove()
+  }
 
-    override fun onDestroy() {
-        Timber.d("Hit")
-        super.onDestroy()
-    }
+  override fun onDestroy() {
+    Timber.d("Hit")
+    super.onDestroy()
+  }
 
-    companion object {
-        private const val QR_WIDTH = 450
-        private const val QR_HEIGHT = 450
-    }
+  companion object {
+    private const val QR_WIDTH = 450
+    private const val QR_HEIGHT = 450
+  }
 }

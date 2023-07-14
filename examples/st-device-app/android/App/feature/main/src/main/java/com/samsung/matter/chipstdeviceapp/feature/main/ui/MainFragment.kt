@@ -19,108 +19,107 @@ import com.samsung.matter.chipstdeviceapp.feature.main.model.Menu
 import com.samsung.matter.chipstdeviceapp.feature.main.ui.adapter.MenuAdapter
 import com.samsung.matter.chipstdeviceapp.feature.main.ui.recyclerview.VerticalSpaceItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.math.abs
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import timber.log.Timber
-import kotlin.math.abs
 
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
-    private lateinit var binding: FragmentMainBinding
-    private lateinit var onBackPressedCallback: OnBackPressedCallback
+  private lateinit var binding: FragmentMainBinding
+  private lateinit var onBackPressedCallback: OnBackPressedCallback
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        Timber.d("Hit")
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    Timber.d("Hit")
+    binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main, container, false)
+    binding.lifecycleOwner = viewLifecycleOwner
 
-        return binding.root
+    return binding.root
+  }
+
+  @OptIn(ExperimentalSerializationApi::class)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    Timber.d("Hit")
+    super.onViewCreated(view, savedInstanceState)
+
+    (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
+    (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+    binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+      var ratio = 0F
+      if (abs(verticalOffset) != 0) {
+        ratio = abs(verticalOffset).toFloat() / appBarLayout.totalScrollRange.toFloat()
+      }
+
+      binding.collapseTitle.alpha = 1f - ratio * 2f + 0.1f
+      binding.toolbarTitle.alpha = (ratio - 0.5f) * 2f + 0.1f
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Timber.d("Hit")
-        super.onViewCreated(view, savedInstanceState)
+    val itemList = arrayListOf(Menu.ON_OFF_SWITCH)
 
-        (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
-        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-            var ratio = 0F
-            if (abs(verticalOffset) != 0) {
-                ratio = abs(verticalOffset).toFloat() / appBarLayout.totalScrollRange.toFloat()
+    val menuAdapter =
+      MenuAdapter(
+        itemList,
+        object : MenuAdapter.ItemHandler {
+          override fun onClick(item: Menu) {
+            val matterSettings = MatterSettings(device = item.device)
+            val jsonSettings = Json.encodeToString(matterSettings)
+            try {
+              findNavController()
+                .navigate(DeepLink.getDeepLinkRequestForSetupFragment(jsonSettings))
+            } catch (e: Exception) {
+              Timber.e(e, "navigate failure")
             }
-
-            binding.collapseTitle.alpha = 1f - ratio * 2f + 0.1f
-            binding.toolbarTitle.alpha = (ratio - 0.5f) * 2f + 0.1f
+          }
         }
+      )
 
-        val itemList = arrayListOf(Menu.ON_OFF_SWITCH)
+    val sideSpace = resources.getDimension(R.dimen.menu_item_side_space).toInt()
+    val bottomSpace = resources.getDimension(R.dimen.menu_item_bottom_space).toInt()
 
-        val menuAdapter = MenuAdapter(itemList, object : MenuAdapter.ItemHandler {
-            override fun onClick(item: Menu) {
-                val matterSettings = MatterSettings(device = item.device)
-                val jsonSettings = Json.encodeToString(matterSettings)
-                try {
-                    findNavController().navigate(
-                        DeepLink.getDeepLinkRequestForSetupFragment(jsonSettings)
-                    )
-                } catch (e: Exception) {
-                    Timber.e(e, "navigate failure")
-                }
-            }
-        })
+    binding.recyclerView.apply {
+      layoutManager = LinearLayoutManager(requireContext())
+      if (itemDecorationCount == 0) {
+        addItemDecoration(VerticalSpaceItemDecoration(sideSpace, bottomSpace))
+      }
+      adapter = menuAdapter
+    }
+  }
 
-        val sideSpace = resources.getDimension(R.dimen.menu_item_side_space).toInt()
-        val bottomSpace = resources.getDimension(R.dimen.menu_item_bottom_space).toInt()
+  override fun onResume() {
+    super.onResume()
+    Timber.d("onResume()")
+  }
 
-        binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            if (itemDecorationCount == 0) {
-                addItemDecoration(
-                    VerticalSpaceItemDecoration(
-                        sideSpace,
-                        bottomSpace
-                    )
-                )
-            }
-            adapter = menuAdapter
+  override fun onAttach(context: Context) {
+    Timber.d("Hit")
+    super.onAttach(context)
+
+    onBackPressedCallback =
+      object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+          Timber.d("handleOnBackPressed()")
+          requireActivity().finishAffinity()
         }
-    }
+      }
 
-    override fun onResume() {
-        super.onResume()
-        Timber.d("onResume()")
-    }
+    requireActivity().onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+  }
 
-    override fun onAttach(context: Context) {
-        Timber.d("Hit")
-        super.onAttach(context)
+  override fun onDetach() {
+    super.onDetach()
+    Timber.d("onDetach()")
+    onBackPressedCallback.remove()
+  }
 
-        onBackPressedCallback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                Timber.d("handleOnBackPressed()")
-                requireActivity().finishAffinity()
-            }
-        }
-
-        requireActivity().onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        Timber.d("onDetach()")
-        onBackPressedCallback.remove()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Timber.d("onDestroy()")
-    }
+  override fun onDestroy() {
+    super.onDestroy()
+    Timber.d("onDestroy()")
+  }
 }

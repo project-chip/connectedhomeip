@@ -4,37 +4,37 @@ import chip.onboardingpayload.OnboardingPayloadException
 import chip.onboardingpayload.OnboardingPayloadParser
 import com.samsung.matter.chipstdeviceapp.core.matter.model.asSetupPayload
 import com.samsung.matter.chipstdeviceapp.core.model.Payload
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
+import timber.log.Timber
 
 @Singleton
 class MatterApi @Inject constructor() {
 
-    fun getQrcodeString(payload: Payload): String {
-        val onboardingPayloadParser = OnboardingPayloadParser()
-        var qrcode = ""
-        try {
-            qrcode = onboardingPayloadParser.getQrCodeFromPayload(payload.asSetupPayload())
-        } catch (e: OnboardingPayloadException) {
-            e.printStackTrace()
-        }
-
-        Timber.d("qrcode:$qrcode")
-        return qrcode
+  fun getQrcodeString(payload: Payload): String {
+    val onboardingPayloadParser = OnboardingPayloadParser()
+    var qrcode = ""
+    try {
+      qrcode = onboardingPayloadParser.getQrCodeFromPayload(payload.asSetupPayload())
+    } catch (e: OnboardingPayloadException) {
+      e.printStackTrace()
     }
 
-    fun getManualPairingCodeString(payload: Payload): String {
-        val onboardingPayloadParser = OnboardingPayloadParser()
-        var manualPairingCode = ""
-        try {
-            manualPairingCode =
-                onboardingPayloadParser.getManualPairingCodeFromPayload(payload.asSetupPayload())
-        } catch (e: OnboardingPayloadException) {
-            e.printStackTrace()
-        }
+    Timber.d("qrcode:$qrcode")
+    return qrcode
+  }
 
-        Timber.d("manualPairingCode:$manualPairingCode")
-        return manualPairingCode
+  fun getManualPairingCodeString(payload: Payload): String {
+    val onboardingPayloadParser = OnboardingPayloadParser()
+    var manualPairingCode = ""
+    try {
+      manualPairingCode =
+        onboardingPayloadParser.getManualPairingCodeFromPayload(payload.asSetupPayload())
+    } catch (e: OnboardingPayloadException) {
+      e.printStackTrace()
     }
+
+    Timber.d("manualPairingCode:$manualPairingCode")
+    return manualPairingCode
+  }
 }

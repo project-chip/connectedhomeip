@@ -14,57 +14,54 @@ import timber.log.Timber
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
+  private lateinit var binding: ActivityMainBinding
 
-    private val permissions = arrayOf(
-        Manifest.permission.ACCESS_FINE_LOCATION
-    )
+  private val permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
 
-    private val requestMultiplePermissions =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            permissions.entries.forEach {
-                Timber.d("${it.key}:${it.value}")
-            }
-        }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Timber.d("onCreate()")
-
-        val isPermissionsGranted = permissions.all {
-            ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
-        }
-
-        if (!isPermissionsGranted) {
-            requestMultiplePermissions.launch(permissions)
-        }
-
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+  private val requestMultiplePermissions =
+    registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+      permissions.entries.forEach { Timber.d("${it.key}:${it.value}") }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        Timber.d("onDestroy()")
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    Timber.d("onCreate()")
+
+    val isPermissionsGranted =
+      permissions.all {
+        ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
+      }
+
+    if (!isPermissionsGranted) {
+      requestMultiplePermissions.launch(permissions)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-                return true
-            }
-        }
+    binding = ActivityMainBinding.inflate(layoutInflater)
+    setContentView(binding.root)
+  }
 
-        return super.onOptionsItemSelected(item)
+  override fun onDestroy() {
+    super.onDestroy()
+    Timber.d("onDestroy()")
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    when (item.itemId) {
+      android.R.id.home -> {
+        onBackPressed()
+        return true
+      }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        Timber.d("RequestCode:$requestCode")
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
+    return super.onOptionsItemSelected(item)
+  }
+
+  override fun onRequestPermissionsResult(
+    requestCode: Int,
+    permissions: Array<out String>,
+    grantResults: IntArray
+  ) {
+    Timber.d("RequestCode:$requestCode")
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+  }
 }

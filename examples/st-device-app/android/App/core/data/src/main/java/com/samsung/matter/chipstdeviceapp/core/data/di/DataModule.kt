@@ -10,13 +10,7 @@ import dagger.hilt.components.SingletonComponent
 @Module
 internal abstract class DataModule {
 
-    @Binds
-    abstract fun bindMatterRepository(
-        repository: MatterRepositoryImpl
-    ): MatterRepository
+  @Binds abstract fun bindMatterRepository(repository: MatterRepositoryImpl): MatterRepository
 
-    @Binds
-    abstract fun bindNetworkRepository(
-        repository: NetworkRepositoryImpl
-    ): NetworkRepository
+  @Binds abstract fun bindNetworkRepository(repository: NetworkRepositoryImpl): NetworkRepository
 }

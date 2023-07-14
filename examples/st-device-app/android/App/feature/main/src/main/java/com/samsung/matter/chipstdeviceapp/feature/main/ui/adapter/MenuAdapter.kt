@@ -7,29 +7,28 @@ import com.samsung.matter.chipstdeviceapp.feature.main.ui.recyclerview.DataBindi
 import com.samsung.matter.chipstdeviceapp.feature.main.ui.recyclerview.ItemDiffCallback
 import com.samsung.matter.chipstdeviceapp.feature.main.ui.recyclerview.ListBindingAdapter
 
+internal class MenuAdapter(menus: List<Menu>, private val itemHandler: ItemHandler) :
+  ListBindingAdapter<Menu>(
+    ItemDiffCallback(
+      onItemsTheSame = { old, new -> old.titleResId == new.titleResId },
+      onContentsTheSame = { old, new -> old == new }
+    )
+  ) {
 
-internal class MenuAdapter(
-    menus: List<Menu>,
-    private val itemHandler: ItemHandler
-) : ListBindingAdapter<Menu>(ItemDiffCallback(
-    onItemsTheSame = { old, new -> old.titleResId == new.titleResId },
-    onContentsTheSame = { old, new -> old == new }
-)) {
+  init {
+    submitList(menus)
+  }
 
-    init {
-        submitList(menus)
-    }
+  override fun getItemViewType(position: Int): Int {
+    return R.layout.item_menu
+  }
 
-    override fun getItemViewType(position: Int): Int {
-        return R.layout.item_menu
-    }
+  override fun viewBindViewHolder(holder: DataBindingViewHolder<Menu>, position: Int) {
+    super.viewBindViewHolder(holder, position)
+    holder.binding.setVariable(BR.itemHandler, itemHandler)
+  }
 
-    override fun viewBindViewHolder(holder: DataBindingViewHolder<Menu>, position: Int) {
-        super.viewBindViewHolder(holder, position)
-        holder.binding.setVariable(BR.itemHandler, itemHandler)
-    }
-
-    interface ItemHandler {
-        fun onClick(item: Menu)
-    }
+  interface ItemHandler {
+    fun onClick(item: Menu)
+  }
 }

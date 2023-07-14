@@ -20,151 +20,153 @@ import com.samsung.matter.chipstdeviceapp.core.model.OnboardingType
 import com.samsung.matter.chipstdeviceapp.feature.setup.databinding.DialogSetupContinueBinding
 import com.samsung.matter.chipstdeviceapp.feature.setup.databinding.FragmentSetupBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.math.abs
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import timber.log.Timber
-import kotlin.math.abs
 
 @AndroidEntryPoint
 class SetupFragment : Fragment() {
 
-    private lateinit var binding: FragmentSetupBinding
-    private val viewModel by viewModels<SetupViewModel>()
+  private lateinit var binding: FragmentSetupBinding
+  private val viewModel by viewModels<SetupViewModel>()
 
-    private lateinit var matterSettings: MatterSettings
-    private var ssid: String = "Unknown"
+  private lateinit var matterSettings: MatterSettings
+  private var ssid: String = "Unknown"
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        Timber.d("Hit")
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_setup, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    Timber.d("Hit")
+    binding = DataBindingUtil.inflate(inflater, R.layout.fragment_setup, container, false)
+    binding.lifecycleOwner = viewLifecycleOwner
 
-        return binding.root
+    return binding.root
+  }
+
+  @OptIn(ExperimentalSerializationApi::class)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    Timber.d("Hit")
+    super.onViewCreated(view, savedInstanceState)
+
+    (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
+    (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+    binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+      var ratio = 0F
+      if (abs(verticalOffset) != 0) {
+        ratio = abs(verticalOffset).toFloat() / appBarLayout.totalScrollRange.toFloat()
+      }
+
+      binding.collapseTitle.alpha = 1f - ratio * 2f + 0.1f
+      binding.toolbarTitle.alpha = (ratio - 0.5f) * 2f + 0.1f
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Timber.d("Hit")
-        super.onViewCreated(view, savedInstanceState)
+    val args: SetupFragmentArgs by navArgs()
+    this.matterSettings = Json.decodeFromString(args.setting)
 
-        (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
-        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    binding.setupDeviceNameValueText.text = getString(matterSettings.device.deviceNameResId)
+    binding.setupDiscriminatorEditText.setText(matterSettings.device.discriminator.toString())
 
-        binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-            var ratio = 0F
-            if (abs(verticalOffset) != 0) {
-                ratio = abs(verticalOffset).toFloat() / appBarLayout.totalScrollRange.toFloat()
-            }
-
-            binding.collapseTitle.alpha = 1f - ratio * 2f + 0.1f
-            binding.toolbarTitle.alpha = (ratio - 0.5f) * 2f + 0.1f
+    binding.setupSaveButton.setOnClickListener {
+      val discriminatorText = binding.setupDiscriminatorEditText.text.toString()
+      if (discriminatorText.isEmpty()) {
+        Toast.makeText(
+            requireActivity(),
+            getString(R.string.toast_discriminator),
+            Toast.LENGTH_LONG
+          )
+          .show()
+      } else {
+        val discriminator = discriminatorText.toInt()
+        if (discriminator > DISCRIMINATOR_LIMIT) {
+          Toast.makeText(
+              requireActivity(),
+              getString(R.string.toast_discriminator),
+              Toast.LENGTH_LONG
+            )
+            .show()
+        } else {
+          lifecycleScope.launch {
+            this@SetupFragment.ssid = viewModel.getSSID()
+            showConfirmDialog()
+          }
         }
+      }
+    }
+  }
 
-        val args: SetupFragmentArgs by navArgs()
-        this.matterSettings = Json.decodeFromString(args.setting)
+  @OptIn(ExperimentalSerializationApi::class)
+  private fun showConfirmDialog() {
+    Timber.d("Hit")
 
-        binding.setupDeviceNameValueText.text = getString(matterSettings.device.deviceNameResId)
-        binding.setupDiscriminatorEditText.setText(matterSettings.device.discriminator.toString())
+    val dialogBinding: DialogSetupContinueBinding =
+      DataBindingUtil.inflate(
+        LayoutInflater.from(requireContext()),
+        R.layout.dialog_setup_continue,
+        null,
+        false
+      )
 
-        binding.setupSaveButton.setOnClickListener {
-            val discriminatorText = binding.setupDiscriminatorEditText.text.toString()
-            if (discriminatorText.isEmpty()) {
-                Toast.makeText(
-                    requireActivity(),
-                    getString(R.string.toast_discriminator),
-                    Toast.LENGTH_LONG
-                ).show()
-            } else {
-                val discriminator = discriminatorText.toInt()
-                if (discriminator > DISCRIMINATOR_LIMIT) {
-                    Toast.makeText(
-                        requireActivity(),
-                        getString(R.string.toast_discriminator),
-                        Toast.LENGTH_LONG
-                    ).show()
-                } else {
-                    lifecycleScope.launch {
-                        this@SetupFragment.ssid = viewModel.getSSID()
-                        showConfirmDialog()
-                    }
-                }
-            }
-        }
+    val confirmDialog =
+      AlertDialog.Builder(requireContext(), R.style.Theme_AppCompat_DayNight_Dialog_Alert)
+        .setView(dialogBinding.root)
+        .setCancelable(false)
+        .create()
+
+    confirmDialog.window?.let {
+      it.setGravity(Gravity.BOTTOM)
+      it.setBackgroundDrawableResource(R.drawable.dialog_bg)
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
-    private fun showConfirmDialog() {
-        Timber.d("Hit")
+    dialogBinding.dialogSetupContinueTypeImage.setImageResource(
+      this.matterSettings.device.deviceIconResId
+    )
+    dialogBinding.dialogSetupContinueSsidText.text = getString(R.string.setup_ssid_text, this.ssid)
+    dialogBinding.dialogSetupContinueDeviceNameText.text =
+      getString(this.matterSettings.device.deviceNameResId)
 
-        val dialogBinding: DialogSetupContinueBinding = DataBindingUtil.inflate(
-            LayoutInflater.from(requireContext()),
-            R.layout.dialog_setup_continue,
-            null,
-            false
-        )
+    val discriminator = binding.setupDiscriminatorEditText.text.toString()
+    dialogBinding.dialogSetupContinueDiscriminatorText.text =
+      getString(
+        R.string.setup_discriminator_text,
+        getString(R.string.hint_discriminator),
+        discriminator
+      )
 
-        val confirmDialog =
-            AlertDialog.Builder(requireContext(), R.style.Theme_AppCompat_DayNight_Dialog_Alert)
-                .setView(dialogBinding.root)
-                .setCancelable(false)
-                .create()
+    dialogBinding.dialogSetupCancelButton.setOnClickListener { confirmDialog.dismiss() }
 
-        confirmDialog.window?.let {
-            it.setGravity(Gravity.BOTTOM)
-            it.setBackgroundDrawableResource(R.drawable.dialog_bg)
+    dialogBinding.dialogSetupStartButton.setOnClickListener {
+      confirmDialog.dismiss()
+
+      val onboardingType =
+        when (binding.setupOnboardingRadioGroup.checkedRadioButtonId) {
+          R.id.setup_onboarding_wifi_only -> OnboardingType.WIFI
+          R.id.setup_onboarding_ble_only -> OnboardingType.BLE
+          R.id.setup_onboarding_wifi_ble -> OnboardingType.WIFI_BLE
+          else -> OnboardingType.WIFI
         }
+      Timber.d("MatterOnboardingType:$onboardingType")
+      this.matterSettings.onboardingType = onboardingType
+      this.matterSettings.discriminator = discriminator.toInt()
 
-        dialogBinding.dialogSetupContinueTypeImage.setImageResource(this.matterSettings.device.deviceIconResId)
-        dialogBinding.dialogSetupContinueSsidText.text =
-            getString(R.string.setup_ssid_text, this.ssid)
-        dialogBinding.dialogSetupContinueDeviceNameText.text =
-            getString(this.matterSettings.device.deviceNameResId)
-
-        val discriminator = binding.setupDiscriminatorEditText.text.toString()
-        dialogBinding.dialogSetupContinueDiscriminatorText.text = getString(
-            R.string.setup_discriminator_text,
-            getString(R.string.hint_discriminator),
-            discriminator
-        )
-
-        dialogBinding.dialogSetupCancelButton.setOnClickListener {
-            confirmDialog.dismiss()
-        }
-
-        dialogBinding.dialogSetupStartButton.setOnClickListener {
-            confirmDialog.dismiss()
-
-            val onboardingType = when (binding.setupOnboardingRadioGroup.checkedRadioButtonId) {
-                R.id.setup_onboarding_wifi_only -> OnboardingType.WIFI
-                R.id.setup_onboarding_ble_only -> OnboardingType.BLE
-                R.id.setup_onboarding_wifi_ble -> OnboardingType.WIFI_BLE
-                else -> OnboardingType.WIFI
-            }
-            Timber.d("MatterOnboardingType:$onboardingType")
-            this.matterSettings.onboardingType = onboardingType
-            this.matterSettings.discriminator = discriminator.toInt()
-
-            val jsonSettings = Json.encodeToString(this.matterSettings)
-            try {
-                findNavController().navigate(
-                    DeepLink.getDeepLinkRequestForQrcodeFragment(jsonSettings)
-                )
-            } catch (e: Exception) {
-                Timber.e(e, "navigate failure")
-            }
-        }
-
-        confirmDialog.show()
+      val jsonSettings = Json.encodeToString(this.matterSettings)
+      try {
+        findNavController().navigate(DeepLink.getDeepLinkRequestForQrcodeFragment(jsonSettings))
+      } catch (e: Exception) {
+        Timber.e(e, "navigate failure")
+      }
     }
 
-    companion object {
-        private const val DISCRIMINATOR_LIMIT = 4095
-    }
+    confirmDialog.show()
+  }
+
+  companion object {
+    private const val DISCRIMINATOR_LIMIT = 4095
+  }
 }
