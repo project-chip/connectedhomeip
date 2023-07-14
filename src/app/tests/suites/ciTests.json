@@ -56,6 +56,14 @@
         "Test_TC_DGETH_2_2"
     ],
     "DiagnosticsLogs": ["Test_TC_DLOG_1_1"],
+    "DishwasherModeSelect": [
+        "Test_TC_DISHM_1_1",
+        "Test_TC_DISHM_1_2",
+        "Test_TC_DISHM_2_1",
+        "Test_TC_DISHM_3_1",
+        "Test_TC_DISHM_3_2",
+        "Test_TC_DISHM_3_3"
+    ],
     "FlowMeasurement": ["Test_TC_FLW_1_1", "Test_TC_FLW_2_1"],
     "FixedLabel": ["Test_TC_FLABEL_1_1", "Test_TC_FLABEL_2_1"],
     "FanControl": [
@@ -351,6 +359,7 @@
         "DeviceManagement",
         "Descriptor",
         "DiagnosticsLogs",
+        "DishwasherModeSelect",
         "EthernetNetworkDiagnostics",
         "FlowMeasurement",
         "FixedLabel",
