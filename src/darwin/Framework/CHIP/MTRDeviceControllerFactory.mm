@@ -622,6 +622,19 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 - (MTRDeviceController * _Nullable)createControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
                                                               error:(NSError * __autoreleasing *)error
 {
+    return [self _createControllerOnExistingFabric:startupParams isAdditional:NO error:error];
+}
+
+- (MTRDeviceController * _Nullable)createAdditionalControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
+                                                                        error:(NSError * __autoreleasing *)error
+{
+    return [self _createControllerOnExistingFabric:startupParams isAdditional:YES error:error];
+}
+
+- (MTRDeviceController * _Nullable)_createControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
+                                                        isAdditional:(BOOL)isAdditional
+                                                               error:(NSError * __autoreleasing *)error
+{
     [self _assertCurrentQueueIsNotMatterQueue];
 
     return [self
@@ -643,28 +656,37 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
                      auto * controllersCopy = [self getRunningControllers];
 
-                     for (MTRDeviceController * existing in controllersCopy) {
-                         BOOL isRunning = YES; // assume the worst
-                         if ([existing isRunningOnFabric:fabricTable fabricIndex:fabric->GetFabricIndex() isRunning:&isRunning]
-                             != CHIP_NO_ERROR) {
-                             MTR_LOG_ERROR("Can't tell what fabric a controller is running on.  Not safe to start.");
-                             fabricError = CHIP_ERROR_INTERNAL;
-                             return nil;
+                     MTRDeviceControllerStartupParamsInternal * params;
+                     if (!isAdditional) {
+                         for (MTRDeviceController * existing in controllersCopy) {
+                             BOOL isRunning = YES; // assume the worst
+                             if ([existing isRunningOnFabric:fabricTable fabricIndex:fabric->GetFabricIndex() isRunning:&isRunning]
+                                 != CHIP_NO_ERROR) {
+                                 MTR_LOG_ERROR("Can't tell what fabric a controller is running on.  Not safe to start.");
+                                 fabricError = CHIP_ERROR_INTERNAL;
+                                 return nil;
+                             }
+
+                             if (isRunning) {
+                                 MTR_LOG_ERROR("Can't start on existing fabric: another controller is running on it");
+                                 fabricError = CHIP_ERROR_INCORRECT_STATE;
+                                 return nil;
+                             }
                          }
 
-                         if (isRunning) {
-                             MTR_LOG_ERROR("Can't start on existing fabric: another controller is running on it");
-                             fabricError = CHIP_ERROR_INCORRECT_STATE;
-                             return nil;
-                         }
+                         params =
+                             [[MTRDeviceControllerStartupParamsInternal alloc] _initForExistingFabricEntry:fabricTable
+                                                                                               fabricIndex:fabric->GetFabricIndex()
+                                                                                                  keystore:self->_keystore
+                                                                                      advertiseOperational:self.advertiseOperational
+                                                                                                    params:startupParams];
+                     } else {
+                         params = [[MTRDeviceControllerStartupParamsInternal alloc] _initForNewFabricEntry:fabricTable
+                                                                                                  keystore:self->_keystore
+                                                                                      advertiseOperational:self.advertiseOperational
+                                                                                                    params:startupParams
+                                                                                    isAdditionalController:YES];
                      }
-
-                     auto * params =
-                         [[MTRDeviceControllerStartupParamsInternal alloc] initForExistingFabric:fabricTable
-                                                                                     fabricIndex:fabric->GetFabricIndex()
-                                                                                        keystore:self->_keystore
-                                                                            advertiseOperational:self.advertiseOperational
-                                                                                          params:startupParams];
                      if (params == nil) {
                          fabricError = CHIP_ERROR_NO_MEMORY;
                      }
@@ -678,22 +700,6 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
                                                          error:(NSError * __autoreleasing *)error
 {
     [self _assertCurrentQueueIsNotMatterQueue];
-
-    if (startupParams.vendorID == nil) {
-        MTR_LOG_ERROR("Must provide vendor id when starting controller on new fabric");
-        if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
-        }
-        return nil;
-    }
-
-    if (startupParams.intermediateCertificate != nil && startupParams.rootCertificate == nil) {
-        MTR_LOG_ERROR("Must provide a root certificate when using an intermediate certificate");
-        if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
-        }
-        return nil;
-    }
 
     return [self
         _startDeviceController:startupParams
@@ -712,10 +718,12 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
                          return nil;
                      }
 
-                     auto * params = [[MTRDeviceControllerStartupParamsInternal alloc] initForNewFabric:fabricTable
-                                                                                               keystore:self->_keystore
-                                                                                   advertiseOperational:self.advertiseOperational
-                                                                                                 params:startupParams];
+                     auto * params =
+                         [[MTRDeviceControllerStartupParamsInternal alloc] _initForNewFabricEntry:fabricTable
+                                                                                         keystore:self->_keystore
+                                                                             advertiseOperational:self.advertiseOperational
+                                                                                           params:startupParams
+                                                                           isAdditionalController:NO];
                      if (params == nil) {
                          fabricError = CHIP_ERROR_NO_MEMORY;
                      }

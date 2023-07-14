@@ -58,6 +58,8 @@ MTR_HIDDEN
 
 @property (nonatomic, assign, readonly) BOOL advertiseOperational;
 
+@property (nonatomic, assign, readonly) BOOL isAdditionalController;
+
 /**
  * Helper method that checks that our keypairs match our certificates.
  * Specifically:
@@ -73,21 +75,24 @@ MTR_HIDDEN
 - (BOOL)keypairsMatchCertificates;
 
 /**
- * Initialize for controller bringup on a new fabric.
+ * Initialize for controller bringup on a new fabric entry (which might be a new
+ * fabric or an additional controller on an existing fabric).
  */
-- (instancetype)initForNewFabric:(chip::FabricTable *)fabricTable
-                        keystore:(chip::Crypto::OperationalKeystore *)keystore
-            advertiseOperational:(BOOL)advertiseOperational
-                          params:(MTRDeviceControllerStartupParams *)params;
+- (instancetype)_initForNewFabricEntry:(chip::FabricTable *)fabricTable
+                              keystore:(chip::Crypto::OperationalKeystore *)keystore
+                  advertiseOperational:(BOOL)advertiseOperational
+                                params:(MTRDeviceControllerStartupParams *)params
+                isAdditionalController:(BOOL)isAdditionalController;
 
 /**
- * Initialize for controller bringup on an existing fabric.
+ * Initialize for controller bringup on an existing fabric entry, identified by
+ * the provided fabricIndex.
  */
-- (instancetype)initForExistingFabric:(chip::FabricTable *)fabricTable
-                          fabricIndex:(chip::FabricIndex)fabricIndex
-                             keystore:(chip::Crypto::OperationalKeystore *)keystore
-                 advertiseOperational:(BOOL)advertiseOperational
-                               params:(MTRDeviceControllerStartupParams *)params;
+- (instancetype)_initForExistingFabricEntry:(chip::FabricTable *)fabricTable
+                                fabricIndex:(chip::FabricIndex)fabricIndex
+                                   keystore:(chip::Crypto::OperationalKeystore *)keystore
+                       advertiseOperational:(BOOL)advertiseOperational
+                                     params:(MTRDeviceControllerStartupParams *)params;
 
 /**
  * Should use initForExistingFabric or initForNewFabric to initialize

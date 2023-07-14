@@ -2382,6 +2382,150 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 }
 
+- (void)test027_AdditionalController
+{
+    // Bring up a second controller with a different node id.
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * fabrics = factory.knownFabrics;
+    XCTAssertNotNil(fabrics);
+    XCTAssertEqual(fabrics.count, 1);
+
+    __auto_type * root = fabrics[0].rootCertificate;
+    XCTAssertNotNil(root);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSError * error;
+    NSNumber * newNodeID = @(0x123123);
+    __auto_type * operational = [MTRCertificates createOperationalCertificate:sTestKeys
+                                                           signingCertificate:root
+                                                         operationalPublicKey:operationalKeys.publicKey
+                                                                     fabricID:@(1)
+                                                                       nodeID:newNodeID
+                                                        caseAuthenticatedTags:nil
+                                                                        error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(operational);
+
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:sTestKeys.ipk
+                                                              operationalKeypair:operationalKeys
+                                                          operationalCertificate:operational
+                                                         intermediateCertificate:nil
+                                                                 rootCertificate:root];
+    XCTAssertNotNil(params);
+
+    params.vendorID = @(kTestVendorId);
+
+    MTRDeviceController * newController = [factory createAdditionalControllerOnExistingFabric:params error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(newController);
+    XCTAssertTrue([newController isRunning]);
+
+    XCTAssertEqualObjects([newController controllerNodeID], newNodeID);
+    XCTAssertNotEqualObjects([sController controllerNodeID], newNodeID);
+
+    __auto_type * device1 = GetConnectedDevice();
+    __auto_type * device2 = [MTRBaseDevice deviceWithNodeID:@(kDeviceId) controller:newController];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    __auto_type * onOff1 = [[MTRBaseClusterOnOff alloc] initWithDevice:device1 endpointID:@(1) queue:queue];
+    __auto_type * onOff2 = [[MTRBaseClusterOnOff alloc] initWithDevice:device2 endpointID:@(1) queue:queue];
+
+    // Check that device1 can read the On/Off attribute
+    XCTestExpectation * canReadExpectation1 = [self expectationWithDescription:@"Initial commissioner can read on/off"];
+    [onOff1 readAttributeOnOffWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        XCTAssertNil(err);
+        XCTAssertEqualObjects(value, @(0));
+        [canReadExpectation1 fulfill];
+    }];
+
+    [self waitForExpectations:@[ canReadExpectation1 ] timeout:kTimeoutInSeconds];
+
+    // Check that device2 cannot read the On/Off attribute due to missing ACLs.
+    XCTestExpectation * cantReadExpectation1 = [self expectationWithDescription:@"New node can't read on/off yet"];
+    [onOff2 readAttributeOnOffWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        XCTAssertNil(value);
+        XCTAssertNotNil(err);
+        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], MTRInteractionErrorCodeUnsupportedAccess);
+        [cantReadExpectation1 fulfill];
+    }];
+
+    [self waitForExpectations:@[ cantReadExpectation1 ] timeout:kTimeoutInSeconds];
+
+    // Now change ACLs so that device2 can read.
+    __auto_type * admin1 = [[MTRAccessControlClusterAccessControlEntryStruct alloc] init];
+    admin1.privilege = @(MTRAccessControlEntryPrivilegeAdminister);
+    admin1.authMode = @(MTRAccessControlEntryAuthModeCASE);
+    admin1.subjects = @[ sController.controllerNodeID ];
+
+    __auto_type * admin2 = [[MTRAccessControlClusterAccessControlEntryStruct alloc] init];
+    admin2.privilege = @(MTRAccessControlEntryPrivilegeAdminister);
+    admin2.authMode = @(MTRAccessControlEntryAuthModeCASE);
+    admin2.subjects = @[ newController.controllerNodeID ];
+
+    __auto_type * acl1 = [[MTRBaseClusterAccessControl alloc] initWithDevice:device1 endpointID:@(0) queue:queue];
+
+    XCTestExpectation * let2ReadExpectation = [self expectationWithDescription:@"ACLs changed so new node can read"];
+    [acl1 writeAttributeACLWithValue:@[ admin1, admin2 ]
+                          completion:^(NSError * _Nullable err) {
+                              XCTAssertNil(err);
+                              [let2ReadExpectation fulfill];
+                          }];
+
+    [self waitForExpectations:@[ let2ReadExpectation ] timeout:kTimeoutInSeconds];
+
+    // Check that device2 can read the On/Off attribute
+    XCTestExpectation * canReadExpectation2 = [self expectationWithDescription:@"New node can read on/off"];
+    [onOff2 readAttributeOnOffWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        XCTAssertNil(err);
+        XCTAssertEqualObjects(value, @(0));
+        [canReadExpectation2 fulfill];
+    }];
+
+    [self waitForExpectations:@[ canReadExpectation2 ] timeout:kTimeoutInSeconds];
+
+    // Check that device1 can still read the On/Off attribute
+    XCTestExpectation * canReadExpectation3 = [self expectationWithDescription:@"Initial commissioner can still read on/off"];
+    [onOff1 readAttributeOnOffWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        XCTAssertNil(err);
+        XCTAssertEqualObjects(value, @(0));
+        [canReadExpectation3 fulfill];
+    }];
+
+    [self waitForExpectations:@[ canReadExpectation3 ] timeout:kTimeoutInSeconds];
+
+    // Check that the two devices are running on the same fabric.
+    __auto_type * opCreds1 = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device1 endpoint:0 queue:queue];
+    __auto_type * opCreds2 = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device2 endpoint:0 queue:queue];
+
+    __block NSNumber * fabricIndex;
+    XCTestExpectation * readFabricIndexExpectation1 =
+        [self expectationWithDescription:@"Fabric index read by initial commissioner"];
+    [opCreds1 readAttributeCurrentFabricIndexWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable readError) {
+        XCTAssertNil(readError);
+        XCTAssertNotNil(value);
+        fabricIndex = value;
+        [readFabricIndexExpectation1 fulfill];
+    }];
+
+    [self waitForExpectations:@[ readFabricIndexExpectation1 ] timeout:kTimeoutInSeconds];
+
+    XCTestExpectation * readFabricIndexExpectation2 = [self expectationWithDescription:@"Fabric index read by new node"];
+    [opCreds2 readAttributeCurrentFabricIndexWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable readError) {
+        XCTAssertNil(readError);
+        XCTAssertNotNil(value);
+        XCTAssertEqualObjects(value, fabricIndex);
+        [readFabricIndexExpectation2 fulfill];
+    }];
+
+    [self waitForExpectations:@[ readFabricIndexExpectation2 ] timeout:kTimeoutInSeconds];
+
+    [newController shutdown];
+}
+
 - (void)test900_SubscribeAllAttributes
 {
     MTRBaseDevice * device = GetConnectedDevice();

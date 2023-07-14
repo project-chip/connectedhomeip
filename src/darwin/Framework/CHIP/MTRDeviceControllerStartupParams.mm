@@ -211,12 +211,23 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     return self;
 }
 
-- (instancetype)initForNewFabric:(chip::FabricTable *)fabricTable
-                        keystore:(chip::Crypto::OperationalKeystore *)keystore
-            advertiseOperational:(BOOL)advertiseOperational
-                          params:(MTRDeviceControllerStartupParams *)params
+- (instancetype)_initForNewFabricEntry:(chip::FabricTable *)fabricTable
+                              keystore:(chip::Crypto::OperationalKeystore *)keystore
+                  advertiseOperational:(BOOL)advertiseOperational
+                                params:(MTRDeviceControllerStartupParams *)params
+                isAdditionalController:(BOOL)isAdditionalController
 {
     if (!(self = [self initWithParams:params])) {
+        return nil;
+    }
+
+    if (self.vendorID == nil) {
+        MTR_LOG_ERROR("Must provide vendor id when starting controller on new fabric");
+        return nil;
+    }
+
+    if (self.intermediateCertificate != nil && self.rootCertificate == nil) {
+        MTR_LOG_ERROR("Must provide a root certificate when using an intermediate certificate");
         return nil;
     }
 
@@ -248,15 +259,16 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     _fabricTable = fabricTable;
     _keystore = keystore;
     _advertiseOperational = advertiseOperational;
+    _isAdditionalController = isAdditionalController;
 
     return self;
 }
 
-- (instancetype)initForExistingFabric:(FabricTable *)fabricTable
-                          fabricIndex:(FabricIndex)fabricIndex
-                             keystore:(chip::Crypto::OperationalKeystore *)keystore
-                 advertiseOperational:(BOOL)advertiseOperational
-                               params:(MTRDeviceControllerStartupParams *)params
+- (instancetype)_initForExistingFabricEntry:(FabricTable *)fabricTable
+                                fabricIndex:(FabricIndex)fabricIndex
+                                   keystore:(chip::Crypto::OperationalKeystore *)keystore
+                       advertiseOperational:(BOOL)advertiseOperational
+                                     params:(MTRDeviceControllerStartupParams *)params
 {
     if (!(self = [self initWithParams:params])) {
         return nil;
@@ -384,6 +396,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     _fabricIndex.Emplace(fabricIndex);
     _keystore = keystore;
     _advertiseOperational = advertiseOperational;
+    _isAdditionalController = NO;
 
     return self;
 }

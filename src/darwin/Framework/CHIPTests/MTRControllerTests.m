@@ -23,6 +23,7 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
+#import "MTRFabricInfoChecker.h"
 #import "MTRTestKeys.h"
 #import "MTRTestOTAProvider.h"
 #import "MTRTestStorage.h"
@@ -1524,8 +1525,6 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 
-    fprintf(stderr, "DOING TOO LONG TEST\n");
-
     //
     // Trying to bring up the same fabric with too-long CATs should fail, if we
     // are taking the provided CATs into account.
@@ -1536,8 +1535,6 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
     controller = [factory createControllerOnExistingFabric:params error:nil];
     XCTAssertNil(controller);
 
-    fprintf(stderr, "DOING INVALID TEST\n");
-
     //
     // Trying to bring up the same fabric with invalid CATs should fail, if we
     // are taking the provided CATs into account.
@@ -1545,12 +1542,115 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
     params.nodeID = @(17);
     params.operationalKeypair = operationalKeys;
     params.caseAuthenticatedTags = invalidCATs;
-    fprintf(stderr, "BRINGING UP CONTROLLER\n");
     controller = [factory createControllerOnExistingFabric:params error:nil];
-    fprintf(stderr, "CONTROLLER SHOULD BE NIL\n");
     XCTAssertNil(controller);
 
-    fprintf(stderr, "STOPPING FACTORY\n");
+    [factory stopControllerFactory];
+    XCTAssertFalse([factory isRunning]);
+}
+
+- (void)testAdditionalController
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[MTRTestStorage alloc] init];
+    __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
+    XCTAssertTrue([factory startControllerFactory:factoryParams error:nil]);
+    XCTAssertTrue([factory isRunning]);
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * params1 = [[MTRDeviceControllerStartupParams alloc] initWithIPK:rootKeys.ipk fabricID:@(1) nocSigner:rootKeys];
+    XCTAssertNotNil(params1);
+
+    params1.vendorID = @(kTestVendorId);
+
+    NSError * error;
+
+    // Start a main controller with node id 0x10001.
+    NSNumber * nodeID1 = @(0x10001);
+    params1.nodeID = nodeID1;
+    MTRDeviceController * controller1 = [factory createControllerOnNewFabric:params1 error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller1);
+    XCTAssertTrue([controller1 isRunning]);
+    XCTAssertEqualObjects(controller1.controllerNodeID, nodeID1);
+
+    // Start an additional controller with node id 0x10002.
+    NSNumber * nodeID2 = @(0x10002);
+    params1.nodeID = nodeID2;
+    MTRDeviceController * controller2 = [factory createAdditionalControllerOnExistingFabric:params1 error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller2);
+    XCTAssertTrue([controller2 isRunning]);
+    XCTAssertEqualObjects(controller2.controllerNodeID, nodeID2);
+
+    // Start an additional controller with node id 0x10003, using explicit
+    // certificates.
+    NSNumber * nodeID3 = @(0x10003);
+    __auto_type * root = [MTRCertificates createRootCertificate:rootKeys issuerID:nil fabricID:nil error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(root);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * operational = [MTRCertificates createOperationalCertificate:rootKeys
+                                                           signingCertificate:root
+                                                         operationalPublicKey:operationalKeys.publicKey
+                                                                     fabricID:@(1)
+                                                                       nodeID:nodeID3
+                                                        caseAuthenticatedTags:nil
+                                                                        error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(operational);
+
+    __auto_type * params2 = [[MTRDeviceControllerStartupParams alloc] initWithIPK:rootKeys.ipk
+                                                               operationalKeypair:operationalKeys
+                                                           operationalCertificate:operational
+                                                          intermediateCertificate:nil
+                                                                  rootCertificate:root];
+    params2.vendorID = @(kTestVendorId);
+
+    MTRDeviceController * controller3 = [factory createAdditionalControllerOnExistingFabric:params2 error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller3);
+    XCTAssertTrue([controller3 isRunning]);
+    XCTAssertEqualObjects(controller3.controllerNodeID, nodeID3);
+
+    __auto_type fabrics = factory.knownFabrics;
+    CheckFabricInfo(fabrics, [NSMutableSet setWithArray:@[
+        @{
+            @"rootPublicKey" : [rootKeys publicKeyData],
+            @"vendorID" : @(kTestVendorId),
+            @"fabricID" : @(1),
+            @"nodeID" : nodeID1,
+            @"label" : @"",
+            @"hasIntermediateCertificate" : @(NO),
+            @"fabricIndex" : @(1)
+        },
+        @{
+            @"rootPublicKey" : [rootKeys publicKeyData],
+            @"vendorID" : @(kTestVendorId),
+            @"fabricID" : @(1),
+            @"nodeID" : nodeID2,
+            @"label" : @"",
+            @"hasIntermediateCertificate" : @(NO),
+            @"fabricIndex" : @(2)
+        },
+        @{
+            @"rootPublicKey" : [rootKeys publicKeyData],
+            @"vendorID" : @(kTestVendorId),
+            @"fabricID" : @(1),
+            @"nodeID" : nodeID3,
+            @"label" : @"",
+            @"hasIntermediateCertificate" : @(NO),
+            @"fabricIndex" : @(3)
+        }
+    ]]);
+
     [factory stopControllerFactory];
     XCTAssertFalse([factory isRunning]);
 }

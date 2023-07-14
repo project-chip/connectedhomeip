@@ -150,6 +150,22 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
                                                               error:(NSError * __autoreleasing *)error;
 
 /**
+ * Create an additional MTRDeviceController on an existing fabric.  Returns nil on failure.
+ *
+ * The fabric is identified by the root public key and fabric id in
+ * the startupParams.
+ *
+ * This method will fail if there is no such fabric.
+ *
+ * This method will fail if the MTRDeviceControllerStartupParams don't follow
+ * the rules for creating a controller on a new fabric.  In particular, the
+ * vendor ID must not be nil.
+ */
+- (MTRDeviceController * _Nullable)createAdditionalControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
+                                                                        error:(NSError * __autoreleasing *)error
+    MTR_NEWLY_AVAILABLE;
+
+/**
  * Create a MTRDeviceController on a new fabric.  Returns nil on failure.
  *
  * This method will fail if the given fabric already exists.

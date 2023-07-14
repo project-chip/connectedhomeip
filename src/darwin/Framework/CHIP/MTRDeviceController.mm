@@ -374,6 +374,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         // bring-up.
         commissionerParams.removeFromFabricTableOnShutdown = false;
         commissionerParams.deviceAttestationVerifier = _factory.deviceAttestationVerifier;
+        commissionerParams.permitMultiControllerFabrics = startupParams.isAdditionalController;
 
         auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
 
