@@ -116,7 +116,7 @@ jobs:
         needs: [build_images_base, build_images_stage_1, build_images_stage_2, build_images_stage_3]
         name: Build Docker CHIP Build images - vscode
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' || false
+        if: github.actor != 'restyled-io[bot]' && false
         strategy:
             fail-fast: false
             matrix:
