@@ -8,7 +8,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 267.4.1. [TC-DISHM-3.1] OnMode Verification with DUT as Server
+name: 193.3.1. [TC-DISHM-3.1] OnMode Verification with DUT as Server
 
 PICS:
     - DISHM.S
@@ -31,7 +31,7 @@ tests:
       verification: |
           ./chip-tool dishwashermodeselect read on-mode 1 1
 
-          On TH(chip-tool), Verify OnMode attribute value is an integer. save the value as on_mode_dut and below is the sample log provided for the raspi platform:
+          On TH(chip-tool), Verify OnMode attribute value is an integer. Save the value as on_mode_dut and below is the sample log provided for the raspi platform:
 
           [1649678983.679893][10871:10876] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065073
           [1649678983.680002][10871:10876] CHIP:TOO: OnMode: 0
@@ -49,9 +49,9 @@ tests:
       verification: |
           ./chip-tool dishwashermodeselect read current-mode 1 1
 
-          On TH(chip-tool), Verify CurrentMode attribute is an integer. save the value as old_current_mode_dut and below is the sample log provided for the raspi platform:
+          On TH(chip-tool), Verify CurrentMode attribute is an integer. Save the value as old_current_mode_dut and below is the sample log provided for the raspi platform:
 
-          NOTE: If startup_mode_dut is equal to old_current_mode_dut proceed to step 4. Else proceed to step 6.
+          NOTE: If on_mode_dut is equal to old_current_mode_dut proceed to step 4. Else proceed to step 6.
 
           [1649679034.895848][10879:10884] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
           [1649679034.895972][10879:10884] CHIP:TOO: CurrentMode: 0
@@ -125,7 +125,7 @@ tests:
                 value: "y"
 
     - label:
-          "TH send a ChangeToMode command to the DUT with NewMode set to
+          "TH sends a ChangeToMode command to the DUT with NewMode set to
           new_mode_th"
       verification: |
           ./chip-tool dishwashermodeselect change-to-mode 2 1 1
@@ -192,7 +192,7 @@ tests:
       verification: |
           ./chip-tool dishwashermodeselect read current-mode 1 1
 
-          On TH(chip-tool), Verify that CurrentMode attribute value is an integer and value is equal to on_mode_dut. below is the sample log provided for the raspi platform:
+          On TH(chip-tool), Verify that CurrentMode attribute value is an integer and value is equal to on_mode_dut. Below is the sample log provided for the raspi platform:
 
           [1649679202.069163][10899:10904] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
           [1649679202.069278][10899:10904] CHIP:TOO: CurrentMode: 0

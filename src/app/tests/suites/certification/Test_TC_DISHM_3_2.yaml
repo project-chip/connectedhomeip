@@ -8,7 +8,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 267.4.2. [TC-DISHM-3.2] OnMode Verification with DUT as Server
+name: 193.3.2. [TC-DISHM-3.2] StartUpMode Verification with DUT as Server
 
 PICS:
     - DISHM.S
@@ -45,7 +45,7 @@ tests:
       verification: |
           ./chip-tool dishwashermodeselect read start-up-mode 1 1
 
-          On TH(chip-tool), Verify StartUpMode attribute value is an integer. save the value as startup_mode_dut and below is the sample log provided for the raspi platform:
+          On TH(chip-tool), Verify StartUpMode attribute value is an integer. Save the value as startup_mode_dut and below is the sample log provided for the raspi platform:
 
           [1645777708.406864][4841:4846] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003DataVersion: 3781469721
           [1645777708.406933][4841:4846] CHIP:TOO: StartUpMode: 0
@@ -86,7 +86,7 @@ tests:
 
           On TH(chip-tool) log, Verify SupportedModes attribute contains two or more ModeOptionsStruct entries.
           Save the Mode field values as supported_modes_dut.
-          Select a value from supported_modes_dut different from on_mode_dut and save the value as new_mode_th, below is the sample log provided for the raspi platform:
+          Select a value from supported_modes_dut different from startup_mode_dut and save the value as new_mode_th, below is the sample log provided for the raspi platform:
 
           [1687687925.438666][18054:18056] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0002 DataVersion: 4148960394
           [1687687925.438838][18054:18056] CHIP:TOO: SupportedModes: 3 entries

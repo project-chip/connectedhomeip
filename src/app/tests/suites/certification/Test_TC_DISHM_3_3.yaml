@@ -8,20 +8,20 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 267.4.3. [TC-DISHM-3.4] OnMode Verification with DUT as Server
+name: 193.3.3. [TC-DISHM-3.3] OnMode overwriting StartUpMode with DUT as Server
 
 PICS:
     - DISHM.S
 
 config:
-    nodeId: 0x0059
+    nodeId: 0x12344321
     cluster: "Dishwasher Mode"
     endpoint: 1
 
 tests:
     - label: "Note"
       verification: |
-          To Execute the TC-MOD-3.4 test case using reboot in raspi device we followed the below suggested way:
+          To Execute the TC-DISHM-3.3 test case using reboot in raspi device we followed the below suggested way:
 
           To run a reboot test case on raspi, run the app with --KVS flag with a file in local directory and pass that file to the command to launch the app. Steps
 
@@ -49,7 +49,7 @@ tests:
       verification: |
           ./chip-tool dishwashermodeselect read start-up-mode 1 1
 
-          On TH(chip-tool) log, Verify StartUpMode attribute value is an integer. save this value as startup_mode_dut and below is the sample log provided for the raspi platform:
+          On TH(chip-tool) log, Verify StartUpMode attribute value is an integer. Save this value as startup_mode_dut and below is the sample log provided for the raspi platform:
 
 
           [1651099663211] [82177:7560652] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004 DataVersion: 2609052118
@@ -68,12 +68,13 @@ tests:
       verification: |
           ./chip-tool dishwashermodeselect read on-mode 1 1
 
-          On TH(chip-tool) log, Verify OnMode attribute value is an integer. save the value as old_on_mode_dut and below is the sample log provided for the raspi platform:
+          On TH(chip-tool) log, Verify OnMode attribute value is an integer. Save the value as old_on_mode_dut and below is the sample log provided for the raspi platform:
 
+          NOTE: If startup_mode_dut is equal to old_on_mode_dut proceed to step 4. Else proceed to step 6.
 
           [1654780979.979743][61542:61547] CHIP:DMG: }
           [1654780979.980040][61542:61547] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 235764160
-          [1654780979.980202][61542:61547] CHIP:TOO: OnMode: 4
+          [1654780979.980202][61542:61547] CHIP:TOO: OnMode: 1
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT
@@ -90,7 +91,7 @@ tests:
 
           On TH(chip-tool) log, Verify SupportedModes attribute contains two or more ModeOptionsStruct entries.
           Save the Mode field values as supported_modes_dut.
-          Select a value from supported_modes_dut different from on_mode_dut and save the value as new_mode_th, below is the sample log provided for the raspi platform:
+          Select a value from supported_modes_dut different from startup_mode_dut and save the value as new_mode_th, below is the sample log provided for the raspi platform:
 
           [1687687925.438666][18054:18056] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0002 DataVersion: 4148960394
           [1687687925.438838][18054:18056] CHIP:TOO: SupportedModes: 3 entries
@@ -143,36 +144,36 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads from the OnMode attribute from DUT"
+    - label: "TH writes to the DUT the OnMode attribute with the new_mode_th value"
       verification: |
-          ./chip-tool dishwashermodeselect write on-mode 7 1 1
+          ./chip-tool dishwashermodeselect write on-mode 2 1 1
 
-          On TH(chip-tool) log, Verify DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
+          On TH(chip-tool) log, verify DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
 
-          [1651099941884] [84269:7567211] CHIP: [DMG] WriteResponseMessage =
-          [1651099941884] [84269:7567211] CHIP: [DMG] {
-          [1651099941884] [84269:7567211] CHIP: [DMG] AttributeStatusIBs =
-          [1651099941884] [84269:7567211] CHIP: [DMG] [
-          [1651099941884] [84269:7567211] CHIP: [DMG] AttributeStatusIB =
-          [1651099941884] [84269:7567211] CHIP: [DMG] {
-          [1651099941887] [84269:7567211] CHIP: [DMG] AttributePathIB =
-          [1651099941887] [84269:7567211] CHIP: [DMG] {
-          [1651099941887] [84269:7567211] CHIP: [DMG] Endpoint = 0x1,
-          [1651099941887] [84269:7567211] CHIP: [DMG] Cluster = 0x50,
-          [1651099941887] [84269:7567211] CHIP: [DMG] Attribute = 0x0000_0005,
-          [1651099941887] [84269:7567211] CHIP: [DMG] }
-          [1651099941887] [84269:7567211] CHIP: [DMG]
-          [1651099941887] [84269:7567211] CHIP: [DMG] StatusIB =
-          [1651099941887] [84269:7567211] CHIP: [DMG] {
-          [1651099941887] [84269:7567211] CHIP: [DMG] status = 0x00 (SUCCESS),
-          [1651099941887] [84269:7567211] CHIP: [DMG] },
-          [1651099941887] [84269:7567211] CHIP: [DMG]
-          [1651099941887] [84269:7567211] CHIP: [DMG] },
-          [1651099941887] [84269:7567211] CHIP: [DMG]
-          [1651099941887] [84269:7567211] CHIP: [DMG] ],
-          [1651099941887] [84269:7567211] CHIP: [DMG]
-          [1651099941887] [84269:7567211] CHIP: [DMG] InteractionModelRevision = 1
-          [1651099941887] [84269:7567211] CHIP: [DMG] }
+          [1651101661959] [90832:7598169] CHIP: [DMG] WriteResponseMessage =
+          [1651101661959] [90832:7598169] CHIP: [DMG] {
+          [1651101661959] [90832:7598169] CHIP: [DMG] AttributeStatusIBs =
+          [1651101661959] [90832:7598169] CHIP: [DMG] [
+          [1651101661959] [90832:7598169] CHIP: [DMG] AttributeStatusIB =
+          [1651101661959] [90832:7598169] CHIP: [DMG] {
+          [1651101661960] [90832:7598169] CHIP: [DMG] AttributePathIB =
+          [1651101661960] [90832:7598169] CHIP: [DMG] {
+          [1651101661960] [90832:7598169] CHIP: [DMG] Endpoint = 0x1,
+          [1651101661960] [90832:7598169] CHIP: [DMG] Cluster = 0x6,
+          [1651101661960] [90832:7598169] CHIP: [DMG] Attribute = 0x0000_4003,
+          [1651101661960] [90832:7598169] CHIP: [DMG] }
+          [1651101661960] [90832:7598169] CHIP: [DMG]
+          [1651101661960] [90832:7598169] CHIP: [DMG] StatusIB =
+          [1651101661960] [90832:7598169] CHIP: [DMG] {
+          [1651101661960] [90832:7598169] CHIP: [DMG] status = 0x00 (SUCCESS),
+          [1651101661960] [90832:7598169] CHIP: [DMG] },
+          [1651101661960] [90832:7598169] CHIP: [DMG]
+          [1651101661960] [90832:7598169] CHIP: [DMG] },
+          [1651101661960] [90832:7598169] CHIP: [DMG]
+          [1651101661960] [90832:7598169] CHIP: [DMG] ],
+          [1651101661960] [90832:7598169] CHIP: [DMG]
+          [1651101661960] [90832:7598169] CHIP: [DMG] InteractionModelRevision = 1
+          [1651101661960] [90832:7598169] CHIP: [DMG] }
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT
@@ -187,10 +188,10 @@ tests:
       verification: |
           ./chip-tool dishwashermodeselect read on-mode 1 1
 
-          On TH(chip-tool) log, Verify OnMode attribute value is an integer. save the value as new_on_mode_dut and below is the sample log provided for the raspi platform:
+          On TH(chip-tool) log, Verify OnMode attribute value is an integer and that it is equal to new_mode_th. Save the value as new_on_mode_dut and below is the sample log provided for the raspi platform:
 
           [1669190858.739158][4187:4189] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4107771634
-          [1669190858.739222][4187:4189] CHIP:TOO: OnMode: 7
+          [1669190858.739222][4187:4189] CHIP:TOO: OnMode: 2
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT
@@ -201,7 +202,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH writes to the OnMode attribute from DUT"
+    - label: "TH writes to the DUT the StartUpOnOff attribute with the value 1."
       verification: |
           ./chip-tool onoff write start-up-on-off 1 1 1
 
@@ -258,10 +259,10 @@ tests:
       verification: |
           ./chip-tool dishwashermodeselect read current-mode 1 1
 
-          On TH(chip-tool), Verify CurrentMode attribute value is same as the value recorded in step 3 and below is the sample log provided for the raspi platform:
+          On TH(chip-tool), Verify CurrentMode attribute value is an integer and that it is equal to new_on_mode_th. Below is the sample log provided for the raspi platform:
 
           [1669190936.869804][4194:4196] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 3908583538
-          [1669190936.869875][4194:4196] CHIP:TOO: CurrentMode: 7
+          [1669190936.869875][4194:4196] CHIP:TOO: CurrentMode: 2
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT
