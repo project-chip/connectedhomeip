@@ -210,7 +210,8 @@ bool SmokeCoAlarmManager::ManualSelfTesting()
 
 bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
 {
-    bool success = false;
+    bool isValidCommand = true;
+    bool success        = false;
 
     switch (eventTrigger)
     {
@@ -218,7 +219,7 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kWarning);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kSmokeAlarm, true);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kSmokeAlarm, true);
         }
         break;
 
@@ -226,7 +227,7 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kCritical);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kSmokeAlarm, true);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kSmokeAlarm, true);
         }
         break;
 
@@ -234,7 +235,7 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kNormal);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kSmokeAlarm, false);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kSmokeAlarm, false);
         }
         break;
 
@@ -242,7 +243,7 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kWarning);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kCOAlarm, true);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kCOAlarm, true);
         }
         break;
 
@@ -250,7 +251,7 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kCritical);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kCOAlarm, true);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kCOAlarm, true);
         }
         break;
 
@@ -258,7 +259,7 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kNormal);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kCOAlarm, false);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kCOAlarm, false);
         }
         break;
 
@@ -266,7 +267,7 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kWarning);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kBatteryAlert, true);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kBatteryAlert, true);
         }
         break;
 
@@ -274,7 +275,7 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kCritical);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kBatteryAlert, true);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kBatteryAlert, true);
         }
         break;
 
@@ -282,7 +283,7 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kNormal);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kBatteryAlert, false);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kBatteryAlert, false);
         }
         break;
 
@@ -290,7 +291,7 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, true);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kHardwareFault, true);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kHardwareFault, true);
         }
         break;
 
@@ -298,7 +299,7 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, false);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kHardwareFault, false);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kHardwareFault, false);
         }
         break;
 
@@ -306,7 +307,7 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, EndOfServiceEnum::kExpired);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kEndOfService, true);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kEndOfService, true);
         }
         break;
 
@@ -314,23 +315,23 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, EndOfServiceEnum::kNormal);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kEndOfService, false);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kEndOfService, false);
         }
         break;
 
     case kTriggeredEvent_DeviceMute:
-        success = SmokeCoAlarmServer::Instance().SetDeviceMuted(1, MuteStateEnum::kMuted);
+        SmokeCoAlarmServer::Instance().SetDeviceMuted(1, MuteStateEnum::kMuted);
         break;
 
     case kTriggeredEvent_DeviceMuteClear:
-        success = SmokeCoAlarmServer::Instance().SetDeviceMuted(1, MuteStateEnum::kNotMuted);
+        SmokeCoAlarmServer::Instance().SetDeviceMuted(1, MuteStateEnum::kNotMuted);
         break;
 
     case kTriggeredEvent_InterconnectSmokeAlarm:
         success = SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(1, AlarmStateEnum::kWarning);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kInterconnectSmoke, true);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kInterconnectSmoke, true);
         }
         break;
 
@@ -338,7 +339,7 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(1, AlarmStateEnum::kNormal);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kInterconnectSmoke, false);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kInterconnectSmoke, false);
         }
         break;
 
@@ -346,7 +347,7 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(1, AlarmStateEnum::kWarning);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kInterconnectCO, true);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kInterconnectCO, true);
         }
         break;
 
@@ -354,39 +355,40 @@ bool SmokeCoAlarmManager::OnEventTriggerHandle(uint64_t eventTrigger)
         success = SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(1, AlarmStateEnum::kNormal);
         if (success)
         {
-            success = AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kInterconnectCO, false);
+            AlarmMgr().SetExpressedState(1, ExpressedStateEnum::kInterconnectCO, false);
         }
         break;
 
     case kTriggeredEvent_ContaminationStateHigh:
-        success = SmokeCoAlarmServer::Instance().SetContaminationState(1, ContaminationStateEnum::kWarning);
+        SmokeCoAlarmServer::Instance().SetContaminationState(1, ContaminationStateEnum::kWarning);
         break;
 
     case kTriggeredEvent_ContaminationStateLow:
-        success = SmokeCoAlarmServer::Instance().SetContaminationState(1, ContaminationStateEnum::kLow);
+        SmokeCoAlarmServer::Instance().SetContaminationState(1, ContaminationStateEnum::kLow);
         break;
 
     case kTriggeredEvent_ContaminationStateClear:
-        success = SmokeCoAlarmServer::Instance().SetContaminationState(1, ContaminationStateEnum::kNormal);
+        SmokeCoAlarmServer::Instance().SetContaminationState(1, ContaminationStateEnum::kNormal);
         break;
 
     case kTriggeredEvent_SensitivityLevelHigh:
-        success = SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, SensitivityEnum::kHigh);
+        SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, SensitivityEnum::kHigh);
         break;
 
     case kTriggeredEvent_SensitivityLevelLow:
-        success = SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, SensitivityEnum::kLow);
+        SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, SensitivityEnum::kLow);
         break;
 
     case kTriggeredEvent_SensitivityLevelClear:
-        success = SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, SensitivityEnum::kStandard);
+        SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, SensitivityEnum::kStandard);
         break;
 
     default:
+        isValidCommand = false;
         break;
     }
 
-    return success;
+    return isValidCommand;
 }
 
 bool SmokeCoAlarmManager::SetExpressedState(EndpointId endpointId, ExpressedStateEnum expressedState, bool isSet)
