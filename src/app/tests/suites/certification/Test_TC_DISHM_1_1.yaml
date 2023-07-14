@@ -81,7 +81,7 @@ tests:
 
     - label:
           "TH reads optional attribute (DISHM.S.A0003(OnMode)) in AttributeList"
-      PICS: DISHM.S.A0003
+      PICS: DISHM.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
       response:
