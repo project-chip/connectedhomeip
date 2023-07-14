@@ -64,12 +64,24 @@ tests:
       response:
           value: { ErrorStateID: 0 }
 
+    - label: "Read current Operational State"
+      command: "readAttribute"
+      attribute: "OperationalState"
+      response:
+          value: 0
+
     - label: "Start Command"
       command: "Start"
       response:
           values:
               - name: "CommandResponseState"
                 value: { ErrorStateID: 0 }
+
+    - label: "Read current Operational State"
+      command: "readAttribute"
+      attribute: "OperationalState"
+      response:
+          value: 1
 
     - label: "Pause Command"
       command: "Pause"
@@ -78,12 +90,24 @@ tests:
               - name: "CommandResponseState"
                 value: { ErrorStateID: 0 }
 
+    - label: "Read current Operational State"
+      command: "readAttribute"
+      attribute: "OperationalState"
+      response:
+          value: 2
+
     - label: "Resume Command"
       command: "Resume"
       response:
           values:
               - name: "CommandResponseState"
                 value: { ErrorStateID: 0 }
+
+    - label: "Read current Operational State"
+      command: "readAttribute"
+      attribute: "OperationalState"
+      response:
+          value: 1
 
     - label: "Stop Command"
       command: "Stop"
@@ -92,3 +116,8 @@ tests:
               - name: "CommandResponseState"
                 value: { ErrorStateID: 0 }
 
+    - label: "Read current Operational State"
+      command: "readAttribute"
+      attribute: "OperationalState"
+      response:
+          value: 0
