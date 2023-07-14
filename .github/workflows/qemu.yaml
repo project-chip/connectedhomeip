@@ -38,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32-qemu:0.7.25
+            image: ghcr.io/project-chip/chip-build-esp32-qemu:1
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -76,7 +76,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-tizen-qemu:0.7.18
+            image: ghcr.io/project-chip/chip-build-tizen-qemu:1
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 

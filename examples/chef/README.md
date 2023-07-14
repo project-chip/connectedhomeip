@@ -101,7 +101,7 @@ relevant platform image. You can simulate the workflow locally by mounting your
 CHIP repo into a container and executing the CI command:
 
 ```shell
-docker run -it --mount source=$(pwd),target=/workspace,type=bind connectedhomeip/chip-build-$PLATFORM:$VERSION
+docker run -it --mount source=$(pwd),target=/workspace,type=bind ghcr.io/project-chip/chip-build-$PLATFORM:$VERSION
 ```
 
 In the container:
@@ -128,7 +128,7 @@ chef_$PLATFORM:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-        image: connectedhomeip/chip-build-$PLATFORM:$VERSION
+        image: ghcr.io/project-chip/chip-build-$PLATFORM:$VERSION
         options: --user root
 
     steps:
@@ -183,7 +183,7 @@ command for these targets.
 To test your configuration locally, you may employ a similar strategy as in CI:
 
 ```shell
-docker run -it --mount source=$(pwd),target=/workspace,type=bind connectedhomeip/chip-build-vscode:$VERSION
+docker run -it --mount source=$(pwd),target=/workspace,type=bind ghcr.io/project-chip/chip-build-vscode:$VERSION
 ```
 
 In the container:

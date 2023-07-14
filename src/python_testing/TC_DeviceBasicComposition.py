@@ -167,7 +167,6 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         dev_ctrl = self.default_controller
         self.problems = []
 
-        # TODO: Handle already commissioned devices and add argument to specify "let's do PASE"
         do_test_over_pase = self.user_params.get("use_pase_only", True)
         dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
 
@@ -213,7 +212,8 @@ class TC_DeviceBasicComposition(MatterBaseTest):
             else:
                 asserts.fail("Failed to find the DUT according to command line arguments.")
         else:
-            asserts.fail("TODO: Support testing on already commissioned devices")
+            # Using the already commissioned node
+            node_id = self.dut_node_id
 
         wildcard_read = (await dev_ctrl.Read(node_id, [()]))
         endpoints_tlv = wildcard_read.tlvAttributes
