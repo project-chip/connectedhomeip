@@ -4,10 +4,10 @@ This is a Matter Android Device app that can be used as a commissionee device.
 
 This app offers the following features:
 
-- Work as a commissionee device on Android environment
-- Make custom payload information and display Matter QR code
-- Provide UI for the user to change the cluster attribute values and create the cluster event
-
+-   Work as a commissionee device on Android environment
+-   Make custom payload information and display Matter QR code
+-   Provide UI for the user to change the cluster attribute values and create
+    the cluster event
 
 <hr>
 
@@ -51,8 +51,8 @@ the top Matter directory:
 See the table above for other values of `TARGET_CPU`.
 
 The debug Android package `app-debug.apk` will be generated at
-`out/android-$TARGET_CPU-st-device-app/outputs/apk/debug/`, and can be
-installed with
+`out/android-$TARGET_CPU-st-device-app/outputs/apk/debug/`, and can be installed
+with
 
 ```shell
 adb install out/android-$TARGET_CPU-st-device-app/outputs/apk/debug/app-debug.apk
