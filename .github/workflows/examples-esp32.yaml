@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.7.25
+            image: ghcr.io/project-chip/chip-build-esp32:1
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -127,7 +127,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.7.25
+            image: ghcr.io/project-chip/chip-build-esp32:1
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
