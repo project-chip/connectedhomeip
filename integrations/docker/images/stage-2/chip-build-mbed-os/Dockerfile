@@ -12,15 +12,15 @@ RUN set -x \
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # ------------------------------------------------------------------------------
-# Install openocd
-RUN set -x \
-    && mkdir -p /opt/openocd \
-    && wget -O - --progress=dot:giga https://github.com/cypresssemiconductorco/openocd/releases/download/release-v4.2.0/openocd-4.2.0.1430-linux.tar.gz | tar --strip-components=1 -xz -C /opt/openocd \
-    && : # last line
+# # Install openocd
+# RUN set -x \
+#     && mkdir -p /opt/openocd \
+#     && wget -O - --progress=dot:giga https://github.com/cypresssemiconductorco/openocd/releases/download/release-v4.2.0/openocd-4.2.0.1430-linux.tar.gz | tar --strip-components=1 -xz -C /opt/openocd \
+#     && : # last line
 
-FROM ghcr.io/project-chip/chip-build:${VERSION}
+# FROM ghcr.io/project-chip/chip-build:${VERSION}
 
-COPY --from=build /opt/openocd/ /opt/openocd/
+# COPY --from=build /opt/openocd/ /opt/openocd/
 
 # ------------------------------------------------------------------------------
 # Install Python modules
