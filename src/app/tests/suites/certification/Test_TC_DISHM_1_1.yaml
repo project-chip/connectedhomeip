@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 267.1.1. [TC-DISHM-1.1] Global Attributes [DUT-Server]
+name: 193.1.1. [TC-DISHM-1.1] Global Attributes with DUT as Server
 
 PICS:
     - DISHM.S
@@ -81,8 +81,8 @@ tests:
               contains: [2]
 
     - label:
-          "TH reads optional attribute (DISHM.S.F00(DEPONOFF)) in AttributeList"
-      PICS: DISHM.S.F00
+          "TH reads optional attribute (DISHM.S.A0003(OnMode)) in AttributeList"
+      PICS: DISHM.S.A0003
       command: "readAttribute"
       attribute: "AttributeList"
       response:
