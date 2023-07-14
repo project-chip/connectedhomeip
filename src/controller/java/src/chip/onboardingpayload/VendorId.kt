@@ -18,8 +18,8 @@
 package chip.onboardingpayload
 
 /**
- * code="0x0000" is defined as "Matter Standard" in the official CSA alliance manufacturer ID database
- * and is treated as invalid in Matter SDK.
+ * code="0x0000" is defined as "Matter Standard" in the official CSA alliance manufacturer ID
+ * database and is treated as invalid in Matter SDK.
  */
 enum class VendorId(val value: Int) {
   UNSPECIFIED(0x0000),
@@ -485,7 +485,7 @@ enum class VendorId(val value: Int) {
   ULTIMATE_IOT_HENAN_TECHNOLOGY_LTD(0x1231),
   AXXESS_INDUSTRIES_INC(0x1232),
   THIRD_REALITY_INC(0x1233),
-  DSR_CORPORATION(0x1234),    
+  DSR_CORPORATION(0x1234),
   GUANGZHOU_VENSI_INTELLIGENT_TECHNOLOGY(0x1235),
   SCHLAGE_LOCK_ALLEGION(0x1236),
   NET2GRID(0x1237),
@@ -717,10 +717,9 @@ enum class VendorId(val value: Int) {
   CONNECTIVITY_STANDARDS_ALLIANCE_13(0xC5AC),
   CONNECTIVITY_STANDARDS_ALLIANCE_14(0xC5AD),
   CONNECTIVITY_STANDARDS_ALLIANCE_15(0xC5AE),
-  CONNECTIVITY_STANDARDS_ALLIANCE_16(0xC5AF),     
+  CONNECTIVITY_STANDARDS_ALLIANCE_16(0xC5AF),
   TESTVENDOR1(0xFFF1),
   TESTVENDOR2(0xFFF2),
   TESTVENDOR3(0xFFF3),
   TESTVENDOR4(0xFFF4),
 }
-

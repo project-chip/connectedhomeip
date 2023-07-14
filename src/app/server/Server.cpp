@@ -248,7 +248,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
-#ifdef CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    mICDManager.Init();
     mICDEventManager.Init(&mICDManager);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
@@ -489,8 +490,9 @@ void Server::Shutdown()
     mAccessControl.Finish();
     Access::ResetAccessControlToDefault();
     Credentials::SetGroupDataProvider(nullptr);
-#ifdef CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     mICDEventManager.Shutdown();
+    mICDManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     mAttributePersister.Shutdown();
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code

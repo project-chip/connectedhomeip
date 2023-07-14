@@ -97,6 +97,13 @@ static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Cloc
 /* Tizen Default Connect Timeout */
 static constexpr System::Clock::Timeout kConnectTimeout = System::Clock::Seconds16(10);
 
+static void __BLEConnectionFree(BLEConnection * conn)
+{
+    VerifyOrReturn(conn != nullptr);
+    g_free(conn->peerAddr);
+    g_free(conn);
+}
+
 static void __AdapterStateChangedCb(int result, bt_adapter_state_e adapterState, void * userData)
 {
     ChipLogProgress(DeviceLayer, "Adapter State Changed: %s", adapterState == BT_ADAPTER_ENABLED ? "Enabled" : "Disabled");
@@ -140,7 +147,10 @@ CHIP_ERROR BLEManagerImpl::_BleInitialize(void * userData)
     ret = bt_gatt_set_connection_state_changed_cb(GattConnectionStateChangedCb, nullptr);
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_set_state_changed_cb() failed. ret: %d", ret));
 
-    sInstance.InitConnectionData();
+    // The hash table key is stored in the BLEConnection structure
+    // and is freed by the __BLEConnectionFree() function.
+    sInstance.mConnectionMap =
+        g_hash_table_new_full(g_str_hash, g_str_equal, nullptr, reinterpret_cast<GDestroyNotify>(__BLEConnectionFree));
 
     sInstance.mFlags.Set(Flags::kTizenBLELayerInitialized);
     ChipLogProgress(DeviceLayer, "BLE Initialized");
@@ -713,16 +723,6 @@ exit:
     return ret;
 }
 
-void BLEManagerImpl::InitConnectionData()
-{
-    /* Initialize Hashmap */
-    if (!mConnectionMap)
-    {
-        mConnectionMap = g_hash_table_new(g_str_hash, g_str_equal);
-        ChipLogProgress(DeviceLayer, "GATT Connection HashMap created");
-    }
-}
-
 static bool __GattClientForeachCharCb(int total, int index, bt_gatt_h charHandle, void * data)
 {
     bt_gatt_type_e type;
@@ -810,14 +810,13 @@ void BLEManagerImpl::AddConnectionData(const char * remoteAddr)
             /* Local Device is BLE Central Role */
             if (IsDeviceChipPeripheral(conn))
             {
-                g_hash_table_insert(mConnectionMap, (gpointer) conn->peerAddr, conn);
+                g_hash_table_insert(mConnectionMap, conn->peerAddr, conn);
                 ChipLogProgress(DeviceLayer, "New Connection Added for [%s]", StringOrNullMarker(remoteAddr));
                 NotifyHandleNewConnection(conn);
             }
             else
             {
-                g_free(conn->peerAddr);
-                g_free(conn);
+                __BLEConnectionFree(conn);
             }
         }
         else
@@ -829,7 +828,7 @@ void BLEManagerImpl::AddConnectionData(const char * remoteAddr)
             conn->gattCharC1Handle = mGattCharC1Handle;
             conn->gattCharC2Handle = mGattCharC2Handle;
 
-            g_hash_table_insert(mConnectionMap, (gpointer) conn->peerAddr, conn);
+            g_hash_table_insert(mConnectionMap, conn->peerAddr, conn);
             ChipLogProgress(DeviceLayer, "New Connection Added for [%s]", StringOrNullMarker(remoteAddr));
         }
     }
@@ -846,13 +845,7 @@ void BLEManagerImpl::RemoveConnectionData(const char * remoteAddr)
     VerifyOrReturn(conn != nullptr,
                    ChipLogError(DeviceLayer, "Connection does not exist for [%s]", StringOrNullMarker(remoteAddr)));
 
-    g_hash_table_remove(mConnectionMap, conn->peerAddr);
-
-    g_free(conn->peerAddr);
-    g_free(conn);
-
-    if (!g_hash_table_size(mConnectionMap))
-        mConnectionMap = nullptr;
+    g_hash_table_remove(mConnectionMap, remoteAddr);
 
     ChipLogProgress(DeviceLayer, "Connection Removed");
 }

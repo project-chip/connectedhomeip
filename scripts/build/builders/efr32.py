@@ -158,7 +158,7 @@ class Efr32Builder(GnBuilder):
             self.extra_gn_options.append('chip_enable_ota_requestor=true')
 
         if enable_sed:
-            self.extra_gn_options.append('enable_sleepy_device=true chip_openthread_ftd=false')
+            self.extra_gn_options.append('chip_enable_icd_server=true chip_openthread_ftd=false')
 
         if enable_low_power:
             self.extra_gn_options.append(

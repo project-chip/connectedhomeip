@@ -40,7 +40,7 @@ public:
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
     static void AppEventHandler(AppEvent * aEvent);
-    void PostButtonEvent(uint8_t btnIdx, uint8_t btnAction);
+    void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
     void PostEvent(const AppEvent * event);
     /**
      * Use internally for registration of the ChipDeviceEvents

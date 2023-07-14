@@ -23,6 +23,9 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    ConfigWait:
+        type: int16u
+        defaultValue: 5000
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -214,6 +217,14 @@ tests:
       PICS: OO.S.C00.Rsp
       cluster: "On/Off"
       command: "Off"
+
+    - label: "Wait to turn Off light"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigWait
 
     - label: "Check on/off attribute value is false after off command"
       cluster: "On/Off"

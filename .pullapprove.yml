@@ -46,10 +46,10 @@ overrides:
     ############################################################
     #  Require Issues
     ############################################################
-# disabling until we have PRs up to date
-#     - if: "'*issue*' not in statuses.successful"
-#       status: failure
-#       explanation: "An issue is required for all PRs"
+    # disabling until we have PRs up to date
+    #     - if: "'*issue*' not in statuses.successful"
+    #       status: failure
+    #       explanation: "An issue is required for all PRs"
 
     ############################################################
     #  Fast tracking
@@ -96,12 +96,28 @@ groups:
             teams: [reviewers-apple]
         reviews:
             request: 10
+    shared-reviewers-bosch:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-bosch]
+        reviews:
+            request: 10
     shared-reviewers-comcast:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
             teams: [reviewers-comcast]
+        reviews:
+            request: 10
+    shared-reviewers-dyson:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-dyson]
         reviews:
             request: 10
     shared-reviewers-espressif:
@@ -118,6 +134,14 @@ groups:
             - files.include('*')
         reviewers:
             teams: [reviewers-google]
+        reviews:
+            request: 10
+    shared-reviewers-irobot:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-irobot]
         reviews:
             request: 10
     shared-reviewers-lg:
@@ -180,6 +204,14 @@ groups:
             - files.include('*')
         reviewers:
             teams: [reviewers-tcl]
+        reviews:
+            request: 10
+    shared-reviewers-qorvo:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-qorvo]
         reviews:
             request: 10
 

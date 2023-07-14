@@ -111,6 +111,12 @@ struct IcdMonitoringTable
     CHIP_ERROR RemoveAll();
 
     /**
+     * @brief Check if the table is empty
+     * @return True when there is no entry in the table. False if there is at least one
+     */
+    bool IsEmpty();
+
+    /**
      * @return Maximum number of entries allowed in the RegisteredClients table.
      */
     uint16_t Limit() const;

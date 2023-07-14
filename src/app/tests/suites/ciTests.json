@@ -71,6 +71,7 @@
     ],
     "GeneralCommissioning": ["Test_TC_CGEN_1_1", "Test_TC_CGEN_2_1"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_1_1", "Test_TC_DGGEN_2_1"],
+    "IcdManagement": ["Test_TC_ICDM_1_1", "Test_TC_ICDM_2_1"],
     "Identify": [
         "Test_TC_I_1_1",
         "Test_TC_I_2_1",
@@ -145,7 +146,10 @@
         "Test_TC_APBSC_9_1",
         "Test_TC_CONTENTLAUNCHER_10_1",
         "Test_TC_WAKEONLAN_4_1",
-        "Test_TC_ALOGIN_12_1"
+        "Test_TC_ALOGIN_12_1",
+        "Test_TC_CONTENTLAUNCHER_10_3",
+        "Test_TC_CONTENTLAUNCHER_10_5",
+        "Test_TC_CONTENTLAUNCHER_10_7"
     ],
     "ModeSelect": ["Test_TC_MOD_1_1"],
     "MultipleFabrics": [],
@@ -187,7 +191,7 @@
         "Test_TC_DGTHREAD_2_3",
         "Test_TC_DGTHREAD_2_4"
     ],
-    "TimeSynchronization": ["Test_TC_TIMESYNC_1_1"],
+    "TimeSynchronization": ["Test_TC_TIMESYNC_1_1", "Test_TC_TIMESYNC_2_3"],
     "WiFiNetworkDiagnostics": [
         "Test_TC_DGWIFI_1_1",
         "Test_TC_DGWIFI_2_1",
@@ -253,7 +257,8 @@
         "TestLevelControlWithOnOffDependency",
         "TestCommissioningWindow",
         "TestCommissionerNodeId",
-        "TestTimeSynchronization"
+        "TestTimeSynchronization",
+        "TestOperationalState"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
@@ -352,6 +357,7 @@
         "FanControl",
         "GeneralCommissioning",
         "GeneralDiagnostics",
+        "IcdManagement",
         "Identify",
         "IlluminanceMeasurement",
         "LevelControl",

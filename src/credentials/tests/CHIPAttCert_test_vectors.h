@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,36 @@
 
 namespace chip {
 namespace TestCerts {
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Long_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Long_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Long_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_PrivateKey;
 
 extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_Cert;
 extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_SKID;

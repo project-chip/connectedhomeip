@@ -437,7 +437,8 @@ extern bool ResignCert(X509 * cert, X509 * caCert, EVP_PKEY * caKey);
 
 extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subjectVID, uint16_t subjectPID,
                         bool encodeVIDandPIDasCN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom, uint32_t validDays,
-                        X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig);
+                        X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig, const FutureExtensionWithNID * exts,
+                        uint8_t extsCount);
 extern bool GenerateKeyPair(EVP_PKEY * key);
 extern bool GenerateKeyPair_Secp256k1(EVP_PKEY * key);
 extern bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key,

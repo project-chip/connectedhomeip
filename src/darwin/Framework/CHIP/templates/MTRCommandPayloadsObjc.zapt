@@ -81,7 +81,7 @@ NS_ASSUME_NONNULL_BEGIN
  * schema for this command.
  */
 - (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+                                         error:(NSError * __autoreleasing *)error {{availability cluster command=command deprecationMessage="This command has been removed" minimalRelease="Fall 2023"}};
 {{/if}}
 @end
 {{/if}}

@@ -94,6 +94,8 @@ jobs:
                     linux debug all-clusters-app \
                     out/linux-x64-all-clusters/chip-all-clusters-app \
                     /tmp/bloat_reports/
+            - name: Clean out build output
+              run: rm -rf ./out
             - name: Build example Standalone All Clusters Minimal Server
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -134,6 +136,8 @@ jobs:
                     linux debug+rpc+ui lighting-app \
                     out/linux-x64-light-rpc-with-ui/chip-lighting-app \
                     /tmp/bloat_reports/
+            - name: Clean out build output
+              run: rm -rf ./out
             - name: Build example Standalone Bridge
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -164,6 +168,8 @@ jobs:
                     linux debug ota-requestor-app \
                     out/linux-x64-ota-requestor/chip-ota-requestor-app \
                     /tmp/bloat_reports/
+            - name: Clean out build output
+              run: rm -rf ./out
             - name: Build example Standalone Lock App
               run: |
                   ./scripts/run_in_build_env.sh \

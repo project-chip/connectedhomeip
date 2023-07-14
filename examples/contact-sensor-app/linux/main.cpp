@@ -17,7 +17,6 @@
  */
 
 #include <AppMain.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/util/af.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 
@@ -28,95 +27,11 @@
 #include <imgui_ui/windows/qrcode.h>
 #endif
 
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-#include <platform/Darwin/NetworkCommissioningDriver.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <platform/Darwin/WiFi/NetworkCommissioningWiFiDriver.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
-
-#if CHIP_DEVICE_LAYER_TARGET_LINUX
-#include <platform/Linux/NetworkCommissioningDriver.h>
-#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-namespace {
-#if CHIP_DEVICE_LAYER_TARGET_LINUX
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-DeviceLayer::NetworkCommissioning::LinuxThreadDriver sThreadDriver;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sWiFiDriver;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-
-DeviceLayer::NetworkCommissioning::LinuxEthernetDriver sEthernetDriver;
-#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
-
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-DeviceLayer::NetworkCommissioning::DarwinWiFiDriver sWiFiDriver;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-
-DeviceLayer::NetworkCommissioning::DarwinEthernetDriver sEthernetDriver;
-#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &sWiFiDriver);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0, &sThreadDriver);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(0, &sEthernetDriver);
-} // namespace
-
-void ApplicationInit()
-{
-    const bool kThreadEnabled = {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        LinuxDeviceOptions::GetInstance().mThread
-#else
-        false
-#endif
-    };
-
-    const bool kWiFiEnabled = {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        LinuxDeviceOptions::GetInstance().mWiFi
-#else
-        false
-#endif
-    };
-
-    if (kThreadEnabled && kWiFiEnabled)
-    {
-        // Just use the Thread one.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        sThreadNetworkCommissioningInstance.Init();
-#endif
-    }
-    else if (kThreadEnabled)
-    {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        sThreadNetworkCommissioningInstance.Init();
-#endif
-    }
-    else if (kWiFiEnabled)
-    {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        sWiFiNetworkCommissioningInstance.Init();
-#endif
-    }
-    else
-    {
-        sEthernetNetworkCommissioningInstance.Init();
-    }
-}
+void ApplicationInit() {}
 
 int main(int argc, char * argv[])
 {

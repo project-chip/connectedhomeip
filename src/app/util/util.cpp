@@ -159,6 +159,7 @@ void MatterPm1ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterPm25ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterRadonConcentrationMeasurementPluginServerInitCallback() {}
 void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInitCallback() {}
+void MatterOperationalStatePluginServerInitCallback() {}
 // ****************************************
 // Print out information about each cluster
 // ****************************************

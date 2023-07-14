@@ -14,18 +14,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- 
+
 package chip.onboardingpayload
 
 import java.util.logging.Level
 import java.util.logging.Logger
 
-/** Parser for scanned QR code or Manual Pairing Code.  */
+/** Parser for scanned QR code or Manual Pairing Code. */
 class OnboardingPayloadParser {
   /**
    * Returns [OnboardingPayload] parsed from the QR code string. If an invalid element is included
-   * in the QRCode Parse result, OnboardingPayloadException occurs. Refer to [OnboardingPayload] for the
-   * description of the invalid element.
+   * in the QRCode Parse result, OnboardingPayloadException occurs. Refer to [OnboardingPayload] for
+   * the description of the invalid element.
    */
   @Throws(UnrecognizedQrCodeException::class, OnboardingPayloadException::class)
   fun parseQrCode(qrCodeString: String): OnboardingPayload {
@@ -37,25 +37,25 @@ class OnboardingPayloadParser {
    *
    * @param qrCodeString the QRCode for commissioning device.
    * @param skipPayloadValidation If this value is true, payload element validation is not checked.
-   * Consider saying that the payload must still parse correctly, but this skips validation of the
-   * content past parsing (i.e. it does not validate ranges for individual elements).
-   * Refer to [OnboardingPayload] for the description of the invalid element.
+   *   Consider saying that the payload must still parse correctly, but this skips validation of the
+   *   content past parsing (i.e. it does not validate ranges for individual elements). Refer to
+   *   [OnboardingPayload] for the description of the invalid element.
    */
   @Throws(UnrecognizedQrCodeException::class, OnboardingPayloadException::class)
   fun parseQrCode(qrCodeString: String, skipPayloadValidation: Boolean): OnboardingPayload {
     return fetchPayloadFromQrCode(qrCodeString, skipPayloadValidation)
   }
 
-  /** Get QR code string from [OnboardingPayload].  */
+  /** Get QR code string from [OnboardingPayload]. */
   @Throws(OnboardingPayloadException::class)
-  fun getQrCodeFromPayload(payload: OnboardingPayload): String
-  {
-    return QRCodeOnboardingPayloadGenerator(payload).payloadBase38Representation();
+  fun getQrCodeFromPayload(payload: OnboardingPayload): String {
+    return QRCodeOnboardingPayloadGenerator(payload).payloadBase38Representation()
   }
 
   @Throws(UnrecognizedQrCodeException::class, OnboardingPayloadException::class)
   private fun fetchPayloadFromQrCode(
-    qrCodeString: String, skipPayloadValidation: Boolean
+    qrCodeString: String,
+    skipPayloadValidation: Boolean
   ): OnboardingPayload {
     val payload = OnboardingPayload()
 
@@ -68,16 +68,16 @@ class OnboardingPayloadParser {
     return payload
   }
 
-  /** Get Manual Pairing Code string from [OnboardingPayload].  */
+  /** Get Manual Pairing Code string from [OnboardingPayload]. */
   @Throws(OnboardingPayloadException::class)
   fun getManualPairingCodeFromPayload(payload: OnboardingPayload): String {
     return ManualOnboardingPayloadGenerator(payload).payloadDecimalStringRepresentation()
-  }  
+  }
 
   /**
    * Returns [OnboardingPayload] parsed from the Manual Pairing Code string. If an SetupPINCode has
-   * invalid value, OnboardingPayloadException occurs. Refer to [OnboardingPayload] for the description
-   * of the invalid element.
+   * invalid value, OnboardingPayloadException occurs. Refer to [OnboardingPayload] for the
+   * description of the invalid element.
    */
   @Throws(InvalidManualPairingCodeFormatException::class, OnboardingPayloadException::class)
   fun parseManualPairingCode(manualPairingCodeString: String): OnboardingPayload {
@@ -89,31 +89,36 @@ class OnboardingPayloadParser {
    *
    * @param manualPairingCodeString the manual Pairing Code for commissioning device.
    * @param skipPayloadValidation If this value is true, payload element validation is not checked.
-   * Consider saying that the payload must still parse correctly, but this skips validation of the
-   * content past parsing (i.e. it does not validate ranges for individual elements).
-   * Refer to [OnboardingPayload] for the description of the invalid element.
+   *   Consider saying that the payload must still parse correctly, but this skips validation of the
+   *   content past parsing (i.e. it does not validate ranges for individual elements). Refer to
+   *   [OnboardingPayload] for the description of the invalid element.
    */
   @Throws(InvalidManualPairingCodeFormatException::class, OnboardingPayloadException::class)
-  fun parseManualPairingCode(manualPairingCodeString: String, skipPayloadValidation: Boolean): OnboardingPayload {
+  fun parseManualPairingCode(
+    manualPairingCodeString: String,
+    skipPayloadValidation: Boolean
+  ): OnboardingPayload {
     return parsePayloadFromManualPairingCode(manualPairingCodeString, skipPayloadValidation)
   }
 
   @Throws(InvalidManualPairingCodeFormatException::class, OnboardingPayloadException::class)
   private fun parsePayloadFromManualPairingCode(
-    manualPairingCodeString: String, skipPayloadValidation: Boolean
+    manualPairingCodeString: String,
+    skipPayloadValidation: Boolean
   ): OnboardingPayload {
     val payload = OnboardingPayload()
     ManualOnboardingPayloadParser(manualPairingCodeString).populatePayload(payload)
 
     if (skipPayloadValidation == false && !payload.isValidManualCode()) {
-        throw OnboardingPayloadException("Invalid manual entry code")
+      throw OnboardingPayloadException("Invalid manual entry code")
     }
 
     return payload
-  }  
+  }
 
   companion object {
-    private val LOGGER: Logger = Logger.getLogger(OnboardingPayloadParser::class.java.getSimpleName())
+    private val LOGGER: Logger =
+      Logger.getLogger(OnboardingPayloadParser::class.java.getSimpleName())
 
     init {
       try {

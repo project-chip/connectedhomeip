@@ -103,6 +103,12 @@ CHIP_ERROR IcdMonitoringTable::RemoveAll()
     return CHIP_NO_ERROR;
 }
 
+bool IcdMonitoringTable::IsEmpty()
+{
+    IcdMonitoringEntry entry(this->mFabric);
+    return (this->Get(0, entry) == CHIP_ERROR_NOT_FOUND);
+}
+
 uint16_t IcdMonitoringTable::Limit() const
 {
     return mLimit;

@@ -8,19 +8,11 @@ reference for creating your own application.
 ---
 
 -   [Matter ASR Lock Example](#matter-asr-lock-example)
-    -   [Supported Chips](#supported-chips)
     -   [Building and Commissioning](#building-and-commissioning)
     -   [Cluster Control](#cluster-control)
     -   [Lock press button and lock status led](#lock-press-button-and-lock-status-led)
 
 ---
-
-## Supported Chips
-
-The Matter demo application is supported on:
-
--   ASR582X
--   ASR595X
 
 ## Building and Commissioning
 
@@ -52,5 +44,5 @@ show the state of these changes.
 
 |    Name     |  Pin  |
 | :---------: | :---: |
-| LOCK-STATE  | PAD13 |
-| LOCK-BUTTON | PAD6  |
+| LOCK-STATE  | PAD7  |
+| LOCK-BUTTON | PAD12 |

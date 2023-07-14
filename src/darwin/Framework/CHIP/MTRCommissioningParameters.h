@@ -86,7 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Defaults to NO.
  */
-@property (nonatomic, assign) BOOL skipCommissioningComplete MTR_NEWLY_AVAILABLE;
+@property (nonatomic, assign) BOOL skipCommissioningComplete API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * The country code to provide to the device during commissioning.
@@ -94,7 +94,7 @@ NS_ASSUME_NONNULL_BEGIN
  * If not nil, this must be a 2-character ISO 3166-1 country code, which the
  * device can use to decide on things like radio communications bands.
  */
-@property (nonatomic, copy, nullable) NSString * countryCode MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, nullable) NSString * countryCode API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 @end
 

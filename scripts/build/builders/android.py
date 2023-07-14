@@ -396,8 +396,6 @@ class AndroidBuilder(Builder):
                     title="Accepting NDK licenses @ tools",
                 )
 
-            app_dir = os.path.join(self.root, "examples/", self.app.AppName())
-
     def stripSymbols(self):
         output_libs_dir = os.path.join(
             self.output_dir,

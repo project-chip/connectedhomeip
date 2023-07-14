@@ -114,11 +114,16 @@ class TC_TIMESYNC_2_4(MatterBaseTest):
         tz = [tz_struct(offset=50401, validAt=0)]
         await self.send_set_time_zone_cmd_expect_error(tz=tz, error=Status.ConstraintError)
 
-        self.print_step(14, "Send SetTimeZone command - too long name")
-        tz = [tz_struct(offset=50401, validAt=0, name="AVeryLongStringWithSixtyFiveChars/ThisIsSomeExtraPaddingForTheStr")]
+        self.print_step(14, "Send SetTimeZone command with max sized name")
+        tz = [tz_struct(offset=0, validAt=0, name="AVeryLongStringWithSixtyFourChars/ThisIsSomeExtraPaddingForTheSt")]
+        ret = await self.send_set_time_zone_cmd(tz=tz)
+        asserts.assert_true(ret.DSTOffsetRequired, "DSTOffsetRequired not set to true")
+
+        self.print_step(15, "Send SetTimeZone command - too long name")
+        tz = [tz_struct(offset=0, validAt=0, name="AVeryLongStringWithSixtyFiveChars/ThisIsSomeExtraPaddingForTheStr")]
         await self.send_set_time_zone_cmd_expect_error(tz=tz, error=Status.ConstraintError)
 
-        self.print_step(15, "Send SetTimeZone command - too many entries")
+        self.print_step(16, "Send SetTimeZone command - too many entries")
         if tz_max_size_dut == 2:
             tz = [tz_struct(offset=3600, validAt=0, name="Europe/Dublin"),
                   tz_struct(offset=7200, validAt=utc_time_in_matter_epoch() +
@@ -128,7 +133,7 @@ class TC_TIMESYNC_2_4(MatterBaseTest):
                   ]
             await self.send_set_time_zone_cmd_expect_error(tz=tz, error=Status.ResourceExhausted)
 
-        self.print_step(16, "Send SetTimeZone command - too many entries")
+        self.print_step(17, "Send SetTimeZone command - too many entries")
         if tz_max_size_dut == 1:
             tz = [tz_struct(offset=3600, validAt=0, name="Europe/Dublin"),
                   tz_struct(offset=7200, validAt=utc_time_in_matter_epoch() +
@@ -136,7 +141,7 @@ class TC_TIMESYNC_2_4(MatterBaseTest):
                   ]
             await self.send_set_time_zone_cmd_expect_error(tz=tz,  error=Status.ResourceExhausted)
 
-        self.print_step(17, "Reset time zone")
+        self.print_step(18, "Reset time zone")
         tz = [tz_struct(offset=0, validAt=0)]
         await self.send_set_time_zone_cmd(tz=tz)
 

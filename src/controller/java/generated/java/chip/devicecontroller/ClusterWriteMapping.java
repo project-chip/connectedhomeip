@@ -1083,28 +1083,292 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeRvcOperationalStateInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("rvcOperationalState", writeRvcOperationalStateInteractionInfo);
     Map<String, InteractionInfo> writeHepaFilterMonitoringInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeHepaFilterMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo hepaFilterMonitoringlastChangedTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Long.class, 
+            Long.class 
+        );
+    writeHepaFilterMonitoringLastChangedTimeCommandParams.put(
+        "value",
+        hepaFilterMonitoringlastChangedTimeCommandParameterInfo
+    );
+    InteractionInfo writeHepaFilterMonitoringLastChangedTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.HepaFilterMonitoringCluster) cluster).writeLastChangedTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Long) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeHepaFilterMonitoringLastChangedTimeCommandParams
+    );
+    writeHepaFilterMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeHepaFilterMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("hepaFilterMonitoring", writeHepaFilterMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeActivatedCarbonFilterMonitoringInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeActivatedCarbonFilterMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo activatedCarbonFilterMonitoringlastChangedTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Long.class, 
+            Long.class 
+        );
+    writeActivatedCarbonFilterMonitoringLastChangedTimeCommandParams.put(
+        "value",
+        activatedCarbonFilterMonitoringlastChangedTimeCommandParameterInfo
+    );
+    InteractionInfo writeActivatedCarbonFilterMonitoringLastChangedTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ActivatedCarbonFilterMonitoringCluster) cluster).writeLastChangedTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Long) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeActivatedCarbonFilterMonitoringLastChangedTimeCommandParams
+    );
+    writeActivatedCarbonFilterMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeActivatedCarbonFilterMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("activatedCarbonFilterMonitoring", writeActivatedCarbonFilterMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeCeramicFilterMonitoringInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeCeramicFilterMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo ceramicFilterMonitoringlastChangedTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Long.class, 
+            Long.class 
+        );
+    writeCeramicFilterMonitoringLastChangedTimeCommandParams.put(
+        "value",
+        ceramicFilterMonitoringlastChangedTimeCommandParameterInfo
+    );
+    InteractionInfo writeCeramicFilterMonitoringLastChangedTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CeramicFilterMonitoringCluster) cluster).writeLastChangedTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Long) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCeramicFilterMonitoringLastChangedTimeCommandParams
+    );
+    writeCeramicFilterMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeCeramicFilterMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("ceramicFilterMonitoring", writeCeramicFilterMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeElectrostaticFilterMonitoringInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeElectrostaticFilterMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo electrostaticFilterMonitoringlastChangedTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Long.class, 
+            Long.class 
+        );
+    writeElectrostaticFilterMonitoringLastChangedTimeCommandParams.put(
+        "value",
+        electrostaticFilterMonitoringlastChangedTimeCommandParameterInfo
+    );
+    InteractionInfo writeElectrostaticFilterMonitoringLastChangedTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ElectrostaticFilterMonitoringCluster) cluster).writeLastChangedTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Long) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeElectrostaticFilterMonitoringLastChangedTimeCommandParams
+    );
+    writeElectrostaticFilterMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeElectrostaticFilterMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("electrostaticFilterMonitoring", writeElectrostaticFilterMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeUvFilterMonitoringInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeUvFilterMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo uvFilterMonitoringlastChangedTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Long.class, 
+            Long.class 
+        );
+    writeUvFilterMonitoringLastChangedTimeCommandParams.put(
+        "value",
+        uvFilterMonitoringlastChangedTimeCommandParameterInfo
+    );
+    InteractionInfo writeUvFilterMonitoringLastChangedTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UvFilterMonitoringCluster) cluster).writeLastChangedTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Long) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeUvFilterMonitoringLastChangedTimeCommandParams
+    );
+    writeUvFilterMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeUvFilterMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("uvFilterMonitoring", writeUvFilterMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeIonizingFilterMonitoringInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeIonizingFilterMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo ionizingFilterMonitoringlastChangedTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Long.class, 
+            Long.class 
+        );
+    writeIonizingFilterMonitoringLastChangedTimeCommandParams.put(
+        "value",
+        ionizingFilterMonitoringlastChangedTimeCommandParameterInfo
+    );
+    InteractionInfo writeIonizingFilterMonitoringLastChangedTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.IonizingFilterMonitoringCluster) cluster).writeLastChangedTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Long) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeIonizingFilterMonitoringLastChangedTimeCommandParams
+    );
+    writeIonizingFilterMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeIonizingFilterMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("ionizingFilterMonitoring", writeIonizingFilterMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeZeoliteFilterMonitoringInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeZeoliteFilterMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo zeoliteFilterMonitoringlastChangedTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Long.class, 
+            Long.class 
+        );
+    writeZeoliteFilterMonitoringLastChangedTimeCommandParams.put(
+        "value",
+        zeoliteFilterMonitoringlastChangedTimeCommandParameterInfo
+    );
+    InteractionInfo writeZeoliteFilterMonitoringLastChangedTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ZeoliteFilterMonitoringCluster) cluster).writeLastChangedTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Long) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeZeoliteFilterMonitoringLastChangedTimeCommandParams
+    );
+    writeZeoliteFilterMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeZeoliteFilterMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("zeoliteFilterMonitoring", writeZeoliteFilterMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeOzoneFilterMonitoringInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeOzoneFilterMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo ozoneFilterMonitoringlastChangedTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Long.class, 
+            Long.class 
+        );
+    writeOzoneFilterMonitoringLastChangedTimeCommandParams.put(
+        "value",
+        ozoneFilterMonitoringlastChangedTimeCommandParameterInfo
+    );
+    InteractionInfo writeOzoneFilterMonitoringLastChangedTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.OzoneFilterMonitoringCluster) cluster).writeLastChangedTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Long) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeOzoneFilterMonitoringLastChangedTimeCommandParams
+    );
+    writeOzoneFilterMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeOzoneFilterMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("ozoneFilterMonitoring", writeOzoneFilterMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeWaterTankMonitoringInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeWaterTankMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo waterTankMonitoringlastChangedTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Long.class, 
+            Long.class 
+        );
+    writeWaterTankMonitoringLastChangedTimeCommandParams.put(
+        "value",
+        waterTankMonitoringlastChangedTimeCommandParameterInfo
+    );
+    InteractionInfo writeWaterTankMonitoringLastChangedTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WaterTankMonitoringCluster) cluster).writeLastChangedTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Long) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeWaterTankMonitoringLastChangedTimeCommandParams
+    );
+    writeWaterTankMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeWaterTankMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("waterTankMonitoring", writeWaterTankMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeFuelTankMonitoringInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeFuelTankMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo fuelTankMonitoringlastChangedTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Long.class, 
+            Long.class 
+        );
+    writeFuelTankMonitoringLastChangedTimeCommandParams.put(
+        "value",
+        fuelTankMonitoringlastChangedTimeCommandParameterInfo
+    );
+    InteractionInfo writeFuelTankMonitoringLastChangedTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.FuelTankMonitoringCluster) cluster).writeLastChangedTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Long) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeFuelTankMonitoringLastChangedTimeCommandParams
+    );
+    writeFuelTankMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeFuelTankMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("fuelTankMonitoring", writeFuelTankMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeInkCartridgeMonitoringInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeInkCartridgeMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo inkCartridgeMonitoringlastChangedTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Long.class, 
+            Long.class 
+        );
+    writeInkCartridgeMonitoringLastChangedTimeCommandParams.put(
+        "value",
+        inkCartridgeMonitoringlastChangedTimeCommandParameterInfo
+    );
+    InteractionInfo writeInkCartridgeMonitoringLastChangedTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.InkCartridgeMonitoringCluster) cluster).writeLastChangedTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Long) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeInkCartridgeMonitoringLastChangedTimeCommandParams
+    );
+    writeInkCartridgeMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeInkCartridgeMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("inkCartridgeMonitoring", writeInkCartridgeMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeTonerCartridgeMonitoringInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeTonerCartridgeMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo tonerCartridgeMonitoringlastChangedTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Long.class, 
+            Long.class 
+        );
+    writeTonerCartridgeMonitoringLastChangedTimeCommandParams.put(
+        "value",
+        tonerCartridgeMonitoringlastChangedTimeCommandParameterInfo
+    );
+    InteractionInfo writeTonerCartridgeMonitoringLastChangedTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TonerCartridgeMonitoringCluster) cluster).writeLastChangedTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Long) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeTonerCartridgeMonitoringLastChangedTimeCommandParams
+    );
+    writeTonerCartridgeMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeTonerCartridgeMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("tonerCartridgeMonitoring", writeTonerCartridgeMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeDoorLockInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDoorLockDoorOpenEventsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
