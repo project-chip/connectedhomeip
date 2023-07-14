@@ -864,17 +864,6 @@ server cluster TimeFormatLocalization = 44 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** This cluster is used to describe the configuration and capabilities of a Device's power system. */
-server cluster PowerSourceConfiguration = 46 {
-  readonly attribute INT8U sources[] = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 server cluster PowerSource = 47 {
   enum BatApprovedChemistryEnum : ENUM16 {
@@ -1103,6 +1092,7 @@ server cluster PowerSource = 47 {
   readonly attribute int32u wiredMaximumCurrent = 8;
   readonly attribute boolean wiredPresent = 9;
   readonly attribute WiredFaultEnum activeWiredFaults[] = 10;
+  readonly attribute ENDPOINT_NO endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2301,16 +2291,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster PowerSourceConfiguration {
-    callback attribute sources;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster GeneralCommissioning {
     ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
@@ -2570,12 +2550,13 @@ endpoint 1 {
     ram      attribute wiredMaximumCurrent default = 1000;
     ram      attribute wiredPresent default = 1;
     callback attribute activeWiredFaults;
+    callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster ColorControl {
