@@ -86,21 +86,9 @@ tests:
       arguments:
           value:
               [
-                  {
-                      FabricIndex: FabricIndexValue,
-                      GroupId: 0x0103,
-                      GroupKeySetID: 0x01a3,
-                  },
-                  {
-                      FabricIndex: FabricIndexValue,
-                      GroupId: 0x0104,
-                      GroupKeySetID: 0x01a3,
-                  },
-                  {
-                      FabricIndex: FabricIndexValue,
-                      GroupId: 0x0105,
-                      GroupKeySetID: 0x01a3,
-                  },
+                  { FabricIndex: 0, GroupId: 0x0103, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 0, GroupId: 0x0104, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 0, GroupId: 0x0105, GroupKeySetID: 0x01a3 },
               ]
 
     - label:
@@ -132,7 +120,7 @@ tests:
       arguments:
           value: [
                   {
-                      FabricIndex: FabricIndexValue,
+                      FabricIndex: 0,
                       Privilege: 5, #Administer
                       AuthMode: 2, #CASE
                       Subjects: [commissionerNodeId],
@@ -146,7 +134,7 @@ tests:
                           ],
                   },
                   {
-                      FabricIndex: FabricIndexValue,
+                      FabricIndex: 0,
                       Privilege: 4, #Manage
                       AuthMode: 3, #Group
                       Subjects: [0x0103], #group 0x0103
@@ -182,7 +170,6 @@ tests:
           GroupID field set to 0x0104 and the GroupName set to an empty string.
           The command is sent as a group command using GroupID 0x0103"
       cluster: "Groups"
-      endpoint: Groups.Endpoint
       groupId: 0x0103
       command: "AddGroup"
       arguments:
@@ -206,7 +193,6 @@ tests:
           GroupID field set to 0x0105 and the GroupName set to an empty string.
           The command is sent as a group command using GroupID 0x0104"
       cluster: "Groups"
-      endpoint: Groups.Endpoint
       groupId: 0x0104
       command: "AddGroup"
       arguments:
@@ -238,7 +224,7 @@ tests:
       arguments:
           value: [
                   {
-                      FabricIndex: FabricIndexValue,
+                      FabricIndex: 0,
                       Privilege: 5, #Administer
                       AuthMode: 2, #CASE
                       Subjects: [commissionerNodeId],
@@ -291,7 +277,6 @@ tests:
           GroupID field set to 0x0105 and the GroupName set to an empty string.
           The command is sent as a group command using GroupID 0x0103"
       cluster: "Groups"
-      endpoint: Groups.Endpoint
       groupId: 0x0103
       command: "AddGroup"
       arguments:
