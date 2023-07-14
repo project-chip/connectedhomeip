@@ -323,6 +323,19 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 
     if (err == CHIP_NO_ERROR)
     {
+#if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
+        DeviceLayer::ChipDeviceEvent event;
+        // Here always set ExpectResponse to false.
+        // The Initial message sent from the Exchange Context will have set ExpectResponse to the correct value.
+        // If we are expecting a Response, the ICD will already be in a state waiting for the response (or timeout).
+        event.Type                       = DeviceLayer::DeviceEventType::kChipMsgSentEvent;
+        event.MessageSent.ExpectResponse = false;
+        CHIP_ERROR status                = DeviceLayer::PlatformMgr().PostEvent(&event);
+        if (status != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to post retransmit message sent event %" CHIP_ERROR_FORMAT, status.Format());
+        }
+#endif // CONFIG_DEVICE_LAYER
 #if CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
         const ExchangeManager * exchangeMgr = entry->ec->GetExchangeMgr();
         // TODO: investigate why in ReliableMessageMgr::CheckResendApplicationMessageWithPeerExchange unit test released exchange
