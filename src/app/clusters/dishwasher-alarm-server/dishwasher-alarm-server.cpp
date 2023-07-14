@@ -26,7 +26,6 @@
 #include <app/util/error-mapping.h>
 #include <lib/support/BitFlags.h>
 
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -36,7 +35,6 @@ using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
 
 using namespace std;
-
 
 DishwasherAlarmServer DishwasherAlarmServer::instance;
 
@@ -116,7 +114,6 @@ EmberAfStatus DishwasherAlarmServer::SetMaskValue(EndpointId endpoint, const Bit
     return status;
 }
 
-
 EmberAfStatus DishwasherAlarmServer::SetLatchValue(EndpointId endpoint, const BitMask<AlarmMap> latch)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -130,7 +127,6 @@ EmberAfStatus DishwasherAlarmServer::SetLatchValue(EndpointId endpoint, const Bi
     ChipLogProgress(Zcl, "Dishwasher Alarm: latch ep%d value: %" PRIu32 "", endpoint, latch.Raw());
     return status;
 }
-
 
 EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, BitMask<AlarmMap> newState)
 {
@@ -153,7 +149,7 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, BitMask<
 
     ChipLogProgress(Zcl, "Dishwasher Alarm: State ep%d value: %" PRIu32 "", endpoint, newState.Raw());
 
-	// Maintain consistency between latch and state states
+    // Maintain consistency between latch and state states
     BitMask<AlarmMap> latch;
     status = GetLatchValue(endpoint, &latch);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -163,7 +159,7 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, BitMask<
 
     if (newState != latch)
     {
-		latch.SetField(latch,newState.Raw());
+        latch.SetField(latch, newState.Raw());
         status = SetLatchValue(endpoint, latch);
     }
 
@@ -185,8 +181,8 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, BitMask<
     return status;
 }
 
-void DishwasherAlarmServer::SendNotifyEvent(EndpointId endpointId, BitMask<AlarmMap> becameActive,
-                                              BitMask<AlarmMap> becameInactive, BitMask<AlarmMap> newState, BitMask<AlarmMap> mask)
+void DishwasherAlarmServer::SendNotifyEvent(EndpointId endpointId, BitMask<AlarmMap> becameActive, BitMask<AlarmMap> becameInactive,
+                                            BitMask<AlarmMap> newState, BitMask<AlarmMap> mask)
 {
     Events::Notify::Type event{ .active = becameActive, .inactive = becameInactive, .state = newState, .mask = mask };
     EventNumber eventNumber;
@@ -203,14 +199,14 @@ static Status resetHandler(const app::ConcreteCommandPath & commandPath, const c
 
     EmberAfStatus status;
     chip::BitMask<AlarmMap> state = 0;
-    status = State::Get(endpoint, &state);
+    status                        = State::Get(endpoint, &state);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         return Status::Failure;
     }
 
-	chip::BitMask<AlarmMap> latch = 0;
-    status = Latch::Get(endpoint, &latch);
+    chip::BitMask<AlarmMap> latch = 0;
+    status                        = Latch::Get(endpoint, &latch);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         return Status::Failure;
@@ -218,7 +214,7 @@ static Status resetHandler(const app::ConcreteCommandPath & commandPath, const c
 
     uint32_t alarmValue = alarms.Raw();
     uint32_t stateValue = state.Raw();
-	uint32_t latchValue = latch.Raw();
+    uint32_t latchValue = latch.Raw();
 
     // Flip the bits of alarms (i.e. ~alarms)
     alarmValue = 0xFFFF ^ alarmValue;
@@ -233,10 +229,10 @@ static Status resetHandler(const app::ConcreteCommandPath & commandPath, const c
         return Status::Failure;
     }
 
-	// Reset latch from active to inactive
+    // Reset latch from active to inactive
     latchValue = latchValue & alarmValue;
 
-	latch.SetRaw(latchValue);
+    latch.SetRaw(latchValue);
     status = Latch::Set(endpoint, latch);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -244,39 +240,39 @@ static Status resetHandler(const app::ConcreteCommandPath & commandPath, const c
     }
 
     return Status::Success;
-
 }
 
 static Status modifyEnabledHandler(const app::ConcreteCommandPath & commandPath, const chip::BitMask<AlarmMap> mask)
 {
-	EndpointId endpoint = commandPath.mEndpointId;
-	chip::BitMask<AlarmMap> support;
+    EndpointId endpoint = commandPath.mEndpointId;
+    chip::BitMask<AlarmMap> support;
 
-	EmberAfStatus status = Attributes::Supported::Get(endpoint, &support);
+    EmberAfStatus status = Attributes::Supported::Get(endpoint, &support);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: reading  supported, err:0x%x", status);
-		return Status::Failure;
+        return Status::Failure;
     }
     else
     {
         ChipLogDetail(Zcl, "Dishwasher Alarm: Supported ep%d value: %" PRIu32 "", endpoint, support.Raw());
     }
 
-	if((support & mask) != mask)
-	{
-		return Status::Failure;
-	}
-	status = Mask::Set(endpoint, mask);
-	if (status != EMBER_ZCL_STATUS_SUCCESS)
-	{
-		return Status::Failure;
-	}
-	return Status::Success;
+    if ((support & mask) != mask)
+    {
+        return Status::Failure;
+    }
+    status = Mask::Set(endpoint, mask);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        return Status::Failure;
+    }
+    return Status::Success;
 }
 
-bool emberAfDishwasherAlarmClusterResetCallback(app::CommandHandler * commandObj,const app::ConcreteCommandPath & commandPath, const Commands::Reset::DecodableType & commandData)
+bool emberAfDishwasherAlarmClusterResetCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                const Commands::Reset::DecodableType & commandData)
 {
     auto & alarms = commandData.alarms;
     Status status = resetHandler(commandPath, alarms);
@@ -285,10 +281,12 @@ bool emberAfDishwasherAlarmClusterResetCallback(app::CommandHandler * commandObj
     return true;
 }
 
-bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(app::CommandHandler * commandObj,const app::ConcreteCommandPath & commandPath,const Commands::ModifyEnabledAlarms::DecodableType & commandData)
+bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(app::CommandHandler * commandObj,
+                                                              const app::ConcreteCommandPath & commandPath,
+                                                              const Commands::ModifyEnabledAlarms::DecodableType & commandData)
 {
-	auto & mask = commandData.mask;
-	Status status = modifyEnabledHandler(commandPath, mask);
+    auto & mask   = commandData.mask;
+    Status status = modifyEnabledHandler(commandPath, mask);
     commandObj->AddStatus(commandPath, status);
 
     return true;
