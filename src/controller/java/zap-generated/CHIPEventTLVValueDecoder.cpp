@@ -2578,6 +2578,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
+            jobject value_alarmSeverityLevel;
+            std::string value_alarmSeverityLevelClassName     = "java/lang/Integer";
+            std::string value_alarmSeverityLevelCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                value_alarmSeverityLevelClassName.c_str(), value_alarmSeverityLevelCtorSignature.c_str(),
+                static_cast<uint8_t>(cppValue.alarmSeverityLevel), value_alarmSeverityLevel);
+
             jclass smokeAlarmStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterSmokeAlarmEvent", smokeAlarmStructClass);
@@ -2586,14 +2593,14 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterSmokeAlarmEvent");
                 return nullptr;
             }
-            jmethodID smokeAlarmStructCtor = env->GetMethodID(smokeAlarmStructClass, "<init>", "()V");
+            jmethodID smokeAlarmStructCtor = env->GetMethodID(smokeAlarmStructClass, "<init>", "(Ljava/lang/Integer;)V");
             if (smokeAlarmStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterSmokeAlarmEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(smokeAlarmStructClass, smokeAlarmStructCtor);
+            jobject value = env->NewObject(smokeAlarmStructClass, smokeAlarmStructCtor, value_alarmSeverityLevel);
 
             return value;
         }
@@ -2604,6 +2611,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
+            jobject value_alarmSeverityLevel;
+            std::string value_alarmSeverityLevelClassName     = "java/lang/Integer";
+            std::string value_alarmSeverityLevelCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                value_alarmSeverityLevelClassName.c_str(), value_alarmSeverityLevelCtorSignature.c_str(),
+                static_cast<uint8_t>(cppValue.alarmSeverityLevel), value_alarmSeverityLevel);
+
             jclass COAlarmStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterCOAlarmEvent", COAlarmStructClass);
@@ -2612,14 +2626,14 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterCOAlarmEvent");
                 return nullptr;
             }
-            jmethodID COAlarmStructCtor = env->GetMethodID(COAlarmStructClass, "<init>", "()V");
+            jmethodID COAlarmStructCtor = env->GetMethodID(COAlarmStructClass, "<init>", "(Ljava/lang/Integer;)V");
             if (COAlarmStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterCOAlarmEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(COAlarmStructClass, COAlarmStructCtor);
+            jobject value = env->NewObject(COAlarmStructClass, COAlarmStructCtor, value_alarmSeverityLevel);
 
             return value;
         }
@@ -2630,6 +2644,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
+            jobject value_alarmSeverityLevel;
+            std::string value_alarmSeverityLevelClassName     = "java/lang/Integer";
+            std::string value_alarmSeverityLevelCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                value_alarmSeverityLevelClassName.c_str(), value_alarmSeverityLevelCtorSignature.c_str(),
+                static_cast<uint8_t>(cppValue.alarmSeverityLevel), value_alarmSeverityLevel);
+
             jclass lowBatteryStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterLowBatteryEvent", lowBatteryStructClass);
@@ -2638,14 +2659,14 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterLowBatteryEvent");
                 return nullptr;
             }
-            jmethodID lowBatteryStructCtor = env->GetMethodID(lowBatteryStructClass, "<init>", "()V");
+            jmethodID lowBatteryStructCtor = env->GetMethodID(lowBatteryStructClass, "<init>", "(Ljava/lang/Integer;)V");
             if (lowBatteryStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterLowBatteryEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(lowBatteryStructClass, lowBatteryStructCtor);
+            jobject value = env->NewObject(lowBatteryStructClass, lowBatteryStructCtor, value_alarmSeverityLevel);
 
             return value;
         }
@@ -2787,6 +2808,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
+            jobject value_alarmSeverityLevel;
+            std::string value_alarmSeverityLevelClassName     = "java/lang/Integer";
+            std::string value_alarmSeverityLevelCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                value_alarmSeverityLevelClassName.c_str(), value_alarmSeverityLevelCtorSignature.c_str(),
+                static_cast<uint8_t>(cppValue.alarmSeverityLevel), value_alarmSeverityLevel);
+
             jclass interconnectSmokeAlarmStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterInterconnectSmokeAlarmEvent",
@@ -2796,14 +2824,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterInterconnectSmokeAlarmEvent");
                 return nullptr;
             }
-            jmethodID interconnectSmokeAlarmStructCtor = env->GetMethodID(interconnectSmokeAlarmStructClass, "<init>", "()V");
+            jmethodID interconnectSmokeAlarmStructCtor =
+                env->GetMethodID(interconnectSmokeAlarmStructClass, "<init>", "(Ljava/lang/Integer;)V");
             if (interconnectSmokeAlarmStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterInterconnectSmokeAlarmEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(interconnectSmokeAlarmStructClass, interconnectSmokeAlarmStructCtor);
+            jobject value =
+                env->NewObject(interconnectSmokeAlarmStructClass, interconnectSmokeAlarmStructCtor, value_alarmSeverityLevel);
 
             return value;
         }
@@ -2814,6 +2844,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
+            jobject value_alarmSeverityLevel;
+            std::string value_alarmSeverityLevelClassName     = "java/lang/Integer";
+            std::string value_alarmSeverityLevelCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                value_alarmSeverityLevelClassName.c_str(), value_alarmSeverityLevelCtorSignature.c_str(),
+                static_cast<uint8_t>(cppValue.alarmSeverityLevel), value_alarmSeverityLevel);
+
             jclass interconnectCOAlarmStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterInterconnectCOAlarmEvent",
@@ -2823,14 +2860,15 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterInterconnectCOAlarmEvent");
                 return nullptr;
             }
-            jmethodID interconnectCOAlarmStructCtor = env->GetMethodID(interconnectCOAlarmStructClass, "<init>", "()V");
+            jmethodID interconnectCOAlarmStructCtor =
+                env->GetMethodID(interconnectCOAlarmStructClass, "<init>", "(Ljava/lang/Integer;)V");
             if (interconnectCOAlarmStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterInterconnectCOAlarmEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(interconnectCOAlarmStructClass, interconnectCOAlarmStructCtor);
+            jobject value = env->NewObject(interconnectCOAlarmStructClass, interconnectCOAlarmStructCtor, value_alarmSeverityLevel);
 
             return value;
         }

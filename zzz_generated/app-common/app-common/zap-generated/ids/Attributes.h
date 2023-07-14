@@ -3132,6 +3132,10 @@ namespace LastChangedTime {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace LastChangedTime
 
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ReplacementProductList
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3181,6 +3185,10 @@ static constexpr AttributeId Id = 0x00000003;
 namespace LastChangedTime {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace LastChangedTime
+
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ReplacementProductList
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3232,6 +3240,10 @@ namespace LastChangedTime {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace LastChangedTime
 
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ReplacementProductList
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3281,6 +3293,10 @@ static constexpr AttributeId Id = 0x00000003;
 namespace LastChangedTime {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace LastChangedTime
+
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ReplacementProductList
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3332,6 +3348,10 @@ namespace LastChangedTime {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace LastChangedTime
 
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ReplacementProductList
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3381,6 +3401,10 @@ static constexpr AttributeId Id = 0x00000003;
 namespace LastChangedTime {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace LastChangedTime
+
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ReplacementProductList
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3432,6 +3456,10 @@ namespace LastChangedTime {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace LastChangedTime
 
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ReplacementProductList
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3481,6 +3509,10 @@ static constexpr AttributeId Id = 0x00000003;
 namespace LastChangedTime {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace LastChangedTime
+
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ReplacementProductList
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3532,6 +3564,10 @@ namespace LastChangedTime {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace LastChangedTime
 
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ReplacementProductList
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3581,6 +3617,10 @@ static constexpr AttributeId Id = 0x00000003;
 namespace LastChangedTime {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace LastChangedTime
+
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ReplacementProductList
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3632,6 +3672,10 @@ namespace LastChangedTime {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace LastChangedTime
 
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ReplacementProductList
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3681,6 +3725,10 @@ static constexpr AttributeId Id = 0x00000003;
 namespace LastChangedTime {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace LastChangedTime
+
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ReplacementProductList
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
