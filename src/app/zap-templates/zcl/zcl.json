@@ -311,14 +311,16 @@
             "DegradationDirection",
             "ChangeIndication",
             "InPlaceIndicator",
-            "LastChangedTime"
+            "LastChangedTime",
+            "FeatureMap"
         ],
         "HEPA Filter Monitoring": [
             "Condition",
             "DegradationDirection",
             "ChangeIndication",
             "InPlaceIndicator",
-            "LastChangedTime"
+            "LastChangedTime",
+            "FeatureMap"
         ]
     },
     "defaultReportingPolicy": "mandatory",
