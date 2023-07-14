@@ -14559,7 +14559,7 @@
       "endpointId": 0,
       "networkId": 0,
       "endpointVersion": 1,
-      "deviceIdentifier": 65280
+      "deviceIdentifier": 22
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
