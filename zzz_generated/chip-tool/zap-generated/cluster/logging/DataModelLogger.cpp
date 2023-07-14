@@ -8967,7 +8967,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("OperationalStateList", 1, value);
         }
         case OperationalState::Attributes::OperationalState::Id: {
-            chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::DecodableType value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalState", 1, value);
         }
@@ -9035,7 +9035,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("OperationalStateList", 1, value);
         }
         case RvcOperationalState::Attributes::OperationalState::Id: {
-            chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::DecodableType value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalState", 1, value);
         }

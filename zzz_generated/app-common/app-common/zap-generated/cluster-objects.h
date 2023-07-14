@@ -16933,9 +16933,9 @@ struct TypeInfo
 namespace OperationalState {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::Type;
-    using DecodableType    = chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::DecodableType &;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalState::Id; }
@@ -17003,7 +17003,7 @@ struct TypeInfo
         Attributes::CurrentPhase::TypeInfo::DecodableType currentPhase;
         Attributes::CountdownTime::TypeInfo::DecodableType countdownTime;
         Attributes::OperationalStateList::TypeInfo::DecodableType operationalStateList;
-        Attributes::OperationalState::TypeInfo::DecodableType operationalState;
+        Attributes::OperationalState::TypeInfo::DecodableType operationalState = static_cast<uint8_t>(0);
         Attributes::OperationalError::TypeInfo::DecodableType operationalError;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
@@ -17327,9 +17327,9 @@ struct TypeInfo
 namespace OperationalState {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::Type;
-    using DecodableType    = chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::DecodableType &;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RvcOperationalState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalState::Id; }
@@ -17397,7 +17397,7 @@ struct TypeInfo
         Attributes::CurrentPhase::TypeInfo::DecodableType currentPhase;
         Attributes::CountdownTime::TypeInfo::DecodableType countdownTime;
         Attributes::OperationalStateList::TypeInfo::DecodableType operationalStateList;
-        Attributes::OperationalState::TypeInfo::DecodableType operationalState;
+        Attributes::OperationalState::TypeInfo::DecodableType operationalState = static_cast<uint8_t>(0);
         Attributes::OperationalError::TypeInfo::DecodableType operationalError;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
