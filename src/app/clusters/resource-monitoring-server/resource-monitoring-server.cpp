@@ -45,30 +45,6 @@ namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
 
-void Instance::LoadPersistentAttributes()
-{
-    CHIP_ERROR err = chip::app::GetAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id), mLastChangedTime);
-    if (err == CHIP_NO_ERROR)
-    {
-        if (mLastChangedTime.IsNull())
-        {
-            ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as null");
-        }
-        else
-        {
-            ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as %lu",
-                          (long unsigned int) mLastChangedTime.Value()); // on some platforms uint32_t is a long, cast it to
-                                                                         // unsigned long on all platforms to prevent CI errors
-        }
-    }
-    else
-    {
-        // If we cannot find the previous LastChangedTime, we will assume it to be null.
-        ChipLogDetail(Zcl, "ResourceMonitoring: Unable to load the LastChangedTime from the KVS. Assuming null");
-    }
-}
-
 CHIP_ERROR Instance::Init()
 {
     ChipLogDetail(Zcl, "ResourceMonitoring: Init");
@@ -88,85 +64,9 @@ CHIP_ERROR Instance::Init()
     return CHIP_NO_ERROR;
 }
 
-// This method is called by the interaction model engine when a command destined for this instance is received.
-void Instance::InvokeCommand(HandlerContext & handlerContext)
-{
-    ChipLogDetail(Zcl, "ResourceMonitoring Instance::InvokeCommand");
-    switch (handlerContext.mRequestPath.mCommandId)
-    {
-    case ResourceMonitoring::Commands::ResetCondition::Id:
-        ChipLogDetail(Zcl, "ResourceMonitoring::Commands::ResetCondition");
-
-        HandleCommand<ResourceMonitoring::Commands::ResetCondition::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleResetCondition(ctx, commandData); });
-        break;
-    }
-}
-
-// List the commands supported by this instance.
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                               CommandHandlerInterface::CommandIdCallback callback, void * context)
-{
-    ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");
-    if (mResetConditionCommandSupported)
-    {
-        callback(ResourceMonitoring::Commands::ResetCondition::Id, context);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 bool Instance::HasFeature(ResourceMonitoring::Feature aFeature) const
 {
     return ((mFeatureMap & to_underlying(aFeature)) != 0);
-}
-
-// Implements the read functionality for non-standard attributes.
-CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    switch (aPath.mAttributeId)
-    {
-    case Attributes::Condition::Id: {
-        ReturnErrorOnFailure(aEncoder.Encode(mCondition));
-        break;
-    }
-    case Attributes::FeatureMap::Id: {
-        ReturnErrorOnFailure(aEncoder.Encode(mFeatureMap));
-        break;
-    }
-    case Attributes::DegradationDirection::Id: {
-        ReturnErrorOnFailure(aEncoder.Encode(mDegradationDirection));
-        break;
-    }
-    case Attributes::ChangeIndication::Id: {
-        ReturnErrorOnFailure(aEncoder.Encode(mChangeIndication));
-        break;
-    }
-    case Attributes::InPlaceIndicator::Id: {
-        ReturnErrorOnFailure(aEncoder.Encode(mInPlaceIndicator));
-        break;
-    }
-    case Attributes::LastChangedTime::Id: {
-        ReturnErrorOnFailure(aEncoder.Encode(mLastChangedTime));
-        break;
-    }
-    }
-    return CHIP_NO_ERROR;
-}
-
-// Implements checking before attribute writes.
-CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    switch (aPath.mAttributeId)
-    {
-    case Attributes::LastChangedTime::Id: {
-        DataModel::Nullable<uint32_t> newLastChangedTime;
-        ReturnErrorOnFailure(aDecoder.Decode(newLastChangedTime));
-        UpdateLastChangedTime(newLastChangedTime);
-        break;
-    }
-    }
-    return CHIP_NO_ERROR;
 }
 
 chip::Protocols::InteractionModel::Status Instance::UpdateCondition(uint8_t aNewCondition)
@@ -247,26 +147,6 @@ DataModel::Nullable<uint32_t> Instance::GetLastChangedTime() const
     return mLastChangedTime;
 }
 
-bool Instance::IsValidAliasCluster() const
-{
-    for (unsigned int AliasedCluster : AliasedClusters)
-    {
-        if (mClusterId == AliasedCluster)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-void Instance::HandleResetCondition(HandlerContext & ctx,
-                                    const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData)
-{
-
-    Status resetConditionStatus = OnResetCondition();
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, resetConditionStatus);
-}
-
 template <typename RequestT, typename FuncT>
 void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
 {
@@ -291,6 +171,127 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
     }
 
     func(handlerContext, requestPayload);
+}
+
+// This method is called by the interaction model engine when a command destined for this instance is received.
+void Instance::InvokeCommand(HandlerContext & handlerContext)
+{
+    ChipLogDetail(Zcl, "ResourceMonitoring Instance::InvokeCommand");
+    switch (handlerContext.mRequestPath.mCommandId)
+    {
+    case ResourceMonitoring::Commands::ResetCondition::Id:
+        ChipLogDetail(Zcl, "ResourceMonitoring::Commands::ResetCondition");
+
+        HandleCommand<ResourceMonitoring::Commands::ResetCondition::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleResetCondition(ctx, commandData); });
+        break;
+    }
+}
+
+// List the commands supported by this instance.
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                               CommandHandlerInterface::CommandIdCallback callback, void * context)
+{
+    ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");
+    if (mResetConditionCommandSupported)
+    {
+        callback(ResourceMonitoring::Commands::ResetCondition::Id, context);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+
+// Implements the read functionality for non-standard attributes.
+CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::Condition::Id: {
+        ReturnErrorOnFailure(aEncoder.Encode(mCondition));
+        break;
+    }
+    case Attributes::FeatureMap::Id: {
+        ReturnErrorOnFailure(aEncoder.Encode(mFeatureMap));
+        break;
+    }
+    case Attributes::DegradationDirection::Id: {
+        ReturnErrorOnFailure(aEncoder.Encode(mDegradationDirection));
+        break;
+    }
+    case Attributes::ChangeIndication::Id: {
+        ReturnErrorOnFailure(aEncoder.Encode(mChangeIndication));
+        break;
+    }
+    case Attributes::InPlaceIndicator::Id: {
+        ReturnErrorOnFailure(aEncoder.Encode(mInPlaceIndicator));
+        break;
+    }
+    case Attributes::LastChangedTime::Id: {
+        ReturnErrorOnFailure(aEncoder.Encode(mLastChangedTime));
+        break;
+    }
+    }
+    return CHIP_NO_ERROR;
+}
+
+// Implements checking before attribute writes.
+CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::LastChangedTime::Id: {
+        DataModel::Nullable<uint32_t> newLastChangedTime;
+        ReturnErrorOnFailure(aDecoder.Decode(newLastChangedTime));
+        UpdateLastChangedTime(newLastChangedTime);
+        break;
+    }
+    }
+    return CHIP_NO_ERROR;
+}
+
+void Instance::LoadPersistentAttributes()
+{
+    CHIP_ERROR err = chip::app::GetAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id), mLastChangedTime);
+    if (err == CHIP_NO_ERROR)
+    {
+        if (mLastChangedTime.IsNull())
+        {
+            ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as null");
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as %lu",
+                          (long unsigned int) mLastChangedTime.Value()); // on some platforms uint32_t is a long, cast it to
+                                                                         // unsigned long on all platforms to prevent CI errors
+        }
+    }
+    else
+    {
+        // If we cannot find the previous LastChangedTime, we will assume it to be null.
+        ChipLogDetail(Zcl, "ResourceMonitoring: Unable to load the LastChangedTime from the KVS. Assuming null");
+    }
+}
+
+bool Instance::IsValidAliasCluster() const
+{
+    for (unsigned int AliasedCluster : AliasedClusters)
+    {
+        if (mClusterId == AliasedCluster)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Instance::HandleResetCondition(HandlerContext & ctx,
+                                    const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData)
+{
+
+    Status resetConditionStatus = OnResetCondition();
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, resetConditionStatus);
 }
 
 } // namespace ResourceMonitoring

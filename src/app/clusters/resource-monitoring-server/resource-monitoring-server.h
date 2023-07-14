@@ -39,8 +39,6 @@ class Instance : public CommandHandlerInterface, public AttributeAccessInterface
 {
 
 public:
-    void LoadPersistentAttributes();
-
     /**
      * Initialise the Resource Monitoring cluster.
      *
@@ -55,10 +53,6 @@ public:
      */
     CHIP_ERROR Init();
 
-    // CommandHandlerInterface
-    void InvokeCommand(HandlerContext & ctx) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
-
     /**
      * Checks if the given feature is supported by the cluster.
      * @param feature   The aFeature to check.
@@ -67,10 +61,6 @@ public:
      * @return false    If the feature is not supported.
      */
     bool HasFeature(ResourceMonitoring::Feature aFeature) const;
-
-    // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     // Attribute setters
     chip::Protocols::InteractionModel::Status UpdateCondition(uint8_t aNewCondition);
@@ -86,35 +76,7 @@ public:
     DataModel::Nullable<uint32_t> GetLastChangedTime() const;
     EndpointId GetEndpointId() const { return mEndpointId; }
 
-private:
-    EndpointId mEndpointId{};
-    ClusterId mClusterId{};
-
-    // attribute Data Store
-    chip::Percent mCondition                       = 100;
-    DegradationDirectionEnum mDegradationDirection = DegradationDirectionEnum::kDown;
-    ChangeIndicationEnum mChangeIndication         = ChangeIndicationEnum::kOk;
-    bool mInPlaceIndicator                         = true;
-    DataModel::Nullable<uint32_t> mLastChangedTime;
-
-    uint32_t mFeatureMap;
-
-    bool mResetConditionCommandSupported = false;
-
-    /**
-     * This checks if the clusters instance is a valid ResourceMonitoring cluster based on the AliasedClusters list.
-     * @return true     if the cluster is a valid ResourceMonitoring cluster.
-     */
-    bool IsValidAliasCluster() const;
-
-    /**
-     * Internal method to handle the ResetCondition command.
-     */
-    void HandleResetCondition(HandlerContext & ctx,
-                              const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData);
-
-public:
-    /**
+ /**
      * Creates a resource monitoring cluster instance. The Init() method needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
      * @param aEndpointId   The endpoint on which this cluster exists. This must match the zap configuration.
@@ -160,6 +122,44 @@ public:
      * @return Status::Success      If the command was handled successfully, all other will cause the command to fail.
      */
     virtual chip::Protocols::InteractionModel::Status OnResetCondition() = 0;
+
+private:
+    EndpointId mEndpointId{};
+    ClusterId mClusterId{};
+
+    // attribute Data Store
+    chip::Percent mCondition                       = 100;
+    DegradationDirectionEnum mDegradationDirection = DegradationDirectionEnum::kDown;
+    ChangeIndicationEnum mChangeIndication         = ChangeIndicationEnum::kOk;
+    bool mInPlaceIndicator                         = true;
+    DataModel::Nullable<uint32_t> mLastChangedTime;
+
+    uint32_t mFeatureMap;
+
+    bool mResetConditionCommandSupported = false;
+
+    // CommandHandlerInterface
+    void InvokeCommand(HandlerContext & ctx) override;
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+
+    // AttributeAccessInterface
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+
+    void LoadPersistentAttributes();
+
+    /**
+     * This checks if the clusters instance is a valid ResourceMonitoring cluster based on the AliasedClusters list.
+     * @return true     if the cluster is a valid ResourceMonitoring cluster.
+     */
+    bool IsValidAliasCluster() const;
+
+    /**
+     * Internal method to handle the ResetCondition command.
+     */
+    void HandleResetCondition(HandlerContext & ctx,
+                              const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData);
+
 };
 
 } // namespace ResourceMonitoring
