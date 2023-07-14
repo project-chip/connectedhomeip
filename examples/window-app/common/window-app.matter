@@ -895,6 +895,7 @@ server cluster PowerSource = 47 {
   readonly attribute BatChargeLevelEnum batChargeLevel = 14;
   readonly attribute BatFaultEnum activeBatFaults[] = 18;
   readonly attribute BatChargeStateEnum batChargeState = 26;
+  readonly attribute ENDPOINT_NO endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2034,8 +2035,9 @@ endpoint 0 {
     ram      attribute batChargeLevel;
     callback attribute activeBatFaults;
     ram      attribute batChargeState;
+    callback attribute endpointList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster GeneralCommissioning {
