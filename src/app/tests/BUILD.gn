@@ -136,7 +136,7 @@ chip_test_suite("tests") {
     "TestEventPathParams.cpp",
     "TestExtensionFieldSets.cpp",
     "TestFabricScopedEventLogging.cpp",
-    "TestICDManager.cpp",
+    "TestIcdManager.cpp",
     "TestIcdMonitoringTable.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",

@@ -249,8 +249,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    mICDManager.Init();
-    mICDEventManager.Init(&mICDManager);
+    mIcdManager.Init();
+    mIcdEventManager.Init(&mIcdManager);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // This initializes clusters, so should come after lower level initialization.
@@ -491,8 +491,8 @@ void Server::Shutdown()
     Access::ResetAccessControlToDefault();
     Credentials::SetGroupDataProvider(nullptr);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    mICDEventManager.Shutdown();
-    mICDManager.Shutdown();
+    mIcdEventManager.Shutdown();
+    mIcdManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     mAttributePersister.Shutdown();
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code

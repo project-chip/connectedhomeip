@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 
-#include "ICDSubscriptionCallback.h"
+#include "IcdSubscriptionCallback.h"
 #include <platform/CHIPDeviceConfig.h>
 
-CHIP_ERROR ICDSubscriptionCallback::OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler,
+CHIP_ERROR IcdSubscriptionCallback::OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler,
                                                             chip::Transport::SecureSession & aSecureSession)
 {
     using namespace chip::System::Clock;

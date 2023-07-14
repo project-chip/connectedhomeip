@@ -66,8 +66,8 @@
 #include <transport/raw/UDP.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDEventManager.h> // nogncheck
-#include <app/icd/ICDManager.h>      // nogncheck
+#include <app/icd/IcdEventManager.h> // nogncheck
+#include <app/icd/IcdManager.h>      // nogncheck
 #endif
 
 namespace chip {
@@ -601,8 +601,8 @@ private:
 
     System::Clock::Microseconds64 mInitTimestamp;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    app::ICDEventManager mICDEventManager;
-    app::ICDManager mICDManager;
+    app::IcdEventManager mIcdEventManager;
+    app::IcdManager mIcdManager;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 };
 

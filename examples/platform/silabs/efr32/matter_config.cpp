@@ -59,7 +59,7 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <lib/support/BytesToHex.h>
 
 #ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
-ICDSubscriptionCallback SilabsMatterConfig::mICDSubscriptionHandler;
+IcdSubscriptionCallback SilabsMatterConfig::mIcdSubscriptionHandler;
 #endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -218,7 +218,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 #ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
     // Register ICD subscription callback to match subscription max intervals to its idle time interval
-    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&mICDSubscriptionHandler);
+    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&mIcdSubscriptionHandler);
 #endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();

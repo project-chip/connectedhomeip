@@ -18,7 +18,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/icd/ICDManager.h>
+#include <app/icd/IcdManager.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
@@ -32,7 +32,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 
-void ICDManager::ICDManager::Init()
+void IcdManager::IcdManager::Init()
 {
     uint32_t activeModeInterval;
     if (Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval) != EMBER_ZCL_STATUS_SUCCESS)
@@ -44,16 +44,16 @@ void ICDManager::ICDManager::Init()
     UpdateOperationState(OperationalState::ActiveMode);
 }
 
-void ICDManager::ICDManager::Shutdown()
+void IcdManager::IcdManager::Shutdown()
 {
     // cancel any running timer of the icd
     DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
     DeviceLayer::SystemLayer().CancelTimer(OnActiveModeDone, this);
-    mIcdMode          = ICDMode::SIT;
+    mIcdMode          = IcdMode::SIT;
     mOperationalState = OperationalState::IdleMode;
 }
 
-bool ICDManager::SupportsCheckInProtocol()
+bool IcdManager::SupportsCheckInProtocol()
 {
     bool success;
     uint32_t featureMap;
@@ -62,11 +62,11 @@ bool ICDManager::SupportsCheckInProtocol()
     return success ? ((featureMap & to_underlying(Feature::kCheckInProtocolSupport)) != 0) : false;
 }
 
-void ICDManager::UpdateIcdMode()
+void IcdManager::UpdateIcdMode()
 {
     assertChipStackLockedByCurrentThread();
 
-    ICDMode tempMode = ICDMode::SIT;
+    IcdMode tempMode = IcdMode::SIT;
 
     // TODO ICD LIT FIX DEPENDENCY ISSUE with app/util/IcdMonitoringTable.h and app/server:server
     // The Check In Protocol Feature is required and the slow polling interval shall also be greater than 15 seconds
@@ -81,7 +81,7 @@ void ICDManager::UpdateIcdMode()
     //         IcdMonitoringTable table(storage, fabricInfo.GetFabricIndex(), 1);
     //         if (!table.IsEmpty())
     //         {
-    //             tempMode = ICDMode::LIT;
+    //             tempMode = IcdMode::LIT;
     //             break;
     //         }
     //     }
@@ -89,7 +89,7 @@ void ICDManager::UpdateIcdMode()
     mIcdMode = tempMode;
 }
 
-void ICDManager::UpdateOperationState(OperationalState state)
+void IcdManager::UpdateOperationState(OperationalState state)
 {
     assertChipStackLockedByCurrentThread();
     // Active mode can be re-triggered.
@@ -145,7 +145,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
     }
 }
 
-void ICDManager::SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state)
+void IcdManager::SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -162,15 +162,15 @@ void ICDManager::SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state)
     }
 }
 
-void ICDManager::OnIdleModeDone(System::Layer * aLayer, void * appState)
+void IcdManager::OnIdleModeDone(System::Layer * aLayer, void * appState)
 {
-    ICDManager * pIcdManager = reinterpret_cast<ICDManager *>(appState);
+    IcdManager * pIcdManager = reinterpret_cast<IcdManager *>(appState);
     pIcdManager->UpdateOperationState(OperationalState::ActiveMode);
 }
 
-void ICDManager::OnActiveModeDone(System::Layer * aLayer, void * appState)
+void IcdManager::OnActiveModeDone(System::Layer * aLayer, void * appState)
 {
-    ICDManager * pIcdManager = reinterpret_cast<ICDManager *>(appState);
+    IcdManager * pIcdManager = reinterpret_cast<IcdManager *>(appState);
 
     // Don't go to idle mode when we have a keep active requirement
     if (!pIcdManager->mKeepActiveFlags.HasAny())

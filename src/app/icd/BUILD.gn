@@ -18,11 +18,11 @@ import("icd.gni")
 # ICD Server sources and configurations
 
 # ICD Manager source-set is broken out of the main source-set to enable unit tests
-# All sources and configurations used by the ICDManager need to go in this source-set
+# All sources and configurations used by the IcdManager need to go in this source-set
 source_set("manager-srcs") {
   sources = [
-    "ICDManager.cpp",
-    "ICDManager.h",
+    "IcdManager.cpp",
+    "IcdManager.h",
   ]
 
   public_deps = [
@@ -37,8 +37,8 @@ source_set("manager-srcs") {
 # The ICD Server featureset is enabled with the chip_enable_icd_server in the src/app/BUILD.gn file
 source_set("server-srcs") {
   sources = [
-    "ICDEventManager.cpp",
-    "ICDEventManager.h",
+    "IcdEventManager.cpp",
+    "IcdEventManager.h",
   ]
 
   public_deps = [ ":manager-srcs" ]

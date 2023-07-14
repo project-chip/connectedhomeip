@@ -254,7 +254,7 @@ enum PublicEventTypes
      * TODO ICD: kChipMsgSentEvent and kChipMsgRxEventHandled should be InternalEventTypes.
      * However the ICD manager leverages those events and its event handler is registered as an application
      * event handler.
-     * ICDEventManager will have to expose 'ICDEventHandler' publicly to 'DispatchEventToDeviceLayer'.
+     * IcdEventManager will have to expose 'ICDEventHandler' publicly to 'DispatchEventToDeviceLayer'.
      */
 
     /**

@@ -15,37 +15,37 @@
  *    limitations under the License.
  */
 
-#include <app/icd/ICDEventManager.h>
+#include <app/icd/IcdEventManager.h>
 
 using namespace chip::DeviceLayer;
 
 namespace chip {
 namespace app {
 
-uint8_t ICDEventManager::expectedMsgCount = 0;
+uint8_t IcdEventManager::expectedMsgCount = 0;
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
-              "ICDEventManager::expectedMsgCount cannot hold count for the max exchange count");
+              "IcdEventManager::expectedMsgCount cannot hold count for the max exchange count");
 
-CHIP_ERROR ICDEventManager::Init(ICDManager * icdManager)
+CHIP_ERROR IcdEventManager::Init(IcdManager * icdManager)
 {
     VerifyOrReturnError(icdManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mICDManager = icdManager;
-    PlatformMgr().AddEventHandler(ICDEventHandler, reinterpret_cast<intptr_t>(mICDManager));
+    mIcdManager = icdManager;
+    PlatformMgr().AddEventHandler(ICDEventHandler, reinterpret_cast<intptr_t>(mIcdManager));
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ICDEventManager::Shutdown()
+CHIP_ERROR IcdEventManager::Shutdown()
 {
     PlatformMgr().RemoveEventHandler(ICDEventHandler, reinterpret_cast<intptr_t>(nullptr));
-    mICDManager = nullptr;
+    mIcdManager = nullptr;
 
     return CHIP_NO_ERROR;
 }
 
-void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t arg)
+void IcdEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
-    ICDManager * icdManager = reinterpret_cast<ICDManager *>(arg);
+    IcdManager * icdManager = reinterpret_cast<IcdManager *>(arg);
 
     if (icdManager == nullptr)
     {
@@ -55,11 +55,11 @@ void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t ar
     switch (event->Type)
     {
     case DeviceEventType::kCommissioningWindowStatusChanged:
-        icdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kCommissioningWindowOpen,
+        icdManager->SetKeepActiveModeRequirements(IcdManager::KeepActiveFlags::kCommissioningWindowOpen,
                                                   event->CommissioningWindowStatus.open);
         break;
     case DeviceEventType::kFailSafeStateChanged:
-        icdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kFailSafeArmed, event->FailSafeState.armed);
+        icdManager->SetKeepActiveModeRequirements(IcdManager::KeepActiveFlags::kFailSafeArmed, event->FailSafeState.armed);
         break;
     case DeviceEventType::kChipMsgSentEvent:
 
@@ -68,11 +68,11 @@ void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t ar
         if (event->MessageSent.ExpectResponse)
         {
             expectedMsgCount++;
-            icdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kExpectingMsgResponse, true);
+            icdManager->SetKeepActiveModeRequirements(IcdManager::KeepActiveFlags::kExpectingMsgResponse, true);
         }
         else
         {
-            icdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+            icdManager->UpdateOperationState(IcdManager::OperationalState::ActiveMode);
         }
         break;
     case DeviceEventType::kChipMsgRxEventHandled:
@@ -90,17 +90,17 @@ void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t ar
 
             if (expectedMsgCount == 0)
             {
-                icdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kExpectingMsgResponse, false);
+                icdManager->SetKeepActiveModeRequirements(IcdManager::KeepActiveFlags::kExpectingMsgResponse, false);
             }
         }
         else if (event->RxEventContext.wasReceived)
         {
-            icdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+            icdManager->UpdateOperationState(IcdManager::OperationalState::ActiveMode);
         }
 
         break;
     case DeviceEventType::kAppWakeUpEvent:
-        icdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+        icdManager->UpdateOperationState(IcdManager::OperationalState::ActiveMode);
         break;
     default:
         break;

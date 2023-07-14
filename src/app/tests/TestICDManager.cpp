@@ -18,14 +18,14 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
-int TestICDManager()
+int TestIcdManager()
 {
     static nlTest sTests[] = { NL_TEST_SENTINEL() };
 
-    nlTestSuite cmSuite = { "TestICDManager", &sTests[0], nullptr, nullptr };
+    nlTestSuite cmSuite = { "TestIcdManager", &sTests[0], nullptr, nullptr };
 
     nlTestRunner(&cmSuite, nullptr);
     return (nlTestRunnerStats(&cmSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestICDManager)
+CHIP_REGISTER_TEST_SUITE(TestIcdManager)

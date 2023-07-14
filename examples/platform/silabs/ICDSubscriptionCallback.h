@@ -20,11 +20,11 @@
 #include <app/ReadHandler.h>
 
 /**
- * @brief The goal of the ICDSubscriptionCallback class is to negotiate the max interval subscription to match the idle interval of
+ * @brief The goal of the IcdSubscriptionCallback class is to negotiate the max interval subscription to match the idle interval of
  * the IC device. When a subscription is requested, the device will change the requested max interval to match its idle time
  * interval through the OnSubscriptionRequested function.
  */
-class ICDSubscriptionCallback : public chip::app::ReadHandler::ApplicationCallback
+class IcdSubscriptionCallback : public chip::app::ReadHandler::ApplicationCallback
 {
     /**
      * @brief Function called when a subscription is requested.

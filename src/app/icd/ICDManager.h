@@ -27,7 +27,7 @@ namespace app {
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
  */
-class ICDManager
+class IcdManager
 {
 public:
     enum class OperationalState : uint8_t
@@ -36,7 +36,7 @@ public:
         ActiveMode,
     };
 
-    enum class ICDMode : uint8_t
+    enum class IcdMode : uint8_t
     {
         SIT, // Short Interval Time ICD
         LIT, // Long Interval Time ICD
@@ -49,14 +49,14 @@ public:
         kExpectingMsgResponse    = 0x03,
     };
 
-    ICDManager() {}
+    IcdManager() {}
     void Init();
     void Shutdown();
     void UpdateIcdMode();
     void UpdateOperationState(OperationalState state);
     void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
     bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
-    ICDMode GetIcdMode() { return mIcdMode; }
+    IcdMode GetIcdMode() { return mIcdMode; }
     OperationalState GetOperationalState() { return mOperationalState; }
 
     static System::Clock::Milliseconds32 GetSlowPollingInterval() { return kSlowPollingInterval; }
@@ -80,7 +80,7 @@ private:
 
     BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };
     OperationalState mOperationalState = OperationalState::IdleMode;
-    ICDMode mIcdMode                   = ICDMode::SIT;
+    IcdMode mIcdMode                   = IcdMode::SIT;
 };
 
 } // namespace app

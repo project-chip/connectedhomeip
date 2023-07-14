@@ -23,7 +23,7 @@
 #include <platform/KeyValueStoreManager.h>
 
 #ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
-#include "ICDSubscriptionCallback.h"
+#include "IcdSubscriptionCallback.h"
 #endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
 
 class SilabsMatterConfig
@@ -38,6 +38,6 @@ private:
     static void InitOTARequestorHandler(chip::System::Layer * systemLayer, void * appState);
 
 #ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
-    static ICDSubscriptionCallback mICDSubscriptionHandler;
+    static IcdSubscriptionCallback mIcdSubscriptionHandler;
 #endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
 };

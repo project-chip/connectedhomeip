@@ -38,7 +38,7 @@
 #include <platform/ConnectivityManager.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDManager.h> // nogncheck
+#include <app/icd/IcdManager.h> // nogncheck
 #endif
 
 using namespace chip::System::Clock::Literals;
@@ -257,7 +257,7 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     // Implement:
     //   "An ICD sender SHOULD increase t to also account for its own sleepy interval
     //   required to receive the acknowledgment"
-    mrpBackoffTime += app::ICDManager::GetFastPollingInterval();
+    mrpBackoffTime += app::IcdManager::GetFastPollingInterval();
 #elif CHIP_DEVICE_CONFIG_ENABLE_SED
     DeviceLayer::ConnectivityManager::SEDIntervalsConfig sedIntervals;
 

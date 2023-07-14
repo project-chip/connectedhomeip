@@ -203,8 +203,8 @@ config("ICD-subscription-callback-config") {
 
 source_set("efr32-ICD-subscription-callback") {
   sources = [
-    "${silabs_common_plat_dir}/ICDSubscriptionCallback.cpp",
-    "${silabs_common_plat_dir}/ICDSubscriptionCallback.h",
+    "${silabs_common_plat_dir}/IcdSubscriptionCallback.cpp",
+    "${silabs_common_plat_dir}/IcdSubscriptionCallback.h",
   ]
 
   public_deps = [ "${chip_root}/src/app:app" ]
