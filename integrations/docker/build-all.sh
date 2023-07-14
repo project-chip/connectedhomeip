@@ -28,18 +28,18 @@ ALL_ARGS=""
 
 for i in "$@"; do
     case $i in
-    -p=* | --path=*)
-        SUB_PATH="${i#*=}"
-        ;;
-    *)
-        ALL_ARGS="$ALL_ARGS ${i#*=}"
-        ;;
+        -p=* | --path=*)
+            SUB_PATH="${i#*=}"
+            ;;
+        *)
+            ALL_ARGS="$ALL_ARGS ${i#*=}"
+            ;;
     esac
 done
 
 echo "SUB_PATH: $SUB_PATH"
 
-function build_image {
+function build_image() {
     PARSE_PATH=$1
     ARGS_TO_PASS=$2
 
