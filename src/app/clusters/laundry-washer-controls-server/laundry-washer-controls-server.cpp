@@ -118,3 +118,50 @@ void MatterLaundryWasherControlsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }
+
+LaundryWasherServer LaundryWasherServer::sInstance;
+
+/**********************************************************
+ * LaundryWasherServer public methods
+ *********************************************************/
+
+LaundryWasherServer & LaundryWasherServer::Instance()
+{
+    return sInstance;
+}
+
+EmberAfStatus LaundryWasherServer::SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> newSpinSpeedCurrent)
+{
+    DataModel::Nullable<uint8_t> spinSpeedCurrent;
+    EmberAfStatus res = SpinSpeedCurrent::Get(endpointId, spinSpeedCurrent);
+
+    if ((res == EMBER_ZCL_STATUS_SUCCESS) && (spinSpeedCurrent != newSpinSpeedCurrent))
+    {
+        res = SpinSpeedCurrent::Set(endpointId, newSpinSpeedCurrent);
+    }
+
+    return res;
+}
+
+EmberAfStatus LaundryWasherServer::GetSpinSpeedCurrent(chip ::EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent)
+{
+    return SpinSpeedCurrent::Get(endpointId, spinSpeedCurrent);
+}
+
+EmberAfStatus LaundryWasherServer::SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses)
+{
+    NumberOfRinsesEnum numberOfRinses;
+    EmberAfStatus res = NumberOfRinses::Get(endpointId, &numberOfRinses);
+
+    if ((res == EMBER_ZCL_STATUS_SUCCESS) && (numberOfRinses != newNumberOfRinses))
+    {
+        res = NumberOfRinses::Set(endpointId, newNumberOfRinses);
+    }
+
+    return res;
+}
+
+EmberAfStatus LaundryWasherServer::GetNumberOfRinses(chip ::EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses)
+{
+    return NumberOfRinses::Get(endpointId, &numberOfRinses);
+}

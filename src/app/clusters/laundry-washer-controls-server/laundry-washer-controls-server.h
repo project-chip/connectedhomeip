@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/util/af.h>
 
 namespace chip {
 namespace app {
@@ -50,6 +51,38 @@ public:
 };
 
 const LaundryWasherManager * getLaundryWasherManager();
+
+/**
+ * @brief LaundryWasher Server Plugin class
+ */
+class LaundryWasherServer
+{
+public:
+    static LaundryWasherServer & Instance();
+
+    /**
+     * @brief Set/Get the attribute newSpinSpeedCurrent
+     *
+     * @param endpointId ID of the endpoint
+     * @param newSpinSpeedCurrent attribute SpinSpeedCurrent
+     * @return true on success, false on failure
+     */
+    EmberAfStatus SetSpinSpeedCurrent(chip::EndpointId endpointId, DataModel::Nullable<uint8_t> newSpinSpeedCurrent);
+    EmberAfStatus GetSpinSpeedCurrent(chip::EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent);
+
+    /**
+     * @brief Set/Get the attribute NumberOfRinses
+     *
+     * @param endpointId ID of the endpoint
+     * @param newNumberOfRinses attribute NumberOfRinses
+     * @return true on success, false on failure
+     */
+    EmberAfStatus SetNumberOfRinses(chip::EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses);
+    EmberAfStatus GetNumberOfRinses(chip::EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses);
+
+private:
+    static LaundryWasherServer sInstance;
+};
 
 } // namespace LaundryWasherControls
 } // namespace Clusters
