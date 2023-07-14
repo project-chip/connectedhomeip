@@ -10,5 +10,5 @@ NEXT_VERSION=$((CURRENT_VERSION + 1))
 echo "Next version: $NEXT_VERSION"
 
 sed -r -i "s|image: ghcr\.io/project-chip/(.*):[0-9]*(\..*)?|image: ghcr.io/project-chip/\1:$NEXT_VERSION|" .github/workflows/*.yaml
-
+sed -r -i "s|matter-dev-environment:local --version [0-9]*|matter-dev-environment:local --version $NEXT_VERSION|" .devcontainer/devcontainer.json
 echo "$NEXT_VERSION" >./integrations/docker/images/base/chip-build/version
