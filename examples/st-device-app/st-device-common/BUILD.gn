@@ -20,6 +20,7 @@ import("${chip_root}/src/lib/lib.gni")
 chip_data_model("st-device-common") {
   zap_file = "st-device-app.zap"
 
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/st-device-app/zap-generated"
+  zap_pregenerated_dir =
+      "${chip_root}/zzz_generated/st-device-app/zap-generated"
   is_server = true
 }
