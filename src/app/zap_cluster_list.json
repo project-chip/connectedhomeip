@@ -183,6 +183,7 @@
         "ON_OFF_SWITCH_CONFIGURATION_CLUSTER": [],
         "OPERATIONAL_CREDENTIALS_CLUSTER": ["operational-credentials-server"],
         "OPERATIONAL_STATE_CLUSTER": ["operational-state-server"],
+        "OPERATIONAL_STATE_RVC_CLUSTER": ["operational-state-server"],
         "OTA_BOOTLOAD_CLUSTER": [],
         "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER": ["ota-provider"],
         "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER": ["ota-requestor"],
