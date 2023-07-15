@@ -85,7 +85,7 @@ public:
      * Set current operational state.
      * @param opState The operational state that should now be the current one.
      */
-    CHIP_ERROR SetOperationalState(const uint8_t & opState) override;
+    CHIP_ERROR SetOperationalState(uint8_t opState) override;
 
     /**
      * Set operational phase.

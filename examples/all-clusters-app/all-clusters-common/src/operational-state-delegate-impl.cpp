@@ -24,7 +24,7 @@ namespace OperationalState {
 
 using chip::Protocols::InteractionModel::Status;
 
-CHIP_ERROR OperationalStateDelegate::SetOperationalState(const uint8_t & opState)
+CHIP_ERROR OperationalStateDelegate::SetOperationalState(uint8_t opState)
 {
     mOperationalState = opState;
     return CHIP_NO_ERROR;

@@ -257,7 +257,7 @@ public:
      * Set current operational state.
      * @param opState The operational state that should now be the current one.
      */
-    virtual CHIP_ERROR SetOperationalState(const uint8_t & opState) = 0;
+    virtual CHIP_ERROR SetOperationalState(uint8_t opState) = 0;
 
     /**
      * Set operational error.
