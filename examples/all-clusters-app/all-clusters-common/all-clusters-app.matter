@@ -2711,6 +2711,69 @@ server cluster OperationalState = 96 {
   command Resume(): OperationalCommandResponse = 3;
 }
 
+/** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
+server cluster RvcOperationalState = 97 {
+  enum ErrorStateEnum : ENUM8 {
+    kFailedToFindChargingDock = 64;
+    kStuck = 65;
+    kDustBinMissing = 66;
+    kDustBinFull = 67;
+    kWaterTankEmpty = 68;
+    kWaterTankMissing = 69;
+    kWaterTankLidOpen = 70;
+    kMopCleaningPadMissing = 71;
+  }
+
+  enum OperationalStateEnum : ENUM8 {
+    kSeekingCharger = 64;
+    kCharging = 65;
+    kDocked = 66;
+  }
+
+  struct ErrorStateStruct {
+    enum8 errorStateID = 0;
+    optional char_string<64> errorStateLabel = 1;
+    optional char_string<64> errorStateDetails = 2;
+  }
+
+  struct OperationalStateStruct {
+    enum8 operationalStateID = 0;
+    optional char_string<64> operationalStateLabel = 1;
+  }
+
+  critical event OperationalError = 0 {
+    ErrorStateStruct errorState = 0;
+  }
+
+  info event OperationCompletion = 1 {
+    ENUM8 completionErrorCode = 0;
+    optional nullable elapsed_s totalOperationalTime = 1;
+    optional nullable elapsed_s pausedTime = 2;
+  }
+
+  readonly attribute nullable CHAR_STRING phaseList[] = 0;
+  readonly attribute nullable int8u currentPhase = 1;
+  readonly attribute nullable elapsed_s countdownTime = 2;
+  readonly attribute OperationalStateStruct operationalStateList[] = 3;
+  readonly attribute enum8 operationalState = 4;
+  readonly attribute ErrorStateStruct operationalError = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct OperationalCommandResponse = 4 {
+    ErrorStateStruct commandResponseState = 0;
+  }
+
+  command Pause(): OperationalCommandResponse = 0;
+  command Stop(): OperationalCommandResponse = 1;
+  command Start(): OperationalCommandResponse = 2;
+  command Resume(): OperationalCommandResponse = 3;
+}
+
 /** Attributes and commands for monitoring HEPA filters in a device */
 server cluster HepaFilterMonitoring = 113 {
   enum ChangeIndicationEnum : ENUM8 {
@@ -6708,6 +6771,23 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster RvcOperationalState {
+    emits event OperationalError;
+    emits event OperationCompletion;
+    callback attribute phaseList;
+    callback attribute currentPhase default = 0;
+    callback attribute countdownTime default = 0;
+    callback attribute operationalStateList default = 0;
+    callback attribute operationalState default = 0;
+    callback attribute operationalError default = 0;
+    callback attribute generatedCommandList default = 0;
+    callback attribute acceptedCommandList default = 0;
+    callback attribute eventList default = 0;
+    callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
