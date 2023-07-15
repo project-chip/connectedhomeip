@@ -101,9 +101,9 @@ static const GenericOperationalState rvcOpStateList[] = {
  * Note: User Define
  */
 static OperationalStateDelegate rvcOpStateDelegate(to_underlying(OperationalStateEnum::kStopped),
-                                                GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)),
-                                                Span<const GenericOperationalState>(rvcOpStateList),
-                                                Span<const GenericOperationalPhase>(opPhaseList));
+                                                   GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)),
+                                                   Span<const GenericOperationalState>(rvcOpStateList),
+                                                   Span<const GenericOperationalPhase>(opPhaseList));
 
 /**
  * Enquiry Table of Operational State Cluster and alias Cluter Delegate corresponding to endpointId and clusterId
@@ -154,13 +154,17 @@ void MatterOperationalStateServerInit()
     static Clusters::OperationalState::OperationalStateServer operationalstateServer(Clusters::OperationalState::kDemoEndpointId,
                                                                                      Clusters::OperationalState::Id);
     operationalstateServer.Init();
-    operationalstateServer.OnOperationalErrorDetect(Clusters::OperationalState::GenericOperationalError(chip::to_underlying(Clusters::OperationalState::ErrorStateEnum::kUnableToStartOrResume)));
+    operationalstateServer.OnOperationalErrorDetect(Clusters::OperationalState::GenericOperationalError(
+        chip::to_underlying(Clusters::OperationalState::ErrorStateEnum::kUnableToStartOrResume)));
 
-    operationalstateServer.OnOperationCompletionDetect(Clusters::OperationalState::GenericOperationCompletion(chip::to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError)));
+    operationalstateServer.OnOperationCompletionDetect(Clusters::OperationalState::GenericOperationCompletion(
+        chip::to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError)));
 
     static Clusters::OperationalState::OperationalStateServer rvcOperationalstateServer(Clusters::OperationalState::kDemoEndpointId,
-                                                                                     Clusters::RvcOperationalState::Id);
+                                                                                        Clusters::RvcOperationalState::Id);
     rvcOperationalstateServer.Init();
-    rvcOperationalstateServer.OnOperationalErrorDetect(Clusters::OperationalState::GenericOperationalError(chip::to_underlying(Clusters::RvcOperationalState::ErrorStateEnum::kFailedToFindChargingDock)));
-    rvcOperationalstateServer.OnOperationCompletionDetect(Clusters::OperationalState::GenericOperationCompletion(chip::to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError)));
+    rvcOperationalstateServer.OnOperationalErrorDetect(Clusters::OperationalState::GenericOperationalError(
+        chip::to_underlying(Clusters::RvcOperationalState::ErrorStateEnum::kFailedToFindChargingDock)));
+    rvcOperationalstateServer.OnOperationCompletionDetect(Clusters::OperationalState::GenericOperationCompletion(
+        chip::to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError)));
 }
