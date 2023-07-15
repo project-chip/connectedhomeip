@@ -67,6 +67,12 @@ public:
     void OnOperationalErrorDetect(const Structs::ErrorStateStruct::Type & aError);
 
     /**
+     * @brief Called when the Node detects a OperationCompletion has been raised.
+     * @param aEvent OperationCompletion event
+     */
+    void OnOperationCompletionDetect(const Events::OperationCompletion::Type & aEvent);
+
+    /**
      * Creates an operational state cluster instance. The Init() function needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
