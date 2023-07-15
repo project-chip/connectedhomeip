@@ -178,8 +178,8 @@ chip_test_suite("tests") {
   }
 
   # The platform manager is not properly clearing queues in test teardown, which results in
-  # DrainIO calls to not being able to run in expected time (5seconds) if unprocesses engine
-  # run are remaining, causing tests to crash in Open IoT SDK and Zephyr tests since they are
+  # DrainIO calls not being able to run in expected time (5seconds) if unprocessed reported engine
+  # runs are remaining, causing tests to crash in Open IoT SDK and Zephyr tests since they are
   # running all tests in one file. We need to figure out how to properly clean the event queues
   # before enabling this test for these platforms.
   if (chip_device_platform != "nrfconnect" &&

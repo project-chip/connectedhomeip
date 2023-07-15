@@ -127,7 +127,7 @@ public:
     bool IsReportableNow(ReadHandler * aReadHandler)
     {
         return FindReadHandlerNode(aReadHandler)->IsReportableNow();
-    }; // TODO: Change the IsReportableNow to IsReportable() for readHandlers
+    } // TODO: Change the IsReportableNow to IsReportable() for readHandlers
     /// @brief Check if a ReadHandler is reportable without considering the timing
     bool IsReadHandlerReportable(ReadHandler * aReadHandler) const
     {
