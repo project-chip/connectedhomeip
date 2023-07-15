@@ -29,6 +29,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventLogging.h>
 #include <app/EventLoggingDelegate.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
