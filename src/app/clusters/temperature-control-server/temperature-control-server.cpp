@@ -71,8 +71,8 @@ void SetInstance(SupportedTemperatureLevelsIteratorDelegate * instance)
 
 CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrDie(aPath.mClusterId == TemperatureControl::Id);
-
     if (TemperatureControl::Attributes::SupportedTemperatureLevels::Id == aPath.mAttributeId)
     {
         TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * instance = TemperatureControl::GetInstance();
@@ -81,10 +81,7 @@ CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & 
             aEncoder.EncodeEmptyList();
             return CHIP_NO_ERROR;
         }
-
         instance->Reset(aPath.mEndpointId);
-
-        CHIP_ERROR err;
         err = aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
             char buffer[kMaxTemperatureLevelStringSize];
             MutableCharSpan item(buffer);
@@ -96,7 +93,7 @@ CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & 
             return CHIP_NO_ERROR;
         });
     }
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 bool TemperatureControlHasFeature(EndpointId endpoint, TemperatureControl::Feature feature)
