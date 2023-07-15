@@ -320,7 +320,7 @@ void OperationalStateServer::OnOperationalErrorDetect(const Structs::ErrorStateS
     }
 }
 
-void OperationalStateServer::OnOperationCompletionDetect(const Events::OperationCompletion::Type & aEvent);
+void OperationalStateServer::OnOperationCompletionDetect(const Events::OperationCompletion::Type & aEvent)
 {
     ChipLogDetail(Zcl, "OperationalStateServer: OnOperationCompletionDetect");
     MatterReportingAttributeChangeCallback(mEndpointId, mClusterId,
