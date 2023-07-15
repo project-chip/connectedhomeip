@@ -33,7 +33,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.7.3
+            image: ghcr.io/project-chip/chip-build:1
 
         steps:
             - name: Checkout

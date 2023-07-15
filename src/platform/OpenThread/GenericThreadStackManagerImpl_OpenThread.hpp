@@ -2000,10 +2000,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetPollingInter
         ChipLogError(DeviceLayer, "Failed to set SED interval to %" PRId32 "ms. Defaulting to %" PRId32 "ms",
                      pollingInterval.count(), curIntervalMS);
     }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "OpenThread SED interval is %" PRId32 "ms", curIntervalMS);
-    }
 
     return err;
 }
