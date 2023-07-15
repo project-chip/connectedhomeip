@@ -213,10 +213,9 @@ class Delegate
 public:
     /**
      * Get the current operational state.
-     * @param op The uint8_t to fill with the current operational state value.
-     * @return void.
+     * @return The current operational state value
      */
-    virtual void GetCurrentOperationalState(uint8_t & op) = 0;
+    virtual uint8_t GetCurrentOperationalState() = 0;
 
     /**
      * Get the list of supported operational states.

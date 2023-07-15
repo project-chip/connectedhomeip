@@ -106,10 +106,9 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
     Commands::OperationalCommandResponse::Type response;
     Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
-    uint8_t opState;
 
     VerifyOrReturn(delegate != nullptr, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure));
-    delegate->GetCurrentOperationalState(opState);
+    uint8_t opState =  delegate->GetCurrentOperationalState();
 
     if (opState != to_underlying(OperationalStateEnum::kPaused))
     {
@@ -126,11 +125,9 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
     Commands::OperationalCommandResponse::Type response;
     Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
-    uint8_t opState;
 
     VerifyOrReturn(delegate != nullptr, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure));
-
-    delegate->GetCurrentOperationalState(opState);
+    uint8_t opState =  delegate->GetCurrentOperationalState();
 
     if (opState != to_underlying(OperationalStateEnum::kPaused) && opState != to_underlying(OperationalStateEnum::kRunning))
     {
@@ -151,11 +148,9 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
     Commands::OperationalCommandResponse::Type response;
     Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
-    uint8_t opState;
 
     VerifyOrReturn(delegate != nullptr, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure));
-
-    delegate->GetCurrentOperationalState(opState);
+    uint8_t opState =  delegate->GetCurrentOperationalState();
 
     if (opState != to_underlying(OperationalStateEnum::kRunning))
     {
@@ -172,11 +167,9 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
     Commands::OperationalCommandResponse::Type response;
     Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
-    uint8_t opState;
 
     VerifyOrReturn(delegate != nullptr, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure));
-
-    delegate->GetCurrentOperationalState(opState);
+    uint8_t opState =  delegate->GetCurrentOperationalState();
 
     if (opState != to_underlying(OperationalStateEnum::kStopped))
     {
@@ -242,9 +235,8 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     case OperationalState::Attributes::OperationalState::Id: {
 
         Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
-        uint8_t opState;
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
-        delegate->GetCurrentOperationalState(opState);
+        uint8_t opState =  delegate->GetCurrentOperationalState();
         return aEncoder.Encode(opState);
     }
     break;

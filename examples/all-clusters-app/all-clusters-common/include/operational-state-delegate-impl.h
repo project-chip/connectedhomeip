@@ -34,11 +34,10 @@ class OperationalStateDelegate : public Delegate
 
 public:
     /**
-     * Get current operational state.
-     * @param op The uint8_t to fill with the current operational state value.
-     * @return void.
+     * Get the current operational state.
+     * @return The current operational state value
      */
-    void GetCurrentOperationalState(uint8_t & op) override;
+    uint8_t GetCurrentOperationalState() override;
 
     /**
      * Get the list of supported operational states.

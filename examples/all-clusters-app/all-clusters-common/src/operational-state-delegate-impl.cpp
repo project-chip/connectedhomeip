@@ -42,9 +42,9 @@ CHIP_ERROR OperationalStateDelegate::SetCountdownTime(const app::DataModel::Null
     return CHIP_NO_ERROR;
 }
 
-void OperationalStateDelegate::GetCurrentOperationalState(uint8_t & op)
+uint8_t OperationalStateDelegate::GetCurrentOperationalState()
 {
-    op = mOperationalState;
+    return mOperationalState;
 }
 
 CHIP_ERROR OperationalStateDelegate::SetOperationalError(const GenericOperationalError & opErrState)
