@@ -51,6 +51,11 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="CURRENT_PHASE"           type="INT8U"                                    min="0x00" max="0x1F"    writable="false" isNullable="true"  optional="false">CurrentPhase</attribute>
     <attribute side="server" code="0x0002" define="COUNTDOWN_TIME"          type="elapsed_s"                                min="0"    max="259200"  writable="false" isNullable="true"  optional="true">CountdownTime</attribute>
     <attribute side="server" code="0x0003" define="OPERATIONAL_STATE_LIST"  type="ARRAY" entryType="OperationalStateStruct"                          writable="false"                    optional="false">OperationalStateList</attribute>
+
+<!--
+The attribute "OPERATIONAL_STATE" herein is applicable to RVC Operational State only and its values are
+additional to the set of values defined in Operational State. So we define the type of this attribute "ENUM8"
+-->
     <attribute side="server" code="0x0004" define="OPERATIONAL_STATE"       type="ENUM8"                                                             writable="false"                    optional="false">OperationalState</attribute>
     <attribute side="server" code="0x0005" define="OPERATIONAL_ERROR"       type="ErrorStateStruct"                                                  writable="false"                    optional="false">OperationalError</attribute>
 
