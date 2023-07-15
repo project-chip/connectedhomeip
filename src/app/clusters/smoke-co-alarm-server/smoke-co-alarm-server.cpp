@@ -83,7 +83,7 @@ bool SmokeCoAlarmServer::SetSmokeState(EndpointId endpointId, AlarmStateEnum new
 
         if (success && (newSmokeState == AlarmStateEnum::kWarning || newSmokeState == AlarmStateEnum::kCritical))
         {
-            Events::SmokeAlarm::Type event{};
+            Events::SmokeAlarm::Type event{ newSmokeState };
             SendEvent(endpointId, event);
         }
 
@@ -107,7 +107,7 @@ bool SmokeCoAlarmServer::SetCOState(EndpointId endpointId, AlarmStateEnum newCOS
 
         if (success && (newCOState == AlarmStateEnum::kWarning || newCOState == AlarmStateEnum::kCritical))
         {
-            Events::COAlarm::Type event{};
+            Events::COAlarm::Type event{ newCOState };
             SendEvent(endpointId, event);
         }
 
@@ -131,7 +131,7 @@ bool SmokeCoAlarmServer::SetBatteryAlert(EndpointId endpointId, AlarmStateEnum n
 
         if (success && (newBatteryAlert == AlarmStateEnum::kWarning || newBatteryAlert == AlarmStateEnum::kCritical))
         {
-            Events::LowBattery::Type event{};
+            Events::LowBattery::Type event{ newBatteryAlert };
             SendEvent(endpointId, event);
         }
 
@@ -297,7 +297,7 @@ bool SmokeCoAlarmServer::SetInterconnectSmokeAlarm(EndpointId endpointId, AlarmS
         if (success &&
             (newInterconnectSmokeAlarm == AlarmStateEnum::kWarning || newInterconnectSmokeAlarm == AlarmStateEnum::kCritical))
         {
-            Events::InterconnectSmokeAlarm::Type event{};
+            Events::InterconnectSmokeAlarm::Type event{ newInterconnectSmokeAlarm };
             SendEvent(endpointId, event);
         }
 
@@ -323,7 +323,7 @@ bool SmokeCoAlarmServer::SetInterconnectCOAlarm(EndpointId endpointId, AlarmStat
 
         if (success && (newInterconnectCOAlarm == AlarmStateEnum::kWarning || newInterconnectCOAlarm == AlarmStateEnum::kCritical))
         {
-            Events::InterconnectCOAlarm::Type event{};
+            Events::InterconnectCOAlarm::Type event{ newInterconnectCOAlarm };
             SendEvent(endpointId, event);
         }
 
