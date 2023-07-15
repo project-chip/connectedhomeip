@@ -142,7 +142,7 @@ class BouffalolabBuilder(GnBuilder):
 
         if enable_resetCnt:
             self.argsOpt.append('enable_reset_counter=true')
-            
+
         if enable_rotating_device_id:
             self.argsOpt.append('chip_enable_additional_data_advertising=true')
             self.argsOpt.append('chip_enable_rotating_device_id=true')

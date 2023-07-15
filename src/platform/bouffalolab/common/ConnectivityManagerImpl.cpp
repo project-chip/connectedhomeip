@@ -171,7 +171,8 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectProvisionedWiFiNetwork(void)
     size_t pskLen  = 0;
 
     ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kBLConfigKey_wifissid, (void *) ssid, 64, &ssidLen, 0));
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kBLConfigKey_wifipassword, (void *) psk, 64, &pskLen, 0));
+    ReturnErrorOnFailure(
+        PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kBLConfigKey_wifipassword, (void *) psk, 64, &pskLen, 0));
 
     NetworkCommissioning::BLWiFiDriver::GetInstance().ConnectWiFiNetwork(ssid, ssidLen, psk, pskLen);
 
