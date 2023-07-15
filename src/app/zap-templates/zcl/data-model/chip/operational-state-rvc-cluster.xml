@@ -53,8 +53,9 @@ limitations under the License.
     <attribute side="server" code="0x0003" define="OPERATIONAL_STATE_LIST"  type="ARRAY" entryType="OperationalStateStruct"                          writable="false"                    optional="false">OperationalStateList</attribute>
 
 <!--
-The attribute "OPERATIONAL_STATE" herein is applicable to RVC Operational State only and its values are
-additional to the set of values defined in Operational State. So we define the type of this attribute "ENUM8"
+The type of this attribute in the spec is OperationalStateEnum, but the OperationalStateEnum in our XML
+excludes the values from the base OperationalState cluster.  Just use ENUM8 for the type, so it allows
+both values from this cluster and from the base cluster.
 -->
     <attribute side="server" code="0x0004" define="OPERATIONAL_STATE"       type="ENUM8"                                                             writable="false"                    optional="false">OperationalState</attribute>
     <attribute side="server" code="0x0005" define="OPERATIONAL_ERROR"       type="ErrorStateStruct"                                                  writable="false"                    optional="false">OperationalError</attribute>
