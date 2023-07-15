@@ -535,7 +535,9 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/platform_util.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/sha256.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/sha512.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509_create.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509_crt.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509write_csr.c",
     ]
 

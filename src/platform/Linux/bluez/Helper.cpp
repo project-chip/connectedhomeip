@@ -124,7 +124,7 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
     BluezObjectSkeleton * object;
     GVariant * serviceData;
     GVariant * serviceUUID;
-    gchar * localName;
+    gchar * localName = nullptr;
     GVariantBuilder serviceDataBuilder;
     GVariantBuilder serviceUUIDsBuilder;
     char * debugStr;
@@ -192,6 +192,7 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
     BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(true, nullptr);
 
 exit:
+    g_free(localName);
     return adv;
 }
 
@@ -814,6 +815,9 @@ static BluezGattCharacteristic1 * BluezCharacteristicCreate(BluezGattService1 * 
 
     bluez_object_skeleton_set_gatt_characteristic1(object, characteristic);
     g_dbus_object_manager_server_export(aRoot, G_DBUS_OBJECT_SKELETON(object));
+
+    g_free(charPath);
+    g_free(servicePath);
     g_object_unref(object);
 
     return characteristic;

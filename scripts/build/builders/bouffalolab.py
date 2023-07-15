@@ -14,7 +14,6 @@
 
 import logging
 import os
-import platform
 from enum import Enum, auto
 
 from .gn import GnBuilder
@@ -79,7 +78,8 @@ class BouffalolabBuilder(GnBuilder):
                  baudrate=2000000,
                  enable_shell: bool = False,
                  enable_cdc: bool = False,
-                 enable_resetCnt: bool = False
+                 enable_resetCnt: bool = False,
+                 enable_rotating_device_id: bool = False
                  ):
 
         if 'BL602' == module_type:
@@ -142,6 +142,10 @@ class BouffalolabBuilder(GnBuilder):
 
         if enable_resetCnt:
             self.argsOpt.append('enable_reset_counter=true')
+            
+        if enable_rotating_device_id:
+            self.argsOpt.append('chip_enable_additional_data_advertising=true')
+            self.argsOpt.append('chip_enable_rotating_device_id=true')
 
         try:
             self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])

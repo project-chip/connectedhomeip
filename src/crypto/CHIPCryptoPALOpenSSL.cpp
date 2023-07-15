@@ -1971,6 +1971,87 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
     return ExtractKIDFromX509Cert(false, certificate, akid);
 }
 
+CHIP_ERROR ExtractCRLDistributionPointURIFromX509Cert(const ByteSpan & certificate, MutableCharSpan & cdpurl)
+{
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    X509 * x509certificate               = nullptr;
+    const unsigned char * pCertificate   = certificate.data();
+    const unsigned char ** ppCertificate = &pCertificate;
+    STACK_OF(DIST_POINT) * crldp         = nullptr;
+    DIST_POINT * dp                      = nullptr;
+    GENERAL_NAMES * gens                 = nullptr;
+    GENERAL_NAME * gen                   = nullptr;
+    ASN1_STRING * uri                    = nullptr;
+    const char * urlptr                  = nullptr;
+    size_t len                           = 0;
+
+    VerifyOrReturnError(!certificate.empty() && CanCastTo<long>(certificate.size()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    x509certificate = d2i_X509(nullptr, ppCertificate, static_cast<long>(certificate.size()));
+    VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    // CRL Distribution Point Extension is encoded as a secuense of DistributionPoint:
+    //     CRLDistributionPoints ::= SEQUENCE SIZE (1..MAX) OF DistributionPoint
+    //
+    // This implementation only supports a single DistributionPoint (sequence of size 1)
+    crldp =
+        reinterpret_cast<STACK_OF(DIST_POINT) *>(X509_get_ext_d2i(x509certificate, NID_crl_distribution_points, nullptr, nullptr));
+    VerifyOrExit(crldp != nullptr, err = CHIP_ERROR_NOT_FOUND);
+    VerifyOrExit(sk_DIST_POINT_num(crldp) == 1, err = CHIP_ERROR_NOT_FOUND);
+
+    dp = sk_DIST_POINT_value(crldp, 0);
+    VerifyOrExit(dp != nullptr, err = CHIP_ERROR_NOT_FOUND);
+    VerifyOrExit(dp->distpoint != nullptr && dp->distpoint->type == 0, err = CHIP_ERROR_NOT_FOUND);
+
+    // The DistributionPoint is a sequence of three optional elements:
+    //     DistributionPoint ::= SEQUENCE {
+    //         distributionPoint       [0]     DistributionPointName OPTIONAL,
+    //         reasons                 [1]     ReasonFlags OPTIONAL,
+    //         cRLIssuer               [2]     GeneralNames OPTIONAL }
+    //
+    // where the DistributionPointName is a CHOICE of:
+    //     DistributionPointName ::= CHOICE {
+    //         fullName                [0]     GeneralNames,
+    //         nameRelativeToCRLIssuer [1]     RelativeDistinguishedName }
+    //
+    // The URI should be encoded in the fullName element.
+    // This implementation only supports a single GeneralName in the fullName sequence:
+    //     GeneralNames ::= SEQUENCE SIZE (1..MAX) OF GeneralName
+    gens = dp->distpoint->name.fullname;
+    VerifyOrExit(sk_GENERAL_NAME_num(gens) == 1, err = CHIP_ERROR_NOT_FOUND);
+
+    // The CDP URI is encoded as a uniformResourceIdentifier field of the GeneralName:
+    //     GeneralName ::= CHOICE {
+    //         otherName                       [0]     OtherName,
+    //         rfc822Name                      [1]     IA5String,
+    //         dNSName                         [2]     IA5String,
+    //         x400Address                     [3]     ORAddress,
+    //         directoryName                   [4]     Name,
+    //         ediPartyName                    [5]     EDIPartyName,
+    //         uniformResourceIdentifier       [6]     IA5String,
+    //         iPAddress                       [7]     OCTET STRING,
+    //         registeredID                    [8]     OBJECT IDENTIFIER }
+    gen = sk_GENERAL_NAME_value(gens, 0);
+    VerifyOrExit(gen->type == GEN_URI, err = CHIP_ERROR_NOT_FOUND);
+
+    uri    = reinterpret_cast<ASN1_STRING *>(GENERAL_NAME_get0_value(gen, nullptr));
+    urlptr = reinterpret_cast<const char *>(ASN1_STRING_get0_data(uri));
+    VerifyOrExit(CanCastTo<size_t>(ASN1_STRING_length(uri)), err = CHIP_ERROR_NOT_FOUND);
+    len = static_cast<size_t>(ASN1_STRING_length(uri));
+    VerifyOrExit(
+        (len > strlen(kValidCDPURIHttpPrefix) && strncmp(urlptr, kValidCDPURIHttpPrefix, strlen(kValidCDPURIHttpPrefix)) == 0) ||
+            (len > strlen(kValidCDPURIHttpsPrefix) &&
+             strncmp(urlptr, kValidCDPURIHttpsPrefix, strlen(kValidCDPURIHttpsPrefix)) == 0),
+        err = CHIP_ERROR_NOT_FOUND);
+    err = CopyCharSpanToMutableCharSpan(CharSpan(urlptr, len), cdpurl);
+
+exit:
+    sk_DIST_POINT_pop_free(crldp, DIST_POINT_free);
+    X509_free(x509certificate);
+
+    return err;
+}
+
 CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, MutableByteSpan & serialNumber)
 {
     CHIP_ERROR err                        = CHIP_NO_ERROR;

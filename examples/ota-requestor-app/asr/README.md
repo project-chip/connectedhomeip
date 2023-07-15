@@ -5,18 +5,10 @@ This example demonstrates the Matter OTA Requestor application on ASR platform.
 ---
 
 -   [Matter ASR OTA Requestor Example](#matter-asr-ota-requestor-example)
-    -   [Supported Chips](#supported-chips)
     -   [Building and Commissioning](#building-and-commissioning)
     -   [Testing the example](#testing-the-example)
 
 ---
-
-## Supported Chips
-
-The Matter demo application is supported on:
-
--   ASR582X
--   ASR595X
 
 ## Building and Commissioning
 

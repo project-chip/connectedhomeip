@@ -44,7 +44,7 @@ from optparse import OptionParser, OptionValueError
 
 import chip.logging
 import coloredlogs
-from chip import ChipCommissionableNodeCtrl, ChipStack, FabricAdmin, exceptions, native
+from chip import ChipCommissionableNodeCtrl, ChipStack, exceptions, native
 from chip.setup_payload import SetupPayload
 from rich import pretty, print
 
@@ -311,7 +311,8 @@ class DeviceMgrCmd(Cmd):
         """
 
         warnings.warn(
-            "This method is being deprecated. Please use the DeviceController.CloseBLEConnection method directly in the REPL", DeprecationWarning)
+            "This method is being deprecated. "
+            "Please use the DeviceController.CloseBLEConnection method directly in the REPL", DeprecationWarning)
 
         args = shlex.split(line)
 
@@ -333,7 +334,8 @@ class DeviceMgrCmd(Cmd):
         """
 
         warnings.warn(
-            "This method is being deprecated. Please use the DeviceController.SetLogFilter method directly in the REPL", DeprecationWarning)
+            "This method is being deprecated. "
+            "Please use the DeviceController.SetLogFilter method directly in the REPL", DeprecationWarning)
 
         args = shlex.split(line)
 
@@ -382,7 +384,8 @@ class DeviceMgrCmd(Cmd):
         """
 
         warnings.warn(
-            "This method is being deprecated. Please use the SetupPayload function in the chip.setup_payload package directly", DeprecationWarning)
+            "This method is being deprecated. "
+            "Please use the SetupPayload function in the chip.setup_payload package directly", DeprecationWarning)
 
         try:
             arglist = shlex.split(line)
@@ -599,7 +602,8 @@ class DeviceMgrCmd(Cmd):
         """
 
         warnings.warn(
-            "This method is being deprecated. Please use the DeviceController.[ConnectBLE|CommissionIP] methods directly in the REPL", DeprecationWarning)
+            "This method is being deprecated. "
+            "Please use the DeviceController.[ConnectBLE|CommissionIP] methods directly in the REPL", DeprecationWarning)
 
         try:
             args = shlex.split(line)
@@ -661,7 +665,7 @@ class DeviceMgrCmd(Cmd):
             self.devCtrl.CloseSession(args.nodeid)
         except exceptions.ChipStackException as ex:
             print(str(ex))
-        except:
+        except Exception:
             self.do_help("close-session")
 
     def do_resolve(self, line):
@@ -782,7 +786,7 @@ class DeviceMgrCmd(Cmd):
             print('exception')
             print(str(ex))
             return
-        except:
+        except Exception:
             self.do_help("discover")
             return
 
@@ -826,7 +830,7 @@ class DeviceMgrCmd(Cmd):
                     args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command), blocking=True)
                 if err != 0:
                     print("Failed to receive command response: {}".format(res))
-                elif res != None:
+                elif res is not None:
                     print("Received command status response:")
                     print(res)
                 else:
@@ -858,10 +862,11 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 5:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
-                self.replHint = f"await devCtrl.ReadAttribute({int(args[2])}, [({int(args[3])}, Clusters.{args[0]}.Attributes.{args[1]})])"
+                self.replHint = (f"await devCtrl.ReadAttribute({int(args[2])}, [({int(args[3])}, "
+                                 f"Clusters.{args[0]}.Attributes.{args[1]})])")
                 res = self.devCtrl.ZCLReadAttribute(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]))
-                if res != None:
+                if res is not None:
                     print(repr(res))
             else:
                 self.do_help("zclread")
@@ -893,7 +898,9 @@ class DeviceMgrCmd(Cmd):
                     raise exceptions.UnknownCluster(args[0])
                 attribute_type = all_attrs.get(args[0], {}).get(
                     args[1], {}).get("type", None)
-                self.replHint = f"await devCtrl.WriteAttribute({int(args[2])}, [({int(args[3])}, Clusters.{args[0]}.Attributes.{args[1]}(value={repr(ParseValueWithType(args[5], attribute_type))}))])"
+                self.replHint = (
+                    f"await devCtrl.WriteAttribute({int(args[2])}, [({int(args[3])}, "
+                    f"Clusters.{args[0]}.Attributes.{args[1]}(value={repr(ParseValueWithType(args[5], attribute_type))}))])")
                 res = self.devCtrl.ZCLWriteAttribute(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]), ParseValueWithType(args[5], attribute_type))
                 print(repr(res))
@@ -930,7 +937,8 @@ class DeviceMgrCmd(Cmd):
                     raise exceptions.UnknownCluster(args[0])
                 res = self.devCtrl.ZCLSubscribeAttribute(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]), int(args[5]))
-                self.replHint = f"sub = await devCtrl.ReadAttribute({int(args[2])}, [({int(args[3])}, Clusters.{args[0]}.Attributes.{args[1]})], reportInterval=({int(args[4])}, {int(args[5])}))"
+                self.replHint = (f"sub = await devCtrl.ReadAttribute({int(args[2])}, [({int(args[3])}, "
+                                 f"Clusters.{args[0]}.Attributes.{args[1]})], reportInterval=({int(args[4])}, {int(args[5])}))")
                 print(res.GetAllValues())
                 print(f"Subscription Established: {res}")
             elif len(args) == 2 and args[0] == '-shutdown':
@@ -1013,7 +1021,8 @@ class DeviceMgrCmd(Cmd):
                 print("Invalid option specified!")
                 raise ValueError("Invalid option specified")
 
-            self.replHint = f"devCtrl.OpenCommissioningWindow(nodeid={int(arglist[0])}, timeout={args.timeout}, iteration={args.iteration}, discriminator={args.discriminator}, option={args.option})"
+            self.replHint = (f"devCtrl.OpenCommissioningWindow(nodeid={int(arglist[0])}, timeout={args.timeout}, "
+                             f"iteration={args.iteration}, discriminator={args.discriminator}, option={args.option})")
 
             self.devCtrl.OpenCommissioningWindow(
                 int(arglist[0]), args.timeout, args.iteration, args.discriminator, args.option)
@@ -1021,7 +1030,7 @@ class DeviceMgrCmd(Cmd):
         except exceptions.ChipStackException as ex:
             print(str(ex))
             return
-        except:
+        except Exception:
             self.do_help("open-commissioning-window")
             return
 
@@ -1041,7 +1050,7 @@ class DeviceMgrCmd(Cmd):
             compressed_fabricid = self.devCtrl.GetCompressedFabricId()
             raw_fabricid = self.devCtrl.fabricId
 
-            self.replHint = f"devCtrl.GetCompressedFabricId(), devCtrl.fabricId"
+            self.replHint = "devCtrl.GetCompressedFabricId(), devCtrl.fabricId"
         except exceptions.ChipStackException as ex:
             print("An exception occurred during reading FabricID:")
             print(str(ex))
@@ -1146,7 +1155,7 @@ def main():
         else:
             try:
                 adapterId = int(options.bluetoothAdapter[3:])
-            except:
+            except ValueError:
                 print(
                     "Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
                 sys.exit(-1)

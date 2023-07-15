@@ -18,11 +18,11 @@
 
 package chip.jsontlv
 
+import chip.tlv.*
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
 import com.google.gson.JsonObject
 import java.util.Base64
-import chip.tlv.*
 
 /**
  * Implements Matter TLV to JSON converter.

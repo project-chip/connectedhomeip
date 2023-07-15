@@ -22,6 +22,7 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/CHIPMemString.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/internal/BLEManager.h>
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #include <setup_payload/AdditionalDataPayloadGenerator.h>

@@ -69,6 +69,14 @@ cpp-app:
         app/PluginApplicationCallbacks.h: outputs/large_lighting_app/cpp-app/PluginApplicationCallbacks.h
         app/callback-stub.cpp: outputs/large_lighting_app/cpp-app/callback-stub.cpp
 
+cpp-tlvmeta:
+    inputs/cluster_with_commands.matter:
+        tlv/meta/clusters_meta.cpp: outputs/cluster_with_commands/cpp-tlvmeta/clusters_meta.cpp
+        tlv/meta/clusters_meta.h: outputs/cluster_with_commands/cpp-tlvmeta/clusters_meta.h
+    inputs/cluster_struct_attribute.matter:
+        tlv/meta/clusters_meta.cpp: outputs/cluster_struct_attribute/cpp-tlvmeta/clusters_meta.cpp
+        tlv/meta/clusters_meta.h: outputs/cluster_struct_attribute/cpp-tlvmeta/clusters_meta.h
+
 custom-example-proto:
     inputs/several_clusters.matter:
         proto/first_cluster.proto: outputs/proto/first_cluster.proto

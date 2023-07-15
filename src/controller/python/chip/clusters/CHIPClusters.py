@@ -5467,6 +5467,19 @@ class ChipClusters:
                 "type": "bool",
                 "reportable": True,
             },
+            0x00000004: {
+                "attributeName": "LastChangedTime",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000005: {
+                "attributeName": "ReplacementProductList",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -5539,6 +5552,19 @@ class ChipClusters:
                 "attributeName": "InPlaceIndicator",
                 "attributeId": 0x00000003,
                 "type": "bool",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "LastChangedTime",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000005: {
+                "attributeName": "ReplacementProductList",
+                "attributeId": 0x00000005,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -5615,6 +5641,19 @@ class ChipClusters:
                 "type": "bool",
                 "reportable": True,
             },
+            0x00000004: {
+                "attributeName": "LastChangedTime",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000005: {
+                "attributeName": "ReplacementProductList",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -5687,6 +5726,19 @@ class ChipClusters:
                 "attributeName": "InPlaceIndicator",
                 "attributeId": 0x00000003,
                 "type": "bool",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "LastChangedTime",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000005: {
+                "attributeName": "ReplacementProductList",
+                "attributeId": 0x00000005,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -5763,6 +5815,19 @@ class ChipClusters:
                 "type": "bool",
                 "reportable": True,
             },
+            0x00000004: {
+                "attributeName": "LastChangedTime",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000005: {
+                "attributeName": "ReplacementProductList",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -5835,6 +5900,19 @@ class ChipClusters:
                 "attributeName": "InPlaceIndicator",
                 "attributeId": 0x00000003,
                 "type": "bool",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "LastChangedTime",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000005: {
+                "attributeName": "ReplacementProductList",
+                "attributeId": 0x00000005,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -5911,6 +5989,19 @@ class ChipClusters:
                 "type": "bool",
                 "reportable": True,
             },
+            0x00000004: {
+                "attributeName": "LastChangedTime",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000005: {
+                "attributeName": "ReplacementProductList",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -5983,6 +6074,19 @@ class ChipClusters:
                 "attributeName": "InPlaceIndicator",
                 "attributeId": 0x00000003,
                 "type": "bool",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "LastChangedTime",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000005: {
+                "attributeName": "ReplacementProductList",
+                "attributeId": 0x00000005,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -6059,6 +6163,19 @@ class ChipClusters:
                 "type": "bool",
                 "reportable": True,
             },
+            0x00000004: {
+                "attributeName": "LastChangedTime",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000005: {
+                "attributeName": "ReplacementProductList",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -6131,6 +6248,19 @@ class ChipClusters:
                 "attributeName": "InPlaceIndicator",
                 "attributeId": 0x00000003,
                 "type": "bool",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "LastChangedTime",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000005: {
+                "attributeName": "ReplacementProductList",
+                "attributeId": 0x00000005,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -6207,6 +6337,19 @@ class ChipClusters:
                 "type": "bool",
                 "reportable": True,
             },
+            0x00000004: {
+                "attributeName": "LastChangedTime",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000005: {
+                "attributeName": "ReplacementProductList",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -6279,6 +6422,19 @@ class ChipClusters:
                 "attributeName": "InPlaceIndicator",
                 "attributeId": 0x00000003,
                 "type": "bool",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "LastChangedTime",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000005: {
+                "attributeName": "ReplacementProductList",
+                "attributeId": 0x00000005,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {

@@ -346,8 +346,9 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
             VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                            ChipLogError(Zcl, "Failed to get SpeedSetting with error: 0x%02x", status));
 
-            float percent        = percentSetting.Value();
-            uint8_t speedSetting = static_cast<uint8_t>(ceil(speedMax * (percent * 0.01)));
+            uint16_t percent = percentSetting.Value();
+            // Plus 99 then integer divide by 100 instead of multiplying 0.01 to avoid floating point precision error
+            uint8_t speedSetting = static_cast<uint8_t>((speedMax * percent + 99) / 100);
 
             if (currentSpeedSetting.IsNull() || speedSetting != currentSpeedSetting.Value())
             {

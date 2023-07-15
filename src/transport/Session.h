@@ -27,7 +27,6 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/LockTracker.h>
 #include <transport/SessionDelegate.h>
-#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace Transport {

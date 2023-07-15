@@ -25,13 +25,10 @@ source_set("manager-srcs") {
     "ICDManager.h",
   ]
 
-  public_deps = [ "${chip_root}/src/lib/core" ]
-}
-
-# ICD Server Configuration
-# All configurations necessary to the ICD Server featureset need to in this configuration
-config("server-config") {
-  defines = [ "CHIP_CONFIG_ENABLE_ICD_SERVER" ]
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/platform:platform",
+  ]
 }
 
 # servers-srcs source-set contains all the sources and configurations necessary to build the ICD Server functionality
@@ -44,10 +41,5 @@ source_set("server-srcs") {
     "ICDEventManager.h",
   ]
 
-  public_deps = [
-    ":manager-srcs",
-    "${chip_root}/src/platform:platform",
-  ]
-
-  public_configs = [ ":server-config" ]
+  public_deps = [ ":manager-srcs" ]
 }

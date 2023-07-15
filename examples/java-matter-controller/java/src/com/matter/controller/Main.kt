@@ -70,13 +70,14 @@ private fun getImCommands(
 }
 
 fun main(args: Array<String>) {
-  val controller = ChipDeviceController(
-    ControllerParams.newBuilder()
-      .setUdpListenPort(0)
-      .setControllerVendorId(0xFFF1)
-      .setCountryCode("US")
-      .build()
-  )
+  val controller =
+    ChipDeviceController(
+      ControllerParams.newBuilder()
+        .setUdpListenPort(0)
+        .setControllerVendorId(0xFFF1)
+        .setCountryCode("US")
+        .build()
+    )
   val credentialsIssuer = CredentialsIssuer()
   val commandManager = CommandManager()
 

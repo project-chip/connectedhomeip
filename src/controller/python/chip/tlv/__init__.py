@@ -116,7 +116,8 @@ TagControls = {
 
 class uint(int):
     '''
-    NewType will not return a class until Python 3.10, as Python 3.10 is not widely used, we still need to construct a class so it can work as a type.
+    NewType will not return a class until Python 3.10, as Python 3.10 is not widely used,
+    we still need to construct a class so it can work as a type.
     '''
 
     def __init__(self, val: int):
@@ -386,7 +387,7 @@ class TLVWriter(object):
                 raise ValueError("Invalid object given for TLV tag")
             if tagNum < 0 or tagNum > UINT32_MAX:
                 raise ValueError("TLV tag number out of range")
-            if profile != None:
+            if profile is not None:
                 if not isinstance(profile, int):
                     raise ValueError("Invalid object given for TLV profile id")
                 if profile < 0 or profile > UINT32_MAX:
@@ -656,7 +657,7 @@ class TLVReader(object):
             )
             try:
                 decoding["value"] = str(val, "utf-8")
-            except Exception as ex:
+            except Exception:
                 decoding["value"] = val
             self._bytesRead += decoding["strDataLen"]
         elif "Byte String" in decoding["type"]:
@@ -673,7 +674,7 @@ class TLVReader(object):
     def _get(self, tlv, decodings, out):
         endOfEncoding = False
 
-        while len(tlv[self._bytesRead:]) > 0 and endOfEncoding == False:
+        while len(tlv[self._bytesRead:]) > 0 and endOfEncoding is False:
             decoding = {}
             self._decodeControlAndTag(tlv, decoding)
             self._decodeStrLength(tlv, decoding)

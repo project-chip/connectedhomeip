@@ -5439,8 +5439,8 @@
     },
     {
       "name": "MA-extendedcolorlight",
-      "deviceTypeName": "MA-dimmablelight",
-      "deviceTypeCode": 257,
+      "deviceTypeName": "MA-extendedcolorlight",
+      "deviceTypeCode": 269,
       "deviceTypeProfileId": 259,
       "clusters": [
         {

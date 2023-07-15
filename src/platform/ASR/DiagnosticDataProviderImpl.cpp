@@ -24,8 +24,11 @@
 #ifdef CFG_PLF_RV32
 #include "asr_alto_boot.h"
 #define duet_get_boot_type asr_get_boot_type
-#else
+#elif defined CFG_PLF_DUET
 #include "duet_boot.h"
+#else
+#include "lega_boot.h"
+#define duet_get_boot_type lega_get_boot_type
 #endif
 
 #ifdef __cplusplus

@@ -76,7 +76,7 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 struct BLEConnection
 {
     char * peerAddr;
-    uint16_t mtu;
+    unsigned int mtu;
     bool subscribed;
     bt_gatt_h gattCharC1Handle;
     bt_gatt_h gattCharC2Handle;
@@ -96,6 +96,13 @@ const char * chip_ble_service_uuid_short = "FFF6";
 static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(10);
 /* Tizen Default Connect Timeout */
 static constexpr System::Clock::Timeout kConnectTimeout = System::Clock::Seconds16(10);
+
+static void __BLEConnectionFree(BLEConnection * conn)
+{
+    VerifyOrReturn(conn != nullptr);
+    g_free(conn->peerAddr);
+    g_free(conn);
+}
 
 static void __AdapterStateChangedCb(int result, bt_adapter_state_e adapterState, void * userData)
 {
@@ -140,7 +147,10 @@ CHIP_ERROR BLEManagerImpl::_BleInitialize(void * userData)
     ret = bt_gatt_set_connection_state_changed_cb(GattConnectionStateChangedCb, nullptr);
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_set_state_changed_cb() failed. ret: %d", ret));
 
-    sInstance.InitConnectionData();
+    // The hash table key is stored in the BLEConnection structure
+    // and is freed by the __BLEConnectionFree() function.
+    sInstance.mConnectionMap =
+        g_hash_table_new_full(g_str_hash, g_str_equal, nullptr, reinterpret_cast<GDestroyNotify>(__BLEConnectionFree));
 
     sInstance.mFlags.Set(Flags::kTizenBLELayerInitialized);
     ChipLogProgress(DeviceLayer, "BLE Initialized");
@@ -713,16 +723,6 @@ exit:
     return ret;
 }
 
-void BLEManagerImpl::InitConnectionData()
-{
-    /* Initialize Hashmap */
-    if (!mConnectionMap)
-    {
-        mConnectionMap = g_hash_table_new(g_str_hash, g_str_equal);
-        ChipLogProgress(DeviceLayer, "GATT Connection HashMap created");
-    }
-}
-
 static bool __GattClientForeachCharCb(int total, int index, bt_gatt_h charHandle, void * data)
 {
     bt_gatt_type_e type;
@@ -798,19 +798,25 @@ void BLEManagerImpl::AddConnectionData(const char * remoteAddr)
         conn           = static_cast<BLEConnection *>(g_malloc0(sizeof(BLEConnection)));
         conn->peerAddr = g_strdup(remoteAddr);
 
+        int ret;
+        if ((ret = bt_gatt_server_get_device_mtu(remoteAddr, &conn->mtu) != BT_ERROR_NONE))
+        {
+            ChipLogError(DeviceLayer, "Failed to get MTU for [%s]. ret: %s", StringOrNullMarker(remoteAddr),
+                         get_error_message(ret));
+        }
+
         if (sInstance.mIsCentral)
         {
             /* Local Device is BLE Central Role */
             if (IsDeviceChipPeripheral(conn))
             {
-                g_hash_table_insert(mConnectionMap, (gpointer) conn->peerAddr, conn);
+                g_hash_table_insert(mConnectionMap, conn->peerAddr, conn);
                 ChipLogProgress(DeviceLayer, "New Connection Added for [%s]", StringOrNullMarker(remoteAddr));
                 NotifyHandleNewConnection(conn);
             }
             else
             {
-                g_free(conn->peerAddr);
-                g_free(conn);
+                __BLEConnectionFree(conn);
             }
         }
         else
@@ -822,7 +828,7 @@ void BLEManagerImpl::AddConnectionData(const char * remoteAddr)
             conn->gattCharC1Handle = mGattCharC1Handle;
             conn->gattCharC2Handle = mGattCharC2Handle;
 
-            g_hash_table_insert(mConnectionMap, (gpointer) conn->peerAddr, conn);
+            g_hash_table_insert(mConnectionMap, conn->peerAddr, conn);
             ChipLogProgress(DeviceLayer, "New Connection Added for [%s]", StringOrNullMarker(remoteAddr));
         }
     }
@@ -839,13 +845,7 @@ void BLEManagerImpl::RemoveConnectionData(const char * remoteAddr)
     VerifyOrReturn(conn != nullptr,
                    ChipLogError(DeviceLayer, "Connection does not exist for [%s]", StringOrNullMarker(remoteAddr)));
 
-    g_hash_table_remove(mConnectionMap, conn->peerAddr);
-
-    g_free(conn->peerAddr);
-    g_free(conn);
-
-    if (!g_hash_table_size(mConnectionMap))
-        mConnectionMap = nullptr;
+    g_hash_table_remove(mConnectionMap, remoteAddr);
 
     ChipLogProgress(DeviceLayer, "Connection Removed");
 }
@@ -1185,7 +1185,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
     auto conn = static_cast<BLEConnection *>(conId);
-    return (conn != nullptr) ? conn->mtu : 0;
+    return (conn != nullptr) ? static_cast<uint16_t>(conn->mtu) : 0;
 }
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,

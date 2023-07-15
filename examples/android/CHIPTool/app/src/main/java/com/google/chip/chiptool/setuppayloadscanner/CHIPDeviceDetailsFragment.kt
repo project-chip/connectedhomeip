@@ -32,7 +32,8 @@ import com.google.chip.chiptool.util.FragmentUtil
 class CHIPDeviceDetailsFragment : Fragment() {
   private lateinit var deviceInfo: CHIPDeviceInfo
   private var _binding: ChipDeviceInfoFragmentBinding? = null
-  private val binding get() = _binding!!
+  private val binding
+    get() = _binding!!
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -47,10 +48,12 @@ class CHIPDeviceDetailsFragment : Fragment() {
     binding.productIdTv.text = "${deviceInfo.productId}"
     binding.setupCodeTv.text = "${deviceInfo.setupPinCode}"
     binding.discriminatorTv.text = "${deviceInfo.discriminator}"
-    binding.discoveryCapabilitiesTv.text = requireContext().getString(
-      R.string.chip_device_info_discovery_capabilities_text,
-      deviceInfo.discoveryCapabilities
-    )
+    binding.discoveryCapabilitiesTv.text =
+      requireContext()
+        .getString(
+          R.string.chip_device_info_discovery_capabilities_text,
+          deviceInfo.discoveryCapabilities
+        )
 
     if (deviceInfo.optionalQrCodeInfoMap.isEmpty()) {
       binding.vendorTagsLabelTv.visibility = View.GONE
