@@ -47,8 +47,7 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
     ChipLogProgress(Zcl, "Device App: OnOffManager::NewManager");
     uint16_t ep = emberAfGetClusterServerEndpointIndex(static_cast<chip::EndpointId>(endpoint), app::Clusters::OnOff::Id,
                                                        EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
-    VerifyOrReturn(ep < kOnffManagerTableSize,
-                   ChipLogError(Zcl, "Device App::OnOff::NewManager: endpoint %d not found", endpoint));
+    VerifyOrReturn(ep < kOnffManagerTableSize, ChipLogError(Zcl, "Device App::OnOff::NewManager: endpoint %d not found", endpoint));
 
     VerifyOrReturn(gOnOffManagerTable[ep] == nullptr,
                    ChipLogError(Zcl, "Device App::OnOff::NewManager: endpoint %d already has a manager", endpoint));
