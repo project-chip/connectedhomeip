@@ -24,6 +24,4 @@ chip_project_config_include_dirs =
     [ "${chip_root}/examples/virtual-device-app/virtual-device-common/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
-chip_build_libshell = true
-
 chip_config_network_layer_ble = true
