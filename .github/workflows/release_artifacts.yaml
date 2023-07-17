@@ -39,6 +39,8 @@ jobs:
               uses: actions/checkout@v3
               with:
                 ref: "${{ github.event.inputs.releaseTag }}"
+            - name: Setup Environment
+              uses: ./.github/actions/setup-environment
             - name: Bootstrap Cache
               uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap

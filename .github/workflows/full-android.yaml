@@ -51,9 +51,8 @@ jobs:
             # Note you likely still need to have non submodules setup for the
             # local machine, like:
             #   git submodule deinit --all
-            - uses: actions/checkout@v3
-              if: ${{ env.ACT }}
-              name: Checkout (ACT for local build)
+            - name: Setup Environment
+              uses: ./.github/actions/setup-environment
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:

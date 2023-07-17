@@ -1,0 +1,11 @@
+name: Setup environment
+description: Setup environment
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    - if: runner.os == 'macOS'
+      shell: bash
+      run: brew install python@3.11 coreutils

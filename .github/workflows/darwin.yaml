@@ -38,7 +38,7 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v3
             - name: Setup Environment
-              run: brew install python@3.9
+              uses: ./.github/actions/setup-environment
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
