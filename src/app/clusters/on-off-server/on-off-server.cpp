@@ -729,19 +729,19 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
 uint32_t OnOffServer::calculateNextWaitTimeMS()
 {
     const chip::System::Clock::Timestamp currentTime = chip::System::SystemClock().GetMonotonicTimestamp();
-    chip::System::Clock::Timestamp waitTime          = UPDATE_TIME_MS;
+    chip::System::Clock::Timestamp waitTime          = ON_OFF_UPDATE_TIME_MS;
     chip::System::Clock::Timestamp latency;
 
     if (currentTime > nextDesiredOnWithTimedOffTimestamp)
     {
         latency = currentTime - nextDesiredOnWithTimedOffTimestamp;
-        if (latency >= UPDATE_TIME_MS)
+        if (latency >= ON_OFF_UPDATE_TIME_MS)
             waitTime = chip::System::Clock::Milliseconds32(1);
         else
             waitTime -= latency;
     }
 
-    nextDesiredOnWithTimedOffTimestamp += UPDATE_TIME_MS;
+    nextDesiredOnWithTimedOffTimestamp += ON_OFF_UPDATE_TIME_MS;
 
     return (uint32_t) waitTime.count();
 }
@@ -755,7 +755,7 @@ bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const 
     Status status                       = Status::Success;
     chip::EndpointId endpoint           = commandPath.mEndpointId;
     bool isOn                           = false;
-    uint16_t currentOffWaitTime         = MAX_TIME_VALUE;
+    uint16_t currentOffWaitTime         = MAX_ON_OFF_TIME_VALUE;
     uint16_t currentOnTime              = 0;
 
     EmberEventControl * event = configureEventControl(endpoint);
@@ -795,10 +795,10 @@ bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const 
 
     ChipLogProgress(Zcl, "On Time:  %d | off wait Time: %d", currentOnTime, currentOffWaitTime);
 
-    if (currentOnTime < MAX_TIME_VALUE && currentOffWaitTime < MAX_TIME_VALUE)
+    if (currentOnTime < MAX_ON_OFF_TIME_VALUE && currentOffWaitTime < MAX_ON_OFF_TIME_VALUE)
     {
-        nextDesiredOnWithTimedOffTimestamp = chip::System::SystemClock().GetMonotonicTimestamp() + UPDATE_TIME_MS;
-        scheduleTimerCallbackMs(configureEventControl(endpoint), (uint32_t) UPDATE_TIME_MS.count());
+        nextDesiredOnWithTimedOffTimestamp = chip::System::SystemClock().GetMonotonicTimestamp() + ON_OFF_UPDATE_TIME_MS;
+        scheduleTimerCallbackMs(configureEventControl(endpoint), ON_OFF_UPDATE_TIME_MS.count());
     }
 
 exit:
@@ -824,7 +824,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
         scheduleTimerCallbackMs(configureEventControl(endpoint), calculateNextWaitTimeMS());
 
         // Update onTime values
-        uint16_t onTime = MIN_TIME_VALUE;
+        uint16_t onTime = MIN_ON_OFF_TIME_VALUE;
         OnOff::Attributes::OnTime::Get(endpoint, &onTime);
         ChipLogProgress(Zcl, "Timer callback - On Time:  %d", onTime);
 

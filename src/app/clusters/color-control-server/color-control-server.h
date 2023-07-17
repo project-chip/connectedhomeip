@@ -31,8 +31,8 @@
  * Defines and Macros
  *********************************************************/
 
-static constexpr chip::System::Clock::Milliseconds32 UPDATE_TIME_MS = chip::System::Clock::Milliseconds32(100);
-static constexpr uint16_t TRANSITION_STEPS_PER_1S                   = 10;
+static constexpr chip::System::Clock::Milliseconds32 TRANSITION_UPDATE_TIME_MS = chip::System::Clock::Milliseconds32(100);
+static constexpr uint16_t TRANSITION_STEPS_PER_1S                              = 10;
 
 static constexpr uint16_t MIN_CIE_XY_VALUE = 0;
 static constexpr uint16_t MAX_CIE_XY_VALUE = 0xfeff; // this value comes directly from the ZCL specification table 5.3
