@@ -107,10 +107,9 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
 
         self.print_step(11, "Read LocalTime")
         local = await self.read_ts_attribute_expect_success(local_attr)
-        compare_time(received=local, offset=timedelta(), tolerance=timedelta(seconds=5))
+        asserts.assert_equal(local, NullValue, "LocalTime cannot be calculated since DST is empty")
 
         self.print_step(12, "Send SetDSTOffset command")
-        th_utc = utc_time_in_matter_epoch()
         dst = [dst_struct(offset=3600, validStarting=0, validUntil=NullValue)]
         await self.send_set_dst_cmd(dst)
 
@@ -165,11 +164,10 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         self.print_step(24, "Read LocalTime")
         if dst_list_size > 1:
             local = await self.read_ts_attribute_expect_success(local_attr)
-            compare_time(received=local, offset=timedelta(), tolerance=timedelta(seconds=5))
+            asserts.assert_equal(local, NullValue, "LocalTime cannot be calculated since DST is empty")
 
         self.print_step(25, "Send SetDSTOffset command")
-        th_utc = utc_time_in_matter_epoch()
-        dst = [dst_struct(offset=3600, validStarting=0, validUntil=NullValue)]
+        dst = [dst_struct(offset=-3600, validStarting=0, validUntil=NullValue)]
         await self.send_set_dst_cmd(dst)
 
         self.print_step(26, "Read LocalTime")
@@ -177,7 +175,6 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         compare_time(received=local, offset=timedelta(seconds=-3600), tolerance=timedelta(seconds=5))
 
         self.print_step(27, "Send SetDSTOffset command")
-        th_utc = utc_time_in_matter_epoch()
         dst = [dst_struct(offset=0, validStarting=0, validUntil=NullValue)]
         await self.send_set_dst_cmd(dst)
 
