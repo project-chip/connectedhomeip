@@ -98,6 +98,12 @@ if [ "$#" == "0" ]; then
             Periodic query timeout variable for OTA in seconds
         rs91x_wpa3_transition
             Support for WPA3 transition mode on RS91x
+        slc_gen_path
+            Allow users to define a path where slc generates boards files. (requires --slc_generate or --slc_reuse_files)
+            (default: /third_party/silabs/slc_gen/<board>/)
+        sl_pre_gen_path
+            Allow users to define a path to pre-generated boards files
+            (default: /third_party/silabs/matter_support/matter/<family>/<board>/)
         sl_matter_version
             Use provided software version at build time
         sl_matter_version_str

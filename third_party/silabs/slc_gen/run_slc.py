@@ -27,10 +27,10 @@ use_wstk_buttons = asBoolean(sys.argv[4])
 use_wstk_leds = asBoolean(sys.argv[5])
 use_external_flash = asBoolean(sys.argv[6])
 silabs_mcu = str(sys.argv[7])
+output_path = str(sys.argv[8])
 
 slcp_file_path = os.path.join(root_path, "examples/platform/silabs/matter-platform.slcp")
 template_path = os.path.join(root_path, "third_party/silabs/slc_gen/")
-output_path = template_path + sys.argv[2] + '/'
 
 slc_arguments = ""
 
