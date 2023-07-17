@@ -1,5 +1,5 @@
-# start with Ubuntu 20.04LTS
-FROM ubuntu:focal
+# start with Ubuntu 22.04.2 LTS
+FROM ubuntu:jammy
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
 VOLUME "/var/source"
@@ -25,7 +25,6 @@ RUN case ${TARGETPLATFORM} in \
     fi \
     ;; \
     esac
-
 
 # base build and check tools and libraries layer
 RUN set -x \
@@ -82,20 +81,28 @@ RUN set -x \
     ninja-build \
     openjdk-8-jdk \
     pkg-config \
-    python-is-python3 \
-    python3.9 \
-    python3.9-dev \
-    python3.9-venv \
     rsync \
     shellcheck \
+    software-properties-common \
     strace \
     systemd \
     udev \
     unzip \
     wget \
     zlib1g-dev \
-    && rm -rf /var/lib/apt/lists/ \
     && git lfs install \
+    && : # last line
+
+RUN add-apt-repository ppa:deadsnakes/ppa
+
+RUN set -x \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing \
+    python3.11 \
+    python3.11-dev \
+    python3.11-venv \
+    python-is-python3 \
+    && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
 # Cmake v3.23.1
@@ -124,8 +131,8 @@ RUN set -x \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common \
     && add-apt-repository universe \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
-    && python3.9 get-pip.py \
-    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1 \
+    && python3.11 get-pip.py \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
