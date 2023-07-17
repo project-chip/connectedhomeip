@@ -629,8 +629,8 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
     colorHueTransitionState->up     = (direction == to_underlying(ColorLoopDirection::kIncrementHue));
     colorHueTransitionState->repeat = true;
 
-    colorHueTransitionState->stepsRemaining = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
-    colorHueTransitionState->stepsTotal     = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
+    colorHueTransitionState->stepsRemaining = static_cast<uint16_t>(time * TRANSITION_STEPS_PER_1S);
+    colorHueTransitionState->stepsTotal     = static_cast<uint16_t>(time * TRANSITION_STEPS_PER_1S);
     colorHueTransitionState->timeRemaining  = MAX_INT16U_VALUE;
     colorHueTransitionState->endpoint       = endpoint;
 
@@ -937,8 +937,8 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
         colorHueTransitionState->up = false;
     }
 
-    colorHueTransitionState->stepsRemaining = TRANSITION_TIME_1S;
-    colorHueTransitionState->stepsTotal     = TRANSITION_TIME_1S;
+    colorHueTransitionState->stepsRemaining = TRANSITION_STEPS_PER_1S;
+    colorHueTransitionState->stepsTotal     = TRANSITION_STEPS_PER_1S;
     colorHueTransitionState->timeRemaining  = MAX_INT16U_VALUE;
     colorHueTransitionState->endpoint       = endpoint;
     colorHueTransitionState->repeat         = true;
@@ -1557,7 +1557,7 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
         // Checks if color loop is active and stays active
         if (isColorLoopActive && !deactiveColorLoop)
         {
-            colorHueTransitionState->stepsTotal         = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
+            colorHueTransitionState->stepsTotal         = static_cast<uint16_t>(time * TRANSITION_STEPS_PER_1S);
             colorHueTransitionState->initialEnhancedHue = colorHueTransitionState->currentEnhancedHue;
 
             if (colorHueTransitionState->up)
