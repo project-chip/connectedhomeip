@@ -31,7 +31,7 @@ from mobly import asserts
 class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.OperationalState
+        cluster = Clusters.Objects.RvcOperationalState
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     @async_test_body
@@ -44,7 +44,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
             self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
 
-            attributes = Clusters.OperationalState.Attributes
+            attributes = Clusters.RvcOperationalState.Attributes
 
             self.print_step(1, "Commissioning, already done")
 
@@ -114,8 +114,8 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
                 logging.info("OperationalState: %s" % (operational_state))
 
-                in_range = (0x8000 <= operational_state.operationalStateID and operational_state.operationalStateID <= 0xBFFF)
-                asserts.assert_true(operational_state.operationalStateID in definedStates.keys() or in_range, "OperationalState has an invalid ID value!")
+                in_range = (0x8000 <= operational_state and operational_state <= 0xBFFF)
+                asserts.assert_true(operational_state in definedStates.keys() or in_range, "OperationalState has an invalid ID value!")
 
             if self.check_pics("RVCOPSTATE.S.A0005"):
                 self.print_step(7, "Read OperationalError attribute")
