@@ -115,7 +115,15 @@
         "Disabled due to HEPAFilterMonitoring not being enabled in Matter.framework for now:",
         "Test_TC_HEPAFREMON_1_1",
         "Test_TC_HEPAFREMON_2_1",
+        "Disabled due to DishWasherModeSelect verification being enabled in MAtter.framework for now:",
+        "Test_TC_DISHM_1_1",
+        "Test_TC_DISHM_1_2",
+        "Test_TC_DISHM_2_1",
+        "Test_TC_DISHM_3_1",
+        "Test_TC_DISHM_3_2",
+        "Test_TC_DISHM_3_3",
         "Disabled due to Events verification not supported",
         "Test_TC_BINFO_2_2"
+
     ]
 }
