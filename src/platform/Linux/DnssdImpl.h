@@ -23,7 +23,6 @@
 #include <chrono>
 #include <map>
 #include <memory>
-#include <set>
 #include <string>
 #include <vector>
 
@@ -142,7 +141,7 @@ private:
         uint8_t mAttempts = 0;
     };
 
-    MdnsAvahi() : mClient(nullptr), mGroup(nullptr) {}
+    MdnsAvahi() : mClient(nullptr) {}
     static MdnsAvahi sInstance;
 
     static void HandleClientState(AvahiClient * client, AvahiClientState state, void * context);
@@ -163,9 +162,8 @@ private:
     DnssdAsyncReturnCallback mErrorCallback;
     void * mAsyncReturnContext;
 
-    std::set<std::string> mPublishedServices;
     AvahiClient * mClient;
-    AvahiEntryGroup * mGroup;
+    std::map<std::string, AvahiEntryGroup *> mPublishedGroups;
     Poller mPoller;
 };
 

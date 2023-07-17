@@ -594,6 +594,7 @@ getManualTests
 getstarted
 getTests
 GH
+ghcr
 ghp
 githubusercontent
 gitignore

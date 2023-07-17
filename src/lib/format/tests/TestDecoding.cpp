@@ -34,7 +34,12 @@ using namespace chip::TLV;
 using namespace chip::TLVMeta;
 using namespace chip::TestData;
 
-const Entry<ItemInfo> _empty_item[0]                 = {};
+// size 1 to avoid compilers complaining about empty arrays
+// (not allowed by ISO 9899:2011 6.7.6.2:
+//    If the expression is a constant expression, it shall have a value greater
+//    than zero.
+// ). We still claim its size is 0 in empty_meta though.
+const Entry<ItemInfo> _empty_item[1]                 = {};
 const std::array<const Node<ItemInfo>, 1> empty_meta = { { { 0, _empty_item } } };
 
 const Entry<ItemInfo> _FakeProtocolData[] = {
