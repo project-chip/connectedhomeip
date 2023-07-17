@@ -19,10 +19,10 @@
 #pragma once
 
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <lib/core/CHIPError.h>
-#include <lib/core/DataModelTypes.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <stdint.h>
 

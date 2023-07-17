@@ -89,18 +89,18 @@ public:
              ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
              bool aResetConditionCommandSupported) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mEndpointId(aEndpointId),
-        mClusterId(aClusterId), mDegradationDirection(aDegradationDirection), mFeatureMap(aFeatureMap),
+        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mEndpointId(aEndpointId), mClusterId(aClusterId),
+        mDegradationDirection(aDegradationDirection), mFeatureMap(aFeatureMap),
         mResetConditionCommandSupported(aResetConditionCommandSupported)
     {}
 
     ~Instance() = default;
 
     // Not copyable or movable
-    Instance(const Instance &)             = delete;
+    Instance(const Instance &) = delete;
     Instance & operator=(const Instance &) = delete;
     Instance(Instance &&)                  = delete;
-    Instance & operator=(Instance &&)      = delete;
+    Instance & operator=(Instance &&) = delete;
 
     // The following methods should be overridden by the SDK user to implement the business logic of their application
 
@@ -170,7 +170,6 @@ private:
      */
     void HandleResetCondition(HandlerContext & ctx,
                               const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData);
-
 };
 
 } // namespace ResourceMonitoring

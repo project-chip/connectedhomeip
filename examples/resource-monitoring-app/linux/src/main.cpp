@@ -34,10 +34,10 @@ constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Featu
                                                      static_cast<uint32_t>(Feature::kWarning) };
 
 static HepaFilterMonitoringInstance HepafilterInstance(0x1, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
-                                                DegradationDirectionEnum::kDown, true);
-static ActivatedCarbonFilterMonitoringInstance ActivatedCarbonFilterInstance(0x1,
-                                                                      static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()),
-                                                                      DegradationDirectionEnum::kDown, true);
+                                                       DegradationDirectionEnum::kDown, true);
+static ActivatedCarbonFilterMonitoringInstance
+    ActivatedCarbonFilterInstance(0x1, static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()),
+                                  DegradationDirectionEnum::kDown, true);
 
 void ApplicationInit()
 {
