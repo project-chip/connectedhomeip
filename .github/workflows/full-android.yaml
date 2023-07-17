@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-android:0.7.3
+            image: ghcr.io/project-chip/chip-build-android:1
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 

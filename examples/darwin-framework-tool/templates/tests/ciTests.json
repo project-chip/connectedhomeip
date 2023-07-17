@@ -116,6 +116,8 @@
         "Test_TC_HEPAFREMON_1_1",
         "Test_TC_HEPAFREMON_2_1",
         "Disabled due to OperationalState not being enabled in Matter.framework for now:",
-        "Test_TC_OPSTATE_1_1"
+        "Test_TC_OPSTATE_1_1",
+        "Disabled due to Events verification not supported",
+        "Test_TC_BINFO_2_2"
     ]
 }
