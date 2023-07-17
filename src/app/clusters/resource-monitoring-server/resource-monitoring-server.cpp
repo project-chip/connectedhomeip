@@ -147,8 +147,6 @@ DataModel::Nullable<uint32_t> Instance::GetLastChangedTime() const
     return mLastChangedTime;
 }
 
-
-
 Status Instance::OnResetCondition()
 {
     ChipLogDetail(Zcl, "ResourceMonitoringServer::OnResetCondition()");
@@ -175,7 +173,7 @@ Status Instance::OnResetCondition()
 
     // handle the reset of the ChangeIndication attribute, mandatory
     UpdateChangeIndication(ChangeIndicationEnum::kOk);
-    
+
     // Handle the reset of the LastChangedTime attribute, if supported
     if (emberAfContainsAttribute(GetEndpointId(), mClusterId, Attributes::LastChangedTime::Id))
     {
