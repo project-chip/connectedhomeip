@@ -7432,6 +7432,17 @@ public class ClusterReadMapping {
           readOperationalStateOperationalStateListCommandParams
         );
         result.put("readOperationalStateListAttribute", readOperationalStateOperationalStateListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readOperationalStateOperationalStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readOperationalStateOperationalStateAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.OperationalStateCluster) cluster).readOperationalStateAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readOperationalStateOperationalStateCommandParams
+        );
+        result.put("readOperationalStateAttribute", readOperationalStateOperationalStateAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readOperationalStateGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readOperationalStateGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -7546,6 +7557,17 @@ public class ClusterReadMapping {
           readRvcOperationalStateOperationalStateListCommandParams
         );
         result.put("readOperationalStateListAttribute", readRvcOperationalStateOperationalStateListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readRvcOperationalStateOperationalStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readRvcOperationalStateOperationalStateAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.RvcOperationalStateCluster) cluster).readOperationalStateAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readRvcOperationalStateOperationalStateCommandParams
+        );
+        result.put("readOperationalStateAttribute", readRvcOperationalStateOperationalStateAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readRvcOperationalStateGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readRvcOperationalStateGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
