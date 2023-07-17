@@ -20,6 +20,8 @@ import("${build_root}/config/defaults.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${psoc6_sdk_build_root}/psoc6_executable.gni")
 import("${psoc6_sdk_build_root}/psoc6_sdk.gni")
+import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/third_party/infineon/trustm/trustm_config.gni")
 
 assert(current_os == "freertos")
 
@@ -109,6 +111,8 @@ psoc6_executable("lock_app") {
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/third_party/infineon/trustm:optiga-trust-m",
+
   ]
 
   include_dirs += [
@@ -116,6 +120,14 @@ psoc6_executable("lock_app") {
     "${examples_plat_dir}",
     "${psoc6_project_dir}/include",
   ]
+
+  if (chip_enable_trustm) {
+    include_dirs += [ "${chip_root}/third_party/infineon/trustm" ]
+  }
+  
+  if (chip_enable_trustm_da) {
+    include_dirs += [ "${chip_root}/examples/platform/infineon/trustm" ]
+  }
 
   sources = [
     "${examples_plat_dir}/LEDWidget.cpp",
