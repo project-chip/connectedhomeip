@@ -16,6 +16,10 @@ buildscript {
     }
 }
 
+allprojects {
+    buildDir = File("${rootProject.buildDir}/${project.name}")
+}
+
 tasks.register("clean", Delete::class) {
     delete(rootProject.buildDir)
 }

@@ -308,35 +308,20 @@ class AndroidBuilder(Builder):
                         self.identifier, module),
                 )
         else:
-            if self.app.ExampleName() == "virtual-device-app":
-                self._Execute(
-                    [
-                        "%s/examples/%s/android/App/gradlew"
-                        % (self.root, self.app.ExampleName()),
-                        "-p",
-                        "%s/examples/%s/android/App/" % (self.root,
-                                                         self.app.ExampleName()),
-                        "-PmatterBuildSrcDir=%s" % self.output_dir,
-                        "-PmatterSdkSourceBuild=false",
-                        ":app:assembleDebug",
-                    ],
-                    title="Building Example " + self.identifier,
-                )
-            else:
-                self._Execute(
-                    [
-                        "%s/examples/%s/android/App/gradlew"
-                        % (self.root, self.app.ExampleName()),
-                        "-p",
-                        "%s/examples/%s/android/App/" % (self.root,
-                                                         self.app.ExampleName()),
-                        "-PmatterBuildSrcDir=%s" % self.output_dir,
-                        "-PmatterSdkSourceBuild=false",
-                        "-PbuildDir=%s" % self.output_dir,
-                        "assembleDebug",
-                    ],
-                    title="Building Example " + self.identifier,
-                )
+            self._Execute(
+                [
+                    "%s/examples/%s/android/App/gradlew"
+                    % (self.root, self.app.ExampleName()),
+                    "-p",
+                    "%s/examples/%s/android/App/" % (self.root,
+                                                     self.app.ExampleName()),
+                    "-PmatterBuildSrcDir=%s" % self.output_dir,
+                    "-PmatterSdkSourceBuild=false",
+                    "-PbuildDir=%s" % self.output_dir,
+                    "assembleDebug",
+                ],
+                title="Building Example " + self.identifier,
+            )
 
     def generate(self):
         self._Execute(
@@ -533,22 +518,6 @@ class AndroidBuilder(Builder):
                 self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
                 self.gradlewBuildExampleAndroid()
 
-                output_dir = os.path.join(
-                    self.output_dir, "outputs", "apk"
-                )
-
-                self._Execute(
-                    ["mkdir", "-p", output_dir], title="Prepare outputs directory"
-                )
-
-                apk_dir = os.path.join(
-                    self.root, "examples", self.app.ExampleName(), "android/App/app/build/outputs/apk/debug"
-                )
-
-                self._Execute(
-                    ["cp", "-f", "-r", apk_dir, output_dir], title="Copying outputs"
-                )
-
             if (self.profile != AndroidProfile.DEBUG):
                 self.stripSymbols()
 
@@ -571,6 +540,12 @@ class AndroidBuilder(Builder):
                     ),
                     "tv-sever-content-app-debug.apk": os.path.join(
                         self.output_dir, "content-app", "outputs", "apk", "debug", "content-app-debug.apk"
+                    )
+                }
+            elif self.app == AndroidApp.VIRTUAL_DEVICE_APP:
+                outputs = {
+                    self.app.AppName() + "app-debug.apk": os.path.join(
+                        self.output_dir, "VirtualDeviceApp", "app", "outputs", "apk", "debug", "app-debug.apk"
                     )
                 }
             else:

@@ -51,11 +51,11 @@ the top Matter directory:
 See the table above for other values of `TARGET_CPU`.
 
 The debug Android package `app-debug.apk` will be generated at
-`out/android-$TARGET_CPU-virtual-device-app/outputs/apk/debug/`, and can be installed
+`out/android-$TARGET_CPU-virtual-device-app/VirtualDeviceApp/app/outputs/apk/debug/`, and can be installed
 with
 
 ```shell
-adb install out/android-$TARGET_CPU-virtual-device-app/outputs/apk/debug/app-debug.apk
+adb install out/android-$TARGET_CPU-virtual-device-app/VirtualDeviceApp/app/outputs/apk/debug/app-debug.apk
 ```
 
 You can use Android Studio to edit the Android app itself and run it after
