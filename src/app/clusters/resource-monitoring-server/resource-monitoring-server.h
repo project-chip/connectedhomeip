@@ -125,7 +125,7 @@ public:
      *
      * The return value will depend on the PreResetCondition() and PostResetCondition() method, if one of them does not return
      * Success, this method will return the failure as well.
-     * @return Status::Success      If the command was handled successfull
+     * @return Status::Success      If the command was handled successfully.
      * @return All Other            PreResetCondition() or PostResetCondition() failed, these are application specific.
      */
     virtual chip::Protocols::InteractionModel::Status OnResetCondition();
