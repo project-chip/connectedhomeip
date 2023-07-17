@@ -1,5 +1,5 @@
 # Stage 1: Setup dependencies (based on chip-build).
-FROM ubuntu:22.04 as chip-build-cert
+FROM ubuntu:jammy as chip-build-cert
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 ARG TARGETPLATFORM
 # COMMITHASH defines the target commit to build from. May be passed in using --build-arg.
@@ -280,7 +280,7 @@ RUN case ${TARGETPLATFORM} in \
 RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i no
 
 # Stage 3: Copy relevant cert bins to a minimal image to reduce size.
-FROM ubuntu:22.04
+FROM ubuntu:jammy
 ENV TZ=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update -y
