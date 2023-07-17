@@ -115,13 +115,15 @@
         "Disabled due to HEPAFilterMonitoring not being enabled in Matter.framework for now:",
         "Test_TC_HEPAFREMON_1_1",
         "Test_TC_HEPAFREMON_2_1",
-        "Disabled due to Events verification not supported",
-        "Test_TC_BINFO_2_2",
-        "Disabled due to using unsupported command:",
+        "Disabled due to SmokeCOAlarm not being enabled in Matter.framework for now:",
+        "Test_TC_SMCO_1_1",
+        "Test_TC_SMCO_2_1",
         "Test_TC_SMCO_2_2",
         "Test_TC_SMCO_2_3",
         "Test_TC_SMCO_2_4",
         "Test_TC_SMCO_2_5",
-        "Test_TC_SMCO_2_6"
+        "Test_TC_SMCO_2_6",
+        "Disabled due to Events verification not supported",
+        "Test_TC_BINFO_2_2"
     ]
 }
