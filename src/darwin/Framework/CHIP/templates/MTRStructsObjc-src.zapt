@@ -65,6 +65,16 @@ NS_ASSUME_NONNULL_BEGIN
 {{#*inline "oldNameImpl"}}
 {{#if (isSupported cluster struct=structName)}}
 @implementation MTR{{cluster}}Cluster{{structName}} : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}
+{{#zcl_struct_items}}
+{{#if (isSupported ../cluster struct=../structName structField=(asStructPropertyName label))}}
+@dynamic {{asStructPropertyName label}};
+{{/if}}
+{{#if (hasOldName ../cluster struct=../structName structField=(asStructPropertyName label))}}
+{{#if (isSupported ../cluster struct=../structName structField=(oldName ../cluster struct=../structName structField=(asStructPropertyName label)))}}
+@dynamic {{oldName ../cluster struct=../structName structField=(asStructPropertyName label)}};
+{{/if}}
+{{/if}}
+{{/zcl_struct_items}}
 @end
 {{/if}}
 {{/inline}}
@@ -139,6 +149,16 @@ NS_ASSUME_NONNULL_BEGIN
 {{#if (isSupported cluster event=eventName)}}
 
 @implementation MTR{{cluster}}Cluster{{eventName}}Event : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event
+{{#zcl_event_fields}}
+{{#if (isSupported ../cluster event=../eventName eventField=(asStructPropertyName name))}}
+@dynamic {{asStructPropertyName name}};
+{{/if}}
+{{#if (hasOldName ../cluster event=../eventName eventField=(asStructPropertyName name))}}
+{{#if (isSupported ../cluster event=../eventName eventField=(oldName ../cluster event=../eventName eventField=(asStructPropertyName name)))}}
+@dynamic {{oldName ../cluster event=../event eventField=(asStructPropertyName name)}};
+{{/if}}
+{{/if}}
+{{/zcl_event_fields}}
 @end
 {{/if}}
 {{/inline}}
