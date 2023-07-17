@@ -1,5 +1,5 @@
 # start with Ubuntu 20.04LTS
-FROM ubuntu:focal
+FROM ubuntu::22.04
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
 VOLUME "/var/source"

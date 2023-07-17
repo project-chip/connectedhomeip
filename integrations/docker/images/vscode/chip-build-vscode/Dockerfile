@@ -1,4 +1,4 @@
-ARG VERSION=latest
+ARG VERSION=2latest
 
 FROM ghcr.io/project-chip/chip-build-nrf-platform:${VERSION} AS nrf
 FROM ghcr.io/project-chip/chip-build-efr32:${VERSION} AS efr32
