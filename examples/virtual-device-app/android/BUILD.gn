@@ -65,9 +65,9 @@ android_library("java") {
 
   sources = [
     "java/src/com/matter/virtual/device/app/DACProvider.java",
-    "java/src/com/matter/virtual/device/app/OnOffManager.java",
     "java/src/com/matter/virtual/device/app/DeviceApp.java",
     "java/src/com/matter/virtual/device/app/DeviceAppCallback.java",
+    "java/src/com/matter/virtual/device/app/OnOffManager.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
