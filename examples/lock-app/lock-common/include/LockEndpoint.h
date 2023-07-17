@@ -64,9 +64,12 @@ public:
 
     inline chip::EndpointId GetEndpointId() const { return mEndpointId; }
 
-    bool Lock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
-    bool Unlock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
-    bool Unbolt(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
+    bool Lock(const chip::app::CommandHandler * commandObj, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
+              OperationSourceEnum opSource);
+    bool Unlock(const chip::app::CommandHandler * commandObj, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
+                OperationSourceEnum opSource);
+    bool Unbolt(const chip::app::CommandHandler * commandObj, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
+                OperationSourceEnum opSource);
 
     bool GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const;
     bool SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier, const chip::CharSpan & userName,
@@ -98,8 +101,8 @@ public:
                          OperatingModeEnum operatingMode);
 
 private:
-    bool setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
-                      OperationSourceEnum opSource = OperationSourceEnum::kUnspecified);
+    bool setLockState(const chip::app::CommandHandler * commandObj, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
+                      OperationErrorEnum & err, OperationSourceEnum opSource = OperationSourceEnum::kUnspecified);
     const char * lockStateToString(DlLockState lockState) const;
 
     bool weekDayScheduleInAction(uint16_t userIndex) const;

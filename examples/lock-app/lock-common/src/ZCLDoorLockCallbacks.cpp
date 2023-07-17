@@ -28,22 +28,22 @@ using namespace chip::app::Clusters::DoorLock;
 // should wait for door to be locked on lock command and return success) but
 // door lock server should check pin before even calling the lock-door
 // callback.
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
-                                            OperationErrorEnum & err)
+bool emberAfPluginDoorLockOnDoorLockCommand(const chip::app::CommandHandler * commandObj, chip::EndpointId endpointId,
+                                            const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
 {
-    return LockManager::Instance().Lock(endpointId, pinCode, err, OperationSourceEnum::kRemote);
+    return LockManager::Instance().Lock(commandObj, endpointId, pinCode, err, OperationSourceEnum::kRemote);
 }
 
-bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
-                                              OperationErrorEnum & err)
+bool emberAfPluginDoorLockOnDoorUnlockCommand(const chip::app::CommandHandler * commandObj, chip::EndpointId endpointId,
+                                              const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
 {
-    return LockManager::Instance().Unlock(endpointId, pinCode, err, OperationSourceEnum::kRemote);
+    return LockManager::Instance().Unlock(commandObj, endpointId, pinCode, err, OperationSourceEnum::kRemote);
 }
 
-bool emberAfPluginDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
-                                              OperationErrorEnum & err)
+bool emberAfPluginDoorLockOnDoorUnboltCommand(const chip::app::CommandHandler * commandObj, chip::EndpointId endpointId,
+                                              const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
 {
-    return LockManager::Instance().Unbolt(endpointId, pinCode, err, OperationSourceEnum::kRemote);
+    return LockManager::Instance().Unbolt(commandObj, endpointId, pinCode, err, OperationSourceEnum::kRemote);
 }
 
 bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)

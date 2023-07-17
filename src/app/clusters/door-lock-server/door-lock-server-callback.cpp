@@ -45,21 +45,24 @@ using namespace chip::app::Clusters::DoorLock;
 // =============================================================================
 
 bool __attribute__((weak))
-emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
+emberAfPluginDoorLockOnDoorLockCommand(const chip::app::CommandHandler * commandObj, chip::EndpointId endpointId,
+                                       const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
 {
     err = OperationErrorEnum::kUnspecified;
     return false;
 }
 
 bool __attribute__((weak))
-emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
+emberAfPluginDoorLockOnDoorUnlockCommand(const chip::app::CommandHandler * commandObj, chip::EndpointId endpointId,
+                                         const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
 {
     err = OperationErrorEnum::kUnspecified;
     return false;
 }
 
 bool __attribute__((weak))
-emberAfPluginDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
+emberAfPluginDoorLockOnDoorUnboltCommand(const chip::app::CommandHandler * commandObj, chip::EndpointId endpointId,
+                                         const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
 {
     err = OperationErrorEnum::kUnspecified;
     return false;

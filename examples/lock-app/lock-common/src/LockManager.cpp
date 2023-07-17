@@ -134,8 +134,8 @@ bool LockManager::SendLockAlarm(chip::EndpointId endpointId, AlarmCodeEnum alarm
     return lockEndpoint->SendLockAlarm(alarmCode);
 }
 
-bool LockManager::Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
-                       OperationSourceEnum opSource)
+bool LockManager::Lock(const chip::app::CommandHandler * commandObj, chip::EndpointId endpointId,
+                       const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)
@@ -143,11 +143,11 @@ bool LockManager::Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpa
         ChipLogError(Zcl, "Unable to lock the door - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
         return false;
     }
-    return lockEndpoint->Lock(pin, err, opSource);
+    return lockEndpoint->Lock(commandObj, pin, err, opSource);
 }
 
-bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
-                         OperationSourceEnum opSource)
+bool LockManager::Unlock(const chip::app::CommandHandler * commandObj, chip::EndpointId endpointId,
+                         const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)
@@ -155,11 +155,11 @@ bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteS
         ChipLogError(Zcl, "Unable to unlock the door - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
         return false;
     }
-    return lockEndpoint->Unlock(pin, err, opSource);
+    return lockEndpoint->Unlock(commandObj, pin, err, opSource);
 }
 
-bool LockManager::Unbolt(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
-                         OperationSourceEnum opSource)
+bool LockManager::Unbolt(const chip::app::CommandHandler * commandObj, chip::EndpointId endpointId,
+                         const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)
@@ -167,7 +167,7 @@ bool LockManager::Unbolt(chip::EndpointId endpointId, const Optional<chip::ByteS
         ChipLogError(Zcl, "Unable to unbolt the door - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
         return false;
     }
-    return lockEndpoint->Unbolt(pin, err, opSource);
+    return lockEndpoint->Unbolt(commandObj, pin, err, opSource);
 }
 
 bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
