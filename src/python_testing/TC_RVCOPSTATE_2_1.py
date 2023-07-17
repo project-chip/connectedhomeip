@@ -69,8 +69,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 if phase_list == NullValue:
                     asserts.assert_true(current_phase == NullValue, "CurrentPhase should be null")    
                 else:
-                    asserts.assert_greater_equal(current_phase, 0, "CurrentPhase must be greater than 0")
-                    asserts.assert_less_equal(current_phase, (phase_list_len - 1), "CurrentPhase must be less than (phase-list-size - 1)")
+                    asserts.assert_true(0 <= current_phase and current_phase <= (phase_list_len - 1), "CurrentPhase must be between 0 and (phase-list-size - 1)")
 
             if self.check_pics("RVCOPSTATE.S.A0002"):
                 self.print_step(4, "Read CountdownTime attribute")
