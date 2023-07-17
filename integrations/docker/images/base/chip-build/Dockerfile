@@ -1,4 +1,4 @@
-# start with Ubuntu 20.04LTS
+# start with Ubuntu 22.04.2 LTS
 FROM ubuntu:jammy
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
