@@ -15158,45 +15158,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            jobject value_operationalStateID;
-            std::string value_operationalStateIDClassName     = "java/lang/Integer";
-            std::string value_operationalStateIDCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_operationalStateIDClassName.c_str(),
-                                                                          value_operationalStateIDCtorSignature.c_str(),
-                                                                          cppValue.operationalStateID, value_operationalStateID);
-            jobject value_operationalStateLabel;
-            if (!cppValue.operationalStateLabel.HasValue())
-            {
-                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_operationalStateLabel);
-            }
-            else
-            {
-                jobject value_operationalStateLabelInsideOptional;
-                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.operationalStateLabel.Value(),
-                                                                                     value_operationalStateLabelInsideOptional));
-                chip::JniReferences::GetInstance().CreateOptional(value_operationalStateLabelInsideOptional,
-                                                                  value_operationalStateLabel);
-            }
-
-            jclass operationalStateStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipStructs$OperationalStateClusterOperationalStateStruct",
-                operationalStateStructStructClass_0);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "Could not find class ChipStructs$OperationalStateClusterOperationalStateStruct");
-                return nullptr;
-            }
-            jmethodID operationalStateStructStructCtor_0 =
-                env->GetMethodID(operationalStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
-            if (operationalStateStructStructCtor_0 == nullptr)
-            {
-                ChipLogError(Zcl, "Could not find ChipStructs$OperationalStateClusterOperationalStateStruct constructor");
-                return nullptr;
-            }
-
-            value = env->NewObject(operationalStateStructStructClass_0, operationalStateStructStructCtor_0,
-                                   value_operationalStateID, value_operationalStateLabel);
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          static_cast<uint8_t>(cppValue), value);
             return value;
         }
         case Attributes::OperationalError::Id: {
@@ -15535,45 +15500,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            jobject value_operationalStateID;
-            std::string value_operationalStateIDClassName     = "java/lang/Integer";
-            std::string value_operationalStateIDCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_operationalStateIDClassName.c_str(),
-                                                                          value_operationalStateIDCtorSignature.c_str(),
-                                                                          cppValue.operationalStateID, value_operationalStateID);
-            jobject value_operationalStateLabel;
-            if (!cppValue.operationalStateLabel.HasValue())
-            {
-                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_operationalStateLabel);
-            }
-            else
-            {
-                jobject value_operationalStateLabelInsideOptional;
-                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.operationalStateLabel.Value(),
-                                                                                     value_operationalStateLabelInsideOptional));
-                chip::JniReferences::GetInstance().CreateOptional(value_operationalStateLabelInsideOptional,
-                                                                  value_operationalStateLabel);
-            }
-
-            jclass operationalStateStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipStructs$RvcOperationalStateClusterOperationalStateStruct",
-                operationalStateStructStructClass_0);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "Could not find class ChipStructs$RvcOperationalStateClusterOperationalStateStruct");
-                return nullptr;
-            }
-            jmethodID operationalStateStructStructCtor_0 =
-                env->GetMethodID(operationalStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
-            if (operationalStateStructStructCtor_0 == nullptr)
-            {
-                ChipLogError(Zcl, "Could not find ChipStructs$RvcOperationalStateClusterOperationalStateStruct constructor");
-                return nullptr;
-            }
-
-            value = env->NewObject(operationalStateStructStructClass_0, operationalStateStructStructCtor_0,
-                                   value_operationalStateID, value_operationalStateLabel);
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::OperationalError::Id: {

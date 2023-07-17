@@ -39,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && false
 
         container:
-            image: connectedhomeip/chip-build-ti:0.7.14
+            image: ghcr.io/project-chip/chip-build-ti:1
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:

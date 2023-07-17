@@ -99,7 +99,7 @@ function __cirquetest_self_hash() {
 }
 
 function cirquetest_cachekey() {
-    echo "$("$REPO_DIR"/integrations/docker/ci-only-images/chip-cirque-device-base/cachekey.sh).openthread.$OPENTHREAD_CHECKOUT.cirque_test.$(__cirquetest_self_hash)"
+    echo "$("$REPO_DIR"/integrations/docker/images/stage-2/chip-cirque-device-base/cachekey.sh).openthread.$OPENTHREAD_CHECKOUT.cirque_test.$(__cirquetest_self_hash)"
 }
 
 function cirquetest_cachekeyhash() {
@@ -116,12 +116,9 @@ function cirquetest_bootstrap() {
 
     make NO_GRPC=1 install -j
 
-    if [[ "$GITHUB_ACTION_RUN" = "1" ]]; then
-        # Note: This script will be invoked in docker on CI, We should add CHIP repo to safe directory to silent git error messages.
-        git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
-    fi
+    git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
 
-    "$REPO_DIR"/integrations/docker/ci-only-images/chip-cirque-device-base/build.sh
+    "$REPO_DIR"/integrations/docker/images/stage-2/chip-cirque-device-base/build.sh
 
     __cirquetest_build_ot_lazy
     pip3 install -r requirements_nogrpc.txt

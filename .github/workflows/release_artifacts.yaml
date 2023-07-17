@@ -32,7 +32,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.7.3
+            image: ghcr.io/project-chip/chip-build-esp32:1
 
         steps:
             - name: Checkout
@@ -68,7 +68,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-efr32:0.7.3
+            image: ghcr.io/project-chip/chip-build-efr32:1
         steps:
             - name: Checkout
               uses: actions/checkout@v3

@@ -18274,7 +18274,7 @@ class OperationalState(Cluster):
                 ClusterObjectFieldDescriptor(Label="currentPhase", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="countdownTime", Tag=0x00000002, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="operationalStateList", Tag=0x00000003, Type=typing.List[OperationalState.Structs.OperationalStateStruct]),
-                ClusterObjectFieldDescriptor(Label="operationalState", Tag=0x00000004, Type=OperationalState.Structs.OperationalStateStruct),
+                ClusterObjectFieldDescriptor(Label="operationalState", Tag=0x00000004, Type=OperationalState.Enums.OperationalStateEnum),
                 ClusterObjectFieldDescriptor(Label="operationalError", Tag=0x00000005, Type=OperationalState.Structs.ErrorStateStruct),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -18288,7 +18288,7 @@ class OperationalState(Cluster):
     currentPhase: 'typing.Union[Nullable, uint]' = None
     countdownTime: 'typing.Union[None, Nullable, uint]' = None
     operationalStateList: 'typing.List[OperationalState.Structs.OperationalStateStruct]' = None
-    operationalState: 'OperationalState.Structs.OperationalStateStruct' = None
+    operationalState: 'OperationalState.Enums.OperationalStateEnum' = None
     operationalError: 'OperationalState.Structs.ErrorStateStruct' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
@@ -18495,9 +18495,9 @@ class OperationalState(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=OperationalState.Structs.OperationalStateStruct)
+                return ClusterObjectFieldDescriptor(Type=OperationalState.Enums.OperationalStateEnum)
 
-            value: 'OperationalState.Structs.OperationalStateStruct' = field(default_factory=lambda: OperationalState.Structs.OperationalStateStruct())
+            value: 'OperationalState.Enums.OperationalStateEnum' = 0
 
         @dataclass
         class OperationalError(ClusterAttributeDescriptor):
@@ -18667,7 +18667,7 @@ class RvcOperationalState(Cluster):
                 ClusterObjectFieldDescriptor(Label="currentPhase", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="countdownTime", Tag=0x00000002, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="operationalStateList", Tag=0x00000003, Type=typing.List[RvcOperationalState.Structs.OperationalStateStruct]),
-                ClusterObjectFieldDescriptor(Label="operationalState", Tag=0x00000004, Type=RvcOperationalState.Structs.OperationalStateStruct),
+                ClusterObjectFieldDescriptor(Label="operationalState", Tag=0x00000004, Type=uint),
                 ClusterObjectFieldDescriptor(Label="operationalError", Tag=0x00000005, Type=RvcOperationalState.Structs.ErrorStateStruct),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -18681,7 +18681,7 @@ class RvcOperationalState(Cluster):
     currentPhase: 'typing.Union[Nullable, uint]' = None
     countdownTime: 'typing.Union[None, Nullable, uint]' = None
     operationalStateList: 'typing.List[RvcOperationalState.Structs.OperationalStateStruct]' = None
-    operationalState: 'RvcOperationalState.Structs.OperationalStateStruct' = None
+    operationalState: 'uint' = None
     operationalError: 'RvcOperationalState.Structs.ErrorStateStruct' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
@@ -18891,9 +18891,9 @@ class RvcOperationalState(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=RvcOperationalState.Structs.OperationalStateStruct)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'RvcOperationalState.Structs.OperationalStateStruct' = field(default_factory=lambda: RvcOperationalState.Structs.OperationalStateStruct())
+            value: 'uint' = 0
 
         @dataclass
         class OperationalError(ClusterAttributeDescriptor):

@@ -603,6 +603,7 @@ def BuildBouffalolabTarget():
     target.AppendModifier('115200', baudrate=115200)
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('cdc', enable_cdc=True)
+    target.AppendModifier('rotating_device_id', enable_rotating_device_id=True)
 
     return target
 
@@ -654,6 +655,7 @@ def BuildTelinkTarget():
         TargetPart('ota-requestor', app=TelinkApp.OTA_REQUESTOR),
         TargetPart('pump', app=TelinkApp.PUMP),
         TargetPart('pump-controller', app=TelinkApp.PUMP_CONTROLLER),
+        TargetPart('smoke-co-alarm', app=TelinkApp.SMOKE_CO_ALARM),
         TargetPart('temperature-measurement',
                    app=TelinkApp.TEMPERATURE_MEASUREMENT),
         TargetPart('thermostat', app=TelinkApp.THERMOSTAT),
