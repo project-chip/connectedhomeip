@@ -32,8 +32,8 @@ It will:
 
 1. Install necessary packages required by cirque,
 
-2. Build `project-chip/chip-cirque-device-base:latest` docker image for running
-   devices,
+2. Build `ghcr.io/project-chip/chip-cirque-device-base:3` docker image for
+   running devices,
 
 3. Build openthread for simulating thread network.
 

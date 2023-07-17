@@ -10,7 +10,7 @@ This example demonstrates the Matter Lighting application on Ameba platform.
     -   [Commissioning](#commissioning)
         -   [BLE mode](#ble-mode)
         -   [IP mode](#ip-mode)
-    -   [Cluster control](#cluster-control)
+    -   [Cluster Control](#cluster-control)
 
 ---
 

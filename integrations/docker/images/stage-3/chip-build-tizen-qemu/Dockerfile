@@ -1,4 +1,4 @@
-ARG VERSION=3latest
+ARG VERSION=3
 FROM ghcr.io/project-chip/chip-build-tizen:${VERSION}
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 

@@ -8,11 +8,11 @@ control.
 -   [CHIP Ameba All Clusters Example](#chip-ameba-all-clusters-example)
     -   [Supported Device](#supported-device)
     -   [Building the Example Application](#building-the-example-application)
-    -   [Commissioning and cluster control](#commissioning-and-cluster-control)
-        -   [Commissioning](#commissioning)
-            -   [BLE mode](#ble-mode)
-            -   [IP mode](#ip-mode)
-        -   [Cluster control](#cluster-control)
+    -   [Commissioning and Cluster Control](#commissioning-and-cluster-control)
+    -   [Commissioning](#commissioning)
+        -   [BLE mode](#ble-mode)
+        -   [IP mode](#ip-mode)
+    -   [Cluster Control](#cluster-control)
     -   [Running RPC Console](#running-rpc-console)
 
 ---

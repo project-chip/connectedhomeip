@@ -10,7 +10,7 @@ This example demonstrates Matter Light-Switch application on Ameba platform.
     -   [Commissioning](#commissioning)
         -   [BLE mode](#ble-mode)
         -   [IP mode](#ip-mode)
-    -   [Cluster control](#cluster-control)
+    -   [Cluster Control](#cluster-control)
     -   [Running RPC Console](#running-rpc-console)
     -   [Running Matter Shell](#running-matter-shell)
     -   [Binding and Controlling a Lighting Device](#binding-and-controlling-a-lighting-device)

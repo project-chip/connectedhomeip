@@ -11,7 +11,7 @@ control.
     -   [Commissioning](#commissioning)
         -   [BLE mode](#ble-mode)
         -   [IP mode](#ip-mode)
-    -   [Cluster control](#cluster-control)
+    -   [Cluster Control](#cluster-control)
     -   [Running RPC Console](#running-rpc-console)
     -   [Running Matter Shell](#running-matter-shell)
     -   [Binding and Controlling a Device](#binding-and-controlling-a-device)

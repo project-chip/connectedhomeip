@@ -26,15 +26,15 @@ ALL_ARGS=""
 
 for i in "$@"; do
     case $i in
-        -v=* | --version=*)
-            NEXT_VERSION="${i#*=}"
-            ;;
-        -r=* | --reason=*)
-            ROLL_REASON="${i#*=}"
-            ;;
-        *)
-            ALL_ARGS="$ALL_ARGS ${i#*=}"
-            ;;
+    -v=* | --version=*)
+        NEXT_VERSION="${i#*=}"
+        ;;
+    -r=* | --reason=*)
+        ROLL_REASON="${i#*=}"
+        ;;
+    *)
+        ALL_ARGS="$ALL_ARGS ${i#*=}"
+        ;;
     esac
 done
 
