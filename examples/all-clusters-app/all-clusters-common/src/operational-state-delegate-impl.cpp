@@ -24,7 +24,7 @@ namespace OperationalState {
 
 using chip::Protocols::InteractionModel::Status;
 
-CHIP_ERROR OperationalStateDelegate::SetOperationalState(const GenericOperationalState & opState)
+CHIP_ERROR OperationalStateDelegate::SetOperationalState(uint8_t opState)
 {
     mOperationalState = opState;
     return CHIP_NO_ERROR;
@@ -42,9 +42,9 @@ CHIP_ERROR OperationalStateDelegate::SetCountdownTime(const app::DataModel::Null
     return CHIP_NO_ERROR;
 }
 
-void OperationalStateDelegate::GetCurrentOperationalState(GenericOperationalState & op)
+uint8_t OperationalStateDelegate::GetCurrentOperationalState()
 {
-    op = mOperationalState;
+    return mOperationalState;
 }
 
 CHIP_ERROR OperationalStateDelegate::SetOperationalError(const GenericOperationalError & opErrState)
@@ -91,28 +91,28 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, Ge
 void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    mOperationalState.Set(to_underlying(OperationalStateEnum::kPaused));
+    mOperationalState = to_underlying(OperationalStateEnum::kPaused);
     err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
 
 void OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    mOperationalState.Set(to_underlying(OperationalStateEnum::kRunning));
+    mOperationalState = to_underlying(OperationalStateEnum::kRunning);
     err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
 
 void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    mOperationalState.Set(to_underlying(OperationalStateEnum::kRunning));
+    mOperationalState = to_underlying(OperationalStateEnum::kRunning);
     err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
 
 void OperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    mOperationalState.Set(to_underlying(OperationalStateEnum::kStopped));
+    mOperationalState = to_underlying(OperationalStateEnum::kStopped);
     err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
 

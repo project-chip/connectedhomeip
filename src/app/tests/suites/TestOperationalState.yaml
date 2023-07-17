@@ -68,7 +68,7 @@ tests:
       command: "readAttribute"
       attribute: "OperationalState"
       response:
-          value: { OperationalStateID: 0 }
+          value: 0
 
     - label: "Start Command"
       command: "Start"
@@ -81,7 +81,7 @@ tests:
       command: "readAttribute"
       attribute: "OperationalState"
       response:
-          value: { OperationalStateID: 1 }
+          value: 1
 
     - label: "Pause Command"
       command: "Pause"
@@ -94,7 +94,7 @@ tests:
       command: "readAttribute"
       attribute: "OperationalState"
       response:
-          value: { OperationalStateID: 2 }
+          value: 2
 
     - label: "Resume Command"
       command: "Resume"
@@ -107,7 +107,7 @@ tests:
       command: "readAttribute"
       attribute: "OperationalState"
       response:
-          value: { OperationalStateID: 1 }
+          value: 1
 
     - label: "Stop Command"
       command: "Stop"
@@ -120,4 +120,4 @@ tests:
       command: "readAttribute"
       attribute: "OperationalState"
       response:
-          value: { OperationalStateID: 0 }
+          value: 0

@@ -3944,6 +3944,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const SmokeCoAlarm::Events::SmokeAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AlarmSeverityLevel", indent + 1, value.alarmSeverityLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AlarmSeverityLevel'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -3951,6 +3959,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const SmokeCoAlarm::Events::COAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AlarmSeverityLevel", indent + 1, value.alarmSeverityLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AlarmSeverityLevel'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -3959,6 +3975,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const SmokeCoAlarm::Events::LowBattery::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AlarmSeverityLevel", indent + 1, value.alarmSeverityLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AlarmSeverityLevel'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -4007,6 +4031,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const SmokeCoAlarm::Events::InterconnectSmokeAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AlarmSeverityLevel", indent + 1, value.alarmSeverityLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AlarmSeverityLevel'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -4015,6 +4047,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const SmokeCoAlarm::Events::InterconnectCOAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AlarmSeverityLevel", indent + 1, value.alarmSeverityLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AlarmSeverityLevel'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -8927,7 +8967,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("OperationalStateList", 1, value);
         }
         case OperationalState::Attributes::OperationalState::Id: {
-            chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::DecodableType value;
+            chip::app::Clusters::OperationalState::OperationalStateEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalState", 1, value);
         }
@@ -8995,7 +9035,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("OperationalStateList", 1, value);
         }
         case RvcOperationalState::Attributes::OperationalState::Id: {
-            chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::DecodableType value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalState", 1, value);
         }

@@ -52,6 +52,7 @@ target_include_directories(${APP_TARGET}
 target_sources(${APP_TARGET}
     PRIVATE
         main/main_ns.cpp
+        ${ALL_CLUSTERS_COMMON}/src/smco-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/bridged-actions-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
         ${ALL_CLUSTERS_COMMON}/src/binding-handler.cpp

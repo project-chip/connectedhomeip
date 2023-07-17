@@ -144,6 +144,7 @@ chip_test_suite("tests") {
     "TestOperationalStateDelegate.cpp",
     "TestPendingNotificationMap.cpp",
     "TestReadInteraction.cpp",
+    "TestReportScheduler.cpp",
     "TestReportingEngine.cpp",
     "TestSceneTable.cpp",
     "TestStatusIB.cpp",

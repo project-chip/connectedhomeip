@@ -201,6 +201,7 @@ class _TestStepWithPlaceholders:
         self.max_interval = _value_or_none(test, 'maxInterval')
         self.timed_interaction_timeout_ms = _value_or_none(
             test, 'timedInteractionTimeoutMs')
+        self.timeout = _value_or_none(test, 'timeout')
         self.data_version = _value_or_none(
             test, 'dataVersion')
         self.busy_wait_ms = _value_or_none(test, 'busyWaitMs')
@@ -660,6 +661,10 @@ class TestStep:
     @property
     def timed_interaction_timeout_ms(self):
         return self._test.timed_interaction_timeout_ms
+
+    @property
+    def timeout(self):
+        return self._test.timeout
 
     @property
     def data_version(self):

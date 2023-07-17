@@ -306,7 +306,7 @@ public:
 
     uint16_t identifyTime = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -340,7 +340,7 @@ public:
     EffectIdentifierEnum effectIdentifier = static_cast<EffectIdentifierEnum>(0);
     EffectVariantEnum effectVariant       = static_cast<EffectVariantEnum>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -519,7 +519,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     chip::CharSpan groupName;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::Groups::Commands::AddGroupResponse::DecodableType;
 
@@ -554,7 +554,7 @@ public:
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -587,7 +587,7 @@ public:
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
 
@@ -623,7 +623,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     chip::CharSpan groupName;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -657,7 +657,7 @@ public:
 
     DataModel::List<const chip::GroupId> groupList;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType;
 
@@ -691,7 +691,7 @@ public:
     DataModel::Nullable<uint8_t> capacity;
     DataModel::List<const chip::GroupId> groupList;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -724,7 +724,7 @@ public:
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::Groups::Commands::RemoveGroupResponse::DecodableType;
 
@@ -758,7 +758,7 @@ public:
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -788,7 +788,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveAllGroups::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -821,7 +821,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     chip::CharSpan groupName;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -1093,7 +1093,7 @@ public:
     chip::CharSpan sceneName;
     DataModel::List<const Structs::ExtensionFieldSet::Type> extensionFieldSets;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::Scenes::Commands::AddSceneResponse::DecodableType;
 
@@ -1133,7 +1133,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -1169,7 +1169,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::Scenes::Commands::ViewSceneResponse::DecodableType;
 
@@ -1212,7 +1212,7 @@ public:
     Optional<chip::CharSpan> sceneName;
     Optional<DataModel::List<const Structs::ExtensionFieldSet::Type>> extensionFieldSets;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -1251,7 +1251,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType;
 
@@ -1288,7 +1288,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -1322,7 +1322,7 @@ public:
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType;
 
@@ -1356,7 +1356,7 @@ public:
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -1391,7 +1391,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::Scenes::Commands::StoreSceneResponse::DecodableType;
 
@@ -1428,7 +1428,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -1466,7 +1466,7 @@ public:
     uint8_t sceneID       = static_cast<uint8_t>(0);
     Optional<DataModel::Nullable<uint16_t>> transitionTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -1500,7 +1500,7 @@ public:
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType;
 
@@ -1538,7 +1538,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     Optional<DataModel::List<const uint8_t>> sceneList;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -1581,7 +1581,7 @@ public:
     chip::CharSpan sceneName;
     DataModel::List<const Structs::ExtensionFieldSet::Type> extensionFieldSets;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType;
 
@@ -1621,7 +1621,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -1657,7 +1657,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType;
 
@@ -1700,7 +1700,7 @@ public:
     Optional<chip::CharSpan> sceneName;
     Optional<DataModel::List<const Structs::ExtensionFieldSet::Type>> extensionFieldSets;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -1745,7 +1745,7 @@ public:
     chip::GroupId groupIdentifierTo    = static_cast<chip::GroupId>(0);
     uint8_t sceneIdentifierTo          = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::Scenes::Commands::CopySceneResponse::DecodableType;
 
@@ -1785,7 +1785,7 @@ public:
     chip::GroupId groupIdentifierFrom = static_cast<chip::GroupId>(0);
     uint8_t sceneIdentifierFrom       = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -2017,7 +2017,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Off::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -2045,7 +2045,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::On::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -2073,7 +2073,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Toggle::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -2106,7 +2106,7 @@ public:
     OnOffEffectIdentifier effectIdentifier = static_cast<OnOffEffectIdentifier>(0);
     uint8_t effectVariant                  = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -2136,7 +2136,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::OnWithRecallGlobalScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -2171,7 +2171,7 @@ public:
     uint16_t onTime                          = static_cast<uint16_t>(0);
     uint16_t offWaitTime                     = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -2473,7 +2473,7 @@ public:
     chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
     chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -2514,7 +2514,7 @@ public:
     chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
     chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -2557,7 +2557,7 @@ public:
     chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
     chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -2595,7 +2595,7 @@ public:
     chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
     chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -2634,7 +2634,7 @@ public:
     chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
     chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -2675,7 +2675,7 @@ public:
     chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
     chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -2718,7 +2718,7 @@ public:
     chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
     chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -2756,7 +2756,7 @@ public:
     chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
     chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -2789,7 +2789,7 @@ public:
 
     uint16_t frequency = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -3801,7 +3801,7 @@ public:
 
     auto GetFabricIndex() const { return fabricIndex; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -3848,7 +3848,7 @@ public:
 
     auto GetFabricIndex() const { return fabricIndex; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -4023,7 +4023,7 @@ public:
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -4060,7 +4060,7 @@ public:
     Optional<uint32_t> invokeID;
     uint16_t transitionTime = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -4096,7 +4096,7 @@ public:
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -4133,7 +4133,7 @@ public:
     Optional<uint32_t> invokeID;
     uint32_t duration = static_cast<uint32_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -4169,7 +4169,7 @@ public:
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -4204,7 +4204,7 @@ public:
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -4241,7 +4241,7 @@ public:
     Optional<uint32_t> invokeID;
     uint32_t duration = static_cast<uint32_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -4277,7 +4277,7 @@ public:
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -4312,7 +4312,7 @@ public:
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -4349,7 +4349,7 @@ public:
     Optional<uint32_t> invokeID;
     uint32_t duration = static_cast<uint32_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -4385,7 +4385,7 @@ public:
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -4422,7 +4422,7 @@ public:
     Optional<uint32_t> invokeID;
     uint32_t duration = static_cast<uint32_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -4565,7 +4565,7 @@ public:
     uint32_t invokeID        = static_cast<uint32_t>(0);
     ActionStateEnum newState = static_cast<ActionStateEnum>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -4606,7 +4606,7 @@ public:
     ActionStateEnum newState = static_cast<ActionStateEnum>(0);
     ActionErrorEnum error    = static_cast<ActionErrorEnum>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -4699,7 +4699,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MfgSpecificPing::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BasicInformation::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -5077,7 +5077,7 @@ public:
 
     uint32_t softwareVersion = static_cast<uint32_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -5107,7 +5107,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BasicInformation::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -5138,7 +5138,7 @@ public:
 
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -5171,7 +5171,7 @@ public:
 
     bool reachableNewValue = static_cast<bool>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -5250,7 +5250,7 @@ public:
     Optional<bool> requestorCanConsent;
     Optional<chip::ByteSpan> metadataForProvider;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
 
@@ -5303,7 +5303,7 @@ public:
     Optional<bool> userConsentNeeded;
     Optional<chip::ByteSpan> metadataForRequestor;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -5344,7 +5344,7 @@ public:
     chip::ByteSpan updateToken;
     uint32_t newVersion = static_cast<uint32_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
 
@@ -5379,7 +5379,7 @@ public:
     OTAApplyUpdateAction action = static_cast<OTAApplyUpdateAction>(0);
     uint32_t delayedActionTime  = static_cast<uint32_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -5414,7 +5414,7 @@ public:
     chip::ByteSpan updateToken;
     uint32_t softwareVersion = static_cast<uint32_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -5562,7 +5562,7 @@ public:
     Optional<chip::ByteSpan> metadataForNode;
     chip::EndpointId endpoint = static_cast<chip::EndpointId>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -5721,7 +5721,7 @@ public:
     OTAChangeReasonEnum reason       = static_cast<OTAChangeReasonEnum>(0);
     DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -5759,7 +5759,7 @@ public:
     uint32_t softwareVersion = static_cast<uint32_t>(0);
     uint16_t productID       = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -5799,7 +5799,7 @@ public:
     DataModel::Nullable<uint8_t> progressPercent;
     DataModel::Nullable<int64_t> platformCode;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -6736,7 +6736,7 @@ public:
     DataModel::List<const WiredFaultEnum> current;
     DataModel::List<const WiredFaultEnum> previous;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -6772,7 +6772,7 @@ public:
     DataModel::List<const BatFaultEnum> current;
     DataModel::List<const BatFaultEnum> previous;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -6808,7 +6808,7 @@ public:
     DataModel::List<const BatChargeFaultEnum> current;
     DataModel::List<const BatChargeFaultEnum> previous;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -6906,7 +6906,7 @@ public:
     uint16_t expiryLengthSeconds = static_cast<uint16_t>(0);
     uint64_t breadcrumb          = static_cast<uint64_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType;
 
@@ -6941,7 +6941,7 @@ public:
     CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -6978,7 +6978,7 @@ public:
     chip::CharSpan countryCode;
     uint64_t breadcrumb = static_cast<uint64_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType;
 
@@ -7014,7 +7014,7 @@ public:
     CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -7044,7 +7044,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CommissioningComplete::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType;
 
@@ -7077,7 +7077,7 @@ public:
     CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -7382,7 +7382,7 @@ public:
     Optional<DataModel::Nullable<chip::ByteSpan>> ssid;
     Optional<uint64_t> breadcrumb;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType;
 
@@ -7421,7 +7421,7 @@ public:
     Optional<DataModel::List<const Structs::WiFiInterfaceScanResultStruct::Type>> wiFiScanResults;
     Optional<DataModel::List<const Structs::ThreadInterfaceScanResultStruct::Type>> threadScanResults;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -7460,7 +7460,7 @@ public:
     chip::ByteSpan credentials;
     Optional<uint64_t> breadcrumb;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType;
 
@@ -7496,7 +7496,7 @@ public:
     chip::ByteSpan operationalDataset;
     Optional<uint64_t> breadcrumb;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType;
 
@@ -7531,7 +7531,7 @@ public:
     chip::ByteSpan networkID;
     Optional<uint64_t> breadcrumb;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType;
 
@@ -7568,7 +7568,7 @@ public:
     Optional<chip::CharSpan> debugText;
     Optional<uint8_t> networkIndex;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -7604,7 +7604,7 @@ public:
     chip::ByteSpan networkID;
     Optional<uint64_t> breadcrumb;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType;
 
@@ -7641,7 +7641,7 @@ public:
     Optional<chip::CharSpan> debugText;
     DataModel::Nullable<int32_t> errorValue;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -7679,7 +7679,7 @@ public:
     uint8_t networkIndex = static_cast<uint8_t>(0);
     Optional<uint64_t> breadcrumb;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType;
 
@@ -7902,7 +7902,7 @@ public:
     TransferProtocolEnum requestedProtocol = static_cast<TransferProtocolEnum>(0);
     Optional<chip::CharSpan> transferFileDesignator;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType;
 
@@ -7942,7 +7942,7 @@ public:
     Optional<uint64_t> UTCTimeStamp;
     Optional<uint64_t> timeSinceBoot;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -8101,7 +8101,7 @@ public:
     chip::ByteSpan enableKey;
     uint64_t eventTrigger = static_cast<uint64_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -8319,7 +8319,7 @@ public:
     DataModel::List<const HardwareFaultEnum> current;
     DataModel::List<const HardwareFaultEnum> previous;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -8355,7 +8355,7 @@ public:
     DataModel::List<const RadioFaultEnum> current;
     DataModel::List<const RadioFaultEnum> previous;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -8391,7 +8391,7 @@ public:
     DataModel::List<const NetworkFaultEnum> current;
     DataModel::List<const NetworkFaultEnum> previous;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -8425,7 +8425,7 @@ public:
 
     BootReasonEnum bootReason = static_cast<BootReasonEnum>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -8498,7 +8498,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ResetWatermarks::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -8649,7 +8649,7 @@ public:
     Optional<chip::CharSpan> name;
     Optional<chip::ByteSpan> faultRecording;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -8847,7 +8847,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ResetCounts::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -9774,7 +9774,7 @@ public:
 
     ConnectionStatusEnum connectionStatus = static_cast<ConnectionStatusEnum>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -9809,7 +9809,7 @@ public:
     DataModel::List<const NetworkFaultEnum> current;
     DataModel::List<const NetworkFaultEnum> previous;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -9852,7 +9852,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ResetCounts::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -10115,7 +10115,7 @@ public:
 
     uint16_t reasonCode = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -10150,7 +10150,7 @@ public:
     AssociationFailureCauseEnum associationFailure = static_cast<AssociationFailureCauseEnum>(0);
     uint16_t status                                = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -10184,7 +10184,7 @@ public:
 
     ConnectionStatusEnum connectionStatus = static_cast<ConnectionStatusEnum>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -10226,7 +10226,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ResetCounts::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -10575,7 +10575,7 @@ public:
     GranularityEnum granularity = static_cast<GranularityEnum>(0);
     Optional<TimeSourceEnum> timeSource;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -10609,7 +10609,7 @@ public:
 
     DataModel::Nullable<Structs::FabricScopedTrustedTimeSourceStruct::Type> trustedTimeSource;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -10641,7 +10641,7 @@ public:
 
     DataModel::List<const Structs::TimeZoneStruct::Type> timeZone;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType;
 
@@ -10673,7 +10673,7 @@ public:
 
     bool DSTOffsetRequired = static_cast<bool>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -10705,7 +10705,7 @@ public:
 
     DataModel::List<const Structs::DSTOffsetStruct::Type> DSTOffset;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -10737,7 +10737,7 @@ public:
 
     DataModel::Nullable<chip::CharSpan> defaultNTP;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -11007,7 +11007,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -11038,7 +11038,7 @@ public:
 
     bool DSTOffsetActive = static_cast<bool>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -11073,7 +11073,7 @@ public:
     int32_t offset = static_cast<int32_t>(0);
     Optional<chip::CharSpan> name;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -11104,7 +11104,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -11132,7 +11132,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -11469,7 +11469,7 @@ public:
 
     uint32_t softwareVersion = static_cast<uint32_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -11499,7 +11499,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -11527,7 +11527,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -11558,7 +11558,7 @@ public:
 
     bool reachableNewValue = static_cast<bool>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -11691,7 +11691,7 @@ public:
 
     uint8_t newPosition = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -11724,7 +11724,7 @@ public:
 
     uint8_t newPosition = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -11757,7 +11757,7 @@ public:
 
     uint8_t newPosition = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -11790,7 +11790,7 @@ public:
 
     uint8_t previousPosition = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -11823,7 +11823,7 @@ public:
 
     uint8_t previousPosition = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -11858,7 +11858,7 @@ public:
     uint8_t newPosition                   = static_cast<uint8_t>(0);
     uint8_t currentNumberOfPressesCounted = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -11894,7 +11894,7 @@ public:
     uint8_t previousPosition            = static_cast<uint8_t>(0);
     uint8_t totalNumberOfPressesCounted = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -11958,7 +11958,7 @@ public:
     uint32_t iterations    = static_cast<uint32_t>(0);
     chip::ByteSpan salt;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -11994,7 +11994,7 @@ public:
 
     uint16_t commissioningTimeout = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -12023,7 +12023,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RevokeCommissioning::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -12295,7 +12295,7 @@ public:
 
     chip::ByteSpan attestationNonce;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType;
 
@@ -12329,7 +12329,7 @@ public:
     chip::ByteSpan attestationElements;
     chip::ByteSpan attestationSignature;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -12362,7 +12362,7 @@ public:
 
     CertificateChainTypeEnum certificateType = static_cast<CertificateChainTypeEnum>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType;
 
@@ -12394,7 +12394,7 @@ public:
 
     chip::ByteSpan certificate;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -12428,7 +12428,7 @@ public:
     chip::ByteSpan CSRNonce;
     Optional<bool> isForUpdateNOC;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType;
 
@@ -12463,7 +12463,7 @@ public:
     chip::ByteSpan NOCSRElements;
     chip::ByteSpan attestationSignature;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -12504,7 +12504,7 @@ public:
     uint64_t caseAdminSubject    = static_cast<uint64_t>(0);
     chip::VendorId adminVendorId = static_cast<chip::VendorId>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
 
@@ -12542,7 +12542,7 @@ public:
     chip::ByteSpan NOCValue;
     Optional<chip::ByteSpan> ICACValue;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
 
@@ -12579,7 +12579,7 @@ public:
     Optional<chip::FabricIndex> fabricIndex;
     Optional<chip::CharSpan> debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -12613,7 +12613,7 @@ public:
 
     chip::CharSpan label;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
 
@@ -12645,7 +12645,7 @@ public:
 
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
 
@@ -12677,7 +12677,7 @@ public:
 
     chip::ByteSpan rootCACertificate;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -13007,7 +13007,7 @@ public:
 
     Structs::GroupKeySetStruct::Type groupKeySet;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -13039,7 +13039,7 @@ public:
 
     uint16_t groupKeySetID = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType;
 
@@ -13071,7 +13071,7 @@ public:
 
     Structs::GroupKeySetStruct::Type groupKeySet;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -13103,7 +13103,7 @@ public:
 
     uint16_t groupKeySetID = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -13132,7 +13132,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndices::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType;
 
@@ -13163,7 +13163,7 @@ public:
 
     DataModel::List<const uint16_t> groupKeySetIDs;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -13714,7 +13714,7 @@ public:
 
     bool stateValue = static_cast<bool>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -13817,7 +13817,7 @@ public:
     chip::ByteSpan key;
     Optional<chip::ByteSpan> verificationKey;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType;
 
@@ -13852,7 +13852,7 @@ public:
 
     uint32_t ICDCounter = static_cast<uint32_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -13886,7 +13886,7 @@ public:
     chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
     Optional<chip::ByteSpan> key;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -13916,7 +13916,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StayActiveRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -14157,7 +14157,7 @@ public:
 
     uint8_t newMode = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -14351,7 +14351,7 @@ public:
 
     uint8_t newMode = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType;
 
@@ -14385,7 +14385,7 @@ public:
     uint8_t status = static_cast<uint8_t>(0);
     Optional<chip::CharSpan> statusText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -14553,7 +14553,7 @@ public:
 
     uint8_t newMode = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType;
 
@@ -14587,7 +14587,7 @@ public:
     uint8_t status = static_cast<uint8_t>(0);
     Optional<chip::CharSpan> statusText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -14869,7 +14869,7 @@ public:
 
     uint8_t newMode = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::RvcRunMode::Commands::ChangeToModeResponse::DecodableType;
 
@@ -14903,7 +14903,7 @@ public:
     uint8_t status = static_cast<uint8_t>(0);
     Optional<chip::CharSpan> statusText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -15071,7 +15071,7 @@ public:
 
     uint8_t newMode = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType;
 
@@ -15105,7 +15105,7 @@ public:
     uint8_t status = static_cast<uint8_t>(0);
     Optional<chip::CharSpan> statusText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -15266,7 +15266,7 @@ public:
     Optional<int16_t> targetTemperature;
     Optional<uint8_t> targetTemperatureLevel;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -15546,7 +15546,7 @@ public:
     chip::BitMask<AlarmMap> state    = static_cast<chip::BitMask<AlarmMap>>(0);
     chip::BitMask<AlarmMap> mask     = static_cast<chip::BitMask<AlarmMap>>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -15603,7 +15603,7 @@ public:
 
     uint8_t newMode = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType;
 
@@ -15637,7 +15637,7 @@ public:
     uint8_t status = static_cast<uint8_t>(0);
     Optional<chip::CharSpan> statusText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -15866,7 +15866,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SelfTestRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -16120,10 +16120,11 @@ struct TypeInfo
 } // namespace Attributes
 namespace Events {
 namespace SmokeAlarm {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
 enum class Fields : uint8_t
 {
+    kAlarmSeverityLevel = 0,
 };
 
 struct Type
@@ -16134,7 +16135,9 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -16143,15 +16146,18 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SmokeAlarm::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace SmokeAlarm
 namespace COAlarm {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
 enum class Fields : uint8_t
 {
+    kAlarmSeverityLevel = 0,
 };
 
 struct Type
@@ -16162,7 +16168,9 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -16171,6 +16179,8 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::COAlarm::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -16180,6 +16190,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
+    kAlarmSeverityLevel = 0,
 };
 
 struct Type
@@ -16190,7 +16201,9 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -16199,6 +16212,8 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LowBattery::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -16218,7 +16233,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -16246,7 +16261,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -16274,7 +16289,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -16302,7 +16317,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -16330,7 +16345,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -16344,10 +16359,11 @@ public:
 };
 } // namespace MuteEnded
 namespace InterconnectSmokeAlarm {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
 enum class Fields : uint8_t
 {
+    kAlarmSeverityLevel = 0,
 };
 
 struct Type
@@ -16358,7 +16374,9 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -16367,15 +16385,18 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::InterconnectSmokeAlarm::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace InterconnectSmokeAlarm
 namespace InterconnectCOAlarm {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
 enum class Fields : uint8_t
 {
+    kAlarmSeverityLevel = 0,
 };
 
 struct Type
@@ -16386,7 +16407,9 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -16395,6 +16418,8 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::InterconnectCOAlarm::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    AlarmStateEnum alarmSeverityLevel = static_cast<AlarmStateEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -16414,7 +16439,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -16462,7 +16487,7 @@ public:
 
     chip::BitMask<AlarmMap> alarms = static_cast<chip::BitMask<AlarmMap>>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -16494,7 +16519,7 @@ public:
 
     chip::BitMask<AlarmMap> mask = static_cast<chip::BitMask<AlarmMap>>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -16650,7 +16675,7 @@ public:
     chip::BitMask<AlarmMap> state    = static_cast<chip::BitMask<AlarmMap>>(0);
     chip::BitMask<AlarmMap> mask     = static_cast<chip::BitMask<AlarmMap>>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -16719,7 +16744,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Pause::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType;
 
@@ -16747,7 +16772,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType;
 
@@ -16775,7 +16800,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Start::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType;
 
@@ -16803,7 +16828,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Resume::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType;
 
@@ -16834,7 +16859,7 @@ public:
 
     Structs::ErrorStateStruct::Type commandResponseState;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -16908,9 +16933,9 @@ struct TypeInfo
 namespace OperationalState {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::Type;
-    using DecodableType    = chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::DecodableType &;
+    using Type             = chip::app::Clusters::OperationalState::OperationalStateEnum;
+    using DecodableType    = chip::app::Clusters::OperationalState::OperationalStateEnum;
+    using DecodableArgType = chip::app::Clusters::OperationalState::OperationalStateEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalState::Id; }
@@ -16978,7 +17003,8 @@ struct TypeInfo
         Attributes::CurrentPhase::TypeInfo::DecodableType currentPhase;
         Attributes::CountdownTime::TypeInfo::DecodableType countdownTime;
         Attributes::OperationalStateList::TypeInfo::DecodableType operationalStateList;
-        Attributes::OperationalState::TypeInfo::DecodableType operationalState;
+        Attributes::OperationalState::TypeInfo::DecodableType operationalState =
+            static_cast<chip::app::Clusters::OperationalState::OperationalStateEnum>(0);
         Attributes::OperationalError::TypeInfo::DecodableType operationalError;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
@@ -17008,7 +17034,7 @@ public:
 
     Structs::ErrorStateStruct::Type errorState;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -17045,7 +17071,7 @@ public:
     Optional<DataModel::Nullable<uint32_t>> totalOperationalTime;
     Optional<DataModel::Nullable<uint32_t>> pausedTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -17113,7 +17139,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Pause::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::RvcOperationalState::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType;
 
@@ -17141,7 +17167,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::RvcOperationalState::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType;
 
@@ -17169,7 +17195,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Start::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::RvcOperationalState::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType;
 
@@ -17197,7 +17223,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Resume::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::RvcOperationalState::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType;
 
@@ -17228,7 +17254,7 @@ public:
 
     Structs::ErrorStateStruct::Type commandResponseState;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -17302,9 +17328,9 @@ struct TypeInfo
 namespace OperationalState {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::Type;
-    using DecodableType    = chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::DecodableType &;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RvcOperationalState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalState::Id; }
@@ -17372,7 +17398,7 @@ struct TypeInfo
         Attributes::CurrentPhase::TypeInfo::DecodableType currentPhase;
         Attributes::CountdownTime::TypeInfo::DecodableType countdownTime;
         Attributes::OperationalStateList::TypeInfo::DecodableType operationalStateList;
-        Attributes::OperationalState::TypeInfo::DecodableType operationalState;
+        Attributes::OperationalState::TypeInfo::DecodableType operationalState = static_cast<uint8_t>(0);
         Attributes::OperationalError::TypeInfo::DecodableType operationalError;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
@@ -17402,7 +17428,7 @@ public:
 
     Structs::ErrorStateStruct::Type errorState;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -17439,7 +17465,7 @@ public:
     Optional<DataModel::Nullable<uint32_t>> totalOperationalTime;
     Optional<DataModel::Nullable<uint32_t>> pausedTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -17508,7 +17534,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -17716,7 +17742,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -17924,7 +17950,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -18132,7 +18158,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -18340,7 +18366,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -18547,7 +18573,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -18755,7 +18781,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -18963,7 +18989,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -19171,7 +19197,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -19379,7 +19405,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -19586,7 +19612,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -19794,7 +19820,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20125,7 +20151,7 @@ public:
 
     Optional<chip::ByteSpan> PINCode;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20157,7 +20183,7 @@ public:
 
     Optional<chip::ByteSpan> PINCode;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20191,7 +20217,7 @@ public:
     uint16_t timeout = static_cast<uint16_t>(0);
     Optional<chip::ByteSpan> PINCode;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20236,7 +20262,7 @@ public:
     uint8_t endHour                     = static_cast<uint8_t>(0);
     uint8_t endMinute                   = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20276,7 +20302,7 @@ public:
     uint8_t weekDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType;
 
@@ -20323,7 +20349,7 @@ public:
     Optional<uint8_t> endHour;
     Optional<uint8_t> endMinute;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20364,7 +20390,7 @@ public:
     uint8_t weekDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20403,7 +20429,7 @@ public:
     uint32_t localStartTime = static_cast<uint32_t>(0);
     uint32_t localEndTime   = static_cast<uint32_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20440,7 +20466,7 @@ public:
     uint8_t yearDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType;
 
@@ -20481,7 +20507,7 @@ public:
     Optional<uint32_t> localStartTime;
     Optional<uint32_t> localEndTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20519,7 +20545,7 @@ public:
     uint8_t yearDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20558,7 +20584,7 @@ public:
     uint32_t localEndTime           = static_cast<uint32_t>(0);
     OperatingModeEnum operatingMode = static_cast<OperatingModeEnum>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20593,7 +20619,7 @@ public:
 
     uint8_t holidayIndex = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType;
 
@@ -20633,7 +20659,7 @@ public:
     Optional<uint32_t> localEndTime;
     Optional<OperatingModeEnum> operatingMode;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20669,7 +20695,7 @@ public:
 
     uint8_t holidayIndex = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20713,7 +20739,7 @@ public:
     DataModel::Nullable<UserTypeEnum> userType;
     DataModel::Nullable<CredentialRuleEnum> credentialRule;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20751,7 +20777,7 @@ public:
 
     uint16_t userIndex = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::GetUserResponse::DecodableType;
 
@@ -20801,7 +20827,7 @@ public:
     DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
     DataModel::Nullable<uint16_t> nextUserIndex;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20842,7 +20868,7 @@ public:
 
     uint16_t userIndex = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20884,7 +20910,7 @@ public:
     DataModel::Nullable<UserStatusEnum> userStatus;
     DataModel::Nullable<UserTypeEnum> userType;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType;
 
@@ -20925,7 +20951,7 @@ public:
     DataModel::Nullable<uint16_t> userIndex;
     DataModel::Nullable<uint16_t> nextCredentialIndex;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -20959,7 +20985,7 @@ public:
 
     Structs::CredentialStruct::Type credential;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType;
 
@@ -20999,7 +21025,7 @@ public:
     DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
     DataModel::Nullable<uint16_t> nextCredentialIndex;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -21035,7 +21061,7 @@ public:
 
     DataModel::Nullable<Structs::CredentialStruct::Type> credential;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -21067,7 +21093,7 @@ public:
 
     Optional<chip::ByteSpan> PINCode;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -21639,7 +21665,7 @@ public:
 
     AlarmCodeEnum alarmCode = static_cast<AlarmCodeEnum>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -21672,7 +21698,7 @@ public:
 
     DoorStateEnum doorState = static_cast<DoorStateEnum>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -21715,7 +21741,7 @@ public:
     DataModel::Nullable<chip::NodeId> sourceNode;
     Optional<DataModel::Nullable<DataModel::List<const Structs::CredentialStruct::Type>>> credentials;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -21765,7 +21791,7 @@ public:
     DataModel::Nullable<chip::NodeId> sourceNode;
     Optional<DataModel::Nullable<DataModel::List<const Structs::CredentialStruct::Type>>> credentials;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -21816,7 +21842,7 @@ public:
     DataModel::Nullable<chip::NodeId> sourceNode;
     DataModel::Nullable<uint16_t> dataIndex;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -21894,7 +21920,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::UpOrOpen::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -21922,7 +21948,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::DownOrClose::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -21950,7 +21976,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopMotion::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -21981,7 +22007,7 @@ public:
 
     uint16_t liftValue = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -22013,7 +22039,7 @@ public:
 
     chip::Percent100ths liftPercent100thsValue = static_cast<chip::Percent100ths>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -22045,7 +22071,7 @@ public:
 
     uint16_t tiltValue = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -22077,7 +22103,7 @@ public:
 
     chip::Percent100ths tiltPercent100thsValue = static_cast<chip::Percent100ths>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -22476,7 +22502,7 @@ public:
 
     uint8_t percentOpen = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -22505,7 +22531,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::BarrierControlStop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -23088,7 +23114,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23116,7 +23142,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23144,7 +23170,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23172,7 +23198,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23200,7 +23226,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23228,7 +23254,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23256,7 +23282,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23284,7 +23310,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23312,7 +23338,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23340,7 +23366,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23368,7 +23394,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23396,7 +23422,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23424,7 +23450,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23452,7 +23478,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23480,7 +23506,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23508,7 +23534,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23536,7 +23562,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -23628,7 +23654,7 @@ public:
     SetpointAdjustMode mode = static_cast<SetpointAdjustMode>(0);
     int8_t amount           = static_cast<int8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -23667,7 +23693,7 @@ public:
     chip::BitMask<ModeForSequence> modeForSequence = static_cast<chip::BitMask<ModeForSequence>>(0);
     DataModel::List<const Structs::ThermostatScheduleTransition::Type> transitions;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -23708,7 +23734,7 @@ public:
     chip::BitMask<ModeForSequence> modeForSequence = static_cast<chip::BitMask<ModeForSequence>>(0);
     DataModel::List<const Structs::ThermostatScheduleTransition::Type> transitions;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -23745,7 +23771,7 @@ public:
     chip::BitMask<DayOfWeek> daysToReturn       = static_cast<chip::BitMask<DayOfWeek>>(0);
     chip::BitMask<ModeForSequence> modeToReturn = static_cast<chip::BitMask<ModeForSequence>>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType;
 
@@ -23775,7 +23801,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ClearWeeklySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -24521,7 +24547,7 @@ public:
     Optional<bool> wrap;
     Optional<bool> lowestOff;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -24985,7 +25011,7 @@ public:
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25027,7 +25053,7 @@ public:
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25070,7 +25096,7 @@ public:
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25112,7 +25138,7 @@ public:
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25153,7 +25179,7 @@ public:
     uint8_t optionsMask         = static_cast<uint8_t>(0);
     uint8_t optionsOverride     = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25196,7 +25222,7 @@ public:
     uint8_t optionsMask         = static_cast<uint8_t>(0);
     uint8_t optionsOverride     = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25240,7 +25266,7 @@ public:
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25284,7 +25310,7 @@ public:
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25326,7 +25352,7 @@ public:
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25369,7 +25395,7 @@ public:
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25411,7 +25437,7 @@ public:
     uint8_t optionsMask             = static_cast<uint8_t>(0);
     uint8_t optionsOverride         = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25454,7 +25480,7 @@ public:
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25496,7 +25522,7 @@ public:
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25539,7 +25565,7 @@ public:
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25583,7 +25609,7 @@ public:
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25631,7 +25657,7 @@ public:
     uint8_t optionsMask                             = static_cast<uint8_t>(0);
     uint8_t optionsOverride                         = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25671,7 +25697,7 @@ public:
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25714,7 +25740,7 @@ public:
     uint8_t optionsMask                    = static_cast<uint8_t>(0);
     uint8_t optionsOverride                = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -25763,7 +25789,7 @@ public:
     uint8_t optionsMask                    = static_cast<uint8_t>(0);
     uint8_t optionsOverride                = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -35179,7 +35205,7 @@ public:
 
     chip::CharSpan match;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::Channel::Commands::ChangeChannelResponse::DecodableType;
 
@@ -35213,7 +35239,7 @@ public:
     ChannelStatusEnum status = static_cast<ChannelStatusEnum>(0);
     Optional<chip::CharSpan> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -35248,7 +35274,7 @@ public:
     uint16_t majorNumber = static_cast<uint16_t>(0);
     uint16_t minorNumber = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -35281,7 +35307,7 @@ public:
 
     int16_t count = static_cast<int16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -35460,7 +35486,7 @@ public:
     uint8_t target = static_cast<uint8_t>(0);
     Optional<chip::CharSpan> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType;
 
@@ -35495,7 +35521,7 @@ public:
     TargetNavigatorStatusEnum status = static_cast<TargetNavigatorStatusEnum>(0);
     Optional<chip::CharSpan> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -35705,7 +35731,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Play::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
@@ -35733,7 +35759,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Pause::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
@@ -35761,7 +35787,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
@@ -35789,7 +35815,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StartOver::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
@@ -35817,7 +35843,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Previous::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
@@ -35845,7 +35871,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Next::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
@@ -35873,7 +35899,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Rewind::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
@@ -35901,7 +35927,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::FastForward::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
@@ -35932,7 +35958,7 @@ public:
 
     uint64_t deltaPositionMilliseconds = static_cast<uint64_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
@@ -35964,7 +35990,7 @@ public:
 
     uint64_t deltaPositionMilliseconds = static_cast<uint64_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
@@ -35998,7 +36024,7 @@ public:
     MediaPlaybackStatusEnum status = static_cast<MediaPlaybackStatusEnum>(0);
     Optional<chip::CharSpan> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -36031,7 +36057,7 @@ public:
 
     uint64_t position = static_cast<uint64_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
@@ -36273,7 +36299,7 @@ public:
 
     uint8_t index = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -36302,7 +36328,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ShowInputStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -36330,7 +36356,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideInputStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -36363,7 +36389,7 @@ public:
     uint8_t index = static_cast<uint8_t>(0);
     chip::CharSpan name;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -36493,7 +36519,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Sleep::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -36601,7 +36627,7 @@ public:
 
     CecKeyCode keyCode = static_cast<CecKeyCode>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType;
 
@@ -36633,7 +36659,7 @@ public:
 
     KeypadInputStatusEnum status = static_cast<KeypadInputStatusEnum>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -36917,7 +36943,7 @@ public:
     bool autoPlay = static_cast<bool>(0);
     Optional<chip::CharSpan> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType;
 
@@ -36955,7 +36981,7 @@ public:
     Optional<chip::CharSpan> displayString;
     Optional<Structs::BrandingInformationStruct::Type> brandingInformation;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType;
 
@@ -36991,7 +37017,7 @@ public:
     ContentLaunchStatusEnum status = static_cast<ContentLaunchStatusEnum>(0);
     Optional<chip::CharSpan> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -37154,7 +37180,7 @@ public:
 
     uint8_t index = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -37188,7 +37214,7 @@ public:
     uint8_t index = static_cast<uint8_t>(0);
     chip::CharSpan name;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -37364,7 +37390,7 @@ public:
     Optional<Structs::ApplicationStruct::Type> application;
     Optional<chip::ByteSpan> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType;
 
@@ -37397,7 +37423,7 @@ public:
 
     Optional<Structs::ApplicationStruct::Type> application;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType;
 
@@ -37429,7 +37455,7 @@ public:
 
     Optional<Structs::ApplicationStruct::Type> application;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType;
 
@@ -37463,7 +37489,7 @@ public:
     ApplicationLauncherStatusEnum status = static_cast<ApplicationLauncherStatusEnum>(0);
     Optional<chip::ByteSpan> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -37781,7 +37807,7 @@ public:
 
     chip::CharSpan tempAccountIdentifier;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType;
 
@@ -37813,7 +37839,7 @@ public:
 
     chip::CharSpan setupPIN;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -37847,7 +37873,7 @@ public:
     chip::CharSpan tempAccountIdentifier;
     chip::CharSpan setupPIN;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -37877,7 +37903,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Logout::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -38001,7 +38027,7 @@ public:
     uint8_t maxNumberOfIntervals  = static_cast<uint8_t>(0);
     DataModel::List<const uint16_t> listOfAttributes;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -38033,7 +38059,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetProfileInfoCommand::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -38074,7 +38100,7 @@ public:
     uint16_t attributeId               = static_cast<uint16_t>(0);
     DataModel::List<const uint8_t> intervals;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -38115,7 +38141,7 @@ public:
     uint32_t startTime        = static_cast<uint32_t>(0);
     uint8_t numberOfIntervals = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -40341,7 +40367,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Test::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -40372,7 +40398,7 @@ public:
 
     uint8_t returnValue = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -40401,7 +40427,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TestNotHandled::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -40432,7 +40458,7 @@ public:
 
     uint8_t returnValue = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -40461,7 +40487,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TestSpecific::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType;
 
@@ -40492,7 +40518,7 @@ public:
 
     bool returnValue = static_cast<bool>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -40521,7 +40547,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TestUnknownCommand::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -40562,7 +40588,7 @@ public:
     SimpleEnum arg5 = static_cast<SimpleEnum>(0);
     bool arg6       = static_cast<bool>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -40601,7 +40627,7 @@ public:
     uint8_t arg1 = static_cast<uint8_t>(0);
     uint8_t arg2 = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType;
 
@@ -40634,7 +40660,7 @@ public:
 
     DataModel::List<const uint8_t> arg1;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -40666,7 +40692,7 @@ public:
 
     bool arg1 = static_cast<bool>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType;
 
@@ -40700,7 +40726,7 @@ public:
     chip::VendorId arg1 = static_cast<chip::VendorId>(0);
     SimpleEnum arg2     = static_cast<SimpleEnum>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -40743,7 +40769,7 @@ public:
     SimpleEnum arg5 = static_cast<SimpleEnum>(0);
     bool arg6       = static_cast<bool>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType;
 
@@ -40786,7 +40812,7 @@ public:
     Optional<uint8_t> value;
     Optional<DataModel::Nullable<uint8_t>> originalValue;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -40821,7 +40847,7 @@ public:
 
     Structs::SimpleStruct::Type arg1;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::BooleanResponse::DecodableType;
 
@@ -40907,7 +40933,7 @@ public:
     Optional<bool> nullableOptionalListWasNull;
     Optional<DataModel::List<const SimpleEnum>> nullableOptionalListValue;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -40966,7 +40992,7 @@ public:
 
     Structs::NestedStruct::Type arg1;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::BooleanResponse::DecodableType;
 
@@ -40998,7 +41024,7 @@ public:
 
     bool value = static_cast<bool>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -41030,7 +41056,7 @@ public:
 
     DataModel::List<const Structs::SimpleStruct::Type> arg1;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::BooleanResponse::DecodableType;
 
@@ -41062,7 +41088,7 @@ public:
 
     Structs::SimpleStruct::Type arg1;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -41094,7 +41120,7 @@ public:
 
     DataModel::List<const uint8_t> arg1;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::BooleanResponse::DecodableType;
 
@@ -41126,7 +41152,7 @@ public:
 
     uint64_t value = static_cast<uint64_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -41158,7 +41184,7 @@ public:
 
     Structs::NestedStructList::Type arg1;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::BooleanResponse::DecodableType;
 
@@ -41190,7 +41216,7 @@ public:
 
     uint64_t value = static_cast<uint64_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -41222,7 +41248,7 @@ public:
 
     DataModel::List<const Structs::NestedStructList::Type> arg1;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::BooleanResponse::DecodableType;
 
@@ -41254,7 +41280,7 @@ public:
 
     DataModel::List<const uint8_t> arg1;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType;
 
@@ -41288,7 +41314,7 @@ public:
     chip::VendorId arg1 = static_cast<chip::VendorId>(0);
     SimpleEnum arg2     = static_cast<SimpleEnum>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType;
 
@@ -41321,7 +41347,7 @@ public:
 
     Optional<DataModel::Nullable<uint8_t>> arg1;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType;
 
@@ -41375,7 +41401,7 @@ public:
     Optional<DataModel::List<const SimpleEnum>> optionalList;
     Optional<DataModel::Nullable<DataModel::List<const SimpleEnum>>> nullableOptionalList;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType;
 
@@ -41418,7 +41444,7 @@ public:
 
     Structs::SimpleStruct::Type arg1;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType;
 
@@ -41447,7 +41473,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TimedInvokeRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -41478,7 +41504,7 @@ public:
 
     Optional<bool> arg1;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -41514,7 +41540,7 @@ public:
     SimpleEnum arg2 = static_cast<SimpleEnum>(0);
     bool arg3       = static_cast<bool>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType;
 
@@ -41548,7 +41574,7 @@ public:
 
     uint8_t arg1 = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType;
 
@@ -42739,7 +42765,7 @@ public:
     DataModel::List<const Structs::SimpleStruct::Type> arg5;
     DataModel::List<const SimpleEnum> arg6;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -42779,7 +42805,7 @@ public:
 
     auto GetFabricIndex() const { return fabricIndex; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -42837,7 +42863,7 @@ public:
     uint32_t numCallsToFail = static_cast<uint32_t>(0);
     bool takeMutex          = static_cast<bool>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -42877,7 +42903,7 @@ public:
     uint32_t id        = static_cast<uint32_t>(0);
     uint8_t percentage = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 

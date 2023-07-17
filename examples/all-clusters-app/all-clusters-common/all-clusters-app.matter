@@ -2542,6 +2542,115 @@ server cluster AirQuality = 91 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface for observing and managing the state of smoke and CO alarms. */
+server cluster SmokeCoAlarm = 92 {
+  enum AlarmStateEnum : ENUM8 {
+    kNormal = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum ContaminationStateEnum : ENUM8 {
+    kNormal = 0;
+    kLow = 1;
+    kWarning = 2;
+    kCritical = 3;
+  }
+
+  enum EndOfServiceEnum : ENUM8 {
+    kNormal = 0;
+    kExpired = 1;
+  }
+
+  enum ExpressedStateEnum : ENUM8 {
+    kNormal = 0;
+    kSmokeAlarm = 1;
+    kCOAlarm = 2;
+    kBatteryAlert = 3;
+    kTesting = 4;
+    kHardwareFault = 5;
+    kEndOfService = 6;
+    kInterconnectSmoke = 7;
+    kInterconnectCO = 8;
+  }
+
+  enum MuteStateEnum : ENUM8 {
+    kNotMuted = 0;
+    kMuted = 1;
+  }
+
+  enum SensitivityEnum : ENUM8 {
+    kHigh = 0;
+    kStandard = 1;
+    kLow = 2;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kSmokeAlarm = 0x1;
+    kCOAlarm = 0x2;
+  }
+
+  critical event SmokeAlarm = 0 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  critical event COAlarm = 1 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  info event LowBattery = 2 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  info event HardwareFault = 3 {
+  }
+
+  info event EndOfService = 4 {
+  }
+
+  info event SelfTestComplete = 5 {
+  }
+
+  info event AlarmMuted = 6 {
+  }
+
+  info event MuteEnded = 7 {
+  }
+
+  critical event InterconnectSmokeAlarm = 8 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  critical event InterconnectCOAlarm = 9 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  info event AllClear = 10 {
+  }
+
+  readonly attribute ExpressedStateEnum expressedState = 0;
+  readonly attribute AlarmStateEnum smokeState = 1;
+  readonly attribute AlarmStateEnum COState = 2;
+  readonly attribute AlarmStateEnum batteryAlert = 3;
+  readonly attribute MuteStateEnum deviceMuted = 4;
+  readonly attribute boolean testInProgress = 5;
+  readonly attribute boolean hardwareFaultAlert = 6;
+  readonly attribute EndOfServiceEnum endOfServiceAlert = 7;
+  readonly attribute AlarmStateEnum interconnectSmokeAlarm = 8;
+  readonly attribute AlarmStateEnum interconnectCOAlarm = 9;
+  readonly attribute ContaminationStateEnum contaminationState = 10;
+  attribute SensitivityEnum sensitivityLevel = 11;
+  readonly attribute epoch_s expiryDate = 12;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  command SelfTestRequest(): DefaultSuccess = 0;
+}
+
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
 server cluster OperationalState = 96 {
   enum ErrorStateEnum : ENUM8 {
@@ -2583,7 +2692,7 @@ server cluster OperationalState = 96 {
   readonly attribute nullable int8u currentPhase = 1;
   readonly attribute nullable elapsed_s countdownTime = 2;
   readonly attribute OperationalStateStruct operationalStateList[] = 3;
-  readonly attribute OperationalStateStruct operationalState = 4;
+  readonly attribute OperationalStateEnum operationalState = 4;
   readonly attribute ErrorStateStruct operationalError = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6554,6 +6663,35 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 15;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster SmokeCoAlarm {
+    emits event SmokeAlarm;
+    emits event COAlarm;
+    emits event LowBattery;
+    emits event HardwareFault;
+    emits event EndOfService;
+    emits event SelfTestComplete;
+    emits event AlarmMuted;
+    emits event MuteEnded;
+    emits event InterconnectSmokeAlarm;
+    emits event InterconnectCOAlarm;
+    emits event AllClear;
+    persist  attribute expressedState default = 0;
+    persist  attribute smokeState default = 0;
+    persist  attribute COState default = 0;
+    persist  attribute batteryAlert default = 0;
+    persist  attribute deviceMuted default = 0;
+    ram      attribute testInProgress default = 0;
+    persist  attribute hardwareFaultAlert default = 0;
+    persist  attribute endOfServiceAlert default = 0;
+    ram      attribute interconnectSmokeAlarm default = 0;
+    ram      attribute interconnectCOAlarm default = 0;
+    ram      attribute contaminationState default = 0;
+    ram      attribute sensitivityLevel default = 1;
+    ram      attribute expiryDate default = 0;
+    ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
   }
 
