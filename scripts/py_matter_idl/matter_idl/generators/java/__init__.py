@@ -798,12 +798,3 @@ class JavaClassGenerator(__JavaCodeGenerator):
                 'clientClusters': clientClusters,
             }
         )
-
-        self.internal_render_one_output(
-            template_path="ClusterIDMapping_kotlin.jinja",
-            output_file_name="java/chip/devicecontroller/ClusterIDMapping.kt",
-            vars={
-                'idl': self.idl,
-                'clientClusters': clientClusters,
-            }
-        )
