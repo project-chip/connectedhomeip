@@ -109,6 +109,8 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
         if tz_list_size > 1:
             th_utc = utc_time_in_matter_epoch()
             tz = [tz_struct(offset=3600, validAt=0), tz_struct(offset=7200, validAt=th_utc+1e+7)]
+            ret = await self.send_set_time_zone_cmd(tz)
+            asserts.assert_true(ret.DSTOffsetRequired, "DSTOffsetRequired not set to true")
 
         self.print_step(12, "Send SetDSTOffset command")
         if tz_list_size > 1:
