@@ -34,7 +34,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-       // check that this is not malformed TLV
+        // check that this is not malformed TLV
     }
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);

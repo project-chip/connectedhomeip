@@ -115,21 +115,41 @@ public:
     virtual CHIP_ERROR AppInit() = 0;
 
     /**
-     * This method is to be overridden by a user implemented method to handle the application specifics of the ResetCondition
-     * command.
-     * The cluster implementation will not handle any of the resets needed by the spec. The user of the SDK will need to implement
-     * the logic to reset:
-     * - The Condition attribute (if supported)
-     * - The ChangeIndicator attribute
-     * - The LastChangedTime attribute (if supported)
+     * This method may be overwritten by the SDK User, if the default behaviour is not desired.
+     * Preferably, the SDK User should implement the PreResetCondition() and PostResetCondition() methods instead.
      *
-     * Upon receipt, the device SHALL reset the Condition and ChangeIndicator attributes, indicating full resource availability and
-     * readiness for use, as initially configured. Invocation of this command MAY cause the LastChangedTime to be updated
-     * automatically based on the clock of the server, if the server supports setting the attribute.
+     * The cluster implementation will handle all of the resets needed by the spec.
+     * - Update the Condition attribute according to the DegradationDirection (if supported)
+     * - Update the ChangeIndicator attribute to kOk
+     * - Update the LastChangedTime attribute (if supported)
      *
-     * @return Status::Success      If the command was handled successfully, all other will cause the command to fail.
+     * The return value will depend on the PreResetCondition() and PostResetCondition() method, if one of them does not return
+     * Success, this method will return the failure as well.
+     * @return Status::Success      If the command was handled successfull
+     * @return All Other            PreResetCondition() or PostResetCondition() failed, these are application specific.
      */
-    virtual chip::Protocols::InteractionModel::Status OnResetCondition() = 0;
+    virtual chip::Protocols::InteractionModel::Status OnResetCondition();
+
+    /**
+     * This method may be overwritten by the SDK User, if the SDK User wants to do something before the reset.
+     * If there are some internal states of the devices or some specific methods that must be called, that are needed for the reset
+     * and that can fail, they should be done here and not in PostResetCondition().
+     *
+     * @return Status::Success      All good, the reset may proceed.
+     * @return All Other            The reset should not proceed. The reset command will fail.
+     */
+    virtual chip::Protocols::InteractionModel::Status PreResetCondition();
+
+    /**
+     * This method may be overwritten by the SDK User, if the SDK User wants to do something after the reset.
+     * If this fails, the attributes will already be updated, so the SDK User should not do something here
+     * that can fail and that will affect the state of the device. Do the checks in the PreResetCondition() method instead.
+     *
+     * @return Status::Success      All good
+     * @return All Other            Something went wrong. The attributes will already be updated. But the reset command will report
+     *                              the failure.
+     */
+    virtual chip::Protocols::InteractionModel::Status PostResetCondition();
 
 private:
     EndpointId mEndpointId{};

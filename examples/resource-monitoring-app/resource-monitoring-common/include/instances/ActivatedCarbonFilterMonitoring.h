@@ -38,7 +38,8 @@ class ActivatedCarbonFilterMonitoringInstance : public ResourceMonitoring::Insta
 {
 private:
     CHIP_ERROR AppInit() override;
-    chip::Protocols::InteractionModel::Status OnResetCondition() override;
+    chip::Protocols::InteractionModel::Status PreResetCondition() override;
+    chip::Protocols::InteractionModel::Status PostResetCondition() override;
 
 public:
     ActivatedCarbonFilterMonitoringInstance(

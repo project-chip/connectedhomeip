@@ -39,30 +39,14 @@ CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
     return CHIP_NO_ERROR;
 }
 
-Status HepaFilterMonitoringInstance::OnResetCondition()
+Status HepaFilterMonitoringInstance::PreResetCondition()
 {
-    ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::OnResetCondition()");
+    ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::PreResetCondition()");
+    return Status::Success;
+}
 
-    if (GetDegradationDirection() == DegradationDirectionEnum::kDown)
-    {
-        UpdateCondition(100);
-    }
-    else if (GetDegradationDirection() == DegradationDirectionEnum::kUp)
-    {
-        UpdateCondition(0);
-    }
-    UpdateChangeIndication(ChangeIndicationEnum::kOk);
-    if (emberAfContainsAttribute(GetEndpointId(), Clusters::HepaFilterMonitoring::Id, Attributes::LastChangedTime::Id))
-    {
-        System::Clock::Milliseconds64 currentUnixTimeMS;
-        System::Clock::ClockImpl clock;
-        CHIP_ERROR err = clock.GetClock_RealTimeMS(currentUnixTimeMS);
-        if (err == CHIP_NO_ERROR)
-        {
-            System::Clock::Seconds32 currentUnixTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentUnixTimeMS);
-            UpdateLastChangedTime(DataModel::MakeNullable(currentUnixTime.count()));
-        }
-    }
-
+Status HepaFilterMonitoringInstance::PostResetCondition()
+{
+    ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::PostResetCondition()");
     return Status::Success;
 }

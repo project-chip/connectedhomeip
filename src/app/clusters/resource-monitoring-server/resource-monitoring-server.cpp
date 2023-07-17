@@ -147,6 +147,65 @@ DataModel::Nullable<uint32_t> Instance::GetLastChangedTime() const
     return mLastChangedTime;
 }
 
+
+
+Status Instance::OnResetCondition()
+{
+    ChipLogDetail(Zcl, "ResourceMonitoringServer::OnResetCondition()");
+
+    // call apllication specific pre reset logic,
+    // anything other than Success will cause the command to fail, and not do any of the resets
+    auto status = PreResetCondition();
+    if (status != Status::Success)
+    {
+        return status;
+    }
+    // Handle the reset of the condition attribute, if supported
+    if (emberAfContainsAttribute(GetEndpointId(), mClusterId, Attributes::Condition::Id))
+    {
+        if (GetDegradationDirection() == DegradationDirectionEnum::kDown)
+        {
+            UpdateCondition(100);
+        }
+        else if (GetDegradationDirection() == DegradationDirectionEnum::kUp)
+        {
+            UpdateCondition(0);
+        }
+    }
+
+    // handle the reset of the ChangeIndication attribute, mandatory
+    UpdateChangeIndication(ChangeIndicationEnum::kOk);
+    
+    // Handle the reset of the LastChangedTime attribute, if supported
+    if (emberAfContainsAttribute(GetEndpointId(), mClusterId, Attributes::LastChangedTime::Id))
+    {
+        System::Clock::Milliseconds64 currentUnixTimeMS;
+        System::Clock::ClockImpl clock;
+        CHIP_ERROR err = clock.GetClock_RealTimeMS(currentUnixTimeMS);
+        if (err == CHIP_NO_ERROR)
+        {
+            System::Clock::Seconds32 currentUnixTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentUnixTimeMS);
+            UpdateLastChangedTime(DataModel::MakeNullable(currentUnixTime.count()));
+        }
+    }
+
+    // call apllication specific post reset logic
+    status = PostResetCondition();
+    return status;
+}
+
+Status Instance::PreResetCondition()
+{
+    ChipLogDetail(Zcl, "ResourceMonitoringServer::PreResetCondition()");
+    return Status::Success;
+}
+
+Status Instance::PostResetCondition()
+{
+    ChipLogDetail(Zcl, "ResourceMonitoringServer::PostResetCondition()");
+    return Status::Success;
+}
+
 // This method is called by the interaction model engine when a command destined for this instance is received.
 void Instance::InvokeCommand(HandlerContext & handlerContext)
 {

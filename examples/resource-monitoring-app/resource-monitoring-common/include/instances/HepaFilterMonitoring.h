@@ -37,7 +37,8 @@ class HepaFilterMonitoringInstance : public ResourceMonitoring::Instance
 {
 private:
     CHIP_ERROR AppInit() override;
-    chip::Protocols::InteractionModel::Status OnResetCondition() override;
+    chip::Protocols::InteractionModel::Status PreResetCondition() override;
+    chip::Protocols::InteractionModel::Status PostResetCondition() override;
 
 public:
     HepaFilterMonitoringInstance(EndpointId aEndpointId, uint32_t aFeature,
