@@ -301,11 +301,10 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 void OperationalStateServer::OnOperationalErrorDetect(const Structs::ErrorStateStruct::Type & aError)
 {
     ChipLogDetail(Zcl, "OperationalStateServer: OnOperationalErrorDetect");
-    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId,
-                                        OperationalState::Attributes::OperationalState::Id);
+    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, OperationalState::Attributes::OperationalState::Id);
 
     EventNumber eventNumber;
-    Events::OperationalError::Type event { aError };
+    Events::OperationalError::Type event{ aError };
     EventLogger<Events::OperationalError::Type> eventData(event);
     ConcreteEventPath path(mEndpointId, mClusterId, event.GetEventId());
     EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
@@ -323,8 +322,7 @@ void OperationalStateServer::OnOperationalErrorDetect(const Structs::ErrorStateS
 void OperationalStateServer::OnOperationCompletionDetect(const Events::OperationCompletion::Type & aEvent)
 {
     ChipLogDetail(Zcl, "OperationalStateServer: OnOperationCompletionDetect");
-    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId,
-                                        OperationalState::Attributes::OperationalState::Id);
+    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, OperationalState::Attributes::OperationalState::Id);
 
     EventNumber eventNumber;
     EventLogger<Events::OperationCompletion::Type> eventData(aEvent);
@@ -337,6 +335,7 @@ void OperationalStateServer::OnOperationCompletionDetect(const Events::Operation
     CHIP_ERROR err = logMgmt.LogEvent(&eventData, eventOptions, eventNumber);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "OperationalStateServer: Failed to record OnOperationCompletionDetect event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "OperationalStateServer: Failed to record OnOperationCompletionDetect event: %" CHIP_ERROR_FORMAT,
+                     err.Format());
     }
 }
