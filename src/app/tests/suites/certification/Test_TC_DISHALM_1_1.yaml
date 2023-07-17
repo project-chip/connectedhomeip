@@ -1,0 +1,122 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 197.1.1. [TC-DISHALM-1.1] Global attributes with server as DUT
+
+PICS:
+    - MOD.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Dishwasher Alarm"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH reads the ClusterRevision attribute from the DUT"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
+
+    - label: "TH reads the FeatureMap attribute from the DUT"
+      PICS: " !DISHALM.S.F00 "
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label: "TH reads the FeatureMap attribute from the DUT"
+      PICS: DISHALM.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
+          constraints:
+              type: bitmap32
+
+    - label: "TH reads the AttributeList attribute from the DUT"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 2, 3, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label:
+          "TH reads the attribute(Latch) in AttributeList from
+          the DUT"
+      PICS: DISHALM.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+
+    - label: "Read the global attribute: EventList"
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: [0]
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Read the optional attribute (Modify): AcceptedCommandList"
+      PICS: DISHALM.S.C01.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+              contains: [1]
+
+    - label: "Read the attribute (Reset) based on feature support: AcceptedCommandList"
+      PICS: DISHALM.S.C00.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
