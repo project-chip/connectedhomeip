@@ -32,8 +32,8 @@
 static constexpr chip::System::Clock::Milliseconds32 UPDATE_TIME_MS = chip::System::Clock::Milliseconds32(100);
 static constexpr uint16_t TRANSITION_TIME_1S                        = 10;
 
+static constexpr uint16_t MIN_TIME_VALUE = 1;
 static constexpr uint16_t MAX_TIME_VALUE = 0xFFFF;
-static constexpr uint8_t MIN_TIME_VALUE  = 1;
 
 /**
  * @brief
