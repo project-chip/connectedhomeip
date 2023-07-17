@@ -1,14 +1,12 @@
 <node>
 	<interface name="org.tizen.matter.example.lighting.OnOff">
 		<property name="onOff" type="b" access="readwrite" />
-		<property name="startUpOnOff" type="y" access="readwrite" />
 	</interface>
 	<interface name="org.tizen.matter.example.lighting.LevelControl">
-		<property name="currentLevel" type="y" access="readwrite" />
-		<property name="startUpCurrentLevel" type="y" access="readwrite" />
+		<property name="level" type="y" access="readwrite" />
 	</interface>
 	<interface name="org.tizen.matter.example.lighting.ColorControl">
-		<property name="currentHue" type="y" access="readwrite" />
-		<property name="currentSaturation" type="y" access="readwrite" />
+		<property name="mode" type="y" access="read" />
+		<property name="colorTemperature" type="q" access="readwrite" />
 	</interface>
 </node>

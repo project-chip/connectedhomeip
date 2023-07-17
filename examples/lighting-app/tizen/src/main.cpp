@@ -69,13 +69,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                           ChipLogValueMEI(attributePath.mAttributeId));
         }
         break;
+#if ENABLE_DBUS_UI
     case Clusters::LevelControl::Id:
         switch (attributePath.mAttributeId)
         {
         case Clusters::LevelControl::Attributes::CurrentLevel::Id:
-#if ENABLE_DBUS_UI
             sDBusInterface.SetLevel(*value);
-#endif
             break;
         default:
             ChipLogDetail(NotSpecified, "Not handled LevelControl cluster attribute ID: " ChipLogFormatMEI,
@@ -85,11 +84,19 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     case Clusters::ColorControl::Id:
         switch (attributePath.mAttributeId)
         {
+        case Clusters::ColorControl::Attributes::ColorMode::Id:
+            sDBusInterface.SetColorMode(static_cast<Clusters::ColorControl::ColorMode>(*value));
+            break;
+        case Clusters::ColorControl::Attributes::ColorTemperatureMireds::Id:
+            VerifyOrDie(size == sizeof(uint16_t));
+            sDBusInterface.SetColorTemperature(*reinterpret_cast<uint16_t *>(value));
+            break;
         default:
             ChipLogDetail(NotSpecified, "Not handled ColorControl cluster attribute ID: " ChipLogFormatMEI,
                           ChipLogValueMEI(attributePath.mAttributeId));
         }
         break;
+#endif // ENABLE_DBUS_UI
     default:
         ChipLogDetail(NotSpecified, "Not handled cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mClusterId));
     }

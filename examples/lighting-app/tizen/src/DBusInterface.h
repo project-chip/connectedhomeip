@@ -20,6 +20,7 @@
 
 #include <gio/gio.h>
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -30,14 +31,15 @@ namespace example {
 class DBusInterface
 {
 public:
-    DBusInterface(chip::EndpointId endpointId) : mEndpointId(endpointId) {}
+    explicit DBusInterface(chip::EndpointId endpointId);
+    ~DBusInterface();
 
     CHIP_ERROR Init();
 
     void SetOnOff(bool on);
     void SetLevel(uint8_t value);
-    void SetHue(uint8_t value);
-    void SetSaturation(uint8_t value);
+    void SetColorMode(chip::app::Clusters::ColorControl::ColorMode colorMode);
+    void SetColorTemperature(uint16_t value);
 
 private:
     static CHIP_ERROR InitOnGLibMatterContext(DBusInterface * self);
@@ -46,8 +48,10 @@ private:
 
     static gboolean OnOnOffChanged(LightAppOnOff *, GDBusMethodInvocation *, DBusInterface *);
     static gboolean OnCurrentLevelChanged(LightAppLevelControl *, GDBusMethodInvocation *, DBusInterface *);
-    static gboolean OnCurrentHueChanged(LightAppColorControl *, GDBusMethodInvocation *, DBusInterface *);
-    static gboolean OnCurrentSaturationChanged(LightAppColorControl *, GDBusMethodInvocation *, DBusInterface *);
+    static gboolean OnColorModeChanged(LightAppColorControl *, GDBusMethodInvocation *, DBusInterface *);
+    static gboolean OnColorTemperatureChanged(LightAppColorControl *, GDBusMethodInvocation *, DBusInterface *);
+
+    void InitOnOff();
 
     class InternalSetGuard
     {

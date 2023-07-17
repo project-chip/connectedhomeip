@@ -23,8 +23,8 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/color-control-server/color-control-server.h>
 #include <app/clusters/level-control/level-control.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -36,6 +36,22 @@ using namespace chip::app;
 
 namespace example {
 
+DBusInterface::DBusInterface(chip::EndpointId endpointId) : mEndpointId(endpointId)
+{
+    mManager           = g_dbus_object_manager_server_new("/");
+    mIfaceOnOff        = light_app_on_off_skeleton_new();
+    mIfaceLevelControl = light_app_level_control_skeleton_new();
+    mIfaceColorControl = light_app_color_control_skeleton_new();
+}
+
+DBusInterface::~DBusInterface()
+{
+    g_object_unref(mIfaceOnOff);
+    g_object_unref(mIfaceLevelControl);
+    g_object_unref(mIfaceColorControl);
+    g_object_unref(mManager);
+}
+
 CHIP_ERROR DBusInterface::Init()
 {
     // During the initialization we are going to connect glib signals, so we need to be
@@ -46,86 +62,57 @@ CHIP_ERROR DBusInterface::Init()
 
 void DBusInterface::SetOnOff(bool on)
 {
-    VerifyOrReturn(mIfaceOnOff != nullptr);
     InternalSetGuard guard(this);
-    light_app_on_off_set_on_off(mIfaceOnOff, on);
+    if (light_app_on_off_get_on_off(mIfaceOnOff) != on)
+        light_app_on_off_set_on_off(mIfaceOnOff, on);
 }
 
 void DBusInterface::SetLevel(uint8_t value)
 {
-    VerifyOrReturn(mIfaceLevelControl != nullptr);
     InternalSetGuard guard(this);
-    light_app_level_control_set_current_level(mIfaceLevelControl, value);
+    if (light_app_level_control_get_level(mIfaceLevelControl) != value)
+        light_app_level_control_set_level(mIfaceLevelControl, value);
 }
 
-void DBusInterface::SetHue(uint8_t value)
+void DBusInterface::SetColorMode(chip::app::Clusters::ColorControl::ColorMode colorMode)
 {
-    VerifyOrReturn(mIfaceColorControl != nullptr);
-    InternalSetGuard guard(this);
-    light_app_color_control_set_current_hue(mIfaceColorControl, value);
+    light_app_color_control_set_mode(mIfaceColorControl, colorMode);
 }
 
-void DBusInterface::SetSaturation(uint8_t value)
+void DBusInterface::SetColorTemperature(uint16_t value)
 {
-    VerifyOrReturn(mIfaceColorControl != nullptr);
     InternalSetGuard guard(this);
-    light_app_color_control_set_current_saturation(mIfaceColorControl, value);
+    if (light_app_color_control_get_color_temperature(mIfaceColorControl) != value)
+        light_app_color_control_set_color_temperature(mIfaceColorControl, value);
 }
 
 CHIP_ERROR DBusInterface::InitOnGLibMatterContext(DBusInterface * self)
 {
     g_autoptr(GDBusConnection) bus = nullptr;
     g_autoptr(GError) error        = nullptr;
-    EmberAfStatus status;
 
     if ((bus = g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error)) == nullptr)
     {
-        ChipLogError(NotSpecified, "Couldn't get D-Bus bus: %s\n", error->message);
+        ChipLogError(NotSpecified, "Couldn't get D-Bus bus: %s", error->message);
         return CHIP_ERROR_NOT_CONNECTED;
     }
-
-    self->mManager = g_dbus_object_manager_server_new("/");
 
     LightAppObjectSkeleton * object = light_app_object_skeleton_new("/app");
     g_dbus_object_manager_server_export(self->mManager, G_DBUS_OBJECT_SKELETON(object));
 
-    self->mIfaceOnOff = light_app_on_off_skeleton_new();
     light_app_object_skeleton_set_on_off(object, self->mIfaceOnOff);
-
-    self->mIfaceLevelControl = light_app_level_control_skeleton_new();
     light_app_object_skeleton_set_level_control(object, self->mIfaceLevelControl);
-
-    self->mIfaceColorControl = light_app_color_control_skeleton_new();
     light_app_object_skeleton_set_color_control(object, self->mIfaceColorControl);
 
-    bool isOn = false;
-    if ((status = Clusters::OnOff::Attributes::OnOff::Get(self->mEndpointId, &isOn)) != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        ChipLogError(NotSpecified, "Error getting current OnOff: %x", status);
-    }
-    else
-    {
-        light_app_on_off_set_on_off(self->mIfaceOnOff, isOn);
-    }
-
-    chip::app::DataModel::Nullable<uint8_t> currentLevel;
-    if ((status = Clusters::LevelControl::Attributes::CurrentLevel::Get(self->mEndpointId, currentLevel)) !=
-        EMBER_ZCL_STATUS_SUCCESS)
-    {
-        ChipLogError(NotSpecified, "Error getting current Level: %x", status);
-    }
-    else
-    {
-        light_app_level_control_set_current_level(self->mIfaceLevelControl, currentLevel.ValueOr(0));
-    }
+    self->InitOnOff();
 
     g_dbus_object_manager_server_set_connection(self->mManager, bus);
     g_object_unref(object);
 
     g_signal_connect(self->mIfaceOnOff, "notify::on-off", G_CALLBACK(OnOnOffChanged), self);
     g_signal_connect(self->mIfaceLevelControl, "notify::current-level", G_CALLBACK(OnCurrentLevelChanged), self);
-    g_signal_connect(self->mIfaceColorControl, "notify::current-hue", G_CALLBACK(OnCurrentHueChanged), self);
-    g_signal_connect(self->mIfaceColorControl, "notify::current-saturation", G_CALLBACK(OnCurrentSaturationChanged), self);
+    // g_signal_connect(self->mIfaceColorControl, "notify::color-mode", G_CALLBACK(OnColorModeChanged), self);
+    g_signal_connect(self->mIfaceColorControl, "notify::color-temperature", G_CALLBACK(OnColorTemperatureChanged), self);
 
     g_bus_own_name_on_connection(bus, "org.tizen.matter.example.lighting", G_BUS_NAME_OWNER_FLAGS_NONE,
                                  reinterpret_cast<GBusAcquiredCallback>(OnBusAcquired),
@@ -141,14 +128,13 @@ void DBusInterface::OnBusAcquired(GDBusConnection *, const char *, DBusInterface
 
 void DBusInterface::OnBusLost(GDBusConnection *, const char * name, DBusInterface * self)
 {
-    if (!self->mNameAcquired)
-    {
-        ChipLogError(NotSpecified, "Couldn't acquire D-Bus name. Please check D-Bus configuration. Requested name: %s", name);
-    }
+    VerifyOrReturn(self->mNameAcquired, /* connection was lost after name was acquired, so it's not an error */);
+    ChipLogError(NotSpecified, "Couldn't acquire D-Bus name. Please check D-Bus configuration. Requested name: %s", name);
 }
 
 gboolean DBusInterface::OnOnOffChanged(LightAppOnOff * onOff, GDBusMethodInvocation * invocation, DBusInterface * self)
 {
+    // Do not handle on-change event if it was triggered by internal set
     VerifyOrReturnValue(!self->mInternalSet, G_DBUS_METHOD_INVOCATION_HANDLED);
 
     chip::DeviceLayer::StackLock lock;
@@ -162,10 +148,11 @@ gboolean DBusInterface::OnOnOffChanged(LightAppOnOff * onOff, GDBusMethodInvocat
 gboolean DBusInterface::OnCurrentLevelChanged(LightAppLevelControl * levelControl, GDBusMethodInvocation * invocation,
                                               DBusInterface * self)
 {
+    // Do not handle on-change event if it was triggered by internal set
     VerifyOrReturnValue(!self->mInternalSet, G_DBUS_METHOD_INVOCATION_HANDLED);
 
     Clusters::LevelControl::Commands::MoveToLevel::DecodableType data;
-    data.level = light_app_level_control_get_current_level(levelControl);
+    data.level = light_app_level_control_get_level(levelControl);
     data.optionsMask.Set(Clusters::LevelControl::LevelControlOptions::kExecuteIfOff);
     data.optionsOverride.Set(Clusters::LevelControl::LevelControlOptions::kExecuteIfOff);
 
@@ -175,16 +162,60 @@ gboolean DBusInterface::OnCurrentLevelChanged(LightAppLevelControl * levelContro
     return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
-gboolean DBusInterface::OnCurrentHueChanged(LightAppColorControl * colorControl, GDBusMethodInvocation * invocation,
-                                            DBusInterface * self)
+#if 0
+gboolean DBusInterface::OnColorModeChanged(LightAppColorControl * colorControl, GDBusMethodInvocation * invocation,
+                                           DBusInterface * self)
 {
+    // Do not handle on-change event if it was triggered by internal set
+    VerifyOrReturnValue(!self->mInternalSet, G_DBUS_METHOD_INVOCATION_HANDLED);
+
+    auto colorMode = light_app_color_control_get_mode(colorControl);
+    VerifyOrReturnValue(colorMode < Clusters::ColorControl::kColorModekUnknownEnumValue, G_DBUS_METHOD_INVOCATION_HANDLED,
+                        ChipLogError(NotSpecified, "Invalid ColorMode: 0x%x", colorMode));
+
+    chip::DeviceLayer::StackLock lock;
+    ColorControlServer::Instance().handleModeSwitch(self->mEndpointId, colorMode);
+
+    return G_DBUS_METHOD_INVOCATION_HANDLED;
+}
+#endif
+
+class CallbackX : public CommandHandler::Callback
+{
+public:
+    void OnDone(CommandHandler & apCommandObj) {}
+    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & apPayload) {}
+    Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath)
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
+};
+
+gboolean DBusInterface::OnColorTemperatureChanged(LightAppColorControl * colorControl, GDBusMethodInvocation * invocation,
+                                                  DBusInterface * self)
+{
+    // Do not handle on-change event if it was triggered by internal set
+    VerifyOrReturnValue(!self->mInternalSet, G_DBUS_METHOD_INVOCATION_HANDLED);
+
+    ConcreteCommandPath path{ self->mEndpointId, Clusters::ColorControl::Id, 0 };
+    Clusters::ColorControl::Commands::MoveToColorTemperature::DecodableType data;
+    data.colorTemperatureMireds = light_app_color_control_get_color_temperature(colorControl);
+
+    CallbackX callback;
+    CommandHandler handler(&callback);
+
+    chip::DeviceLayer::StackLock lock;
+    ColorControlServer::Instance().moveToColorTempCommand(&handler, path, data);
+
     return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
-gboolean DBusInterface::OnCurrentSaturationChanged(LightAppColorControl * colorControl, GDBusMethodInvocation * invocation,
-                                                   DBusInterface * self)
+void DBusInterface::InitOnOff()
 {
-    return G_DBUS_METHOD_INVOCATION_HANDLED;
+    bool isOn   = false;
+    auto status = Clusters::OnOff::Attributes::OnOff::Get(mEndpointId, &isOn);
+    VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(NotSpecified, "Error getting OnOff: 0x%x", status));
+    light_app_on_off_set_on_off(mIfaceOnOff, isOn);
 }
 
 }; // namespace example
