@@ -16,46 +16,26 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific key value storage implementation for EFR32.
- *
- */
-
 #pragma once
-#include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <system/SystemClock.h>
-#include <system/SystemLayer.h>
+
+#include <platform/KeyValueStoreManager.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
 
-#define KVS_MAX_ENTRIES 50
-
-class KeyValueStoreManagerImpl final : public KeyValueStoreManager
+class KeyValueStoreManagerImpl : public KeyValueStoreManager
 {
-    // Allow the KeyValueStoreManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend class KeyValueStoreManager;
-
 public:
-    CHIP_ERROR Init(void);
-    CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
-    CHIP_ERROR _Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size = nullptr, size_t offset = 0) const;
-    CHIP_ERROR _Delete(const char * key);
-    CHIP_ERROR ErasePartition(void);
-
-    static constexpr size_t kMaxEntries = KVS_MAX_ENTRIES;
-
-    static void ForceKeyMapSave();
+    CHIP_ERROR _Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size = nullptr, size_t offset = 0)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR _Delete(const char * key) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _Put(const char * key, const void * value, size_t value_size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
 private:
-    static void OnScheduledKeyMapSave(System::Layer * systemLayer, void * appState);
-
-    void ScheduleKeyMapSave(void);
-
-    //  ===== Members for internal use by the following friends.
+    // ===== Members for internal use by the following friends.
     friend KeyValueStoreManager & KeyValueStoreMgr();
     friend KeyValueStoreManagerImpl & KeyValueStoreMgrImpl();
 

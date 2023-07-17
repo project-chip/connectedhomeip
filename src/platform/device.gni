@@ -94,7 +94,7 @@ declare_args() {
   } else if (chip_device_platform == "darwin" ||
              chip_device_platform == "cc13x2_26x2" ||
              chip_device_platform == "cc13x4_26x4" || current_os == "android" ||
-             chip_device_platform == "fake" ||
+             chip_device_platform == "fake" || chip_device_platform == "renesas" ||
              chip_device_platform == "tizen") {
     chip_mdns = "platform"
   } else {

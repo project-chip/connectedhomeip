@@ -42,12 +42,12 @@
  *            digests and ciphers instead.
  *
  */
-#define MBEDTLS_AES_ALT
+//#define MBEDTLS_AES_ALT
 //#define MBEDTLS_ARC4_ALT
 //#define MBEDTLS_ARIA_ALT
 //#define MBEDTLS_BLOWFISH_ALT
 //#define MBEDTLS_CAMELLIA_ALT
-#define MBEDTLS_CCM_ALT
+//#define MBEDTLS_CCM_ALT
 //#define MBEDTLS_CHACHA20_ALT
 //#define MBEDTLS_CHACHAPOLY_ALT
 //#define MBEDTLS_CMAC_ALT
@@ -63,7 +63,7 @@
 //#define MBEDTLS_RIPEMD160_ALT
 //#define MBEDTLS_RSA_ALT
 //#define MBEDTLS_SHA1_ALT
-#define MBEDTLS_SHA256_ALT
+//#define MBEDTLS_SHA256_ALT
 //#define MBEDTLS_SHA512_ALT
 //#define MBEDTLS_XTEA_ALT
 
@@ -80,7 +80,7 @@
  * Disable if you run into name conflicts and want to really remove the
  * mbedtls_strerror()
  */
-#define MBEDTLS_ERROR_STRERROR_DUMMY
+//#define MBEDTLS_ERROR_STRERROR_DUMMY
 
 /**
  * \def MBEDTLS_BASE64_C
@@ -92,7 +92,7 @@
  *
  * This module is required for PEM support (required by X.509).
  */
-#define MBEDTLS_BASE64_C
+//#define MBEDTLS_BASE64_C
 
 /**
  * \def MBEDTLS_HKDF_C
@@ -107,7 +107,7 @@
  * This module adds support for the Hashed Message Authentication Code
  * (HMAC)-based key derivation function (HKDF).
  */
-#define MBEDTLS_HKDF_C
+//#define MBEDTLS_HKDF_C
 
 /**
  * \def MBEDTLS_OID_C
@@ -130,7 +130,7 @@
  *
  * This modules translates between OIDs and internal values.
  */
-#define MBEDTLS_OID_C
+//#define MBEDTLS_OID_C
 
 /**
  * \def MBEDTLS_PEM_WRITE_C
@@ -146,7 +146,7 @@
  *
  * This modules adds support for encoding / writing PEM files.
  */
-#define MBEDTLS_PEM_WRITE_C
+//#define MBEDTLS_PEM_WRITE_C
 
 /**
  * \def MBEDTLS_PK_WRITE_C
@@ -160,7 +160,7 @@
  *
  * Uncomment to enable generic public key write functions.
  */
-#define MBEDTLS_PK_WRITE_C
+//#define MBEDTLS_PK_WRITE_C
 
 /**
  * \def MBEDTLS_PKCS5_C
@@ -173,7 +173,7 @@
  *
  * This module adds support for the PKCS#5 functions.
  */
-#define MBEDTLS_PKCS5_C
+//#define MBEDTLS_PKCS5_C
 
 /**
  * \def MBEDTLS_X509_CREATE_C
@@ -186,7 +186,7 @@
  *
  * This module is the basis for creating X.509 certificates and CSRs.
  */
-#define MBEDTLS_X509_CREATE_C
+//#define MBEDTLS_X509_CREATE_C
 
 /**
  * \def MBEDTLS_X509_CSR_WRITE_C
@@ -199,4 +199,4 @@
  *
  * This module is required for X.509 certificate request writing.
  */
-#define MBEDTLS_X509_CSR_WRITE_C
+//#define MBEDTLS_X509_CSR_WRITE_C

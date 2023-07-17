@@ -1,7 +1,7 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,77 +18,16 @@
 
 /**
  *    @file
- *          Provides an implementation of the PlatformManager object
- *          for Silabs platforms using the Silicon Labs SDK.
+ *          Stub for PlatformManagerImpl for fake platform.
  */
-/* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <platform/FreeRTOS/SystemTimeSupport.h>
-#include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
-#include <platform/renesas/DiagnosticDataProviderImpl.h>
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#include <lwip/tcpip.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#include "FreeRTOS.h"
 
 namespace chip {
 namespace DeviceLayer {
 
+/** Singleton instance of the KeyValueStoreManager implementation object.
+ */
 PlatformManagerImpl PlatformManagerImpl::sInstance;
-
-CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
-{
-    CHIP_ERROR err;
-
-    // Initialize the configuration system.
-    err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
-    SuccessOrExit(err);
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    // Initialize LwIP.
-    tcpip_init(NULL, NULL);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-    ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
-
-    // Call _InitChipStack() on the generic implementation base class
-    // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
-    SuccessOrExit(err);
-
-exit:
-    return err;
-}
-
-void PlatformManagerImpl::_Shutdown()
-{
-    uint64_t upTime = 0;
-
-    if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
-    {
-        uint32_t totalOperationalHours = 0;
-
-        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
-        {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
-        }
-        else
-        {
-            ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
-        }
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
-    }
-
-    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
-}
 
 } // namespace DeviceLayer
 } // namespace chip

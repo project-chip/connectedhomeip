@@ -24,7 +24,8 @@ custom_toolchain = "${build_root}/toolchain/arm_gcc"
 arm_platform_config = "${renesas_sdk_build_root}/renesas_arm.gni"
 
 chip_target_style = "embedded"
-chip_crypto = "mbedtls"
+#chip_crypto = "mbedtls"
+chip_crypto = "platform"
 
 chip_device_platform = "renesas"
 print("=========chip_device_platform: ${chip_device_platform}")
@@ -32,6 +33,7 @@ chip_mdns = "platform"
 
 chip_enable_openthread = false
 chip_config_network_layer_ble = false
+chip_enable_ble = false
 
 lwip_platform = "external"
 

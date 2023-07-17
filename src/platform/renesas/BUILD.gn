@@ -40,11 +40,12 @@ static_library("renesas") {
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
+    #"Logging.cpp",
+    "DnssdImpl.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
-    "SystemTimeSupport.cpp",
+    #"SystemTimeSupport.cpp",
     "renesas-chip-mbedtls-config.h",
   ]
 
@@ -59,6 +60,7 @@ static_library("renesas") {
     #"OTAImageProcessorImpl.h",
 #  ]
 
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  public_deps = [ "${chip_root}/src/lib/dnssd:platform_header",
+                "${chip_root}/src/platform:platform_base" ]
 
 }
