@@ -25,10 +25,8 @@ source_set("manager-srcs") {
     "ICDManager.h",
   ]
 
-  public_deps = [
-    ":monitoring-table",
-    "${chip_root}/src/credentials:credentials",
-  ]
+  deps = [ ":monitoring-table" ]
+  public_deps = [ "${chip_root}/src/credentials:credentials" ]
 }
 
 source_set("monitoring-table") {

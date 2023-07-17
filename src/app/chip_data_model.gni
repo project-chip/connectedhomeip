@@ -195,8 +195,8 @@ template("chip_data_model") {
                                      [ invoker.zap_file ])
     }
 
-    if (!defined(public_deps)) {
-      public_deps = []
+    if (!defined(deps)) {
+      deps = []
     }
 
     foreach(cluster, _cluster_sources) {
@@ -261,10 +261,14 @@ template("chip_data_model") {
       } else if (cluster == "icd-management-server") {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
 
-        public_deps += [ "${chip_root}/src/app/icd:monitoring-table" ]
+        deps += [ "${chip_root}/src/app/icd:monitoring-table" ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
+    }
+
+    if (!defined(public_deps)) {
+      public_deps = []
     }
 
     public_deps += [
