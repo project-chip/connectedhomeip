@@ -34,7 +34,7 @@ using namespace chip::TLV;
 using namespace chip::TLVMeta;
 using namespace chip::TestData;
 
-const Entry<ItemInfo> _empty_item[]                  = {};
+const Entry<ItemInfo> _empty_item[0]                 = {};
 const std::array<const Node<ItemInfo>, 1> empty_meta = { { { 0, _empty_item } } };
 
 const Entry<ItemInfo> _FakeProtocolData[] = {

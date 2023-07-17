@@ -81,6 +81,9 @@ public:
                     (now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || now >= mSyncTimestamp)));
         }
 
+        bool IsEnginRunScheduled() const { return mEnginRunScheduled; }
+        void SetEngineRunScheduled(bool aEnginRunScheduled) { mEnginRunScheduled = aEnginRunScheduled; }
+
         void SetIntervalTimeStamps(ReadHandler * aReadHandler)
         {
             uint16_t minInterval, maxInterval;
@@ -91,7 +94,11 @@ public:
             mSyncTimestamp = mMaxTimestamp;
         }
 
-        void RunCallback() { mCallback(); }
+        void RunCallback()
+        {
+            mCallback();
+            SetEngineRunScheduled(true);
+        }
 
         void SetSyncTimestamp(System::Clock::Timestamp aSyncTimestamp)
         {
@@ -112,6 +119,8 @@ public:
         Timestamp mMaxTimestamp;
         Timestamp mSyncTimestamp; // Timestamp at which the read handler will be allowed to emit a report so it can be synced with
                                   // other handlers that have an earlier max timestamp
+        bool mEnginRunScheduled = false; // Flag to indicate if the engine run is already scheduled so the scheduler can ignore
+                                         // it when calculating the next run time
     };
 
     ReportScheduler(TimerDelegate * aTimerDelegate) : mTimerDelegate(aTimerDelegate) {}
@@ -120,8 +129,6 @@ public:
      */
     virtual ~ReportScheduler() = default;
 
-    /// @brief Check if a ReadHandler is scheduled for reporting
-    virtual bool IsReportScheduled(ReadHandler * aReadHandler) = 0;
     /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
     /// @param aReadHandler read handler to check
     bool IsReportableNow(ReadHandler * aReadHandler)

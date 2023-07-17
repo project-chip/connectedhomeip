@@ -51,14 +51,8 @@
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-#define SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL
-#else
-#define SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT 3600 // 3600 seconds
-#endif
-
 // https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/61a9d19e6af12fdfb0872bcff26d19de6c680a1a/src/Ch02_Architecture.adoc#1122-subscribe-interaction-limits
-constexpr uint16_t kSubscriptionMaxIntervalPublisherLimit = SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT;
+constexpr uint16_t kSubscriptionMaxIntervalPublisherLimit = 3600;
 
 namespace chip {
 namespace app {

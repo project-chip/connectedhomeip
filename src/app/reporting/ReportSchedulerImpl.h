@@ -24,29 +24,27 @@ namespace chip {
 namespace app {
 namespace reporting {
 
-using Timeout = System::Clock::Timeout;
-
 class ReportSchedulerImpl : public ReportScheduler
 {
 public:
+    using Timeout = System::Clock::Timeout;
+
     ReportSchedulerImpl(TimerDelegate * aTimerDelegate);
     ~ReportSchedulerImpl() override { UnregisterAllHandlers(); }
 
     // ReadHandlerObserver
-    void OnReadHandlerCreated(ReadHandler * aReadHandler) override;
-    void OnBecameReportable(ReadHandler * aReadHandler) override;
-    void OnSubscriptionAction(ReadHandler * aReadHandler) override;
+    void OnReadHandlerCreated(ReadHandler * aReadHandler) final;
+    void OnBecameReportable(ReadHandler * aReadHandler) final;
+    void OnSubscriptionAction(ReadHandler * aReadHandler) final;
     void OnReadHandlerDestroyed(ReadHandler * aReadHandler) override;
 
-    bool IsReportScheduled(ReadHandler * aReadHandler) override;
+    bool IsReportScheduled(ReadHandler * aReadHandler);
 
     void ReportTimerCallback();
 
 protected:
-    virtual CHIP_ERROR RegisterReadHandler(ReadHandler * aReadHandler);
     virtual CHIP_ERROR ScheduleReport(Timeout timeout, ReadHandlerNode * node);
-    virtual void CancelReport(ReadHandler * aReadHandler);
-    virtual void UnregisterReadHandler(ReadHandler * aReadHandler);
+    void CancelReport(ReadHandler * aReadHandler);
     virtual void UnregisterAllHandlers();
 
 private:

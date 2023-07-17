@@ -26,23 +26,7 @@ namespace reporting {
 using namespace System::Clock;
 using ReadHandlerNode = ReportScheduler::ReadHandlerNode;
 
-CHIP_ERROR SynchronizedReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode * node)
-{
-    // Cancel Report if it is currently scheduled
-    mTimerDelegate->CancelTimer(this);
-    ReturnErrorOnFailure(mTimerDelegate->StartTimer(this, timeout));
-    mTestNextReportTimestamp = mTimerDelegate->GetCurrentMonotonicTimestamp() + timeout;
-
-    return CHIP_NO_ERROR;
-}
-
-void SynchronizedReportSchedulerImpl::CancelReport(ReadHandler * aReadHandler)
-{
-    // We don't need to take action on the handler, since the timer is common here
-    mTimerDelegate->CancelTimer(this);
-}
-
-void SynchronizedReportSchedulerImpl::UnregisterReadHandler(ReadHandler * aReadHandler)
+void SynchronizedReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aReadHandler)
 {
     // Verify list is populated and handler is not null
     VerifyOrReturn((!mReadHandlerList.Empty() || (nullptr == aReadHandler)));
@@ -57,8 +41,24 @@ void SynchronizedReportSchedulerImpl::UnregisterReadHandler(ReadHandler * aReadH
     if (mReadHandlerList.Empty())
     {
         // Only cancel the timer if there are no more handlers registered
-        CancelReport(aReadHandler);
+        CancelReport();
     }
+}
+
+CHIP_ERROR SynchronizedReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode * node)
+{
+    // Cancel Report if it is currently scheduled
+    mTimerDelegate->CancelTimer(this);
+    ReturnErrorOnFailure(mTimerDelegate->StartTimer(this, timeout));
+    mTestNextReportTimestamp = mTimerDelegate->GetCurrentMonotonicTimestamp() + timeout;
+
+    return CHIP_NO_ERROR;
+}
+
+void SynchronizedReportSchedulerImpl::CancelReport()
+{
+    // We don't need to take action on the handler, since the timer is common here
+    mTimerDelegate->CancelTimer(this);
 }
 
 /// @brief Checks if the timer is active for the given ReadHandler. Since all read handlers are scheduled on the same timer, we
@@ -76,7 +76,7 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::FindNextMaxInterval()
 {
     VerifyOrReturnError(!mReadHandlerList.Empty(), CHIP_ERROR_INVALID_LIST_LENGTH);
     System::Clock::Timestamp now      = mTimerDelegate->GetCurrentMonotonicTimestamp();
-    System::Clock::Timestamp earliest = now + Seconds16(kSubscriptionMaxIntervalPublisherLimit);
+    System::Clock::Timestamp earliest = now + Seconds16::max();
 
     for (auto & iter : mReadHandlerList)
     {
@@ -102,7 +102,7 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::FindNextMinInterval()
 
     for (auto & iter : mReadHandlerList)
     {
-        if (iter.GetMinTimestamp() > latest)
+        if (iter.GetMinTimestamp() > latest && IsReadHandlerReportable(iter.GetReadHandler()))
         {
             // We do not want the new min to be set above the max for any handler
             if (iter.GetMinTimestamp() <= mNextMaxTimestamp)

@@ -40,40 +40,6 @@ ReportSchedulerImpl::ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : Repor
 /// @brief When a ReadHandler is added, register it, which will schedule an engine run
 void ReportSchedulerImpl::OnReadHandlerCreated(ReadHandler * aReadHandler)
 {
-    RegisterReadHandler(aReadHandler);
-}
-
-/// @brief When a ReadHandler becomes reportable, schedule, verifies if the min interval of a handleris elapsed. If not,
-/// reschedule the report to happen when the min interval is elapsed. If it is, schedule an engine run.
-void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
-{
-    ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
-    VerifyOrReturn(nullptr != node);
-
-    Milliseconds32 newTimeout;
-    ReturnOnFailure(CalculateNextReportTimeout(newTimeout, node));
-    ScheduleReport(newTimeout, node);
-}
-
-void ReportSchedulerImpl::OnSubscriptionAction(ReadHandler * apReadHandler)
-{
-    ReadHandlerNode * node = FindReadHandlerNode(apReadHandler);
-    VerifyOrReturn(nullptr != node);
-    // Schedule callback for max interval by computing the difference between the max timestamp and the current timestamp
-    node->SetIntervalTimeStamps(apReadHandler);
-    Milliseconds32 newTimeout;
-    ReturnOnFailure(CalculateNextReportTimeout(newTimeout, node));
-    ScheduleReport(newTimeout, node);
-}
-
-/// @brief When a ReadHandler is removed, unregister it, which will cancel any scheduled report
-void ReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aReadHandler)
-{
-    UnregisterReadHandler(aReadHandler);
-}
-
-CHIP_ERROR ReportSchedulerImpl::RegisterReadHandler(ReadHandler * aReadHandler)
-{
     ReadHandlerNode * newNode = FindReadHandlerNode(aReadHandler);
     // Handler must not be registered yet; it's just being constructed.
     VerifyOrDie(nullptr == newNode);
@@ -90,8 +56,43 @@ CHIP_ERROR ReportSchedulerImpl::RegisterReadHandler(ReadHandler * aReadHandler)
     Milliseconds32 newTimeout;
     // No need to check for error here, since the node is already in the list otherwise we would have Died
     CalculateNextReportTimeout(newTimeout, newNode);
-    ReturnErrorOnFailure(ScheduleReport(newTimeout, newNode));
-    return CHIP_NO_ERROR;
+    ScheduleReport(newTimeout, newNode);
+}
+
+/// @brief When a ReadHandler becomes reportable, schedule, verifies if the min interval of a handleris elapsed. If not,
+/// reschedule the report to happen when the min interval is elapsed. If it is, schedule an engine run.
+void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
+{
+    ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
+    VerifyOrReturn(nullptr != node);
+
+    Milliseconds32 newTimeout;
+    CalculateNextReportTimeout(newTimeout, node);
+    ScheduleReport(newTimeout, node);
+}
+
+void ReportSchedulerImpl::OnSubscriptionAction(ReadHandler * apReadHandler)
+{
+    ReadHandlerNode * node = FindReadHandlerNode(apReadHandler);
+    VerifyOrReturn(nullptr != node);
+    node->SetIntervalTimeStamps(apReadHandler);
+    Milliseconds32 newTimeout;
+    CalculateNextReportTimeout(newTimeout, node);
+    ScheduleReport(newTimeout, node);
+    node->SetEngineRunScheduled(false);
+}
+
+/// @brief When a ReadHandler is removed, unregister it, which will cancel any scheduled report
+void ReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aReadHandler)
+{
+    CancelReport(aReadHandler);
+
+    ReadHandlerNode * removeNode = FindReadHandlerNode(aReadHandler);
+    // Nothing to remove if the handler is not found in the list
+    VerifyOrReturn(nullptr != removeNode);
+
+    mReadHandlerList.Remove(removeNode);
+    mNodesPool.ReleaseObject(removeNode);
 }
 
 CHIP_ERROR ReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode * node)
@@ -110,24 +111,12 @@ void ReportSchedulerImpl::CancelReport(ReadHandler * aReadHandler)
     mTimerDelegate->CancelTimer(node);
 }
 
-void ReportSchedulerImpl::UnregisterReadHandler(ReadHandler * aReadHandler)
-{
-    CancelReport(aReadHandler);
-
-    ReadHandlerNode * removeNode = FindReadHandlerNode(aReadHandler);
-    // Nothing to remove if the handler is not found in the list
-    VerifyOrReturn(nullptr != removeNode);
-
-    mReadHandlerList.Remove(removeNode);
-    mNodesPool.ReleaseObject(removeNode);
-}
-
 void ReportSchedulerImpl::UnregisterAllHandlers()
 {
     while (!mReadHandlerList.Empty())
     {
         ReadHandler * firstReadHandler = mReadHandlerList.begin()->GetReadHandler();
-        UnregisterReadHandler(firstReadHandler);
+        OnReadHandlerDestroyed(firstReadHandler);
     }
 }
 

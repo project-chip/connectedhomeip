@@ -33,17 +33,18 @@ using TimerDelegate   = ReportScheduler::TimerDelegate;
 class SynchronizedReportSchedulerImpl : public ReportSchedulerImpl
 {
 public:
+    void OnReadHandlerDestroyed(ReadHandler * aReadHandler) override;
+
     SynchronizedReportSchedulerImpl(TimerDelegate * aTimerDelegate) : ReportSchedulerImpl(aTimerDelegate) {}
     ~SynchronizedReportSchedulerImpl() {}
 
-    bool IsReportScheduled(ReadHandler * aReadHandler) override;
+    bool IsReportScheduled(ReadHandler * aReadHandler);
 
     void ReportTimerCallback();
 
 protected:
     CHIP_ERROR ScheduleReport(System::Clock::Timeout timeout, ReadHandlerNode * node) override;
-    void CancelReport(ReadHandler * aReadHandler) override;
-    void UnregisterReadHandler(ReadHandler * aReadHandler) override;
+    void CancelReport();
 
 private:
     friend class chip::app::reporting::TestReportScheduler;
