@@ -1,0 +1,16 @@
+reset
+halt
+// Factory data size is one internal flash sector (8K).
+// Factory data address is retrieved from the map file.
+erase 0xec000 0xee000 noreset
+// Load factory data and conversion application, then
+// wait for 10 seconds and load the "real" application.
+loadfile factory_data.bin 0xec000
+loadfile chip-k32w1-light-example-before-conversion.srec
+reset
+go
+Sleep 10000
+loadfile chip-k32w1-light-example-after-conversion.srec
+reset
+go
+quit
