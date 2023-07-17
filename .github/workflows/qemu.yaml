@@ -75,6 +75,9 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
 
+            - name: Fixup GdbGui requirement
+              run: perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt
+
             - name: Build ESP32 QEMU test images
               timeout-minutes: 20
               run: |
