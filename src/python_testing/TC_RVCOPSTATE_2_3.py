@@ -32,18 +32,18 @@ import time
 class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.OperationalState
+        cluster = Clusters.Objects.RvcOperationalState
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    async def send_pause_cmd(self) -> Clusters.Objects.OperationalState.Commands.Pause:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.OperationalState.Commands.Pause(), endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.OperationalState.Commands.OperationalCommandResponse),
+    async def send_pause_cmd(self) -> Clusters.Objects.RvcOperationalState.Commands.Pause:
+        ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcOperationalState.Commands.Pause(), endpoint=self.endpoint)
+        asserts.assert_true(type_matches(ret, Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse),
                             "Unexpected return type for Pause")
         return ret
 
-    async def send_resume_cmd(self) -> Clusters.Objects.OperationalState.Commands.Resume:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.OperationalState.Commands.Resume(), endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.OperationalState.Commands.OperationalCommandResponse),
+    async def send_resume_cmd(self) -> Clusters.Objects.RvcOperationalState.Commands.Resume:
+        ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcOperationalState.Commands.Resume(), endpoint=self.endpoint)
+        asserts.assert_true(type_matches(ret, Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse),
                             "Unexpected return type for Resume")
         return ret
 
@@ -63,7 +63,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             asserts.assert_true(self.check_pics("RVCOPSTATE.S.C00.Rsp"), "RVCOPSTATE.S.C00.Rsp must be supported")
             asserts.assert_true(self.check_pics("RVCOPSTATE.S.C03.Rsp"), "RVCOPSTATE.S.C03.Rsp must be supported")
 
-            attributes = Clusters.OperationalState.Attributes
+            attributes = Clusters.RvcOperationalState.Attributes
 
             self.print_step(1, "Commissioning, already done")
 
@@ -92,7 +92,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             self.print_step(5, "Read OperationalState attribute")
             operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OperationalState)
             logging.info("OperationalState: %s" % (operational_state))
-            asserts.assert_equal(operational_state.operationalStateID, 0x02, "OperationalState ID should be Paused(0x02)")
+            asserts.assert_equal(operational_state, 0x02, "OperationalState ID should be Paused(0x02)")
 
             self.print_step(6, "Read CountdownTime attribute")
             initial_countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CountdownTime)
@@ -121,7 +121,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             self.print_step(11, "Read OperationalState attribute")
             operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OperationalState)
             logging.info("OperationalState: %s" % (operational_state))
-            asserts.assert_equal(operational_state.operationalStateID, 0x01, "OperationalState ID should be Running(0x01)")
+            asserts.assert_equal(operational_state, 0x01, "OperationalState ID should be Running(0x01)")
 
             self.print_step(12, "Send Resume command")
             ret = await self.send_resume_cmd()
