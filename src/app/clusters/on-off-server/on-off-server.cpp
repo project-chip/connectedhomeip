@@ -813,7 +813,7 @@ exit:
  */
 void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "Timer callback - Entering callbackc");
+    ChipLogDetail(Zcl, "Timer callback - Entering callback");
 
     bool isOn = false;
     OnOff::Attributes::OnOff::Get(endpoint, &isOn);
@@ -826,7 +826,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
         // Update onTime values
         uint16_t onTime = MIN_TIME_VALUE;
         OnOff::Attributes::OnTime::Get(endpoint, &onTime);
-        ChipLogProgress(Zcl, "Timer callback - On Time:  %d", onTime);
+        ChipLogDetail(Zcl, "Timer callback - On Time:  %d", onTime);
 
         if (onTime > 0)
         {
@@ -836,7 +836,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
 
         if (onTime == 0)
         {
-            ChipLogProgress(Zcl, "Timer callback - Turning off OnOff");
+            ChipLogDetail(Zcl, "Timer callback - Turning off OnOff");
 
             OnOff::Attributes::OffWaitTime::Set(endpoint, 0);
             setOnOffValue(endpoint, Commands::Off::Id, false);
@@ -854,7 +854,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
             OnOff::Attributes::OffWaitTime::Set(endpoint, offWaitTime);
         }
 
-        ChipLogProgress(Zcl, "Timer Callback - wait Off Time:  %d", offWaitTime);
+        ChipLogDetail(Zcl, "Timer Callback - wait Off Time:  %d", offWaitTime);
 
         // Validate if necessary to restart timer
         if (offWaitTime > 0)

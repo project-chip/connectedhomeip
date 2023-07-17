@@ -16904,6 +16904,18 @@ public class ChipClusters {
       subscribeOperationalStateListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readOperationalStateAttribute(
+      IntegerAttributeCallback callback
+    ) {
+      readOperationalStateAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeOperationalStateAttribute(
+        IntegerAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeOperationalStateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(
       GeneratedCommandListAttributeCallback callback
     ) {
@@ -17003,6 +17015,13 @@ public class ChipClusters {
     private native void subscribeOperationalStateListAttribute(long chipClusterPtr,
         OperationalStateListAttributeCallback callback
       , int minInterval, int maxInterval);
+
+    private native void readOperationalStateAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+    );
+    private native void subscribeOperationalStateAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(long chipClusterPtr,
         GeneratedCommandListAttributeCallback callback
@@ -17208,6 +17227,18 @@ public class ChipClusters {
       subscribeOperationalStateListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readOperationalStateAttribute(
+      IntegerAttributeCallback callback
+    ) {
+      readOperationalStateAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeOperationalStateAttribute(
+        IntegerAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeOperationalStateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(
       GeneratedCommandListAttributeCallback callback
     ) {
@@ -17307,6 +17338,13 @@ public class ChipClusters {
     private native void subscribeOperationalStateListAttribute(long chipClusterPtr,
         OperationalStateListAttributeCallback callback
       , int minInterval, int maxInterval);
+
+    private native void readOperationalStateAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+    );
+    private native void subscribeOperationalStateAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(long chipClusterPtr,
         GeneratedCommandListAttributeCallback callback
