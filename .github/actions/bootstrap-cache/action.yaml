@@ -7,7 +7,7 @@ runs:
       name: Bootstrap cache
       continue-on-error: true
       with:
-        action: buildjet/cache@v3
+        action: action/cache@v3
         attempt_limit: 3
         attempt_delay: 2000
         with: |
