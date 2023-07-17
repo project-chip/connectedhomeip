@@ -188,21 +188,26 @@ tests:
               - name: "ms"
                 value: 1000
 
+    #Issue : https://github.com/project-chip/connectedhomeip/issues/27967
     - label:
           "Step 7: TH sends a AddGroup Command to the Groups cluster with the
           GroupID field set to 0x0105 and the GroupName set to an empty string.
           The command is sent as a group command using GroupID 0x0104"
-      cluster: "Groups"
-      groupId: 0x0104
-      command: "AddGroup"
+      verification: |
+          ./chip-tool groups add-group 261 '' 0xffffffffffff0104 1 --trace_decode 1
+
+          This step does not have any expected outcome as per the spec, Hence no verification logs has been provided.
+
+          Further continuation of this step has been validated using "view group" command in Step 10
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
-              - name: GroupID
-                value: 0x0105
-              - name: GroupName
-                value: ""
-      response:
-          error: FAILURE
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     # multicast if the unicast packet is sent immediately after the multicast one.
     - label: "Wait for AddGroup"
@@ -252,25 +257,33 @@ tests:
               - name: GroupName
                 value: ""
 
+    #Issue : https://github.com/project-chip/connectedhomeip/issues/27967
     - label:
           "Step 10: TH sends a ViewGroup Command to the Groups cluster on
           Endpoint PIXIT.G.ENDPOINT over CASE with the GroupID set to 0x0105 to
           confirm that the AddGroup command from step 7 was not successful"
-      cluster: "Groups"
-      endpoint: Groups.Endpoint
-      command: "ViewGroup"
+      verification: |
+          ./chip-tool groups view-group 0x0105 1 0
+
+          Verify DUT sends a ViewGroupResponse with Status is set to NOT_FOUND on TH(chip-tool) Logs:
+
+          [1685009398.600925][39795:39797] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0004 Command=0x0000_0001
+          [1685009398.600932][39795:39797] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
+          [1685009398.600944][39795:39797] CHIP:TOO: ViewGroupResponse: {
+          [1685009398.600949][39795:39797] CHIP:TOO: status: 139
+          [1685009398.600952][39795:39797] CHIP:TOO: groupID: 261
+          [1685009398.600955][39795:39797] CHIP:TOO: groupName:
+          [1685009398.600957][39795:39797] CHIP:TOO: }
+          [1685009398.600964][39795:39797] CHIP:DMG: ICR moving to [AwaitingDe]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
-              - name: GroupID
-                value: 0x0105
-      response:
-          values:
-              - name: Status
-                value: 139
-              - name: GroupID
-                value: 0x0105
-              - name: GroupName
-                value: ""
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Step 11: TH sends a AddGroup Command to the Groups cluster with the
