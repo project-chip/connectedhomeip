@@ -6,6 +6,6 @@ runs:
     - uses: actions/setup-python@v4
       with:
         python-version: "3.11"
-    - if: runner.os == 'macOS'
+    - if: runner.os == 'macOS' || matrix.os == 'macos-latest'
       shell: bash
-      run: brew install python@3.11 coreutils
+      run: brew install coreutils
