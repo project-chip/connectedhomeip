@@ -26,14 +26,6 @@ namespace ResourceMonitoring {
 namespace Commands {
 namespace ResetCondition {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

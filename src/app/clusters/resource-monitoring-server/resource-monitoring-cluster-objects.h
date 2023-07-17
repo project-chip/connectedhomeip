@@ -181,18 +181,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInf
 namespace Commands {
 namespace ResetCondition {
 static constexpr CommandId Id = 0x00000000;
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
 
 struct DecodableType
 {
