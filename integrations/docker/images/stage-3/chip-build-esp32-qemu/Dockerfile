@@ -1,4 +1,4 @@
-ARG VERSION=2latest
+ARG VERSION=3latest
 FROM ghcr.io/project-chip/chip-build-esp32:${VERSION}
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
