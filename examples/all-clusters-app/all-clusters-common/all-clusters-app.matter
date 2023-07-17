@@ -6738,15 +6738,15 @@ endpoint 1 {
 
   server cluster DishwasherAlarm {
     emits event Notify;
-    ram      attribute mask default = 0;
-    ram      attribute latch default = 0;
-    ram      attribute state default = 0;
+    ram      attribute mask default = 1;
+    ram      attribute latch default = 1;
+    ram      attribute state default = 1;
     ram      attribute supported default = 15;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }
 
