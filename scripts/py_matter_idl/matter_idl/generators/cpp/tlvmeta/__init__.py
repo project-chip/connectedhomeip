@@ -96,7 +96,8 @@ class ClusterTablesGenerator:
 
         # Events are structures
         for e in self.cluster.events:
-            self.known_types.add("%s_%s" % (self.cluster.name, e.name))
+            if e.fields:
+                self.known_types.add("%s_%s" % (self.cluster.name, e.name))
 
         for e in self.cluster.enums:
             self.known_types.add("%s_%s" % (self.cluster.name, e.name))
@@ -155,7 +156,7 @@ class ClusterTablesGenerator:
                 reference="%s_%s" % (self.cluster.name, e.name),
                 real_type='%s::%s' % (self.cluster.name, e.name)
             )
-            for e in self.cluster.events
+            for e in self.cluster.events if e.fields
         ])
         cluster_entries.extend(
             [entry for entry in self.CommandEntries()]
@@ -173,10 +174,11 @@ class ClusterTablesGenerator:
             )
 
         for e in self.cluster.events:
-            yield Table(
-                full_name="%s_%s" % (self.cluster.name, e.name),
-                entries=[self.FieldEntry(field) for field in e.fields]
-            )
+            if e.fields:
+                yield Table(
+                    full_name="%s_%s" % (self.cluster.name, e.name),
+                    entries=[self.FieldEntry(field) for field in e.fields]
+                )
 
         # some items have lists, create an intermediate item for those
         for name in self.list_types:

@@ -14,7 +14,7 @@
 
 # isort: off
 
-from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
+from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin # noqa: F401
 import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 
 # isort: on
@@ -22,7 +22,7 @@ import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 import chip.CertificateAuthority
 import chip.logging
 import chip.native
-from chip.ChipStack import *
+from chip.ChipStack import ChipStack
 from chip.yaml.runner import ReplTestRunner
 from matter_yamltests.runner import TestRunner
 
@@ -45,7 +45,7 @@ class Runner(TestRunner):
 
         commission_device = False
         if len(certificate_authority_manager.activeCaList) == 0:
-            if self._commission_on_network_dut == False:
+            if self._commission_on_network_dut is False:
                 raise Exception(
                     'Provided repl storage does not contain certificate. Without commission_on_network_dut, there is no reachable DUT')
             certificate_authority_manager.NewCertificateAuthority()

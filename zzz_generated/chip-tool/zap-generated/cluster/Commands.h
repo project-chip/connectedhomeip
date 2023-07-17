@@ -89,6 +89,16 @@
 | RvcOperationalState                                                 | 0x0061 |
 | HepaFilterMonitoring                                                | 0x0071 |
 | ActivatedCarbonFilterMonitoring                                     | 0x0072 |
+| CeramicFilterMonitoring                                             | 0x0073 |
+| ElectrostaticFilterMonitoring                                       | 0x0074 |
+| UvFilterMonitoring                                                  | 0x0075 |
+| IonizingFilterMonitoring                                            | 0x0076 |
+| ZeoliteFilterMonitoring                                             | 0x0077 |
+| OzoneFilterMonitoring                                               | 0x0078 |
+| WaterTankMonitoring                                                 | 0x0079 |
+| FuelTankMonitoring                                                  | 0x007A |
+| InkCartridgeMonitoring                                              | 0x007B |
+| TonerCartridgeMonitoring                                            | 0x007C |
 | DoorLock                                                            | 0x0101 |
 | WindowCovering                                                      | 0x0102 |
 | BarrierControl                                                      | 0x0103 |
@@ -4898,6 +4908,7 @@ private:
 | * ChangeIndication                                                  | 0x0002 |
 | * InPlaceIndicator                                                  | 0x0003 |
 | * LastChangedTime                                                   | 0x0004 |
+| * ReplacementProductList                                            | 0x0005 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -4950,6 +4961,7 @@ private:
 | * ChangeIndication                                                  | 0x0002 |
 | * InPlaceIndicator                                                  | 0x0003 |
 | * LastChangedTime                                                   | 0x0004 |
+| * ReplacementProductList                                            | 0x0005 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -4988,6 +5000,536 @@ public:
 
 private:
     chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster CeramicFilterMonitoring                                     | 0x0073 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetCondition                                                    |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Condition                                                         | 0x0000 |
+| * DegradationDirection                                              | 0x0001 |
+| * ChangeIndication                                                  | 0x0002 |
+| * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
+| * ReplacementProductList                                            | 0x0005 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ResetCondition
+ */
+class CeramicFilterMonitoringResetCondition : public ClusterCommand
+{
+public:
+    CeramicFilterMonitoringResetCondition(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("reset-condition", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000073) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000073, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000073) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000073, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CeramicFilterMonitoring::Commands::ResetCondition::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster ElectrostaticFilterMonitoring                               | 0x0074 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetCondition                                                    |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Condition                                                         | 0x0000 |
+| * DegradationDirection                                              | 0x0001 |
+| * ChangeIndication                                                  | 0x0002 |
+| * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
+| * ReplacementProductList                                            | 0x0005 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ResetCondition
+ */
+class ElectrostaticFilterMonitoringResetCondition : public ClusterCommand
+{
+public:
+    ElectrostaticFilterMonitoringResetCondition(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("reset-condition", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000074) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000074, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000074) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000074, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ElectrostaticFilterMonitoring::Commands::ResetCondition::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster UvFilterMonitoring                                          | 0x0075 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetCondition                                                    |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Condition                                                         | 0x0000 |
+| * DegradationDirection                                              | 0x0001 |
+| * ChangeIndication                                                  | 0x0002 |
+| * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
+| * ReplacementProductList                                            | 0x0005 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ResetCondition
+ */
+class UvFilterMonitoringResetCondition : public ClusterCommand
+{
+public:
+    UvFilterMonitoringResetCondition(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("reset-condition", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000075) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000075, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000075) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000075, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::UvFilterMonitoring::Commands::ResetCondition::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster IonizingFilterMonitoring                                    | 0x0076 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetCondition                                                    |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Condition                                                         | 0x0000 |
+| * DegradationDirection                                              | 0x0001 |
+| * ChangeIndication                                                  | 0x0002 |
+| * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
+| * ReplacementProductList                                            | 0x0005 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ResetCondition
+ */
+class IonizingFilterMonitoringResetCondition : public ClusterCommand
+{
+public:
+    IonizingFilterMonitoringResetCondition(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("reset-condition", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000076) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000076, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000076) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000076, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::IonizingFilterMonitoring::Commands::ResetCondition::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster ZeoliteFilterMonitoring                                     | 0x0077 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetCondition                                                    |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Condition                                                         | 0x0000 |
+| * DegradationDirection                                              | 0x0001 |
+| * ChangeIndication                                                  | 0x0002 |
+| * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
+| * ReplacementProductList                                            | 0x0005 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ResetCondition
+ */
+class ZeoliteFilterMonitoringResetCondition : public ClusterCommand
+{
+public:
+    ZeoliteFilterMonitoringResetCondition(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("reset-condition", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000077) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000077, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000077) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000077, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ZeoliteFilterMonitoring::Commands::ResetCondition::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster OzoneFilterMonitoring                                       | 0x0078 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetCondition                                                    |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Condition                                                         | 0x0000 |
+| * DegradationDirection                                              | 0x0001 |
+| * ChangeIndication                                                  | 0x0002 |
+| * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
+| * ReplacementProductList                                            | 0x0005 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ResetCondition
+ */
+class OzoneFilterMonitoringResetCondition : public ClusterCommand
+{
+public:
+    OzoneFilterMonitoringResetCondition(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("reset-condition", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000078) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000078, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000078) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000078, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::OzoneFilterMonitoring::Commands::ResetCondition::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster WaterTankMonitoring                                         | 0x0079 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetCondition                                                    |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Condition                                                         | 0x0000 |
+| * DegradationDirection                                              | 0x0001 |
+| * ChangeIndication                                                  | 0x0002 |
+| * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
+| * ReplacementProductList                                            | 0x0005 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ResetCondition
+ */
+class WaterTankMonitoringResetCondition : public ClusterCommand
+{
+public:
+    WaterTankMonitoringResetCondition(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("reset-condition", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000079) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000079, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000079) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000079, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::WaterTankMonitoring::Commands::ResetCondition::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster FuelTankMonitoring                                          | 0x007A |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetCondition                                                    |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Condition                                                         | 0x0000 |
+| * DegradationDirection                                              | 0x0001 |
+| * ChangeIndication                                                  | 0x0002 |
+| * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
+| * ReplacementProductList                                            | 0x0005 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ResetCondition
+ */
+class FuelTankMonitoringResetCondition : public ClusterCommand
+{
+public:
+    FuelTankMonitoringResetCondition(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("reset-condition", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000007A) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000007A, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000007A) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000007A, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::FuelTankMonitoring::Commands::ResetCondition::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster InkCartridgeMonitoring                                      | 0x007B |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetCondition                                                    |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Condition                                                         | 0x0000 |
+| * DegradationDirection                                              | 0x0001 |
+| * ChangeIndication                                                  | 0x0002 |
+| * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
+| * ReplacementProductList                                            | 0x0005 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ResetCondition
+ */
+class InkCartridgeMonitoringResetCondition : public ClusterCommand
+{
+public:
+    InkCartridgeMonitoringResetCondition(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("reset-condition", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000007B) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000007B, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000007B) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000007B, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::InkCartridgeMonitoring::Commands::ResetCondition::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster TonerCartridgeMonitoring                                    | 0x007C |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetCondition                                                    |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Condition                                                         | 0x0000 |
+| * DegradationDirection                                              | 0x0001 |
+| * ChangeIndication                                                  | 0x0002 |
+| * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
+| * ReplacementProductList                                            | 0x0005 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ResetCondition
+ */
+class TonerCartridgeMonitoringResetCondition : public ClusterCommand
+{
+public:
+    TonerCartridgeMonitoringResetCondition(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("reset-condition", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000007C) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000007C, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000007C) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000007C, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TonerCartridgeMonitoring::Commands::ResetCondition::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -10638,7 +11180,7 @@ void registerClusterIdentify(Commands & commands, CredentialIssuerCommands * cre
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterGroups(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -10699,7 +11241,7 @@ void registerClusterGroups(Commands & commands, CredentialIssuerCommands * creds
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterScenes(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -10793,7 +11335,7 @@ void registerClusterScenes(Commands & commands, CredentialIssuerCommands * creds
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterOnOff(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -10870,7 +11412,7 @@ void registerClusterOnOff(Commands & commands, CredentialIssuerCommands * credsI
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterOnOffSwitchConfiguration(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -10929,7 +11471,7 @@ void registerClusterOnOffSwitchConfiguration(Commands & commands, CredentialIssu
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterLevelControl(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -11048,7 +11590,7 @@ void registerClusterLevelControl(Commands & commands, CredentialIssuerCommands *
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterBinaryInputBasic(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -11135,7 +11677,7 @@ void registerClusterBinaryInputBasic(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterPulseWidthModulation(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -11186,7 +11728,7 @@ void registerClusterPulseWidthModulation(Commands & commands, CredentialIssuerCo
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterDescriptor(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -11254,7 +11796,7 @@ void registerClusterDescriptor(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterBinding(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -11310,7 +11852,7 @@ void registerClusterBinding(Commands & commands, CredentialIssuerCommands * cred
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterAccessControl(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -11399,7 +11941,7 @@ void registerClusterAccessControl(Commands & commands, CredentialIssuerCommands 
                                     credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterActions(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -11480,7 +12022,7 @@ void registerClusterActions(Commands & commands, CredentialIssuerCommands * cred
         make_unique<SubscribeEvent>(Id, "action-failed", Events::ActionFailed::Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterBasicInformation(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -11624,7 +12166,7 @@ void registerClusterBasicInformation(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeEvent>(Id, "reachable-changed", Events::ReachableChanged::Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterOtaSoftwareUpdateProvider(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -11678,7 +12220,7 @@ void registerClusterOtaSoftwareUpdateProvider(Commands & commands, CredentialIss
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterOtaSoftwareUpdateRequestor(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -11754,7 +12296,7 @@ void registerClusterOtaSoftwareUpdateRequestor(Commands & commands, CredentialIs
         make_unique<SubscribeEvent>(Id, "download-error", Events::DownloadError::Id, credsIssuerConfig),     //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterLocalizationConfiguration(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -11813,7 +12355,7 @@ void registerClusterLocalizationConfiguration(Commands & commands, CredentialIss
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterTimeFormatLocalization(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -11880,7 +12422,7 @@ void registerClusterTimeFormatLocalization(Commands & commands, CredentialIssuer
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterUnitLocalization(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -11935,7 +12477,7 @@ void registerClusterUnitLocalization(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterPowerSourceConfiguration(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -11990,7 +12532,7 @@ void registerClusterPowerSourceConfiguration(Commands & commands, CredentialIssu
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -12195,7 +12737,7 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
         make_unique<SubscribeEvent>(Id, "bat-charge-fault-change", Events::BatChargeFaultChange::Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -12275,7 +12817,7 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterNetworkCommissioning(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -12370,7 +12912,7 @@ void registerClusterNetworkCommissioning(Commands & commands, CredentialIssuerCo
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterDiagnosticLogs(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -12422,7 +12964,7 @@ void registerClusterDiagnosticLogs(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -12525,7 +13067,7 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeEvent>(Id, "boot-reason", Events::BootReason::Id, credsIssuerConfig),                    //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterSoftwareDiagnostics(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -12599,7 +13141,7 @@ void registerClusterSoftwareDiagnostics(Commands & commands, CredentialIssuerCom
         make_unique<SubscribeEvent>(Id, "software-fault", Events::SoftwareFault::Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterThreadNetworkDiagnostics(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -12946,7 +13488,7 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands, CredentialIssu
         make_unique<SubscribeEvent>(Id, "network-fault-change", Events::NetworkFaultChange::Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterWiFiNetworkDiagnostics(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -13066,7 +13608,7 @@ void registerClusterWiFiNetworkDiagnostics(Commands & commands, CredentialIssuer
         make_unique<SubscribeEvent>(Id, "connection-status", Events::ConnectionStatus::Id, credsIssuerConfig),     //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterEthernetNetworkDiagnostics(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -13154,7 +13696,7 @@ void registerClusterEthernetNetworkDiagnostics(Commands & commands, CredentialIs
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterTimeSynchronization(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -13276,7 +13818,7 @@ void registerClusterTimeSynchronization(Commands & commands, CredentialIssuerCom
         make_unique<SubscribeEvent>(Id, "missing-trusted-time-source", Events::MissingTrustedTimeSource::Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterBridgedDeviceBasicInformation(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -13400,7 +13942,7 @@ void registerClusterBridgedDeviceBasicInformation(Commands & commands, Credentia
         make_unique<SubscribeEvent>(Id, "reachable-changed", Events::ReachableChanged::Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterSwitch(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -13477,7 +14019,7 @@ void registerClusterSwitch(Commands & commands, CredentialIssuerCommands * creds
         make_unique<SubscribeEvent>(Id, "multi-press-complete", Events::MultiPressComplete::Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterAdministratorCommissioning(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -13545,7 +14087,7 @@ void registerClusterAdministratorCommissioning(Commands & commands, CredentialIs
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterOperationalCredentials(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -13632,7 +14174,7 @@ void registerClusterOperationalCredentials(Commands & commands, CredentialIssuer
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterGroupKeyManagement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -13706,7 +14248,7 @@ void registerClusterGroupKeyManagement(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterFixedLabel(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -13762,7 +14304,7 @@ void registerClusterFixedLabel(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterUserLabel(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -13818,7 +14360,7 @@ void registerClusterUserLabel(Commands & commands, CredentialIssuerCommands * cr
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterProxyConfiguration(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -13869,7 +14411,7 @@ void registerClusterProxyConfiguration(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterProxyDiscovery(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -13920,7 +14462,7 @@ void registerClusterProxyDiscovery(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterProxyValid(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -13971,7 +14513,7 @@ void registerClusterProxyValid(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterBooleanState(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -14028,7 +14570,7 @@ void registerClusterBooleanState(Commands & commands, CredentialIssuerCommands *
         make_unique<SubscribeEvent>(Id, "state-change", Events::StateChange::Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterIcdManagement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -14110,7 +14652,7 @@ void registerClusterIcdManagement(Commands & commands, CredentialIssuerCommands 
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterModeSelect(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -14188,7 +14730,7 @@ void registerClusterModeSelect(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterLaundryWasherMode(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -14257,7 +14799,7 @@ void registerClusterLaundryWasherMode(Commands & commands, CredentialIssuerComma
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterRefrigeratorAndTemperatureControlledCabinetMode(Commands & commands,
                                                                     CredentialIssuerCommands * credsIssuerConfig)
@@ -14327,7 +14869,7 @@ void registerClusterRefrigeratorAndTemperatureControlledCabinetMode(Commands & c
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterLaundryWasherControls(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -14396,7 +14938,7 @@ void registerClusterLaundryWasherControls(Commands & commands, CredentialIssuerC
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterRvcRunMode(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -14465,7 +15007,7 @@ void registerClusterRvcRunMode(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterRvcCleanMode(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -14534,7 +15076,7 @@ void registerClusterRvcCleanMode(Commands & commands, CredentialIssuerCommands *
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterTemperatureControl(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -14616,7 +15158,7 @@ void registerClusterTemperatureControl(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterRefrigeratorAlarm(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -14681,7 +15223,7 @@ void registerClusterRefrigeratorAlarm(Commands & commands, CredentialIssuerComma
         make_unique<SubscribeEvent>(Id, "notify", Events::Notify::Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterDishwasherMode(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -14750,7 +15292,7 @@ void registerClusterDishwasherMode(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterAirQuality(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -14805,7 +15347,7 @@ void registerClusterAirQuality(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterSmokeCoAlarm(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -14938,7 +15480,7 @@ void registerClusterSmokeCoAlarm(Commands & commands, CredentialIssuerCommands *
         make_unique<SubscribeEvent>(Id, "all-clear", Events::AllClear::Id, credsIssuerConfig),                              //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterDishwasherAlarm(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -15009,7 +15551,7 @@ void registerClusterDishwasherAlarm(Commands & commands, CredentialIssuerCommand
         make_unique<SubscribeEvent>(Id, "notify", Events::Notify::Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterOperationalState(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -15054,8 +15596,9 @@ void registerClusterOperationalState(Commands & commands, CredentialIssuerComman
             chip::app::DataModel::List<const chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::Type>>>(
             Id, "operational-state-list", Attributes::OperationalStateList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::Type>>(
-            Id, "operational-state", Attributes::OperationalState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::OperationalState::OperationalStateEnum>>(
+            Id, "operational-state", 0, UINT8_MAX, Attributes::OperationalState::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::Type>>(
             Id, "operational-error", Attributes::OperationalError::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -15095,7 +15638,7 @@ void registerClusterOperationalState(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeEvent>(Id, "operation-completion", Events::OperationCompletion::Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterRvcOperationalState(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -15140,8 +15683,8 @@ void registerClusterRvcOperationalState(Commands & commands, CredentialIssuerCom
             chip::app::DataModel::List<const chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::Type>>>(
             Id, "operational-state-list", Attributes::OperationalStateList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::Type>>(
-            Id, "operational-state", Attributes::OperationalState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "operational-state", 0, UINT8_MAX, Attributes::OperationalState::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::Clusters::RvcOperationalState::Structs::ErrorStateStruct::Type>>(
             Id, "operational-error", Attributes::OperationalError::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -15181,7 +15724,7 @@ void registerClusterRvcOperationalState(Commands & commands, CredentialIssuerCom
         make_unique<SubscribeEvent>(Id, "operation-completion", Events::OperationCompletion::Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterHepaFilterMonitoring(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -15198,19 +15741,20 @@ void registerClusterHepaFilterMonitoring(Commands & commands, CredentialIssuerCo
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
-        make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
         make_unique<WriteAttribute<chip::Percent>>(Id, "condition", 0, UINT8_MAX, Attributes::Condition::Id,
                                                    WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum>>(
@@ -15224,6 +15768,10 @@ void registerClusterHepaFilterMonitoring(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
                                                                               Attributes::LastChangedTime::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+            Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -15236,13 +15784,15 @@ void registerClusterHepaFilterMonitoring(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                         //
-        make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
-        make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
-        make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id,
+                                        credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -15256,7 +15806,7 @@ void registerClusterHepaFilterMonitoring(Commands & commands, CredentialIssuerCo
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterActivatedCarbonFilterMonitoring(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -15273,19 +15823,20 @@ void registerClusterActivatedCarbonFilterMonitoring(Commands & commands, Credent
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
-        make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
         make_unique<WriteAttribute<chip::Percent>>(Id, "condition", 0, UINT8_MAX, Attributes::Condition::Id,
                                                    WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum>>(
@@ -15299,6 +15850,10 @@ void registerClusterActivatedCarbonFilterMonitoring(Commands & commands, Credent
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
                                                                               Attributes::LastChangedTime::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+            Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -15311,13 +15866,15 @@ void registerClusterActivatedCarbonFilterMonitoring(Commands & commands, Credent
         make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                         //
-        make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),  //
-        make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),          //
-        make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),           //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id,
+                                        credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -15331,7 +15888,827 @@ void registerClusterActivatedCarbonFilterMonitoring(Commands & commands, Credent
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterCeramicFilterMonitoring(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::CeramicFilterMonitoring;
+
+    const char * clusterName = "CeramicFilterMonitoring";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                    //
+        make_unique<CeramicFilterMonitoringResetCondition>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteAttribute<chip::Percent>>(Id, "condition", 0, UINT8_MAX, Attributes::Condition::Id,
+                                                   WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CeramicFilterMonitoring::DegradationDirectionEnum>>(
+            Id, "degradation-direction", 0, UINT8_MAX, Attributes::DegradationDirection::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CeramicFilterMonitoring::ChangeIndicationEnum>>(
+            Id, "change-indication", 0, UINT8_MAX, Attributes::ChangeIndication::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+            Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterElectrostaticFilterMonitoring(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::ElectrostaticFilterMonitoring;
+
+    const char * clusterName = "ElectrostaticFilterMonitoring";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                          //
+        make_unique<ElectrostaticFilterMonitoringResetCondition>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteAttribute<chip::Percent>>(Id, "condition", 0, UINT8_MAX, Attributes::Condition::Id,
+                                                   WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ElectrostaticFilterMonitoring::DegradationDirectionEnum>>(
+            Id, "degradation-direction", 0, UINT8_MAX, Attributes::DegradationDirection::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ElectrostaticFilterMonitoring::ChangeIndicationEnum>>(
+            Id, "change-indication", 0, UINT8_MAX, Attributes::ChangeIndication::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+            Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterUvFilterMonitoring(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::UvFilterMonitoring;
+
+    const char * clusterName = "UvFilterMonitoring";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),               //
+        make_unique<UvFilterMonitoringResetCondition>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteAttribute<chip::Percent>>(Id, "condition", 0, UINT8_MAX, Attributes::Condition::Id,
+                                                   WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::UvFilterMonitoring::DegradationDirectionEnum>>(
+            Id, "degradation-direction", 0, UINT8_MAX, Attributes::DegradationDirection::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::UvFilterMonitoring::ChangeIndicationEnum>>(
+            Id, "change-indication", 0, UINT8_MAX, Attributes::ChangeIndication::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+            Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterIonizingFilterMonitoring(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::IonizingFilterMonitoring;
+
+    const char * clusterName = "IonizingFilterMonitoring";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                     //
+        make_unique<IonizingFilterMonitoringResetCondition>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteAttribute<chip::Percent>>(Id, "condition", 0, UINT8_MAX, Attributes::Condition::Id,
+                                                   WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::IonizingFilterMonitoring::DegradationDirectionEnum>>(
+            Id, "degradation-direction", 0, UINT8_MAX, Attributes::DegradationDirection::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::IonizingFilterMonitoring::ChangeIndicationEnum>>(
+            Id, "change-indication", 0, UINT8_MAX, Attributes::ChangeIndication::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+            Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterZeoliteFilterMonitoring(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::ZeoliteFilterMonitoring;
+
+    const char * clusterName = "ZeoliteFilterMonitoring";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                    //
+        make_unique<ZeoliteFilterMonitoringResetCondition>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteAttribute<chip::Percent>>(Id, "condition", 0, UINT8_MAX, Attributes::Condition::Id,
+                                                   WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ZeoliteFilterMonitoring::DegradationDirectionEnum>>(
+            Id, "degradation-direction", 0, UINT8_MAX, Attributes::DegradationDirection::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ZeoliteFilterMonitoring::ChangeIndicationEnum>>(
+            Id, "change-indication", 0, UINT8_MAX, Attributes::ChangeIndication::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+            Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterOzoneFilterMonitoring(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::OzoneFilterMonitoring;
+
+    const char * clusterName = "OzoneFilterMonitoring";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                  //
+        make_unique<OzoneFilterMonitoringResetCondition>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteAttribute<chip::Percent>>(Id, "condition", 0, UINT8_MAX, Attributes::Condition::Id,
+                                                   WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::OzoneFilterMonitoring::DegradationDirectionEnum>>(
+            Id, "degradation-direction", 0, UINT8_MAX, Attributes::DegradationDirection::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::OzoneFilterMonitoring::ChangeIndicationEnum>>(
+            Id, "change-indication", 0, UINT8_MAX, Attributes::ChangeIndication::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+            Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterWaterTankMonitoring(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::WaterTankMonitoring;
+
+    const char * clusterName = "WaterTankMonitoring";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                //
+        make_unique<WaterTankMonitoringResetCondition>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteAttribute<chip::Percent>>(Id, "condition", 0, UINT8_MAX, Attributes::Condition::Id,
+                                                   WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::WaterTankMonitoring::DegradationDirectionEnum>>(
+            Id, "degradation-direction", 0, UINT8_MAX, Attributes::DegradationDirection::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::WaterTankMonitoring::ChangeIndicationEnum>>(
+            Id, "change-indication", 0, UINT8_MAX, Attributes::ChangeIndication::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::Type>>>(
+            Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterFuelTankMonitoring(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::FuelTankMonitoring;
+
+    const char * clusterName = "FuelTankMonitoring";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),               //
+        make_unique<FuelTankMonitoringResetCondition>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteAttribute<chip::Percent>>(Id, "condition", 0, UINT8_MAX, Attributes::Condition::Id,
+                                                   WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::FuelTankMonitoring::DegradationDirectionEnum>>(
+            Id, "degradation-direction", 0, UINT8_MAX, Attributes::DegradationDirection::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::FuelTankMonitoring::ChangeIndicationEnum>>(
+            Id, "change-indication", 0, UINT8_MAX, Attributes::ChangeIndication::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::Type>>>(
+            Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterInkCartridgeMonitoring(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::InkCartridgeMonitoring;
+
+    const char * clusterName = "InkCartridgeMonitoring";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                   //
+        make_unique<InkCartridgeMonitoringResetCondition>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteAttribute<chip::Percent>>(Id, "condition", 0, UINT8_MAX, Attributes::Condition::Id,
+                                                   WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::InkCartridgeMonitoring::DegradationDirectionEnum>>(
+            Id, "degradation-direction", 0, UINT8_MAX, Attributes::DegradationDirection::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::InkCartridgeMonitoring::ChangeIndicationEnum>>(
+            Id, "change-indication", 0, UINT8_MAX, Attributes::ChangeIndication::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::Type>>>(
+            Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterTonerCartridgeMonitoring(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::TonerCartridgeMonitoring;
+
+    const char * clusterName = "TonerCartridgeMonitoring";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                     //
+        make_unique<TonerCartridgeMonitoringResetCondition>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteAttribute<chip::Percent>>(Id, "condition", 0, UINT8_MAX, Attributes::Condition::Id,
+                                                   WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::TonerCartridgeMonitoring::DegradationDirectionEnum>>(
+            Id, "degradation-direction", 0, UINT8_MAX, Attributes::DegradationDirection::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::TonerCartridgeMonitoring::ChangeIndicationEnum>>(
+            Id, "change-indication", 0, UINT8_MAX, Attributes::ChangeIndication::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::Type>>>(
+            Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -15595,7 +16972,7 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<SubscribeEvent>(Id, "lock-user-change", Events::LockUserChange::Id, credsIssuerConfig),         //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterWindowCovering(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -15781,7 +17158,7 @@ void registerClusterWindowCovering(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterBarrierControl(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -15880,7 +17257,7 @@ void registerClusterBarrierControl(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterPumpConfigurationAndControl(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -16073,7 +17450,7 @@ void registerClusterPumpConfigurationAndControl(Commands & commands, CredentialI
         make_unique<SubscribeEvent>(Id, "turbine-operation", Events::TurbineOperation::Id, credsIssuerConfig),              //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -16381,7 +17758,7 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterFanControl(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -16482,7 +17859,7 @@ void registerClusterFanControl(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterThermostatUserInterfaceConfiguration(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -16549,7 +17926,7 @@ void registerClusterThermostatUserInterfaceConfiguration(Commands & commands, Cr
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterColorControl(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -16856,7 +18233,7 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterBallastConfiguration(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -16969,7 +18346,7 @@ void registerClusterBallastConfiguration(Commands & commands, CredentialIssuerCo
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterIlluminanceMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -17045,7 +18422,7 @@ void registerClusterIlluminanceMeasurement(Commands & commands, CredentialIssuer
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterTemperatureMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -17115,7 +18492,7 @@ void registerClusterTemperatureMeasurement(Commands & commands, CredentialIssuer
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterPressureMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -17208,7 +18585,7 @@ void registerClusterPressureMeasurement(Commands & commands, CredentialIssuerCom
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterFlowMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -17278,7 +18655,7 @@ void registerClusterFlowMeasurement(Commands & commands, CredentialIssuerCommand
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterRelativeHumidityMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -17348,7 +18725,7 @@ void registerClusterRelativeHumidityMeasurement(Commands & commands, CredentialI
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterOccupancySensing(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -17478,7 +18855,7 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterCarbonMonoxideConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -17586,7 +18963,7 @@ void registerClusterCarbonMonoxideConcentrationMeasurement(Commands & commands, 
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterCarbonDioxideConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -17694,7 +19071,7 @@ void registerClusterCarbonDioxideConcentrationMeasurement(Commands & commands, C
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterEthyleneConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -17802,7 +19179,7 @@ void registerClusterEthyleneConcentrationMeasurement(Commands & commands, Creden
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterEthyleneOxideConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -17910,7 +19287,7 @@ void registerClusterEthyleneOxideConcentrationMeasurement(Commands & commands, C
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterHydrogenConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -18018,7 +19395,7 @@ void registerClusterHydrogenConcentrationMeasurement(Commands & commands, Creden
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterHydrogenSulfideConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -18126,7 +19503,7 @@ void registerClusterHydrogenSulfideConcentrationMeasurement(Commands & commands,
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterNitricOxideConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -18234,7 +19611,7 @@ void registerClusterNitricOxideConcentrationMeasurement(Commands & commands, Cre
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterNitrogenDioxideConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -18342,7 +19719,7 @@ void registerClusterNitrogenDioxideConcentrationMeasurement(Commands & commands,
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterOxygenConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -18450,7 +19827,7 @@ void registerClusterOxygenConcentrationMeasurement(Commands & commands, Credenti
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterOzoneConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -18558,7 +19935,7 @@ void registerClusterOzoneConcentrationMeasurement(Commands & commands, Credentia
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterSulfurDioxideConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -18666,7 +20043,7 @@ void registerClusterSulfurDioxideConcentrationMeasurement(Commands & commands, C
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterDissolvedOxygenConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -18774,7 +20151,7 @@ void registerClusterDissolvedOxygenConcentrationMeasurement(Commands & commands,
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterBromateConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -18882,7 +20259,7 @@ void registerClusterBromateConcentrationMeasurement(Commands & commands, Credent
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterChloraminesConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -18990,7 +20367,7 @@ void registerClusterChloraminesConcentrationMeasurement(Commands & commands, Cre
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterChlorineConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -19098,7 +20475,7 @@ void registerClusterChlorineConcentrationMeasurement(Commands & commands, Creden
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterFecalColiformEColiConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -19206,7 +20583,7 @@ void registerClusterFecalColiformEColiConcentrationMeasurement(Commands & comman
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterFluorideConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -19314,7 +20691,7 @@ void registerClusterFluorideConcentrationMeasurement(Commands & commands, Creden
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterHaloaceticAcidsConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -19422,7 +20799,7 @@ void registerClusterHaloaceticAcidsConcentrationMeasurement(Commands & commands,
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterTotalTrihalomethanesConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -19530,7 +20907,7 @@ void registerClusterTotalTrihalomethanesConcentrationMeasurement(Commands & comm
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterTotalColiformBacteriaConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -19638,7 +21015,7 @@ void registerClusterTotalColiformBacteriaConcentrationMeasurement(Commands & com
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterTurbidityConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -19746,7 +21123,7 @@ void registerClusterTurbidityConcentrationMeasurement(Commands & commands, Crede
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterCopperConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -19854,7 +21231,7 @@ void registerClusterCopperConcentrationMeasurement(Commands & commands, Credenti
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterLeadConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -19962,7 +21339,7 @@ void registerClusterLeadConcentrationMeasurement(Commands & commands, Credential
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterManganeseConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -20070,7 +21447,7 @@ void registerClusterManganeseConcentrationMeasurement(Commands & commands, Crede
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterSulfateConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -20178,7 +21555,7 @@ void registerClusterSulfateConcentrationMeasurement(Commands & commands, Credent
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterBromodichloromethaneConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -20286,7 +21663,7 @@ void registerClusterBromodichloromethaneConcentrationMeasurement(Commands & comm
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterBromoformConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -20394,7 +21771,7 @@ void registerClusterBromoformConcentrationMeasurement(Commands & commands, Crede
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterChlorodibromomethaneConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -20502,7 +21879,7 @@ void registerClusterChlorodibromomethaneConcentrationMeasurement(Commands & comm
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterChloroformConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -20610,7 +21987,7 @@ void registerClusterChloroformConcentrationMeasurement(Commands & commands, Cred
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterSodiumConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -20718,7 +22095,7 @@ void registerClusterSodiumConcentrationMeasurement(Commands & commands, Credenti
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterPm25ConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -20826,7 +22203,7 @@ void registerClusterPm25ConcentrationMeasurement(Commands & commands, Credential
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterFormaldehydeConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -20934,7 +22311,7 @@ void registerClusterFormaldehydeConcentrationMeasurement(Commands & commands, Cr
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterPm1ConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -21042,7 +22419,7 @@ void registerClusterPm1ConcentrationMeasurement(Commands & commands, CredentialI
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterPm10ConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -21150,7 +22527,7 @@ void registerClusterPm10ConcentrationMeasurement(Commands & commands, Credential
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterTotalVolatileOrganicCompoundsConcentrationMeasurement(Commands & commands,
                                                                           CredentialIssuerCommands * credsIssuerConfig)
@@ -21261,7 +22638,7 @@ void registerClusterTotalVolatileOrganicCompoundsConcentrationMeasurement(Comman
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterRadonConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -21369,7 +22746,7 @@ void registerClusterRadonConcentrationMeasurement(Commands & commands, Credentia
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterWakeOnLan(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -21424,7 +22801,7 @@ void registerClusterWakeOnLan(Commands & commands, CredentialIssuerCommands * cr
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterChannel(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -21493,7 +22870,7 @@ void registerClusterChannel(Commands & commands, CredentialIssuerCommands * cred
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterTargetNavigator(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -21554,7 +22931,7 @@ void registerClusterTargetNavigator(Commands & commands, CredentialIssuerCommand
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterMediaPlayback(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -21647,7 +23024,7 @@ void registerClusterMediaPlayback(Commands & commands, CredentialIssuerCommands 
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterMediaInput(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -21711,7 +23088,7 @@ void registerClusterMediaInput(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterLowPower(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -21763,7 +23140,7 @@ void registerClusterLowPower(Commands & commands, CredentialIssuerCommands * cre
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterKeypadInput(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -21815,7 +23192,7 @@ void registerClusterKeypadInput(Commands & commands, CredentialIssuerCommands * 
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterContentLauncher(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -21879,7 +23256,7 @@ void registerClusterContentLauncher(Commands & commands, CredentialIssuerCommand
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterAudioOutput(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -21941,7 +23318,7 @@ void registerClusterAudioOutput(Commands & commands, CredentialIssuerCommands * 
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterApplicationLauncher(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -22004,7 +23381,7 @@ void registerClusterApplicationLauncher(Commands & commands, CredentialIssuerCom
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterApplicationBasic(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -22087,7 +23464,7 @@ void registerClusterApplicationBasic(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterAccountLogin(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -22141,7 +23518,7 @@ void registerClusterAccountLogin(Commands & commands, CredentialIssuerCommands *
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterElectricalMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -22837,7 +24214,7 @@ void registerClusterElectricalMeasurement(Commands & commands, CredentialIssuerC
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -23282,7 +24659,7 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<SubscribeEvent>(Id, "test-fabric-scoped-event", Events::TestFabricScopedEvent::Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 void registerClusterFaultInjection(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -23335,7 +24712,7 @@ void registerClusterFaultInjection(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 
 void registerClusterAny(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
@@ -23353,7 +24730,8 @@ void registerClusterAny(Commands & commands, CredentialIssuerCommands * credsIss
         make_unique<SubscribeAll>(credsIssuerConfig),       //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands,
+                                "Commands for sending IM messages based on cluster id, not cluster name.");
 }
 
 void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
@@ -23416,6 +24794,16 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterRvcOperationalState(commands, credsIssuerConfig);
     registerClusterHepaFilterMonitoring(commands, credsIssuerConfig);
     registerClusterActivatedCarbonFilterMonitoring(commands, credsIssuerConfig);
+    registerClusterCeramicFilterMonitoring(commands, credsIssuerConfig);
+    registerClusterElectrostaticFilterMonitoring(commands, credsIssuerConfig);
+    registerClusterUvFilterMonitoring(commands, credsIssuerConfig);
+    registerClusterIonizingFilterMonitoring(commands, credsIssuerConfig);
+    registerClusterZeoliteFilterMonitoring(commands, credsIssuerConfig);
+    registerClusterOzoneFilterMonitoring(commands, credsIssuerConfig);
+    registerClusterWaterTankMonitoring(commands, credsIssuerConfig);
+    registerClusterFuelTankMonitoring(commands, credsIssuerConfig);
+    registerClusterInkCartridgeMonitoring(commands, credsIssuerConfig);
+    registerClusterTonerCartridgeMonitoring(commands, credsIssuerConfig);
     registerClusterDoorLock(commands, credsIssuerConfig);
     registerClusterWindowCovering(commands, credsIssuerConfig);
     registerClusterBarrierControl(commands, credsIssuerConfig);

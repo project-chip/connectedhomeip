@@ -31,6 +31,8 @@
         "Test_TC_ACL_2_9",
         "Test_TC_ACL_2_10",
         "DL_LockUnlock",
+        "Disabled due to OperationalState not being enabled in Matter.framework for now:",
+        "TestOperationalState",
         "Disabled due to using ICD Management (ICDManagement) cluster, which is provisional on Darwin for now:",
         "TestIcdManagementCluster",
         "Test_TC_ICDM_1_1",
@@ -112,6 +114,8 @@
         "Test_TC_ACFREMON_2_1",
         "Disabled due to HEPAFilterMonitoring not being enabled in Matter.framework for now:",
         "Test_TC_HEPAFREMON_1_1",
-        "Test_TC_HEPAFREMON_2_1"
+        "Test_TC_HEPAFREMON_2_1",
+        "Disabled due to Events verification not supported",
+        "Test_TC_BINFO_2_2"
     ]
 }

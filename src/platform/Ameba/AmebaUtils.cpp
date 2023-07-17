@@ -108,8 +108,8 @@ CHIP_ERROR AmebaUtils::GetWiFiConfig(rtw_wifi_config_t * config)
                                                    &credentialsLen);
     SuccessOrExit(err);
 
-    config->ssid_len     = ssidLen;
-    config->password_len = credentialsLen;
+    config->ssid_len     = strlen((const char *) config->ssid);
+    config->password_len = strlen((const char *) config->password);
 
 exit:
     return err;

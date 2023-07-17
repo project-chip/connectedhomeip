@@ -177,7 +177,8 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
                                                  opCreds.Commands.AddNOC(chainForAddNOC.nocBytes,
                                                                          chainForAddNOC.icacBytes,
                                                                          chainForAddNOC.ipkBytes,
-                                                                         newFabricDevCtrl.nodeId, 0xFFF1))
+                                                                         newFabricDevCtrl.nodeId,
+                                                                         newFabricDevCtrl.fabricAdmin.vendorId))
     if resp.statusCode is not opCreds.Enums.NodeOperationalCertStatusEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))

@@ -31,6 +31,7 @@ limitations under the License.
     <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
     <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
     <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
+    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="ARRAY" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -53,6 +54,7 @@ limitations under the License.
     <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
     <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
     <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
+    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="ARRAY" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -83,4 +85,31 @@ limitations under the License.
     <item value="1" name="Warning" />
     <item value="2" name="Critical" />
   </enum>
+
+  <enum name="ProductIdentifierTypeEnum" type="ENUM8">
+    <cluster code="0x0071" />
+    <cluster code="0x0072" />
+    <item value="0" name="UPC" />
+    <item value="1" name="GTIN-8" />
+    <item value="2" name="EAN" />
+    <item value="3" name="GTIN-14" />
+    <item value="4" name="OEM" />
+  </enum>
+
+  <!-- Unfortunately due to the way these aliased clusters are generated, we need to declare separate
+       ReplacementProductStructs for each cluster. This is because they refer to the ProductIdentifierTypeEnum
+       which is scoped to each implementation. Duplicate this struct definition for now until we can
+       create either a global enum that these can refer to, or create an alternative
+       solution that can help us better address shared structs for aliased clusters. -->
+  <struct name="ReplacementProductStruct">
+    <cluster code="0x0071" />
+    <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
+    <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
+  </struct>
+
+  <struct name="ReplacementProductStruct">
+    <cluster code="0x0072" />
+    <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
+    <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
+  </struct>
 </configurator>

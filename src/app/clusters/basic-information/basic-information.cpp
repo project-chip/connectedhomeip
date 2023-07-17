@@ -439,8 +439,6 @@ bool IsLocalConfigDisabled()
 } // namespace app
 } // namespace chip
 
-void emberAfBasicInformationClusterServerInitCallback(chip::EndpointId endpoint) {}
-
 void MatterBasicInformationPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);

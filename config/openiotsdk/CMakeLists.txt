@@ -50,6 +50,7 @@ matter_common_gn_args(
     LIB_SHELL       CONFIG_CHIP_LIB_SHELL
     LIB_TESTS       CONFIG_CHIP_LIB_TESTS
     PROJECT_CONFIG  ${CONFIG_CHIP_PROJECT_CONFIG}
+    PROJECT_CONFIG_INC_DIR ${CONFIG_CHIP_PROJECT_CONFIG_INCLUDE_DIRS}
 )
 matter_add_gn_arg_string("target_cpu"                           "${CMAKE_SYSTEM_PROCESSOR}")
 matter_add_gn_arg_string("openiotsdk_ar"                        ${CMAKE_AR})

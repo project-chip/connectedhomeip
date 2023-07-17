@@ -31,7 +31,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-minimal:0.7.3
+            image: ghcr.io/project-chip/chip-build-minimal:1
 
         steps:
             - name: Checkout
