@@ -300,10 +300,37 @@ group("unit_tests") {
   ]
 }
 
+kotlin_library("chipcluster") {
+  output_name = "CHIPClusters.jar"
+
+  deps = [ ":tlv" ]
+
+  sources = [
+    "generated/java/chip/cluster/ChipEventStructs.kt",
+    "generated/java/chip/cluster/ChipStructs.kt",
+    "src/chip/cluster/TlvReaderExtension.kt",
+  ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
+kotlin_library("chipclusterID") {
+  output_name = "CHIPClusterID.jar"
+
+  sources = [
+    "generated/java/chip/devicecontroller/ClusterIDMapping.kt",
+    "src/chip/devicecontroller/ChipIdLookup.kt",
+  ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
 android_library("java") {
   output_name = "CHIPController.jar"
 
   deps = [
+    ":chipcluster",
+    ":chipclusterID",
     ":tlv",
     "${chip_root}/third_party/java_deps:annotation",
   ]
@@ -311,7 +338,6 @@ android_library("java") {
   data_deps = [ ":jni" ]
 
   sources = [
-    "generated/java/chip/devicecontroller/ClusterIDMapping.java",
     "generated/java/chip/devicecontroller/ClusterReadMapping.java",
     "generated/java/chip/devicecontroller/ClusterWriteMapping.java",
     "src/chip/clusterinfo/ClusterCommandCallback.java",
@@ -327,7 +353,6 @@ android_library("java") {
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
-    "src/chip/devicecontroller/ChipIdLookup.java",
     "src/chip/devicecontroller/ControllerParams.java",
     "src/chip/devicecontroller/DeviceAttestationDelegate.java",
     "src/chip/devicecontroller/DiscoveredDevice.java",

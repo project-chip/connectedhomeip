@@ -479,6 +479,43 @@ class EncodableValue:
             return "Object"
 
     @property
+    def kotlin_type(self):
+        t = ParseDataType(self.data_type, self.context)
+
+        if isinstance(t, FundamentalType):
+            if t == FundamentalType.BOOL:
+                return "Boolean"
+            elif t == FundamentalType.FLOAT:
+                return "Float"
+            elif t == FundamentalType.DOUBLE:
+                return "Double"
+            else:
+                raise Exception("Unknown fundamental type")
+        elif isinstance(t, BasicInteger):
+            # the >= 3 will include int24_t to be considered "long"
+            if t.byte_count >= 3:
+                return "Long"
+            else:
+                return "Int"
+        elif isinstance(t, BasicString):
+            if t.is_binary:
+                return "ByteArray"
+            else:
+                return "String"
+        elif isinstance(t, IdlEnumType):
+            if t.base_type.byte_count >= 3:
+                return "Long"
+            else:
+                return "Int"
+        elif isinstance(t, IdlBitmapType):
+            if t.base_type.byte_count >= 3:
+                return "Long"
+            else:
+                return "Int"
+        else:
+            return "Any"
+
+    @property
     def unboxed_java_signature(self):
         if self.is_optional or self.is_list:
             raise Exception("Not a basic type: %r" % self)
@@ -738,6 +775,33 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ClusterIDMapping.jinja",
             output_file_name="java/chip/devicecontroller/ClusterIDMapping.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
+        self.internal_render_one_output(
+            template_path="ChipStructs.jinja",
+            output_file_name="java/chip/cluster/ChipStructs.kt",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
+        self.internal_render_one_output(
+            template_path="ChipEventStructs.jinja",
+            output_file_name="java/chip/cluster/ChipEventStructs.kt",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
+        self.internal_render_one_output(
+            template_path="ClusterIDMapping_kotlin.jinja",
+            output_file_name="java/chip/devicecontroller/ClusterIDMapping.kt",
             vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
