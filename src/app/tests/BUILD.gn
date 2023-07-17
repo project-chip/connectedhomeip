@@ -176,6 +176,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/icd:manager-srcs",
+    "${chip_root}/src/app/icd:monitoring-table",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
