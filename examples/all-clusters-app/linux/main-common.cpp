@@ -35,9 +35,6 @@
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
 
-#include <instances/ActivatedCarbonFilterMonitoring.h>
-#include <instances/HepaFilterMonitoring.h>
-
 #include <Options.h>
 
 using namespace chip;
@@ -51,18 +48,6 @@ LowPowerManager sLowPowerManager;
 NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
 Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
-
-constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(Clusters::ResourceMonitoring::Feature::kCondition) |
-                                                static_cast<uint32_t>(Clusters::ResourceMonitoring::Feature::kWarning) };
-constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Clusters::ResourceMonitoring::Feature::kCondition) |
-                                                     static_cast<uint32_t>(Clusters::ResourceMonitoring::Feature::kWarning) };
-
-static Clusters::ResourceMonitoring::HepaFilterMonitoringInstance
-    gHepafilterInstance(0x1, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
-                        Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);
-static Clusters::ResourceMonitoring::ActivatedCarbonFilterMonitoringInstance
-    gActivatedCarbonFilterInstance(0x1, static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()),
-                                   Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);
 
 } // namespace
 
@@ -172,10 +157,6 @@ ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
 
 void ApplicationInit()
 {
-
-    gHepafilterInstance.Init();
-    gActivatedCarbonFilterInstance.Init();
-
     std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
 
     if (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR)
