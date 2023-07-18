@@ -75,6 +75,30 @@ constexpr chip::EndpointId kDemoEndpointId = 1;
 
 void MatterDishwasherAlarmServerInit()
 {
-    static chip::app::Clusters::DishwasherAlarm::DishwasherAlarmDelegate delegate;
+    using namespace chip::app::Clusters;
+    using namespace chip::app::Clusters::DishwasherAlarm;
+
+    static DishwasherAlarm::DishwasherAlarmDelegate delegate;
     chip::app::Clusters::DishwasherAlarm::SetDefaultDelegate(kDemoEndpointId, &delegate);
+
+    chip::BitMask<AlarmMap> supported;
+    supported.SetField(AlarmMap::kInflowError, 1);
+    supported.SetField(AlarmMap::kDrainError, 1);
+    supported.SetField(AlarmMap::kTempTooLow, 1);
+    DishwasherAlarmServer::Instance().SetSupportedValue(kDemoEndpointId, supported);
+
+    chip::BitMask<AlarmMap> mask;
+    mask.SetField(AlarmMap::kInflowError, 1);
+    mask.SetField(AlarmMap::kTempTooLow, 1);
+    DishwasherAlarmServer::Instance().SetMaskValue(kDemoEndpointId, mask);
+
+    chip::BitMask<AlarmMap> state;
+    state.SetField(AlarmMap::kInflowError, 1);
+    state.SetField(AlarmMap::kTempTooLow, 1);
+    DishwasherAlarmServer::Instance().SetStateValue(kDemoEndpointId, state);
+
+    chip::BitMask<AlarmMap> latch;
+    latch.SetField(AlarmMap::kInflowError, 1);
+    latch.SetField(AlarmMap::kTempTooLow, 1);
+    DishwasherAlarmServer::Instance().SetMaskValue(kDemoEndpointId, latch);
 }
