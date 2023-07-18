@@ -18,38 +18,45 @@ on:
   pull_request:
   push:
 
-# concurrency:
-#     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
-#     cancel-in-progress: true
-
+concurrency:
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
 
 jobs:
     docker_build:
         uses: ./.github/workflows/docker_img.yaml
-    builds:
+    example_matrix:
         needs: [docker_build]
-        uses: ./.github/workflows/build.yaml
-    minimal_build:
-        needs: [docker_build]
-        uses: ./.github/workflows/minimal-build.yaml
-    chef:
-        needs: [docker_build]
-        uses: ./.github/workflows/chef.yaml
-    examples:
-        needs: [docker_build]
-        uses: ./.github/workflows/examples-all.yaml
-    tests:
-        needs: [docker_build]
-        uses: ./.github/workflows/tests-all.yaml
-    lint:
-        needs: [docker_build]
-        uses: ./.github/workflows/lint.yml
-    android_main_only:
-        needs: [docker_build]
-        uses: ./.github/workflows/full-android.yaml
-    zap:
-        needs: [docker_build]
-        uses: ./.github/workflows/zap_templates.yaml
-    doxygen:
-        needs: [docker_build]
-        uses: ./.github/workflows/doxygen.yaml
+        strategy:
+          matrix:
+            workflow: ["./.github/workflows/build.yaml"]
+        runs-on: ubuntu-latest
+        steps:
+          - uses: ${{ matrix.workflow }}
+    # builds:
+    #     needs: [docker_build]
+    #     uses: ./.github/workflows/build.yaml
+    # minimal_build:
+    #     needs: [docker_build]
+    #     uses: ./.github/workflows/minimal-build.yaml
+    # chef:
+    #     needs: [docker_build]
+    #     uses: ./.github/workflows/chef.yaml
+    # examples:
+    #     needs: [docker_build]
+    #     uses: ./.github/workflows/examples-all.yaml
+    # tests:
+    #     needs: [docker_build]
+    #     uses: ./.github/workflows/tests-all.yaml
+    # lint:
+    #     needs: [docker_build]
+    #     uses: ./.github/workflows/lint.yml
+    # android_main_only:
+    #     needs: [docker_build]
+    #     uses: ./.github/workflows/full-android.yaml
+    # zap:
+    #     needs: [docker_build]
+    #     uses: ./.github/workflows/zap_templates.yaml
+    # doxygen:
+    #     needs: [docker_build]
+    #     uses: ./.github/workflows/doxygen.yaml
