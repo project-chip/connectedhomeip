@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/util/IcdMonitoringTable.h>
+#include <app/icd/IcdMonitoringTable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>

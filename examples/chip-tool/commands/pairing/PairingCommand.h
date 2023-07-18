@@ -158,6 +158,12 @@ public:
             break;
         }
 
+        if (mode != PairingMode::None)
+        {
+            AddArgument("country-code", &mCountryCode,
+                        "Country code to use to set the Basic Information cluster's Location attribute");
+        }
+
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
@@ -203,6 +209,7 @@ private:
     chip::Optional<bool> mSkipCommissioningComplete;
     chip::Optional<bool> mBypassAttestationVerifier;
     chip::Optional<std::vector<uint32_t>> mCASEAuthTags;
+    chip::Optional<char *> mCountryCode;
     uint16_t mRemotePort;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
