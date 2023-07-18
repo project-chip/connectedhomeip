@@ -101,9 +101,9 @@ static const GenericOperationalState rvcOpStateList[] = {
  * Note: User Define
  */
 static OperationalStateDelegate rvcOpStateDelegate(to_underlying(OperationalStateEnum::kStopped),
-                                                GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)),
-                                                Span<const GenericOperationalState>(rvcOpStateList),
-                                                Span<const GenericOperationalPhase>(opPhaseList));
+                                                   GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)),
+                                                   Span<const GenericOperationalState>(rvcOpStateList),
+                                                   Span<const GenericOperationalPhase>(opPhaseList));
 
 /**
  * Enquiry Table of Operational State Cluster and alias Cluter Delegate corresponding to endpointId and clusterId
@@ -156,6 +156,6 @@ void MatterOperationalStateServerInit()
     operationalstateServer.Init();
 
     static Clusters::OperationalState::OperationalStateServer rvcOperationalstateServer(Clusters::OperationalState::kDemoEndpointId,
-                                                                                     Clusters::RvcOperationalState::Id);
+                                                                                        Clusters::RvcOperationalState::Id);
     rvcOperationalstateServer.Init();
 }
