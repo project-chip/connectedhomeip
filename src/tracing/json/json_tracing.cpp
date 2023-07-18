@@ -62,7 +62,7 @@ using PayloadDecoderType = chip::Decoders::PayloadDecoder<64, 256>;
 /// The existing code does not attempt to encode lists and everytying is an object,
 /// so this name builder attempts to find unique keys for elements inside a json.
 ///
-/// In particular a repeated "[]", "[]", ... will become "[0]", "[1]", ...
+/// In particular a repeated "Anonymous<>", "Anonymous<>", ... will become "Anonymous<0>", ...
 class UniqueNameBuilder
 {
 public:
@@ -90,9 +90,9 @@ public:
 private:
     void FirstName(const char * baseName)
     {
-        if (strcmp(baseName, "[]") == 0)
+        if (strcmp(baseName, "Anonymous<>") == 0)
         {
-            mFormatter.Reset().Add("[0]");
+            mFormatter.Reset().Add("Anonymous<0>");
         }
         else
         {
@@ -102,9 +102,9 @@ private:
 
     void NextName(const char * baseName)
     {
-        if (strcmp(baseName, "[]") == 0)
+        if (strcmp(baseName, "Anonymous<>") == 0)
         {
-            mFormatter.Reset().Add("[").Add(mUniqueIndex++).Add("]");
+            mFormatter.Reset().Add("Anonymous<").Add(mUniqueIndex++).Add(">");
         }
         else
         {

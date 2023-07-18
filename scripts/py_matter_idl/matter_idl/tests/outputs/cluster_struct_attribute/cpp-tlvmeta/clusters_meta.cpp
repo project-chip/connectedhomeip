@@ -19,7 +19,7 @@ const Entry<ItemInfo> _DemoCluster_ArmFailSafeRequest[] = {
 };
 
 const Entry<ItemInfo> _DemoCluster_ArmFailSafeRequest_list_[] = {
-  { { AnonymousTag(), "[]", ItemType::kDefault }, 3 }, // DemoCluster_ArmFailSafeRequest[]
+  { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 3 }, // DemoCluster_ArmFailSafeRequest[]
 };
 
 const Entry<ItemInfo> _all_clusters[] = {
