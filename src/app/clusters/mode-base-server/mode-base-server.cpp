@@ -139,10 +139,9 @@ void Instance::loadPersistentAttributes()
 
 CHIP_ERROR Instance::Init()
 {
-    // Initialise the current mode with the value og the first mode. This ensures that it is representing a valid mode.
+    // Initialise the current mode with the value of the first mode. This ensures that it is representing a valid mode.
     ReturnErrorOnFailure(GetModeValueByIndex(0, mCurrentMode));
 
-    ChipLogError(Zcl, "ModeBase: Initialising the cluster with ID %lu.", long(mClusterId));
     // Check that the cluster ID given is a valid mode base alias cluster ID.
     if (!isDerivedCluster())
     {
@@ -265,14 +264,14 @@ void Instance::handleChangeToMode(HandlerContext & ctx, const Commands::ChangeTo
     if (!IsSupportedMode(newMode))
     {
         ChipLogError(Zcl, "ModeBase: Failed to find the option with mode %u", newMode);
-        response.status = static_cast<uint8_t>(StatusCode::kUnsupportedMode);
+        response.status = to_underlying(StatusCode::kUnsupportedMode);
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
         return;
     }
 
     HandleChangeToMode(newMode, response);
 
-    if (response.status == static_cast<uint8_t>(StatusCode::kSuccess))
+    if (response.status == to_underlying(StatusCode::kSuccess))
     {
         UpdateCurrentMode(newMode);
         ChipLogProgress(Zcl, "ModeBase: handleChangeToMode changed to mode %u", newMode);
@@ -344,32 +343,12 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(mCurrentMode));
         break;
     case Attributes::StartUpMode::Id:
-        if (mStartUpMode.IsNull())
-        {
-            ReturnErrorOnFailure(aEncoder.EncodeNull());
-        }
-        else
-        {
-            ReturnErrorOnFailure(aEncoder.Encode(mStartUpMode));
-        }
+        ReturnErrorOnFailure(aEncoder.Encode(mStartUpMode));
         break;
     case Attributes::OnMode::Id:
-        if (mOnMode.IsNull())
-        {
-            ReturnErrorOnFailure(aEncoder.EncodeNull());
-        }
-        else
-        {
-            ReturnErrorOnFailure(aEncoder.Encode(mOnMode));
-        }
+        ReturnErrorOnFailure(aEncoder.Encode(mOnMode));
         break;
     case Attributes::SupportedModes::Id:
-        if (NumberOfModes() == 0)
-        {
-            aEncoder.EncodeEmptyList();
-            return CHIP_NO_ERROR;
-        }
-
         Instance * d   = this;
         CHIP_ERROR err = aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR {
             return d->encodeSupportedModes(encoder);
