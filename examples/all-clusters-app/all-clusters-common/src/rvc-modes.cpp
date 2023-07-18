@@ -47,28 +47,28 @@ void RvcRunModeInstance::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
 
 CHIP_ERROR RvcRunModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    if (modeIndex < NumberOfModes())
+    if (modeIndex >= ArraySize(kModeOptions))
     {
-        return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    return CHIP_ERROR_NOT_FOUND;
+    return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
 }
 
 CHIP_ERROR RvcRunModeInstance::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex < NumberOfModes())
+    if (modeIndex >= ArraySize(kModeOptions))
     {
-        value = kModeOptions[modeIndex].mode;
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    return CHIP_ERROR_NOT_FOUND;
+    value = kModeOptions[modeIndex].mode;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR RvcRunModeInstance::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= NumberOfModes())
+    if (modeIndex >= ArraySize(kModeOptions))
     {
-        return CHIP_ERROR_NOT_FOUND;
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
 
     if (tags.size() < kModeOptions[modeIndex].modeTags.size())
@@ -102,28 +102,28 @@ void RvcCleanModeInstance::HandleChangeToMode(uint8_t NewMode, ModeBase::Command
 
 CHIP_ERROR RvcCleanModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    if (modeIndex < NumberOfModes())
+    if (modeIndex >= ArraySize(kModeOptions))
     {
-        return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    return CHIP_ERROR_NOT_FOUND;
+    return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
 }
 
 CHIP_ERROR RvcCleanModeInstance::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex < NumberOfModes())
+    if (modeIndex >= ArraySize(kModeOptions))
     {
-        value = kModeOptions[modeIndex].mode;
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    return CHIP_ERROR_NOT_FOUND;
+    value = kModeOptions[modeIndex].mode;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR RvcCleanModeInstance::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= NumberOfModes())
+    if (modeIndex >= ArraySize(kModeOptions))
     {
-        return CHIP_ERROR_NOT_FOUND;
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
 
     if (tags.size() < kModeOptions[modeIndex].modeTags.size())

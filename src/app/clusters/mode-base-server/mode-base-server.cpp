@@ -310,14 +310,20 @@ CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & clus
 
 CHIP_ERROR Instance::encodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper &encoder)
 {
-    for (uint8_t i = 0; i < NumberOfModes(); i++)
+    for (uint8_t i = 0; true; i++)
     {
         ModeOptionStructType mode;
 
         // Get the mode label
         char buffer[kMaxModeLabelSize];
         MutableCharSpan label(buffer);
-        ReturnErrorOnFailure(GetModeLabelByIndex(i, label));
+        auto err = GetModeLabelByIndex(i, label);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            return CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+
         mode.label = label;
 
         // Get the mode value
@@ -458,11 +464,10 @@ uint8_t Instance::GetCurrentMode() const
 
 bool Instance::IsSupportedMode(uint8_t modeValue)
 {
-    for (uint8_t i = 0; i < NumberOfModes(); i++)
+    uint8_t value;
+    for (uint8_t i = 0; GetModeValueByIndex(i, value) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
     {
-        uint8_t value;
-        auto err = GetModeValueByIndex(i, value);
-        if (err == CHIP_NO_ERROR && value == modeValue)
+        if (value == modeValue)
         {
             return true;
         }

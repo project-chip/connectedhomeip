@@ -174,16 +174,12 @@ public:
     virtual CHIP_ERROR AppInit() = 0;
 
     /**
-     * Returns the number of modes managed by this instance.
-     */
-    virtual uint8_t NumberOfModes() = 0;
-
-    /**
      * Get the mode label of the Nth mode in the list of modes.
      * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
      * @param label A reference to the mutable char span which will be mutated to receive the label on success. Use
      * CopyCharSpanToMutableCharSpan to copy into the MutableCharSpan.
-     * @return Returns a CHIP_NO_ERROR if there was no error.
+     * @return Returns a CHIP_NO_ERROR if there was no error and the label was returned successfully.
+     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available labels.
      */
     virtual CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) = 0;
 
@@ -191,7 +187,8 @@ public:
      * Get the mode value of the Nth mode in the list of modes.
      * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
      * @param value a reference to the uint8_t variable that is to contain the mode value.
-     * @return Returns a CHIP_NO_ERROR if there was no error.
+     * @return Returns a CHIP_NO_ERROR if there was no error and the value was returned successfully.
+     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available values.
      */
     virtual CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) = 0;
 
@@ -205,7 +202,8 @@ public:
      * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
      * @param tags a reference to an existing and initialised buffer that is to contain the mode tags. std::copy can be used
      * to copy into the buffer.
-     * @return Returns a CHIP_NO_ERROR if there was no error.
+     * @return Returns a CHIP_NO_ERROR if there was no error and the mode tags were returned successfully.
+     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available mode tags.
      */
     virtual CHIP_ERROR
     GetModeTagsByIndex(uint8_t modeIndex,
