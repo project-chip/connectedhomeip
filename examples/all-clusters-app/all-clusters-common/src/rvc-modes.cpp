@@ -39,7 +39,7 @@ void RvcRunModeInstance::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
     if (NewMode == RvcRunMode::ModeMapping && currentMode != RvcRunMode::ModeIdle)
     {
         response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
-        response.statusText.SetValue(chip::CharSpan("Change to the mapping mode is only allowed from idle", 52));
+        response.statusText.SetValue(chip::CharSpan::fromCharString("Change to the mapping mode is only allowed from idle"));
     }
 
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
@@ -94,7 +94,7 @@ void RvcCleanModeInstance::HandleChangeToMode(uint8_t NewMode, ModeBase::Command
     if (rvcRunCurrentMode == RvcRunMode::ModeCleaning)
     {
         response.status = to_underlying(RvcCleanMode::StatusCode::kCleaningInProgress);
-        response.statusText.SetValue(chip::CharSpan("Cannot change the cleaning mode during a clean", 60));
+        response.statusText.SetValue(chip::CharSpan::fromCharString("Cannot change the cleaning mode during a clean"));
     }
 
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
