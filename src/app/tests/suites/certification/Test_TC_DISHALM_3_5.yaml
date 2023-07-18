@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 197.2.6. [TC-DISHALM-3.5] Temperature High alarm functionality with DUT as Server
+name:
+    197.2.6. [TC-DISHALM-3.5] Temperature High alarm functionality with DUT as
+    Server
 
 PICS:
     - DISHALM.S
@@ -70,7 +72,9 @@ tests:
           constraints:
               value: 10
 
-    - label: "TH sends command Reset to DUT with bit 4 (TempHigh) of Alarms set to 1"
+    - label:
+          "TH sends command Reset to DUT with bit 4 (TempHigh) of Alarms set to
+          1"
       PICS: DISHALM.S.F00 && DISHALM.S.C00.Rsp
       command: "reset"
 
@@ -113,7 +117,9 @@ tests:
       arguments:
           value: 0
 
-    - label: "TH sends command Reset to DUT with bit 4 (TempHigh) of Alarms set to 1"
+    - label:
+          "TH sends command Reset to DUT with bit 4 (TempHigh) of Alarms set to
+          1"
       PICS: DISHALM.S.F00 && DISHALM.S.C00.Rsp
       command: "reset"
       response:

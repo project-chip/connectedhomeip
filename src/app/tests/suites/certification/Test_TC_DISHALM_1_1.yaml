@@ -65,9 +65,7 @@ tests:
               type: list
               contains: [0, 2, 3, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label:
-          "TH reads the attribute(Latch) in AttributeList from
-          the DUT"
+    - label: "TH reads the attribute(Latch) in AttributeList from the DUT"
       PICS: DISHALM.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
@@ -75,7 +73,6 @@ tests:
           constraints:
               type: list
               contains: [1]
-
 
     - label: "Read the global attribute: EventList"
       command: "readAttribute"
@@ -103,7 +100,9 @@ tests:
               type: list
               contains: [1]
 
-    - label: "Read the attribute (Reset) based on feature support: AcceptedCommandList"
+    - label:
+          "Read the attribute (Reset) based on feature support:
+          AcceptedCommandList"
       PICS: DISHALM.S.C00.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"

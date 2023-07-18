@@ -70,7 +70,8 @@ tests:
           constraints:
               value: 4
 
-    - label: "TH sends command Reset to DUT with bit 2 (Door) of Alarms set to 1"
+    - label:
+          "TH sends command Reset to DUT with bit 2 (Door) of Alarms set to 1"
       PICS: DISHALM.S.F00 && DISHALM.S.C00.Rsp
       command: "reset"
 
@@ -113,7 +114,8 @@ tests:
       arguments:
           value: 0
 
-    - label: "TH sends command Reset to DUT with bit 2 (Door) of Alarms set to 1"
+    - label:
+          "TH sends command Reset to DUT with bit 2 (Door) of Alarms set to 1"
       PICS: DISHALM.S.F00 && DISHALM.S.C00.Rsp
       command: "reset"
       response:
