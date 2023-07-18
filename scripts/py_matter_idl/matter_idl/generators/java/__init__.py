@@ -791,7 +791,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
                 if struct.tag:
                     continue
 
-                output_name="java/chip/cluster/structs/{cluster_name}Cluster{struct_name}.kt"
+                output_name = "java/chip/cluster/structs/{cluster_name}Cluster{struct_name}.kt"
                 self.internal_render_one_output(
                     template_path="ChipStructs.jinja",
                     output_file_name=output_name.format(
@@ -805,7 +805,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
                 )
 
             for event in cluster.events:
-                output_name="java/chip/cluster/eventstructs/{cluster_name}Cluster{event_name}Event.kt"
+                output_name = "java/chip/cluster/eventstructs/{cluster_name}Cluster{event_name}Event.kt"
                 self.internal_render_one_output(
                     template_path="ChipEventStructs.jinja",
                     output_file_name=output_name.format(
