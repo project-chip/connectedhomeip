@@ -675,7 +675,6 @@ void TimeSynchronizationServer::OnFabricRemoved(const FabricTable & fabricTable,
     if (!mTrustedTimeSource.IsNull() && mTrustedTimeSource.Value().fabricIndex == fabricIndex)
     {
         DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> tts;
-        tts.SetNull();
         TimeSynchronizationServer::Instance().SetTrustedTimeSource(tts);
         emitMissingTrustedTimeSourceEvent(0);
     }
