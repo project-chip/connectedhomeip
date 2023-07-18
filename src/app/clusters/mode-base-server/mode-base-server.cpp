@@ -365,14 +365,6 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
     ReturnErrorOnFailure(aDecoder.Decode(newMode));
     Status status;
 
-    if (!newMode.IsNull())
-    {
-        if (!IsSupportedMode(newMode.Value()))
-        {
-            return StatusIB(Protocols::InteractionModel::Status::InvalidCommand).ToChipError();
-        }
-    }
-
     switch (attributePath.mAttributeId)
     {
     case ModeBase::Attributes::StartUpMode::Id:
@@ -383,23 +375,24 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
         return StatusIB(status).ToChipError();
     }
 
-    return StatusIB(Protocols::InteractionModel::Status::InvalidCommand).ToChipError();
+    return CHIP_ERROR_INCORRECT_STATE;
 }
 
 Status Instance::UpdateCurrentMode(uint8_t aNewMode)
 {
     if (!IsSupportedMode(aNewMode))
     {
-        return Protocols::InteractionModel::Status::InvalidValue;
+        return Protocols::InteractionModel::Status::ConstraintError;
     }
     uint8_t oldMode = mCurrentMode;
     mCurrentMode    = aNewMode;
     if (mCurrentMode != oldMode)
     {
         // Write new value to persistent storage.
-        GetAttributePersistenceProvider()->WriteScalarValue(
-            ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), mCurrentMode);
-        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::CurrentMode::Id);
+        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId,
+                                                           Attributes::CurrentMode::Id);
+        GetAttributePersistenceProvider()->WriteScalarValue(path, mCurrentMode);
+        MatterReportingAttributeChangeCallback(path);
     }
     return Protocols::InteractionModel::Status::Success;
 }
@@ -410,7 +403,7 @@ Status Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
     {
         if (!IsSupportedMode(aNewStartUpMode.Value()))
         {
-            return Protocols::InteractionModel::Status::InvalidValue;
+            return Protocols::InteractionModel::Status::ConstraintError;
         }
     }
     DataModel::Nullable<uint8_t> oldStartUpMode = mStartUpMode;
@@ -418,9 +411,10 @@ Status Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
     if (mStartUpMode != oldStartUpMode)
     {
         // Write new value to persistent storage.
-        GetAttributePersistenceProvider()->WriteScalarValue(
-            ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), mStartUpMode);
-        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::StartUpMode::Id);
+        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId,
+                                                           Attributes::StartUpMode::Id);
+        GetAttributePersistenceProvider()->WriteScalarValue(path, mStartUpMode);
+        MatterReportingAttributeChangeCallback(path);
     }
     return Protocols::InteractionModel::Status::Success;
 }
@@ -431,7 +425,7 @@ Status Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
     {
         if (!IsSupportedMode(aNewOnMode.Value()))
         {
-            return Protocols::InteractionModel::Status::InvalidValue;
+            return Protocols::InteractionModel::Status::ConstraintError;
         }
     }
     DataModel::Nullable<uint8_t> oldOnMode = mOnMode;
@@ -439,9 +433,10 @@ Status Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
     if (mOnMode != oldOnMode)
     {
         // Write new value to persistent storage.
-        GetAttributePersistenceProvider()->WriteScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id),
-                                                            mOnMode);
-        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OnMode::Id);
+        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId,
+                                                           Attributes::OnMode::Id);
+        GetAttributePersistenceProvider()->WriteScalarValue(path, mOnMode);
+        MatterReportingAttributeChangeCallback(path);
     }
     return Protocols::InteractionModel::Status::Success;
 }
