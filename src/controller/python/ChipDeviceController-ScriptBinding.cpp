@@ -97,6 +97,9 @@ namespace {
 chip::Platform::ScopedMemoryBuffer<uint8_t> sSsidBuf;
 chip::Platform::ScopedMemoryBuffer<uint8_t> sCredsBuf;
 chip::Platform::ScopedMemoryBuffer<uint8_t> sThreadBuf;
+chip::Platform::ScopedMemoryBuffer<char> sDefaultNTPBuf;
+app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type sDSTBuf;
+app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type sTimeZoneBuf;
 chip::Controller::CommissioningParameters sCommissioningParameters;
 
 } // namespace
@@ -137,6 +140,11 @@ PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommiss
                                                  DeviceUnpairingCompleteFunct callback);
 PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
 PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const char * credentials);
+PyChipError pychip_DeviceController_SetTimeZone(int32_t offset, uint64_t validAt);
+PyChipError pychip_DeviceController_SetDSTOffset(int32_t offset, uint64_t validStarting, uint64_t validUntil);
+PyChipError pychip_DeviceController_SetDefaultNtp(const char * defaultNTP);
+PyChipError pychip_DeviceController_SetTrustedTimeSource(chip::NodeId nodeId, chip::EndpointId endpoint);
+PyChipError pychip_DeviceController_ResetCommissioningParameters();
 PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                                            uint32_t setupPINCode, chip::NodeId nodeid, uint16_t port);
@@ -491,6 +499,47 @@ PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const 
 
     sCommissioningParameters.SetWiFiCredentials(
         chip::Controller::WiFiCredentials(ByteSpan(sSsidBuf.Get(), ssidSize), ByteSpan(sCredsBuf.Get(), credsSize)));
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_SetTimeZone(int32_t offset, uint64_t validAt)
+{
+    sTimeZoneBuf.offset  = offset;
+    sTimeZoneBuf.validAt = validAt;
+    app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> list(&sTimeZoneBuf, 1);
+    sCommissioningParameters.SetTimeZone(list);
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+PyChipError pychip_DeviceController_SetDSTOffset(int32_t offset, uint64_t validStarting, uint64_t validUntil)
+{
+    sDSTBuf.offset        = offset;
+    sDSTBuf.validStarting = validStarting;
+    sDSTBuf.validUntil    = chip::app::DataModel::MakeNullable(validUntil);
+    app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type> list(&sDSTBuf, 1);
+    sCommissioningParameters.SetDSTOffsets(list);
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+PyChipError pychip_DeviceController_SetDefaultNtp(const char * defaultNTP)
+{
+    size_t len = strlen(defaultNTP);
+    ReturnErrorCodeIf(!sDefaultNTPBuf.Alloc(len), ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    memcpy(sDefaultNTPBuf.Get(), defaultNTP, len);
+    sCommissioningParameters.SetDefaultNTP(chip::app::DataModel::MakeNullable(CharSpan(sDefaultNTPBuf.Get(), len)));
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_SetTrustedTimeSource(chip::NodeId nodeId, chip::EndpointId endpoint)
+{
+    chip::app::Clusters::TimeSynchronization::Structs::FabricScopedTrustedTimeSourceStruct::Type timeSource = { .nodeID = nodeId,
+                                                                                                                .endpoint =
+                                                                                                                    endpoint };
+    sCommissioningParameters.SetTrustedTimeSource(chip::app::DataModel::MakeNullable(timeSource));
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_ResetCommissioningParameters()
+{
+    sCommissioningParameters = CommissioningParameters();
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
