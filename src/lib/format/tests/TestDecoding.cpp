@@ -294,7 +294,7 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "            privilege: 5 == kAdminister\n"
                    "            authMode: 2 == kCASE\n"
                    "            subjects\n"
-                   "              []: 112233\n"
+                   "              Anonymous<>: 112233\n"
                    "            targets: NULL\n"
                    "            fabricIndex: 1\n"
                    "  suppress_response: true\n"
