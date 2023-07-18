@@ -79,6 +79,10 @@ public:
     uint8_t GetCurrentMode() const;
     EndpointId GetEndpointId() const { return mEndpointId; }
 
+    // Cluster constants
+    static constexpr uint8_t kMaxModeLabelSize = 64;
+    static constexpr uint8_t kMaxNumOfModeTags = 8;
+
     /**
      * Returns true if the feature is supported.
      * @param feature the feature to check.

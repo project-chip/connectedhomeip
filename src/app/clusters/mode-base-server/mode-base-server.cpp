@@ -315,7 +315,7 @@ CHIP_ERROR Instance::encodeSupportedModes(const AttributeValueEncoder::ListEncod
         ModeOptionStructType mode;
 
         // Get the mode label
-        char buffer[64];
+        char buffer[kMaxModeLabelSize];
         MutableCharSpan label(buffer);
         ReturnErrorOnFailure(GetModeLabelByIndex(i, label));
         mode.label = label;
@@ -324,7 +324,7 @@ CHIP_ERROR Instance::encodeSupportedModes(const AttributeValueEncoder::ListEncod
         ReturnErrorOnFailure(GetModeValueByIndex(i, mode.mode));
 
         // Get the mode tags
-        ModeTagStructType tagsBuffer[8];
+        ModeTagStructType tagsBuffer[kMaxNumOfModeTags];
         DataModel::List<ModeTagStructType> tags(tagsBuffer);
         ReturnErrorOnFailure(GetModeTagsByIndex(i, tags));
         mode.modeTags = tags;
@@ -353,8 +353,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         CHIP_ERROR err = aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR {
             return d->encodeSupportedModes(encoder);
         });
-        ReturnErrorOnFailure(err);
-        break;
+        return err;
     }
     return CHIP_NO_ERROR;
 }
