@@ -59,7 +59,7 @@ using PayloadDecoderType = chip::Decoders::PayloadDecoder<64, 256>;
 /// Figures out a unique name within a json object.
 ///
 /// Decoded keys may be duplicated, like list elements are denoted as "[]".
-/// The existing code does not attempt to encode lists and everytying is an object,
+/// The existing code does not attempt to encode lists and everything is an object,
 /// so this name builder attempts to find unique keys for elements inside a json.
 ///
 /// In particular a repeated "[]", "[]", ... will become "[0]", "[1]", ...
