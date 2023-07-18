@@ -310,31 +310,36 @@
             "SupportedModes",
             "CurrentMode",
             "StartUpMode",
-            "OnMode"
+            "OnMode",
+            "FeatureMap"
         ],
         "Laundry Washer Mode": [
             "SupportedModes",
             "CurrentMode",
             "StartUpMode",
-            "OnMode"
+            "OnMode",
+            "FeatureMap"
         ],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
             "SupportedModes",
             "CurrentMode",
             "StartUpMode",
-            "OnMode"
+            "OnMode",
+            "FeatureMap"
         ],
         "RVC Clean Mode": [
             "SupportedModes",
             "CurrentMode",
             "StartUpMode",
-            "OnMode"
+            "OnMode",
+            "FeatureMap"
         ],
         "RVC Run Mode": [
             "SupportedModes",
             "CurrentMode",
             "StartUpMode",
-            "OnMode"
+            "OnMode",
+            "FeatureMap"
         ]
     },
     "defaultReportingPolicy": "mandatory",

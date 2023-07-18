@@ -215,7 +215,7 @@ public:
 
     /**
      * Get the mode tags of the Nth mode in the list of modes.
-     * The caller must make sure the List points to an existing buffer of sufficient size to hold the spec-required number
+     * The caller will make sure the List points to an existing buffer of sufficient size to hold the spec-required number
      * of tags, and the size of the List is the size of the buffer.
      *
      * The implementation must place its desired ModeTagStructType instances in that buffer and call tags.reduce_size
