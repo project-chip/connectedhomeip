@@ -74,6 +74,12 @@ public:
             break;
         }
 
+        if (mode != PairingMode::None)
+        {
+            AddArgument("country-code", &mCountryCode,
+                        "Country code to use to set the Basic Information cluster's Location attribute");
+        }
+
         AddArgument("use-device-attestation-delegate", 0, 1, &mUseDeviceAttestationDelegate,
                     "If true, use a device attestation delegate that always wants to be notified about attestation results.  "
                     "Defaults to false.");
@@ -104,4 +110,5 @@ private:
     char * mOnboardingPayload;
     chip::Optional<bool> mUseDeviceAttestationDelegate;
     chip::Optional<uint16_t> mDeviceAttestationFailsafeTime;
+    chip::Optional<char *> mCountryCode;
 };

@@ -77,7 +77,7 @@ static const GenericOperationalPhase opPhaseList[] = {
  * Operational State Delegate
  * Note: User Define
  */
-static OperationalStateDelegate opStateDelegate(GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+static OperationalStateDelegate opStateDelegate(to_underlying(OperationalStateEnum::kStopped),
                                                 GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)),
                                                 Span<const GenericOperationalState>(opStateList),
                                                 Span<const GenericOperationalPhase>(opPhaseList));

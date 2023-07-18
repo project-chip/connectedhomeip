@@ -212,6 +212,7 @@ template("efr32_sdk") {
       "PLAT=EMBER_PLATFORM_CORTEXM3",
       "${silabs_mcu}=1",
       "${silabs_board}=1",
+      "SL_BOARD_NAME=${silabs_board}",
       "SL_SUPRESS_DEPRECATION_WARNINGS_SDK_3_1",
       "__HEAP_SIZE=0",
       "SL_CATALOG_FREERTOS_KERNEL_PRESENT=1",

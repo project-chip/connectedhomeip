@@ -33,10 +33,10 @@
   ],
   "endpointTypes": [
     {
-      "name": "Anonymous Endpoint Type",
-      "deviceTypeName": null,
-      "deviceTypeCode": null,
-      "deviceTypeProfileId": null,
+      "name": "MA-rootdevice",
+      "deviceTypeName": "MA-rootdevice",
+      "deviceTypeCode": 22,
+      "deviceTypeProfileId": 259,
       "clusters": [
         {
           "name": "Descriptor",
@@ -14585,7 +14585,7 @@
       "endpointId": 0,
       "networkId": 0,
       "endpointVersion": 1,
-      "deviceIdentifier": 65280
+      "deviceIdentifier": 22
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",

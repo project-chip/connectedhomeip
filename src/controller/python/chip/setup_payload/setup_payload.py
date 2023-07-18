@@ -123,6 +123,10 @@ class SetupPayload:
     # Prefer using the methods below to access setup payload information once parse.
 
     @property
+    def version(self) -> int:
+        return int(self.attributes.get("Version", "0"))
+
+    @property
     def vendor_id(self) -> int:
         return int(self.attributes.get("VendorID", "0"))
 
