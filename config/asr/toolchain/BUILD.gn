@@ -16,10 +16,11 @@ import("//build_overrides/asr.gni")
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-assert(asr_ic_family == "asr582x" || asr_ic_family == "asr595x",
+assert(asr_ic_family == "asr582x" || asr_ic_family == "asr595x" ||
+           asr_ic_family == "asr550x",
        "Unsupported ASR IC: ${asr_ic_family}")
 
-if (asr_ic_family == "asr582x") {
+if (asr_ic_family == "asr582x" || asr_ic_family == "asr550x") {
   import("${build_root}/toolchain/arm_gcc/arm_toolchain.gni")
   _tool_name_root = "${asr_toolchain_root}arm-none-eabi-"
 }
