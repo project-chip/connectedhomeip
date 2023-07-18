@@ -2639,3 +2639,25 @@ RVCCLEANMS.S.A0005=1
 RVCCLEANMS.S.C00.Rsp=1
 RVCCLEANMS.S.C01.Rsp=1
 RVCCLEANMS.S.C03.Tx=1
+
+#Dishwasher Alarm
+DISHALM.S=1
+
+#Features
+DISHALM.S.F00=1
+
+#Server Attributes
+DISHALM.S.A0000=1
+DISHALM.S.A0001=1
+DISHALM.S.A0002=1
+DISHALM.S.A0003=1
+
+#Manual controllable
+DISHALM.M.ManuallyControlled
+
+#Server Events
+DISHALM.S.E00
+
+#Server commands received
+DISHALM.S.C00.Rsp=1
+DISHALM.S.C01.Rsp=1
