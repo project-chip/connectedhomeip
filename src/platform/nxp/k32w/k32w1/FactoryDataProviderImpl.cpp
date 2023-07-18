@@ -139,19 +139,24 @@ CHIP_ERROR FactoryDataProviderImpl::SSS_ConvertDacKey()
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_INTERNAL);
 
     ReturnErrorOnFailure(SSS_ExportBlob(blob, &blobSize, offset));
+    ChipLogError(DeviceLayer, "SSS: extracted blob from DAC private key");
 
     hal_flash_status_t status = HAL_FlashRead(kFactoryDataStart, newSize - kSssBlobMetadataLength, data);
     VerifyOrReturnError(status == kStatus_HAL_Flash_Success, CHIP_ERROR_INTERNAL);
+    ChipLogError(DeviceLayer, "SSS: cached factory data in RAM");
 
     ReturnErrorOnFailure(ReplaceWithBlob(data, blob, blobSize, offset));
+    ChipLogError(DeviceLayer, "SSS: replaced DAC private key with secured blob");
 
     status = HAL_FlashEraseSector(kFactoryDataStart, kFactoryDataSize);
     VerifyOrReturnError(status == kStatus_HAL_Flash_Success, CHIP_ERROR_INTERNAL);
     status = HAL_FlashProgramUnaligned(kFactoryDataStart, newSize, data);
     VerifyOrReturnError(status == kStatus_HAL_Flash_Success, CHIP_ERROR_INTERNAL);
+    ChipLogError(DeviceLayer, "SSS: updated factory data");
 
     memset(data, 0, newSize);
     chip::Platform::MemoryFree(data);
+    ChipLogError(DeviceLayer, "SSS: sanitized RAM cache");
 
     return CHIP_NO_ERROR;
 }
