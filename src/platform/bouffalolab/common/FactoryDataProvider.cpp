@@ -678,7 +678,10 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
 #else
     constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
 
-    uniqueIdSpan = MutableByteSpan((uint8_t *) uniqueId, sizeof(uniqueId));
+    VerifyOrReturnValue(uniqueIdSpan.size() >= sizeof(uniqueId), CHIP_ERROR_INVALID_ARGUMENT);
+
+    memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
+    uniqueIdSpan.reduce_size(sizeof(uniqueId));
 
     return CHIP_NO_ERROR;
 #endif

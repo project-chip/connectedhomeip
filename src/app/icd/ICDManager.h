@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <credentials/FabricTable.h>
 #include <lib/support/BitFlags.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -50,15 +51,16 @@ public:
     };
 
     ICDManager() {}
-    void Init();
+    void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable);
     void Shutdown();
     void UpdateIcdMode();
     void UpdateOperationState(OperationalState state);
     void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
     bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
-    ICDMode GetIcdMode() { return mIcdMode; }
+    ICDMode GetICDMode() { return mICDMode; }
     OperationalState GetOperationalState() { return mOperationalState; }
 
+    static System::Clock::Milliseconds32 GetSITPollingThreshold() { return kSITPollingThreshold; }
     static System::Clock::Milliseconds32 GetSlowPollingInterval() { return kSlowPollingInterval; }
     static System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
 
@@ -67,9 +69,10 @@ protected:
     static void OnActiveModeDone(System::Layer * aLayer, void * appState);
 
 private:
-    static constexpr System::Clock::Milliseconds32 kICDSitModePollingThreashold = System::Clock::Milliseconds32(15000);
-    static constexpr System::Clock::Milliseconds32 kSlowPollingInterval         = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
-    static constexpr System::Clock::Milliseconds32 kFastPollingInterval         = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
+    // SIT ICDs should have a SlowPollingThreshold shorter than or equal to 15s (spec 9.16.1.5)
+    static constexpr System::Clock::Milliseconds32 kSITPollingThreshold = System::Clock::Milliseconds32(15000);
+    static constexpr System::Clock::Milliseconds32 kSlowPollingInterval = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+    static constexpr System::Clock::Milliseconds32 kFastPollingInterval = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
 
     // Minimal constraint value of the the ICD attributes.
     static constexpr uint32_t kMinIdleModeInterval    = 500;
@@ -79,8 +82,10 @@ private:
     bool SupportsCheckInProtocol();
 
     BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };
-    OperationalState mOperationalState = OperationalState::IdleMode;
-    ICDMode mIcdMode                   = ICDMode::SIT;
+    OperationalState mOperationalState   = OperationalState::IdleMode;
+    ICDMode mICDMode                     = ICDMode::SIT;
+    PersistentStorageDelegate * mStorage = nullptr;
+    FabricTable * mFabricTable           = nullptr;
 };
 
 } // namespace app

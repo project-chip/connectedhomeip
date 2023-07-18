@@ -111,6 +111,11 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         break;
     }
 
+    if (mCountryCode.HasValue())
+    {
+        params.SetCountryCode(CharSpan::fromCharString(mCountryCode.Value()));
+    }
+
     return params;
 }
 
