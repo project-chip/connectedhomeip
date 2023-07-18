@@ -28,6 +28,11 @@ namespace DeviceLayer {
 static constexpr size_t kSssBlobMetadataLength = 24;
 static constexpr size_t kPrivateKeyBlobLength = Crypto::kP256_PrivateKey_Length + kSssBlobMetadataLength;
 
+FactoryDataProviderImpl::~FactoryDataProviderImpl()
+{
+    SSS_KEY_OBJ_FREE(&mContext);
+}
+
 CHIP_ERROR FactoryDataProviderImpl::Init()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;

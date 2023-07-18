@@ -53,6 +53,8 @@ namespace DeviceLayer {
 class FactoryDataProviderImpl : public FactoryDataProvider
 {
 public:
+    ~FactoryDataProviderImpl();
+
     CHIP_ERROR Init() override;
     CHIP_ERROR SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) override;
 
