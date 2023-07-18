@@ -40,11 +40,11 @@ public:
      * **NOTE** The caller must ensure that the lifetime of the label and modeTags is as long as the
      * returned structure.
      */
-    static chip::app::Clusters::detail::Structs::ModeOptionStruct::Type
+    static detail::Structs::ModeOptionStruct::Type
     BuildModeOptionStruct(const char * label, uint8_t mode,
-                          const DataModel::List<const chip::app::Clusters::detail::Structs::ModeTagStruct::Type> modeTags)
+                          const DataModel::List<const detail::Structs::ModeTagStruct::Type> modeTags)
     {
-        chip::app::Clusters::detail::Structs::ModeOptionStruct::Type option;
+        detail::Structs::ModeOptionStruct::Type option;
         option.label    = CharSpan::fromCharString(label);
         option.mode     = mode;
         option.modeTags = modeTags;
@@ -59,24 +59,47 @@ public:
      */
     CHIP_ERROR Init();
 
-    // CommandHandlerInterface
-    void InvokeCommand(HandlerContext & ctx) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
-    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
-
-    // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-
     // Attribute setters
-    chip::Protocols::InteractionModel::Status UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode);
-    chip::Protocols::InteractionModel::Status UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode);
-    chip::Protocols::InteractionModel::Status UpdateCurrentMode(uint8_t aNewMode);
+    /**
+     * Sets the Start-Up attribute. Note, this also handles writing the new value into non-volatile storage.
+     * @param aNewStartUpMode The value to which the Start-Up mode is to be set.
+     * @return Returns a ConstraintError if the aNewStartUpMode value is not valid. Returns Success otherwise.
+     */
+    Protocols::InteractionModel::Status UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode);
+
+    /**
+     * Sets the On-Mode attribute. Note, this also handles writing the new value into non-volatile storage.
+     * @param aNewOnMode The value to which the On-Mode mode is to be set.
+     * @return Returns a ConstraintError if the aNewOnMode value is not valid. Returns Success otherwise.
+     */
+    Protocols::InteractionModel::Status UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode);
+
+    /**
+     * Sets the Current-Mode attribute. Note, this also handles writing the new value into non-volatile storage.
+     * @param aNewMode The value to which the Current-Mode mode is to be set.
+     * @return Returns a ConstraintError if the aNewMode value is not valid. Returns Success otherwise.
+     */
+    Protocols::InteractionModel::Status UpdateCurrentMode(uint8_t aNewMode);
 
     // Attribute getters
+    /**
+     * @return The Start-Up mode.
+     */
     DataModel::Nullable<uint8_t> GetStartUpMode() const;
+
+    /**
+     * @return The On mode.
+     */
     DataModel::Nullable<uint8_t> GetOnMode() const;
+
+    /**
+     * @return The Current mode.
+     */
     uint8_t GetCurrentMode() const;
+
+    /**
+     * @return The endpoint ID.
+     */
     EndpointId GetEndpointId() const { return mEndpointId; }
 
     // Cluster constants
@@ -105,6 +128,15 @@ private:
     DataModel::Nullable<uint8_t> mOnMode;
 
     uint32_t mFeature;
+
+    // CommandHandlerInterface
+    void InvokeCommand(HandlerContext & ctx) override;
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+
+    // AttributeAccessInterface
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     /**
      * This checks to see if this clusters instance is a valid ModeBase aliased cluster based on the AliasedClusters list.
@@ -139,14 +171,12 @@ public:
      */
     Instance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mEndpointId(aEndpointId), mClusterId(aClusterId),
-        mFeature(aFeature)
-    {
-        mCurrentMode = 0; // This is a temporary value and may not be valid. We will change this to the value of the first
-                          // mode in the list at the start of the Init function to ensure that it represents a valid mode.
-        mStartUpMode = DataModel::Nullable<uint8_t>(); // Initialised to null
-        mOnMode      = DataModel::Nullable<uint8_t>(); // Initialised to null
-    }
+        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId),
+        mEndpointId(aEndpointId),
+        mClusterId(aClusterId),
+        mCurrentMode(0), // This is a temporary value and may not be valid. We will change this to the value of the first
+                         // mode in the list at the start of the Init function to ensure that it represents a valid mode.
+        mFeature(aFeature) {}
 
     ~Instance() override;
 
@@ -173,7 +203,7 @@ public:
      * CopyCharSpanToMutableCharSpan to copy into the MutableCharSpan.
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
-    virtual CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label) = 0;
+    virtual CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) = 0;
 
     /**
      * Get the mode value of the Nth mode in the list of modes.
@@ -197,7 +227,7 @@ public:
      */
     virtual CHIP_ERROR
     GetModeTagsByIndex(uint8_t modeIndex,
-                       DataModel::List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) = 0;
+                       DataModel::List<detail::Structs::ModeTagStruct::Type> & modeTags) = 0;
 
     /**
      * When a ChangeToMode command is received, if the NewMode value is a supported mode, this method is called to 1) decide if
