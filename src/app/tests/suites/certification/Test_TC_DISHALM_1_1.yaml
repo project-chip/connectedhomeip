@@ -15,7 +15,7 @@
 name: 197.1.1. [TC-DISHALM-1.1] Global attributes with server as DUT
 
 PICS:
-    - MOD.S
+    - DISHALM.S
 
 config:
     nodeId: 0x12344321
@@ -49,7 +49,7 @@ tests:
               type: bitmap32
 
     - label: "TH reads the FeatureMap attribute from the DUT"
-      PICS: DISHALM.S.F00
+      PICS: "DISHALM.S.F00"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:

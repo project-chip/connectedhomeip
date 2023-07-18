@@ -15,7 +15,7 @@
 name: 197.2.1. [TC-DISHALM-2.1] Attributes with DUT as Server
 
 PICS:
-    - MOD.S
+    - DISHALM.S
 
 config:
     nodeId: 0x12344321
