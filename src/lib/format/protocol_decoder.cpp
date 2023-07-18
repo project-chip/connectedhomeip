@@ -296,7 +296,7 @@ void PayloadDecoderBase::ExitContainer(PayloadEntry & entry)
         if (err != CHIP_NO_ERROR)
         {
             mValueBuilder.AddFormat("ERROR: %" CHIP_ERROR_FORMAT, err.Format());
-            mNameBuilder.Format("EXIT CONTAINER");
+            mNameBuilder.AddFormat("EXIT CONTAINER");
             entry  = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
             mState = State::kDone;
             return;
