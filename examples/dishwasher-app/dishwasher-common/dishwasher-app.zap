@@ -9414,7 +9414,7 @@
               "code": 4,
               "mfgCode": null,
               "side": "server",
-              "type": "OperationalStateStruct",
+              "type": "OperationalStateEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
