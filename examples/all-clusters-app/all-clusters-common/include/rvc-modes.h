@@ -45,13 +45,18 @@ private:
                                                                        ModeTag::kCleaning) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        BuildModeOptionStruct("Idle", ModeIdle,
-                              DataModel::List<const ModeTagStructType>(ModeTagsIdle)),
-        BuildModeOptionStruct("Cleaning", ModeCleaning,
-                              DataModel::List<const ModeTagStructType>(ModeTagsCleaning)),
-        BuildModeOptionStruct(
-            "Mapping", ModeMapping,
-            DataModel::List<const ModeTagStructType>(ModeTagsIdle)), // todo set to no mode tags
+        detail::Structs::ModeOptionStruct::Type{
+            .label=CharSpan::fromCharString("Idle"),
+            .mode=ModeIdle,
+            .modeTags=DataModel::List<const ModeTagStructType>(ModeTagsIdle)},
+        detail::Structs::ModeOptionStruct::Type{
+            .label=CharSpan::fromCharString("Cleaning"),
+            .mode=ModeCleaning,
+            .modeTags=DataModel::List<const ModeTagStructType>(ModeTagsCleaning)},
+        detail::Structs::ModeOptionStruct::Type{
+            .label=CharSpan::fromCharString("Mapping"),
+            .mode=ModeMapping,
+            .modeTags=DataModel::List<const ModeTagStructType>(ModeTagsIdle)}, // todo set to no mode tags
     };
 
     CHIP_ERROR AppInit() override;
@@ -91,12 +96,18 @@ private:
                                                                     ModeTag::kDeepClean) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        BuildModeOptionStruct("Vacuum", ModeVacuum,
-                              DataModel::List<const ModeTagStructType>(modeTagsVac)),
-        BuildModeOptionStruct("Wash", ModeWash,
-                              DataModel::List<const ModeTagStructType>(modeTagsMop)),
-        BuildModeOptionStruct("Deep clean", ModeDeepClean,
-                              DataModel::List<const ModeTagStructType>(modeTagsBoost)),
+        detail::Structs::ModeOptionStruct::Type{
+            .label=CharSpan::fromCharString("Vacuum"),
+            .mode=ModeVacuum,
+            .modeTags=DataModel::List<const ModeTagStructType>(modeTagsVac)},
+        detail::Structs::ModeOptionStruct::Type{
+            .label=CharSpan::fromCharString("Wash"),
+            .mode=ModeWash,
+            .modeTags=DataModel::List<const ModeTagStructType>(modeTagsMop)},
+        detail::Structs::ModeOptionStruct::Type{
+            .label=CharSpan::fromCharString("Deep clean"),
+            .mode=ModeDeepClean,
+            .modeTags=DataModel::List<const ModeTagStructType>(modeTagsBoost)},
     };
 
     CHIP_ERROR AppInit() override;

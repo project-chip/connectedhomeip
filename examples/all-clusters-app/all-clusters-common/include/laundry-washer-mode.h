@@ -54,14 +54,22 @@ private:
                                                                      ModeTag::kWhites) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[4] = {
-        BuildModeOptionStruct("Normal", ModeNormal,
-                              DataModel::List<const ModeTagStructType>(modeTagsNormal)),
-        BuildModeOptionStruct("Delicate", ModeDelicate,
-                              DataModel::List<const ModeTagStructType>(modeTagsDelicate)),
-        BuildModeOptionStruct("Heavy", ModeHeavy,
-                              DataModel::List<const ModeTagStructType>(modeTagsHeavy)),
-        BuildModeOptionStruct("Whites", ModeWhites,
-                              DataModel::List<const ModeTagStructType>(modeTagsWhites)),
+        detail::Structs::ModeOptionStruct::Type{
+            .label = CharSpan::fromCharString("Normal"),
+            .mode = ModeNormal,
+            .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = CharSpan::fromCharString("Delicate"),
+            .mode = ModeDelicate,
+            .modeTags = DataModel::List<const ModeTagStructType>(modeTagsDelicate) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = CharSpan::fromCharString("Heavy"),
+            .mode = ModeHeavy,
+            .modeTags = DataModel::List<const ModeTagStructType>(modeTagsHeavy) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = CharSpan::fromCharString("Whites"),
+            .mode = ModeWhites,
+            .modeTags = DataModel::List<const ModeTagStructType>(modeTagsWhites) },
     };
 
     CHIP_ERROR AppInit() override;

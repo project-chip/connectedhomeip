@@ -51,12 +51,21 @@ private:
     };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        BuildModeOptionStruct("Normal", ModeNormal,
-                              DataModel::List<const ModeTagStructType>(modeTagsNormal)),
-        BuildModeOptionStruct("Heavy", ModeHeavy,
-                              DataModel::List<const ModeTagStructType>(modeTagsHeavy)),
-        BuildModeOptionStruct("Light", ModeLight,
-                              DataModel::List<const ModeTagStructType>(modeTagsLight)),
+        detail::Structs::ModeOptionStruct::Type{
+            .label=CharSpan::fromCharString("Normal"),
+            .mode=ModeNormal,
+            .modeTags=DataModel::List<const ModeTagStructType>(modeTagsNormal)
+        },
+        detail::Structs::ModeOptionStruct::Type{
+            .label=CharSpan::fromCharString("Heavy"),
+            .mode=ModeHeavy,
+            .modeTags=DataModel::List<const ModeTagStructType>(modeTagsHeavy)
+        },
+        detail::Structs::ModeOptionStruct::Type{
+            .label=CharSpan::fromCharString("Light"),
+            .mode=ModeLight,
+            .modeTags=DataModel::List<const ModeTagStructType>(modeTagsLight)
+        }
     };
 
     CHIP_ERROR AppInit() override;

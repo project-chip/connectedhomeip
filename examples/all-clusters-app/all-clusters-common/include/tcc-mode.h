@@ -49,12 +49,18 @@ private:
     };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        BuildModeOptionStruct("Normal", ModeNormal,
-                              DataModel::List<const ModeTagStructType>(modeTagsTccNormal)),
-        BuildModeOptionStruct("Rapid Cool", ModeRapidCool,
-                              DataModel::List<const ModeTagStructType>(modeTagsTccRapidCool)),
-        BuildModeOptionStruct("Rapid Freeze", ModeRapidFreeze,
-                              DataModel::List<const ModeTagStructType>(modeTagsTccRapidFreeze)),
+        detail::Structs::ModeOptionStruct::Type{
+            .label=CharSpan::fromCharString("Normal"),
+            .mode=ModeNormal,
+            .modeTags=DataModel::List<const ModeTagStructType>(modeTagsTccNormal)},
+        detail::Structs::ModeOptionStruct::Type{
+            .label=CharSpan::fromCharString("Rapid Cool"),
+            .mode=ModeRapidCool,
+            .modeTags=DataModel::List<const ModeTagStructType>(modeTagsTccRapidCool)},
+        detail::Structs::ModeOptionStruct::Type{
+            .label=CharSpan::fromCharString("Rapid Freeze"),
+            .mode=ModeRapidFreeze,
+            .modeTags=DataModel::List<const ModeTagStructType>(modeTagsTccRapidFreeze)},
     };
 
     CHIP_ERROR AppInit() override;
