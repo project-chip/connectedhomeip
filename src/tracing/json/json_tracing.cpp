@@ -108,7 +108,7 @@ private:
         }
         else
         {
-            mFormatter.Reset().Add(baseName).Add(" - ").Add(mUniqueIndex++);
+            mFormatter.Reset().Add(baseName).Add("@").Add(mUniqueIndex++);
         }
     }
 
