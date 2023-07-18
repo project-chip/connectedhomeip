@@ -107,8 +107,7 @@ private:
 };
 
 // Gets the current value of the decoder until a NEST exit is returned
-::Json::Value
-GetPayload(PayloadDecoderType & decoder)
+::Json::Value GetPayload(PayloadDecoderType & decoder)
 {
     ::Json::Value value;
     PayloadEntry entry;
