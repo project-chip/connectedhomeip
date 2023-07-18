@@ -39,7 +39,7 @@ CHIP_ERROR TccModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::Mutable
 {
     if (modeIndex < NumberOfModes())
     {
-        return CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
+        return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
     }
     return CHIP_ERROR_NOT_FOUND;
 }

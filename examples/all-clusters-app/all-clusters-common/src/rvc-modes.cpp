@@ -49,7 +49,7 @@ CHIP_ERROR RvcRunModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::Muta
 {
     if (modeIndex < NumberOfModes())
     {
-        return CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
+        return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
     }
     return CHIP_ERROR_NOT_FOUND;
 }
@@ -104,7 +104,7 @@ CHIP_ERROR RvcCleanModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::Mu
 {
     if (modeIndex < NumberOfModes())
     {
-        return CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
+        return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
     }
     return CHIP_ERROR_NOT_FOUND;
 }

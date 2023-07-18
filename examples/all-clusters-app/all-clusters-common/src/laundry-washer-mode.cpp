@@ -39,7 +39,7 @@ CHIP_ERROR LaundryWasherModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chi
 {
     if (modeIndex < NumberOfModes())
     {
-        return CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
+        return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
     }
     return CHIP_ERROR_NOT_FOUND;
 }

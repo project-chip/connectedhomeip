@@ -39,7 +39,7 @@ CHIP_ERROR DishwasherModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::
 {
     if (modeIndex < NumberOfModes())
     {
-        return CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
+        return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
     }
     return CHIP_ERROR_NOT_FOUND;
 }
