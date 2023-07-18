@@ -170,7 +170,7 @@ void DecodePayloadData(::Json::Value & value, chip::ByteSpan payload, Protocols:
     value["size"] = static_cast<::Json::Value::UInt>(payload.size());
 
 #if MATTER_LOG_JSON_DECODE_HEX
-    char hex_buffer[1024];
+    char hex_buffer[4096];
     if (chip::Encoding::BytesToUppercaseHexString(payload.data(), payload.size(), hex_buffer, sizeof(hex_buffer)) == CHIP_NO_ERROR)
     {
         value["hex"] = hex_buffer;
