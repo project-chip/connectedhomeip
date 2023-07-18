@@ -38,7 +38,7 @@ public:
     SynchronizedReportSchedulerImpl(TimerDelegate * aTimerDelegate) : ReportSchedulerImpl(aTimerDelegate) {}
     ~SynchronizedReportSchedulerImpl() {}
 
-    bool IsReportScheduled(ReadHandler * aReadHandler);
+    bool IsReportScheduled();
 
     void ReportTimerCallback();
 

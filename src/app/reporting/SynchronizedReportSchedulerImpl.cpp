@@ -63,10 +63,8 @@ void SynchronizedReportSchedulerImpl::CancelReport()
 
 /// @brief Checks if the timer is active for the given ReadHandler. Since all read handlers are scheduled on the same timer, we
 /// check if the node is in the list and if the timer is active for the ReportScheduler
-bool SynchronizedReportSchedulerImpl::IsReportScheduled(ReadHandler * aReadHandler)
+bool SynchronizedReportSchedulerImpl::IsReportScheduled()
 {
-    ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
-    VerifyOrReturnValue(nullptr != node, false);
     return mTimerDelegate->IsTimerActive(this);
 }
 
@@ -122,19 +120,37 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::CalculateNextReportTimeout(Timeout &
     VerifyOrReturnError(mReadHandlerList.Contains(aNode), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(FindNextMaxInterval());
     ReturnErrorOnFailure(FindNextMinInterval());
+    bool reportableNow   = false;
+    bool reportableAtMin = false;
 
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
-    // Find out if any handler is reportable now
-    if (IsReadHandlerReportable(aNode->GetReadHandler()))
+
+    for (auto & iter : mReadHandlerList)
     {
-        if (now > mNextMinTimestamp)
+        if (!iter.IsEngineRunScheduled())
         {
-            timeout = Milliseconds32(0);
+            if (iter.IsReportableNow())
+            {
+                reportableNow = true;
+                break;
+            }
+
+            if (IsReadHandlerReportable(iter.GetReadHandler()) && iter.GetMinTimestamp() <= mNextMaxTimestamp)
+            {
+                reportableAtMin = true;
+            }
         }
-        else
-        {
-            timeout = mNextMinTimestamp - now;
-        }
+    }
+
+    // Find out if any handler is reportable now
+
+    if (reportableNow)
+    {
+        timeout = Milliseconds32(0);
+    }
+    else if (reportableAtMin)
+    {
+        timeout = mNextMinTimestamp - now;
     }
     else
     {
@@ -167,6 +183,7 @@ void SynchronizedReportSchedulerImpl::ReportTimerCallback()
     {
         if (iter.IsReportableNow())
         {
+            iter.SetEngineRunScheduled(true);
             ChipLogProgress(DataManagement, "Handler: %p with min: %" PRIu64 " and max: %" PRIu64 " and sync: %" PRIu64, (&iter),
                             iter.GetMinTimestamp().count(), iter.GetMaxTimestamp().count(), iter.GetSyncTimestamp().count());
         }

@@ -81,7 +81,7 @@ public:
                     (now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || now >= mSyncTimestamp)));
         }
 
-        bool IsEnginRunScheduled() const { return mEnginRunScheduled; }
+        bool IsEngineRunScheduled() const { return mEnginRunScheduled; }
         void SetEngineRunScheduled(bool aEnginRunScheduled) { mEnginRunScheduled = aEnginRunScheduled; }
 
         void SetIntervalTimeStamps(ReadHandler * aReadHandler)
