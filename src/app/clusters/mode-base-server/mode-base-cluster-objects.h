@@ -39,11 +39,11 @@ namespace SupportedModes {
 static constexpr AttributeId Id = 0x00000000;
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::detail::Structs::ModeOptionStruct::Type>;
+    using Type = DataModel::List<const detail::Structs::ModeOptionStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::detail::Structs::ModeOptionStruct::DecodableType>;
+        DataModel::DecodableList<detail::Structs::ModeOptionStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::detail::Structs::ModeOptionStruct::DecodableType> &;
+        const DataModel::DecodableList<detail::Structs::ModeOptionStruct::DecodableType> &;
 
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
@@ -67,9 +67,9 @@ namespace StartUpMode {
 static constexpr AttributeId Id = 0x00000002;
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = DataModel::Nullable<uint8_t>;
+    using DecodableType    = DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
 
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
@@ -80,9 +80,9 @@ namespace OnMode {
 static constexpr AttributeId Id = 0x00000003;
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = DataModel::Nullable<uint8_t>;
+    using DecodableType    = DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
 
     static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
@@ -138,7 +138,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
 
     uint8_t status = static_cast<uint8_t>(0);
-    Optional<chip::CharSpan> statusText;
+    Optional<CharSpan> statusText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -153,7 +153,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
 
     uint8_t status = static_cast<uint8_t>(0);
-    Optional<chip::CharSpan> statusText;
+    Optional<CharSpan> statusText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeToModeResponse
