@@ -30,7 +30,7 @@ class MTRSwiftPairingTestControllerDelegate : NSObject, MTRDeviceControllerDeleg
         do {
             try controller.commissionNode(withID: Constants.deviceID as NSNumber, commissioningParams: MTRCommissioningParameters())
         } catch {
-            XCTFail("Could not start commissioning of node")
+            XCTFail("Could not start commissioning of node: \(error)")
         }
 
         // Keep waiting for commissioningComplete
@@ -45,24 +45,34 @@ class MTRSwiftPairingTestControllerDelegate : NSObject, MTRDeviceControllerDeleg
 
 class MTRSwiftPairingTests : XCTestCase {
     @available(macOS, introduced: 13.3)
-    func test001_BasicPairing() throws {
+    func test001_BasicPairing() {
         let factory = MTRDeviceControllerFactory.sharedInstance()
-        XCTAssertNotNil(factory)
 
         let storage = MTRTestStorage()
         let factoryParams = MTRDeviceControllerFactoryParams(storage: storage)
         factoryParams.port = Constants.localPort as NSNumber
 
-        try factory.start(factoryParams)
+        do {
+            try factory.start(factoryParams)
+        } catch {
+            XCTFail("Could not start controller factory: \(error)")
+            return
+        }
         XCTAssertTrue(factory.isRunning)
 
         let testKeys = MTRTestKeys()
 
         let params = MTRDeviceControllerStartupParams(ipk: testKeys.ipk, fabricID: 1, nocSigner: testKeys)
-        params.vendorID = Constants.vendorID as NSNumber;
+        params.vendorID = Constants.vendorID as NSNumber
 
-        let controller = try factory.createController(onNewFabric: params)
-        XCTAssertTrue(factory.isRunning)
+        let controller: MTRDeviceController
+        do {
+            controller = try factory.createController(onNewFabric: params)
+        } catch {
+            XCTFail("Could not create controller: \(error)")
+            return
+        }
+        XCTAssertTrue(controller.isRunning)
 
         let expectation = expectation(description: "Commissioning Complete")
 
@@ -71,9 +81,20 @@ class MTRSwiftPairingTests : XCTestCase {
 
         controller.setDeviceControllerDelegate(controllerDelegate, queue: serialQueue)
 
-        let payload = try MTRSetupPayload(onboardingPayload: Constants.onboardingPayload)
+        let payload : MTRSetupPayload
+        do {
+            payload = try MTRSetupPayload(onboardingPayload: Constants.onboardingPayload)
+        } catch {
+            XCTFail("Could not parse setup payload: \(error)")
+            return
+        }
 
-        try controller.setupCommissioningSession(with: payload, newNodeID: Constants.deviceID as NSNumber)
+        do {
+            try controller.setupCommissioningSession(with: payload, newNodeID: Constants.deviceID as NSNumber)
+        } catch {
+            XCTFail("Could not start setting up PASE session: \(error)")
+            return
+        }
 
         wait(for: [expectation], timeout: TimeInterval(Constants.timeoutInSeconds))
 
