@@ -25,7 +25,6 @@
 #include <app/util/error-mapping.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <optional>
 
 using namespace chip;
 using namespace chip::app;
@@ -51,7 +50,7 @@ private:
     CHIP_ERROR ReadSpeedCurrent(AttributeValueEncoder & aEncoder);
 };
 
-static std::optional<FanControlManager> mFanControlManager;
+static FanControlManager * mFanControlManager;
 
 CHIP_ERROR FanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncoder)
 {
@@ -204,7 +203,7 @@ CHIP_ERROR FanControlManager::Read(const ConcreteReadAttributePath & aPath, Attr
 
 void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 {
-    mFanControlManager.emplace(endpoint);
-    registerAttributeAccessOverride(&mFanControlManager.value());
-    FanControl::SetDefaultDelegate(endpoint, &mFanControlManager.value());
+    mFanControlManager = new FanControlManager(endpoint);
+    registerAttributeAccessOverride(mFanControlManager);
+    FanControl::SetDefaultDelegate(endpoint, mFanControlManager);
 }
