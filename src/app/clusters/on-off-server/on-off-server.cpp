@@ -57,14 +57,12 @@ namespace {
  */
 void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
 {
-    for (const auto & element : ModeBase::GetModeBaseInstances())
+    for (const auto & modeBaseInstance : *ModeBase::GetModeBaseInstances())
     {
-        auto modeBaseAlias = element.second;
-        if (modeBaseAlias->GetEndpointId() == endpoint)
+        if (modeBaseInstance->GetEndpointId() == endpoint)
         {
-            if (modeBaseAlias->HasFeature(ModeBase::Feature::kOnOff))
+            if (modeBaseInstance->HasFeature(ModeBase::Feature::kOnOff))
             {
-                ModeBase::Instance * modeBaseInstance               = element.second;
                 ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance->GetOnMode();
                 if (!onMode.IsNull())
                 {

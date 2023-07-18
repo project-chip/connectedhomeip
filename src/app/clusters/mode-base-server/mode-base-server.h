@@ -23,7 +23,7 @@
 #include <app/AttributePersistenceProvider.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/util/af.h>
-#include <map>
+#include<set>
 
 namespace chip {
 namespace app {
@@ -245,11 +245,11 @@ public:
     virtual void HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response) = 0;
 };
 
-// This map holds pointers to all initialised ModeBase instances. It provides a way to access all ModeBase clusters.
+// A set of pointers to all initialised ModeBase instances. It provides a way to access all ModeBase derived clusters.
 // todo change once there is a clear public interface for the OnOff cluster data dependencies (#27508)
-static std::map<uint32_t, Instance *> ModeBaseAliasesInstanceMap;
+static std::set<Instance *> ModeBaseAliasesInstances;
 
-std::map<uint32_t, Instance *> GetModeBaseInstances();
+std::set<Instance *> * GetModeBaseInstances();
 
 } // namespace ModeBase
 } // namespace Clusters

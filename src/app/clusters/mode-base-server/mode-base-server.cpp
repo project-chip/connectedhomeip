@@ -162,7 +162,7 @@ CHIP_ERROR Instance::Init()
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(AppInit());
 
-    ModeBaseAliasesInstanceMap[mClusterId] = this;
+    ModeBaseAliasesInstances.insert(this);
 
     // Read the StartUpMode attribute and set the CurrentMode attribute
     if (!mStartUpMode.IsNull())
@@ -473,12 +473,12 @@ bool Instance::IsSupportedMode(uint8_t modeValue)
 
 Instance::~Instance()
 {
-    ModeBaseAliasesInstanceMap.erase(mClusterId);
+    ModeBaseAliasesInstances.erase(this);
 }
 
-std::map<uint32_t, Instance *> GetModeBaseInstances()
+std::set<Instance *> * GetModeBaseInstances()
 {
-    return ModeBaseAliasesInstanceMap;
+    return &ModeBaseAliasesInstances;
 }
 
 } // namespace ModeBase
