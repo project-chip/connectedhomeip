@@ -63,12 +63,25 @@ using PayloadDecoderType = chip::Decoders::PayloadDecoder<64, 256>;
     PayloadEntry entry;
     StringBuilder<128> formatter;
 
+    int unique_idx = 0;
+
     while (decoder.Next(entry))
     {
         switch (entry.GetType())
         {
         case PayloadEntry::IMPayloadType::kNestingEnter:
             formatter.Reset().Add(entry.GetName()); // name gets destroyed by decoding
+
+            while (value.isMember(formatter.c_str()))
+            {
+                formatter.Reset().Add(entry.GetName()).Add(" - ").Add(unique_idx++);
+                if (!formatter.Fit())
+                {
+                    ChipLogError(Automation, "Potential data loss: insufficient space for unique keys in json");
+                    break;
+                }
+            }
+
             value[formatter.c_str()] = GetPayload(decoder);
             break;
         case PayloadEntry::IMPayloadType::kNestingExit:
@@ -84,7 +97,17 @@ using PayloadDecoderType = chip::Decoders::PayloadDecoder<64, 256>;
             value[formatter.Reset().AddFormat("EVNT(%u/%u)", entry.GetClusterId(), entry.GetEventId()).c_str()] = "<NOT_DECODED>";
             continue;
         default:
-            value[entry.GetName()] = entry.GetValueText();
+            formatter.Reset().Add(entry.GetName()); // name gets destroyed by decoding
+            while (value.isMember(formatter.c_str()))
+            {
+                formatter.Reset().Add(entry.GetName()).Add(" - ").Add(unique_idx++);
+                if (!formatter.Fit())
+                {
+                    ChipLogError(Automation, "Potential data loss: insufficient space for unique keys in json");
+                    break;
+                }
+            }
+            value[formatter.c_str()] = entry.GetValueText();
             break;
         }
     }
