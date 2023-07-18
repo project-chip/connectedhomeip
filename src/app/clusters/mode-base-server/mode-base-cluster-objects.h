@@ -42,8 +42,7 @@ struct TypeInfo
     using Type = DataModel::List<const detail::Structs::ModeOptionStruct::Type>;
     using DecodableType =
         DataModel::DecodableList<detail::Structs::ModeOptionStruct::DecodableType>;
-    using DecodableArgType =
-        const DataModel::DecodableList<detail::Structs::ModeOptionStruct::DecodableType> &;
+    using DecodableArgType = DecodableType &;
 
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
@@ -69,7 +68,7 @@ struct TypeInfo
 {
     using Type             = DataModel::Nullable<uint8_t>;
     using DecodableType    = DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
+    using DecodableArgType = const DecodableType &;
 
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
@@ -82,7 +81,7 @@ struct TypeInfo
 {
     using Type             = DataModel::Nullable<uint8_t>;
     using DecodableType    = DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
+    using DecodableArgType = const DecodableType &;
 
     static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
