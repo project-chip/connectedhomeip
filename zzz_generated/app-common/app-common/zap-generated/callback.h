@@ -8797,30 +8797,6 @@ bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
 /**
- * @brief RVC Operational State Cluster Pause Command callback (from client)
- */
-bool emberAfRvcOperationalStateClusterPauseCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RvcOperationalState::Commands::Pause::DecodableType & commandData);
-/**
- * @brief RVC Operational State Cluster Stop Command callback (from client)
- */
-bool emberAfRvcOperationalStateClusterStopCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RvcOperationalState::Commands::Stop::DecodableType & commandData);
-/**
- * @brief RVC Operational State Cluster Start Command callback (from client)
- */
-bool emberAfRvcOperationalStateClusterStartCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RvcOperationalState::Commands::Start::DecodableType & commandData);
-/**
- * @brief RVC Operational State Cluster Resume Command callback (from client)
- */
-bool emberAfRvcOperationalStateClusterResumeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RvcOperationalState::Commands::Resume::DecodableType & commandData);
-/**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */
 bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj,
