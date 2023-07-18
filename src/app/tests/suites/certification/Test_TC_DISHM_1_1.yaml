@@ -60,7 +60,6 @@ tests:
               type: bitmap32
 
     - label: "TH reads AttributeList from DUT"
-      PICS: DISHM.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:

@@ -29,7 +29,7 @@ tests:
 
     - label: "TH reads from the OnMode attribute from DUT"
       verification: |
-          ./chip-tool dishwashermodeselect read on-mode 1 1
+          ./chip-tool dishwashermode read on-mode 1 1
 
           On TH(chip-tool), Verify OnMode attribute value is an integer. Save the value as on_mode_dut and below is the sample log provided for the raspi platform:
 
@@ -47,7 +47,7 @@ tests:
 
     - label: "TH reads the CurrentMode attribute from the DUT"
       verification: |
-          ./chip-tool dishwashermodeselect read current-mode 1 1
+          ./chip-tool dishwashermode read current-mode 1 1
 
           On TH(chip-tool), Verify CurrentMode attribute is an integer. Save the value as old_current_mode_dut and below is the sample log provided for the raspi platform:
 
@@ -67,7 +67,7 @@ tests:
 
     - label: "TH reads the SupportedModes attribute from DUT"
       verification: |
-          ./chip-tool dishwashermodeselect read supported-modes 1 1
+          ./chip-tool dishwashermode read supported-modes 1 1
 
           On TH(chip-tool) log, Verify SupportedModes attribute contains two or more ModeOptionsStruct entries.
           Save the Mode field values as supported_modes_dut.
@@ -128,7 +128,7 @@ tests:
           "TH sends a ChangeToMode command to the DUT with NewMode set to
           new_mode_th"
       verification: |
-          ./chip-tool dishwashermodeselect change-to-mode 2 1 1
+          ./chip-tool dishwashermode change-to-mode 2 1 1
 
           On TH(chip-tool) log, verify DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
 
@@ -190,7 +190,7 @@ tests:
 
     - label: "TH reads the CurrentMode attribute from the DUT"
       verification: |
-          ./chip-tool dishwashermodeselect read current-mode 1 1
+          ./chip-tool dishwashermode read current-mode 1 1
 
           On TH(chip-tool), Verify that CurrentMode attribute value is an integer and value is equal to on_mode_dut. Below is the sample log provided for the raspi platform:
 

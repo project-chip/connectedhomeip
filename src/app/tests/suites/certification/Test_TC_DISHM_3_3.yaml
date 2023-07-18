@@ -34,7 +34,7 @@ tests:
 
           To execute this test case set onmode to any integer value because as default it value has null.
 
-          ./chip-tool dishwashermodeselect write on-mode 4 1 1
+          ./chip-tool dishwashermode write on-mode 4 1 1
       disabled: true
 
     - label: "Wait for the commissioned device to be retrieved"
@@ -47,7 +47,7 @@ tests:
 
     - label: "TH reads from the StartUpMode attribute from DUT"
       verification: |
-          ./chip-tool dishwashermodeselect read start-up-mode 1 1
+          ./chip-tool dishwashermode read start-up-mode 1 1
 
           On TH(chip-tool) log, Verify StartUpMode attribute value is an integer. Save this value as startup_mode_dut and below is the sample log provided for the raspi platform:
 
@@ -66,7 +66,7 @@ tests:
 
     - label: "TH reads from the OnMode attribute from DUT"
       verification: |
-          ./chip-tool dishwashermodeselect read on-mode 1 1
+          ./chip-tool dishwashermode read on-mode 1 1
 
           On TH(chip-tool) log, Verify OnMode attribute value is an integer. Save the value as old_on_mode_dut and below is the sample log provided for the raspi platform:
 
@@ -87,7 +87,7 @@ tests:
 
     - label: "TH reads the SupportedModes attribute from DUT"
       verification: |
-          ./chip-tool dishwashermodeselect read supported-modes 1 1
+          ./chip-tool dishwashermode read supported-modes 1 1
 
           On TH(chip-tool) log, Verify SupportedModes attribute contains two or more ModeOptionsStruct entries.
           Save the Mode field values as supported_modes_dut.
@@ -147,7 +147,7 @@ tests:
     - label:
           "TH writes to the DUT the OnMode attribute with the new_mode_th value"
       verification: |
-          ./chip-tool dishwashermodeselect write on-mode 2 1 1
+          ./chip-tool dishwashermode write on-mode 2 1 1
 
           On TH(chip-tool) log, verify DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
 
@@ -187,7 +187,7 @@ tests:
 
     - label: "TH reads from the OnMode attribute from DUT"
       verification: |
-          ./chip-tool dishwashermodeselect read on-mode 1 1
+          ./chip-tool dishwashermode read on-mode 1 1
 
           On TH(chip-tool) log, Verify OnMode attribute value is an integer and that it is equal to new_mode_th. Save the value as new_on_mode_dut and below is the sample log provided for the raspi platform:
 
@@ -258,7 +258,7 @@ tests:
 
     - label: "TH reads the CurrentMode attribute from the DUT"
       verification: |
-          ./chip-tool dishwashermodeselect read current-mode 1 1
+          ./chip-tool dishwashermode read current-mode 1 1
 
           On TH(chip-tool), Verify CurrentMode attribute value is an integer and that it is equal to new_on_mode_th. Below is the sample log provided for the raspi platform:
 

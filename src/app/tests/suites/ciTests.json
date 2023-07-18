@@ -55,7 +55,7 @@
         "Test_TC_DGETH_2_2"
     ],
     "DiagnosticsLogs": ["Test_TC_DLOG_1_1"],
-    "DishwasherModeSelect": [
+    "DishwasherMode": [
         "Test_TC_DISHM_1_1",
         "Test_TC_DISHM_1_2",
         "Test_TC_DISHM_2_1",
@@ -356,7 +356,7 @@
         "DeviceManagement",
         "Descriptor",
         "DiagnosticsLogs",
-        "DishwasherModeSelect",
+        "DishwasherMode",
         "EthernetNetworkDiagnostics",
         "FlowMeasurement",
         "FixedLabel",
