@@ -37,8 +37,8 @@ import json
 import threading
 import time
 import typing
-from ctypes import (CDLL, CFUNCTYPE, POINTER, byref, c_bool, c_char, c_char_p, c_int, c_size_t, c_uint8, c_uint16, c_uint32,
-                    c_uint64, c_void_p, create_string_buffer, pointer, py_object, resize, string_at)
+from ctypes import (CDLL, CFUNCTYPE, POINTER, byref, c_bool, c_char, c_char_p, c_int, c_int32, c_size_t, c_uint8, c_uint16,
+                    c_uint32, c_uint64, c_void_p, create_string_buffer, pointer, py_object, resize, string_at)
 from dataclasses import dataclass
 
 import dacite
@@ -505,6 +505,11 @@ class ChipDeviceControllerBase():
     def CheckTestCommissionerCallbacks(self):
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_TestCommissioningCallbacks()
+        )
+
+    def CheckStageSuccessful(self, stage: int):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_TestCommissioningStageSuccessful(stage)
         )
 
     def CheckTestCommissionerPaseConnection(self, nodeid):
@@ -1327,6 +1332,25 @@ class ChipDeviceControllerBase():
                 c_char_p, c_char_p]
             self._dmLib.pychip_DeviceController_SetWiFiCredentials.restype = PyChipError
 
+            # Currently only supports 1 list item, no name
+            self._dmLib.pychip_DeviceController_SetTimeZone.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetTimeZone.argtypes = [
+                c_int32, c_uint64]
+
+            # Currently only supports 1 list item
+            self._dmLib.pychip_DeviceController_SetDSTOffset.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetDSTOffset.argtypes = [
+                c_int32, c_uint64, c_uint64]
+
+            self._dmLib.pychip_DeviceController_SetDefaultNtp.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetDefaultNtp.argtypes = [c_char_p]
+
+            self._dmLib.pychip_DeviceController_SetTrustedTimeSource.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetTrustedTimeSource.argtypes = [c_uint64, c_uint16]
+
+            self._dmLib.pychip_DeviceController_ResetCommissioningParameters.restype = PyChipError
+            self._dmLib.pychip_DeviceController_ResetCommissioningParameters.argtypes = []
+
             self._dmLib.pychip_DeviceController_Commission.argtypes = [
                 c_void_p, c_uint64]
             self._dmLib.pychip_DeviceController_Commission.restype = PyChipError
@@ -1450,6 +1474,9 @@ class ChipDeviceControllerBase():
 
             self._dmLib.pychip_TestCommissioningCallbacks.argtypes = []
             self._dmLib.pychip_TestCommissioningCallbacks.restype = c_bool
+
+            self._dmLib.pychip_TestCommissioningStageSuccessful.argtypes = [c_uint8]
+            self._dmLib.pychip_TestCommissioningStageSuccessful.restype = c_bool
 
             self._dmLib.pychip_ResetCommissioningTests.argtypes = []
             self._dmLib.pychip_TestPaseConnection.argtypes = [c_uint64]
@@ -1602,6 +1629,36 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetThreadOperationalDataset(
                 threadOperationalDataset, len(threadOperationalDataset))
+        ).raise_on_error()
+
+    def ResetCommissioningParameters(self):
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_ResetCommissioningParameters()
+        ).raise_on_error()
+
+    def SetTimeZone(self, offset: int, validAt: int):
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetTimeZone(offset, validAt)
+        ).raise_on_error()
+
+    def SetDSTOffset(self, offset: int, validStarting: int, validUntil: int):
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetDSTOffset(offset, validStarting, validUntil)
+        ).raise_on_error()
+
+    def SetDefaultNTP(self, defaultNTP: str):
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetDefaultNtp(defaultNTP.encode("utf-8"))
+        ).raise_on_error()
+
+    def SetTrustedTimeSource(self, nodeId: int, endpoint: int):
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetTrustedTimeSource(nodeId, endpoint)
         ).raise_on_error()
 
     def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,

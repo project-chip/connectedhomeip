@@ -27,6 +27,16 @@ from chip.ChipDeviceCtrl import CommissioningParameters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
+# Commissioning stage numbers - we should find a better way to match these to the C++ code
+kArmFailsafe = 4
+kConfigRegulatory = 5
+kSendPAICertificateRequest = 10
+kSendDACCertificateRequest = 11
+kSendAttestationRequest = 12
+kSendOpCertSigningRequest = 14
+kSendTrustedRootCert = 17
+kSendNOC = 18
+
 
 class TC_CGEN_2_4(MatterBaseTest):
 
@@ -68,22 +78,22 @@ class TC_CGEN_2_4(MatterBaseTest):
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
         self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
-        # Stage 3 = kArmFailsafe, expect General error 0x7e (UNSUPPORTED_ACCESS)
-        await self.CommissionToStageSendCompleteAndCleanup(3, chip.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
-        # Stage 4 = kConfigRegulatory, expect General error 0x7e (UNSUPPORTED_ACCESS)
-        await self.CommissionToStageSendCompleteAndCleanup(4, chip.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
-        # Stage 5 = kSendPAICertificateRequest, expect General error 0x7e (UNSUPPORTED_ACCESS)
-        await self.CommissionToStageSendCompleteAndCleanup(5, chip.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
-        # Stage 6 = kSendDACCertificateRequest, expect General error 0x7e (UNSUPPORTED_ACCESS)
-        await self.CommissionToStageSendCompleteAndCleanup(6, chip.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
-        # Stage 7 = kSendAttestationRequest, expect General error 0x7e (UNSUPPORTED_ACCESS)
-        await self.CommissionToStageSendCompleteAndCleanup(7, chip.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
-        # Stage 9 = kSendOpCertSigningRequest, expect General error 0x7e (UNSUPPORTED_ACCESS)
-        await self.CommissionToStageSendCompleteAndCleanup(9, chip.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
-        # Stage 12 = kSendTrustedRootCert, expect General error 0x7e (UNSUPPORTED_ACCESS)
-        await self.CommissionToStageSendCompleteAndCleanup(12, chip.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
-        # Stage 13 = kSendNOC, expect cluster error InvalidAuthentication
-        await self.CommissionToStageSendCompleteAndCleanup(13, chip.native.ErrorSDKPart.IM_CLUSTER_STATUS, 0x02)
+        # kArmFailsafe, expect General error 0x7e (UNSUPPORTED_ACCESS)
+        await self.CommissionToStageSendCompleteAndCleanup(kArmFailsafe, chip.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
+        # kConfigRegulatory, expect General error 0x7e (UNSUPPORTED_ACCESS)
+        await self.CommissionToStageSendCompleteAndCleanup(kConfigRegulatory, chip.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
+        # kSendPAICertificateRequest, expect General error 0x7e (UNSUPPORTED_ACCESS)
+        await self.CommissionToStageSendCompleteAndCleanup(kSendPAICertificateRequest, chip.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
+        # kSendDACCertificateRequest, expect General error 0x7e (UNSUPPORTED_ACCESS)
+        await self.CommissionToStageSendCompleteAndCleanup(kSendDACCertificateRequest, chip.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
+        # kSendAttestationRequest, expect General error 0x7e (UNSUPPORTED_ACCESS)
+        await self.CommissionToStageSendCompleteAndCleanup(kSendAttestationRequest, chip.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
+        # kSendOpCertSigningRequest, expect General error 0x7e (UNSUPPORTED_ACCESS)
+        await self.CommissionToStageSendCompleteAndCleanup(kSendOpCertSigningRequest, chip.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
+        # kSendTrustedRootCert, expect General error 0x7e (UNSUPPORTED_ACCESS)
+        await self.CommissionToStageSendCompleteAndCleanup(kSendTrustedRootCert, chip.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
+        # kSendNOC, expect cluster error InvalidAuthentication
+        await self.CommissionToStageSendCompleteAndCleanup(kSendNOC, chip.native.ErrorSDKPart.IM_CLUSTER_STATUS, 0x02)
 
         logging.info('Step 15 - TH1 opens a commissioning window')
         params = self.OpenCommissioningWindow()
