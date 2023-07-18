@@ -25,6 +25,7 @@
 #include <app/util/error-mapping.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <optional>
 
 using namespace chip;
 using namespace chip::app;
