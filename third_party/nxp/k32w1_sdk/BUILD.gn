@@ -64,13 +64,6 @@ config("mbedtls_k32w1_config") {
     ]
   }
 
-  if (chip_with_factory_data == 1) {
-    defines += [
-      "MBEDTLS_X509_CRT_PARSE_C",
-      "MBEDTLS_X509_USE_C",
-    ]
-  }
-
   if (chip_crypto == "platform") {
    defines += [
      # "MBEDTLS_CCM_ALT",
