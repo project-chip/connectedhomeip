@@ -27,12 +27,12 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
- #Init
- #Support 00 1011  (11)
- #Mask    00 1001  (9)
- #State   00 1001  (9)
- #Latch   00 1001  (9)
- #FeatureMap 1
+    #Init
+    #Support 00 1011  (11)
+    #Mask    00 1001  (9)
+    #State   00 1001  (9)
+    #Latch   00 1001  (9)
+    #FeatureMap 1
     - label: "Read Supported Attribute"
       command: "readAttribute"
       attribute: "Supported"
@@ -65,11 +65,11 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
- #After Modify Enabled Alarm (Valid)
- #Support 00 1011  (11)
- #Mask    00 0011  (3)
- #State   00 0001  (1)
- #Latch   00 1001  (9)
+    #After Modify Enabled Alarm (Valid)
+    #Support 00 1011  (11)
+    #Mask    00 0011  (3)
+    #State   00 0001  (1)
+    #Latch   00 1001  (9)
     - label: "Modify enabled alarms Command"
       command: "ModifyEnabledAlarms"
       arguments:
@@ -95,11 +95,11 @@ tests:
       response:
           value: 9
 
- #After Modify Enabled Alarm (Invalid)
- #Support 00 1011  (11)
- #Mask    00 0011  (3)
- #State   00 0001  (1)
- #Latch   00 1001  (9)
+    #After Modify Enabled Alarm (Invalid)
+    #Support 00 1011  (11)
+    #Mask    00 0011  (3)
+    #State   00 0001  (1)
+    #Latch   00 1001  (9)
 
     - label: "Modify enabled alarms Command"
       command: "ModifyEnabledAlarms"
@@ -128,11 +128,11 @@ tests:
       response:
           value: 9
 
- #After Reset alarms bit 0
- #Support 00 1011  (11)
- #Mask    00 0011  (3)
- #State   00 0000  (0)
- #Latch   00 1000  (8)
+    #After Reset alarms bit 0
+    #Support 00 1011  (11)
+    #Mask    00 0011  (3)
+    #State   00 0000  (0)
+    #Latch   00 1000  (8)
     - label: "Reset Command"
       command: "Reset"
       arguments:
