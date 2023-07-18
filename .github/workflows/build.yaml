@@ -16,6 +16,11 @@ name: Builds
 
 on:
     merge_group:
+    workflow_run:
+      workflows:
+        - Docker Build
+      types:
+        - completed
     workflow_dispatch:
     workflow_call:
       inputs:
