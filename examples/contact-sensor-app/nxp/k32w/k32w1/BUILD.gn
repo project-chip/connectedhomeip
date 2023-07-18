@@ -84,6 +84,13 @@ k32w1_executable("contact_sensor_app") {
     "main/main.cpp",
   ]
 
+  if (chip_enable_icd_subscription_handle) {
+    sources += [
+      "${chip_root}/examples/platform/nxp/common/icd/ICDSubscriptionCallback.cpp",
+      "${chip_root}/examples/platform/nxp/common/icd/ICDSubscriptionCallback.h",
+    ]
+  }
+
   deps = [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
@@ -122,11 +129,16 @@ k32w1_executable("contact_sensor_app") {
     "-Wl,--defsym=gNvmSectors=8",
     "-Wl,--defsym=lp_ram_lower_limit=0x04000000",
     "-Wl,--defsym=lp_ram_upper_limit=0x2001C000",
-    "-Wl,--defsym=gUseFactoryData_d=1",
     "-Wl,-print-memory-usage",
     "-Wl,--no-warn-rwx-segments",
     "-T" + rebase_path(ldscript, root_build_dir),
   ]
+
+  if (chip_with_factory_data == 1) {
+    ldflags += [
+      "-Wl,--defsym=gUseFactoryData_d=1"
+    ]
+  }
 
   output_dir = root_out_dir
 }
