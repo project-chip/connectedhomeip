@@ -2,3 +2,4 @@ shell
 lock-app
 tv-app
 all-clusters-app
+ota-requestor-app
