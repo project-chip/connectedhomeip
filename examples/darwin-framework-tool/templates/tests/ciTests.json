@@ -35,6 +35,8 @@
         "TestOperationalState",
         "Disabled due to TemperatureControl not being enabled in Matter.framework for now:",
         "TestTemperatureControl",
+        "Disabled due to RVCOperationalState not being enabled in Matter.framework for now:",
+        "TestRVCOperationalState",
         "Disabled due to using ICD Management (ICDManagement) cluster, which is provisional on Darwin for now:",
         "TestIcdManagementCluster",
         "Test_TC_ICDM_1_1",
