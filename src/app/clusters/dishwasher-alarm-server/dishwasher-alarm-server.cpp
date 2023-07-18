@@ -26,6 +26,7 @@
 #include <app/util/error-mapping.h>
 #include <lib/support/BitFlags.h>
 
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -33,8 +34,42 @@ using namespace chip::app::Clusters::DishwasherAlarm;
 using namespace chip::app::Clusters::DishwasherAlarm::Attributes;
 using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
-
 using namespace std;
+
+constexpr size_t kDishwasherAlarmDelegateTableSize =
+    EMBER_AF_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
+static_assert(kDishwasherAlarmDelegateTableSize <= kEmberInvalidEndpointIndex, "Dishwasher Alarm Delegate table size error");
+
+static Delegate * gDelegateTable[kDishwasherAlarmDelegateTableSize] = { nullptr };
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DishwasherAlarm {
+
+Delegate * GetDelegate(EndpointId endpoint)
+{
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, DishwasherAlarm::Id, EMBER_AF_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kDishwasherAlarmDelegateTableSize ? nullptr : gDelegateTable[ep]);
+}
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+{
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, DishwasherAlarm::Id, EMBER_AF_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT);
+    // if endpoint is found
+    if (ep < kDishwasherAlarmDelegateTableSize)
+    {
+        gDelegateTable[ep] = delegate;
+    }
+}
+
+} // namespace DishwasherAlarm
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 DishwasherAlarmServer DishwasherAlarmServer::instance;
 
@@ -279,9 +314,15 @@ static Status modifyEnabledHandler(const app::ConcreteCommandPath & commandPath,
         return Status::InvalidCommand;
     }
 
-    // TODO: A server that is unable to enable a currently suppressed alarm,
+    // A server that is unable to enable a currently suppressed alarm,
     // or is unable to suppress a currently enabled alarm SHALL respond
     // with a status code of FAILURE
+    Delegate * delegate = DishwasherAlarm::GetDelegate(endpoint);
+    if(delegate && !(delegate->ModifyEnableAlarmsCallback(mask)))
+    {
+        ChipLogProgress(Zcl, "Unable to modify enabled alarms");
+        return Status::Failure;
+    }
 
     if (DishwasherAlarmServer::Instance().SetMaskValue(endpoint, mask) != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -296,7 +337,13 @@ static Status ResetHandler(const app::ConcreteCommandPath & commandPath, const c
     EndpointId endpoint = commandPath.mEndpointId;
     chip::BitMask<AlarmMap> newState;
 
-    //TODO: check whether alarm definition requires manual intervention
+    //check whether alarm definition requires manual intervention
+    Delegate * delegate = DishwasherAlarm::GetDelegate(endpoint);
+    if(delegate && delegate->ResetAlarmsCallback(alarms))
+    {
+        ChipLogProgress(Zcl, "The alarm definition requires manual intervention");
+        return Status::Failure;
+    }
 
     //If the feature is true, the latch operation can only be performed
     if (DishwasherAlarmServer::Instance().HasAlarmFeature(endpoint))

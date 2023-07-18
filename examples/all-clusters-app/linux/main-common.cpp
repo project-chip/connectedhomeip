@@ -54,6 +54,9 @@ chip::app::Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManage
 #ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
 extern void MatterOperationalStateServerInit();
 #endif
+#ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
+extern void MatterDishwasherAlarmServerInit();
+#endif
 
 void OnIdentifyStart(::Identify *)
 {
@@ -173,6 +176,10 @@ void ApplicationInit()
     }
 #ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
     MatterOperationalStateServerInit();
+#endif
+
+#ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
+    MatterDishwasherAlarmServerInit();
 #endif
 }
 

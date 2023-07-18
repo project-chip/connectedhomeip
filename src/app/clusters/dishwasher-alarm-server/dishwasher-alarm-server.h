@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "dishwasher-alarm-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
@@ -60,6 +61,9 @@ private:
                          BitMask<AlarmMap> newState,
                          BitMask<AlarmMap> mask);
 };
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
 } // namespace DishwasherAlarm
 } // namespace Clusters
 } // namespace app
