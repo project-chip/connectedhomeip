@@ -26,35 +26,30 @@ jobs:
     docker_build:
         name: Docker Build
         uses: ./.github/workflows/docker_img.yaml
-    # example_matrix:
-    #     needs: [docker_build]
-    #     runs-on: ubuntu-latest
-    #     steps:
-    #       - uses: ./.github/workflows/build.yaml
-    # builds:
-    #     needs: [docker_build]
-    #     uses: ./.github/workflows/build.yaml
-    # minimal_build:
-    #     needs: [docker_build]
-    #     uses: ./.github/workflows/minimal-build.yaml
-    # chef:
-    #     needs: [docker_build]
-    #     uses: ./.github/workflows/chef.yaml
-    # examples:
-    #     needs: [docker_build]
-    #     uses: ./.github/workflows/examples-all.yaml
-    # tests:
-    #     needs: [docker_build]
-    #     uses: ./.github/workflows/tests-all.yaml
-    # lint:
-    #     needs: [docker_build]
-    #     uses: ./.github/workflows/lint.yml
-    # android_main_only:
-    #     needs: [docker_build]
-    #     uses: ./.github/workflows/full-android.yaml
-    # zap:
-    #     needs: [docker_build]
-    #     uses: ./.github/workflows/zap_templates.yaml
-    # doxygen:
-    #     needs: [docker_build]
-    #     uses: ./.github/workflows/doxygen.yaml
+    builds:
+        needs: [docker_build]
+        uses: ./.github/workflows/build.yaml
+    minimal_build:
+        needs: [docker_build]
+        uses: ./.github/workflows/minimal-build.yaml
+    chef:
+        needs: [docker_build]
+        uses: ./.github/workflows/chef.yaml
+    examples:
+        needs: [docker_build]
+        uses: ./.github/workflows/examples-all.yaml
+    tests:
+        needs: [docker_build]
+        uses: ./.github/workflows/tests-all.yaml
+    lint:
+        needs: [docker_build]
+        uses: ./.github/workflows/lint.yml
+    android_main_only:
+        needs: [docker_build]
+        uses: ./.github/workflows/full-android.yaml
+    zap:
+        needs: [docker_build]
+        uses: ./.github/workflows/zap_templates.yaml
+    doxygen:
+        needs: [docker_build]
+        uses: ./.github/workflows/doxygen.yaml
