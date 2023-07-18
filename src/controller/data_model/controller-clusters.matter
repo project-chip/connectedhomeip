@@ -3469,6 +3469,7 @@ client cluster HepaFilterMonitoring = 113 {
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+    kReplacementProductList = 0x3;
   }
 
   struct ReplacementProductStruct {
@@ -3481,7 +3482,7 @@ client cluster HepaFilterMonitoring = 113 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   attribute optional nullable epoch_s lastChangedTime = 4;
-  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
+  readonly attribute optional nullable ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3517,6 +3518,7 @@ client cluster ActivatedCarbonFilterMonitoring = 114 {
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+    kReplacementProductList = 0x3;
   }
 
   struct ReplacementProductStruct {
@@ -3529,7 +3531,7 @@ client cluster ActivatedCarbonFilterMonitoring = 114 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   attribute optional nullable epoch_s lastChangedTime = 4;
-  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
+  readonly attribute optional nullable ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

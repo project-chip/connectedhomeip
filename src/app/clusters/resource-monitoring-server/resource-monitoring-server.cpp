@@ -123,6 +123,11 @@ chip::Protocols::InteractionModel::Status Instance::UpdateLastChangedTime(DataMo
     return Protocols::InteractionModel::Status::Success;
 }
 
+void Instance::SetReplacementProductListManagerInstance(ReplacementProductListManager * aReplacementProductListManager)
+{
+    mReplacementProductListManager = aReplacementProductListManager;
+}
+
 uint8_t Instance::GetCondition() const
 {
     return mCondition;
@@ -145,6 +150,11 @@ bool Instance::GetInPlaceIndicator() const
 DataModel::Nullable<uint32_t> Instance::GetLastChangedTime() const
 {
     return mLastChangedTime;
+}
+
+ReplacementProductListManager * Instance::GetReplacementProductListManagerInstance()
+{
+    return mReplacementProductListManager;
 }
 
 Status Instance::OnResetCondition()
@@ -232,6 +242,32 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
+{
+    CHIP_ERROR err;
+    if (Instance::HasFeature(ResourceMonitoring::Feature::kReplacementProductList))
+    {
+        ReplacementProductListManager * instance = Instance::GetReplacementProductListManagerInstance();
+        if (nullptr == instance)
+        {
+            aEncoder.EncodeEmptyList();
+            return CHIP_NO_ERROR;
+        }
+
+        instance->Reset();
+
+        err = aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+            Attributes::ReplacementProductStruct::Type replacementProductStruct;
+            while (instance->Next(replacementProductStruct) == CHIP_NO_ERROR)
+            {
+                ReturnErrorOnFailure(encoder.Encode(replacementProductStruct));
+            }
+            return CHIP_NO_ERROR;
+        });
+    }
+    return CHIP_NO_ERROR;
+}
+
 // Implements the read functionality for non-standard attributes.
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -259,6 +295,10 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     }
     case Attributes::LastChangedTime::Id: {
         ReturnErrorOnFailure(aEncoder.Encode(mLastChangedTime));
+        break;
+    }
+    case Attributes::ReplacementProductList::Id: {
+        return ReadReplacableProductList(aEncoder);
         break;
     }
     }

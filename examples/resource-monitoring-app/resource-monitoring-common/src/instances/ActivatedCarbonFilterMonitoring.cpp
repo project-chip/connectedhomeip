@@ -22,20 +22,39 @@
 #include <app/data-model/Nullable.h>
 #include <app/util/endpoint-config-api.h>
 #include <instances/ActivatedCarbonFilterMonitoring.h>
+#include <instances/StaticReplacementProductListManager.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemClock.h>
+
+#define ACTIVATED_CARBON_FILTER_REPLACEMENT_PRODUCT_LIST_SIZE 3
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ActivatedCarbonFilterMonitoring;
 using namespace chip::app::Clusters::ResourceMonitoring;
 using chip::Protocols::InteractionModel::Status;
 
-//-- Hepa filter Monitoring Instance methods
+static ResourceMonitoring::Attributes::ReplacementProductStruct::Type
+    sActivatedCarbonFilterReplacementProductsList[ACTIVATED_CARBON_FILTER_REPLACEMENT_PRODUCT_LIST_SIZE];
+StaticReplacementProductListManager
+    sActivatedCarbonFilterReplacementProductListManager(&sActivatedCarbonFilterReplacementProductsList[0],
+                                                        ACTIVATED_CARBON_FILTER_REPLACEMENT_PRODUCT_LIST_SIZE);
+
+//-- Activated carbon filter Monitoring Instance methods
 CHIP_ERROR ActivatedCarbonFilterMonitoringInstance::AppInit()
 {
     ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringDelegate::Init()");
+
+    sActivatedCarbonFilterReplacementProductsList[0].productIdentifierType  = ProductIdentifierTypeEnum::kUpc;
+    sActivatedCarbonFilterReplacementProductsList[0].productIdentifierValue = "upc12xcarbon";
+    sActivatedCarbonFilterReplacementProductsList[1].productIdentifierType  = ProductIdentifierTypeEnum::kGtin8;
+    sActivatedCarbonFilterReplacementProductsList[1].productIdentifierValue = "gtin8xca";
+    sActivatedCarbonFilterReplacementProductsList[2].productIdentifierType  = ProductIdentifierTypeEnum::kEan;
+    sActivatedCarbonFilterReplacementProductsList[2].productIdentifierValue = "ean13xacarbon";
+
+    SetReplacementProductListManagerInstance(&sActivatedCarbonFilterReplacementProductListManager);
+
     return CHIP_NO_ERROR;
 }
 

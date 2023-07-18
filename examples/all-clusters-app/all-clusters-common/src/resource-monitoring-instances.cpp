@@ -28,11 +28,13 @@ using namespace chip::app::Clusters::ResourceMonitoring;
 using chip::Protocols::InteractionModel::Status;
 
 constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
-                                                static_cast<uint32_t>(Feature::kWarning) };
+                                                static_cast<uint32_t>(Feature::kWarning) |
+                                                static_cast<uint32_t>(Feature::kReplacementProductList) };
 constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
-                                                     static_cast<uint32_t>(Feature::kWarning) };
+                                                     static_cast<uint32_t>(Feature::kWarning) |
+                                                     static_cast<uint32_t>(Feature::kReplacementProductList) };
 
-static HepaFilterMonitoringInstance * gHepafilterInstance                       = nullptr;
+static HepaFilterMonitoringInstance * gHepaFilterInstance                       = nullptr;
 static ActivatedCarbonFilterMonitoringInstance * gActivatedCarbonFilterInstance = nullptr;
 
 //-- Activated Carbon Filter Monitoring Instance methods
@@ -82,8 +84,7 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
 }
 void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 {
-    VerifyOrDie(gActivatedCarbonFilterInstance == nullptr);
-    gHepafilterInstance = new HepaFilterMonitoringInstance(endpoint, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
+    gHepaFilterInstance = new HepaFilterMonitoringInstance(endpoint, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                                                            DegradationDirectionEnum::kDown, true);
-    gHepafilterInstance->Init();
+    gHepaFilterInstance->Init();
 }

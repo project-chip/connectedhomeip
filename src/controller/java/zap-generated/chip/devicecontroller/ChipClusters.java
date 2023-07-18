@@ -17419,7 +17419,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
       public interface ReplacementProductListAttributeCallback {
-        void onSuccess( List<ChipStructs.HepaFilterMonitoringClusterReplacementProductStruct> valueList);
+        void onSuccess(@Nullable List<ChipStructs.HepaFilterMonitoringClusterReplacementProductStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
@@ -17712,7 +17712,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
       public interface ReplacementProductListAttributeCallback {
-        void onSuccess( List<ChipStructs.ActivatedCarbonFilterMonitoringClusterReplacementProductStruct> valueList);
+        void onSuccess(@Nullable List<ChipStructs.ActivatedCarbonFilterMonitoringClusterReplacementProductStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }

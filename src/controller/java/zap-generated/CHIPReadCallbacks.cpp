@@ -25676,8 +25676,8 @@ CHIPHepaFilterMonitoringReplacementProductListAttributeCallback::~CHIPHepaFilter
 
 void CHIPHepaFilterMonitoringReplacementProductListAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & list)
+    const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -25699,43 +25699,50 @@ void CHIPHepaFilterMonitoringReplacementProductListAttributeCallback::CallbackFn
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject arrayListObj;
-    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-
-    auto iter_arrayListObj_0 = list.begin();
-    while (iter_arrayListObj_0.Next())
+    if (list.IsNull())
     {
-        auto & entry_0 = iter_arrayListObj_0.GetValue();
-        jobject newElement_0;
-        jobject newElement_0_productIdentifierType;
-        std::string newElement_0_productIdentifierTypeClassName     = "java/lang/Integer";
-        std::string newElement_0_productIdentifierTypeCtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-            newElement_0_productIdentifierTypeClassName.c_str(), newElement_0_productIdentifierTypeCtorSignature.c_str(),
-            static_cast<uint8_t>(entry_0.productIdentifierType), newElement_0_productIdentifierType);
-        jobject newElement_0_productIdentifierValue;
-        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.productIdentifierValue,
-                                                                             newElement_0_productIdentifierValue));
+        arrayListObj = nullptr;
+    }
+    else
+    {
+        chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-        jclass replacementProductStructStructClass_1;
-        err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$HepaFilterMonitoringClusterReplacementProductStruct",
-            replacementProductStructStructClass_1);
-        if (err != CHIP_NO_ERROR)
+        auto iter_arrayListObj_1 = list.Value().begin();
+        while (iter_arrayListObj_1.Next())
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$HepaFilterMonitoringClusterReplacementProductStruct");
-            return;
-        }
-        jmethodID replacementProductStructStructCtor_1 =
-            env->GetMethodID(replacementProductStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
-        if (replacementProductStructStructCtor_1 == nullptr)
-        {
-            ChipLogError(Zcl, "Could not find ChipStructs$HepaFilterMonitoringClusterReplacementProductStruct constructor");
-            return;
-        }
+            auto & entry_1 = iter_arrayListObj_1.GetValue();
+            jobject newElement_1;
+            jobject newElement_1_productIdentifierType;
+            std::string newElement_1_productIdentifierTypeClassName     = "java/lang/Integer";
+            std::string newElement_1_productIdentifierTypeCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                newElement_1_productIdentifierTypeClassName.c_str(), newElement_1_productIdentifierTypeCtorSignature.c_str(),
+                static_cast<uint8_t>(entry_1.productIdentifierType), newElement_1_productIdentifierType);
+            jobject newElement_1_productIdentifierValue;
+            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_1.productIdentifierValue,
+                                                                                 newElement_1_productIdentifierValue));
 
-        newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1,
-                                      newElement_0_productIdentifierType, newElement_0_productIdentifierValue);
-        chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
+            jclass replacementProductStructStructClass_2;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$HepaFilterMonitoringClusterReplacementProductStruct",
+                replacementProductStructStructClass_2);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipStructs$HepaFilterMonitoringClusterReplacementProductStruct");
+                return;
+            }
+            jmethodID replacementProductStructStructCtor_2 =
+                env->GetMethodID(replacementProductStructStructClass_2, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
+            if (replacementProductStructStructCtor_2 == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipStructs$HepaFilterMonitoringClusterReplacementProductStruct constructor");
+                return;
+            }
+
+            newElement_1 = env->NewObject(replacementProductStructStructClass_2, replacementProductStructStructCtor_2,
+                                          newElement_1_productIdentifierType, newElement_1_productIdentifierValue);
+            chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_1);
+        }
     }
 
     env->ExceptionClear();
@@ -26128,8 +26135,8 @@ CHIPActivatedCarbonFilterMonitoringReplacementProductListAttributeCallback::
 
 void CHIPActivatedCarbonFilterMonitoringReplacementProductListAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & list)
+    const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -26152,44 +26159,52 @@ void CHIPActivatedCarbonFilterMonitoringReplacementProductListAttributeCallback:
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject arrayListObj;
-    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-
-    auto iter_arrayListObj_0 = list.begin();
-    while (iter_arrayListObj_0.Next())
+    if (list.IsNull())
     {
-        auto & entry_0 = iter_arrayListObj_0.GetValue();
-        jobject newElement_0;
-        jobject newElement_0_productIdentifierType;
-        std::string newElement_0_productIdentifierTypeClassName     = "java/lang/Integer";
-        std::string newElement_0_productIdentifierTypeCtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-            newElement_0_productIdentifierTypeClassName.c_str(), newElement_0_productIdentifierTypeCtorSignature.c_str(),
-            static_cast<uint8_t>(entry_0.productIdentifierType), newElement_0_productIdentifierType);
-        jobject newElement_0_productIdentifierValue;
-        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.productIdentifierValue,
-                                                                             newElement_0_productIdentifierValue));
+        arrayListObj = nullptr;
+    }
+    else
+    {
+        chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-        jclass replacementProductStructStructClass_1;
-        err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$ActivatedCarbonFilterMonitoringClusterReplacementProductStruct",
-            replacementProductStructStructClass_1);
-        if (err != CHIP_NO_ERROR)
+        auto iter_arrayListObj_1 = list.Value().begin();
+        while (iter_arrayListObj_1.Next())
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$ActivatedCarbonFilterMonitoringClusterReplacementProductStruct");
-            return;
-        }
-        jmethodID replacementProductStructStructCtor_1 =
-            env->GetMethodID(replacementProductStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
-        if (replacementProductStructStructCtor_1 == nullptr)
-        {
-            ChipLogError(Zcl,
-                         "Could not find ChipStructs$ActivatedCarbonFilterMonitoringClusterReplacementProductStruct constructor");
-            return;
-        }
+            auto & entry_1 = iter_arrayListObj_1.GetValue();
+            jobject newElement_1;
+            jobject newElement_1_productIdentifierType;
+            std::string newElement_1_productIdentifierTypeClassName     = "java/lang/Integer";
+            std::string newElement_1_productIdentifierTypeCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                newElement_1_productIdentifierTypeClassName.c_str(), newElement_1_productIdentifierTypeCtorSignature.c_str(),
+                static_cast<uint8_t>(entry_1.productIdentifierType), newElement_1_productIdentifierType);
+            jobject newElement_1_productIdentifierValue;
+            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_1.productIdentifierValue,
+                                                                                 newElement_1_productIdentifierValue));
 
-        newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1,
-                                      newElement_0_productIdentifierType, newElement_0_productIdentifierValue);
-        chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
+            jclass replacementProductStructStructClass_2;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$ActivatedCarbonFilterMonitoringClusterReplacementProductStruct",
+                replacementProductStructStructClass_2);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl,
+                             "Could not find class ChipStructs$ActivatedCarbonFilterMonitoringClusterReplacementProductStruct");
+                return;
+            }
+            jmethodID replacementProductStructStructCtor_2 =
+                env->GetMethodID(replacementProductStructStructClass_2, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
+            if (replacementProductStructStructCtor_2 == nullptr)
+            {
+                ChipLogError(
+                    Zcl, "Could not find ChipStructs$ActivatedCarbonFilterMonitoringClusterReplacementProductStruct constructor");
+                return;
+            }
+
+            newElement_1 = env->NewObject(replacementProductStructStructClass_2, replacementProductStructStructCtor_2,
+                                          newElement_1_productIdentifierType, newElement_1_productIdentifierValue);
+            chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_1);
+        }
     }
 
     env->ExceptionClear();
