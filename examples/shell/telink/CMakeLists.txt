@@ -61,8 +61,8 @@ target_include_directories(app PRIVATE
                            include
                            ${GEN_DIR}/app-common
                            ${APP_ROOT}/shell_common/include
-                           #${TELINK_COMMON}/common/include
-                           #${TELINK_COMMON}/util/include
+                           ${TELINK_COMMON}/common/include
+                           ${TELINK_COMMON}/util/include
                            )
 
 add_definitions(
@@ -70,17 +70,17 @@ add_definitions(
 )
 
 target_sources(app PRIVATE
-               #src/AppTask.cpp
+               src/AppTask.cpp
                #${TELINK_COMMON}/common/src/mainCommon.cpp
                #${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                #${TELINK_COMMON}/util/src/LEDWidget.cpp
                #${TELINK_COMMON}/util/src/ButtonManager.cpp
-               #${TELINK_COMMON}/util/src/ThreadUtil.cpp
+               ${TELINK_COMMON}/util/src/ThreadUtil.cpp
                #${TELINK_COMMON}/util/src/PWMDevice.cpp
                ${APP_ROOT}/shell_common/globals.cpp
                ${APP_ROOT}/shell_common/cmd_misc.cpp
                ${APP_ROOT}/shell_common/cmd_otcli.cpp
-               ${APP_ROOT}/standalone/main.cpp
+#               ${APP_ROOT}/standalone/main.cpp
                )
 
 # chip_configure_data_model(app

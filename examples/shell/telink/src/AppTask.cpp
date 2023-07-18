@@ -20,44 +20,32 @@
 #include "platform/CHIPDeviceLayer.h"
 #include <lib/core/CHIPError.h>
 
+#include <lib/shell/Engine.h>
+
+using chip::Shell::Engine;
+
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
+    CHIP_ERROR ret = CHIP_NO_ERROR;
 
     InitCommonParts();
 
-    // CHIP_ERROR err = AlarmMgr().Init();
-    // if (err != CHIP_NO_ERROR)
-    // {
-    //     LOG_ERR("AlarmMgr::Init() failed");
-    //     return err;
-    // }
+    Engine::Root().Init();
 
-    // CHIP_ERROR err = ConnectivityMgr().SetBLEDeviceName("TelinkCOSensor");
-    // if (err != CHIP_NO_ERROR)
-    // {
-    //     LOG_ERR("SetBLEDeviceName fail");
-    //     return err;
-    // }
+    ret = ThreadStackMgrImpl().StartThreadTask();
+    if (ret != CHIP_NO_ERROR)
+    {
+        while (true)
+            ;
+    }
+
+    Engine::Root().RunMainLoop();
 
     return CHIP_NO_ERROR;
 }
 
-// void AppTask::SelfTestHandler(AppEvent * aEvent)
-// {
-//     AlarmMgr().StartSelfTesting();
-// }
 
-// void AppTask::SelfTestEventHandler(AppEvent * aEvent)
-// {
-//     AppEvent event;
-//     if (aEvent->Type == AppEvent::kEventType_Button)
-//     {
-//         event.ButtonEvent.Action = kButtonPushEvent;
-//         event.Handler            = SelfTestHandler;
-//         GetAppTask().PostEvent(&event);
-//     }
-// }
