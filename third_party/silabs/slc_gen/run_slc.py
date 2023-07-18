@@ -4,7 +4,7 @@ import os
 import subprocess
 import sys
 
-if len(sys.argv) != 8:
+if len(sys.argv) != 9:
     print("wrong number of arguments")
     sys.exit(1)
 

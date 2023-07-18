@@ -48,9 +48,6 @@ declare_args() {
 declare_args() {
   # Enables LCD Qr Code on supported devices
   show_qr_code = !disable_lcd
-
-  # board related generated files path (used if slc_generate or slc_reuse_files is set)
-  slc_gen_path = "${chip_root}/third_party/silabs/slc_gen/${silabs_board}/"
 }
 
 if (silabs_board == "") {

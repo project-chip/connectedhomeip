@@ -75,6 +75,9 @@ declare_args() {
   # board related pre-generated files path (default)
   sl_pre_gen_path =
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/"
+
+  # board related generated files path (used if slc_generate or slc_reuse_files is set)
+  slc_gen_path = "${chip_root}/third_party/silabs/slc_gen/${silabs_board}/"
 }
 
 if (slc_generate || slc_reuse_files) {
