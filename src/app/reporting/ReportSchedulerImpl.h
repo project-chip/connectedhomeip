@@ -40,7 +40,7 @@ public:
 
     bool IsReportScheduled(ReadHandler * aReadHandler);
 
-    void ReportTimerCallback();
+    void ReportTimerCallback() override;
 
 protected:
     virtual CHIP_ERROR ScheduleReport(Timeout timeout, ReadHandlerNode * node);

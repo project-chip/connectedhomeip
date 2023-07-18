@@ -56,14 +56,12 @@ public:
     class ReadHandlerNode : public IntrusiveListNodeBase<>
     {
     public:
-        using TimerCompleteCallback = std::function<void()>;
-
-        ReadHandlerNode(ReadHandler * aReadHandler, TimerDelegate * aTimerDelegate, TimerCompleteCallback aCallback) :
-            mTimerDelegate(aTimerDelegate), mCallback(aCallback)
+        ReadHandlerNode(ReadHandler * aReadHandler, TimerDelegate * aTimerDelegate, ReportScheduler * aScheduler) :
+            mTimerDelegate(aTimerDelegate), mScheduler(aScheduler)
         {
             VerifyOrDie(aReadHandler != nullptr);
             VerifyOrDie(aTimerDelegate != nullptr);
-            VerifyOrDie(aCallback != nullptr);
+            VerifyOrDie(aScheduler != nullptr);
 
             mReadHandler = aReadHandler;
             SetIntervalTimeStamps(aReadHandler);
@@ -96,7 +94,7 @@ public:
 
         void RunCallback()
         {
-            mCallback();
+            mScheduler->ReportTimerCallback();
             SetEngineRunScheduled(true);
         }
 
@@ -113,8 +111,8 @@ public:
 
     private:
         TimerDelegate * mTimerDelegate;
-        TimerCompleteCallback mCallback;
         ReadHandler * mReadHandler;
+        ReportScheduler * mScheduler;
         Timestamp mMinTimestamp;
         Timestamp mMaxTimestamp;
         Timestamp mSyncTimestamp; // Timestamp at which the read handler will be allowed to emit a report so it can be synced with
@@ -128,6 +126,8 @@ public:
      *  Interface to act on changes in the ReadHandler reportability
      */
     virtual ~ReportScheduler() = default;
+
+    virtual void ReportTimerCallback() = 0;
 
     /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
     /// @param aReadHandler read handler to check

@@ -40,7 +40,7 @@ public:
 
     bool IsReportScheduled();
 
-    void ReportTimerCallback();
+    void ReportTimerCallback() override;
 
 protected:
     CHIP_ERROR ScheduleReport(System::Clock::Timeout timeout, ReadHandlerNode * node) override;

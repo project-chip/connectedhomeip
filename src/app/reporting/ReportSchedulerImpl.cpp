@@ -45,7 +45,7 @@ void ReportSchedulerImpl::OnReadHandlerCreated(ReadHandler * aReadHandler)
     VerifyOrDie(nullptr == newNode);
     // The NodePool is the same size as the ReadHandler pool from the IM Engine, so we don't need a check for size here since if a
     // ReadHandler was created, space should be available.
-    newNode = mNodesPool.CreateObject(aReadHandler, mTimerDelegate, [this]() { this->ReportTimerCallback(); });
+    newNode = mNodesPool.CreateObject(aReadHandler, mTimerDelegate, this);
     mReadHandlerList.PushBack(newNode);
 
     ChipLogProgress(DataManagement,
