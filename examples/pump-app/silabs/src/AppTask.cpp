@@ -102,7 +102,7 @@ CHIP_ERROR AppTask::Init()
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
-    // GetLCD().WriteDemoUI(LightMgr().IsLightOn());
+    GetLCD().WriteDemoUI(!PumpMgr().IsStopped());
 #ifdef QR_CODE_ENABLED
 #ifdef SL_WIFI
     if (!ConnectivityMgr().IsWiFiStationProvisioned())
@@ -245,7 +245,7 @@ void AppTask::UpdateClusterState(intptr_t context)
     // Set On/Off state
     EmberStatus status;
     bool onOffState = !PumpMgr().IsStopped();
-    status          = chip::app::Clusters::OnOff::Attributes::OnOff::Set(1, onOffState);
+    status          = chip::app::Clusters::OnOff::Attributes::OnOff::Set(PCC_CLUSTER_ENDPOINT, onOffState);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Updating On/Off state  %x", status);

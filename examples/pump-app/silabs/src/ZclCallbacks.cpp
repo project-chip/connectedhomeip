@@ -35,7 +35,7 @@ void OnLevelControlPostAttributeChangeCallback(EndpointId endpointId, AttributeI
 /***** Helper functions *****/
 void OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> pumpStatus;
+    BitMask<PumpConfigurationAndControl::PumpStatusBitmap> pumpStatus;
 
     VerifyOrExit(attributeId == OnOff::Attributes::OnOff::Id,
                  ChipLogError(NotSpecified, "Unhandled Attribute ID: '0x%04lx", attributeId));
@@ -54,16 +54,16 @@ void OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attri
 
     // Adjust PumpStatus attribute
     ChipLogProgress(Zcl, "[pump-app] Adjust PumpStatus attribute");
-    chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::Get(PCC_CLUSTER_ENDPOINT, &pumpStatus);
+    PumpConfigurationAndControl::Attributes::PumpStatus::Get(PCC_CLUSTER_ENDPOINT, &pumpStatus);
     if (PumpMgr().IsStopped())
     {
-        pumpStatus.Clear(chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap::kRunning);
+        pumpStatus.Clear(PumpConfigurationAndControl::PumpStatusBitmap::kRunning);
     }
     else
     {
-        pumpStatus.Set(chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap::kRunning);
+        pumpStatus.Set(PumpConfigurationAndControl::PumpStatusBitmap::kRunning);
     }
-    chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::Set(PCC_CLUSTER_ENDPOINT, pumpStatus);
+    PumpConfigurationAndControl::Attributes::PumpStatus::Set(PCC_CLUSTER_ENDPOINT, pumpStatus);
 
 exit:
     return;
