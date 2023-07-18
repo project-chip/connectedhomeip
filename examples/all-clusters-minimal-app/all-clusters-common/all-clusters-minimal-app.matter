@@ -287,6 +287,7 @@ server cluster OnOff = 6 {
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
   bitmap OnOffControl : BITMAP8 {
@@ -4209,7 +4210,7 @@ endpoint 1 {
   server cluster OnOff {
     persist  attribute onOff default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster LevelControl {
@@ -4594,7 +4595,7 @@ endpoint 2 {
   server cluster OnOff {
     ram      attribute onOff default = 0x00;
     ram      attribute featureMap default = 0x0000;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster Descriptor {
