@@ -50,6 +50,7 @@ echo ""
 
 echo "Rolling workflows"
 sed -r -i "s|image: ghcr\.io/project-chip/(.*):[0-9,a-z,A-Z,-]*(\..*)?|image: ghcr.io/project-chip/\1:$NEXT_VERSION|" .github/workflows/*.yaml
+sed -r -i "s|image: ghcr\.io/project-chip/(.*):[0-9,a-z,A-Z,-]*(\..*)?|image: ghcr.io/project-chip/\1:$NEXT_VERSION|" .github/workflows/*.yml
 
 echo "Rolling VSCode container"
 sed -r -i "s|matter-dev-environment:local --version [0-9,a-z,A-Z,-]*|matter-dev-environment:local --version $NEXT_VERSION|" .devcontainer/devcontainer.json
