@@ -29,15 +29,10 @@ class DishwasherAlarmServer
 public:
     static DishwasherAlarmServer & Instance();
 
-    void ResetCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
-
     EmberAfStatus GetMaskValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * mask);
     EmberAfStatus GetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * state);
     EmberAfStatus GetLatchValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * latch);
     EmberAfStatus GetSupportedValue(chip::EndpointId endpoint,chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * suppported);
-
-
-    bool HasSupportsLatch(chip::EndpointId endpoint);
 
     // Whenever there is change on Mask we should change State accordingly.
     EmberAfStatus SetMaskValue(chip::EndpointId endpoint, const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> mask);
@@ -46,8 +41,12 @@ public:
                                 const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> newState);
     EmberAfStatus SetLatchValue(chip::EndpointId endpoint,
                                const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> latch);
+    // A change in supported value will result in a corresponding change in mask and state.
     EmberAfStatus SetSupportedValue(chip::EndpointId endpoint,
                                     const chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> supported);
+
+    //check whether the Alarm featureMap has value
+    bool HasAlarmFeature(chip::EndpointId endpoint);
 private:
     static DishwasherAlarmServer instance;
 
