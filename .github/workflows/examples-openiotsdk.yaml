@@ -177,6 +177,8 @@ jobs:
                     'scripts/examples/openiotsdk_example.sh --no-activate -C test unit-tests'
 
             - name: Build lock-app example (psa)
+              # Disabled being tracked here: https://github.com/project-chip/connectedhomeip/issues/28026
+              if: false
               id: build_lock_app_psa
               run: |
                   scripts/examples/openiotsdk_example.sh -c -b psa lock-app
