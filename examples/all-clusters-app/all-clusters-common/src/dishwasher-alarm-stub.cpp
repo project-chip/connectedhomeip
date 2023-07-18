@@ -49,7 +49,6 @@ public:
     ~DishwasherAlarmDelegate() = default;
 };
 
-
 bool DishwasherAlarmDelegate::ModifyEnableAlarmsCallback(const chip::BitMask<AlarmMap> mask)
 {
     // placeholder implementation
@@ -71,7 +70,6 @@ bool DishwasherAlarmDelegate::ResetAlarmsCallback(const chip::BitMask<AlarmMap> 
  * An example to present device's endpointId
  */
 constexpr chip::EndpointId kDemoEndpointId = 1;
-
 
 void MatterDishwasherAlarmServerInit()
 {

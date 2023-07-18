@@ -26,7 +26,6 @@
 #include <app/util/error-mapping.h>
 #include <lib/support/BitFlags.h>
 
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -50,15 +49,15 @@ namespace DishwasherAlarm {
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, DishwasherAlarm::Id, EMBER_AF_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DishwasherAlarm::Id,
+                                                       EMBER_AF_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kDishwasherAlarmDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, DishwasherAlarm::Id, EMBER_AF_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DishwasherAlarm::Id,
+                                                       EMBER_AF_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kDishwasherAlarmDelegateTableSize)
     {
@@ -138,7 +137,6 @@ EmberAfStatus DishwasherAlarmServer::GetSupportedValue(EndpointId endpoint, BitM
     return status;
 }
 
-
 EmberAfStatus DishwasherAlarmServer::SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -203,7 +201,7 @@ EmberAfStatus DishwasherAlarmServer::SetLatchValue(EndpointId endpoint, const Bi
         return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
     }
 
-    EmberAfStatus status               = Attributes::Latch::Set(endpoint, latch);
+    EmberAfStatus status = Attributes::Latch::Set(endpoint, latch);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: writing  latch, err:0x%x", status);
@@ -235,7 +233,7 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const Bi
 
     ChipLogProgress(Zcl, "Dishwasher Alarm: State ep%d value: %" PRIx32 "", endpoint, newState.Raw());
 
-    //If the feature is true, the latch operation can only be performed
+    // If the feature is true, the latch operation can only be performed
     if (HasAlarmFeature(endpoint))
     {
         BitMask<AlarmMap> latch;
@@ -279,7 +277,7 @@ bool DishwasherAlarmServer::HasAlarmFeature(EndpointId endpoint)
         return false;
     }
 
-    if(featureMap != 0)
+    if (featureMap != 0)
     {
         return true;
     }
@@ -318,7 +316,7 @@ static Status modifyEnabledHandler(const app::ConcreteCommandPath & commandPath,
     // or is unable to suppress a currently enabled alarm SHALL respond
     // with a status code of FAILURE
     Delegate * delegate = DishwasherAlarm::GetDelegate(endpoint);
-    if(delegate && !(delegate->ModifyEnableAlarmsCallback(mask)))
+    if (delegate && !(delegate->ModifyEnableAlarmsCallback(mask)))
     {
         ChipLogProgress(Zcl, "Unable to modify enabled alarms");
         return Status::Failure;
@@ -331,21 +329,20 @@ static Status modifyEnabledHandler(const app::ConcreteCommandPath & commandPath,
     return Status::Success;
 }
 
-
 static Status ResetHandler(const app::ConcreteCommandPath & commandPath, const chip::BitMask<AlarmMap> alarms)
 {
     EndpointId endpoint = commandPath.mEndpointId;
     chip::BitMask<AlarmMap> newState;
 
-    //check whether alarm definition requires manual intervention
+    // check whether alarm definition requires manual intervention
     Delegate * delegate = DishwasherAlarm::GetDelegate(endpoint);
-    if(delegate && delegate->ResetAlarmsCallback(alarms))
+    if (delegate && delegate->ResetAlarmsCallback(alarms))
     {
         ChipLogProgress(Zcl, "The alarm definition requires manual intervention");
         return Status::Failure;
     }
 
-    //If the feature is true, the latch operation can only be performed
+    // If the feature is true, the latch operation can only be performed
     if (DishwasherAlarmServer::Instance().HasAlarmFeature(endpoint))
     {
         BitMask<AlarmMap> latch;

@@ -38,28 +38,24 @@ public:
     EmberAfStatus GetMaskValue(EndpointId endpoint, BitMask<AlarmMap> * mask);
     EmberAfStatus GetStateValue(EndpointId endpoint, BitMask<AlarmMap> * state);
     EmberAfStatus GetLatchValue(EndpointId endpoint, BitMask<AlarmMap> * latch);
-    EmberAfStatus GetSupportedValue(EndpointId endpoint,BitMask<AlarmMap> * suppported);
+    EmberAfStatus GetSupportedValue(EndpointId endpoint, BitMask<AlarmMap> * suppported);
 
     // Whenever there is change on Mask we should change State accordingly.
     EmberAfStatus SetMaskValue(EndpointId endpoint, const BitMask<AlarmMap> mask);
     // When State changes we are generating Notify event.
-    EmberAfStatus SetStateValue(EndpointId endpoint,
-                                const BitMask<AlarmMap> newState);
-    EmberAfStatus SetLatchValue(EndpointId endpoint,
-                               const BitMask<AlarmMap> latch);
+    EmberAfStatus SetStateValue(EndpointId endpoint, const BitMask<AlarmMap> newState);
+    EmberAfStatus SetLatchValue(EndpointId endpoint, const BitMask<AlarmMap> latch);
     // A change in supported value will result in a corresponding change in mask and state.
-    EmberAfStatus SetSupportedValue(EndpointId endpoint,
-                                    const BitMask<AlarmMap> supported);
+    EmberAfStatus SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported);
 
-    //check whether the Alarm featureMap has value
+    // check whether the Alarm featureMap has value
     bool HasAlarmFeature(EndpointId endpoint);
+
 private:
     static DishwasherAlarmServer instance;
 
-    void SendNotifyEvent(EndpointId endpointId, BitMask<AlarmMap> becameActive,
-                         BitMask<AlarmMap> becameInactive,
-                         BitMask<AlarmMap> newState,
-                         BitMask<AlarmMap> mask);
+    void SendNotifyEvent(EndpointId endpointId, BitMask<AlarmMap> becameActive, BitMask<AlarmMap> becameInactive,
+                         BitMask<AlarmMap> newState, BitMask<AlarmMap> mask);
 };
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
