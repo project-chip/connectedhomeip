@@ -56,6 +56,13 @@ using namespace chip::Decoders;
 
 using PayloadDecoderType = chip::Decoders::PayloadDecoder<64, 256>;
 
+/// Figures out a unique name within a json object.
+///
+/// Decoded keys may be duplicated, like list elements are denoted as "[]".
+/// The existing code does not attempt to encode lists and everytying is an object,
+/// so this name builder attempts to find unique keys for elements inside a json.
+///
+/// In particular a repeated "[]", "[]", ... will become "[0]", "[1]", ...
 class UniqueNameBuilder
 {
 public:
@@ -63,6 +70,9 @@ public:
     const char * c_str() const { return mFormatter.c_str(); }
 
     // Figure out the next unique name in the given value
+    //
+    // After this returns, c_str() will return a name based on `baseName` that is
+    // not a key of `value` (unless on overflows, which are just logged)
     void ComputeNextUniqueName(const char * baseName, ::Json::Value & value)
     {
         FirstName(baseName);
@@ -119,8 +129,14 @@ private:
         switch (entry.GetType())
         {
         case PayloadEntry::IMPayloadType::kNestingEnter:
-            // Important to compute name before payload decoding, as payload decoding
-            // changes the name
+            // PayloadEntry validity is only until any decoder calls are made,
+            // because the entry Name/Value may point into a shared Decoder buffer.
+            //
+            // As such entry.GetName() is only valid here and would not be valid once
+            // GetPayload() is called as GetPayload calls decoder.Next, which invalidates
+            // internal name and value buffers (makes them point to the next element).
+            // 
+            // TLDR: name MUST be used and saved before GetPayload is executed.
             nameBuilder.ComputeNextUniqueName(entry.GetName(), value);
             value[nameBuilder.c_str()] = GetPayload(decoder);
             break;
