@@ -62,4 +62,3 @@ tests:
       response:
           constraints:
               type: int32u
-  
