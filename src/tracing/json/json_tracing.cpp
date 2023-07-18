@@ -135,7 +135,7 @@ private:
             // As such entry.GetName() is only valid here and would not be valid once
             // GetPayload() is called as GetPayload calls decoder.Next, which invalidates
             // internal name and value buffers (makes them point to the next element).
-            // 
+            //
             // TLDR: name MUST be used and saved before GetPayload is executed.
             nameBuilder.ComputeNextUniqueName(entry.GetName(), value);
             value[nameBuilder.c_str()] = GetPayload(decoder);
