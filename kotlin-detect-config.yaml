@@ -7,6 +7,8 @@
 # Ideally this should be driven down to 0
 
 style:
+    excludes:
+        - "**/src/controller/java/generated/java/chip/devicecontroller/cluster/**/*.kt"
     MagicNumber:
         excludes:
             - "**/examples/android/CHIPTest/app/src/test/java/com/tcl/chip/chiptest/ExampleUnitTest.kt"
@@ -23,8 +25,6 @@ style:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairingCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImSubscribeCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/Main.kt"
-            - "**/src/controller/java/generated/java/chip/cluster/structs/*.kt"
-            - "**/src/controller/java/generated/java/chip/cluster/eventstructs/*.kt"
             - "**/src/controller/java/src/chip/jsontlv/JsonToTlv.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/Base38.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadParser.kt"
@@ -60,8 +60,6 @@ style:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/SelectActionFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/setuppayloadscanner/BarcodeFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/Main.kt"
-            - "**/src/controller/java/generated/java/chip/cluster/structs/*.kt"
-            - "**/src/controller/java/generated/java/chip/cluster/eventstructs/*.kt"
             - "**/src/controller/java/src/chip/jsontlv/JsonToTlv.kt"
             - "**/src/controller/java/src/chip/jsontlv/TlvToJson.kt"
             - "**/src/controller/java/tests/chip/jsontlv/JsonToTlvToJsonTest.kt"
@@ -108,8 +106,6 @@ style:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkShortCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkVendorCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/UnpairCommand.kt"
-            - "**/src/controller/java/generated/java/chip/cluster/structs/*.kt"
-            - "**/src/controller/java/generated/java/chip/cluster/eventstructs/*.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/Verhoeff.kt"
     MaxLineLength:
         excludes:
@@ -129,8 +125,6 @@ style:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/MatterCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairingCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImSubscribeCommand.kt"
-            - "**/src/controller/java/generated/java/chip/cluster/structs/*.kt"
-            - "**/src/controller/java/generated/java/chip/cluster/eventstructs/*.kt"
             - "**/src/controller/java/src/chip/jsontlv/TlvToJson.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadParser.kt"
