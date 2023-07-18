@@ -338,6 +338,7 @@ client cluster OnOff = 6 {
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
   bitmap OnOffControl : BITMAP8 {
@@ -406,6 +407,7 @@ server cluster OnOff = 6 {
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
   bitmap OnOffControl : BITMAP8 {
@@ -7147,7 +7149,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster LevelControl {
