@@ -10,4 +10,9 @@ kconfiglib==13.7.1
 construct==2.10.54
 python-socketio<5
 itsdangerous<2.1 ; python_version < "3.11"
-gdbgui==0.13.2.0 ; python_version < "3.11" and platform_machine != 'aarch64' and sys_platform == 'linux'
+#
+# gdbgui pulls in gevent which fails to compile due to cython updates.
+# Could not find a good way to fix this dependency, so commenting it
+# out here.
+#
+# gdbgui==0.13.2.0 ; python_version < "3.11" and platform_machine != 'aarch64' and sys_platform == 'linux'

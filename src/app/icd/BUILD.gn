@@ -25,6 +25,16 @@ source_set("manager-srcs") {
     "ICDManager.h",
   ]
 
+  deps = [ ":monitoring-table" ]
+  public_deps = [ "${chip_root}/src/credentials:credentials" ]
+}
+
+source_set("monitoring-table") {
+  sources = [
+    "IcdMonitoringTable.cpp",
+    "IcdMonitoringTable.h",
+  ]
+
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform:platform",
