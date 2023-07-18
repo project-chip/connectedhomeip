@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,11 +31,6 @@
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
-//  Switching from Thread child to router may cause a few second packet stall.
-//  Until this is improved in OpenThread we need to increase the retransmission
-//  interval to survive the stall.
-#define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (1000_ms32)
-
 /**
  * CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
  *
@@ -51,3 +46,5 @@
 // shell app uses openthread but does not have the NETWORK_COMMISSIONING cluster or zap config
 // Do not instantiate the NETWORK_COMMISSIONING thread driver
 #define _NO_NETWORK_COMMISSIONING_DRIVER_
+
+//#define CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI 1
