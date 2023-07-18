@@ -14,10 +14,6 @@
 	path = third_party/nlunit-test/repo
 	url = https://github.com/nestlabs/nlunit-test.git
 	branch  = master
-[submodule "mbedtls"]
-	path = third_party/mbedtls/repo
-	url = https://github.com/ARMmbed/mbedtls.git
-	branch = mbedtls-2.28
 [submodule "qrcode"]
 	path = examples/common/QRCode/repo
 	url = https://github.com/nayuki/QR-Code-generator.git
@@ -30,10 +26,6 @@
 [submodule "pigweed"]
 	path = third_party/pigweed/repo
 	url = https://github.com/google/pigweed.git
-	branch  = main
-[submodule "openthread"]
-	path = third_party/openthread/repo
-	url = https://github.com/openthread/openthread.git
 	branch  = main
 [submodule "ot-br-posix"]
 	path = third_party/ot-br-posix/repo
