@@ -21,12 +21,6 @@ on:
             required: false
             type: boolean
             default: false
-    push:
-        paths:
-            - "integrations/docker/**"
-    pull_request:
-        paths:
-            - "integrations/docker/**"
     workflow_dispatch:
         inputs:
             push_images:
@@ -48,13 +42,20 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v3
+            - name: Detect changed paths
+              uses: dorny/paths-filter@v2
+              id: changed_paths
+              with:
+                  filters: |
+                      docker-images:
+                        - 'integrations/docker/images/**'
             - name: Build & Push images using project bash script
-              if: ${{ inputs.push_images == true }}
+              if: ${{ inputs.push_images == true && (github.event_name == 'push' || github.event_name == 'pull_request') && steps.changed_paths.outputs.docker-images == 'true'}}
               run: |
                   cd integrations/docker/images/base/chip-build${{ matrix.img }}
                   ./build.sh --latest --push
             - name: Build images using project bash script
-              if: ${{ inputs.push_images == false }}
+              if: ${{ inputs.push_images == false && (github.event_name == 'push' || github.event_name == 'pull_request') && steps.changed_paths.outputs.docker-images == 'true'}}
               run: |
                   cd integrations/docker/images/base/chip-build${{ matrix.img }}
                   ./build.sh --latest
@@ -71,13 +72,20 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v3
+            - name: Detect changed paths
+              uses: dorny/paths-filter@v2
+              id: changed_paths
+              with:
+                  filters: |
+                      docker-images:
+                        - 'integrations/docker/images/**'
             - name: Build & Push images using project bash script
-              if: ${{ inputs.push_images == true }}
+              if: ${{ inputs.push_images == true && (github.event_name == 'push' || github.event_name == 'pull_request') && steps.changed_paths.outputs.docker-images == 'true'}}
               run: |
                   cd integrations/docker/images/stage-1/chip-build${{ matrix.img }}
                   ./build.sh --latest --push
             - name: Build images using project bash script
-              if: ${{ inputs.push_images == false }}
+              if: ${{ inputs.push_images == false && (github.event_name == 'push' || github.event_name == 'pull_request') && steps.changed_paths.outputs.docker-images == 'true'}}
               run: |
                   cd integrations/docker/images/stage-1/chip-build${{ matrix.img }}
                   ./build.sh --latest
@@ -111,13 +119,20 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v3
+            - name: Detect changed paths
+              uses: dorny/paths-filter@v2
+              id: changed_paths
+              with:
+                  filters: |
+                      docker-images:
+                        - 'integrations/docker/images/**'
             - name: Build & Push images using project bash script
-              if: ${{ inputs.push_images == true }}
+              if: ${{ inputs.push_images == true && (github.event_name == 'push' || github.event_name == 'pull_request') && steps.changed_paths.outputs.docker-images == 'true'}}
               run: |
                   cd integrations/docker/images/stage-2/chip-build${{ matrix.img }}
                   ./build.sh --latest --push
             - name: Build images using project bash script
-              if: ${{ inputs.push_images == false }}
+              if: ${{ inputs.push_images == false && (github.event_name == 'push' || github.event_name == 'pull_request') && steps.changed_paths.outputs.docker-images == 'true'}}
               run: |
                   cd integrations/docker/images/stage-2/chip-build${{ matrix.img }}
                   ./build.sh --latest
@@ -137,13 +152,20 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v3
+            - name: Detect changed paths
+              uses: dorny/paths-filter@v2
+              id: changed_paths
+              with:
+                  filters: |
+                      docker-images:
+                        - 'integrations/docker/images/**'
             - name: Build & Push images using project bash script
-              if: ${{ inputs.push_images == true }}
+              if: ${{ inputs.push_images == true && (github.event_name == 'push' || github.event_name == 'pull_request') && steps.changed_paths.outputs.docker-images == 'true'}}
               run: |
                   cd integrations/docker/images/stage-3/chip-build${{ matrix.img }}
                   ./build.sh --latest --push
             - name: Build images using project bash script
-              if: ${{ inputs.push_images == false }}
+              if: ${{ inputs.push_images == false && (github.event_name == 'push' || github.event_name == 'pull_request') && steps.changed_paths.outputs.docker-images == 'true'}}
               run: |
                   cd integrations/docker/images/stage-3/chip-build${{ matrix.img }}
                   ./build.sh --latest
@@ -160,13 +182,20 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v3
+            - name: Detect changed paths
+              uses: dorny/paths-filter@v2
+              id: changed_paths
+              with:
+                  filters: |
+                      docker-images:
+                        - 'integrations/docker/images/**'
             - name: Build & Push images using project bash script
-              if: ${{ inputs.push_images == true }}
+              if: ${{ inputs.push_images == true && (github.event_name == 'push' || github.event_name == 'pull_request') && steps.changed_paths.outputs.docker-images == 'true'}}
               run: |
                   cd integrations/docker/images/vscode/chip-build${{ matrix.img }}
                   ./build.sh --latest --push
             - name: Build images using project bash script
-              if: ${{ inputs.push_images == false }}
+              if: ${{ inputs.push_images == false && (github.event_name == 'push' || github.event_name == 'pull_request') && steps.changed_paths.outputs.docker-images == 'true'}}
               run: |
                   cd integrations/docker/images/vscode-3/chip-build${{ matrix.img }}
                   ./build.sh --latest

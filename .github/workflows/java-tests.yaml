@@ -15,10 +15,9 @@
 name: Java Tests
 
 on:
-    push:
-    pull_request:
     merge_group:
     workflow_dispatch:
+    workflow_call:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==

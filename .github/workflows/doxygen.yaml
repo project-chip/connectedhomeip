@@ -15,61 +15,8 @@
 name: Doxygen
 
 on:
-    push:
-        paths:
-            - "**.do[xc]"
-            - "**.c[cs]?"
-            - "**.cxx"
-            - "**.cpp"
-            - "**.c\\+\\+"
-            - "**.ii"
-            - "**.ixx"
-            - "**.ipp"
-            - "**.i\\+\\+"
-            - "**.inl"
-            - "**.[hH]"
-            - "**.hh"
-            - "**.HH"
-            - "**.hxx"
-            - "**.hpp"
-            - "**.h\\+\\+"
-            - "**.mm"
-            - "**.txt"
-            - "**.[ido]dl"
-            - "**.java"
-            - "**.d"
-            - "**.php[45]?"
-            - "**.inc"
-            - "**.phtml"
-            - "**.[mM]"
-    pull_request:
-        paths:
-            - "**.do[xc]"
-            - "**.c[cs]?"
-            - "**.cxx"
-            - "**.cpp"
-            - "**.c\\+\\+"
-            - "**.ii"
-            - "**.ixx"
-            - "**.ipp"
-            - "**.i\\+\\+"
-            - "**.inl"
-            - "**.[hH]"
-            - "**.hh"
-            - "**.HH"
-            - "**.hxx"
-            - "**.hpp"
-            - "**.h\\+\\+"
-            - "**.mm"
-            - "**.txt"
-            - "**.[ido]dl"
-            - "**.java"
-            - "**.d"
-            - "**.php[45]?"
-            - "**.inc"
-            - "**.phtml"
-            - "**.[mM]"
     workflow_dispatch:
+    workflow_call:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -90,14 +37,47 @@ jobs:
               run: echo ${{github.actor}}
             - name: Checkout
               uses: actions/checkout@v3
+            - name: Detect changed paths
+              uses: dorny/paths-filter@v2
+              id: changed_paths
+              with:
+                  filters: |
+                      source-files:
+                              - "**.do[xc]"
+                              - "**.c[cs]?"
+                              - "**.cxx"
+                              - "**.cpp"
+                              - "**.c\\+\\+"
+                              - "**.ii"
+                              - "**.ixx"
+                              - "**.ipp"
+                              - "**.i\\+\\+"
+                              - "**.inl"
+                              - "**.[hH]"
+                              - "**.hh"
+                              - "**.HH"
+                              - "**.hxx"
+                              - "**.hpp"
+                              - "**.h\\+\\+"
+                              - "**.mm"
+                              - "**.txt"
+                              - "**.[ido]dl"
+                              - "**.java"
+                              - "**.d"
+                              - "**.php[45]?"
+                              - "**.inc"
+                              - "**.phtml"
+                              - "**.[mM]"
             - name: Generate
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip' && (github.event_name == 'push' || github.event_name == 'pull_request') && steps.changed_paths.outputs.docker-images == 'true'
               run: scripts/helpers/doxygen.sh
             - name: Extract branch name
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip' && (github.event_name == 'push' || github.event_name == 'pull_request') && steps.changed_paths.outputs.docker-images == 'true'
               shell: bash
               run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
               id: extract_branch
             - name: Deploy if master
-              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip' && (github.event_name == 'push' || github.event_name == 'pull_request') && steps.changed_paths.outputs.docker-images == 'true'
               uses: peaceiris/actions-gh-pages@v3
               with:
                   deploy_key: ${{ secrets.DOXYGEN_DEPLOY_KEY }}

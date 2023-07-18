@@ -15,8 +15,8 @@
 name: Full builds - Android
 
 on:
-    push:
     workflow_dispatch:
+    workflow_call:
 
 concurrency:
     group: full-${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -41,7 +41,12 @@ jobs:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
+            - name: Extract branch name
+              shell: bash
+              run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+              id: extract_branch
             - uses: actions/checkout@v3
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               name: Checkout
               with:
                 token: ${{ github.token }}
@@ -52,51 +57,66 @@ jobs:
             # local machine, like:
             #   git submodule deinit --all
             - name: Setup Environment
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               uses: ./.github/actions/setup-environment
             - name: Checkout submodules & Bootstrap
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: android
 
             - name: Build Android arm-chip-tool
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm-chip-tool build"
             - name: Clean out build output
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             - name: Build Android arm-tv-casting-app
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm-tv-casting-app build"
             - name: Clean out build output
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             - name: Build Android arm-tv-server
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm-tv-server build"
             - name: Clean out build output
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             - name: Build Android arm64-tv-casting-app
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm64-tv-casting-app build"
             - name: Clean out build output
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             - name: Build Android arm64-tv-server
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm64-tv-server build"
             - name: Clean out build output
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             - name: Build Android arm64-chip-tool
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm64-chip-tool build"
             - name: Run Android build rule tests
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test"
             - name: Clean out build output
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             # - name: Build Android Studio build (arm64 only)
             #   run: |

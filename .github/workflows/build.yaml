@@ -15,14 +15,13 @@
 name: Builds
 
 on:
-    push:
-    pull_request:
     merge_group:
     workflow_dispatch:
     workflow_call:
       inputs:
         run-codeql:
           required: false
+          default: false
           type: boolean
     
 concurrency:

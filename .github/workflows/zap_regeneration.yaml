@@ -16,6 +16,7 @@ name: ZAP - Regenerate
 
 on:
     workflow_dispatch:
+    workflow_call:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
