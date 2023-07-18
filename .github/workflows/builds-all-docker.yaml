@@ -26,10 +26,7 @@ jobs:
     docker_build:
         uses: ./.github/workflows/docker_img.yaml
     example_matrix:
-        needs: [docker_build]
-        strategy:
-          matrix:
-            workflow: ["./.github/workflows/build.yaml"]
+        # needs: [docker_build]
         runs-on: ubuntu-latest
         steps:
           - uses: ./.github/workflows/build.yaml
