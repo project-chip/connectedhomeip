@@ -36,6 +36,16 @@ using namespace chip::app;
 
 namespace example {
 
+// Dummy class to satisfy the CommandHandler::Callback interface.
+class CommandHandlerCallback : public CommandHandler::Callback
+{
+public:
+    using Status = Protocols::InteractionModel::Status;
+    void OnDone(CommandHandler & apCommandObj) {}
+    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & apPayload) {}
+    Status CommandExists(const ConcreteCommandPath & aCommandPath) { return Status::Success; }
+};
+
 DBusInterface::DBusInterface(chip::EndpointId endpointId) : mEndpointId(endpointId)
 {
     mManager           = g_dbus_object_manager_server_new("/");
@@ -76,7 +86,9 @@ void DBusInterface::SetLevel(uint8_t value)
 
 void DBusInterface::SetColorMode(chip::app::Clusters::ColorControl::ColorMode colorMode)
 {
-    light_app_color_control_set_mode(mIfaceColorControl, colorMode);
+    InternalSetGuard guard(this);
+    if (light_app_color_control_get_mode(mIfaceColorControl) != colorMode)
+        light_app_color_control_set_mode(mIfaceColorControl, colorMode);
 }
 
 void DBusInterface::SetColorTemperature(uint16_t value)
@@ -110,8 +122,7 @@ CHIP_ERROR DBusInterface::InitOnGLibMatterContext(DBusInterface * self)
     g_object_unref(object);
 
     g_signal_connect(self->mIfaceOnOff, "notify::on-off", G_CALLBACK(OnOnOffChanged), self);
-    g_signal_connect(self->mIfaceLevelControl, "notify::current-level", G_CALLBACK(OnCurrentLevelChanged), self);
-    // g_signal_connect(self->mIfaceColorControl, "notify::color-mode", G_CALLBACK(OnColorModeChanged), self);
+    g_signal_connect(self->mIfaceLevelControl, "notify::level", G_CALLBACK(OnCurrentLevelChanged), self);
     g_signal_connect(self->mIfaceColorControl, "notify::color-temperature", G_CALLBACK(OnColorTemperatureChanged), self);
 
     g_bus_own_name_on_connection(bus, "org.tizen.matter.example.lighting", G_BUS_NAME_OWNER_FLAGS_NONE,
@@ -162,47 +173,19 @@ gboolean DBusInterface::OnCurrentLevelChanged(LightAppLevelControl * levelContro
     return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
-#if 0
-gboolean DBusInterface::OnColorModeChanged(LightAppColorControl * colorControl, GDBusMethodInvocation * invocation,
-                                           DBusInterface * self)
-{
-    // Do not handle on-change event if it was triggered by internal set
-    VerifyOrReturnValue(!self->mInternalSet, G_DBUS_METHOD_INVOCATION_HANDLED);
-
-    auto colorMode = light_app_color_control_get_mode(colorControl);
-    VerifyOrReturnValue(colorMode < Clusters::ColorControl::kColorModekUnknownEnumValue, G_DBUS_METHOD_INVOCATION_HANDLED,
-                        ChipLogError(NotSpecified, "Invalid ColorMode: 0x%x", colorMode));
-
-    chip::DeviceLayer::StackLock lock;
-    ColorControlServer::Instance().handleModeSwitch(self->mEndpointId, colorMode);
-
-    return G_DBUS_METHOD_INVOCATION_HANDLED;
-}
-#endif
-
-class CallbackX : public CommandHandler::Callback
-{
-public:
-    void OnDone(CommandHandler & apCommandObj) {}
-    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & apPayload) {}
-    Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath)
-    {
-        return Protocols::InteractionModel::Status::Success;
-    }
-};
-
 gboolean DBusInterface::OnColorTemperatureChanged(LightAppColorControl * colorControl, GDBusMethodInvocation * invocation,
                                                   DBusInterface * self)
 {
     // Do not handle on-change event if it was triggered by internal set
     VerifyOrReturnValue(!self->mInternalSet, G_DBUS_METHOD_INVOCATION_HANDLED);
 
+    CommandHandlerCallback callback;
+    CommandHandler handler(&callback);
+
     ConcreteCommandPath path{ self->mEndpointId, Clusters::ColorControl::Id, 0 };
+
     Clusters::ColorControl::Commands::MoveToColorTemperature::DecodableType data;
     data.colorTemperatureMireds = light_app_color_control_get_color_temperature(colorControl);
-
-    CallbackX callback;
-    CommandHandler handler(&callback);
 
     chip::DeviceLayer::StackLock lock;
     ColorControlServer::Instance().moveToColorTempCommand(&handler, path, data);
