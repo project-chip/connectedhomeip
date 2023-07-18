@@ -26,6 +26,7 @@
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
 #include <app/util/config.h>
+#include <credentials/FabricTable.h>
 #include <lib/core/TLV.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -60,7 +61,7 @@ enum class TimeSyncEventFlag : uint8_t
     kMissingTTSource = 16,
 };
 
-class TimeSynchronizationServer
+class TimeSynchronizationServer : public FabricTable::Delegate
 {
 public:
     void Init();
@@ -93,6 +94,9 @@ public:
     TimeState UpdateDSTOffsetState();
     TimeSyncEventFlag GetEventFlag(void);
     void ClearEventFlag(TimeSyncEventFlag flag);
+
+    // Fabric Table delegate functions
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex);
 
 private:
     DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> mTrustedTimeSource;

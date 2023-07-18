@@ -35,14 +35,15 @@ tests:
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 4
           constraints:
               type: int16u
+              minValue: 4
+              maxValue: 5
 
     - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: " !OO.S.F00 "
+      PICS: ( !OO.S.F00 && !OO.S.F01 )
       response:
           value: 0
           constraints:
@@ -56,6 +57,15 @@ tests:
           constraints:
               type: bitmap32
               hasMasksSet: [0x1]
+
+    - label: "Given OO.S.F01(DF) ensure featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: OO.S.F01
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
