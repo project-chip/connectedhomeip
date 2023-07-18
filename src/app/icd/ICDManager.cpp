@@ -19,11 +19,13 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/icd/ICDManager.h>
+#include <app/icd/IcdMonitoringTable.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/LockTracker.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <stdlib.h>
 
 namespace chip {
 namespace app {
@@ -32,8 +34,13 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 
-void ICDManager::ICDManager::Init()
+void ICDManager::ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable)
 {
+    VerifyOrDie(storage != nullptr);
+    VerifyOrDie(fabricTable != nullptr);
+    mStorage     = storage;
+    mFabricTable = fabricTable;
+
     uint32_t activeModeInterval;
     if (Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval) != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -49,8 +56,10 @@ void ICDManager::ICDManager::Shutdown()
     // cancel any running timer of the icd
     DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
     DeviceLayer::SystemLayer().CancelTimer(OnActiveModeDone, this);
-    mIcdMode          = ICDMode::SIT;
+    mICDMode          = ICDMode::SIT;
     mOperationalState = OperationalState::IdleMode;
+    mStorage          = nullptr;
+    mFabricTable      = nullptr;
 }
 
 bool ICDManager::SupportsCheckInProtocol()
@@ -58,7 +67,6 @@ bool ICDManager::SupportsCheckInProtocol()
     bool success;
     uint32_t featureMap;
     success = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
-
     return success ? ((featureMap & to_underlying(Feature::kCheckInProtocolSupport)) != 0) : false;
 }
 
@@ -68,25 +76,25 @@ void ICDManager::UpdateIcdMode()
 
     ICDMode tempMode = ICDMode::SIT;
 
-    // TODO ICD LIT FIX DEPENDENCY ISSUE with app/util/IcdMonitoringTable.h and app/server:server
     // The Check In Protocol Feature is required and the slow polling interval shall also be greater than 15 seconds
     // to run an ICD in LIT mode.
-    // if (kSlowPollingInterval > kICDSitModePollingThreashold && SupportsCheckInProtocol())
-    // {
-    //     // We can only get to LIT Mode, if at least one client is registered to the ICD device
-    //     const auto & fabricTable = Server::GetInstance().GetFabricTable();
-    //     for (const auto & fabricInfo : fabricTable)
-    //     {
-    //         PersistentStorageDelegate & storage = Server::GetInstance().GetPersistentStorage();
-    //         IcdMonitoringTable table(storage, fabricInfo.GetFabricIndex(), 1);
-    //         if (!table.IsEmpty())
-    //         {
-    //             tempMode = ICDMode::LIT;
-    //             break;
-    //         }
-    //     }
-    // }
-    mIcdMode = tempMode;
+    if (GetSlowPollingInterval() > GetSITPollingThreshold() && SupportsCheckInProtocol())
+    {
+        VerifyOrDie(mStorage != nullptr);
+        VerifyOrDie(mFabricTable != nullptr);
+        // We can only get to LIT Mode, if at least one client is registered with the ICD device
+        for (const auto & fabricInfo : *mFabricTable)
+        {
+            // We only need 1 valid entry to ensure LIT compliance
+            IcdMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), 1 /*Table entry limit*/);
+            if (!table.IsEmpty())
+            {
+                tempMode = ICDMode::LIT;
+                break;
+            }
+        }
+    }
+    mICDMode = tempMode;
 }
 
 void ICDManager::UpdateOperationState(OperationalState state)
@@ -105,7 +113,17 @@ void ICDManager::UpdateOperationState(OperationalState state)
         }
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(idleModeInterval), OnIdleModeDone, this);
 
-        CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(GetSlowPollingInterval());
+        System::Clock::Milliseconds32 slowPollInterval = GetSlowPollingInterval();
+        // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
+        if (mICDMode == ICDMode::SIT && slowPollInterval > GetSITPollingThreshold())
+        {
+            ChipLogDetail(AppServer, "The Slow Polling Interval of an ICD in SIT mode should be <= %" PRIu32,
+                          (GetSITPollingThreshold().count() / 1000));
+            // TODO Spec to define this conformance as a SHALL
+            // slowPollInterval = GetSITPollingThreshold();
+        }
+
+        CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(slowPollInterval);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());

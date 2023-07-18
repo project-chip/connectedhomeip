@@ -50,6 +50,9 @@ jobs:
               with:
                 platform: esp32
 
+            - name: Fixup GdbGui requirement
+              run: perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt
+
             - name: Build ESP32 QEMU test images
               run: |
                   scripts/run_in_build_env.sh "         \
