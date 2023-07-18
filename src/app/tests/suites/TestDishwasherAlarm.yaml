@@ -157,4 +157,3 @@ tests:
       attribute: "Latch"
       response:
           value: 8
-

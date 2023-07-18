@@ -395,4 +395,3 @@ bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(app::CommandHandle
 
     return true;
 }
-
