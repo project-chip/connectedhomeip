@@ -212,6 +212,10 @@
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/anycloud-ota
 	url = https://github.com/Infineon/anycloud-ota
 	platforms = infineon
+[submodule "third_party/mbed-mcu-boot/repo"]
+	path = third_party/mbed-mcu-boot/repo
+	url = https://github.com/ATmobica/mcuboot.git
+	platforms = mbed
 [submodule "p6/serial-flash"]
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/serial-flash
 	url = https://github.com/Infineon/serial-flash
