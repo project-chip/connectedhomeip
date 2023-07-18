@@ -1903,8 +1903,9 @@ enum class ProductIdentifierTypeEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kCondition = 0x1,
-    kWarning   = 0x2,
+    kCondition              = 0x1,
+    kWarning                = 0x2,
+    kReplacementProductList = 0x3,
 };
 } // namespace HepaFilterMonitoring
 
@@ -1953,8 +1954,9 @@ enum class ProductIdentifierTypeEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kCondition = 0x1,
-    kWarning   = 0x2,
+    kCondition              = 0x1,
+    kWarning                = 0x2,
+    kReplacementProductList = 0x3,
 };
 } // namespace ActivatedCarbonFilterMonitoring
 
@@ -2003,8 +2005,9 @@ enum class ProductIdentifierTypeEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kCondition = 0x1,
-    kWarning   = 0x2,
+    kCondition              = 0x1,
+    kWarning                = 0x2,
+    kReplacementProductList = 0x3,
 };
 } // namespace CeramicFilterMonitoring
 
@@ -2053,8 +2056,9 @@ enum class ProductIdentifierTypeEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kCondition = 0x1,
-    kWarning   = 0x2,
+    kCondition              = 0x1,
+    kWarning                = 0x2,
+    kReplacementProductList = 0x3,
 };
 } // namespace ElectrostaticFilterMonitoring
 
@@ -2103,8 +2107,9 @@ enum class ProductIdentifierTypeEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kCondition = 0x1,
-    kWarning   = 0x2,
+    kCondition              = 0x1,
+    kWarning                = 0x2,
+    kReplacementProductList = 0x3,
 };
 } // namespace UvFilterMonitoring
 
@@ -2153,8 +2158,9 @@ enum class ProductIdentifierTypeEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kCondition = 0x1,
-    kWarning   = 0x2,
+    kCondition              = 0x1,
+    kWarning                = 0x2,
+    kReplacementProductList = 0x3,
 };
 } // namespace IonizingFilterMonitoring
 
@@ -2203,8 +2209,9 @@ enum class ProductIdentifierTypeEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kCondition = 0x1,
-    kWarning   = 0x2,
+    kCondition              = 0x1,
+    kWarning                = 0x2,
+    kReplacementProductList = 0x3,
 };
 } // namespace ZeoliteFilterMonitoring
 
@@ -2253,8 +2260,9 @@ enum class ProductIdentifierTypeEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kCondition = 0x1,
-    kWarning   = 0x2,
+    kCondition              = 0x1,
+    kWarning                = 0x2,
+    kReplacementProductList = 0x3,
 };
 } // namespace OzoneFilterMonitoring
 
@@ -2303,8 +2311,9 @@ enum class ProductIdentifierTypeEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kCondition = 0x1,
-    kWarning   = 0x2,
+    kCondition              = 0x1,
+    kWarning                = 0x2,
+    kReplacementProductList = 0x3,
 };
 } // namespace WaterTankMonitoring
 
@@ -2353,8 +2362,9 @@ enum class ProductIdentifierTypeEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kCondition = 0x1,
-    kWarning   = 0x2,
+    kCondition              = 0x1,
+    kWarning                = 0x2,
+    kReplacementProductList = 0x3,
 };
 } // namespace FuelTankMonitoring
 
@@ -2403,8 +2413,9 @@ enum class ProductIdentifierTypeEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kCondition = 0x1,
-    kWarning   = 0x2,
+    kCondition              = 0x1,
+    kWarning                = 0x2,
+    kReplacementProductList = 0x3,
 };
 } // namespace InkCartridgeMonitoring
 
@@ -2453,8 +2464,9 @@ enum class ProductIdentifierTypeEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kCondition = 0x1,
-    kWarning   = 0x2,
+    kCondition              = 0x1,
+    kWarning                = 0x2,
+    kReplacementProductList = 0x3,
 };
 } // namespace TonerCartridgeMonitoring
 

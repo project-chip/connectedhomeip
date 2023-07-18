@@ -17617,12 +17617,12 @@ struct TypeInfo
 namespace ReplacementProductList {
 struct TypeInfo
 {
-    using Type =
-        chip::app::DataModel::List<const chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
@@ -17825,12 +17825,12 @@ struct TypeInfo
 namespace ReplacementProductList {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<
-        const chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+    using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<
+        const chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
@@ -18033,12 +18033,12 @@ struct TypeInfo
 namespace ReplacementProductList {
 struct TypeInfo
 {
-    using Type =
-        chip::app::DataModel::List<const chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::Type>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
@@ -18241,12 +18241,12 @@ struct TypeInfo
 namespace ReplacementProductList {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<
-        const chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+    using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<
+        const chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::Type>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
@@ -18449,11 +18449,12 @@ struct TypeInfo
 namespace ReplacementProductList {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::Type>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
@@ -18656,12 +18657,12 @@ struct TypeInfo
 namespace ReplacementProductList {
 struct TypeInfo
 {
-    using Type =
-        chip::app::DataModel::List<const chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::Type>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
@@ -18864,12 +18865,12 @@ struct TypeInfo
 namespace ReplacementProductList {
 struct TypeInfo
 {
-    using Type =
-        chip::app::DataModel::List<const chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::Type>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
@@ -19072,12 +19073,12 @@ struct TypeInfo
 namespace ReplacementProductList {
 struct TypeInfo
 {
-    using Type =
-        chip::app::DataModel::List<const chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::Type>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
@@ -19280,12 +19281,12 @@ struct TypeInfo
 namespace ReplacementProductList {
 struct TypeInfo
 {
-    using Type =
-        chip::app::DataModel::List<const chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::Type>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::DecodableType>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
@@ -19488,11 +19489,12 @@ struct TypeInfo
 namespace ReplacementProductList {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::Type>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::DecodableType>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
@@ -19695,12 +19697,12 @@ struct TypeInfo
 namespace ReplacementProductList {
 struct TypeInfo
 {
-    using Type =
-        chip::app::DataModel::List<const chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::Type>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
@@ -19903,12 +19905,12 @@ struct TypeInfo
 namespace ReplacementProductList {
 struct TypeInfo
 {
-    using Type =
-        chip::app::DataModel::List<const chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType> &;
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::Type>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }

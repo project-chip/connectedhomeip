@@ -15768,8 +15768,8 @@ void registerClusterHepaFilterMonitoring(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
                                                                               Attributes::LastChangedTime::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type>>>>(
             Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -15850,8 +15850,8 @@ void registerClusterActivatedCarbonFilterMonitoring(Commands & commands, Credent
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
                                                                               Attributes::LastChangedTime::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
-            const chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<
+            const chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type>>>>(
             Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -15932,8 +15932,8 @@ void registerClusterCeramicFilterMonitoring(Commands & commands, CredentialIssue
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
                                                                               Attributes::LastChangedTime::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
-            const chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<
+            const chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::Type>>>>(
             Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -16014,8 +16014,8 @@ void registerClusterElectrostaticFilterMonitoring(Commands & commands, Credentia
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
                                                                               Attributes::LastChangedTime::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
-            const chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<
+            const chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::Type>>>>(
             Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -16096,8 +16096,8 @@ void registerClusterUvFilterMonitoring(Commands & commands, CredentialIssuerComm
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
                                                                               Attributes::LastChangedTime::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::Type>>>>(
             Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -16178,8 +16178,8 @@ void registerClusterIonizingFilterMonitoring(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
                                                                               Attributes::LastChangedTime::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
-            const chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<
+            const chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::Type>>>>(
             Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -16260,8 +16260,8 @@ void registerClusterZeoliteFilterMonitoring(Commands & commands, CredentialIssue
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
                                                                               Attributes::LastChangedTime::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
-            const chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<
+            const chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::Type>>>>(
             Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -16342,8 +16342,8 @@ void registerClusterOzoneFilterMonitoring(Commands & commands, CredentialIssuerC
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
                                                                               Attributes::LastChangedTime::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<
+            const chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::Type>>>>(
             Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -16424,8 +16424,8 @@ void registerClusterWaterTankMonitoring(Commands & commands, CredentialIssuerCom
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
                                                                               Attributes::LastChangedTime::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::Type>>>>(
             Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -16506,8 +16506,8 @@ void registerClusterFuelTankMonitoring(Commands & commands, CredentialIssuerComm
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
                                                                               Attributes::LastChangedTime::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::Type>>>>(
             Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -16588,8 +16588,8 @@ void registerClusterInkCartridgeMonitoring(Commands & commands, CredentialIssuer
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
                                                                               Attributes::LastChangedTime::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
-            const chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<
+            const chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::Type>>>>(
             Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -16670,8 +16670,8 @@ void registerClusterTonerCartridgeMonitoring(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
                                                                               Attributes::LastChangedTime::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
-            const chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<
+            const chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::Type>>>>(
             Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(

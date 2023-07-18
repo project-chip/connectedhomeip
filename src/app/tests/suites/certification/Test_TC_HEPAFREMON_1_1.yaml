@@ -42,7 +42,7 @@ tests:
     - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: "!HEPAFREMON.S.F00 && !HEPAFREMON.S.F01"
+      PICS: "!HEPAFREMON.S.F00 && !HEPAFREMON.S.F01 && !HEPAFREMON.S.F02"
       response:
           value: 0
           constraints:
@@ -70,6 +70,17 @@ tests:
               type: bitmap32
               hasMasksSet: [0x2]
 
+    - label:
+          "Given HEPAFREMON.S.F02(ReplacementProductList) ensure featuremap has
+          the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: HEPAFREMON.S.F02
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x3]
+
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -87,7 +98,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 1]
+              contains: [0, 1, 2]
 
     - label:
           "Read the optional attribute InPlaceIndicator (HEPAFREMON.S.A0002) in

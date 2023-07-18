@@ -17419,7 +17419,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
       public interface ReplacementProductListAttributeCallback {
-        void onSuccess( List<ChipStructs.HepaFilterMonitoringClusterReplacementProductStruct> valueList);
+        void onSuccess(@Nullable List<ChipStructs.HepaFilterMonitoringClusterReplacementProductStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
@@ -17712,7 +17712,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
       public interface ReplacementProductListAttributeCallback {
-        void onSuccess( List<ChipStructs.ActivatedCarbonFilterMonitoringClusterReplacementProductStruct> valueList);
+        void onSuccess(@Nullable List<ChipStructs.ActivatedCarbonFilterMonitoringClusterReplacementProductStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
@@ -18005,7 +18005,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
       public interface ReplacementProductListAttributeCallback {
-        void onSuccess( List<ChipStructs.CeramicFilterMonitoringClusterReplacementProductStruct> valueList);
+        void onSuccess(@Nullable List<ChipStructs.CeramicFilterMonitoringClusterReplacementProductStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
@@ -18298,7 +18298,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
       public interface ReplacementProductListAttributeCallback {
-        void onSuccess( List<ChipStructs.ElectrostaticFilterMonitoringClusterReplacementProductStruct> valueList);
+        void onSuccess(@Nullable List<ChipStructs.ElectrostaticFilterMonitoringClusterReplacementProductStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
@@ -18591,7 +18591,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
       public interface ReplacementProductListAttributeCallback {
-        void onSuccess( List<ChipStructs.UvFilterMonitoringClusterReplacementProductStruct> valueList);
+        void onSuccess(@Nullable List<ChipStructs.UvFilterMonitoringClusterReplacementProductStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
@@ -18884,7 +18884,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
       public interface ReplacementProductListAttributeCallback {
-        void onSuccess( List<ChipStructs.IonizingFilterMonitoringClusterReplacementProductStruct> valueList);
+        void onSuccess(@Nullable List<ChipStructs.IonizingFilterMonitoringClusterReplacementProductStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
@@ -19177,7 +19177,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
       public interface ReplacementProductListAttributeCallback {
-        void onSuccess( List<ChipStructs.ZeoliteFilterMonitoringClusterReplacementProductStruct> valueList);
+        void onSuccess(@Nullable List<ChipStructs.ZeoliteFilterMonitoringClusterReplacementProductStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
@@ -19470,7 +19470,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
       public interface ReplacementProductListAttributeCallback {
-        void onSuccess( List<ChipStructs.OzoneFilterMonitoringClusterReplacementProductStruct> valueList);
+        void onSuccess(@Nullable List<ChipStructs.OzoneFilterMonitoringClusterReplacementProductStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
@@ -19763,7 +19763,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
       public interface ReplacementProductListAttributeCallback {
-        void onSuccess( List<ChipStructs.WaterTankMonitoringClusterReplacementProductStruct> valueList);
+        void onSuccess(@Nullable List<ChipStructs.WaterTankMonitoringClusterReplacementProductStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
@@ -20056,7 +20056,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
       public interface ReplacementProductListAttributeCallback {
-        void onSuccess( List<ChipStructs.FuelTankMonitoringClusterReplacementProductStruct> valueList);
+        void onSuccess(@Nullable List<ChipStructs.FuelTankMonitoringClusterReplacementProductStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
@@ -20349,7 +20349,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
       public interface ReplacementProductListAttributeCallback {
-        void onSuccess( List<ChipStructs.InkCartridgeMonitoringClusterReplacementProductStruct> valueList);
+        void onSuccess(@Nullable List<ChipStructs.InkCartridgeMonitoringClusterReplacementProductStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
@@ -20642,7 +20642,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
       public interface ReplacementProductListAttributeCallback {
-        void onSuccess( List<ChipStructs.TonerCartridgeMonitoringClusterReplacementProductStruct> valueList);
+        void onSuccess(@Nullable List<ChipStructs.TonerCartridgeMonitoringClusterReplacementProductStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }

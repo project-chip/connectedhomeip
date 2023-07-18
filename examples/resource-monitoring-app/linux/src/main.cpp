@@ -21,6 +21,7 @@
 #include <bitset>
 #include <instances/ActivatedCarbonFilterMonitoring.h>
 #include <instances/HepaFilterMonitoring.h>
+#include <instances/StaticReplacementProductListManager.h>
 #include <stdint.h>
 
 using namespace chip;
@@ -29,20 +30,24 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
 
 constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
-                                                static_cast<uint32_t>(Feature::kWarning) };
+                                                static_cast<uint32_t>(Feature::kWarning) |
+                                                static_cast<uint32_t>(Feature::kReplacementProductList) };
 constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
-                                                     static_cast<uint32_t>(Feature::kWarning) };
+                                                     static_cast<uint32_t>(Feature::kWarning) |
+                                                     static_cast<uint32_t>(Feature::kReplacementProductList) };
 
-static HepaFilterMonitoringInstance HepafilterInstance(0x1, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
-                                                       DegradationDirectionEnum::kDown, true);
-static ActivatedCarbonFilterMonitoringInstance
-    ActivatedCarbonFilterInstance(0x1, static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()),
-                                  DegradationDirectionEnum::kDown, true);
+static HepaFilterMonitoringInstance * gHepaFilterInstance;
+static ActivatedCarbonFilterMonitoringInstance * gActivatedCarbonFilterInstance;
 
 void ApplicationInit()
 {
-    HepafilterInstance.Init();
-    ActivatedCarbonFilterInstance.Init();
+    gHepaFilterInstance            = new HepaFilterMonitoringInstance(0x1, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
+                                                           DegradationDirectionEnum::kDown, true);
+    gActivatedCarbonFilterInstance = new ActivatedCarbonFilterMonitoringInstance(
+        0x1, static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()), DegradationDirectionEnum::kDown, true);
+
+    gHepaFilterInstance->Init();
+    gActivatedCarbonFilterInstance->Init();
 }
 
 int main(int argc, char * argv[])

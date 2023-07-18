@@ -7689,7 +7689,7 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess( List<ChipStructs.HepaFilterMonitoringClusterReplacementProductStruct> valueList) {
+        public void onSuccess(@Nullable List<ChipStructs.HepaFilterMonitoringClusterReplacementProductStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.HepaFilterMonitoringClusterReplacementProductStruct>");
           responseValues.put(commandResponseInfo, valueList);
@@ -7804,7 +7804,7 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess( List<ChipStructs.ActivatedCarbonFilterMonitoringClusterReplacementProductStruct> valueList) {
+        public void onSuccess(@Nullable List<ChipStructs.ActivatedCarbonFilterMonitoringClusterReplacementProductStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ActivatedCarbonFilterMonitoringClusterReplacementProductStruct>");
           responseValues.put(commandResponseInfo, valueList);
@@ -7919,7 +7919,7 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess( List<ChipStructs.CeramicFilterMonitoringClusterReplacementProductStruct> valueList) {
+        public void onSuccess(@Nullable List<ChipStructs.CeramicFilterMonitoringClusterReplacementProductStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CeramicFilterMonitoringClusterReplacementProductStruct>");
           responseValues.put(commandResponseInfo, valueList);
@@ -8034,7 +8034,7 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess( List<ChipStructs.ElectrostaticFilterMonitoringClusterReplacementProductStruct> valueList) {
+        public void onSuccess(@Nullable List<ChipStructs.ElectrostaticFilterMonitoringClusterReplacementProductStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ElectrostaticFilterMonitoringClusterReplacementProductStruct>");
           responseValues.put(commandResponseInfo, valueList);
@@ -8149,7 +8149,7 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess( List<ChipStructs.UvFilterMonitoringClusterReplacementProductStruct> valueList) {
+        public void onSuccess(@Nullable List<ChipStructs.UvFilterMonitoringClusterReplacementProductStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.UvFilterMonitoringClusterReplacementProductStruct>");
           responseValues.put(commandResponseInfo, valueList);
@@ -8264,7 +8264,7 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess( List<ChipStructs.IonizingFilterMonitoringClusterReplacementProductStruct> valueList) {
+        public void onSuccess(@Nullable List<ChipStructs.IonizingFilterMonitoringClusterReplacementProductStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.IonizingFilterMonitoringClusterReplacementProductStruct>");
           responseValues.put(commandResponseInfo, valueList);
@@ -8379,7 +8379,7 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess( List<ChipStructs.ZeoliteFilterMonitoringClusterReplacementProductStruct> valueList) {
+        public void onSuccess(@Nullable List<ChipStructs.ZeoliteFilterMonitoringClusterReplacementProductStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ZeoliteFilterMonitoringClusterReplacementProductStruct>");
           responseValues.put(commandResponseInfo, valueList);
@@ -8494,7 +8494,7 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess( List<ChipStructs.OzoneFilterMonitoringClusterReplacementProductStruct> valueList) {
+        public void onSuccess(@Nullable List<ChipStructs.OzoneFilterMonitoringClusterReplacementProductStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.OzoneFilterMonitoringClusterReplacementProductStruct>");
           responseValues.put(commandResponseInfo, valueList);
@@ -8609,7 +8609,7 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess( List<ChipStructs.WaterTankMonitoringClusterReplacementProductStruct> valueList) {
+        public void onSuccess(@Nullable List<ChipStructs.WaterTankMonitoringClusterReplacementProductStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.WaterTankMonitoringClusterReplacementProductStruct>");
           responseValues.put(commandResponseInfo, valueList);
@@ -8724,7 +8724,7 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess( List<ChipStructs.FuelTankMonitoringClusterReplacementProductStruct> valueList) {
+        public void onSuccess(@Nullable List<ChipStructs.FuelTankMonitoringClusterReplacementProductStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.FuelTankMonitoringClusterReplacementProductStruct>");
           responseValues.put(commandResponseInfo, valueList);
@@ -8839,7 +8839,7 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess( List<ChipStructs.InkCartridgeMonitoringClusterReplacementProductStruct> valueList) {
+        public void onSuccess(@Nullable List<ChipStructs.InkCartridgeMonitoringClusterReplacementProductStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.InkCartridgeMonitoringClusterReplacementProductStruct>");
           responseValues.put(commandResponseInfo, valueList);
@@ -8954,7 +8954,7 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess( List<ChipStructs.TonerCartridgeMonitoringClusterReplacementProductStruct> valueList) {
+        public void onSuccess(@Nullable List<ChipStructs.TonerCartridgeMonitoringClusterReplacementProductStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.TonerCartridgeMonitoringClusterReplacementProductStruct>");
           responseValues.put(commandResponseInfo, valueList);

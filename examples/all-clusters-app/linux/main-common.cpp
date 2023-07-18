@@ -35,6 +35,9 @@
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
 
+#include <instances/ActivatedCarbonFilterMonitoring.h>
+#include <instances/HepaFilterMonitoring.h>
+
 #include <Options.h>
 
 using namespace chip;

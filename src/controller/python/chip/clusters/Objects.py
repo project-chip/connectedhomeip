@@ -19046,7 +19046,7 @@ class HepaFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=HepaFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[HepaFilterMonitoring.Structs.ReplacementProductStruct]]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Union[None, Nullable, typing.List[HepaFilterMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -19060,7 +19060,7 @@ class HepaFilterMonitoring(Cluster):
     changeIndication: 'HepaFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
-    replacementProductList: 'typing.Optional[typing.List[HepaFilterMonitoring.Structs.ReplacementProductStruct]]' = None
+    replacementProductList: 'typing.Union[None, Nullable, typing.List[HepaFilterMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -19104,6 +19104,7 @@ class HepaFilterMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+            kReplacementProductList = 0x3
 
     class Structs:
         @dataclass
@@ -19226,9 +19227,9 @@ class HepaFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[HepaFilterMonitoring.Structs.ReplacementProductStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[HepaFilterMonitoring.Structs.ReplacementProductStruct]])
 
-            value: 'typing.Optional[typing.List[HepaFilterMonitoring.Structs.ReplacementProductStruct]]' = None
+            value: 'typing.Union[None, Nullable, typing.List[HepaFilterMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -19340,7 +19341,7 @@ class ActivatedCarbonFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=ActivatedCarbonFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[ActivatedCarbonFilterMonitoring.Structs.ReplacementProductStruct]]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Union[None, Nullable, typing.List[ActivatedCarbonFilterMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -19354,7 +19355,7 @@ class ActivatedCarbonFilterMonitoring(Cluster):
     changeIndication: 'ActivatedCarbonFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
-    replacementProductList: 'typing.Optional[typing.List[ActivatedCarbonFilterMonitoring.Structs.ReplacementProductStruct]]' = None
+    replacementProductList: 'typing.Union[None, Nullable, typing.List[ActivatedCarbonFilterMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -19398,6 +19399,7 @@ class ActivatedCarbonFilterMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+            kReplacementProductList = 0x3
 
     class Structs:
         @dataclass
@@ -19520,9 +19522,9 @@ class ActivatedCarbonFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ActivatedCarbonFilterMonitoring.Structs.ReplacementProductStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[ActivatedCarbonFilterMonitoring.Structs.ReplacementProductStruct]])
 
-            value: 'typing.Optional[typing.List[ActivatedCarbonFilterMonitoring.Structs.ReplacementProductStruct]]' = None
+            value: 'typing.Union[None, Nullable, typing.List[ActivatedCarbonFilterMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -19634,7 +19636,7 @@ class CeramicFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=CeramicFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[CeramicFilterMonitoring.Structs.ReplacementProductStruct]]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Union[None, Nullable, typing.List[CeramicFilterMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -19648,7 +19650,7 @@ class CeramicFilterMonitoring(Cluster):
     changeIndication: 'CeramicFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
-    replacementProductList: 'typing.Optional[typing.List[CeramicFilterMonitoring.Structs.ReplacementProductStruct]]' = None
+    replacementProductList: 'typing.Union[None, Nullable, typing.List[CeramicFilterMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -19692,6 +19694,7 @@ class CeramicFilterMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+            kReplacementProductList = 0x3
 
     class Structs:
         @dataclass
@@ -19814,9 +19817,9 @@ class CeramicFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CeramicFilterMonitoring.Structs.ReplacementProductStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[CeramicFilterMonitoring.Structs.ReplacementProductStruct]])
 
-            value: 'typing.Optional[typing.List[CeramicFilterMonitoring.Structs.ReplacementProductStruct]]' = None
+            value: 'typing.Union[None, Nullable, typing.List[CeramicFilterMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -19928,7 +19931,7 @@ class ElectrostaticFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=ElectrostaticFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[ElectrostaticFilterMonitoring.Structs.ReplacementProductStruct]]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Union[None, Nullable, typing.List[ElectrostaticFilterMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -19942,7 +19945,7 @@ class ElectrostaticFilterMonitoring(Cluster):
     changeIndication: 'ElectrostaticFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
-    replacementProductList: 'typing.Optional[typing.List[ElectrostaticFilterMonitoring.Structs.ReplacementProductStruct]]' = None
+    replacementProductList: 'typing.Union[None, Nullable, typing.List[ElectrostaticFilterMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -19986,6 +19989,7 @@ class ElectrostaticFilterMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+            kReplacementProductList = 0x3
 
     class Structs:
         @dataclass
@@ -20108,9 +20112,9 @@ class ElectrostaticFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ElectrostaticFilterMonitoring.Structs.ReplacementProductStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[ElectrostaticFilterMonitoring.Structs.ReplacementProductStruct]])
 
-            value: 'typing.Optional[typing.List[ElectrostaticFilterMonitoring.Structs.ReplacementProductStruct]]' = None
+            value: 'typing.Union[None, Nullable, typing.List[ElectrostaticFilterMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -20222,7 +20226,7 @@ class UvFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=UvFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[UvFilterMonitoring.Structs.ReplacementProductStruct]]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Union[None, Nullable, typing.List[UvFilterMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -20236,7 +20240,7 @@ class UvFilterMonitoring(Cluster):
     changeIndication: 'UvFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
-    replacementProductList: 'typing.Optional[typing.List[UvFilterMonitoring.Structs.ReplacementProductStruct]]' = None
+    replacementProductList: 'typing.Union[None, Nullable, typing.List[UvFilterMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -20280,6 +20284,7 @@ class UvFilterMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+            kReplacementProductList = 0x3
 
     class Structs:
         @dataclass
@@ -20402,9 +20407,9 @@ class UvFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[UvFilterMonitoring.Structs.ReplacementProductStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[UvFilterMonitoring.Structs.ReplacementProductStruct]])
 
-            value: 'typing.Optional[typing.List[UvFilterMonitoring.Structs.ReplacementProductStruct]]' = None
+            value: 'typing.Union[None, Nullable, typing.List[UvFilterMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -20516,7 +20521,7 @@ class IonizingFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=IonizingFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[IonizingFilterMonitoring.Structs.ReplacementProductStruct]]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Union[None, Nullable, typing.List[IonizingFilterMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -20530,7 +20535,7 @@ class IonizingFilterMonitoring(Cluster):
     changeIndication: 'IonizingFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
-    replacementProductList: 'typing.Optional[typing.List[IonizingFilterMonitoring.Structs.ReplacementProductStruct]]' = None
+    replacementProductList: 'typing.Union[None, Nullable, typing.List[IonizingFilterMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -20574,6 +20579,7 @@ class IonizingFilterMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+            kReplacementProductList = 0x3
 
     class Structs:
         @dataclass
@@ -20696,9 +20702,9 @@ class IonizingFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[IonizingFilterMonitoring.Structs.ReplacementProductStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[IonizingFilterMonitoring.Structs.ReplacementProductStruct]])
 
-            value: 'typing.Optional[typing.List[IonizingFilterMonitoring.Structs.ReplacementProductStruct]]' = None
+            value: 'typing.Union[None, Nullable, typing.List[IonizingFilterMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -20810,7 +20816,7 @@ class ZeoliteFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=ZeoliteFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[ZeoliteFilterMonitoring.Structs.ReplacementProductStruct]]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Union[None, Nullable, typing.List[ZeoliteFilterMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -20824,7 +20830,7 @@ class ZeoliteFilterMonitoring(Cluster):
     changeIndication: 'ZeoliteFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
-    replacementProductList: 'typing.Optional[typing.List[ZeoliteFilterMonitoring.Structs.ReplacementProductStruct]]' = None
+    replacementProductList: 'typing.Union[None, Nullable, typing.List[ZeoliteFilterMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -20868,6 +20874,7 @@ class ZeoliteFilterMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+            kReplacementProductList = 0x3
 
     class Structs:
         @dataclass
@@ -20990,9 +20997,9 @@ class ZeoliteFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ZeoliteFilterMonitoring.Structs.ReplacementProductStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[ZeoliteFilterMonitoring.Structs.ReplacementProductStruct]])
 
-            value: 'typing.Optional[typing.List[ZeoliteFilterMonitoring.Structs.ReplacementProductStruct]]' = None
+            value: 'typing.Union[None, Nullable, typing.List[ZeoliteFilterMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -21104,7 +21111,7 @@ class OzoneFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=OzoneFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[OzoneFilterMonitoring.Structs.ReplacementProductStruct]]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Union[None, Nullable, typing.List[OzoneFilterMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -21118,7 +21125,7 @@ class OzoneFilterMonitoring(Cluster):
     changeIndication: 'OzoneFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
-    replacementProductList: 'typing.Optional[typing.List[OzoneFilterMonitoring.Structs.ReplacementProductStruct]]' = None
+    replacementProductList: 'typing.Union[None, Nullable, typing.List[OzoneFilterMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -21162,6 +21169,7 @@ class OzoneFilterMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+            kReplacementProductList = 0x3
 
     class Structs:
         @dataclass
@@ -21284,9 +21292,9 @@ class OzoneFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[OzoneFilterMonitoring.Structs.ReplacementProductStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[OzoneFilterMonitoring.Structs.ReplacementProductStruct]])
 
-            value: 'typing.Optional[typing.List[OzoneFilterMonitoring.Structs.ReplacementProductStruct]]' = None
+            value: 'typing.Union[None, Nullable, typing.List[OzoneFilterMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -21398,7 +21406,7 @@ class WaterTankMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=WaterTankMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[WaterTankMonitoring.Structs.ReplacementProductStruct]]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Union[None, Nullable, typing.List[WaterTankMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -21412,7 +21420,7 @@ class WaterTankMonitoring(Cluster):
     changeIndication: 'WaterTankMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
-    replacementProductList: 'typing.Optional[typing.List[WaterTankMonitoring.Structs.ReplacementProductStruct]]' = None
+    replacementProductList: 'typing.Union[None, Nullable, typing.List[WaterTankMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -21456,6 +21464,7 @@ class WaterTankMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+            kReplacementProductList = 0x3
 
     class Structs:
         @dataclass
@@ -21578,9 +21587,9 @@ class WaterTankMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[WaterTankMonitoring.Structs.ReplacementProductStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[WaterTankMonitoring.Structs.ReplacementProductStruct]])
 
-            value: 'typing.Optional[typing.List[WaterTankMonitoring.Structs.ReplacementProductStruct]]' = None
+            value: 'typing.Union[None, Nullable, typing.List[WaterTankMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -21692,7 +21701,7 @@ class FuelTankMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=FuelTankMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[FuelTankMonitoring.Structs.ReplacementProductStruct]]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Union[None, Nullable, typing.List[FuelTankMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -21706,7 +21715,7 @@ class FuelTankMonitoring(Cluster):
     changeIndication: 'FuelTankMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
-    replacementProductList: 'typing.Optional[typing.List[FuelTankMonitoring.Structs.ReplacementProductStruct]]' = None
+    replacementProductList: 'typing.Union[None, Nullable, typing.List[FuelTankMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -21750,6 +21759,7 @@ class FuelTankMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+            kReplacementProductList = 0x3
 
     class Structs:
         @dataclass
@@ -21872,9 +21882,9 @@ class FuelTankMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[FuelTankMonitoring.Structs.ReplacementProductStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[FuelTankMonitoring.Structs.ReplacementProductStruct]])
 
-            value: 'typing.Optional[typing.List[FuelTankMonitoring.Structs.ReplacementProductStruct]]' = None
+            value: 'typing.Union[None, Nullable, typing.List[FuelTankMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -21986,7 +21996,7 @@ class InkCartridgeMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=InkCartridgeMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[InkCartridgeMonitoring.Structs.ReplacementProductStruct]]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Union[None, Nullable, typing.List[InkCartridgeMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -22000,7 +22010,7 @@ class InkCartridgeMonitoring(Cluster):
     changeIndication: 'InkCartridgeMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
-    replacementProductList: 'typing.Optional[typing.List[InkCartridgeMonitoring.Structs.ReplacementProductStruct]]' = None
+    replacementProductList: 'typing.Union[None, Nullable, typing.List[InkCartridgeMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -22044,6 +22054,7 @@ class InkCartridgeMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+            kReplacementProductList = 0x3
 
     class Structs:
         @dataclass
@@ -22166,9 +22177,9 @@ class InkCartridgeMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[InkCartridgeMonitoring.Structs.ReplacementProductStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[InkCartridgeMonitoring.Structs.ReplacementProductStruct]])
 
-            value: 'typing.Optional[typing.List[InkCartridgeMonitoring.Structs.ReplacementProductStruct]]' = None
+            value: 'typing.Union[None, Nullable, typing.List[InkCartridgeMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -22280,7 +22291,7 @@ class TonerCartridgeMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=TonerCartridgeMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="lastChangedTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Optional[typing.List[TonerCartridgeMonitoring.Structs.ReplacementProductStruct]]),
+                ClusterObjectFieldDescriptor(Label="replacementProductList", Tag=0x00000005, Type=typing.Union[None, Nullable, typing.List[TonerCartridgeMonitoring.Structs.ReplacementProductStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -22294,7 +22305,7 @@ class TonerCartridgeMonitoring(Cluster):
     changeIndication: 'TonerCartridgeMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
-    replacementProductList: 'typing.Optional[typing.List[TonerCartridgeMonitoring.Structs.ReplacementProductStruct]]' = None
+    replacementProductList: 'typing.Union[None, Nullable, typing.List[TonerCartridgeMonitoring.Structs.ReplacementProductStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -22338,6 +22349,7 @@ class TonerCartridgeMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+            kReplacementProductList = 0x3
 
     class Structs:
         @dataclass
@@ -22460,9 +22472,9 @@ class TonerCartridgeMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[TonerCartridgeMonitoring.Structs.ReplacementProductStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[TonerCartridgeMonitoring.Structs.ReplacementProductStruct]])
 
-            value: 'typing.Optional[typing.List[TonerCartridgeMonitoring.Structs.ReplacementProductStruct]]' = None
+            value: 'typing.Union[None, Nullable, typing.List[TonerCartridgeMonitoring.Structs.ReplacementProductStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

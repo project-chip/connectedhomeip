@@ -322,6 +322,7 @@
             "ChangeIndication",
             "InPlaceIndicator",
             "LastChangedTime",
+            "ReplacementProductList",
             "FeatureMap"
         ],
         "HEPA Filter Monitoring": [
@@ -330,6 +331,7 @@
             "ChangeIndication",
             "InPlaceIndicator",
             "LastChangedTime",
+            "ReplacementProductList",
             "FeatureMap"
         ]
     },
