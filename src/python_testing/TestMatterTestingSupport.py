@@ -15,14 +15,15 @@
 #    limitations under the License.
 #
 
+import time
 import typing
 from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.tlv import uint
-from matter_testing_support import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main, parse_pics,
-                                    type_matches, utc_time_in_matter_epoch)
+from matter_testing_support import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main,
+                                    get_wait_seconds_from_set_time, parse_pics, type_matches, utc_time_in_matter_epoch)
 from mobly import asserts, signals
 
 
@@ -183,6 +184,21 @@ class TestMatterTestingSupport(MatterBaseTest):
         # everything in the seconds range
         compare_time(received=timedelta(seconds=3600).total_seconds() * 1000000,
                      offset=timedelta(seconds=3605), utc=0, tolerance=timedelta(seconds=5))
+
+    def test_get_wait_time_function(self):
+        th_utc = utc_time_in_matter_epoch()
+        secs = get_wait_seconds_from_set_time(th_utc, 5)
+        asserts.assert_equal(secs, 5)
+        # If we've pass less than a second, we still want to wait 5
+        time.sleep(0.5)
+        secs = get_wait_seconds_from_set_time(th_utc, 5)
+        asserts.assert_equal(secs, 5)
+
+        time.sleep(0.5)
+        secs = get_wait_seconds_from_set_time(th_utc, 5)
+        asserts.assert_equal(secs, 4)
+        secs = get_wait_seconds_from_set_time(th_utc, 15)
+        asserts.assert_equal(secs, 14)
 
 
 if __name__ == "__main__":
