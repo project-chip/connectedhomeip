@@ -396,7 +396,3 @@ bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(app::CommandHandle
     return true;
 }
 
-/**********************************************************
- * Callbacks Implementation
- *********************************************************/
-void MatterDishwasherAlarmPluginServerInitCallback() {}

@@ -160,6 +160,7 @@ void MatterPm25ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterRadonConcentrationMeasurementPluginServerInitCallback() {}
 void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInitCallback() {}
 void MatterOperationalStatePluginServerInitCallback() {}
+void MatterDishwasherAlarmPluginServerInitCallback() {}
 // ****************************************
 // Print out information about each cluster
 // ****************************************
