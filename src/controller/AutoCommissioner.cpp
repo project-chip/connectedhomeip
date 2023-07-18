@@ -242,10 +242,53 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             // Per the spec, we restart from after adding the NOC.
             return GetNextCommissioningStage(CommissioningStage::kSendNOC, lastErr);
         }
+        if (mParams.GetCheckForMatchingFabric())
+        {
+            return CommissioningStage::kCheckForMatchingFabric;
+        }
+        return CommissioningStage::kArmFailsafe;
+    case CommissioningStage::kCheckForMatchingFabric:
         return CommissioningStage::kArmFailsafe;
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kConfigRegulatory:
+        if (mDeviceCommissioningInfo.requiresUTC)
+        {
+            return CommissioningStage::kConfigureUTCTime;
+        }
+        else
+        {
+            // Time cluster is not supported, move right to DA
+            return CommissioningStage::kSendPAICertificateRequest;
+        }
+    case CommissioningStage::kConfigureUTCTime:
+        if (mDeviceCommissioningInfo.requiresTimeZone && mParams.GetTimeZone().HasValue())
+        {
+            return kConfigureTimeZone;
+        }
+        else
+        {
+            return GetNextCommissioningStageInternal(CommissioningStage::kConfigureTimeZone, lastErr);
+        }
+    case CommissioningStage::kConfigureTimeZone:
+        if (mNeedsDST && mParams.GetDSTOffsets().HasValue())
+        {
+            return CommissioningStage::kConfigureDSTOffset;
+        }
+        else
+        {
+            return GetNextCommissioningStageInternal(CommissioningStage::kConfigureDSTOffset, lastErr);
+        }
+    case CommissioningStage::kConfigureDSTOffset:
+        if (mDeviceCommissioningInfo.requiresDefaultNTP && mParams.GetDefaultNTP().HasValue())
+        {
+            return CommissioningStage::kConfigureDefaultNTP;
+        }
+        else
+        {
+            return GetNextCommissioningStageInternal(CommissioningStage::kConfigureDefaultNTP, lastErr);
+        }
+    case CommissioningStage::kConfigureDefaultNTP:
         return CommissioningStage::kSendPAICertificateRequest;
     case CommissioningStage::kSendPAICertificateRequest:
         return CommissioningStage::kSendDACCertificateRequest;
@@ -264,6 +307,15 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kSendTrustedRootCert:
         return CommissioningStage::kSendNOC;
     case CommissioningStage::kSendNOC:
+        if (mDeviceCommissioningInfo.requiresTrustedTimeSource && mParams.GetTrustedTimeSource().HasValue())
+        {
+            return CommissioningStage::kConfigureTrustedTimeSource;
+        }
+        else
+        {
+            return GetNextCommissioningStageInternal(CommissioningStage::kConfigureTrustedTimeSource, lastErr);
+        }
+    case CommissioningStage::kConfigureTrustedTimeSource:
         // TODO(cecille): device attestation casues operational cert provisioning to happen, This should be a separate stage.
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
@@ -580,10 +632,19 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 .SetRemoteProductId(mDeviceCommissioningInfo.basic.productId)
                 .SetDefaultRegulatoryLocation(mDeviceCommissioningInfo.general.currentRegulatoryLocation)
                 .SetLocationCapability(mDeviceCommissioningInfo.general.locationCapability);
-            if (mDeviceCommissioningInfo.nodeId != kUndefinedNodeId)
+            // Don't send DST unless the device says it needs it
+            mNeedsDST = false;
+            break;
+        case CommissioningStage::kCheckForMatchingFabric: {
+            chip::NodeId nodeId = report.Get<MatchingFabricInfo>().nodeId;
+            if (nodeId != kUndefinedNodeId)
             {
-                mParams.SetRemoteNodeId(mDeviceCommissioningInfo.nodeId);
+                mParams.SetRemoteNodeId(nodeId);
             }
+            break;
+        }
+        case CommissioningStage::kConfigureTimeZone:
+            mNeedsDST = report.Get<TimeZoneResponseInfo>().requiresDSTOffsets;
             break;
         case CommissioningStage::kSendPAICertificateRequest:
             SetPAI(report.Get<RequestedCertificate>().certificate);
@@ -650,6 +711,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mCommissioneeDeviceProxy = nullptr;
             mOperationalDeviceProxy  = OperationalDeviceProxy();
             mDeviceCommissioningInfo = ReadCommissioningInfo();
+            mNeedsDST                = false;
             return CHIP_NO_ERROR;
         default:
             break;
@@ -691,6 +753,26 @@ CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
     {
         ChipLogError(Controller, "Invalid device for commissioning");
         return CHIP_ERROR_INCORRECT_STATE;
+    }
+    // Perform any last minute parameter adjustments before calling the commissioner object
+    switch (nextStage)
+    {
+    case CommissioningStage::kConfigureTimeZone:
+        if (mParams.GetTimeZone().Value().size() > mDeviceCommissioningInfo.maxTimeZoneSize)
+        {
+            mParams.SetTimeZone(app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>(
+                mParams.GetTimeZone().Value().SubSpan(0, mDeviceCommissioningInfo.maxTimeZoneSize)));
+        }
+        break;
+    case CommissioningStage::kConfigureDSTOffset:
+        if (mParams.GetDSTOffsets().Value().size() > mDeviceCommissioningInfo.maxDSTSize)
+        {
+            mParams.SetDSTOffsets(app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>(
+                mParams.GetDSTOffsets().Value().SubSpan(0, mDeviceCommissioningInfo.maxDSTSize)));
+        }
+        break;
+    default:
+        break;
     }
 
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, GetEndpoint(nextStage),
