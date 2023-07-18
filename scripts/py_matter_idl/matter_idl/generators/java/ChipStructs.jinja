@@ -94,8 +94,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package chip.devicecontroller.cluster
+package chip.devicecontroller.cluster.structs
 
+import chip.devicecontroller.cluster.*
 import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
@@ -105,57 +106,50 @@ import chip.tlv.TlvWriter
 
 import java.util.Optional
 
-class ChipStructs {
-  {%- for cluster in clientClusters | sort(attribute='code') %}
-    {%- set typeLookup = idl | createLookupContext(cluster) %}
-    {%- for struct in cluster.structs -%}{% if not struct.tag %}
-    class {{cluster.name}}Cluster{{struct.name}} (
-      {%- for field in struct.fields %}
+class {{cluster.name}}Cluster{{struct.name}} (
+  {%- for field in struct.fields %}
+    {%- set encodable = field | asEncodable(typeLookup) %}
+    val {{field.name}}: {{encode_value(cluster, encodable, 0)}}
+    {%- if loop.index0 < loop.length - 1 -%}{{","}}{%- endif -%}
+  {%- endfor -%}) {
+  override fun toString() : String {
+    val builder: StringBuilder = StringBuilder()
+    builder.append("{{cluster.name}}Cluster{{struct.name}} {\n")
+    {%- for field in struct.fields %}
+    builder.append("\t{{field.name}} : ${{field.name}}\n")
+    {%- endfor %}
+    builder.append("}\n")
+    return builder.toString()
+  }
+
+  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+    tlvWriter.startStructure(tag)
+    {% for field in struct.fields %}
+      {%- set encodable = field | asEncodable(typeLookup) %}
+      {%- set tag = contextSpecificTag(field.code) -%}
+      {{encode_tlv(encodable, tag, field.name, 0)}}
+    {% endfor -%}
+    tlvWriter.endStructure()
+  }
+
+  companion object {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : {{cluster.name}}Cluster{{struct.name}} {
+      tlvReader.enterStructure(tag)
+      {% for field in struct.fields %}
         {%- set encodable = field | asEncodable(typeLookup) %}
-        val {{field.name}}: {{encode_value(cluster, encodable, 0)}}
-        {%- if loop.index0 < loop.length - 1 -%}{{","}}{%- endif -%}
-      {%- endfor -%}) {
-      override fun toString() : String {
-        val builder: StringBuilder = StringBuilder()
-        builder.append("{{cluster.name}}Cluster{{struct.name}} {\n")
-        {%- for field in struct.fields %}
-        builder.append("\t{{field.name}} : ${{field.name}}\n")
-        {%- endfor %}
-        builder.append("}\n")
-        return builder.toString()
-      }
+        {%- set decodable = field | asEncodable(typeLookup) %}
+        {%- set tag = contextSpecificTag(field.code) -%}
+        val {{field.name}}: {{encode_value(cluster, encodable, 0)}} = {{decode_tlv(cluster, decodable, tag, 0)}}
+      {% endfor %}
+      tlvReader.exitContainer()
 
-      fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-        tlvWriter.startStructure(tag)
-        {% for field in struct.fields %}
-          {%- set encodable = field | asEncodable(typeLookup) %}
-          {%- set tag = contextSpecificTag(field.code) -%}
-          {{encode_tlv(encodable, tag, field.name, 0)}}
-        {% endfor -%}
-        tlvWriter.endStructure()
-      }
-
-      companion object {
-        fun fromTlv(tag: Tag, tlvReader: TlvReader) : {{cluster.name}}Cluster{{struct.name}} {
-          tlvReader.enterStructure(tag)
-          {% for field in struct.fields %}
-            {%- set encodable = field | asEncodable(typeLookup) %}
-            {%- set decodable = field | asEncodable(typeLookup) %}
-            {%- set tag = contextSpecificTag(field.code) -%}
-            val {{field.name}}: {{encode_value(cluster, encodable, 0)}} = {{decode_tlv(cluster, decodable, tag, 0)}}
-          {% endfor %}
-          tlvReader.exitContainer()
-
-          return {{cluster.name}}Cluster{{struct.name}}(
-            {%- for field in struct.fields -%}
-              {%- set encodable = field | asEncodable(typeLookup) -%}
-              {{field.name}}
-              {%- if loop.index0 < loop.length - 1 -%}{{", "}}{%- endif -%}
-            {%- endfor -%}
-          )
-        }
-      }
+      return {{cluster.name}}Cluster{{struct.name}}(
+        {%- for field in struct.fields -%}
+          {%- set encodable = field | asEncodable(typeLookup) -%}
+          {{field.name}}
+          {%- if loop.index0 < loop.length - 1 -%}{{", "}}{%- endif -%}
+        {%- endfor -%}
+      )
     }
-    {% endif %}{%- endfor -%}
-  {%- endfor -%}
+  }
 }

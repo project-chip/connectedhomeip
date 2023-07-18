@@ -52,8 +52,6 @@ java-jni:
 
 java-class:
     inputs/several_clusters.matter:
-        java/chip/cluster/ChipEventStructs.kt: outputs/several_clusters/java/ChipEventStructs.kt
-        java/chip/cluster/ChipStructs.kt: outputs/several_clusters/java/ChipStructs.kt
         java/chip/devicecontroller/ClusterWriteMapping.java: outputs/several_clusters/java/ClusterWriteMapping.java
         java/chip/devicecontroller/ClusterReadMapping.java: outputs/several_clusters/java/ClusterReadMapping.java
         java/chip/devicecontroller/ClusterIDMapping.java: outputs/several_clusters/java/ClusterIDMapping.java

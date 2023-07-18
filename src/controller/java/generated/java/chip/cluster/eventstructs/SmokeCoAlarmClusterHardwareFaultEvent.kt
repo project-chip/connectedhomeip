@@ -14,8 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package chip.devicecontroller.cluster
+package chip.devicecontroller.cluster.eventstructs
 
+import chip.devicecontroller.cluster.*
 import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
@@ -25,4 +26,26 @@ import chip.tlv.TlvWriter
 
 import java.util.Optional
 
-class ChipEventStructs {}
+class SmokeCoAlarmClusterHardwareFaultEvent () {
+  override fun toString() : String {
+    val builder: StringBuilder = StringBuilder()
+    builder.append("SmokeCoAlarmClusterHardwareFaultEvent {\n")
+    builder.append("}\n")
+    return builder.toString()
+  }
+
+  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+    tlvWriter.startStructure(tag)
+    tlvWriter.endStructure()
+  }
+
+  companion object {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : SmokeCoAlarmClusterHardwareFaultEvent {
+      tlvReader.enterStructure(tag)
+      
+      tlvReader.exitContainer()
+
+      return SmokeCoAlarmClusterHardwareFaultEvent()
+    }
+  }
+}

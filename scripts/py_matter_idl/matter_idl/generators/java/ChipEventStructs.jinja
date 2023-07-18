@@ -7,7 +7,7 @@
     List<{{encode_value(source, encodable.without_list(), depth + 1)}}>
   {%- elif encodable.is_struct -%}
     {%- set struct = encodable.get_underlying_struct() -%}
-    ChipStructs.{{source.name}}Cluster{{struct.name}}
+    chip.devicecontroller.cluster.structs.{{source.name}}Cluster{{struct.name}}
   {%- else -%}
     {{encodable.kotlin_type}}
   {%- endif -%}
@@ -68,7 +68,7 @@
     }
   {%- elif encodable.is_struct -%}
       {%- set struct = encodable.get_underlying_struct() -%}
-      ChipStructs.{{source.name}}Cluster{{struct.name}}.fromTlv({{tag}}, tlvReader)
+      chip.devicecontroller.cluster.structs.{{source.name}}Cluster{{struct.name}}.fromTlv({{tag}}, tlvReader)
   {%- else -%}
       tlvReader.get{{encodable.kotlin_type}}({{tag}})
   {%- endif -%}
@@ -94,8 +94,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package chip.devicecontroller.cluster
+package chip.devicecontroller.cluster.eventstructs
 
+import chip.devicecontroller.cluster.*
 import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
@@ -105,57 +106,50 @@ import chip.tlv.TlvWriter
 
 import java.util.Optional
 
-class ChipEventStructs {
-  {%- for cluster in clientClusters | sort(attribute='code') -%}
-    {%- set typeLookup = idl | createLookupContext(cluster) -%}
-    {%- for event in cluster.events %}
-    class {{cluster.name}}Cluster{{event.name}}Event (
-      {%- for field in event.fields -%}
+class {{cluster.name}}Cluster{{event.name}}Event (
+  {%- for field in event.fields -%}
+    {%- set encodable = field | asEncodable(typeLookup) %}
+    val {{field.name}}: {{encode_value(cluster, encodable, 0)}}
+    {%- if loop.index0 < loop.length - 1 -%}{{","}}{%- endif -%}
+  {%- endfor -%}) {
+  override fun toString() : String {
+    val builder: StringBuilder = StringBuilder()
+    builder.append("{{cluster.name}}Cluster{{event.name}}Event {\n")
+    {%- for field in event.fields %}
+    builder.append("\t{{field.name}} : ${{field.name}}\n")
+    {%- endfor %}
+    builder.append("}\n")
+    return builder.toString()
+  }
+
+  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+    tlvWriter.startStructure(tag)
+    {% for field in event.fields %}
+      {%- set encodable = field | asEncodable(typeLookup) %}
+      {%- set tag = contextSpecificTag(field.code) -%}
+      {{encode_tlv(encodable, tag, field.name, 0)}}
+    {% endfor -%}
+    tlvWriter.endStructure()
+  }
+
+  companion object {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : {{cluster.name}}Cluster{{event.name}}Event {
+      tlvReader.enterStructure(tag)
+      {% for field in event.fields %}
         {%- set encodable = field | asEncodable(typeLookup) %}
-        val {{field.name}}: {{encode_value(cluster, encodable, 0)}}
-        {%- if loop.index0 < loop.length - 1 -%}{{","}}{%- endif -%}
-      {%- endfor -%}) {
-      override fun toString() : String {
-        val builder: StringBuilder = StringBuilder()
-        builder.append("{{cluster.name}}Cluster{{event.name}}Event {\n")
-        {%- for field in event.fields %}
-        builder.append("\t{{field.name}} : ${{field.name}}\n")
-        {%- endfor %}
-        builder.append("}\n")
-        return builder.toString()
-      }
+        {%- set decodable = field | asEncodable(typeLookup) %}
+        {%- set tag = contextSpecificTag(field.code) -%}
+        val {{field.name}}: {{encode_value(cluster, encodable, 0)}} = {{decode_tlv(cluster, decodable, tag, 0)}}
+      {% endfor %}
+      tlvReader.exitContainer()
 
-      fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-        tlvWriter.startStructure(tag)
-        {% for field in event.fields %}
-          {%- set encodable = field | asEncodable(typeLookup) %}
-          {%- set tag = contextSpecificTag(field.code) -%}
-          {{encode_tlv(encodable, tag, field.name, 0)}}
-        {% endfor -%}
-        tlvWriter.endStructure()
-      }
-
-      companion object {
-        fun fromTlv(tag: Tag, tlvReader: TlvReader) : {{cluster.name}}Cluster{{event.name}}Event {
-          tlvReader.enterStructure(tag)
-          {% for field in event.fields %}
-            {%- set encodable = field | asEncodable(typeLookup) %}
-            {%- set decodable = field | asEncodable(typeLookup) %}
-            {%- set tag = contextSpecificTag(field.code) -%}
-            val {{field.name}}: {{encode_value(cluster, encodable, 0)}} = {{decode_tlv(cluster, decodable, tag, 0)}}
-          {% endfor %}
-          tlvReader.exitContainer()
-
-          return {{cluster.name}}Cluster{{event.name}}Event(
-            {%- for field in event.fields -%}
-              {%- set encodable = field | asEncodable(typeLookup) -%}
-              {{field.name}}
-              {%- if loop.index0 < loop.length - 1 -%}{{", "}}{%- endif -%}
-            {%- endfor -%}
-          )
-        }
-      }
+      return {{cluster.name}}Cluster{{event.name}}Event(
+        {%- for field in event.fields -%}
+          {%- set encodable = field | asEncodable(typeLookup) -%}
+          {{field.name}}
+          {%- if loop.index0 < loop.length - 1 -%}{{", "}}{%- endif -%}
+        {%- endfor -%}
+      )
     }
-    {% endfor %}
-  {%- endfor -%}
+  }
 }

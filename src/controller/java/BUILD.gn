@@ -301,15 +301,15 @@ group("unit_tests") {
 }
 
 kotlin_library("chipcluster") {
+  import("${chip_root}/src/controller/java/src/chip/cluster/files.gni")
   output_name = "CHIPClusters.jar"
 
   deps = [ ":tlv" ]
 
-  sources = [
-    "generated/java/chip/cluster/ChipEventStructs.kt",
-    "generated/java/chip/cluster/ChipStructs.kt",
-    "src/chip/cluster/TlvReaderExtension.kt",
-  ]
+  sources = [ "src/chip/cluster/TlvReaderExtension.kt" ]
+
+  sources += structs_sources
+  sources += eventstructs_sources
 
   kotlinc_flags = [ "-Xlint:deprecation" ]
 }

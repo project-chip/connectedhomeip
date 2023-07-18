@@ -1,0 +1,143 @@
+/*
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+package chip.devicecontroller.cluster.structs
+
+import chip.devicecontroller.cluster.*
+import chip.tlv.Tag
+import chip.tlv.AnonymousTag
+import chip.tlv.ContextSpecificTag
+import chip.tlv.TlvParsingException
+import chip.tlv.TlvReader
+import chip.tlv.TlvWriter
+
+import java.util.Optional
+
+class UnitTestingClusterNestedStructList (
+    val a: Int,
+    val b: Boolean,
+    val c: UnitTestingClusterSimpleStruct,
+    val d: List<UnitTestingClusterSimpleStruct>,
+    val e: List<Long>,
+    val f: List<ByteArray>,
+    val g: List<Int>) {
+  override fun toString() : String {
+    val builder: StringBuilder = StringBuilder()
+    builder.append("UnitTestingClusterNestedStructList {\n")
+    builder.append("\ta : $a\n")
+    builder.append("\tb : $b\n")
+    builder.append("\tc : $c\n")
+    builder.append("\td : $d\n")
+    builder.append("\te : $e\n")
+    builder.append("\tf : $f\n")
+    builder.append("\tg : $g\n")
+    builder.append("}\n")
+    return builder.toString()
+  }
+
+  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+    tlvWriter.startStructure(tag)
+    tlvWriter.put(ContextSpecificTag(0), a)
+    tlvWriter.put(ContextSpecificTag(1), b)
+    c.toTlv(ContextSpecificTag(2), tlvWriter)
+    tlvWriter.startList(ContextSpecificTag(3))
+      val iter_d = d.iterator()
+      while(iter_d.hasNext()) {
+        val next = iter_d.next()
+        next.toTlv(AnonymousTag, tlvWriter)
+      }
+      tlvWriter.endList()
+    tlvWriter.startList(ContextSpecificTag(4))
+      val iter_e = e.iterator()
+      while(iter_e.hasNext()) {
+        val next = iter_e.next()
+        tlvWriter.put(AnonymousTag, next)
+      }
+      tlvWriter.endList()
+    tlvWriter.startList(ContextSpecificTag(5))
+      val iter_f = f.iterator()
+      while(iter_f.hasNext()) {
+        val next = iter_f.next()
+        tlvWriter.put(AnonymousTag, next)
+      }
+      tlvWriter.endList()
+    tlvWriter.startList(ContextSpecificTag(6))
+      val iter_g = g.iterator()
+      while(iter_g.hasNext()) {
+        val next = iter_g.next()
+        tlvWriter.put(AnonymousTag, next)
+      }
+      tlvWriter.endList()
+    tlvWriter.endStructure()
+  }
+
+  companion object {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader) : UnitTestingClusterNestedStructList {
+      tlvReader.enterStructure(tag)
+      val a: Int = tlvReader.getInt(ContextSpecificTag(0))
+      val b: Boolean = tlvReader.getBoolean(ContextSpecificTag(1))
+      val c: UnitTestingClusterSimpleStruct = UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(2), tlvReader)
+      val d: List<UnitTestingClusterSimpleStruct> = mutableListOf<UnitTestingClusterSimpleStruct>().apply {
+      tlvReader.enterList(ContextSpecificTag(3))
+      while(true) {
+        try {
+          this.add(UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader))
+        } catch (e: TlvParsingException) {
+          break
+        }
+      }
+      tlvReader.exitContainer()
+    }
+      val e: List<Long> = mutableListOf<Long>().apply {
+      tlvReader.enterList(ContextSpecificTag(4))
+      while(true) {
+        try {
+          this.add(tlvReader.getLong(AnonymousTag))
+        } catch (e: TlvParsingException) {
+          break
+        }
+      }
+      tlvReader.exitContainer()
+    }
+      val f: List<ByteArray> = mutableListOf<ByteArray>().apply {
+      tlvReader.enterList(ContextSpecificTag(5))
+      while(true) {
+        try {
+          this.add(tlvReader.getByteArray(AnonymousTag))
+        } catch (e: TlvParsingException) {
+          break
+        }
+      }
+      tlvReader.exitContainer()
+    }
+      val g: List<Int> = mutableListOf<Int>().apply {
+      tlvReader.enterList(ContextSpecificTag(6))
+      while(true) {
+        try {
+          this.add(tlvReader.getInt(AnonymousTag))
+        } catch (e: TlvParsingException) {
+          break
+        }
+      }
+      tlvReader.exitContainer()
+    }
+      
+      tlvReader.exitContainer()
+
+      return UnitTestingClusterNestedStructList(a, b, c, d, e, f, g)
+    }
+  }
+}

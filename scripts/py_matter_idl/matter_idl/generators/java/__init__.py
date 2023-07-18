@@ -781,20 +781,39 @@ class JavaClassGenerator(__JavaCodeGenerator):
             }
         )
 
-        self.internal_render_one_output(
-            template_path="ChipStructs.jinja",
-            output_file_name="java/chip/cluster/ChipStructs.kt",
-            vars={
-                'idl': self.idl,
-                'clientClusters': clientClusters,
-            }
-        )
+        # Every cluster has its own impl, to avoid
+        # very large compilations (running out of RAM)
+        for cluster in self.idl.clusters:
+            if cluster.side != ClusterSide.CLIENT:
+                continue
 
-        self.internal_render_one_output(
-            template_path="ChipEventStructs.jinja",
-            output_file_name="java/chip/cluster/ChipEventStructs.kt",
-            vars={
-                'idl': self.idl,
-                'clientClusters': clientClusters,
-            }
-        )
+            for struct in cluster.structs:
+                if struct.tag:
+                    continue
+
+                output_name="java/chip/cluster/structs/{cluster_name}Cluster{struct_name}.kt"
+                self.internal_render_one_output(
+                    template_path="ChipStructs.jinja",
+                    output_file_name=output_name.format(
+                        cluster_name=cluster.name,
+                        struct_name=struct.name),
+                    vars={
+                        'cluster': cluster,
+                        'struct': struct,
+                        'typeLookup': TypeLookupContext(self.idl, cluster),
+                    }
+                )
+
+            for event in cluster.events:
+                output_name="java/chip/cluster/eventstructs/{cluster_name}Cluster{event_name}Event.kt"
+                self.internal_render_one_output(
+                    template_path="ChipEventStructs.jinja",
+                    output_file_name=output_name.format(
+                        cluster_name=cluster.name,
+                        event_name=event.name),
+                    vars={
+                        'cluster': cluster,
+                        'event': event,
+                        'typeLookup': TypeLookupContext(self.idl, cluster),
+                    }
+                )
