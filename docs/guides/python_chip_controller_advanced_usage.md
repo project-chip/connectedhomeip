@@ -7,8 +7,9 @@ tool or Matter accessories on Linux.
 
 <hr>
 
--   [Bluetooth LE virtualization on Linux](#bluetooth-le-virtualization-on-linux)
--   [Debugging with gdb](#debugging-with-gdb)
+- [Using Python CHIP Controller advanced features](#using-python-chip-controller-advanced-features)
+  - [Bluetooth LE virtualization on Linux](#bluetooth-le-virtualization-on-linux)
+  - [Debugging with gdb](#debugging-with-gdb)
 
 <hr>
 
@@ -180,7 +181,7 @@ chip-device-ctrl > connect -ip 192.168.50.5 20202021 1
 Device is assigned with nodeid = 1
 
 Thread 1 "python3" hit Breakpoint 1, 0x0000fffff5b0f6b4 in chip::Controller::DeviceCommissioner::PairDevice(unsigned long, chip::RendezvousParameters&)@plt ()
-   from /home/ubuntu/.local/lib/python3.9/site-packages/chip/_ChipDeviceCtrl.so
+   from /home/ubuntu/.local/lib/python3.11/site-packages/chip/_ChipDeviceCtrl.so
 (gdb)
 ```
 
@@ -207,8 +208,8 @@ then you can use `bt` (for `backtrace`) to see the backtrace of the call stack.
     (devCtrl=0xd28540, peerAddrStr=0xfffff467ace0 "192.168.50.5", setupPINCode=20202021, nodeid=1) at ../../src/controller/python/ChipDeviceController-ScriptBinding.cpp:234
 #2  0x0000fffff7639148 in  () at /lib/aarch64-linux-gnu/libffi.so.8
 #3  0x0000fffff7638750 in  () at /lib/aarch64-linux-gnu/libffi.so.8
-#4  0x0000fffff7665a44 in  () at /usr/lib/python3.9/lib-dynload/_ctypes.cpython-39-aarch64-linux-gnu.so
-#5  0x0000fffff7664c7c in  () at /usr/lib/python3.9/lib-dynload/_ctypes.cpython-39-aarch64-linux-gnu.so
+#4  0x0000fffff7665a44 in  () at /usr/lib/python3.11/lib-dynload/_ctypes.cpython-39-aarch64-linux-gnu.so
+#5  0x0000fffff7664c7c in  () at /usr/lib/python3.11/lib-dynload/_ctypes.cpython-39-aarch64-linux-gnu.so
 #6  0x00000000004a54f0 in _PyObject_MakeTpCall ()
 #7  0x000000000049cb10 in _PyEval_EvalFrameDefault ()
 #8  0x0000000000496d1c in  ()

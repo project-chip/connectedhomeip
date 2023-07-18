@@ -46,9 +46,9 @@ shared_library("CHIPController") {
   include_dirs = [ "${chip_root}/third_party/pybind11/repo/include" ]
   if (current_os == "mac") {
     include_dirs +=
-        [ "${chip_root}/.environment/cipd/packages/python/include/python3.9" ]
+        [ "${chip_root}/.environment/cipd/packages/python/include/python3.11" ]
   } else if (current_os == "linux") {
-    include_dirs += [ "/usr/include/python3.9" ]
+    include_dirs += [ "/usr/include/python3.11" ]
   } else {
     assert(false, "OS not supported.")
   }
@@ -78,7 +78,7 @@ shared_library("CHIPController") {
     ]
   }
   if (current_os == "linux") {
-    libs = [ "python3.9" ]
+    libs = [ "python3.11" ]
   }
 }
 

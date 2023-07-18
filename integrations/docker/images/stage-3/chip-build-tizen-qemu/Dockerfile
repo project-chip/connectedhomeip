@@ -184,7 +184,7 @@ RUN set -x \
     "echo o > /proc/sysrq-trigger\n" \
     | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - /launcher.sh : chmod 0755 /launcher.sh \
     # Remove ALL previously installed packages
-    && apt-get autopurge -fy $(tail -2 /var/log/apt/history.log | grep ^Install | cut -c 10- | sed 's/([^)]*),\?//g') \
+    && DEBIAN_FRONTEND=noninteractive apt-get autopurge -fy $(tail -2 /var/log/apt/history.log | grep ^Install | cut -c 10- | sed 's/([^)]*),\?//g') \
     && rm -rf /var/lib/apt/lists \
     && rm -rf /var/tmp/.guestfs-0 \
     # Cleanup

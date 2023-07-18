@@ -37,7 +37,7 @@ ENV TIZEN_SDK_ROOT /opt/tizen-sdk
 
 COPY tizen-sdk-installer $TIZEN_SDK_ROOT/files/installer
 RUN set -x \
-    && bash $TIZEN_SDK_ROOT/files/installer/install.sh \
+    && DEBIAN_FRONTEND=noninteractive $TIZEN_SDK_ROOT/files/installer/install.sh \
     --tizen-sdk-path $TIZEN_SDK_ROOT \
     --tizen-sdk-data-path $USER_HOME/tizen-sdk-data \
     --tizen-version $TIZEN_VERSION  \

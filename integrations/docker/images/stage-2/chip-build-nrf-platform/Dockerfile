@@ -39,7 +39,7 @@ FROM ghcr.io/project-chip/chip-build:${VERSION}
 # Tools for building, flashing and accessing device logs
 RUN set -x \
     && apt-get update \
-    && apt-get install --no-install-recommends -fy device-tree-compiler=1.5.1-1 \
+    && apt-get install --no-install-recommends -fy device-tree-compiler \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
