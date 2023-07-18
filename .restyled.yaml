@@ -82,6 +82,8 @@ exclude:
     - "src/controller/java/zap-generated/**/*" # not formatted: generated files
     - "scripts/setup/bootstrap.sh" # tries to quote loop variable
     - "scripts/helpers/roll_docker_version.sh" # tries to quote loop variable
+    - "scripts/helpers/**/*" # tries to quote loop variable
+    - "scripts/helpers/*" # tries to quote loop variable
 
 changed_paths:
     maximum: 100000
