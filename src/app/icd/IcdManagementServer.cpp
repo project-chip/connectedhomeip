@@ -49,7 +49,7 @@ Status IcdManagementServer::RegisterClient(PersistentStorageDelegate & storage, 
 }
 
 Status IcdManagementServer::UnregisterClient(PersistentStorageDelegate & storage, FabricIndex fabric_index, chip::NodeId node_id,
-                                             Optional<chip::ByteSpan> key, bool is_admin)
+                                             Optional<chip::ByteSpan> verificationKey, bool is_admin)
 {
     IcdMonitoringTable table(storage, fabric_index, GetClientsSupportedPerFabric());
 
@@ -62,8 +62,8 @@ Status IcdManagementServer::UnregisterClient(PersistentStorageDelegate & storage
     // Existing entry: Validate Key if, and only if, the ISD has NOT administrator permissions
     if (!is_admin)
     {
-        VerifyOrReturnError(key.HasValue(), InteractionModel::Status::Failure);
-        VerifyOrReturnError(key.Value().data_equal(entry.key), InteractionModel::Status::Failure);
+        VerifyOrReturnError(verificationKey.HasValue(), InteractionModel::Status::Failure);
+        VerifyOrReturnError(verificationKey.Value().data_equal(entry.key), InteractionModel::Status::Failure);
     }
 
     err = table.Remove(entry.index);

@@ -228,7 +228,7 @@ bool emberAfIcdManagementClusterUnregisterClientCallback(chip::app::CommandHandl
     {
         PersistentStorageDelegate & storage = chip::Server::GetInstance().GetPersistentStorage();
         FabricIndex fabric                  = commandObj->GetAccessingFabricIndex();
-        status = IcdManagementServer::GetInstance().UnregisterClient(storage, fabric, commandData.checkInNodeID, commandData.key,
+        status = IcdManagementServer::GetInstance().UnregisterClient(storage, fabric, commandData.checkInNodeID, commandData.verificationKey,
                                                                      is_admin);
     }
 
