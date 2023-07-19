@@ -251,6 +251,18 @@ function run_test() {
         TEST_OPTIONS+=(--networkInterface="$FVP_NETWORK")
     fi
 
+    if [[ "$EXAMPLE" == "ota-requestor-app" ]]; then
+        TEST_OPTIONS+=(--updateBinaryPath="${EXAMPLE_EXE_PATH/elf/"ota"}")
+        # Check if OTA provider exists, if so get the path to it
+        OTA_PROVIDER_APP=$(find . -type f -name "chip-ota-provider-app")
+        if [ -z "$OTA_PROVIDER_APP" ]; then
+            echo "Error: OTA provider application does not exist." >&2
+            exit 1
+        fi
+        TEST_OPTIONS+=(--otaProvider="$OTA_PROVIDER_APP")
+        TEST_OPTIONS+=(--softwareVersion="$APP_VERSION:$APP_VERSION_STR")
+    fi
+
     if [[ -f $EXAMPLE_TEST_PATH/test_report_$EXAMPLE.json ]]; then
         rm -rf "$EXAMPLE_TEST_PATH/test_report_$EXAMPLE".json
     fi

@@ -5584,6 +5584,9 @@ PICS:
     - label: "Level Control for Lighting"
       id: OO.S.F00
 
+    - label: "Device has Deadfront behaviour"
+      id: OO.S.F01
+
     #
     # server / manually
     #
@@ -9536,3 +9539,27 @@ PICS:
     - label:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: RVCCLEANMS.S.C03.Tx
+
+    #
+    #Operational State
+    #
+    #Server Attributes
+    - label: "Does the device implement the CountdownTime attribute?"
+      id: OPSTATE.S.A0002
+
+    #Events Generated
+    - label: "Does the device generate the OperationCompltion event?"
+      id: OPSTATE.S.E01
+
+    #Server Commands Received
+    - label: "Does the device implement receiving the Pause command?"
+      id: OPSTATE.S.C00
+
+    - label: "Does the device implement receiving the Stop command?"
+      id: OPSTATE.S.C01
+
+    - label: "Does the device implement receiving the Start command?"
+      id: OPSTATE.S.C02
+
+    - label: "Does the device implement receiving the Resume command?"
+      id: OPSTATE.S.C03
