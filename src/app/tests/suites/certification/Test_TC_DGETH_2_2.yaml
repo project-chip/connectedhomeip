@@ -23,7 +23,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads PHYRate attribute from DUT"
+    - label: "Step 2a.1: TH reads PHYRate attribute from DUT"
       PICS: DGETH.S.A0000
       command: "readAttribute"
       attribute: "PHYRate"
@@ -41,7 +41,7 @@ tests:
               minValue: 0
               maxValue: 9
 
-    - label: "TH reads PHYRate attribute from DUT"
+    - label: "Step 2a.2: TH reads PHYRate attribute from DUT"
       PICS: DGETH.S.A0000
       command: "readAttribute"
       attribute: "PHYRate"
@@ -51,7 +51,7 @@ tests:
               minValue: 0
               maxValue: 9
 
-    - label: "TH reads PHYRate attribute from DUT"
+    - label: "Step 2a.3: TH reads PHYRate attribute from DUT"
       PICS: DGETH.S.A0000
       command: "readAttribute"
       attribute: "PHYRate"
@@ -61,7 +61,7 @@ tests:
               minValue: 0
               maxValue: 9
 
-    - label: "TH reads PHYRate attribute from DUT"
+    - label: "Step 2a.4: TH reads PHYRate attribute from DUT"
       PICS: DGETH.S.A0000
       command: "readAttribute"
       attribute: "PHYRate"
@@ -71,7 +71,7 @@ tests:
               minValue: 0
               maxValue: 9
 
-    - label: "TH reads PHYRate attribute from DUT"
+    - label: "Step 2a.5: TH reads PHYRate attribute from DUT"
       PICS: DGETH.S.A0000
       command: "readAttribute"
       attribute: "PHYRate"
@@ -81,7 +81,7 @@ tests:
               minValue: 0
               maxValue: 9
 
-    - label: "TH reads PHYRate attribute from DUT"
+    - label: "Step 2a.6: TH reads PHYRate attribute from DUT"
       PICS: DGETH.S.A0000
       command: "readAttribute"
       attribute: "PHYRate"
@@ -91,7 +91,7 @@ tests:
               minValue: 0
               maxValue: 9
 
-    - label: "TH reads PHYRate attribute from DUT"
+    - label: "Step 2a.7: TH reads PHYRate attribute from DUT"
       PICS: DGETH.S.A0000
       command: "readAttribute"
       attribute: "PHYRate"
@@ -101,7 +101,7 @@ tests:
               minValue: 0
               maxValue: 9
 
-    - label: "TH reads PHYRate attribute from DUT"
+    - label: "Step 2a.8: TH reads PHYRate attribute from DUT"
       PICS: DGETH.S.A0000
       command: "readAttribute"
       attribute: "PHYRate"
@@ -111,7 +111,7 @@ tests:
               minValue: 0
               maxValue: 9
 
-    - label: "TH reads PHYRate attribute from DUT"
+    - label: "Step 2a.9: TH reads PHYRate attribute from DUT"
       PICS: DGETH.S.A0000
       command: "readAttribute"
       attribute: "PHYRate"
@@ -121,7 +121,7 @@ tests:
               minValue: 0
               maxValue: 9
 
-    - label: "TH reads PHYRate attribute from DUT"
+    - label: "Step 2a.10: TH reads PHYRate attribute from DUT"
       PICS: DGETH.S.A0000
       command: "readAttribute"
       attribute: "PHYRate"
@@ -131,35 +131,35 @@ tests:
               minValue: 0
               maxValue: 9
 
-    - label: "TH reads PacketRxCount attribute value from DUT"
+    - label: "Step 2b: TH reads PacketRxCount attribute value from DUT"
       PICS: DGETH.S.A0002
       command: "readAttribute"
       attribute: "PacketRxCount"
       response:
           saveAs: PacketRxCountValue
 
-    - label: "TH reads PacketTxCount attribute value from DUT"
+    - label: "Step 2c: TH reads PacketTxCount attribute value from DUT"
       PICS: DGETH.S.A0003
       command: "readAttribute"
       attribute: "PacketTxCount"
       response:
           saveAs: PacketTxCountValue
 
-    - label: "TH reads TxErrCount attribute value from DUT"
+    - label: "Step 2d: TH reads TxErrCount attribute value from DUT"
       PICS: DGETH.S.A0004
       command: "readAttribute"
       attribute: "TxErrCount"
       response:
           saveAs: TxErrCountValue
 
-    - label: "TH reads CollisionCount attribute value from DUT"
+    - label: "Step 2e: TH reads CollisionCount attribute value from DUT"
       PICS: DGETH.S.A0005
       command: "readAttribute"
       attribute: "CollisionCount"
       response:
           saveAs: CollisionCountValue
 
-    - label: "TH reads OverrunCount attribute value from DUT"
+    - label: "Step 2f: TH reads OverrunCount attribute value from DUT"
       PICS: DGETH.S.A0006
       command: "readAttribute"
       attribute: "OverrunCount"
@@ -167,12 +167,12 @@ tests:
           saveAs: OverrunCountValue
 
     #issue #13648
-    - label: "Sends ResetCounts command"
+    - label: "Step 2g: Sends ResetCounts command"
       PICS: DGETH.S.C00.Rsp
       command: "ResetCounts"
 
     #https://github.com/CHIP-Specifications/chip-certification-tool/issues/702#issuecomment-1427974329
-    - label: "TH reads PacketRxCount attribute value from DUT"
+    - label: "Step 2h: TH reads PacketRxCount attribute value from DUT"
       PICS: DGETH.S.A0002 && PICS_SKIP_SAMPLE_APP
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read packet-rx-count 1 0
@@ -191,7 +191,7 @@ tests:
                 value: "y"
 
     #https://github.com/CHIP-Specifications/chip-certification-tool/issues/702#issuecomment-1427974329
-    - label: "TH reads PacketTxCount attribute value from DUT"
+    - label: "Step 2i: TH reads PacketTxCount attribute value from DUT"
       PICS: DGETH.S.A0003 && PICS_SKIP_SAMPLE_APP
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read packet-tx-count 1 0
@@ -209,7 +209,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads TxErrCount attribute value from DUT"
+    - label: "Step 2j: TH reads TxErrCount attribute value from DUT"
       PICS: DGETH.S.A0004
       command: "readAttribute"
       attribute: "TxErrCount"
@@ -217,7 +217,7 @@ tests:
           constraints:
               maxValue: TxErrCountValue
 
-    - label: "TH reads CollisionCount attribute value from DUT"
+    - label: "Step 2k: TH reads CollisionCount attribute value from DUT"
       PICS: DGETH.S.A0005
       command: "readAttribute"
       attribute: "CollisionCount"
@@ -225,7 +225,7 @@ tests:
           constraints:
               maxValue: CollisionCountValue
 
-    - label: "TH reads OverrunCount attribute value from DUT"
+    - label: "Step 2l: TH reads OverrunCount attribute value from DUT"
       PICS: DGETH.S.A0006
       command: "readAttribute"
       attribute: "OverrunCount"

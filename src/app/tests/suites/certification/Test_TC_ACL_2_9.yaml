@@ -149,7 +149,7 @@ tests:
               minValue: 4
 
     - label:
-          "TH1 reads DUT Endpoint 0 AccessControl cluster
+          "Step 10:TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlEntryChanged event"
       PICS: ACL.S.E00
       command: "readEvent"
@@ -158,7 +158,7 @@ tests:
           error: UNSUPPORTED_ACCESS
 
     - label:
-          "TH1 reads DUT Endpoint 0 AccessControl cluster
+          "Step 11:TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
       PICS: ACL.S.E01
       command: "readEvent"

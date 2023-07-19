@@ -23,7 +23,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads Channel attribute value from DUT"
+    - label: "Step 2: TH reads Channel attribute value from DUT"
       PICS: DGTHREAD.S.A0000
       command: "readAttribute"
       attribute: "Channel"
@@ -41,7 +41,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "TH reads RoutingRole attribute value from DUT"
+    - label: "Step 3: TH reads RoutingRole attribute value from DUT"
       PICS: DGTHREAD.S.A0001
       command: "readAttribute"
       attribute: "RoutingRole"
@@ -52,8 +52,8 @@ tests:
               maxValue: 6
 
     - label:
-          "TH reads Network Name attribute value from DUT and Verify that
-          Network name is of the type string"
+          "Step 4a: TH reads Network Name attribute value from DUT and Verify
+          that Network name is of the type string"
       PICS: DGTHREAD.S.A0002
       command: "readAttribute"
       attribute: "NetworkName"
@@ -62,8 +62,8 @@ tests:
               type: char_string
 
     - label:
-          "Read NetworkName attribute from DUT and verify response value, If
-          value is NULL then verify that RoutingRole is set to 1"
+          "Step 4b: Read NetworkName attribute from DUT and verify response
+          value, If value is NULL then verify that RoutingRole is set to 1"
       verification: |
           ./chip-tool threadnetworkdiagnostics read network-name 54 0
 
@@ -86,8 +86,8 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads PanId attribute value from DUT and Verify that PanId is of
-          the type uint16"
+          "Step 5a: TH reads PanId attribute value from DUT and Verify that
+          PanId is of the type uint16"
       PICS: DGTHREAD.S.A0003
       command: "readAttribute"
       attribute: "PanId"
@@ -98,8 +98,8 @@ tests:
               maxValue: 65535
 
     - label:
-          "Read PanId attribute from DUT and verify response value, If value is
-          NULL then verify that RoutingRole is set to 1"
+          "Step 5b: Read PanId attribute from DUT and verify response value, If
+          value is NULL then verify that RoutingRole is set to 1"
       verification: |
           ./chip-tool threadnetworkdiagnostics read pan-id 54 0
 
@@ -121,8 +121,8 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads ExtendedPanId attribute value from DUT and Verify that
-          ExtendedPanId is of the type uint64"
+          "Step 6a: TH reads ExtendedPanId attribute value from DUT and Verify
+          that ExtendedPanId is of the type uint64"
       PICS: DGTHREAD.S.A0004
       command: "readAttribute"
       attribute: "ExtendedPanId"
@@ -131,8 +131,8 @@ tests:
               type: int64u
 
     - label:
-          "Read ExtendedPanId attribute from DUT and verify response value, If
-          value is NULL then verify that RoutingRole is set to 1"
+          "Step 6b: Read ExtendedPanId attribute from DUT and verify response
+          value, If value is NULL then verify that RoutingRole is set to 1"
       verification: |
           ./chip-tool threadnetworkdiagnostics read extended-pan-id 54 0
 
@@ -155,8 +155,8 @@ tests:
 
     #issue #18144
     - label:
-          "Read MeshLocalPrefix attribute from DUT and verify response value, If
-          value is NULL then verify that RoutingRole is set to 1"
+          "Step 7: Read MeshLocalPrefix attribute from DUT and verify response
+          value, If value is NULL then verify that RoutingRole is set to 1"
       verification: |
           ./chip-tool threadnetworkdiagnostics read mesh-local-prefix 54 0
 
@@ -177,7 +177,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads OverrunCount attribute value from DUT"
+    - label: "Step 8a: TH reads OverrunCount attribute value from DUT"
       PICS: DGTHREAD.S.A0006 && DGTHREAD.S.F01
       command: "readAttribute"
       attribute: "OverrunCount"
@@ -186,8 +186,8 @@ tests:
               type: int64u
 
     - label:
-          "read OverrunCount attribute from DUT and verify response value, If
-          the Overruncount is greater than zero or not"
+          "Step 8b: Read OverrunCount attribute from DUT and verify response
+          value, If the Overruncount is greater than zero or not"
       verification: |
           ./chip-tool threadnetworkdiagnostics read overrun-count 54 0
 
@@ -210,7 +210,7 @@ tests:
 
     #issue #14097
     - label:
-          "read NeighborTableList attribute from DUT and Verify that the
+          "Step 9: Read NeighborTableList attribute from DUT and Verify that the
           NeighborTable List size is Zero or greater and verify each node types"
       verification: |
           ./chip-tool threadnetworkdiagnostics read neighbor-table 54 0
@@ -250,8 +250,8 @@ tests:
                 value: "y"
 
     - label:
-          "Read RouteTable attribute from DUT and Verify that the RouteTableList
-          List size is Zero or greater and verify each node types"
+          "Step 10: Read RouteTable attribute from DUT and Verify that the
+          RouteTableList List size is Zero or greater and verify each node types"
       verification: |
           ./chip-tool threadnetworkdiagnostics read route-table 54 0
 
@@ -286,7 +286,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads PartitionId attribute value from DUT"
+    - label: "Step 11: TH reads PartitionId attribute value from DUT"
       PICS: DGTHREAD.S.A0009
       command: "readAttribute"
       attribute: "PartitionId"
@@ -294,7 +294,7 @@ tests:
           constraints:
               type: int32u
 
-    - label: "TH reads Weighting attribute value from DUT"
+    - label: "Step 12: TH reads Weighting attribute value from DUT"
       PICS: DGTHREAD.S.A000a
       command: "readAttribute"
       attribute: "Weighting"
@@ -304,7 +304,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "TH reads DataVersion attribute value from DUT"
+    - label: "Step 13: TH reads DataVersion attribute value from DUT"
       PICS: DGTHREAD.S.A000b
       command: "readAttribute"
       attribute: "DataVersion"
@@ -314,7 +314,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "TH reads StableDataVersion attribute value from DUT"
+    - label: "Step 14: TH reads StableDataVersion attribute value from DUT"
       PICS: DGTHREAD.S.A000c
       command: "readAttribute"
       attribute: "StableDataVersion"
@@ -324,7 +324,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "TH reads LeaderRouterId attribute value from DUT"
+    - label: "Step 15: TH reads LeaderRouterId attribute value from DUT"
       PICS: DGTHREAD.S.A000d
       command: "readAttribute"
       attribute: "LeaderRouterId"
@@ -334,7 +334,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "TH reads DetachedRoleCount attribute value from DUT"
+    - label: "Step 16: TH reads DetachedRoleCount attribute value from DUT"
       PICS: DGTHREAD.S.A000e && DGTHREAD.S.F02
       command: "readAttribute"
       attribute: "DetachedRoleCount"
@@ -344,7 +344,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "TH reads ChildRoleCount attribute value from DUT"
+    - label: "Step 17: TH reads ChildRoleCount attribute value from DUT"
       PICS: DGTHREAD.S.A000f && DGTHREAD.S.F02
       command: "readAttribute"
       attribute: "ChildRoleCount"
@@ -354,7 +354,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "TH reads RouterRoleCount attribute value from DUT"
+    - label: "Step 18: TH reads RouterRoleCount attribute value from DUT"
       PICS: DGTHREAD.S.A0010 && DGTHREAD.S.F02
       command: "readAttribute"
       attribute: "RouterRoleCount"
@@ -364,7 +364,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "TH reads LeaderRoleCount attribute value from DUT"
+    - label: "Step 19: TH reads LeaderRoleCount attribute value from DUT"
       PICS: DGTHREAD.S.A0011 && DGTHREAD.S.F02
       command: "readAttribute"
       attribute: "LeaderRoleCount"
@@ -374,7 +374,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "TH reads AttachAttemptCount attribute value from DUT"
+    - label: "Step 20: TH reads AttachAttemptCount attribute value from DUT"
       PICS: DGTHREAD.S.A0012 && DGTHREAD.S.F02
       command: "readAttribute"
       attribute: "AttachAttemptCount"
@@ -384,7 +384,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "TH reads PartitionIdChangeCount attribute value from DUT"
+    - label: "Step 21: TH reads PartitionIdChangeCount attribute value from DUT"
       PICS: DGTHREAD.S.A0013 && DGTHREAD.S.F02
       command: "readAttribute"
       attribute: "PartitionIdChangeCount"
@@ -395,7 +395,8 @@ tests:
               maxValue: 65535
 
     - label:
-          "TH reads BetterPartitionAttachAttemptCount attribute value from DUT"
+          "Step 22: TH reads BetterPartitionAttachAttemptCount attribute value
+          from DUT"
       PICS: DGTHREAD.S.A0014 && DGTHREAD.S.F02
       command: "readAttribute"
       attribute: "BetterPartitionAttachAttemptCount"
@@ -405,7 +406,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "TH reads ParentChangeCount attribute value from DUT"
+    - label: "Step 23: TH reads ParentChangeCount attribute value from DUT"
       PICS: DGTHREAD.S.A0015 && DGTHREAD.S.F02
       command: "readAttribute"
       attribute: "ParentChangeCount"
@@ -415,7 +416,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "TH reads ActiveTimestamp attribute value from DUT"
+    - label: "Step 24: TH reads ActiveTimestamp attribute value from DUT"
       PICS: DGTHREAD.S.A0038
       command: "readAttribute"
       attribute: "ActiveTimestamp"
@@ -423,7 +424,7 @@ tests:
           constraints:
               type: int64u
 
-    - label: "TH reads PendingTimestamp attribute value from DUT"
+    - label: "Step 25: TH reads PendingTimestamp attribute value from DUT"
       PICS: DGTHREAD.S.A0039
       command: "readAttribute"
       attribute: "PendingTimestamp"
@@ -431,7 +432,7 @@ tests:
           constraints:
               type: int64u
 
-    - label: "TH reads Delay attribute value from DUT"
+    - label: "Step 26: TH reads Delay attribute value from DUT"
       PICS: DGTHREAD.S.A003a
       command: "readAttribute"
       attribute: "Delay"
@@ -443,8 +444,8 @@ tests:
 
     #issue #14097
     - label:
-          "Read SecurityPolicy struct attribute from DUT and Verify the each
-          field"
+          "Step 27: Read SecurityPolicy struct attribute from DUT and Verify the
+          each field"
       verification: |
           ./chip-tool threadnetworkdiagnostics read security-policy 54 0
 
@@ -471,7 +472,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads ChannelPage0Mask attribute value from DUT"
+    - label: "Step 28: TH reads ChannelPage0Mask attribute value from DUT"
       PICS: DGTHREAD.S.A003c
       command: "readAttribute"
       attribute: "ChannelPage0Mask"
@@ -481,8 +482,8 @@ tests:
 
     #issue #14097
     - label:
-          "Read OperationalDatasetComponents struct attribute from DUT and
-          Verify the each field"
+          "Step 29: Read OperationalDatasetComponents struct attribute from DUT
+          and Verify the each field"
       verification: |
           ./chip-tool threadnetworkdiagnostics read operational-dataset-components 54 0
 
@@ -518,7 +519,7 @@ tests:
                 value: "y"
 
     #issue #18145
-    - label: "TH reads ActiveNetworkFaults attribute value from DUT"
+    - label: "Step 30: TH reads ActiveNetworkFaults attribute value from DUT"
       PICS: DGTHREAD.S.A003e
       command: "readAttribute"
       attribute: "ActiveNetworkFaultsList"
