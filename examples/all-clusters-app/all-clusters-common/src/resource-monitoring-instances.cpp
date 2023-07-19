@@ -17,13 +17,15 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <instances/ActivatedCarbonFilterMonitoring.h>
-#include <instances/HepaFilterMonitoring.h>
+#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
+#include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
+#include <resource-monitoring-instances.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
+using chip::Protocols::InteractionModel::Status;
 
 constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
                                                 static_cast<uint32_t>(Feature::kWarning) };
@@ -32,6 +34,44 @@ constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Featu
 
 static HepaFilterMonitoringInstance * gHepafilterInstance                       = nullptr;
 static ActivatedCarbonFilterMonitoringInstance * gActivatedCarbonFilterInstance = nullptr;
+
+//-- Activated Carbon Filter Monitoring Instance methods
+CHIP_ERROR ActivatedCarbonFilterMonitoringInstance::AppInit()
+{
+    ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringDelegate::Init()");
+    return CHIP_NO_ERROR;
+}
+
+Status ActivatedCarbonFilterMonitoringInstance::PreResetCondition()
+{
+    ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringInstance::PreResetCondition()");
+    return Status::Success;
+}
+
+Status ActivatedCarbonFilterMonitoringInstance::PostResetCondition()
+{
+    ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringInstance::PostResetCondition()");
+    return Status::Success;
+}
+
+//-- Hepa Filter Monitoring instance methods
+CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
+{
+    ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::Init()");
+    return CHIP_NO_ERROR;
+}
+
+Status HepaFilterMonitoringInstance::PreResetCondition()
+{
+    ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::PreResetCondition()");
+    return Status::Success;
+}
+
+Status HepaFilterMonitoringInstance::PostResetCondition()
+{
+    ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::PostResetCondition()");
+    return Status::Success;
+}
 
 void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 {
