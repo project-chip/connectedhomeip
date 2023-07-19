@@ -1344,6 +1344,7 @@ class OnOff(Cluster):
     class Bitmaps:
         class Feature(IntFlag):
             kLighting = 0x1
+            kDeadFront = 0x2
 
         class OnOffControl(IntFlag):
             kAcceptOnlyWhenOn = 0x1

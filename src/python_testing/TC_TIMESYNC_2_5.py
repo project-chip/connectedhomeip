@@ -151,8 +151,8 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
         for i in range(dst_max_size_dut):
             year = 3.156e+13
             six_months = 1.577e+13
-            vstart = year*i + six_months
-            vuntil = year * (i+1)
+            vstart = th_utc + year*i + six_months
+            vuntil = th_utc + year * (i+1)
             dst.append(dst_struct(offset=3600, validStarting=vstart, validUntil=vuntil))
         await self.send_set_dst_cmd(dst=dst)
 
