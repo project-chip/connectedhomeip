@@ -9540,10 +9540,12 @@ PICS:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: RVCCLEANMS.S.C03.Tx
 
-##  Dishwasher Mode control
+    ##  Dishwasher Mode control
 
     # Features
-    - label: "Does the device support depending on an On/Off cluster implemented on the same endpoint?"
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same endpoint?"
       id: DISHM.S.F00
 
     #
@@ -9570,7 +9572,8 @@ PICS:
     #
     #Server commands generated
     #
-    - label: "Does the device implement sending the ChangeToModeResponse command?"
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
       id: DISHM.S.C01.Tx
     #
     #Operational State
