@@ -15,4 +15,5 @@
 # limitations under the License.
 
 cd optiga-trust-m
-git apply -3 --whitespace=fix ./../optiga_m_matter.patch
+git apply --whitespace=nowarn ./../optiga_m_matter.patch
+
