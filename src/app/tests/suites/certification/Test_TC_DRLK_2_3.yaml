@@ -32,7 +32,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Create new user"
+    - label: "Precondition: Create new user"
       command: "SetUser"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -52,7 +52,7 @@ tests:
               - name: "CredentialRule"
                 value: 0
 
-    - label: "Read the user back and verify its fields"
+    - label: "Precondition: Read the user back and verify its fields"
       command: "GetUser"
       arguments:
           values:
@@ -81,7 +81,7 @@ tests:
               - name: "NextUserIndex"
                 value: null
 
-    - label: "Create new PIN credential and lock/unlock user"
+    - label: "Precondition: Create new PIN credential and lock/unlock user"
       command: "SetCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -107,7 +107,7 @@ tests:
               - name: "NextCredentialIndex"
                 value: 2
 
-    - label: "Verify created PIN credential"
+    - label: "Precondition: Verify created PIN credential"
       command: "GetCredentialStatus"
       arguments:
           values:
@@ -127,8 +127,8 @@ tests:
                 value: null
 
     - label:
-          "TH writes the RequirePINforRemoteOperation attribute value as False
-          on the DUT"
+          "Step 1a: TH writes the RequirePINforRemoteOperation attribute value
+          as False on the DUT"
       PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
@@ -136,8 +136,8 @@ tests:
           value: false
 
     - label:
-          "TH writes the RequirePINforRemoteOperation attribute value as False
-          on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
+          "Step 1b: TH writes the RequirePINforRemoteOperation attribute value
+          as False on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
       PICS: DRLK.S.F07 && DRLK.S.F00 && !DRLK.S.A0033
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
@@ -146,19 +146,24 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads the RequirePINforRemoteOperation attribute from the DUT"
+    - label:
+          "Step 2: TH reads the RequirePINforRemoteOperation attribute from the
+          DUT"
       PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033
       command: "readAttribute"
       attribute: "RequirePINforRemoteOperation"
       response:
           value: false
 
-    - label: "TH sends the unlock Door command to the DUT without PINCode"
+    - label:
+          "Step 3: TH sends the unlock Door command to the DUT without PINCode"
       PICS: DRLK.S.C01.Rsp
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
 
-    - label: "TH sends the unlock Door command to the DUT with valid PINCode"
+    - label:
+          "Step 4: TH sends the unlock Door command to the DUT with valid
+          PINCode"
       PICS: DRLK.S.C01.Rsp
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
@@ -168,8 +173,8 @@ tests:
                 value: "123456"
 
     - label:
-          "TH writes the RequirePINforRemoteOperation attribute value as False
-          on the DUT"
+          "Step 5a: TH writes the RequirePINforRemoteOperation attribute value
+          as False on the DUT"
       PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
@@ -177,8 +182,8 @@ tests:
           value: true
 
     - label:
-          "TH writes the RequirePINforRemoteOperation attribute value as False
-          on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
+          "Step 5b: TH writes the RequirePINforRemoteOperation attribute value
+          as False on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
       PICS: DRLK.S.F07 && DRLK.S.F00 && !DRLK.S.A0033
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
@@ -187,14 +192,18 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads the RequirePINforRemoteOperation attribute from the DUT"
+    - label:
+          "Step 6: TH reads the RequirePINforRemoteOperation attribute from the
+          DUT"
       PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033
       command: "readAttribute"
       attribute: "RequirePINforRemoteOperation"
       response:
           value: true
 
-    - label: "TH sends the unlock Door command to the DUT with valid PINCode"
+    - label:
+          "Step 7: TH sends the unlock Door command to the DUT with valid
+          PINCode"
       PICS: DRLK.S.C01.Rsp && DRLK.S.A0033
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
@@ -203,7 +212,9 @@ tests:
               - name: "PINCode"
                 value: "123456"
 
-    - label: "TH sends the unlock Door command to the DUT with invalid PINCode"
+    - label:
+          "Step 8: TH sends the unlock Door command to the DUT with invalid
+          PINCode"
       PICS: DRLK.S.C01.Rsp && DRLK.S.A0033
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
@@ -214,7 +225,8 @@ tests:
       response:
           error: FAILURE
 
-    - label: "TH sends the unlock Door command to the DUT without PINCode"
+    - label:
+          "Step 9: TH sends the unlock Door command to the DUT without PINCode"
       PICS: DRLK.S.C01.Rsp && DRLK.S.A0033
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
@@ -222,8 +234,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH writes WrongCodeEntryLimit attribute value as 3 on the DUT and
-          Verify that the DUT sends Success response"
+          "Step 10a: TH writes WrongCodeEntryLimit attribute value as 3 on the
+          DUT and Verify that the DUT sends Success response"
       PICS: DRLK.S.F00 && DRLK.S.F01 && DRLK.S.A0030.Write
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
@@ -231,8 +243,8 @@ tests:
           value: 3
 
     - label:
-          "TH writes WrongCodeEntryLimit attribute value as 3 on the DUT and
-          verify DUT responds with UNSUPPORTED_WRITE"
+          "Step 10b: TH writes WrongCodeEntryLimit attribute value as 3 on the
+          DUT and verify DUT responds with UNSUPPORTED_WRITE"
       PICS: DRLK.S.F00 && DRLK.S.F01 && !DRLK.S.A0030.Write
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
@@ -242,8 +254,8 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label:
-          "TH writes UserCodeTemporaryDisableTime attribute value as 15 Seconds
-          on the DUT and Verify that the DUT sends Success response"
+          "Step 11a: TH writes UserCodeTemporaryDisableTime attribute value as
+          15 Seconds on the DUT and Verify that the DUT sends Success response"
       PICS: DRLK.S.F00 && DRLK.S.F01 && DRLK.S.A0031.Write
       command: "writeAttribute"
       attribute: "UserCodeTemporaryDisableTime"
@@ -251,8 +263,8 @@ tests:
           value: 15
 
     - label:
-          "TH writes UserCodeTemporaryDisableTime attribute value as 15 Seconds
-          on the DUT and Verify that the DUT sends Success response"
+          "Step 11b: TH writes UserCodeTemporaryDisableTime attribute value as
+          15 Seconds on the DUT and Verify that the DUT sends Success response"
       PICS: DRLK.S.F00 && DRLK.S.F01 && !DRLK.S.A0031.Write
       command: "writeAttribute"
       attribute: "UserCodeTemporaryDisableTime"
@@ -261,40 +273,9 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH sends the unlock Door command to the DUT with invalid PINCode"
-      PICS: DRLK.S.C01.Rsp
-      command: "UnlockDoor"
-      timedInteractionTimeoutMs: 1000
-      arguments:
-          values:
-              - name: "PINCode"
-                value: "1234568"
-      response:
-          error: FAILURE
-
-    - label: "TH sends the unlock Door command to the DUT with invalid PINCode"
-      PICS: DRLK.S.C01.Rsp
-      command: "UnlockDoor"
-      timedInteractionTimeoutMs: 1000
-      arguments:
-          values:
-              - name: "PINCode"
-                value: "1234568"
-      response:
-          error: FAILURE
-
-    - label: "TH sends the unlock Door command to the DUT with invalid PINCode"
-      PICS: DRLK.S.C01.Rsp
-      command: "UnlockDoor"
-      timedInteractionTimeoutMs: 1000
-      arguments:
-          values:
-              - name: "PINCode"
-                value: "1234568"
-      response:
-          error: FAILURE
-
-    - label: "TH sends the unlock Door command to the DUT with invalid PINCode"
+    - label:
+          "Step 12a: TH sends the unlock Door command to the DUT with invalid
+          PINCode"
       PICS: DRLK.S.C01.Rsp
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
@@ -306,15 +287,56 @@ tests:
           error: FAILURE
 
     - label:
-          "TH reads the UserCodeTemporaryDisableTime attribute from the DUT and
-          check attribute is triggered"
+          "Step 12b: TH sends the unlock Door command to the DUT with invalid
+          PINCode"
+      PICS: DRLK.S.C01.Rsp
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "1234568"
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 12c: TH sends the unlock Door command to the DUT with invalid
+          PINCode"
+      PICS: DRLK.S.C01.Rsp
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "1234568"
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 12d: TH sends the unlock Door command to the DUT with invalid
+          PINCode"
+      PICS: DRLK.S.C01.Rsp
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "1234568"
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 13: TH reads the UserCodeTemporaryDisableTime attribute from the
+          DUT and check attribute is triggered"
       PICS: DRLK.S.F00 && DRLK.S.F01 && DRLK.S.A0031
       command: "readAttribute"
       attribute: "UserCodeTemporaryDisableTime"
       response:
           value: 15
 
-    - label: "TH sends the unlock Door command to the DUT with valid PINCode"
+    - label:
+          "Step 14: TH sends the unlock Door command to the DUT with valid
+          PINCode"
       PICS: DRLK.S.C01.Rsp
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
@@ -334,21 +356,27 @@ tests:
               - name: "ms"
                 value: 15000
 
-    - label: "TH writes AutoRelockTime attribute value as 10 seconds on the DUT"
+    - label:
+          "Step 15a: TH writes AutoRelockTime attribute value as 10 seconds on
+          the DUT"
       PICS: DRLK.S.A0023.Write && PICS_SDK_CI_ONLY
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
           value: 10
 
-    - label: "TH writes AutoRelockTime attribute value as 60 seconds on the DUT"
+    - label:
+          "Step 15b: TH writes AutoRelockTime attribute value as 60 seconds on
+          the DUT"
       PICS: DRLK.S.A0023.Write && PICS_SKIP_SAMPLE_APP
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
           value: 60
 
-    - label: "TH writes AutoRelockTime attribute value as 10 seconds on the DUT"
+    - label:
+          "Step 15c: TH writes AutoRelockTime attribute value as 10 seconds on
+          the DUT"
       PICS: " !DRLK.S.A0023.Write && PICS_SDK_CI_ONLY "
       command: "writeAttribute"
       attribute: "AutoRelockTime"
@@ -357,7 +385,9 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH writes AutoRelockTime attribute value as 60 seconds on the DUT"
+    - label:
+          "Step 15d: TH writes AutoRelockTime attribute value as 60 seconds on
+          the DUT"
       PICS: " !DRLK.S.A0023.Write && PICS_SKIP_SAMPLE_APP "
       command: "writeAttribute"
       attribute: "AutoRelockTime"
@@ -366,14 +396,14 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads the AutoRelockTime attribute from the DUT"
+    - label: "Step 16a: TH reads the AutoRelockTime attribute from the DUT"
       PICS: DRLK.S.A0023 && PICS_SDK_CI_ONLY
       command: "readAttribute"
       attribute: "AutoRelockTime"
       response:
           value: 10
 
-    - label: "TH reads the AutoRelockTime attribute from the DUT"
+    - label: "Step 16b: TH reads the AutoRelockTime attribute from the DUT"
       PICS: DRLK.S.A0023 && PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AutoRelockTime"
@@ -381,8 +411,8 @@ tests:
           value: 60
 
     - label:
-          "TH sends the unlock Door command to the DUT with valid PINCode and
-          Verify that DUT sends SUCCESS response to the TH"
+          "Step 17: TH sends the unlock Door command to the DUT with valid
+          PINCode and Verify that DUT sends SUCCESS response to the TH"
       PICS: DRLK.S.C01.Rsp
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
@@ -409,7 +439,7 @@ tests:
               - name: "ms"
                 value: 60000
 
-    - label: "TH reads LockState attribute"
+    - label: "Step 18: TH reads LockState attribute"
       PICS: DRLK.S.A0000 && DRLK.S.C01.Rsp
       command: "readAttribute"
       attribute: "LockState"

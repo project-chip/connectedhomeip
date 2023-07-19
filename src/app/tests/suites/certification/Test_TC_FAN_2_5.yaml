@@ -24,7 +24,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -32,7 +32,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads from the DUT the the AirflowDirection attribute"
+    - label: "Step 2: TH reads from the DUT the the AirflowDirection attribute"
       PICS: FAN.S.F05
       command: "readAttribute"
       attribute: "AirflowDirection"

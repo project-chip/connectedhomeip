@@ -24,7 +24,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -32,7 +32,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads RxTotalCount attribute value from DUT"
+    - label: "Step 2: TH reads RxTotalCount attribute value from DUT"
       PICS: DGTHREAD.S.A0027
       command: "readAttribute"
       attribute: "RxTotalCount"
@@ -42,7 +42,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "TH reads RxUnicastCount attribute value from DUT"
+    - label: "Step 3: TH reads RxUnicastCount attribute value from DUT"
       PICS: DGTHREAD.S.A0028
       command: "readAttribute"
       attribute: "RxUnicastCount"
@@ -52,7 +52,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "TH reads RxBroadcastCount attribute value from DUT"
+    - label: "Step 4: TH reads RxBroadcastCount attribute value from DUT"
       PICS: DGTHREAD.S.A0029
       command: "readAttribute"
       attribute: "RxBroadcastCount"
@@ -62,7 +62,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "TH reads RxDataCount attribute value from DUT"
+    - label: "Step 5: TH reads RxDataCount attribute value from DUT"
       PICS: DGTHREAD.S.A002a
       command: "readAttribute"
       attribute: "RxDataCount"
@@ -72,7 +72,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "TH reads RxDataPollCount attribute value from DUT"
+    - label: "Step 6: TH reads RxDataPollCount attribute value from DUT"
       PICS: DGTHREAD.S.A002b
       command: "readAttribute"
       attribute: "RxDataPollCount"
@@ -82,7 +82,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "TH reads RxBeaconCount attribute value from DUT"
+    - label: "Step 7: TH reads RxBeaconCount attribute value from DUT"
       PICS: DGTHREAD.S.A002c
       command: "readAttribute"
       attribute: "RxBeaconCount"
@@ -92,7 +92,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "TH reads RxBeaconRequestCount attribute value from DUT"
+    - label: "Step 8: TH reads RxBeaconRequestCount attribute value from DUT"
       PICS: DGTHREAD.S.A002d
       command: "readAttribute"
       attribute: "RxBeaconRequestCount"
@@ -102,7 +102,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "TH reads RxOtherCount attribute value from DUT"
+    - label: "Step 9: TH reads RxOtherCount attribute value from DUT"
       PICS: DGTHREAD.S.A002e
       command: "readAttribute"
       attribute: "RxOtherCount"
@@ -112,7 +112,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "TH reads RxAddressFilteredCount attribute value from DUT"
+    - label: "Step 10: TH reads RxAddressFilteredCount attribute value from DUT"
       PICS: DGTHREAD.S.A002f
       command: "readAttribute"
       attribute: "RxAddressFilteredCount"
@@ -122,7 +122,8 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "TH reads RxDestAddrFilteredCount attribute value from DUT"
+    - label:
+          "Step 11: TH reads RxDestAddrFilteredCount attribute value from DUT"
       PICS: DGTHREAD.S.A0030
       command: "readAttribute"
       attribute: "RxDestAddrFilteredCount"
@@ -132,7 +133,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "TH reads RxDuplicatedCount attribute value from DUT"
+    - label: "Step 12: TH reads RxDuplicatedCount attribute value from DUT"
       PICS: DGTHREAD.S.A0031
       command: "readAttribute"
       attribute: "RxDuplicatedCount"
@@ -142,7 +143,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "TH reads RxErrNoFrameCount attribute value from DUT"
+    - label: "Step 13: TH reads RxErrNoFrameCount attribute value from DUT"
       PICS: DGTHREAD.S.A0032
       command: "readAttribute"
       attribute: "RxErrNoFrameCount"
@@ -152,7 +153,8 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "TH reads RxErrUnknownNeighborCount attribute value from DUT"
+    - label:
+          "Step 14: TH reads RxErrUnknownNeighborCount attribute value from DUT"
       PICS: DGTHREAD.S.A0033
       command: "readAttribute"
       attribute: "RxErrUnknownNeighborCount"
@@ -163,8 +165,8 @@ tests:
               maxValue: 0xFFFFFFFF
 
     - label:
-          "TH reads RxErrInvalidSrcAddrCount attribute value from DUT and verify
-          data type"
+          "Step 15: TH reads RxErrInvalidSrcAddrCount attribute value from DUT
+          and verify data type"
       PICS: DGTHREAD.S.A0034
       command: "readAttribute"
       attribute: "RxErrInvalidSrcAddrCount"
@@ -174,7 +176,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "TH reads RxErrSecCount attribute value from DUT"
+    - label: "Step 16: TH reads RxErrSecCount attribute value from DUT"
       PICS: DGTHREAD.S.A0035
       command: "readAttribute"
       attribute: "RxErrSecCount"
@@ -184,7 +186,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "TH reads RxErrFcsCount attribute value from DUT"
+    - label: "Step 17: TH reads RxErrFcsCount attribute value from DUT"
       PICS: DGTHREAD.S.A0036
       command: "readAttribute"
       attribute: "RxErrFcsCount"
@@ -194,7 +196,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "TH reads RxErrOtherCount attribute value from DUT"
+    - label: "Step 18: TH reads RxErrOtherCount attribute value from DUT"
       PICS: DGTHREAD.S.A0037
       command: "readAttribute"
       attribute: "RxErrOtherCount"

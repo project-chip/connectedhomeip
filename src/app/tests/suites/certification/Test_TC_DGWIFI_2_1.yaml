@@ -23,7 +23,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads BSSID attribute from DUT"
+    - label: "Step 2: TH reads BSSID attribute from DUT"
       PICS: DGWIFI.S.A0000
       command: "readAttribute"
       attribute: "BSSID"
@@ -40,7 +40,7 @@ tests:
               type: octet_string
 
     #issue #13645
-    - label: "Reads SecurityType attribute constraints"
+    - label: "Step 3: Reads SecurityType attribute constraints"
       PICS: DGWIFI.S.A0001
       command: "readAttribute"
       attribute: "SecurityType"
@@ -48,7 +48,7 @@ tests:
           constraints:
               type: enum8
 
-    - label: "Reads WiFiVersion attribute constraints"
+    - label: "Step 4: Reads WiFiVersion attribute constraints"
       PICS: DGWIFI.S.A0002
       command: "readAttribute"
       attribute: "WiFiVersion"
@@ -58,7 +58,7 @@ tests:
               minValue: 0
               maxValue: 5
 
-    - label: "Reads ChannelNumber attribute constraints"
+    - label: "Step 5: Reads ChannelNumber attribute constraints"
       PICS: DGWIFI.S.A0003
       command: "readAttribute"
       attribute: "ChannelNumber"
@@ -68,7 +68,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Reads RSSI attribute constraints"
+    - label: "Step 6: Reads RSSI attribute constraints"
       PICS: DGWIFI.S.A0004
       command: "readAttribute"
       attribute: "RSSI"
@@ -78,7 +78,7 @@ tests:
               minValue: -120
               maxValue: 0
 
-    - label: "Reads BeaconLostCount attribute constraints"
+    - label: "Step 7: Reads BeaconLostCount attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0005
       command: "readAttribute"
       attribute: "BeaconLostCount"
@@ -88,7 +88,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "Reads BeaconRxCount attribute constraints"
+    - label: "Step 8: Reads BeaconRxCount attribute constraints"
       PICS: DGWIFI.S.A0006
       command: "readAttribute"
       attribute: "BeaconRxCount"
@@ -98,7 +98,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "Reads PacketMulticastRxCount attribute constraints"
+    - label: "Step 9: Reads PacketMulticastRxCount attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0007
       command: "readAttribute"
       attribute: "PacketMulticastRxCount"
@@ -108,7 +108,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "Reads PacketMulticastTxCount attribute constraints"
+    - label: "Step 10: Reads PacketMulticastTxCount attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0008
       command: "readAttribute"
       attribute: "PacketMulticastTxCount"
@@ -118,7 +118,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "Reads PacketUnicastRxCount attribute constraints"
+    - label: "Step 11: Reads PacketUnicastRxCount attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0009
       command: "readAttribute"
       attribute: "PacketUnicastRxCount"
@@ -128,7 +128,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "Reads PacketUnicastTxCount attribute constraints"
+    - label: "Step 12: Reads PacketUnicastTxCount attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A000a
       command: "readAttribute"
       attribute: "PacketUnicastTxCount"
@@ -138,7 +138,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "Reads CurrentMaxRate attribute constraints"
+    - label: "Step 13: Reads CurrentMaxRate attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A000b
       command: "readAttribute"
       attribute: "CurrentMaxRate"
@@ -146,7 +146,7 @@ tests:
           constraints:
               type: int64u
 
-    - label: "Reads OverrunCount attribute constraints"
+    - label: "Step 14: Reads OverrunCount attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A000c
       command: "readAttribute"
       attribute: "OverrunCount"
