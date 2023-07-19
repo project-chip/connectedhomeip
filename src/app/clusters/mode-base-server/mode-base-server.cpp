@@ -142,19 +142,11 @@ CHIP_ERROR Instance::Init()
     // Initialise the current mode with the value of the first mode. This ensures that it is representing a valid mode.
     ReturnErrorOnFailure(GetModeValueByIndex(0, mCurrentMode));
 
-    // Check that the cluster ID given is a valid mode base alias cluster ID.
-    if (!isDerivedCluster())
-    {
-        ChipLogError(Zcl, "ModeBase: The cluster with ID %lu is not a mode base alias.", long(mClusterId));
-        return CHIP_ERROR_INVALID_ARGUMENT; // todo is this the correct error?
-    }
+    // Check that the cluster ID given is a valid mode base derived cluster ID.
+    VerifyOrDie(isDerivedCluster() == true);
 
     // Check if the cluster has been selected in zap
-    if (!emberAfContainsServer(mEndpointId, mClusterId))
-    {
-        ChipLogError(Zcl, "ModeBase: The cluster with ID %lu was not enabled in zap.", long(mClusterId));
-        return CHIP_ERROR_INVALID_ARGUMENT; // todo is this the correct error?
-    }
+    VerifyOrDie(emberAfContainsServer(mEndpointId, mClusterId) == true);
 
     loadPersistentAttributes();
 
