@@ -366,6 +366,7 @@ public:
 private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
+    friend class TestInteractionModelEngine;
     using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandHandler & apCommandObj) override;
