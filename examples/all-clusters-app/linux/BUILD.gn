@@ -46,9 +46,8 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/third_party/jsoncpp",
   ]
 
-  include_dirs = [
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
-  ]
+  include_dirs =
+      [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
 
   cflags = [ "-Wconversion" ]
 
