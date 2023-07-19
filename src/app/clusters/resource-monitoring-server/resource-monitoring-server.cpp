@@ -151,7 +151,7 @@ Status Instance::OnResetCondition()
 {
     ChipLogDetail(Zcl, "ResourceMonitoringServer::OnResetCondition()");
 
-    // call apllication specific pre reset logic,
+    // call application specific pre reset logic,
     // anything other than Success will cause the command to fail, and not do any of the resets
     auto status = PreResetCondition();
     if (status != Status::Success)
@@ -187,7 +187,7 @@ Status Instance::OnResetCondition()
         }
     }
 
-    // call apllication specific post reset logic
+    // call application specific post reset logic
     status = PostResetCondition();
     return status;
 }
