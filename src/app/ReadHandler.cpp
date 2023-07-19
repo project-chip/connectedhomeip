@@ -39,7 +39,7 @@ namespace app {
 using Status = Protocols::InteractionModel::Status;
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
-                         InteractionType aInteractionType) :
+                         InteractionType aInteractionType, Observer * observer) :
     mExchangeCtx(*this),
     mManagementCallback(apCallback)
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
@@ -63,15 +63,37 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
     SetStateFlag(ReadHandlerFlags::PrimingReports);
 
     mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
+
+// TODO (#27672): Uncomment when the ReportScheduler is implemented
+#if 0
+    if (nullptr != observer)
+    {
+        if (CHIP_NO_ERROR == SetObserver(observer))
+        {
+            mObserver->OnReadHandlerCreated(this);
+        }
+    }
+#endif
 }
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-ReadHandler::ReadHandler(ManagementCallback & apCallback) :
+ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer) :
     mExchangeCtx(*this), mManagementCallback(apCallback), mOnConnectedCallback(HandleDeviceConnected, this),
     mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {
     mInteractionType = InteractionType::Subscribe;
     mFlags.ClearAll();
+
+// TODO (#27672): Uncomment when the ReportScheduler is implemented
+#if 0
+    if (nullptr != observer)
+    {
+        if (CHIP_NO_ERROR == SetObserver(observer))
+        {
+            mObserver->OnReadHandlerCreated(this);
+        }
+    }
+#endif
 }
 
 void ReadHandler::ResumeSubscription(CASESessionManager & caseSessionManager,
@@ -115,6 +137,13 @@ void ReadHandler::ResumeSubscription(CASESessionManager & caseSessionManager,
 
 ReadHandler::~ReadHandler()
 {
+    // TODO (#27672): Enable when the ReportScheduler is implemented and move in Close() after testing
+#if 0
+    if (nullptr != mObserver)
+    {
+        mObserver->OnReadHandlerDestroyed(this);
+    }
+#endif
     auto * appCallback = mManagementCallback.GetAppCallback();
     if (mFlags.Has(ReadHandlerFlags::ActiveSubscription) && appCallback)
     {
@@ -319,6 +348,15 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 
         if (IsType(InteractionType::Subscribe) && !IsPriming())
         {
+// TODO (#27672): Enable when the ReportScheduler is implemented and remove call to UpdateReportTimer, will be handled by
+// the report Scheduler
+#if 0
+            if (nullptr != mObserver)
+            {
+                mObserver->OnSubscriptionAction(this);
+            }
+#endif
+
             // Ignore the error from UpdateReportTimer.  If we've
             // successfully sent the message, we need to return success from
             // this method.
@@ -593,6 +631,13 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
     //
     if (aTargetState == HandlerState::GeneratingReports && IsReportableNow())
     {
+// TODO (#27672): Enable when the ReportScheduler is implemented and remove the call to ScheduleRun()
+#if 0
+         if(nullptr != mObserver)
+        {
+            mObserver->OnBecameReportable(this);
+        }
+#endif
         InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
     }
 }
@@ -634,6 +679,14 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
     ReturnErrorOnFailure(writer.Finalize(&packet));
     VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
 
+    // TODO (#27672): Uncomment when the ReportScheduler is implemented and remove call to UpdateReportTimer, handled by
+    // the report Scheduler
+#if 0
+    if (nullptr != mObserver)
+    {
+        mObserver->OnSubscriptionAction(this);
+    }
+#endif
     ReturnErrorOnFailure(UpdateReportTimer());
 
     ClearStateFlag(ReadHandlerFlags::PrimingReports);
@@ -753,6 +806,7 @@ void ReadHandler::PersistSubscription()
     }
 }
 
+// TODO (#27672): Remove when ReportScheduler is enabled as timing will now be handled by the ReportScheduler
 void ReadHandler::MinIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState)
 {
     VerifyOrReturn(apAppState != nullptr);
@@ -764,6 +818,7 @@ void ReadHandler::MinIntervalExpiredCallback(System::Layer * apSystemLayer, void
         readHandler);
 }
 
+// TODO (#27672): Remove when ReportScheduler is enabled as timing will now be handled by the ReportScheduler
 void ReadHandler::MaxIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState)
 {
     VerifyOrReturn(apAppState != nullptr);
@@ -773,6 +828,7 @@ void ReadHandler::MaxIntervalExpiredCallback(System::Layer * apSystemLayer, void
                     readHandler->mMaxInterval - readHandler->mMinIntervalFloorSeconds);
 }
 
+// TODO (#27672): Remove when ReportScheduler is enabled as timing will now be handled by the ReportScheduler
 CHIP_ERROR ReadHandler::UpdateReportTimer()
 {
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
@@ -812,7 +868,7 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
     // Here we just reset the iterator to the beginning of the current cluster, if the dirty path affects it.
     // This will ensure the reports are consistent within a single cluster generated from a single path in the request.
 
-    // TODO (#16699): Currently we can only gurentee the reports generated from a single path in the request are consistent. The
+    // TODO (#16699): Currently we can only guarantee the reports generated from a single path in the request are consistent. The
     // data might be inconsistent if the user send a request with two paths from the same cluster. We need to clearify the behavior
     // or make it consistent.
     if (mAttributePathExpandIterator.Get(path) &&
@@ -831,6 +887,13 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
 
     if (IsReportableNow())
     {
+        // TODO (#27672): Enable when the ReportScheduler is implemented and remove the call to ScheduleRun()
+#if 0
+        if(nullptr != mObserver)
+        {
+            mObserver->OnBecameReportable(this);
+        }
+#endif
         InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
     }
 }
@@ -853,9 +916,17 @@ void ReadHandler::SetStateFlag(ReadHandlerFlags aFlag, bool aValue)
 {
     bool oldReportable = IsReportableNow();
     mFlags.Set(aFlag, aValue);
+
     // If we became reportable, schedule a reporting run.
     if (!oldReportable && IsReportableNow())
     {
+// TODO (#27672): Enable when the ReportScheduler is implemented and remove the call to ScheduleRun()
+#if 0
+        if(nullptr != mObserver)
+        {
+            mObserver->OnBecameReportable(this);
+        }
+#endif
         InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
     }
 }

@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- 
+
 package chip.onboardingpayload
 
 enum class OptionalQRCodeInfoType {
@@ -38,4 +38,3 @@ class OptionalQRCodeInfoExtension : OptionalQRCodeInfo() {
   var uint32: Long = 0
   var uint64: Long = 0
 }
-

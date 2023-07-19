@@ -302,7 +302,7 @@ private:
 
         if (mAlterSubscriptionIntervals)
         {
-            ReturnErrorOnFailure(aReadHandler.SetReportingIntervals(mMaxInterval));
+            ReturnErrorOnFailure(aReadHandler.SetMaxReportingInterval(mMaxInterval));
         }
         return CHIP_NO_ERROR;
     }
@@ -4645,14 +4645,15 @@ void TestReadInteraction::TestReadHandler_KeepSubscriptionTest(nlTestSuite * apS
 
 System::Clock::Timeout TestReadInteraction::ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval)
 {
-    // Add 100ms of slack to our max interval to make sure we hit the
-    // subscription liveness timer.
+    // Add 1000ms of slack to our max interval to make sure we hit the
+    // subscription liveness timer.  100ms was tried in the past and is not
+    // sufficient: our process can easily lose the timeslice for 100ms.
     const auto & ourMrpConfig = GetDefaultMRPConfig();
     auto publisherTransmissionTimeout =
         GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
                                  System::SystemClock().GetMonotonicTimestamp(), Transport::kMinActiveTime);
 
-    return publisherTransmissionTimeout + aMaxInterval + System::Clock::Milliseconds32(100);
+    return publisherTransmissionTimeout + aMaxInterval + System::Clock::Milliseconds32(1000);
 }
 
 // clang-format off

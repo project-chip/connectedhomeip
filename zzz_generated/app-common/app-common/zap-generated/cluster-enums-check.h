@@ -1538,6 +1538,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(HepaFilterMonitoring::D
         return static_cast<EnumType>(2);
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(HepaFilterMonitoring::ProductIdentifierTypeEnum val)
+{
+    using EnumType = HepaFilterMonitoring::ProductIdentifierTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUpc:
+    case EnumType::kGtin8:
+    case EnumType::kEan:
+    case EnumType::kGtin14:
+    case EnumType::kOem:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
 
 static auto __attribute__((unused)) EnsureKnownEnumValue(ActivatedCarbonFilterMonitoring::ChangeIndicationEnum val)
 {
@@ -1562,6 +1577,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ActivatedCarbonFilterMo
         return val;
     default:
         return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ActivatedCarbonFilterMonitoring::ProductIdentifierTypeEnum val)
+{
+    using EnumType = ActivatedCarbonFilterMonitoring::ProductIdentifierTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUpc:
+    case EnumType::kGtin8:
+    case EnumType::kEan:
+    case EnumType::kGtin14:
+    case EnumType::kOem:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
     }
 }
 
@@ -1590,6 +1620,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CeramicFilterMonitoring
         return static_cast<EnumType>(2);
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(CeramicFilterMonitoring::ProductIdentifierTypeEnum val)
+{
+    using EnumType = CeramicFilterMonitoring::ProductIdentifierTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUpc:
+    case EnumType::kGtin8:
+    case EnumType::kEan:
+    case EnumType::kGtin14:
+    case EnumType::kOem:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
 
 static auto __attribute__((unused)) EnsureKnownEnumValue(ElectrostaticFilterMonitoring::ChangeIndicationEnum val)
 {
@@ -1614,6 +1659,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ElectrostaticFilterMoni
         return val;
     default:
         return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ElectrostaticFilterMonitoring::ProductIdentifierTypeEnum val)
+{
+    using EnumType = ElectrostaticFilterMonitoring::ProductIdentifierTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUpc:
+    case EnumType::kGtin8:
+    case EnumType::kEan:
+    case EnumType::kGtin14:
+    case EnumType::kOem:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
     }
 }
 
@@ -1642,6 +1702,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(UvFilterMonitoring::Deg
         return static_cast<EnumType>(2);
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(UvFilterMonitoring::ProductIdentifierTypeEnum val)
+{
+    using EnumType = UvFilterMonitoring::ProductIdentifierTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUpc:
+    case EnumType::kGtin8:
+    case EnumType::kEan:
+    case EnumType::kGtin14:
+    case EnumType::kOem:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
 
 static auto __attribute__((unused)) EnsureKnownEnumValue(IonizingFilterMonitoring::ChangeIndicationEnum val)
 {
@@ -1666,6 +1741,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(IonizingFilterMonitorin
         return val;
     default:
         return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(IonizingFilterMonitoring::ProductIdentifierTypeEnum val)
+{
+    using EnumType = IonizingFilterMonitoring::ProductIdentifierTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUpc:
+    case EnumType::kGtin8:
+    case EnumType::kEan:
+    case EnumType::kGtin14:
+    case EnumType::kOem:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
     }
 }
 
@@ -1694,6 +1784,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ZeoliteFilterMonitoring
         return static_cast<EnumType>(2);
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(ZeoliteFilterMonitoring::ProductIdentifierTypeEnum val)
+{
+    using EnumType = ZeoliteFilterMonitoring::ProductIdentifierTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUpc:
+    case EnumType::kGtin8:
+    case EnumType::kEan:
+    case EnumType::kGtin14:
+    case EnumType::kOem:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
 
 static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneFilterMonitoring::ChangeIndicationEnum val)
 {
@@ -1718,6 +1823,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneFilterMonitoring::
         return val;
     default:
         return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneFilterMonitoring::ProductIdentifierTypeEnum val)
+{
+    using EnumType = OzoneFilterMonitoring::ProductIdentifierTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUpc:
+    case EnumType::kGtin8:
+    case EnumType::kEan:
+    case EnumType::kGtin14:
+    case EnumType::kOem:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
     }
 }
 
@@ -1746,6 +1866,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(WaterTankMonitoring::De
         return static_cast<EnumType>(2);
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(WaterTankMonitoring::ProductIdentifierTypeEnum val)
+{
+    using EnumType = WaterTankMonitoring::ProductIdentifierTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUpc:
+    case EnumType::kGtin8:
+    case EnumType::kEan:
+    case EnumType::kGtin14:
+    case EnumType::kOem:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
 
 static auto __attribute__((unused)) EnsureKnownEnumValue(FuelTankMonitoring::ChangeIndicationEnum val)
 {
@@ -1770,6 +1905,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FuelTankMonitoring::Deg
         return val;
     default:
         return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(FuelTankMonitoring::ProductIdentifierTypeEnum val)
+{
+    using EnumType = FuelTankMonitoring::ProductIdentifierTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUpc:
+    case EnumType::kGtin8:
+    case EnumType::kEan:
+    case EnumType::kGtin14:
+    case EnumType::kOem:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
     }
 }
 
@@ -1798,6 +1948,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(InkCartridgeMonitoring:
         return static_cast<EnumType>(2);
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(InkCartridgeMonitoring::ProductIdentifierTypeEnum val)
+{
+    using EnumType = InkCartridgeMonitoring::ProductIdentifierTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUpc:
+    case EnumType::kGtin8:
+    case EnumType::kEan:
+    case EnumType::kGtin14:
+    case EnumType::kOem:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
 
 static auto __attribute__((unused)) EnsureKnownEnumValue(TonerCartridgeMonitoring::ChangeIndicationEnum val)
 {
@@ -1822,6 +1987,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TonerCartridgeMonitorin
         return val;
     default:
         return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(TonerCartridgeMonitoring::ProductIdentifierTypeEnum val)
+{
+    using EnumType = TonerCartridgeMonitoring::ProductIdentifierTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUpc:
+    case EnumType::kGtin8:
+    case EnumType::kEan:
+    case EnumType::kGtin14:
+    case EnumType::kOem:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
     }
 }
 

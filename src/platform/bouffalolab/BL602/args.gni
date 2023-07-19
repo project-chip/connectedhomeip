@@ -22,11 +22,11 @@ mbedtls_target = "${bouffalolab_iot_sdk_build_root}/bl602:bl_iot_sdk"
 
 chip_device_platform = "bl602"
 
+chip_enable_ota_requestor = true
+
 lwip_platform = "bl602"
 
 chip_inet_config_enable_ipv4 = true
-
-chip_enable_rotating_device_id = false
 
 chip_build_tests = false
 chip_inet_config_enable_dns_resolver = false

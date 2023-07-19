@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,47 +11,136 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.12.2. [TC-CONTENTLAUNCHER-10.3] Launch Content Verification
+name: 19.12.2. [TC-CONTENTLAUNCHER-10.3] Launch Content Verification
 
 PICS:
     - CONTENTLAUNCHER.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Content Launcher"
+    endpoint: 1
+    data:
+        type: char_string
+        defaultValue: "exampleData"
+    SearchValue:
+        type: char_string
+        defaultValue: "exampleValue"
+    ExternalIdName:
+        type: char_string
+        defaultValue: "name"
+    ExternalIdValue:
+        type: char_string
+        defaultValue: "value"
 
 tests:
-    - label:
-          "TH sends a LaunchContent command to the DUT with a search parameter
-          and string, and AutoPlay flag set to false"
-      PICS: CONTENTLAUNCHER.S.C00.Rsp
-      verification: |
-          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
-          ./chip-tv-casting-app contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
-
-          On TH  verify the success response (value 0) received  from DUT
-          [1651062794.114531][157317:157322] CHIP:TOO:   LaunchResponse: {
-          [1651062794.114546][157317:157322] CHIP:TOO:     status: 0
-          [1651062794.114553][157317:157322] CHIP:TOO:     data: exampleData
-          [1651062794.114560][157317:157322] CHIP:TOO:    }
-      disabled: true
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label:
-          "TH sends a LaunchContent command to the DUT with a search parameter
-          and string, and AutoPlay flag set to true"
+          "Step 1: TH sends a LaunchContent command to the DUT with a search
+          parameter and string, and AutoPlay flag set to false"
       PICS: CONTENTLAUNCHER.S.C00.Rsp
-      verification: |
-          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 1 1 1
-          ./chip-tv-casting-app contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 1 1 1
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: false
+              - name: "Data"
+                value: data
+              - name: "Search"
+                value:
+                    {
+                        ParameterList:
+                            [
+                                {
+                                    Type: 0,
+                                    Value: SearchValue,
+                                    ExternalIDList:
+                                        [
+                                            {
+                                                Name: ExternalIdName,
+                                                Value: ExternalIdValue,
+                                            },
+                                        ],
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Data"
+                value: data
+              - name: "Status"
+                value: 0
 
-          On TH  verify the success response (value 0) received  from DUT
-          [1651062895.695667][157343:157348] CHIP:TOO:   LaunchResponse: {
-          [1651062895.695703][157343:157348] CHIP:TOO:     status: 0
-          [1651062895.695724][157343:157348] CHIP:TOO:     data: exampleData
-          [1651062895.695746][157343:157348] CHIP:TOO:    }
-      disabled: true
+    - label:
+          "Verify that DUT present via its user interface a list of matches
+          based on the provided search criteria."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT present via its user interface a
+                    list of matches based on the provided search criteria."
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 2: TH sends a LaunchContent command to the DUT with a search
+          parameter and string, and AutoPlay flag set to true"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: true
+              - name: "Data"
+                value: data
+              - name: "Search"
+                value:
+                    {
+                        ParameterList:
+                            [
+                                {
+                                    Type: 0,
+                                    Value: SearchValue,
+                                    ExternalIDList:
+                                        [
+                                            {
+                                                Name: ExternalIdName,
+                                                Value: ExternalIdValue,
+                                            },
+                                        ],
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Data"
+                value: data
+              - name: "Status"
+                value: 0
+
+    - label:
+          "Verify that DUT should also begin playing content that best matched
+          the given search criteria"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT begin playing content that best
+                    matched the given search criteria"
+              - name: "expectedValue"
+                value: "y"

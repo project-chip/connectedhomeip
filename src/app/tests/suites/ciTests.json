@@ -3,9 +3,10 @@
         "TestAccessControlCluster",
         "Test_TC_ACL_1_1",
         "Test_TC_ACL_2_1",
-        "Test_TC_ACL_2_2",
         "Test_TC_ACL_2_3",
         "Test_TC_ACL_2_4",
+        "Test_TC_ACL_2_5",
+        "Test_TC_ACL_2_6",
         "Test_TC_ACL_2_7",
         "Test_TC_ACL_2_8",
         "Test_TC_ACL_2_9",
@@ -71,6 +72,7 @@
     ],
     "GeneralCommissioning": ["Test_TC_CGEN_1_1", "Test_TC_CGEN_2_1"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_1_1", "Test_TC_DGGEN_2_1"],
+    "IcdManagement": ["Test_TC_ICDM_1_1", "Test_TC_ICDM_2_1"],
     "Identify": [
         "Test_TC_I_1_1",
         "Test_TC_I_2_1",
@@ -126,8 +128,6 @@
         "Test_TC_APPLAUNCHER_3_5",
         "Test_TC_APPLAUNCHER_3_6",
         "Test_TC_APPLAUNCHER_3_7",
-        "Test_TC_APPLAUNCHER_3_8",
-        "Test_TC_APPLAUNCHER_3_9",
         "Test_TC_MEDIAINPUT_3_10",
         "Test_TC_MEDIAINPUT_3_11",
         "Test_TC_MEDIAINPUT_3_12",
@@ -145,7 +145,10 @@
         "Test_TC_APBSC_9_1",
         "Test_TC_CONTENTLAUNCHER_10_1",
         "Test_TC_WAKEONLAN_4_1",
-        "Test_TC_ALOGIN_12_1"
+        "Test_TC_ALOGIN_12_1",
+        "Test_TC_CONTENTLAUNCHER_10_3",
+        "Test_TC_CONTENTLAUNCHER_10_5",
+        "Test_TC_CONTENTLAUNCHER_10_7"
     ],
     "ModeSelect": ["Test_TC_MOD_1_1"],
     "MultipleFabrics": [],
@@ -156,6 +159,7 @@
         "Test_TC_OO_2_2",
         "Test_TC_OO_2_4"
     ],
+    "OperationalState": ["Test_TC_OPSTATE_1_1"],
     "PowerSource": ["Test_TC_PS_1_1", "Test_TC_PS_2_1"],
     "PressureMeasurement": [
         "Test_TC_PRS_1_1",
@@ -171,7 +175,7 @@
     ],
     "PowerSourceConfiguration": ["Test_TC_PSCFG_1_1", "Test_TC_PSCFG_2_1"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_1_1", "Test_TC_RH_2_1"],
-    "SecureChannel": ["Test_TC_SC_5_1", "Test_TC_SC_5_2"],
+    "SecureChannel": [],
     "Switch": ["Test_TC_SWTCH_1_1", "Test_TC_SWTCH_2_1"],
     "TemperatureMeasurement": ["Test_TC_TMP_1_1", "Test_TC_TMP_2_1"],
     "Thermostat": ["Test_TC_TSTAT_1_1", "Test_TC_TSTAT_2_1"],
@@ -187,7 +191,7 @@
         "Test_TC_DGTHREAD_2_3",
         "Test_TC_DGTHREAD_2_4"
     ],
-    "TimeSynchronization": ["Test_TC_TIMESYNC_1_1"],
+    "TimeSynchronization": ["Test_TC_TIMESYNC_1_1", "Test_TC_TIMESYNC_2_3"],
     "WiFiNetworkDiagnostics": [
         "Test_TC_DGWIFI_1_1",
         "Test_TC_DGWIFI_2_1",
@@ -242,6 +246,7 @@
         "TestIdentifyCluster",
         "TestOperationalCredentialsCluster",
         "TestModeSelectCluster",
+        "TestTemperatureControl",
         "TestSelfFabricRemoval",
         "TestSystemCommands",
         "TestBinding",
@@ -253,7 +258,8 @@
         "TestLevelControlWithOnOffDependency",
         "TestCommissioningWindow",
         "TestCommissionerNodeId",
-        "TestTimeSynchronization"
+        "TestTimeSynchronization",
+        "TestOperationalState"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
@@ -352,6 +358,7 @@
         "FanControl",
         "GeneralCommissioning",
         "GeneralDiagnostics",
+        "IcdManagement",
         "Identify",
         "IlluminanceMeasurement",
         "LevelControl",
@@ -364,6 +371,7 @@
         "OTASoftwareUpdate",
         "OccupancySensing",
         "OnOff",
+        "OperationalState",
         "PowerSource",
         "PressureMeasurement",
         "PumpConfigurationControl",

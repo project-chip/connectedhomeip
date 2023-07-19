@@ -11,7 +11,8 @@ import com.google.chip.chiptool.databinding.AttestationTestFragmentBinding
 /** Fragment for launching external attestation apps */
 class AttestationTestFragment : Fragment() {
   private var _binding: AttestationTestFragmentBinding? = null
-  private val binding get() = _binding!!
+  private val binding
+    get() = _binding!!
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -23,8 +24,7 @@ class AttestationTestFragment : Fragment() {
     binding.attestationText.text = context!!.getString(R.string.attestation_fetching_status)
     val appIntent = AttestationAppLauncher.getAttestationIntent(requireContext())
     if (appIntent != null) {
-      AttestationAppLauncher
-        .getLauncher(this@AttestationTestFragment) { result ->
+      AttestationAppLauncher.getLauncher(this@AttestationTestFragment) { result ->
           binding.attestationText.text = result
         }
         .launch(appIntent)
@@ -41,7 +41,6 @@ class AttestationTestFragment : Fragment() {
   }
 
   companion object {
-    @JvmStatic
-    fun newInstance(): AttestationTestFragment = AttestationTestFragment()
+    @JvmStatic fun newInstance(): AttestationTestFragment = AttestationTestFragment()
   }
 }

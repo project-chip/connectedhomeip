@@ -619,6 +619,10 @@ typedef void (*RvcOperationalStateEventListListAttributeCallback)(void * context
                                                                   const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*RvcOperationalStateAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*HepaFilterMonitoringReplacementProductListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & data);
 typedef void (*HepaFilterMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*HepaFilterMonitoringAcceptedCommandListListAttributeCallback)(
@@ -627,6 +631,10 @@ typedef void (*HepaFilterMonitoringEventListListAttributeCallback)(void * contex
                                                                    const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*HepaFilterMonitoringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & data);
 typedef void (*ActivatedCarbonFilterMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ActivatedCarbonFilterMonitoringAcceptedCommandListListAttributeCallback)(
@@ -635,6 +643,10 @@ typedef void (*ActivatedCarbonFilterMonitoringEventListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*ActivatedCarbonFilterMonitoringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*CeramicFilterMonitoringReplacementProductListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & data);
 typedef void (*CeramicFilterMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*CeramicFilterMonitoringAcceptedCommandListListAttributeCallback)(
@@ -643,6 +655,10 @@ typedef void (*CeramicFilterMonitoringEventListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*CeramicFilterMonitoringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ElectrostaticFilterMonitoringReplacementProductListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & data);
 typedef void (*ElectrostaticFilterMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ElectrostaticFilterMonitoringAcceptedCommandListListAttributeCallback)(
@@ -651,6 +667,10 @@ typedef void (*ElectrostaticFilterMonitoringEventListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*ElectrostaticFilterMonitoringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*UvFilterMonitoringReplacementProductListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & data);
 typedef void (*UvFilterMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*UvFilterMonitoringAcceptedCommandListListAttributeCallback)(
@@ -659,6 +679,10 @@ typedef void (*UvFilterMonitoringEventListListAttributeCallback)(void * context,
                                                                  const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*UvFilterMonitoringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*IonizingFilterMonitoringReplacementProductListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & data);
 typedef void (*IonizingFilterMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*IonizingFilterMonitoringAcceptedCommandListListAttributeCallback)(
@@ -667,6 +691,10 @@ typedef void (*IonizingFilterMonitoringEventListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*IonizingFilterMonitoringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ZeoliteFilterMonitoringReplacementProductListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & data);
 typedef void (*ZeoliteFilterMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ZeoliteFilterMonitoringAcceptedCommandListListAttributeCallback)(
@@ -675,6 +703,10 @@ typedef void (*ZeoliteFilterMonitoringEventListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*ZeoliteFilterMonitoringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*OzoneFilterMonitoringReplacementProductListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & data);
 typedef void (*OzoneFilterMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OzoneFilterMonitoringAcceptedCommandListListAttributeCallback)(
@@ -683,6 +715,10 @@ typedef void (*OzoneFilterMonitoringEventListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*OzoneFilterMonitoringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*WaterTankMonitoringReplacementProductListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::DecodableType> & data);
 typedef void (*WaterTankMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*WaterTankMonitoringAcceptedCommandListListAttributeCallback)(
@@ -691,6 +727,10 @@ typedef void (*WaterTankMonitoringEventListListAttributeCallback)(void * context
                                                                   const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*WaterTankMonitoringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*FuelTankMonitoringReplacementProductListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::DecodableType> & data);
 typedef void (*FuelTankMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*FuelTankMonitoringAcceptedCommandListListAttributeCallback)(
@@ -699,6 +739,10 @@ typedef void (*FuelTankMonitoringEventListListAttributeCallback)(void * context,
                                                                  const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*FuelTankMonitoringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*InkCartridgeMonitoringReplacementProductListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType> & data);
 typedef void (*InkCartridgeMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*InkCartridgeMonitoringAcceptedCommandListListAttributeCallback)(
@@ -707,6 +751,10 @@ typedef void (*InkCartridgeMonitoringEventListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*InkCartridgeMonitoringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*TonerCartridgeMonitoringReplacementProductListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::DecodableType> & data);
 typedef void (*TonerCartridgeMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TonerCartridgeMonitoringAcceptedCommandListListAttributeCallback)(

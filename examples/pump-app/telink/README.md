@@ -13,13 +13,13 @@ reference for creating your own pump application.
 1. Pull docker image from repository:
 
     ```bash
-    $ docker pull connectedhomeip/chip-build-telink:latest
+    $ docker pull ghcr.io/project-chip/chip-build-telink:1
     ```
 
 1. Run docker container:
 
     ```bash
-    $ docker run -it --rm -v ${CHIP_BASE}:/root/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" connectedhomeip/chip-build-telink:latest
+    $ docker run -it --rm -v ${CHIP_BASE}:/root/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" ghcr.io/project-chip/chip-build-telink:1
     ```
 
     here `${CHIP_BASE}` is directory which contains CHIP repo files **!!!Pay

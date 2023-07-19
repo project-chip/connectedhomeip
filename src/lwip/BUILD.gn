@@ -64,6 +64,7 @@ if (lwip_platform == "cc13xx_26xx") {
   import("//build_overrides/bouffalolab_iot_sdk.gni")
 } else if (lwip_platform == "bl702") {
   import("//build_overrides/bouffalolab_iot_sdk.gni")
+  import("${chip_root}/src/platform/device.gni")
 } else if (lwip_platform == "bl702l") {
   import("//build_overrides/bouffalolab_iot_sdk.gni")
 } else if (lwip_platform == "mw320") {
@@ -111,28 +112,6 @@ if (current_os == "zephyr" || current_os == "mbed") {
     public_configs = [ "${chip_root}/src:includes" ]
     public_configs += [ "${psoc6_sdk_build_root}:psoc6_sdk_config" ]
   }
-} else if (lwip_platform == "bl702_lwip") {
-  import("${bouffalolab_iot_sdk_build_root}/bl702/bl_iot_sdk.gni")
-
-  group("lwip") {
-    public_deps = [ ":lwip_buildconfig" ]
-    public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk" ]
-  }
-
-  group("all") {
-    deps = [ ":lwip" ]
-  }
-} else if (lwip_platform == "bl702l_lwip") {
-  import("${bouffalolab_iot_sdk_build_root}/bl702l/bl_iot_sdk.gni")
-
-  group("lwip") {
-    public_deps = [ ":lwip_buildconfig" ]
-    public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl702l:bl_iot_sdk" ]
-  }
-
-  group("all") {
-    deps = [ ":lwip" ]
-  }
 } else if (lwip_platform == "qpg") {
   config("lwip_config") {
     include_dirs = [ "freertos" ]
@@ -159,6 +138,18 @@ if (current_os == "zephyr" || current_os == "mbed") {
   group("lwip") {
     public_deps = [ ":lwip_buildconfig" ]
     public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl602:bl_iot_sdk" ]
+  }
+
+  group("all") {
+    deps = [ ":lwip" ]
+  }
+} else if (lwip_platform == "bl702" && defined(chip_enable_openthread) &&
+           chip_enable_openthread == false) {
+  # bl702 platform will use ethernet or SPI Wi-Fi for connectivity, if openthread is not enabled
+  import("${bouffalolab_iot_sdk_build_root}/bl702/bl_iot_sdk.gni")
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig" ]
+    public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk" ]
   }
 
   group("all") {
@@ -220,8 +211,6 @@ if (current_os == "zephyr" || current_os == "mbed") {
       public_deps += [ "${k32w0_sdk_build_root}:k32w0_sdk" ]
     } else if (lwip_platform == "cyw30739") {
       public_deps += [ "${cyw30739_sdk_build_root}:cyw30739_sdk" ]
-    } else if (lwip_platform == "bl602") {
-      public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl702l:bl_iot_sdk" ]
     } else if (lwip_platform == "bl702") {
       public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk" ]
     } else if (lwip_platform == "bl702l") {

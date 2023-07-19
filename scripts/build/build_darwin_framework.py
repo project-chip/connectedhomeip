@@ -45,6 +45,15 @@ def run_command(command):
 
     with open(args.log_path, "wb") as f:
         f.write(command_log)
+
+    if returncode != 0:
+        # command_log is binary, so decoding as utf-8 might technically fail.  We don't want
+        # to throw on that.
+        try:
+            print("Failure log: {}".format(command_log.decode()))
+        except Exception:
+            pass
+
     return returncode
 
 

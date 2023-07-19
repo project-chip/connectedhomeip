@@ -143,6 +143,44 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRDescriptorClusterDeviceType : MTRDescriptorClusterDeviceTypeStruct
+@dynamic revision;
+@end
+
+@implementation MTRDescriptorClusterSemanticTagStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mfgCode = nil;
+
+        _namespace = @(0);
+
+        _tag = @(0);
+
+        _label = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDescriptorClusterSemanticTagStruct alloc] init];
+
+    other.mfgCode = self.mfgCode;
+    other.namespace = self.namespace;
+    other.tag = self.tag;
+    other.label = self.label;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; namespace:%@; tag:%@; label:%@; >",
+                                             NSStringFromClass([self class]), _mfgCode, _namespace, _tag, _label];
+    return descriptionString;
+}
+
 @end
 
 @implementation MTRDescriptorClusterSemanticTagStruct
@@ -257,6 +295,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRAccessControlClusterTarget : MTRAccessControlClusterAccessControlTargetStruct
+@dynamic cluster;
+@dynamic endpoint;
+@dynamic deviceType;
 @end
 
 @implementation MTRAccessControlClusterAccessControlEntryStruct
@@ -301,6 +342,11 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRAccessControlClusterAccessControlEntry : MTRAccessControlClusterAccessControlEntryStruct
+@dynamic privilege;
+@dynamic authMode;
+@dynamic subjects;
+@dynamic targets;
+@dynamic fabricIndex;
 @end
 
 @implementation MTRAccessControlClusterAccessControlExtensionStruct
@@ -335,6 +381,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRAccessControlClusterExtensionEntry : MTRAccessControlClusterAccessControlExtensionStruct
+@dynamic data;
+@dynamic fabricIndex;
 @end
 
 @implementation MTRAccessControlClusterAccessControlEntryChangedEvent
@@ -603,6 +651,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRBasicClusterCapabilityMinimaStruct : MTRBasicInformationClusterCapabilityMinimaStruct
+@dynamic caseSessionsPerFabric;
+@dynamic subscriptionsPerFabric;
 @end
 
 @implementation MTRBasicInformationClusterProductAppearanceStruct
@@ -665,6 +715,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRBasicClusterStartUpEvent : MTRBasicInformationClusterStartUpEvent
+@dynamic softwareVersion;
 @end
 
 @implementation MTRBasicInformationClusterShutDownEvent
@@ -722,6 +773,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRBasicClusterLeaveEvent : MTRBasicInformationClusterLeaveEvent
+@dynamic fabricIndex;
 @end
 
 @implementation MTRBasicInformationClusterReachableChangedEvent
@@ -753,6 +805,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRBasicClusterReachableChangedEvent : MTRBasicInformationClusterReachableChangedEvent
+@dynamic reachableNewValue;
 @end
 
 @implementation MTROTASoftwareUpdateRequestorClusterProviderLocation
@@ -790,6 +843,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROtaSoftwareUpdateRequestorClusterProviderLocation : MTROTASoftwareUpdateRequestorClusterProviderLocation
+@dynamic providerNodeID;
+@dynamic endpoint;
+@dynamic fabricIndex;
 @end
 
 @implementation MTROTASoftwareUpdateRequestorClusterStateTransitionEvent
@@ -831,6 +887,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent : MTROTASoftwareUpdateRequestorClusterStateTransitionEvent
+@dynamic previousState;
+@dynamic newState;
+@dynamic reason;
+@dynamic targetSoftwareVersion;
 @end
 
 @implementation MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent
@@ -865,6 +925,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent : MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent
+@dynamic softwareVersion;
+@dynamic productID;
 @end
 
 @implementation MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent
@@ -906,6 +968,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent : MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent
+@dynamic softwareVersion;
+@dynamic bytesDownloaded;
+@dynamic progressPercent;
+@dynamic platformCode;
 @end
 
 @implementation MTRPowerSourceClusterBatChargeFaultChangeType
@@ -1159,6 +1225,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRNetworkCommissioningClusterNetworkInfo : MTRNetworkCommissioningClusterNetworkInfoStruct
+@dynamic networkID;
+@dynamic connected;
 @end
 
 @implementation MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct
@@ -1215,6 +1283,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRNetworkCommissioningClusterThreadInterfaceScanResult
     : MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct
+@dynamic panId;
+@dynamic extendedPanId;
+@dynamic networkName;
+@dynamic channel;
+@dynamic version;
+@dynamic extendedAddress;
+@dynamic rssi;
+@dynamic lqi;
 @end
 
 @implementation MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct
@@ -1263,6 +1339,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRNetworkCommissioningClusterWiFiInterfaceScanResult : MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct
+@dynamic security;
+@dynamic ssid;
+@dynamic bssid;
+@dynamic channel;
+@dynamic wiFiBand;
+@dynamic rssi;
 @end
 
 @implementation MTRGeneralDiagnosticsClusterNetworkInterface
@@ -1318,6 +1400,14 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRGeneralDiagnosticsClusterNetworkInterfaceType : MTRGeneralDiagnosticsClusterNetworkInterface
+@dynamic name;
+@dynamic isOperational;
+@dynamic offPremiseServicesReachableIPv4;
+@dynamic offPremiseServicesReachableIPv6;
+@dynamic hardwareAddress;
+@dynamic iPv4Addresses;
+@dynamic iPv6Addresses;
+@dynamic type;
 @end
 
 @implementation MTRGeneralDiagnosticsClusterHardwareFaultChangeEvent
@@ -1483,6 +1573,11 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRSoftwareDiagnosticsClusterThreadMetrics : MTRSoftwareDiagnosticsClusterThreadMetricsStruct
+@dynamic id;
+@dynamic name;
+@dynamic stackFreeCurrent;
+@dynamic stackFreeMinimum;
+@dynamic stackSize;
 @end
 
 @implementation MTRSoftwareDiagnosticsClusterSoftwareFaultEvent
@@ -1592,6 +1687,20 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRThreadNetworkDiagnosticsClusterNeighborTable : MTRThreadNetworkDiagnosticsClusterNeighborTableStruct
+@dynamic extAddress;
+@dynamic age;
+@dynamic rloc16;
+@dynamic linkFrameCounter;
+@dynamic mleFrameCounter;
+@dynamic lqi;
+@dynamic averageRssi;
+@dynamic lastRssi;
+@dynamic frameErrorRate;
+@dynamic messageErrorRate;
+@dynamic rxOnWhenIdle;
+@dynamic fullThreadDevice;
+@dynamic fullNetworkData;
+@dynamic isChild;
 @end
 
 @implementation MTRThreadNetworkDiagnosticsClusterOperationalDatasetComponents
@@ -1719,6 +1828,16 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRThreadNetworkDiagnosticsClusterRouteTable : MTRThreadNetworkDiagnosticsClusterRouteTableStruct
+@dynamic extAddress;
+@dynamic rloc16;
+@dynamic routerId;
+@dynamic nextHop;
+@dynamic pathCost;
+@dynamic lqiIn;
+@dynamic lqiOut;
+@dynamic age;
+@dynamic allocated;
+@dynamic linkEstablished;
 @end
 
 @implementation MTRThreadNetworkDiagnosticsClusterSecurityPolicy
@@ -1933,6 +2052,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTimeSynchronizationClusterDstOffsetType : MTRTimeSynchronizationClusterDSTOffsetStruct
+@dynamic offset;
+@dynamic validStarting;
+@dynamic validUntil;
 @end
 
 @implementation MTRTimeSynchronizationClusterTimeZoneStruct
@@ -1970,6 +2092,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTimeSynchronizationClusterTimeZoneType : MTRTimeSynchronizationClusterTimeZoneStruct
+@dynamic offset;
+@dynamic validAt;
+@dynamic name;
 @end
 
 @implementation MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct
@@ -2032,6 +2157,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRBridgedDeviceBasicClusterStartUpEvent : MTRBridgedDeviceBasicInformationClusterStartUpEvent
+@dynamic softwareVersion;
 @end
 
 @implementation MTRBridgedDeviceBasicInformationClusterShutDownEvent
@@ -2115,6 +2241,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRBridgedDeviceBasicClusterReachableChangedEvent : MTRBridgedDeviceBasicInformationClusterReachableChangedEvent
+@dynamic reachableNewValue;
 @end
 
 @implementation MTRSwitchClusterSwitchLatchedEvent
@@ -2404,6 +2531,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROperationalCredentialsClusterFabricDescriptor : MTROperationalCredentialsClusterFabricDescriptorStruct
+@dynamic rootPublicKey;
+@dynamic label;
+@dynamic fabricIndex;
 @end
 
 @implementation MTROperationalCredentialsClusterNOCStruct
@@ -2687,6 +2817,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRModeSelectClusterSemanticTag : MTRModeSelectClusterSemanticTagStruct
+@dynamic mfgCode;
+@dynamic value;
 @end
 
 @implementation MTRModeSelectClusterModeOptionStruct
@@ -2755,6 +2887,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRDoorLockClusterDlCredential : MTRDoorLockClusterCredentialStruct
+@dynamic credentialType;
+@dynamic credentialIndex;
 @end
 
 @implementation MTRDoorLockClusterDoorLockAlarmEvent
@@ -3419,6 +3553,11 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRChannelClusterChannelInfo : MTRChannelClusterChannelInfoStruct
+@dynamic majorNumber;
+@dynamic minorNumber;
+@dynamic name;
+@dynamic callSign;
+@dynamic affiliateCallSign;
 @end
 
 @implementation MTRChannelClusterLineupInfoStruct
@@ -3460,6 +3599,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRChannelClusterLineupInfo : MTRChannelClusterLineupInfoStruct
+@dynamic operatorName;
+@dynamic lineupName;
+@dynamic postalCode;
+@dynamic lineupInfoType;
 @end
 
 @implementation MTRTargetNavigatorClusterTargetInfoStruct
@@ -3494,6 +3637,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTargetNavigatorClusterTargetInfo : MTRTargetNavigatorClusterTargetInfoStruct
+@dynamic identifier;
+@dynamic name;
 @end
 
 @implementation MTRMediaPlaybackClusterPlaybackPositionStruct
@@ -3528,6 +3673,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRMediaPlaybackClusterPlaybackPosition : MTRMediaPlaybackClusterPlaybackPositionStruct
+@dynamic updatedAt;
+@dynamic position;
 @end
 
 @implementation MTRMediaInputClusterInputInfoStruct
@@ -3568,6 +3715,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRMediaInputClusterInputInfo : MTRMediaInputClusterInputInfoStruct
+@dynamic index;
+@dynamic inputType;
+@dynamic name;
+@dynamic descriptionString;
 @end
 
 @implementation MTRContentLauncherClusterDimensionStruct
@@ -3605,6 +3756,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRContentLauncherClusterDimension : MTRContentLauncherClusterDimensionStruct
+@dynamic width;
+@dynamic height;
+@dynamic metric;
 @end
 
 @implementation MTRContentLauncherClusterAdditionalInfoStruct
@@ -3639,6 +3793,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRContentLauncherClusterAdditionalInfo : MTRContentLauncherClusterAdditionalInfoStruct
+@dynamic name;
+@dynamic value;
 @end
 
 @implementation MTRContentLauncherClusterParameterStruct
@@ -3676,6 +3832,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRContentLauncherClusterParameter : MTRContentLauncherClusterParameterStruct
+@dynamic type;
+@dynamic value;
+@dynamic externalIDList;
 @end
 
 @implementation MTRContentLauncherClusterContentSearchStruct
@@ -3707,6 +3866,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRContentLauncherClusterContentSearch : MTRContentLauncherClusterContentSearchStruct
+@dynamic parameterList;
 @end
 
 @implementation MTRContentLauncherClusterStyleInformationStruct
@@ -3754,6 +3914,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRContentLauncherClusterStyleInformation : MTRContentLauncherClusterStyleInformationStruct
+@dynamic color;
+@dynamic size;
 @end
 
 @implementation MTRContentLauncherClusterBrandingInformationStruct
@@ -3801,6 +3963,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRContentLauncherClusterBrandingInformation : MTRContentLauncherClusterBrandingInformationStruct
+@dynamic providerName;
+@dynamic background;
+@dynamic logo;
+@dynamic progressBar;
+@dynamic splash;
+@dynamic waterMark;
 @end
 
 @implementation MTRAudioOutputClusterOutputInfoStruct
@@ -3838,6 +4006,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRAudioOutputClusterOutputInfo : MTRAudioOutputClusterOutputInfoStruct
+@dynamic index;
+@dynamic outputType;
+@dynamic name;
 @end
 
 @implementation MTRApplicationLauncherClusterApplicationStruct
@@ -3926,6 +4097,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRApplicationLauncherClusterApplicationEP : MTRApplicationLauncherClusterApplicationEPStruct
+@dynamic application;
+@dynamic endpoint;
 @end
 
 @implementation MTRApplicationBasicClusterApplicationStruct
@@ -4033,6 +4206,14 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterSimpleStruct : MTRUnitTestingClusterSimpleStruct
+@dynamic a;
+@dynamic b;
+@dynamic c;
+@dynamic d;
+@dynamic e;
+@dynamic f;
+@dynamic g;
+@dynamic h;
 @end
 
 @implementation MTRUnitTestingClusterTestFabricScoped
@@ -4090,6 +4271,14 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestFabricScoped : MTRUnitTestingClusterTestFabricScoped
+@dynamic fabricSensitiveInt8u;
+@dynamic optionalFabricSensitiveInt8u;
+@dynamic nullableFabricSensitiveInt8u;
+@dynamic nullableOptionalFabricSensitiveInt8u;
+@dynamic fabricSensitiveCharString;
+@dynamic fabricSensitiveStruct;
+@dynamic fabricSensitiveInt8uList;
+@dynamic fabricIndex;
 @end
 
 @implementation MTRUnitTestingClusterNullablesAndOptionalsStruct
@@ -4159,6 +4348,18 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterNullablesAndOptionalsStruct : MTRUnitTestingClusterNullablesAndOptionalsStruct
+@dynamic nullableInt;
+@dynamic optionalInt;
+@dynamic nullableOptionalInt;
+@dynamic nullableString;
+@dynamic optionalString;
+@dynamic nullableOptionalString;
+@dynamic nullableStruct;
+@dynamic optionalStruct;
+@dynamic nullableOptionalStruct;
+@dynamic nullableList;
+@dynamic optionalList;
+@dynamic nullableOptionalList;
 @end
 
 @implementation MTRUnitTestingClusterNestedStruct
@@ -4196,6 +4397,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterNestedStruct : MTRUnitTestingClusterNestedStruct
+@dynamic a;
+@dynamic b;
+@dynamic c;
 @end
 
 @implementation MTRUnitTestingClusterNestedStructList
@@ -4245,6 +4449,13 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterNestedStructList : MTRUnitTestingClusterNestedStructList
+@dynamic a;
+@dynamic b;
+@dynamic c;
+@dynamic d;
+@dynamic e;
+@dynamic f;
+@dynamic g;
 @end
 
 @implementation MTRUnitTestingClusterDoubleNestedStructList
@@ -4275,6 +4486,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterDoubleNestedStructList : MTRUnitTestingClusterDoubleNestedStructList
+@dynamic a;
 @end
 
 @implementation MTRUnitTestingClusterTestListStructOctet
@@ -4309,6 +4521,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestListStructOctet : MTRUnitTestingClusterTestListStructOctet
+@dynamic member1;
+@dynamic member2;
 @end
 
 @implementation MTRUnitTestingClusterTestEventEvent
@@ -4355,6 +4569,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestEventEvent : MTRUnitTestingClusterTestEventEvent
+@dynamic arg1;
+@dynamic arg2;
+@dynamic arg3;
+@dynamic arg4;
+@dynamic arg5;
+@dynamic arg6;
 @end
 
 @implementation MTRUnitTestingClusterTestFabricScopedEventEvent
@@ -4386,6 +4606,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestFabricScopedEventEvent : MTRUnitTestingClusterTestFabricScopedEventEvent
+@dynamic fabricIndex;
 @end
 
 NS_ASSUME_NONNULL_END
