@@ -69,10 +69,10 @@ void TestGetTxtFieldKey(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kPairingHint);
 
     strcpy(key, "SII");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kSleepyIdleInterval);
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kSessionIdleInterval);
 
     strcpy(key, "SAI");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kSleepyActiveInterval);
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kSessionActiveInterval);
 
     strcpy(key, "T");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kTcpSupported);

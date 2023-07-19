@@ -95,6 +95,7 @@ CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessa
     ReturnErrorOnFailure(tlvWriter.StartContainer(tag, TLV::kTLVType_Structure, mrpParamsContainer));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), mrpLocalConfig.mIdleRetransTimeout.count()));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), mrpLocalConfig.mActiveRetransTimeout.count()));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), mrpLocalConfig.mActiveThresholdTime.count()));
     return tlvWriter.EndContainer(mrpParamsContainer);
 }
 
@@ -131,9 +132,23 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
         ReturnErrorOnFailure(err);
     }
 
-    VerifyOrReturnError(TLV::TagNumFromTag(tlvReader.GetTag()) == 2, CHIP_ERROR_INVALID_TLV_TAG);
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == 2)
+    {
+        ReturnErrorOnFailure(tlvReader.Get(tlvElementValue));
+        mRemoteMRPConfig.mActiveRetransTimeout = System::Clock::Milliseconds32(tlvElementValue);
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        CHIP_ERROR err = tlvReader.Next();
+        if (err == CHIP_END_OF_TLV)
+        {
+            return tlvReader.ExitContainer(containerType);
+        }
+        ReturnErrorOnFailure(err);
+    }
+
+    VerifyOrReturnError(TLV::TagNumFromTag(tlvReader.GetTag()) == 3, CHIP_ERROR_INVALID_TLV_TAG);
     ReturnErrorOnFailure(tlvReader.Get(tlvElementValue));
-    mRemoteMRPConfig.mActiveRetransTimeout = System::Clock::Milliseconds32(tlvElementValue);
+    mRemoteMRPConfig.mActiveThresholdTime = System::Clock::Milliseconds16(tlvElementValue);
 
     return tlvReader.ExitContainer(containerType);
 }

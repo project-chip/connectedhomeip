@@ -63,6 +63,9 @@ public:
     static System::Clock::Milliseconds32 GetSITPollingThreshold() { return kSITPollingThreshold; }
     static System::Clock::Milliseconds32 GetSlowPollingInterval() { return kSlowPollingInterval; }
     static System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
+    static System::Clock::Milliseconds32 GetActiveThresholdInterval() { return mActiveThreshold; }
+    // TODO ICD this will change with PR #27272
+    static void SetActiveThresholdInterval(System::Clock::Milliseconds32 activeThreshold) { mActiveThreshold = activeThreshold; }
 
 protected:
     static void OnIdleModeDone(System::Layer * aLayer, void * appState);
@@ -78,6 +81,7 @@ private:
     static constexpr uint32_t kMinIdleModeInterval    = 500;
     static constexpr uint32_t kMinActiveModeInterval  = 300;
     static constexpr uint16_t kMinActiveModeThreshold = 300;
+    static System::Clock::Milliseconds32 mActiveThreshold;
 
     bool SupportsCheckInProtocol();
 
