@@ -402,7 +402,7 @@ CHIP_ERROR ASRFactoryDataProvider::GetProductId(uint16_t & productId)
 #else
     uint32_t productId32;
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_PRODUCT_ID_PARTITION, productId32));
-    productId = static_cast<uint16_t>(productId32);
+    productId                           = static_cast<uint16_t>(productId32);
 #endif
     return CHIP_NO_ERROR;
 }
@@ -424,40 +424,88 @@ CHIP_ERROR ASRFactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
 
 CHIP_ERROR ASRFactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 {
-    ChipError err = CHIP_NO_ERROR;
-
-    size_t serialNumLen = 0; // without counting null-terminator
-
-#ifdef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
-    if (CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER[0] != 0)
-    {
-        ReturnErrorCodeIf(sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER));
-        serialNumLen = sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) - 1;
-        err          = CHIP_NO_ERROR;
-    }
-#endif // CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
-
-    ReturnErrorCodeIf(serialNumLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(buf[serialNumLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
-
-    return err;
+#if !CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER
+    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER), CHIP_ERROR_BUFFER_TOO_SMALL);
+    strcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
+#else
+#define BUFFER_MAX_SIZE 32
+    uint8_t buffer[BUFFER_MAX_SIZE + 1] = { 0 };
+    size_t buffer_len                   = BUFFER_MAX_SIZE + 1;
+    ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_SERIAL_NUMBER_PARTITION, buffer, buffer_len, buffer_len));
+    ReturnErrorCodeIf(bufSize < buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(buf, buffer, buffer_len);
+    buf[buffer_len] = 0;
+#endif
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ASRFactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    enum
+    {
+        kDateStringLength = 10 // YYYY-MM-DD
+    };
+    char dateStr[kDateStringLength + 1];
+    char * parseEnd;
+#if !CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER
+    memcpy(dateStr, CHIP_DEVICE_CONFIG_TEST_MANUFACTURY_DATE, kDateStringLength + 1);
+#else
+    size_t dateLen;
+    err = ASRConfig::ReadFactoryConfigValue(ASR_MANUFACTURY_DATE_PARTITION, (uint8_t *) dateStr, sizeof(dateStr), dateLen);
+    SuccessOrExit(err);
+
+    VerifyOrExit(dateLen == kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+#endif
+    // Cast does not lose information, because we then check that we only parsed
+    // 4 digits, so our number can't be bigger than 9999.
+    year = static_cast<uint16_t>(strtoul(dateStr, &parseEnd, 10));
+    VerifyOrExit(parseEnd == dateStr + 4, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    month = static_cast<uint8_t>(strtoul(dateStr + 5, &parseEnd, 10));
+    VerifyOrExit(parseEnd == dateStr + 7, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    day = static_cast<uint8_t>(strtoul(dateStr + 8, &parseEnd, 10));
+    VerifyOrExit(parseEnd == dateStr + 10, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+exit:
+    if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ChipLogError(DeviceLayer, "Invalid manufacturing date: %s", dateStr);
+    }
+    return err;
 }
 
 CHIP_ERROR ASRFactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+#if !CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER
+    hardwareVersion = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION);
+#else
+    uint32_t hardwareVersion32;
+    ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_HARDWARE_VERSION_PARTITION, hardwareVersion32));
+    hardwareVersion                     = static_cast<uint16_t>(hardwareVersion32);
+#endif
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ASRFactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
 {
+#if !CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
+#else
+#define BUFFER_MAX_SIZE 32
+    uint8_t buffer[BUFFER_MAX_SIZE + 1] = { 0 };
+    size_t buffer_len                   = BUFFER_MAX_SIZE + 1;
+    ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_HARDWARE_VERSION_STR_PARTITION, buffer, buffer_len, buffer_len));
+    ReturnErrorCodeIf(bufSize < buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(buf, buffer, buffer_len);
+    buf[buffer_len] = 0;
+#endif
     return CHIP_NO_ERROR;
 }
 

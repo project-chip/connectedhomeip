@@ -23,7 +23,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read PHYRate attribute constraints"
+    - label: "Step 2: Read PHYRate attribute constraints"
       PICS: DGETH.S.A0000
       command: "readAttribute"
       attribute: "PHYRate"
@@ -41,7 +41,7 @@ tests:
               minValue: 0
               maxValue: 9
 
-    - label: "Read FullDuplex attribute constraints"
+    - label: "Step 3: Read FullDuplex attribute constraints"
       PICS: DGETH.S.A0001
       command: "readAttribute"
       attribute: "FullDuplex"
@@ -50,7 +50,7 @@ tests:
               type: boolean
 
     #issue #13648
-    - label: "Read PacketRxCount attribute constraints"
+    - label: "Step 4a: Read PacketRxCount attribute constraints"
       PICS: DGETH.S.A0002
       command: "readAttribute"
       attribute: "PacketRxCount"
@@ -59,8 +59,8 @@ tests:
               type: int64u
 
     - label:
-          "Read PacketRxCount value from DUT and verify the number of packets
-          received on ethernet network interface"
+          "Step 4b: Read PacketRxCount value from DUT and verify the number of
+          packets received on ethernet network interface"
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read packet-rx-count 1 0
 
@@ -78,7 +78,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Read PacketTxCount attribute constraints"
+    - label: "Step 5a: Read PacketTxCount attribute constraints"
       PICS: DGETH.S.A0003
       command: "readAttribute"
       attribute: "PacketTxCount"
@@ -87,8 +87,8 @@ tests:
               type: int64u
 
     - label:
-          "Read PacketTxCount value from DUT and verify the number of packets
-          received on ethernet network interface"
+          "Step 5b: Read PacketTxCount value from DUT and verify the number of
+          packets received on ethernet network interface"
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read packet-tx-count 1 0
 
@@ -106,7 +106,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Read TxErrCount attribute constraints"
+    - label: "Step 6a: Read TxErrCount attribute constraints"
       PICS: DGETH.S.A0004
       command: "readAttribute"
       attribute: "TxErrCount"
@@ -115,8 +115,8 @@ tests:
               type: int64u
 
     - label:
-          "Read TxErrCount value from DUT and verify value indicates the number
-          of failed packet transmission on ethernet network interface"
+          "Step 6b: Read TxErrCount value from DUT and verify value indicates
+          the number of failed packet transmission on ethernet network interface"
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read tx-err-count 1 0
 
@@ -134,7 +134,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Read CollisionCount attribute constraints"
+    - label: "Step 7a: Read CollisionCount attribute constraints"
       PICS: DGETH.S.A0005
       command: "readAttribute"
       attribute: "CollisionCount"
@@ -143,9 +143,9 @@ tests:
               type: int64u
 
     - label:
-          "Read CollisionCount value from DUT and verify value indicates the
-          number of collision occurred while transmitting packets on ethernet
-          network interface"
+          "Step 7b: Read CollisionCount value from DUT and verify value
+          indicates the number of collision occurred while transmitting packets
+          on ethernet network interface"
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read collision-count 1 0
 
@@ -163,7 +163,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Read OverrunCount attribute constraints"
+    - label: "Step 8a: Read OverrunCount attribute constraints"
       PICS: DGETH.S.A0006
       command: "readAttribute"
       attribute: "OverrunCount"
@@ -172,8 +172,8 @@ tests:
               type: int64u
 
     - label:
-          "Read OverrunCount value from DUT and verify value indicates the
-          number of packets dropped due to lack of buffer memory on ethernet
+          "Step 8b: Read OverrunCount value from DUT and verify value indicates
+          the number of packets dropped due to lack of buffer memory on ethernet
           network interface"
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read overrun-count 1 0
@@ -192,7 +192,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Read CarrierDetect attribute constraints"
+    - label: "Step 9a: Read CarrierDetect attribute constraints"
       PICS: DGETH.S.A0007
       command: "readAttribute"
       attribute: "CarrierDetect"
@@ -201,8 +201,8 @@ tests:
               type: boolean
 
     - label:
-          "Read CarrierDetect value from DUT and verify value indicates the
-          presence of carrier detect control signal on ethernet network
+          "Step 9b: Read CarrierDetect value from DUT and verify value indicates
+          the presence of carrier detect control signal on ethernet network
           interface"
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read carrier-detect 1 0
@@ -221,7 +221,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Read TimeSinceReset attribute constraints"
+    - label: "Step 10a: Read TimeSinceReset attribute constraints"
       PICS: DGETH.S.A0008
       command: "readAttribute"
       attribute: "TimeSinceReset"
@@ -230,8 +230,8 @@ tests:
               type: int64u
 
     - label:
-          "Read TimeSinceReset value from DUT and verify the value indicates the
-          duration of time, in minutes"
+          "Step 10b: Read TimeSinceReset value from DUT and verify the value
+          indicates the duration of time, in minutes"
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read  time-since-reset 1 0
 
