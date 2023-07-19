@@ -58,21 +58,21 @@ namespace app {
 namespace Clusters {
 namespace FanControl {
 
-Delegate * GetDelegate(EndpointId endpoint)
+Delegate * GetDelegate(EndpointId aEndpoint)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, FanControl::Id, EMBER_AF_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(aEndpoint, FanControl::Id, EMBER_AF_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kFanControlDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, FanControl::Id, EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(aEndpoint, FanControl::Id, EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kFanControlDelegateTableSize)
     {
-        gDelegateTable[ep] = delegate;
+        gDelegateTable[ep] = aDelegate;
     }
 }
 
