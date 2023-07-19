@@ -21,9 +21,9 @@ assert(chip_device_platform == "renesas")
 static_library("renesas") {
   sources = [
     "../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.cpp",
-    "BLEManagerImpl.h",
-    "BlePlatformConfig.h",
+    #"BLEManagerImpl.cpp",
+    #"BLEManagerImpl.h",
+    #"BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPPlatformConfig.h",
@@ -45,7 +45,8 @@ static_library("renesas") {
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
-    #"SystemTimeSupport.cpp",
+    "SystemTimeSupport.h",
+    "SystemTimeSupport.cpp",
     "renesas-chip-mbedtls-config.h",
   ]
 

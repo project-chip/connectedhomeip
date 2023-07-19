@@ -38,9 +38,12 @@ chip_enable_ble = false
 lwip_platform = "external"
 
 chip_inet_config_enable_ipv4 = false
+chip_inet_config_enable_ipv6 = false
 chip_inet_config_enable_tcp_endpoint = false
+chip_inet_config_enable_udp_endpoint = false
 chip_system_config_use_open_thread_inet_endpoints = false
 chip_with_lwip = true
+chip_inet_config_enable_dns_resolver = false
 
 chip_system_config_locking = "none"
 chip_system_config_use_sockets = false
@@ -52,3 +55,5 @@ lwip_debug = false
 default_configs_optimize = [ "$dir_pw_build:optimize_size" ]
 
 chip_build_tests = false
+
+

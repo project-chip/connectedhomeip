@@ -47,4 +47,7 @@ chip_project_config_include_dirs =
     "//../../../../../../common/common_peripherals/include/",
     "//../../../../../../common/lwip-port/",
     "//../../../../../../common/generic/",
-    "//../../../../../segger-rtt/rtt/"]
+    "//../../../../../segger-rtt/rtt/"
+    ]
+
+    print("=========renesas include paths: ${chip_project_config_include_dirs}")

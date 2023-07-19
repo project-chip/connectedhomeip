@@ -54,16 +54,16 @@ static_library("address_resolve") {
   }
 }
 
-executable("address-resolve-tool") {
-  sources = [ "tool.cpp" ]
+#executable("address-resolve-tool") {
+#  sources = [ "tool.cpp" ]
 
-  cflags = [ "-Wconversion" ]
+#  cflags = [ "-Wconversion" ]
 
-  public_deps = [
-    ":address_resolve",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/platform/logging:stdio",
-  ]
+#  public_deps = [
+#    ":address_resolve",
+#    "${chip_root}/src/lib/support",
+#    "${chip_root}/src/platform/logging:stdio",
+#  ]
 
-  output_dir = root_out_dir
-}
+#  output_dir = root_out_dir
+#}
