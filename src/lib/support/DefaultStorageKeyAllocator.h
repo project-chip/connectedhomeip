@@ -182,6 +182,17 @@ public:
         return StorageKeyName::Formatted("f/%x/icd/%x", fabric, index);
     }
 
+    // Laundry Washer Control cluster
+    static StorageKeyName LaundryWasherCtrlSpinSpeedsList(EndpointId endpoint, ClusterId clusterId)
+    {
+        return StorageKeyName::Formatted("g/lwc/ssl/%x/%" PRIx32, endpoint, clusterId);
+    }
+
+    static StorageKeyName LaundryWasherCtrlSupportedRinsesList(EndpointId endpoint, ClusterId clusterId)
+    {
+        return StorageKeyName::Formatted("g/lwc/srl/%x/%" PRIx32, endpoint, clusterId);
+    }
+
     static StorageKeyName OTADefaultProviders() { return StorageKeyName::FromConst("g/o/dp"); }
     static StorageKeyName OTACurrentProvider() { return StorageKeyName::FromConst("g/o/cp"); }
     static StorageKeyName OTAUpdateToken() { return StorageKeyName::FromConst("g/o/ut"); }

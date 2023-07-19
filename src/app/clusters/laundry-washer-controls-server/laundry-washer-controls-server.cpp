@@ -30,6 +30,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
+#include <app/server/Server.h>
 #include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
@@ -40,59 +41,13 @@ using namespace chip::app::Clusters::LaundryWasherControls;
 using namespace chip::app::Clusters::LaundryWasherControls::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-namespace {
-class LaundryWasherControlsAttrAccess : public AttributeAccessInterface
-{
-public:
-    LaundryWasherControlsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), LaundryWasherControls::Id) {}
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+LaundryWasherControlsServer LaundryWasherControlsServer::sInstance;
 
-private:
-    CHIP_ERROR ReadSpinSpeeds(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadSupportedRinses(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
-};
+/**********************************************************
+ * LaundryWasherControlsServer public methods
+ *********************************************************/
 
-CHIP_ERROR LaundryWasherControlsAttrAccess::ReadSpinSpeeds(const ConcreteReadAttributePath & aPath,
-                                                           AttributeValueEncoder & aEncoder)
-{
-    const LaundryWasherControls::LaundryWasherManager * gLaundryWasherManager = LaundryWasherControls::getLaundryWasherManager();
-    const LaundryWasherControls::LaundryWasherManager::AttributeProvider<const CharSpan> attrProvider =
-        gLaundryWasherManager->getSpinSpeedProvider(aPath.mEndpointId);
-    aEncoder.EncodeEmptyList();
-    CHIP_ERROR err;
-    err = aEncoder.EncodeList([attrProvider](const auto & encoder) -> CHIP_ERROR {
-        const auto * end = attrProvider.end();
-        for (auto * it = attrProvider.begin(); it != end; ++it)
-        {
-            auto & spinSpeed = *it;
-            ReturnErrorOnFailure(encoder.Encode(spinSpeed));
-        }
-        return CHIP_NO_ERROR;
-    });
-    return err;
-}
-
-CHIP_ERROR LaundryWasherControlsAttrAccess::ReadSupportedRinses(const ConcreteReadAttributePath & aPath,
-                                                                AttributeValueEncoder & aEncoder)
-{
-    const LaundryWasherControls::LaundryWasherManager * gLaundryWasherManager = LaundryWasherControls::getLaundryWasherManager();
-    const LaundryWasherControls::LaundryWasherManager::AttributeProvider<const NumberOfRinsesEnum> attrProvider =
-        gLaundryWasherManager->getSupportedRinseProvider(aPath.mEndpointId);
-    aEncoder.EncodeEmptyList();
-    CHIP_ERROR err;
-    err = aEncoder.EncodeList([attrProvider](const auto & encoder) -> CHIP_ERROR {
-        const auto * end = attrProvider.end();
-        for (auto * it = attrProvider.begin(); it != end; ++it)
-        {
-            auto & rinse = *it;
-            ReturnErrorOnFailure(encoder.Encode(rinse));
-        }
-        return CHIP_NO_ERROR;
-    });
-    return err;
-}
-
-CHIP_ERROR LaundryWasherControlsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR LaundryWasherControlsServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != LaundryWasherControls::Id)
     {
@@ -110,27 +65,20 @@ CHIP_ERROR LaundryWasherControlsAttrAccess::Read(const ConcreteReadAttributePath
     }
     return CHIP_NO_ERROR;
 }
-} // namespace
 
-LaundryWasherControlsAttrAccess gAttrAccess;
-
-void MatterLaundryWasherControlsPluginServerInitCallback()
+CHIP_ERROR LaundryWasherControlsServer::Init()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    mLaundryWasherDataProvider.Init(Server::GetInstance().GetPersistentStorage());
+
+    return CHIP_NO_ERROR;
 }
 
-LaundryWasherServer LaundryWasherServer::sInstance;
-
-/**********************************************************
- * LaundryWasherServer public methods
- *********************************************************/
-
-LaundryWasherServer & LaundryWasherServer::Instance()
+LaundryWasherControlsServer & LaundryWasherControlsServer::Instance()
 {
     return sInstance;
 }
 
-EmberAfStatus LaundryWasherServer::SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> newSpinSpeedCurrent)
+EmberAfStatus LaundryWasherControlsServer::SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> newSpinSpeedCurrent)
 {
     DataModel::Nullable<uint8_t> spinSpeedCurrent;
     EmberAfStatus res = SpinSpeedCurrent::Get(endpointId, spinSpeedCurrent);
@@ -143,12 +91,12 @@ EmberAfStatus LaundryWasherServer::SetSpinSpeedCurrent(EndpointId endpointId, Da
     return res;
 }
 
-EmberAfStatus LaundryWasherServer::GetSpinSpeedCurrent(chip ::EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent)
+EmberAfStatus LaundryWasherControlsServer::GetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent)
 {
     return SpinSpeedCurrent::Get(endpointId, spinSpeedCurrent);
 }
 
-EmberAfStatus LaundryWasherServer::SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses)
+EmberAfStatus LaundryWasherControlsServer::SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses)
 {
     NumberOfRinsesEnum numberOfRinses;
     EmberAfStatus res = NumberOfRinses::Get(endpointId, &numberOfRinses);
@@ -161,7 +109,117 @@ EmberAfStatus LaundryWasherServer::SetNumberOfRinses(EndpointId endpointId, Numb
     return res;
 }
 
-EmberAfStatus LaundryWasherServer::GetNumberOfRinses(chip ::EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses)
+EmberAfStatus LaundryWasherControlsServer::GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses)
 {
     return NumberOfRinses::Get(endpointId, &numberOfRinses);
 }
+
+EmberAfStatus LaundryWasherControlsServer::SetSpinSpeedList(EndpointId endpointId, const SpinSpeedList & spinSpeedList)
+{
+    CHIP_ERROR err = mLaundryWasherDataProvider.StoreSpinSpeedList(endpointId, LaundryWasherControls::Id, spinSpeedList);
+    return (err == CHIP_NO_ERROR)?(EMBER_ZCL_STATUS_SUCCESS):(EMBER_ZCL_STATUS_FAILURE);
+}
+
+EmberAfStatus LaundryWasherControlsServer::GetSpinSpeedList(EndpointId endpointId, SpinSpeedListCharSpan ** spinSpeedList, size_t & size)
+{
+    CHIP_ERROR err = mLaundryWasherDataProvider.LoadSpinSpeedList(endpointId, LaundryWasherControls::Id, spinSpeedList, size);
+    return (err == CHIP_NO_ERROR)?(EMBER_ZCL_STATUS_SUCCESS):(EMBER_ZCL_STATUS_FAILURE);
+}
+
+EmberAfStatus LaundryWasherControlsServer::SetSupportedRinsesList(EndpointId endpointId, const SupportedRinsesList & supportedRinsesList)
+{
+    CHIP_ERROR err = mLaundryWasherDataProvider.StoreSupportedRinsesList(endpointId, LaundryWasherControls::Id, supportedRinsesList);
+    return (err == CHIP_NO_ERROR)?(EMBER_ZCL_STATUS_SUCCESS):(EMBER_ZCL_STATUS_FAILURE);
+}
+
+EmberAfStatus LaundryWasherControlsServer::GetSupportedRinsesList(EndpointId endpointId, SupportedRinsesListSpan ** supportedRinsesList, size_t & size)
+{
+    CHIP_ERROR err = mLaundryWasherDataProvider.LoadSupportedRinsesList(endpointId, LaundryWasherControls::Id, supportedRinsesList, size);
+    return (err == CHIP_NO_ERROR)?(EMBER_ZCL_STATUS_SUCCESS):(EMBER_ZCL_STATUS_FAILURE);
+}
+
+/**********************************************************
+ * LaundryWasherControlsServer private methods
+ *********************************************************/
+void LaundryWasherControlsServer::ReleaseSpinSpeedList(SpinSpeedListCharSpan * spinSpeedList)
+{
+    mLaundryWasherDataProvider.ReleaseSpinSpeedList(spinSpeedList);
+}
+
+CHIP_ERROR LaundryWasherControlsServer::ClearSpinSpeedList(EndpointId endpointId)
+{
+    return mLaundryWasherDataProvider.ClearSpinSpeedList(endpointId, LaundryWasherControls::Id);
+}
+
+void LaundryWasherControlsServer::ReleaseSupportedRinsesList(SupportedRinsesListSpan* supportedRinsesList)
+{
+    mLaundryWasherDataProvider.ReleaseSupportedRinsesList(supportedRinsesList);
+}
+
+CHIP_ERROR LaundryWasherControlsServer::ClearSupportedRinsesList(EndpointId endpointId)
+{
+    return mLaundryWasherDataProvider.ClearSupportedRinsesList(endpointId, LaundryWasherControls::Id);
+}
+
+CHIP_ERROR LaundryWasherControlsServer::ReadSpinSpeeds(const ConcreteReadAttributePath & aPath,
+                                                           AttributeValueEncoder & aEncoder)
+{
+    SpinSpeedListCharSpan * spinSpeedList = nullptr;
+    size_t size                   = 0;
+    EndpointId endpointId = aPath.mEndpointId;
+    GetSpinSpeedList(endpointId, &spinSpeedList, size);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    aEncoder.EncodeEmptyList();
+    if (size > 0)
+    {
+        return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+            for (SpinSpeedListCharSpan * pHead = spinSpeedList; pHead != nullptr; pHead = pHead->Next)
+            {
+                ReturnErrorOnFailure(encoder.Encode(pHead->spinSpeed));
+            }
+            ReleaseSpinSpeedList(spinSpeedList);
+            spinSpeedList = nullptr;
+            return CHIP_NO_ERROR;
+        });
+    }
+    return err;
+}
+
+CHIP_ERROR LaundryWasherControlsServer::ReadSupportedRinses(const ConcreteReadAttributePath & aPath,
+                                                                AttributeValueEncoder & aEncoder)
+{
+    SupportedRinsesListSpan * supportedRinsesList = nullptr;
+    size_t size                   = 0;
+    EndpointId endpointId = aPath.mEndpointId;
+    GetSupportedRinsesList(endpointId, &supportedRinsesList, size);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    aEncoder.EncodeEmptyList();
+    if (size > 0)
+    {
+        return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+
+            for (SupportedRinsesListSpan* pHead = supportedRinsesList; pHead != nullptr; pHead = pHead->Next)
+            {
+                ReturnErrorOnFailure(encoder.Encode(pHead->numberOfRinses));
+            }
+            ReleaseSupportedRinsesList(supportedRinsesList);
+            supportedRinsesList = nullptr;
+            return CHIP_NO_ERROR;
+        });
+    }
+    return err;
+}
+
+/**********************************************************
+ * Register LaundryWasherControlsServer
+ *********************************************************/
+
+void MatterLaundryWasherControlsPluginServerInitCallback()
+{
+    LaundryWasherControlsServer & laundryWasherControlsServer = LaundryWasherControlsServer::Instance();
+    registerAttributeAccessOverride(&laundryWasherControlsServer);
+    laundryWasherControlsServer.Init();
+}
+
