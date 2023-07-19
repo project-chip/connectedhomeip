@@ -43,7 +43,7 @@ bool Instance::HasFeature(Feature feature) const
     return (mFeature & to_underlying(feature)) != 0;
 }
 
-bool Instance::isDerivedCluster() const
+bool Instance::IsDerivedCluster() const
 {
     for (unsigned int AliasedCluster : AliasedClusters)
     {
@@ -55,7 +55,7 @@ bool Instance::isDerivedCluster() const
     return false;
 }
 
-void Instance::loadPersistentAttributes()
+void Instance::LoadPersistentAttributes()
 {
     // Load Current Mode
     uint8_t tempCurrentMode;
@@ -140,19 +140,19 @@ void Instance::loadPersistentAttributes()
 CHIP_ERROR Instance::Init()
 {
     // Initialise the current mode with the value of the first mode. This ensures that it is representing a valid mode.
-    ReturnErrorOnFailure(GetModeValueByIndex(0, mCurrentMode));
+    ReturnErrorOnFailure(mDelegate->GetModeValueByIndex(0, mCurrentMode));
 
     // Check that the cluster ID given is a valid mode base derived cluster ID.
-    VerifyOrDie(isDerivedCluster() == true);
+    VerifyOrDie(IsDerivedCluster() == true);
 
     // Check if the cluster has been selected in zap
     VerifyOrDie(emberAfContainsServer(mEndpointId, mClusterId) == true);
 
-    loadPersistentAttributes();
+    LoadPersistentAttributes();
 
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(AppInit());
+    ReturnErrorOnFailure(mDelegate->Init());
 
     ModeBaseAliasesInstances.insert(this);
 
@@ -259,7 +259,7 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
     }
 }
 
-void Instance::handleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & commandData)
+void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & commandData)
 {
     uint8_t newMode = commandData.newMode;
 
@@ -273,12 +273,12 @@ void Instance::handleChangeToMode(HandlerContext & ctx, const Commands::ChangeTo
         return;
     }
 
-    HandleChangeToMode(newMode, response);
+    mDelegate->HandleChangeToMode(newMode, response);
 
     if (response.status == to_underlying(StatusCode::kSuccess))
     {
         UpdateCurrentMode(newMode);
-        ChipLogProgress(Zcl, "ModeBase: handleChangeToMode changed to mode %u", newMode);
+        ChipLogProgress(Zcl, "ModeBase: HandleChangeToMode changed to mode %u", newMode);
     }
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -293,7 +293,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         ChipLogDetail(Zcl, "ModeBase: Entering handling ChangeToModeWithStatus");
 
         HandleCommand<Commands::ChangeToMode::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { handleChangeToMode(ctx, commandData); });
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleChangeToMode(ctx, commandData); });
     }
 }
 
@@ -312,7 +312,7 @@ CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & clus
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::encodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper &encoder)
+CHIP_ERROR Instance::EncodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper &encoder)
 {
     for (uint8_t i = 0; true; i++)
     {
@@ -321,7 +321,7 @@ CHIP_ERROR Instance::encodeSupportedModes(const AttributeValueEncoder::ListEncod
         // Get the mode label
         char buffer[kMaxModeLabelSize];
         MutableCharSpan label(buffer);
-        auto err = GetModeLabelByIndex(i, label);
+        auto err = mDelegate->GetModeLabelByIndex(i, label);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
             return CHIP_NO_ERROR;
@@ -331,12 +331,12 @@ CHIP_ERROR Instance::encodeSupportedModes(const AttributeValueEncoder::ListEncod
         mode.label = label;
 
         // Get the mode value
-        ReturnErrorOnFailure(GetModeValueByIndex(i, mode.mode));
+        ReturnErrorOnFailure(mDelegate->GetModeValueByIndex(i, mode.mode));
 
         // Get the mode tags
         ModeTagStructType tagsBuffer[kMaxNumOfModeTags];
         DataModel::List<ModeTagStructType> tags(tagsBuffer);
-        ReturnErrorOnFailure(GetModeTagsByIndex(i, tags));
+        ReturnErrorOnFailure(mDelegate->GetModeTagsByIndex(i, tags));
         mode.modeTags = tags;
 
         ReturnErrorOnFailure(encoder.Encode(mode));
@@ -361,7 +361,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::SupportedModes::Id:
         Instance * d   = this;
         CHIP_ERROR err = aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR {
-            return d->encodeSupportedModes(encoder);
+            return d->EncodeSupportedModes(encoder);
         });
         return err;
     }
@@ -469,7 +469,7 @@ uint8_t Instance::GetCurrentMode() const
 bool Instance::IsSupportedMode(uint8_t modeValue)
 {
     uint8_t value;
-    for (uint8_t i = 0; GetModeValueByIndex(i, value) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
+    for (uint8_t i = 0; mDelegate->GetModeValueByIndex(i, value) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
     {
         if (value == modeValue)
         {
@@ -480,11 +480,24 @@ bool Instance::IsSupportedMode(uint8_t modeValue)
     return false;
 }
 
+Instance::Instance(Delegate *aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
+    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
+    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId),
+    mDelegate(aDelegate),
+    mEndpointId(aEndpointId),
+    mClusterId(aClusterId),
+    mCurrentMode(0), // This is a temporary value and may not be valid. We will change this to the value of the first
+                     // mode in the list at the start of the Init function to ensure that it represents a valid mode.
+    mFeature(aFeature)
+{
+    mDelegate->SetInstance(this);
+}
+
 Instance::~Instance()
 {
     ModeBaseAliasesInstances.erase(this);
     chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
-    // todo unregister the AttributeAccessOverride
+    // todo unregister the AttributeAccessOverride. Waiting for issue #28072.
 }
 
 std::set<Instance *> * GetModeBaseInstances()

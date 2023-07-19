@@ -30,8 +30,54 @@ namespace app {
 namespace Clusters {
 namespace ModeBase {
 
+class Delegate;
+
 class Instance : public CommandHandlerInterface, public AttributeAccessInterface
 {
+private:
+    Delegate *mDelegate;
+
+    EndpointId mEndpointId{};
+    ClusterId mClusterId{};
+
+    // Attribute data store
+    uint8_t mCurrentMode;
+    DataModel::Nullable<uint8_t> mStartUpMode;
+    DataModel::Nullable<uint8_t> mOnMode;
+    uint32_t mFeature;
+
+    // CommandHandlerInterface
+    void InvokeCommand(HandlerContext & ctx) override;
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+
+    // AttributeAccessInterface
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+
+    /**
+     * This checks to see if this clusters instance is a valid ModeBase aliased cluster based on the AliasedClusters list.
+     * @return true if the clusterId of this instance is a valid ModeBase cluster.
+     */
+    bool IsDerivedCluster() const;
+
+    /**
+     * Internal change-to-mode command handler function.
+     */
+    void HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & req);
+
+    /**
+     * Helper function that loads all the persistent attributes from the KVS. These attributes are CurrentMode,
+     * StartUpMode and OnMode.
+     */
+    void LoadPersistentAttributes();
+
+    /**
+     * Helper function that encodes the supported modes.
+     * @param encoder The encoder to encode the supported modes into.
+     */
+    CHIP_ERROR EncodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper &encoder);
+
 public:
     /**
      * Initialise the ModeBase server instance.
@@ -100,50 +146,6 @@ public:
      */
     bool IsSupportedMode(uint8_t mode);
 
-private:
-    EndpointId mEndpointId{};
-    ClusterId mClusterId{};
-
-    // Attribute data store
-    uint8_t mCurrentMode;
-    DataModel::Nullable<uint8_t> mStartUpMode;
-    DataModel::Nullable<uint8_t> mOnMode;
-
-    uint32_t mFeature;
-
-    // CommandHandlerInterface
-    void InvokeCommand(HandlerContext & ctx) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
-    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
-
-    // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-
-    /**
-     * This checks to see if this clusters instance is a valid ModeBase aliased cluster based on the AliasedClusters list.
-     * @return true if the clusterId of this instance is a valid ModeBase cluster.
-     */
-    bool isDerivedCluster() const;
-
-    /**
-     * Internal change-to-mode command handler function.
-     */
-    void handleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & req);
-
-    /**
-     * Helper function that loads all the persistent attributes from the KVS. These attributes are CurrentMode,
-     * StartUpMode and OnMode.
-     */
-    void loadPersistentAttributes();
-
-    /**
-     * Helper function that encodes the supported modes.
-     * @param encoder The encoder to encode the supported modes into.
-     */
-    CHIP_ERROR encodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper &encoder);
-
-public:
     /**
      * Creates a mode base cluster instance. The Init() function needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
@@ -152,27 +154,36 @@ public:
      * @param aClusterId The ID of the ModeBase aliased cluster to be instantiated.
      * @param aFeature The bitmask value that identifies which features are supported by this instance.
      */
-    Instance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
-        CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        mEndpointId(aEndpointId),
-        mClusterId(aClusterId),
-        mCurrentMode(0), // This is a temporary value and may not be valid. We will change this to the value of the first
-                         // mode in the list at the start of the Init function to ensure that it represents a valid mode.
-        mFeature(aFeature) {}
+    Instance(Delegate *aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature);
 
     ~Instance() override;
 
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
 
-    // The following functions should be overridden by the SDK user to implement the business logic of their application.
+};
+
+class Delegate{
 protected:
+    Instance *mInstance = nullptr;
+
+public:
+    Delegate() = default;
+
+    virtual ~Delegate() = default;
+
+    /**
+     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of an Instance object.
+     * @param aInstance A pointer to the Instance object related to this delegate object.
+     */
+    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
+
+    // The following functions should be overridden by the SDK user to implement the business logic of their application.
     /**
      * This init function will be called during the ModeBase server initialization after the Instance information has been
      * validated and the Instance has been registered. This can be used to initialise app logic.
      */
-    virtual CHIP_ERROR AppInit() = 0;
+    virtual CHIP_ERROR Init() = 0;
 
     /**
      * Get the mode label of the Nth mode in the list of modes.
@@ -206,9 +217,8 @@ protected:
      * @return Returns a CHIP_NO_ERROR if there was no error and the mode tags were returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available mode tags.
      */
-    virtual CHIP_ERROR
-    GetModeTagsByIndex(uint8_t modeIndex,
-                       DataModel::List<detail::Structs::ModeTagStruct::Type> & modeTags) = 0;
+    virtual CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex,
+                                          DataModel::List<detail::Structs::ModeTagStruct::Type> & modeTags) = 0;
 
     /**
      * When a ChangeToMode command is received, if the NewMode value is a supported mode, this method is called to 1) decide if

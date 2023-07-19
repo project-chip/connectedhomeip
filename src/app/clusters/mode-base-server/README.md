@@ -16,7 +16,7 @@ To use a ModeBase derived cluster, you need to
     Look at the documentation in `mode-base-server.h` for more information about
     these methods. Cluster-specific enums can be accessed from the cluster
     namespace.
--   Optionally implement the `AppInit` function.
+-   Optionally implement the `Init` function.
 -   In your translation unit, instantiate your `ModeBase::Instance` inherited class.
     See the constructor documentation in `mode-base-server.h`.
 -   Call the `.Init()` function of your instance.

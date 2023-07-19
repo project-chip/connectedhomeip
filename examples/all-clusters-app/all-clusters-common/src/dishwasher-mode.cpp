@@ -25,18 +25,18 @@ template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
-CHIP_ERROR DishwasherModeInstance::AppInit()
+CHIP_ERROR DishwasherModeDelegate::Init()
 {
     return CHIP_NO_ERROR;
 }
 
 // todo refactor code by making a parent class for all ModeInstance classes to reduce flash usage.
-void DishwasherModeInstance::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
+void DishwasherModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
-CHIP_ERROR DishwasherModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
+CHIP_ERROR DishwasherModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {
@@ -45,7 +45,7 @@ CHIP_ERROR DishwasherModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::
     return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
 }
 
-CHIP_ERROR DishwasherModeInstance::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
+CHIP_ERROR DishwasherModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {
@@ -55,7 +55,7 @@ CHIP_ERROR DishwasherModeInstance::GetModeValueByIndex(uint8_t modeIndex, uint8_
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DishwasherModeInstance::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
+CHIP_ERROR DishwasherModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {

@@ -25,17 +25,17 @@ template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
-CHIP_ERROR TccModeInstance::AppInit()
+CHIP_ERROR TccModeDelegate::Init()
 {
     return CHIP_NO_ERROR;
 }
 
-void TccModeInstance::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
+void TccModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
-CHIP_ERROR TccModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
+CHIP_ERROR TccModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {
@@ -44,7 +44,7 @@ CHIP_ERROR TccModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::Mutable
     return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
 }
 
-CHIP_ERROR TccModeInstance::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
+CHIP_ERROR TccModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {
@@ -54,7 +54,7 @@ CHIP_ERROR TccModeInstance::GetModeValueByIndex(uint8_t modeIndex, uint8_t & val
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TccModeInstance::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
+CHIP_ERROR TccModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {

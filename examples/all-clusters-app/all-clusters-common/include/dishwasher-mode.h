@@ -35,7 +35,7 @@ const uint8_t ModeHeavy  = 1;
 const uint8_t ModeLight  = 2;
 
 /// This is an application level delegate to handle DishwasherMode commands according to the specific business logic.
-class DishwasherModeInstance : public ModeBase::Instance
+class DishwasherModeDelegate : public ModeBase::Delegate
 {
 private:
     using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
@@ -68,7 +68,7 @@ private:
         }
     };
 
-    CHIP_ERROR AppInit() override;
+    CHIP_ERROR Init() override;
     void HandleChangeToMode(uint8_t mode, ModeBase::Commands::ChangeToModeResponse::Type & response) override;
 
     CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label) override;
@@ -76,10 +76,7 @@ private:
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override;
 
 public:
-    DishwasherModeInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeatures) :
-        Instance(aEndpointId, aClusterId, aFeatures){};
-
-    ~DishwasherModeInstance() override = default;
+    ~DishwasherModeDelegate() override = default;
 };
 
 } // namespace DishwasherMode

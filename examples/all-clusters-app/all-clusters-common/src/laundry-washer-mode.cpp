@@ -25,17 +25,17 @@ template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
-CHIP_ERROR LaundryWasherModeInstance::AppInit()
+CHIP_ERROR LaundryWasherModeDelegate::Init()
 {
     return CHIP_NO_ERROR;
 }
 
-void LaundryWasherModeInstance::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
+void LaundryWasherModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
-CHIP_ERROR LaundryWasherModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
+CHIP_ERROR LaundryWasherModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {
@@ -44,7 +44,7 @@ CHIP_ERROR LaundryWasherModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chi
     return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
 }
 
-CHIP_ERROR LaundryWasherModeInstance::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
+CHIP_ERROR LaundryWasherModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {
@@ -54,7 +54,7 @@ CHIP_ERROR LaundryWasherModeInstance::GetModeValueByIndex(uint8_t modeIndex, uin
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LaundryWasherModeInstance::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
+CHIP_ERROR LaundryWasherModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {
