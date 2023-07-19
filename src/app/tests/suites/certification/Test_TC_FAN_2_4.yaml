@@ -24,7 +24,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -32,7 +32,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads from the DUT the the WindSupport attribute"
+    - label: "Step 2: TH reads from the DUT the the WindSupport attribute"
       PICS: FAN.S.A0009
       command: "readAttribute"
       attribute: "WindSupport"
@@ -40,7 +40,7 @@ tests:
           constraints:
               type: bitmap8
 
-    - label: "TH reads from the DUT the the WindSetting attribute"
+    - label: "Step 3: TH reads from the DUT the the WindSetting attribute"
       PICS: FAN.S.A000A
       command: "readAttribute"
       attribute: "WindSetting"

@@ -31,7 +31,8 @@ tests:
               - name: "nodeId"
                 value: nodeId
     - label:
-          "TH reads SoftwareVersion attribute from DUT and saves for future use"
+          "Precondition: TH reads SoftwareVersion attribute from DUT and saves
+          for future use"
       PICS: BINFO.S.A0009
       command: "readAttribute"
       attribute: "SoftwareVersion"
