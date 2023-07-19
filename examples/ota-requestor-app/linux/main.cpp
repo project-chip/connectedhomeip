@@ -17,7 +17,6 @@
  */
 
 #include "AppMain.h"
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
@@ -130,29 +129,7 @@ OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
 
 // Network commissioning
 namespace {
-constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
-
-// This file is being used by platforms other than Linux, so we need this check to disable related features since we only
-// implemented them on linux.
-#if CHIP_DEVICE_LAYER_TARGET_LINUX
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-NetworkCommissioning::LinuxThreadDriver sLinuxThreadDriver;
-Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(kNetworkCommissioningEndpointMain,
-                                                                             &sLinuxThreadDriver);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
-Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointSecondary,
-                                                                           &sLinuxWiFiDriver);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-NetworkCommissioning::LinuxEthernetDriver sLinuxEthernetDriver;
-Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kNetworkCommissioningEndpointMain,
-                                                                               &sLinuxEthernetDriver);
-#else  // CHIP_DEVICE_LAYER_TARGET_LINUX
-Clusters::NetworkCommissioning::NullNetworkDriver sNullNetworkDriver;
-Clusters::NetworkCommissioning::Instance sNullNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sNullNetworkDriver);
-#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 } // namespace
 
 bool CustomOTARequestorDriver::CanConsent()
@@ -204,68 +181,6 @@ static void InitOTARequestor(void)
     {
         gUserConsentProvider.SetUserConsentState(gUserConsentState);
         gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
-    }
-}
-
-static void InitNetworkCommissioning(void)
-{
-    (void) kNetworkCommissioningEndpointMain;
-    // Enable secondary endpoint only when we need it, this should be applied to all platforms.
-    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
-
-#if CHIP_DEVICE_LAYER_TARGET_LINUX
-    const bool kThreadEnabled = {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        LinuxDeviceOptions::GetInstance().mThread
-#else
-        false
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    };
-
-    const bool kWiFiEnabled = {
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-        LinuxDeviceOptions::GetInstance().mWiFi
-#else
-        false
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-    };
-
-    if (kThreadEnabled && kWiFiEnabled)
-    {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        sThreadNetworkCommissioningInstance.Init();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-        sWiFiNetworkCommissioningInstance.Init();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-       // Only enable secondary endpoint for network commissioning cluster when both WiFi and Thread are enabled.
-        emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, true);
-    }
-    else if (kThreadEnabled)
-    {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        sThreadNetworkCommissioningInstance.Init();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    }
-    else if (kWiFiEnabled)
-    {
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-        // If we only enable WiFi on this device, "move" WiFi instance to main NetworkCommissioning cluster endpoint.
-        sWiFiNetworkCommissioningInstance.~Instance();
-        new (&sWiFiNetworkCommissioningInstance)
-            Clusters::NetworkCommissioning::Instance(kNetworkCommissioningEndpointMain, &sLinuxWiFiDriver);
-        sWiFiNetworkCommissioningInstance.Init();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-    }
-    else
-#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
-    {
-#if CHIP_DEVICE_LAYER_TARGET_LINUX
-        sEthernetNetworkCommissioningInstance.Init();
-#else
-        // Use NullNetworkCommissioningInstance to disable the network commissioning functions.
-        sNullNetworkCommissioningInstance.Init();
-#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
     }
 }
 
@@ -338,13 +253,11 @@ void ApplicationInit()
 {
     // Initialize all OTA download components
     InitOTARequestor();
-    // Initialize Network Commissioning instances
-    InitNetworkCommissioning();
 }
 
 int main(int argc, char * argv[])
 {
-    VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions) == 0);
+    VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions, MakeOptional(kNetworkCommissioningEndpointSecondary)) == 0);
     ChipLinuxAppMainLoop();
 
     // If the event loop had been stopped due to an update being applied, boot into the new image

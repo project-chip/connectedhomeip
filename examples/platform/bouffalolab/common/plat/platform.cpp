@@ -15,26 +15,40 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+#include <DeviceInfoProviderImpl.h>
+#include <OTAConfig.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
+#include <platform/bouffalolab/common/PlatformManagerImpl.h>
 #include <system/SystemClock.h>
+
+#if HEAP_MONITORING
+#include <MemMonitoring.h>
+#endif
+
+#if CONFIG_ENABLE_CHIP_SHELL
+#include <ChipShellCollection.h>
+#include <lib/shell/Engine.h>
+#endif
+
+#if PW_RPC_ENABLED
+#include <PigweedLogger.h>
+#include <Rpc.h>
+#endif
+#if CONFIG_ENABLE_CHIP_SHELL || PW_RPC_ENABLED
+#include <uart.h>
+#endif
+
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || defined(CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST)
+#include <platform/bouffalolab/common/FactoryDataProvider.h>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <NetworkCommissioningDriver.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <route_hook/bl_route_hook.h>
-#endif
-#include <platform/bouffalolab/common/PlatformManagerImpl.h>
-
-#if HEAP_MONITORING
-#include <MemMonitoring.h>
-#include <lib/support/CHIPMem.h>
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -44,27 +58,18 @@
 #include <utils_list.h>
 #endif
 
-#ifdef OTA_ENABLED
-#include "OTAConfig.h"
-#endif // OTA_ENABLED
-
-#if CONFIG_ENABLE_CHIP_SHELL
-#include <ChipShellCollection.h>
-#include <lib/shell/Engine.h>
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <lwip/netif.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#if defined(BL602_ENABLE)
+#include <wifi_mgmr_ext.h>
+#else
+#include <platform/bouffalolab/BL702/WiFiInterface.h>
 #endif
-
-#if PW_RPC_ENABLED
-#include "PigweedLogger.h"
-#include "Rpc.h"
+#else
+#include <platform/bouffalolab/BL702/EthernetInterface.h>
 #endif
-
-#include <DeviceInfoProviderImpl.h>
-#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || defined(CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST)
-#include <platform/bouffalolab/common/FactoryDataProvider.h>
-#endif
-
-#if CONFIG_ENABLE_CHIP_SHELL || PW_RPC_ENABLED
-#include "uart.h"
+#include <bl_route_hook.h>
 #endif
 
 #include <AppTask.h>
@@ -95,55 +100,18 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        GetAppTask().mIsConnected = ConnectivityMgr().IsWiFiStationConnected();
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        GetAppTask().mIsConnected = ConnectivityMgr().IsThreadAttached();
-#endif
-
-        if (ConnectivityMgr().NumBLEConnections())
-        {
-            GetAppTask().PostEvent(AppTask::APP_EVENT_SYS_BLE_CONN);
-        }
-        else
-        {
-            GetAppTask().PostEvent(AppTask::APP_EVENT_SYS_BLE_ADV);
-        }
         ChipLogProgress(NotSpecified, "BLE adv changed, connection number: %d", ConnectivityMgr().NumBLEConnections());
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case DeviceEventType::kThreadStateChange:
 
-        ChipLogProgress(NotSpecified, "Thread state changed, IsThreadAttached: %d", ConnectivityMgr().IsThreadAttached());
-        if (!GetAppTask().mIsConnected && ConnectivityMgr().IsThreadAttached())
+        if (ConnectivityMgr().IsThreadAttached())
         {
-            GetAppTask().PostEvent(AppTask::APP_EVENT_SYS_PROVISIONED);
-            GetAppTask().mIsConnected = true;
-#ifdef OTA_ENABLED
             chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
                                                         OTAConfig::InitOTARequestorHandler, nullptr);
-#endif
         }
         break;
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    case DeviceEventType::kWiFiConnectivityChange:
-
-        ChipLogProgress(NotSpecified, "Wi-Fi state changed to %s.",
-                        ConnectivityMgr().IsWiFiStationConnected() ? "connected" : "disconnected");
-
-        chip::app::DnssdServer::Instance().StartServer();
-        NetworkCommissioning::BLWiFiDriver::GetInstance().SaveConfiguration();
-        if (!GetAppTask().mIsConnected && ConnectivityMgr().IsWiFiStationConnected())
-        {
-            GetAppTask().PostEvent(AppTask::APP_EVENT_SYS_PROVISIONED);
-            GetAppTask().mIsConnected = true;
-        }
-        break;
-
+#else
     case DeviceEventType::kInterfaceIpAddressChanged:
         if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
             (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
@@ -152,21 +120,45 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
             // will not trigger a 'internet connectivity change' as there is no internet
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
-            chip::app::DnssdServer::Instance().StartServer();
-        }
 
-        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
-        {
-            ChipLogProgress(NotSpecified, "Initializing route hook...");
+            chip::app::DnssdServer::Instance().StartServer();
+
             bl_route_hook_init();
 
-#ifdef OTA_ENABLED
             chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
                                                         OTAConfig::InitOTARequestorHandler, nullptr);
-#endif
         }
+
         break;
 #endif
+    case DeviceEventType::kInternetConnectivityChange:
+        if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
+        {
+            ChipLogProgress(NotSpecified, "IPv4 connectivity ready...");
+        }
+        else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
+        {
+            ChipLogProgress(NotSpecified, "Lost IPv4 connectivity...");
+        }
+        if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
+        {
+            ChipLogProgress(NotSpecified, "IPv6 connectivity ready...");
+        }
+        else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
+        {
+            ChipLogProgress(NotSpecified, "Lost IPv6 connectivity...");
+        }
+        break;
+    case DeviceEventType::kCHIPoBLEConnectionEstablished:
+        ChipLogProgress(NotSpecified, "BLE connection established");
+        break;
+    case DeviceEventType::kCHIPoBLEConnectionClosed:
+        ChipLogProgress(NotSpecified, "BLE disconnected");
+        break;
+    case DeviceEventType::kCommissioningComplete:
+        ChipLogProgress(NotSpecified, "Commissioning complete");
+        GetAppTask().PostEvent(AppTask::APP_EVENT_LIGHTING_MASK);
+        break;
     default:
         break;
     }
@@ -253,7 +245,12 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 
     ConfigurationMgr().LogDeviceConfig();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+#else
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
+#endif
+
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
 #if PW_RPC_ENABLED

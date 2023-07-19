@@ -338,6 +338,7 @@ client cluster OnOff = 6 {
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
   bitmap OnOffControl : BITMAP8 {
@@ -406,6 +407,7 @@ server cluster OnOff = 6 {
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
   bitmap OnOffControl : BITMAP8 {
@@ -6398,7 +6400,7 @@ server cluster AccountLogin = 1294 {
 }
 
 endpoint 0 {
-  device type anonymousEndpointType = 65280, version 1;
+  device type rootdevice = 22, version 1;
   binding cluster GeneralCommissioning;
   binding cluster ThreadNetworkDiagnostics;
   binding cluster Switch;
@@ -7123,7 +7125,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster LevelControl {

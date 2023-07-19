@@ -1,4 +1,4 @@
-pip-tools
+pip-tools>=7.0.0
 virtualenv
 
 # core build requirements

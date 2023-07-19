@@ -32,7 +32,6 @@ tests:
                 value: nodeId
 
     - label: "TH reads the ClusterRevision attribute from the DUT"
-      PICS: OPSTATE.S.Afffd
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -41,7 +40,6 @@ tests:
               type: int16u
 
     - label: "TH reads the FeatureMap attribute from the DUT"
-      PICS: OPSTATE.S.Afffc
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -50,7 +48,6 @@ tests:
               type: bitmap32
 
     - label: "TH reads the AttributeList attribute from the DUT"
-      PICS: OPSTATE.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -62,7 +59,7 @@ tests:
     - label:
           "TH reads from the DUT the optional attribute(CountdownTime) in the
           AttributeList from the DUT"
-      PICS: OPSTATE.S.A0002 && OPSTATE.S.Afffb
+      PICS: OPSTATE.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -71,7 +68,6 @@ tests:
               contains: [2]
 
     - label: "TH reads from the DUT the EventList attribute."
-      PICS: OPSTATE.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -82,7 +78,7 @@ tests:
     - label:
           "TH reads from the DUT the optional event(OperationCompletion) in
           EventList."
-      PICS: OPSTATE.S.E01 && OPSTATE.S.Afffa
+      PICS: OPSTATE.S.E01
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -91,7 +87,7 @@ tests:
               contains: [0x01]
 
     - label: "Read the optional command(Start) in AcceptedCommandList"
-      PICS: OPSTATE.S.C02 && OPSTATE.S.Afff9
+      PICS: OPSTATE.S.C02
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -100,7 +96,7 @@ tests:
               contains: [1, 2]
 
     - label: "Read the optional command(Stop) in AcceptedCommandList"
-      PICS: OPSTATE.S.C01 && OPSTATE.S.Afff9
+      PICS: OPSTATE.S.C01
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -109,7 +105,7 @@ tests:
               contains: [1]
 
     - label: "Read the optional command(Pause) in AcceptedCommandList"
-      PICS: OPSTATE.S.C00 && OPSTATE.S.Afff9
+      PICS: OPSTATE.S.C00
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -118,7 +114,7 @@ tests:
               contains: [0, 3]
 
     - label: "Read the optional command(Resume) in AcceptedCommandList"
-      PICS: OPSTATE.S.C03 && OPSTATE.S.Afff9
+      PICS: OPSTATE.S.C03
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -127,9 +123,7 @@ tests:
               contains: [0, 3]
 
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS:
-          OPSTATE.S.Afff8 && (OPSTATE.S.C00 || OPSTATE.S.C01 || OPSTATE.S.C02 ||
-          OPSTATE.S.C03)
+      PICS: (OPSTATE.S.C00 || OPSTATE.S.C01 || OPSTATE.S.C02 || OPSTATE.S.C03)
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

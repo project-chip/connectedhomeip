@@ -26,8 +26,8 @@ class WaitForCommissioneeCommand : public CHIPCommand
 {
 public:
     WaitForCommissioneeCommand(CredentialIssuerCommands * credIssuerCommands) :
-        CHIPCommand("wait-for-commissionee", credIssuerCommands), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
-        mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+        CHIPCommand("wait-for-commissionee", credIssuerCommands, "Establish a CASE session to the provided node id."),
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("expire-existing-session", 0, 1, &mExpireExistingSession);

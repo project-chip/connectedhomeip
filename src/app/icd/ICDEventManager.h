@@ -47,7 +47,7 @@ private:
      *        Function dispatchs the event to the ICDManager member
      */
     static void ICDEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-
+    static uint8_t expectedMsgCount;
     ICDManager * mICDManager;
 };
 

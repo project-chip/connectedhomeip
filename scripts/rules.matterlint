@@ -66,6 +66,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/relative-humidity-measurement
 load "../src/app/zap-templates/zcl/data-model/chip/rvc-clean-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/rvc-run-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/scene.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/smoke-co-alarm-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/switch-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/target-navigator-cluster.xml";
@@ -121,7 +122,7 @@ endpoint 0 {
   // reject server cluster Scenes;
   // reject server cluster Groups;
 
-  // Required only if !CustomNetworkConfig. 
+  // Required only if !CustomNetworkConfig.
   // require server cluster NetworkCommissioning;
 
   // If Ethernet

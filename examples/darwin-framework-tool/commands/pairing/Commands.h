@@ -102,5 +102,5 @@ void registerCommandsPairing(Commands & commands)
         make_unique<GetCommissionerNodeIdCommand>(),
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for commissioning devices.");
 }

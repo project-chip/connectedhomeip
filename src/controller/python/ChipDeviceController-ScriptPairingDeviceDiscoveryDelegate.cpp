@@ -32,6 +32,9 @@ void ScriptPairingDeviceDiscoveryDelegate::OnDiscoveredDevice(const Dnssd::Disco
     nodeData.resolutionData.ipAddress[0].ToString(buf);
     ChipLogProgress(chipTool, "Discovered Device: %s:%u", buf, port);
 
+    // Cancel discovery timer.
+    chip::DeviceLayer::SystemLayer().CancelTimer(OnDiscoveredTimeout, this);
+
     // Stop Mdns discovery.
     mActiveDeviceCommissioner->RegisterDeviceDiscoveryDelegate(nullptr);
 

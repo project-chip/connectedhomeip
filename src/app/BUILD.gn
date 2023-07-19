@@ -56,6 +56,7 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY=${chip_access_control_policy_logging_verbosity}",
     "CHIP_CONFIG_PERSIST_SUBSCRIPTIONS=${chip_persist_subscriptions}",
     "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
+    "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
   ]
 }
 
@@ -192,6 +193,9 @@ static_library("app") {
     "WriteHandler.cpp",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
+    "reporting/ReportScheduler.h",
+    "reporting/ReportSchedulerImpl.cpp",
+    "reporting/ReportSchedulerImpl.h",
     "reporting/reporting.h",
   ]
 

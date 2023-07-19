@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-telink:0.7.14
+            image: ghcr.io/project-chip/chip-build-telink:1
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -208,6 +208,18 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d pump-controller-app \
                     out/telink-tlsr9518adk80d-pump-controller/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output
+              run: rm -rf ./out
+
+            - name: Build example Telink Smoke CO Alarm App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-smoke-co-alarm' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d smoke_co_alarm-app \
+                    out/telink-tlsr9518adk80d-smoke-co-alarm/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output

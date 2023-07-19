@@ -27,6 +27,7 @@
 -   [Open IoT SDK - Examples](./openiotsdk_examples.md)
 -   [Open IoT SDK - Unit Tests](./openiotsdk_unit_tests.md)
 -   [Open IoT SDK - Commissioning](./openiotsdk_commissioning.md)
+-   [Open IoT SDK - Software Update](./openiotsdk_examples_software_update.md)
 
 ## Development Guides
 

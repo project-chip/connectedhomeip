@@ -304,8 +304,6 @@
             "DSTOffsetListMaxSize"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
-        "Operational State": ["OperationalState", "OperationalError"],
-        "RVC Operational State": ["OperationalState", "OperationalError"],
         "Dishwasher Mode": [
             "SupportedModes",
             "CurrentMode",
@@ -340,6 +338,18 @@
             "StartUpMode",
             "OnMode",
             "FeatureMap"
+        ],
+        "Operational State": [
+            "OperationalState",
+            "OperationalError",
+            "CurrentPhase",
+            "CountdownTime"
+        ],
+        "RVC Operational State": [
+            "OperationalState",
+            "OperationalError",
+            "CurrentPhase",
+            "CountdownTime"
         ]
     },
     "defaultReportingPolicy": "mandatory",
