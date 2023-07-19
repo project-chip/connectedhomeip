@@ -129,6 +129,7 @@ def BuildHostTarget():
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
         TargetPart('contact-sensor', app=HostApp.CONTACT_SENSOR),
+        TargetPart('dishwasher', app=HostApp.DISHWASHER),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):

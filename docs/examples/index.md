@@ -202,6 +202,15 @@ shell/**/README
 smoke-co-alarm-app/**/README
 ```
 
+## Dishwasher example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+dishwasher-app/**/README
+```
+
 ## Temperature measurement example
 
 ```{toctree}
