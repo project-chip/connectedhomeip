@@ -316,12 +316,12 @@ static Status modifyEnabledHandler(const app::ConcreteCommandPath & commandPath,
     // or is unable to suppress a currently enabled alarm SHALL respond
     // with a status code of FAILURE
     Delegate * delegate = DishwasherAlarm::GetDelegate(endpoint);
-    if (delegate && !(delegate->ModifyEnableAlarmsCallback(mask)))
+    if (delegate && !(delegate->ModifyEnabledAlarmsCallback(mask)))
     {
         ChipLogProgress(Zcl, "Unable to modify enabled alarms");
         return Status::Failure;
     }
-
+    // The cluster will do this update if delegate.ModifyEnabledAlarmsCallback() returns true.
     if (DishwasherAlarmServer::Instance().SetMaskValue(endpoint, mask) != EMBER_ZCL_STATUS_SUCCESS)
     {
         return Status::Failure;
@@ -336,9 +336,9 @@ static Status ResetHandler(const app::ConcreteCommandPath & commandPath, const c
 
     // check whether alarm definition requires manual intervention
     Delegate * delegate = DishwasherAlarm::GetDelegate(endpoint);
-    if (delegate && delegate->ResetAlarmsCallback(alarms))
+    if (delegate && !(delegate->ResetAlarmsCallback(alarms)))
     {
-        ChipLogProgress(Zcl, "The alarm definition requires manual intervention");
+        ChipLogProgress(Zcl, "Unable to reset alarms");
         return Status::Failure;
     }
 

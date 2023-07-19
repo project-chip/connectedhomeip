@@ -36,20 +36,20 @@ class Delegate
 public:
     /**
      *   @brief
-     *   This method for a server whether is able to enable a currently suppressed alarm,
-     *   or suppress a currently enabled alarm
-     *   @param[in] mask The value of modify Alarm mask
-     *   @return true
-     *   @return false
+     *   A notification that the Mask attribute has changed.  When this happens, some previously suppressed
+     *   alarms may need to be enabled, and previously enabled alarms may need to be suppressed.
+     *   @param[in] mask The new value of the Mask attribute.
+     *   @return The cluster will do this update if ModifyEnabledAlarmsCallback() returns true.
+     *   the cluster will not do this update if ModifyEnabledAlarmsCallback() returns false.
      */
-    virtual bool ModifyEnableAlarmsCallback(const chip::BitMask<AlarmMap> mask) = 0;
+    virtual bool ModifyEnabledAlarmsCallback(const chip::BitMask<AlarmMap> mask) = 0;
 
     /**
      *   @brief
-     *   This method for a server whether the alarm definition requires manual intervention
-     *   @param[in] alarms The value of reset alarm
-     *   @return true
-     *   @return false
+     *   A notification that resets active and latched alarms (if possible)
+     *   @param[in] alarms The value of reset alarms
+     *   @return The cluster will do this update if ResetAlarmsCallback() returns true.
+     *   The cluster will not do this update if ResetAlarmsCallback() returns false.
      */
     virtual bool ResetAlarmsCallback(const chip::BitMask<AlarmMap> alarms) = 0;
 
