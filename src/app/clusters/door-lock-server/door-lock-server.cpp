@@ -105,7 +105,7 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
 
 bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState, OperationSourceEnum opSource,
                                   const Nullable<uint16_t> & userIndex, const Nullable<List<const LockOpCredentials>> & credentials,
-                                  const chip::app::CommandHandler * commandObj)
+                                  const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId)
 {
     bool success = SetLockState(endpointId, newLockState);
 
@@ -128,17 +128,8 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
         opType = LockOperationTypeEnum::kUnlatch;
     }
 
-    if (commandObj == nullptr)
-    {
-        SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kUnspecified, userIndex,
-                               Nullable<chip::FabricIndex>(), Nullable<chip::NodeId>(), credentials, success);
-    }
-    else
-    {
-        SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kUnspecified, userIndex,
-                               Nullable<chip::FabricIndex>(getFabricIndex(commandObj)),
-                               Nullable<chip::NodeId>(getNodeId(commandObj)), credentials, success);
-    }
+    SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kUnspecified, userIndex, fabricIdx, nodeId,
+                           credentials, success);
 
     // Reset wrong entry attempts (in case there were any incorrect credentials presented before) if lock/unlock was a success
     // and a valid credential was presented.
@@ -3435,7 +3426,8 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
     }
 
     // credentials check succeeded, try to lock/unlock door
-    success = opHandler(commandObj, endpoint, pinCode, reason);
+    success = opHandler(endpoint, Nullable<chip::FabricIndex>(getFabricIndex(commandObj)),
+                        Nullable<chip::NodeId>(getNodeId(commandObj)), pinCode, reason);
     // The app should trigger the lock state change as it may take a while before the lock actually locks/unlocks
 exit:
     if (!success && reason == OperationErrorEnum::kInvalidCredential)

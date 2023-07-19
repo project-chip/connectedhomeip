@@ -59,8 +59,9 @@ using chip::app::DataModel::NullNullable;
 using CredentialStruct  = chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type;
 using LockOpCredentials = CredentialStruct;
 
-typedef bool (*RemoteLockOpHandler)(const chip::app::CommandHandler * commandObj, chip::EndpointId endpointId,
-                                    const Optional<chip::ByteSpan> & pinCode, OperationErrorEnum & err);
+typedef bool (*RemoteLockOpHandler)(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                    const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pinCode,
+                                    OperationErrorEnum & err);
 
 static constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE = 10; /**< Maximum size of the user name (in characters). */
 static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE =
@@ -95,14 +96,16 @@ public:
      * @param endpointId ID of the endpoint to the lock state
      * @param newLockState new lock state
      * @param opSource source of the operation (will be used in the event).
-     * @param commandObj command context
+     * @param fabricIdx fabric index
+     * @param nodeId node id
      *
      * @return true on success, false on failure.
      */
     bool SetLockState(chip::EndpointId endpointId, DlLockState newLockState, OperationSourceEnum opSource,
                       const Nullable<uint16_t> & userIndex                        = NullNullable,
                       const Nullable<List<const LockOpCredentials>> & credentials = NullNullable,
-                      const chip::app::CommandHandler * commandObj                = nullptr);
+                      const Nullable<chip::FabricIndex> & fabricIdx               = NullNullable,
+                      const Nullable<chip::NodeId> & nodeId                       = NullNullable);
 
     /**
      * Updates the LockState attribute with new value.
@@ -900,44 +903,50 @@ emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, con
 /**
  * @brief User handler for LockDoor command (server)
  *
- * @param   commandObj      command context
  * @param   endpointId      endpoint for which LockDoor command is called
+ * @param   fabricIdx       fabric index
+ * @param   nodeId          node id
  * @param   pinCode         PIN code (optional)
  * @param   err             error code if door locking failed (set only if retval==false)
  *
  * @retval true on success
  * @retval false if error happenned (err should be set to appropriate error code)
  */
-bool emberAfPluginDoorLockOnDoorLockCommand(const chip::app::CommandHandler * commandObj, chip::EndpointId endpointId,
-                                            const Optional<chip::ByteSpan> & pinCode, OperationErrorEnum & err);
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                            const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pinCode,
+                                            OperationErrorEnum & err);
 
 /**
  * @brief User handler for UnlockDoor command (server)
  *
- * @param   commandObj      command context
  * @param   endpointId      endpoint for which UnlockDoor command is called
+ * @param   fabricIdx       fabric index
+ * @param   nodeId          node id
  * @param   pinCode         PIN code (optional)
  * @param   err             error code if door unlocking failed (set only if retval==false)
  *
  * @retval true on success
  * @retval false if error happenned (err should be set to appropriate error code)
  */
-bool emberAfPluginDoorLockOnDoorUnlockCommand(const chip::app::CommandHandler * commandObj, chip::EndpointId endpointId,
-                                              const Optional<chip::ByteSpan> & pinCode, OperationErrorEnum & err);
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                              const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pinCode,
+                                              OperationErrorEnum & err);
 
 /**
  * @brief User handler for UnboltDoor command (server)
  *
- * @param   commandObj      command context
  * @param   endpointId      endpoint for which UnboltDoor command is called
+ * @param   fabricIdx       fabric index
+ * @param   nodeId          node id
  * @param   pinCode         PIN code (optional)
  * @param   err             error code if door unbolting failed (set only if retval==false)
  *
  * @retval true on success
  * @retval false if error happenned (err should be set to appropriate error code)
  */
-bool emberAfPluginDoorLockOnDoorUnboltCommand(const chip::app::CommandHandler * commandObj, chip::EndpointId endpointId,
-                                              const Optional<chip::ByteSpan> & pinCode, OperationErrorEnum & err);
+bool emberAfPluginDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                              const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pinCode,
+                                              OperationErrorEnum & err);
 
 /**
  * @brief This callback is called when the AutoRelock timer is expired.

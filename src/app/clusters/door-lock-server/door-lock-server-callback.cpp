@@ -45,24 +45,27 @@ using namespace chip::app::Clusters::DoorLock;
 // =============================================================================
 
 bool __attribute__((weak))
-emberAfPluginDoorLockOnDoorLockCommand(const chip::app::CommandHandler * commandObj, chip::EndpointId endpointId,
-                                       const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
+emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                       const Nullable<chip::NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
+                                       OperationErrorEnum & err)
 {
     err = OperationErrorEnum::kUnspecified;
     return false;
 }
 
 bool __attribute__((weak))
-emberAfPluginDoorLockOnDoorUnlockCommand(const chip::app::CommandHandler * commandObj, chip::EndpointId endpointId,
-                                         const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
+emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                         const Nullable<chip::NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
+                                         OperationErrorEnum & err)
 {
     err = OperationErrorEnum::kUnspecified;
     return false;
 }
 
 bool __attribute__((weak))
-emberAfPluginDoorLockOnDoorUnboltCommand(const chip::app::CommandHandler * commandObj, chip::EndpointId endpointId,
-                                         const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
+emberAfPluginDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                         const Nullable<chip::NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
+                                         OperationErrorEnum & err)
 {
     err = OperationErrorEnum::kUnspecified;
     return false;

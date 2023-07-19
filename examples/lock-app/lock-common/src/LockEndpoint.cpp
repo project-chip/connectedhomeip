@@ -22,28 +22,28 @@
 using chip::to_underlying;
 using chip::app::DataModel::MakeNullable;
 
-bool LockEndpoint::Lock(const chip::app::CommandHandler * commandObj, const Optional<chip::ByteSpan> & pin,
-                        OperationErrorEnum & err, OperationSourceEnum opSource)
+bool LockEndpoint::Lock(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+                        const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
 {
-    return setLockState(commandObj, DlLockState::kLocked, pin, err, opSource);
+    return setLockState(fabricIdx, nodeId, DlLockState::kLocked, pin, err, opSource);
 }
 
-bool LockEndpoint::Unlock(const chip::app::CommandHandler * commandObj, const Optional<chip::ByteSpan> & pin,
-                          OperationErrorEnum & err, OperationSourceEnum opSource)
+bool LockEndpoint::Unlock(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+                          const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
 {
     if (DoorLockServer::Instance().SupportsUnbolt(mEndpointId))
     {
         // If Unbolt is supported Unlock is supposed to pull the latch
-        setLockState(commandObj, DlLockState::kUnlatched, pin, err, opSource);
+        setLockState(fabricIdx, nodeId, DlLockState::kUnlatched, pin, err, opSource);
     }
 
-    return setLockState(commandObj, DlLockState::kUnlocked, pin, err, opSource);
+    return setLockState(fabricIdx, nodeId, DlLockState::kUnlocked, pin, err, opSource);
 }
 
-bool LockEndpoint::Unbolt(const chip::app::CommandHandler * commandObj, const Optional<chip::ByteSpan> & pin,
-                          OperationErrorEnum & err, OperationSourceEnum opSource)
+bool LockEndpoint::Unbolt(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+                          const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
 {
-    return setLockState(commandObj, DlLockState::kUnlocked, pin, err, opSource);
+    return setLockState(fabricIdx, nodeId, DlLockState::kUnlocked, pin, err, opSource);
 }
 
 bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const
@@ -391,8 +391,9 @@ DlStatus LockEndpoint::SetSchedule(uint8_t holidayIndex, DlScheduleStatus status
     return DlStatus::kSuccess;
 }
 
-bool LockEndpoint::setLockState(const chip::app::CommandHandler * commandObj, DlLockState lockState,
-                                const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
+bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+                                DlLockState lockState, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
+                                OperationSourceEnum opSource)
 {
     // Assume pin is required until told otherwise
     bool requirePin = true;
@@ -478,7 +479,7 @@ bool LockEndpoint::setLockState(const chip::app::CommandHandler * commandObj, Dl
     LockOpCredentials userCredential[] = { { CredentialTypeEnum::kPin, uint16_t(credentialIndex) } };
     auto userCredentials               = MakeNullable<List<const LockOpCredentials>>(userCredential);
     DoorLockServer::Instance().SetLockState(mEndpointId, mLockState, opSource, MakeNullable(static_cast<uint16_t>(userIndex + 1)),
-                                            userCredentials, commandObj);
+                                            userCredentials, fabricIdx, nodeId);
 
     return true;
 }
