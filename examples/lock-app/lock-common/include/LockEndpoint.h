@@ -109,6 +109,8 @@ private:
     bool weekDayScheduleInAction(uint16_t userIndex) const;
     bool yearDayScheduleInAction(uint16_t userIndex) const;
 
+    static void OnLockActionCompleteCallback(chip::System::Layer *, void * callbackContext);
+
     chip::EndpointId mEndpointId;
     DlLockState mLockState;
     DoorStateEnum mDoorState;

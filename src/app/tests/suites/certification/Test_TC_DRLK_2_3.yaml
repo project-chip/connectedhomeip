@@ -158,6 +158,14 @@ tests:
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
 
+    - label: "Wait for lock action to complete"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
     - label: "TH sends the unlock Door command to the DUT with valid PINCode"
       PICS: DRLK.S.C01.Rsp
       command: "UnlockDoor"
@@ -166,6 +174,14 @@ tests:
           values:
               - name: "PINCode"
                 value: "123456"
+
+    - label: "Wait for lock action to complete"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
 
     - label:
           "TH writes the RequirePINforRemoteOperation attribute value as False
@@ -202,6 +218,14 @@ tests:
           values:
               - name: "PINCode"
                 value: "123456"
+
+    - label: "Wait for lock action to complete"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
 
     - label: "TH sends the unlock Door command to the DUT with invalid PINCode"
       PICS: DRLK.S.C01.Rsp && DRLK.S.A0033
@@ -390,6 +414,14 @@ tests:
           values:
               - name: "PINCode"
                 value: "123456"
+
+    - label: "Wait for lock action to complete"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
 
     - label: "Wait for AutoRelockTime Expires"
       cluster: "DelayCommands"

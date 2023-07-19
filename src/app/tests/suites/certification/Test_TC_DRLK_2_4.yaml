@@ -181,6 +181,14 @@ tests:
               - name: "PINCode"
                 value: "123456"
 
+    - label: "Wait for lock action to complete"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
     - label: "Wait for AutoRelockTime Expires"
       cluster: "DelayCommands"
       command: "WaitForMs"

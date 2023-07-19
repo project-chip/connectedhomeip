@@ -63,6 +63,14 @@ tests:
       command: "LockDoor"
       timedInteractionTimeoutMs: 1000
 
+    - label: "Wait for lock action to complete"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
     - label: "TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
       command: "readAttribute"
@@ -74,6 +82,14 @@ tests:
       PICS: DRLK.S.C01.Rsp
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
+
+    - label: "Wait for lock action to complete"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
 
     - label: "TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
