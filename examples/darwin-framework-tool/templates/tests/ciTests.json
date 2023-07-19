@@ -121,6 +121,8 @@
         "Test_TC_OPSTATE_1_1",
         "Disabled due to Events verification not supported",
         "Test_TC_BINFO_2_2",
+        "Test_TC_ACL_2_5",
+        "Test_TC_ACL_2_6",
         "Disabled because the power source configuration cluster is now deprecated and not present in all-clusters",
         "Test_TC_PSCFG_1_1",
         "Test_TC_PSCFG_2_1",
