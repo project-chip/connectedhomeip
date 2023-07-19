@@ -209,6 +209,7 @@ static_library("app") {
   public_deps = [
     ":app_config",
     "${chip_root}/src/access",
+    "${chip_root}/src/app/icd:cluster-srcs",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
