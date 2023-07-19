@@ -1350,12 +1350,13 @@ bool DoorLockServer::OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIn
     ChipLogProgress(Zcl, "[OnFabricRemoved] Handling a fabric removal from the door lock server [endpointId=%d,fabricIndex=%d]",
                     endpointId, fabricIndex);
 
+    bool status{ true };
     // Iterate over all the users and clean up the deleted fabric
     if (!clearFabricFromUsers(endpointId, fabricIndex))
     {
         ChipLogError(Zcl, "[OnFabricRemoved] Unable to cleanup fabric from users - internal error [endpointId=%d,fabricIndex=%d]",
                      endpointId, fabricIndex);
-        return false;
+        status = false;
     }
 
     // Iterate over all the credentials and clean up the fabrics
@@ -1364,10 +1365,15 @@ bool DoorLockServer::OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIn
         ChipLogError(Zcl,
                      "[OnFabricRemoved] Unable to cleanup fabric from credentials - internal error [endpointId=%d,fabricIndex=%d]",
                      endpointId, fabricIndex);
-        return false;
+        status = false;
     }
 
-    return true;
+    if (mOnFabricRemovedCustomCallback)
+    {
+        mOnFabricRemovedCustomCallback(endpointId, fabricIndex);
+    }
+
+    return status;
 }
 
 /**********************************************************

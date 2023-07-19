@@ -83,7 +83,8 @@ class DoorLockServer
 public:
     static DoorLockServer & Instance();
 
-    using Feature = chip::app::Clusters::DoorLock::Feature;
+    using Feature                       = chip::app::Clusters::DoorLock::Feature;
+    using OnFabricRemovedCustomCallback = void (*)(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
     void InitServer(chip::EndpointId endpointId);
 
@@ -187,6 +188,18 @@ public:
     }
 
     inline bool SupportsUnbolt(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kUnbolt); }
+
+    /**
+     * @brief Allows the application to register a custom callback which will be called after the default DoorLock
+     *        OnFabricRemoved implementation. At that point the door lock cluster has done any
+     *        spec-required clearing of state for fabric removal.
+     *
+     * @param callback callback to be registered
+     */
+    inline void SetOnFabricRemovedCustomCallback(OnFabricRemovedCustomCallback callback)
+    {
+        mOnFabricRemovedCustomCallback = callback;
+    }
 
     bool OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
@@ -565,6 +578,8 @@ private:
     static_assert(kDoorLockClusterServerMaxEndpointCount <= kEmberInvalidEndpointIndex, "DoorLock Endpoint count error");
 
     std::array<EmberAfDoorLockEndpointContext, kDoorLockClusterServerMaxEndpointCount> mEndpointCtx;
+
+    OnFabricRemovedCustomCallback mOnFabricRemovedCustomCallback{ nullptr };
 
     static DoorLockServer instance;
 };
