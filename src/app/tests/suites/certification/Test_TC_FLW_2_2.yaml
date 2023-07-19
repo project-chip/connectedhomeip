@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read the mandatory attribute: MeasuredValue"
+    - label: "Step 2: Read the mandatory attribute: MeasuredValue"
       PICS: FLW.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
@@ -42,7 +42,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Operate on device to change the flow significantly"
+    - label: "Step 3: Operate on device to change the flow significantly"
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && FLW.M.FlowChange
@@ -53,7 +53,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Read the mandatory attribute: MeasuredValue"
+    - label: "Step 4: Read the mandatory attribute: MeasuredValue"
       PICS: FLW.S.A0000 && FLW.M.FlowChange
       command: "readAttribute"
       attribute: "MeasuredValue"

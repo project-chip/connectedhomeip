@@ -32,7 +32,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads VendorName from the DUT."
+    - label: "Step 5: TH reads VendorName from the DUT."
       PICS: BRBINFO.S.A0001
       command: "readAttribute"
       attribute: "VendorName"
@@ -42,7 +42,7 @@ tests:
               type: char_string
               maxLength: 32
 
-    - label: "TH writes VendorName from the DUT."
+    - label: "Step 6: TH writes VendorName from the DUT."
       PICS: BRBINFO.S.A0001
       command: "writeAttribute"
       attribute: "VendorName"
@@ -51,14 +51,14 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads VendorName from the DUT."
+    - label: "Step 7: TH reads VendorName from the DUT."
       PICS: BRBINFO.S.A0001
       command: "readAttribute"
       attribute: "VendorName"
       response:
           value: VendorNameValue
 
-    - label: "TH reads VendorID from the DUT."
+    - label: "Step 8: TH reads VendorID from the DUT."
       PICS: BRBINFO.S.A0002
       command: "readAttribute"
       attribute: "VendorID"
@@ -81,7 +81,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH writes VendorID from the DUT."
+    - label: "Step 9: TH writes VendorID from the DUT."
       PICS: BRBINFO.S.A0002
       command: "writeAttribute"
       attribute: "VendorID"
@@ -90,14 +90,14 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads VendorID from the DUT."
+    - label: "Step 10: TH reads VendorID from the DUT."
       PICS: BRBINFO.S.A0002
       command: "readAttribute"
       attribute: "VendorID"
       response:
           value: VendorIDValue
 
-    - label: "TH reads ProductName from the DUT"
+    - label: "Step 11: TH reads ProductName from the DUT"
       PICS: BRBINFO.S.A0003
       command: "readAttribute"
       attribute: "ProductName"
@@ -107,7 +107,7 @@ tests:
               type: char_string
               maxLength: 32
 
-    - label: "TH writes ProductName from the DUT."
+    - label: "Step 12: TH writes ProductName from the DUT."
       PICS: BRBINFO.S.A0003
       command: "writeAttribute"
       attribute: "ProductName"
@@ -116,14 +116,14 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads ProductName from the DUT"
+    - label: "Step 13: TH reads ProductName from the DUT"
       PICS: BRBINFO.S.A0003
       command: "readAttribute"
       attribute: "ProductName"
       response:
           value: ProductNameValue
 
-    - label: "TH reads NodeLabel from the DUT"
+    - label: "Step 17: TH reads NodeLabel from the DUT"
       PICS: BRBINFO.S.A0005
       command: "readAttribute"
       attribute: "NodeLabel"
@@ -134,7 +134,7 @@ tests:
               maxLength: 32
 
     #Issue https://github.com/project-chip/connectedhomeip/issues/23509
-    - label: "TH writes NodeLabel from the DUT."
+    - label: "Step 18: TH writes NodeLabel from the DUT."
       PICS: BRBINFO.S.A0005 && PICS_USER_PROMPT
       verification: |
           ./chip-tool bridgeddevicebasicinformation write node-label '"newnode"' 1 3
@@ -161,7 +161,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads NodeLabel from the DUT"
+    - label: "Step 19: TH reads NodeLabel from the DUT"
       PICS: BRBINFO.S.A0005 && PICS_USER_PROMPT
       verification: |
           ./chip-tool bridgeddevicebasicinformation read node-label 1 3
@@ -180,7 +180,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads HardwareVersion from the DUT"
+    - label: "Step 21: TH reads HardwareVersion from the DUT"
       PICS: BRBINFO.S.A0007
       command: "readAttribute"
       attribute: "HardwareVersion"
@@ -191,7 +191,7 @@ tests:
               minValue: 0
               maxValue: 65534
 
-    - label: "TH writes HardwareVersion from the DUT."
+    - label: "Step 22: TH writes HardwareVersion from the DUT."
       PICS: BRBINFO.S.A0007
       command: "writeAttribute"
       attribute: "HardwareVersion"
@@ -200,14 +200,14 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads HardwareVersion from the DUT"
+    - label: "Step 23: TH reads HardwareVersion from the DUT"
       PICS: BRBINFO.S.A0007
       command: "readAttribute"
       attribute: "HardwareVersion"
       response:
           value: HardwareVersionValue
 
-    - label: "TH reads HardwareVersionString from the DUT."
+    - label: "Step 24: TH reads HardwareVersionString from the DUT."
       PICS: BRBINFO.S.A0008
       command: "readAttribute"
       attribute: "HardwareVersionString"
@@ -218,7 +218,7 @@ tests:
               minLength: 1
               maxLength: 64
 
-    - label: "TH writes HardwareVersionString from the DUT."
+    - label: "Step 25: TH writes HardwareVersionString from the DUT."
       PICS: BRBINFO.S.A0008
       command: "writeAttribute"
       attribute: "HardwareVersionString"
@@ -227,14 +227,14 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads HardwareVersionString from the DUT."
+    - label: "Step 26: TH reads HardwareVersionString from the DUT."
       PICS: BRBINFO.S.A0008
       command: "readAttribute"
       attribute: "HardwareVersionString"
       response:
           value: HardwareVersionStringValue
 
-    - label: "TH reads SoftwareVersion from the DUT"
+    - label: "Step 27: TH reads SoftwareVersion from the DUT"
       PICS: BRBINFO.S.A0009
       command: "readAttribute"
       attribute: "SoftwareVersion"
@@ -244,7 +244,7 @@ tests:
               minValue: 0
               maxValue: 4294967294
 
-    - label: "TH writes SoftwareVersion from the DUT."
+    - label: "Step 28: TH writes SoftwareVersion from the DUT."
       PICS: BRBINFO.S.A0009
       command: "writeAttribute"
       attribute: "SoftwareVersion"
@@ -253,14 +253,14 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads SoftwareVersion from the DUT"
+    - label: "Step 29: TH reads SoftwareVersion from the DUT"
       PICS: BRBINFO.S.A0009
       command: "readAttribute"
       attribute: "SoftwareVersion"
       response:
           value: SoftwareVersionValue
 
-    - label: "TH reads SoftwareVersionString from the DUT"
+    - label: "Step 30: TH reads SoftwareVersionString from the DUT"
       PICS: BRBINFO.S.A000a
       command: "readAttribute"
       attribute: "SoftwareVersionString"
@@ -270,7 +270,7 @@ tests:
               minLength: 1
               maxLength: 64
 
-    - label: "TH writes SoftwareVersionString from the DUT."
+    - label: "Step 31: TH writes SoftwareVersionString from the DUT."
       PICS: BRBINFO.S.A000a
       command: "writeAttribute"
       attribute: "SoftwareVersionString"
@@ -279,14 +279,14 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads SoftwareVersionString from the DUT"
+    - label: "Step 32: TH reads SoftwareVersionString from the DUT"
       PICS: BRBINFO.S.A000a
       command: "readAttribute"
       attribute: "SoftwareVersionString"
       response:
           value: SoftwareVersionStringValue
 
-    - label: "TH reads ManufacturingDate from the DUT."
+    - label: "Step 33: TH reads ManufacturingDate from the DUT."
       PICS: BRBINFO.S.A000b
       command: "readAttribute"
       attribute: "ManufacturingDate"
@@ -310,7 +310,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH writes ManufacturingDate from the DUT."
+    - label: "Step 34: TH writes ManufacturingDate from the DUT."
       PICS: BRBINFO.S.A000b
       command: "writeAttribute"
       attribute: "ManufacturingDate"
@@ -319,14 +319,14 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads ManufacturingDate from the DUT."
+    - label: "Step 35: TH reads ManufacturingDate from the DUT."
       PICS: BRBINFO.S.A000b
       command: "readAttribute"
       attribute: "ManufacturingDate"
       response:
           value: ManufacturingDateValue
 
-    - label: "TH reads PartNumber from the DUT"
+    - label: "Step 36: TH reads PartNumber from the DUT"
       PICS: BRBINFO.S.A000c
       command: "readAttribute"
       attribute: "PartNumber"
@@ -336,7 +336,7 @@ tests:
               type: char_string
               maxLength: 32
 
-    - label: "TH writes PartNumber from the DUT."
+    - label: "Step 37: TH writes PartNumber from the DUT."
       PICS: BRBINFO.S.A000c
       command: "writeAttribute"
       attribute: "PartNumber"
@@ -345,14 +345,14 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads PartNumber from the DUT"
+    - label: "Step 38: TH reads PartNumber from the DUT"
       PICS: BRBINFO.S.A000c
       command: "readAttribute"
       attribute: "PartNumber"
       response:
           value: PartNumberValue
 
-    - label: "TH reads ProductURL from the DUT"
+    - label: "Step 39: TH reads ProductURL from the DUT"
       PICS: BRBINFO.S.A000d
       command: "readAttribute"
       attribute: "ProductURL"
@@ -375,7 +375,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH writes ProductURL from the DUT."
+    - label: "Step 40: TH writes ProductURL from the DUT."
       PICS: BRBINFO.S.A000d
       command: "writeAttribute"
       attribute: "ProductURL"
@@ -384,14 +384,14 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads ProductURL from the DUT"
+    - label: "Step 41: TH reads ProductURL from the DUT"
       PICS: BRBINFO.S.A000d
       command: "readAttribute"
       attribute: "ProductURL"
       response:
           value: ProductURLValue
 
-    - label: "TH reads ProductLabel from the DUT."
+    - label: "Step 42: TH reads ProductLabel from the DUT."
       PICS: BRBINFO.S.A000e
       command: "readAttribute"
       attribute: "ProductLabel"
@@ -414,7 +414,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH writes ProductLabel from the DUT."
+    - label: "Step 43: TH writes ProductLabel from the DUT."
       PICS: BRBINFO.S.A000e
       command: "writeAttribute"
       attribute: "ProductLabel"
@@ -423,14 +423,14 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads ProductLabel from the DUT."
+    - label: "Step 44: TH reads ProductLabel from the DUT."
       PICS: BRBINFO.S.A000e
       command: "readAttribute"
       attribute: "ProductLabel"
       response:
           value: ProductLabelValue
 
-    - label: "TH reads SerialNumber from the DUT."
+    - label: "Step 45: TH reads SerialNumber from the DUT."
       PICS: BRBINFO.S.A000f
       command: "readAttribute"
       attribute: "SerialNumber"
@@ -440,7 +440,7 @@ tests:
               type: char_string
               maxLength: 32
 
-    - label: "TH writes SerialNumber from the DUT."
+    - label: "Step 46: TH writes SerialNumber from the DUT."
       PICS: BRBINFO.S.A000f
       command: "writeAttribute"
       attribute: "SerialNumber"
@@ -449,14 +449,14 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads SerialNumber from the DUT."
+    - label: "Step 47: TH reads SerialNumber from the DUT."
       PICS: BRBINFO.S.A000f
       command: "readAttribute"
       attribute: "SerialNumber"
       response:
           value: SerialNumberValue
 
-    - label: "TH reads Reachable from the DUT."
+    - label: "Step 51: TH reads Reachable from the DUT."
       PICS: BRBINFO.S.A0011
       command: "readAttribute"
       attribute: "Reachable"
@@ -466,8 +466,8 @@ tests:
               type: boolean
 
     - label:
-          "TH sends Write request message to DUT to change value of Reachable to
-          false"
+          "Step 52: TH sends Write request message to DUT to change value of
+          Reachable to false"
       PICS: BRBINFO.S.A0011
       command: "writeAttribute"
       attribute: "Reachable"
@@ -476,7 +476,7 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads Reachable from the DUT."
+    - label: "Step 52b: TH reads Reachable from the DUT."
       PICS: BRBINFO.S.A0011
       command: "readAttribute"
       attribute: "Reachable"
@@ -485,7 +485,7 @@ tests:
           constraints:
               type: boolean
 
-    - label: "TH reads UniqueID from the DUT."
+    - label: "Step 53: TH reads UniqueID from the DUT."
       PICS: BRBINFO.S.A0012
       command: "readAttribute"
       attribute: "UniqueID"
@@ -495,7 +495,7 @@ tests:
               type: char_string
               maxLength: 32
 
-    - label: "TH writes UniqueID from the DUT."
+    - label: "Step 54: TH writes UniqueID from the DUT."
       PICS: BRBINFO.S.A0012
       command: "writeAttribute"
       attribute: "UniqueID"
@@ -504,14 +504,14 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads UniqueID from the DUT."
+    - label: "Step 55: TH reads UniqueID from the DUT."
       PICS: BRBINFO.S.A0012
       command: "readAttribute"
       attribute: "UniqueID"
       response:
           value: UniqueIDValue
 
-    - label: "TH reads ProductAppearance from the DUT."
+    - label: "Step 59: TH reads ProductAppearance from the DUT."
       PICS: BRBINFO.S.A0014
       command: "readAttribute"
       attribute: "ProductAppearance"
@@ -520,7 +520,7 @@ tests:
           constraints:
               type: ProductAppearanceStruct
 
-    - label: "TH writes ProductAppearance to the DUT."
+    - label: "Step 60: TH writes ProductAppearance to the DUT."
       PICS: BRBINFO.S.A0014
       command: "writeAttribute"
       attribute: "ProductAppearance"
@@ -529,7 +529,7 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH reads ProductAppearance attribute from the DUT."
+    - label: "Step 61: TH reads ProductAppearance attribute from the DUT."
       PICS: BRBINFO.S.A0014
       command: "readAttribute"
       attribute: "ProductAppearance"
