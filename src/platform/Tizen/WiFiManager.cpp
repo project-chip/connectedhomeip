@@ -356,14 +356,14 @@ void WiFiManager::_ScanFinishedCb(wifi_manager_error_e wifiErr, void * userData)
         int err = wifi_manager_foreach_found_specific_ap(sInstance.mWiFiManagerHandle, _FoundAPOnScanCb, networkScanned);
         if (err == WIFI_MANAGER_ERROR_NONE)
         {
+            chip::DeviceLayer::PlatformMgr().LockChipStack();
             if (sInstance.mpScanCallback != nullptr)
             {
                 TizenScanResponseIterator<WiFiScanResponse> iter(const_cast<std::vector<WiFiScanResponse> *>(networkScanned));
-                chip::DeviceLayer::PlatformMgr().LockChipStack();
                 sInstance.mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
-                chip::DeviceLayer::PlatformMgr().UnlockChipStack();
                 sInstance.mpScanCallback = nullptr;
             }
+            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         }
         else
         {
