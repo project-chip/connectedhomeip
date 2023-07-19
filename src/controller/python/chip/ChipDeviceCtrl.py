@@ -1355,7 +1355,8 @@ class ChipDeviceControllerBase():
                 c_void_p, c_uint64]
             self._dmLib.pychip_DeviceController_Commission.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_OnNetworkCommission.argtypes = [c_void_p, c_uint64, c_uint32, c_uint8, c_char_p]
+            self._dmLib.pychip_DeviceController_OnNetworkCommission.argtypes = [
+                c_void_p, c_uint64, c_uint32, c_uint8, c_char_p, c_uint32]
             self._dmLib.pychip_DeviceController_OnNetworkCommission.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.argtypes = [
@@ -1662,7 +1663,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
-                            filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None) -> PyChipError:
+                            filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None, discoveryTimeoutMsec: int = 30000) -> PyChipError:
         '''
         Does the routine for OnNetworkCommissioning, with a filter for mDNS discovery.
         Supported filters are:
@@ -1693,7 +1694,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_OnNetworkCommission(
-                self.devCtrl, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") + b"\x00" if filter is not None else None)
+                self.devCtrl, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") + b"\x00" if filter is not None else None, discoveryTimeoutMsec)
         )
         if not self._ChipStack.commissioningCompleteEvent.isSet():
             # Error 50 is a timeout
