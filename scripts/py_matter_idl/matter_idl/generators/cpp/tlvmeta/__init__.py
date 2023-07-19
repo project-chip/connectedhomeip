@@ -62,7 +62,7 @@ class ClusterTablesGenerator:
         for b in self.cluster.bitmaps:
             self.item_type_map[b.name] = "kBitmap"
 
-    def FieldEntry(self, field: Field, tag_type: str = 'ContextTag', type_override:Optional[str] = None) -> TableEntry:
+    def FieldEntry(self, field: Field, tag_type: str = 'ContextTag', type_override: Optional[str] = None) -> TableEntry:
         data_type_name = type_override or field.data_type.name
         type_reference = "%s_%s" % (self.cluster.name, data_type_name)
 
