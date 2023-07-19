@@ -30,17 +30,19 @@ constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(Feature::k
 constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
                                                      static_cast<uint32_t>(Feature::kWarning) };
 
-static HepaFilterMonitoringInstance * gHepafilterInstance;
-static ActivatedCarbonFilterMonitoringInstance * gActivatedCarbonFilterInstance;
+static HepaFilterMonitoringInstance * gHepafilterInstance = nullptr;
+static ActivatedCarbonFilterMonitoringInstance * gActivatedCarbonFilterInstance = nullptr;
 
 void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 {
+    VerifyOrDie(gActivatedCarbonFilterInstance == nullptr);
     gActivatedCarbonFilterInstance = new ActivatedCarbonFilterMonitoringInstance(
         endpoint, static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()), DegradationDirectionEnum::kDown, true);
     gActivatedCarbonFilterInstance->Init();
 }
 void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 {
+    VerifyOrDie(gActivatedCarbonFilterInstance == nullptr);
     gHepafilterInstance = new HepaFilterMonitoringInstance(endpoint, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                                                            DegradationDirectionEnum::kDown, true);
     gHepafilterInstance->Init();
