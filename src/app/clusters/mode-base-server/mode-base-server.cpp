@@ -483,6 +483,8 @@ bool Instance::IsSupportedMode(uint8_t modeValue)
 Instance::~Instance()
 {
     ModeBaseAliasesInstances.erase(this);
+    chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
+    // todo unregister the AttributeAccessOverride
 }
 
 std::set<Instance *> * GetModeBaseInstances()

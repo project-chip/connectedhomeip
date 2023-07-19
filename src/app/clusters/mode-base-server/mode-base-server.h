@@ -147,6 +147,7 @@ public:
     /**
      * Creates a mode base cluster instance. The Init() function needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
+     * **Note** Once instantiated, the lifetime of this object must span the entire lifetime of the application.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aClusterId The ID of the ModeBase aliased cluster to be instantiated.
      * @param aFeature The bitmask value that identifies which features are supported by this instance.
