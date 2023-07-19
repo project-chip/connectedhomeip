@@ -463,6 +463,9 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
         goto exit;
     }
 
+    // Stack-allocated dict still needs to be cleared after initialization
+    g_variant_dict_clear(&options);
+
     channel = g_io_channel_unix_new(fds[0]);
     g_io_channel_set_encoding(channel, nullptr, nullptr);
     g_io_channel_set_close_on_unref(channel, TRUE);
@@ -519,6 +522,9 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
         GVariant * v = g_variant_dict_lookup_value(&options, "mtu", G_VARIANT_TYPE_UINT16);
         conn->mMtu   = g_variant_get_uint16(v);
     }
+
+    // Stack-allocated dict still needs to be cleared after initialization
+    g_variant_dict_clear(&options);
 
     if (bluez_gatt_characteristic1_get_notifying(aChar))
     {
@@ -1127,6 +1133,9 @@ static BluezConnection * BluezCharacteristicGetBluezConnection(BluezGattCharacte
 
         v = g_variant_dict_lookup_value(&options, "device", G_VARIANT_TYPE_OBJECT_PATH);
         VerifyOrExit(v != nullptr, ChipLogError(DeviceLayer, "FAIL: No device option in dictionary (%s)", __func__));
+
+        // Stack-allocated dict still needs to be cleared after initialization
+        g_variant_dict_clear(&options);
 
         retval = static_cast<BluezConnection *>(g_hash_table_lookup(apEndpoint->mpConnMap, g_variant_get_string(v, nullptr)));
     }
