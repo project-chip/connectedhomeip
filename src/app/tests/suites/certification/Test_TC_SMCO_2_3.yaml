@@ -151,7 +151,7 @@ tests:
 
     - label: "Start manually DUT self-test"
       cluster: "LogCommands"
-      PICS: PICS_USER_PROMPT && SMCO.M.ManuallyControlledTest
+      PICS: PICS_USER_PROMPT && SMOKECO.M.ManuallyControlledTest
       endpoint: 1
       command: "UserPrompt"
       arguments:
