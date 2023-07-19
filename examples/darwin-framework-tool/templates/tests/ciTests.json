@@ -31,7 +31,7 @@
         "Test_TC_ACL_2_9",
         "Test_TC_ACL_2_10",
         "DL_LockUnlock",
-        "Disabled due to Dishwaser Alarm not being enabled in Matter.framework for now:",
+        "Disabled due to DishwaserAlarm not being enabled in Matter.framework for now:",
         "TestDishwasherAlarm",
         "Disabled due to OperationalState not being enabled in Matter.framework for now:",
         "TestOperationalState",
