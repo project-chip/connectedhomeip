@@ -72,6 +72,7 @@ jobs:
                 --target efr32-brd4187c-unit-test \
                 --target efr32-brd4187c-light-use_ot_lib \
                 --target efr32-brd4187c-light-rpc \
+                --target efr32-brd4187c-pump \
                 --target efr32-brd4187c-lock-rpc-shell-enable_heap_monitoring \
                 build \
                 --copy-artifacts-to out/artifacts \
