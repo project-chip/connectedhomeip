@@ -5,6 +5,8 @@
         "Test_TC_ACL_2_1",
         "Test_TC_ACL_2_3",
         "Test_TC_ACL_2_4",
+        "Test_TC_ACL_2_5",
+        "Test_TC_ACL_2_6",
         "Test_TC_ACL_2_7",
         "Test_TC_ACL_2_8",
         "Test_TC_ACL_2_9",
@@ -157,6 +159,7 @@
         "Test_TC_OO_2_2",
         "Test_TC_OO_2_4"
     ],
+    "OperationalState": ["Test_TC_OPSTATE_1_1"],
     "PowerSource": ["Test_TC_PS_1_1", "Test_TC_PS_2_1"],
     "PressureMeasurement": [
         "Test_TC_PRS_1_1",
@@ -243,6 +246,7 @@
         "TestIdentifyCluster",
         "TestOperationalCredentialsCluster",
         "TestModeSelectCluster",
+        "TestTemperatureControl",
         "TestSelfFabricRemoval",
         "TestSystemCommands",
         "TestBinding",
@@ -367,6 +371,7 @@
         "OTASoftwareUpdate",
         "OccupancySensing",
         "OnOff",
+        "OperationalState",
         "PowerSource",
         "PressureMeasurement",
         "PumpConfigurationControl",

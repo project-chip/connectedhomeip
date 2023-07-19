@@ -20,6 +20,10 @@ import("${chip_root}/examples/platform/bouffalolab/bl702/args.gni")
 
 chip_device_platform = "bl702"
 
+chip_enable_ota_requestor = true
+
+lwip_platform = "bl702"
+
 riscv_platform_config = "${bouffalolab_iot_sdk_build_root}/common/rsicv.gni"
 
 mbedtls_target = "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk"

@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the ClusterRevision attribute from the DUT"
+    - label: "Step 2: TH reads the ClusterRevision attribute from the DUT"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -48,7 +48,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads the AttributeList attribute from the DUT"
+    - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
       command: "readAttribute"
       attribute: "AttributeList"
       response:

@@ -44,7 +44,7 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label: "Sends a Seek command"
+    - label: "Step 1: Sends a Seek command"
       PICS: MEDIAPLAYBACK.S.C0b.Rsp
       command: "Seek"
       arguments:
@@ -70,7 +70,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the SampledPosition attribute"
+    - label: "Step 2: Reads the SampledPosition attribute"
       PICS: MEDIAPLAYBACK.S.A0003 && MEDIAPLAYBACK.S.C0b.Rsp
       command: "readAttribute"
       attribute: "SampledPosition"
@@ -78,7 +78,7 @@ tests:
           value: { "Position": 10000 }
 
     #Issue 10988
-    - label: "TH reads the StartTime attribute from the DUT"
+    - label: "Step 3: TH reads the StartTime attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0001 && PICS_USER_PROMPT
       verification: |
           The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
@@ -98,7 +98,7 @@ tests:
                 value: "y"
 
     #Issue 10988
-    - label: "TH reads the SeekRangeEnd attribute from the DUT"
+    - label: "Step 4: TH reads the SeekRangeEnd attribute from the DUT"
       verification: |
           The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool mediaplayback read seek-range-end 1 3
@@ -118,7 +118,7 @@ tests:
                 value: "y"
 
     #Issue 10988
-    - label: "TH reads the SeekRangeStart attribute from the DUT"
+    - label: "Step 5: TH reads the SeekRangeStart attribute from the DUT"
       verification: |
           The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool mediaplayback read seek-range-start 1 3
@@ -143,7 +143,7 @@ tests:
                 value: "y"
 
     #Issue 10988
-    - label: "TH reads the Duration attribute from the DUT"
+    - label: "Step 6: TH reads the Duration attribute from the DUT"
       verification: |
           The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool mediaplayback read duration 1 3
@@ -163,7 +163,7 @@ tests:
                 value: "y"
 
     - label:
-          "Sends a Seek command Position value beyond the furthest valid
+          "Step 7: Sends a Seek command Position value beyond the furthest valid
           position"
       PICS: MEDIAPLAYBACK.S.C0b.Rsp
       command: "Seek"

@@ -20,8 +20,10 @@ import asyncio
 import builtins
 import json
 import logging
+import math
 import os
 import pathlib
+import queue
 import re
 import sys
 import typing
@@ -46,6 +48,7 @@ import chip.clusters as Clusters
 import chip.logging
 import chip.native
 from chip.ChipStack import ChipStack
+from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.interaction_model import InteractionModelError, Status
 from chip.storage import PersistentStorage
 from mobly import asserts, base_test, signals, utils
@@ -193,6 +196,28 @@ def compare_time(received: int, offset: timedelta = timedelta(), utc: int = None
     delta_us = abs(expected - received)
     delta = timedelta(microseconds=delta_us)
     asserts.assert_less_equal(delta, tolerance, "Received time is out of tolerance")
+
+
+def get_wait_seconds_from_set_time(set_time_matter_us: int, wait_seconds: int):
+    seconds_passed = math.floor((utc_time_in_matter_epoch() - set_time_matter_us)/1000000)
+    return wait_seconds - seconds_passed
+
+
+class SimpleEventCallback:
+    def __init__(self, name: str, expected_cluster_id: int, expected_event_id: int, output_queue: queue.SimpleQueue):
+        self._name = name
+        self._expected_cluster_id = expected_cluster_id
+        self._expected_event_id = expected_event_id
+        self._output_queue = output_queue
+
+    def __call__(self, event_result: EventReadResult, transaction: SubscriptionTransaction):
+        if (self._expected_cluster_id == event_result.Header.ClusterId and
+                self._expected_event_id == event_result.Header.EventId):
+            self._output_queue.put(event_result)
+
+    @property
+    def name(self) -> str:
+        return self._name
 
 
 @dataclass

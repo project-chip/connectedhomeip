@@ -23,7 +23,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads from the DUT the IdleModeInterval attribute"
+    - label: "Step 2: TH reads from the DUT the IdleModeInterval attribute"
       PICS: ICDM.S.A0000
       command: "readAttribute"
       attribute: "IdleModeInterval"
@@ -42,7 +42,7 @@ tests:
               minValue: 500
               maxValue: 64800000
 
-    - label: "TH reads from the DUT the ActiveModeInterval attribute"
+    - label: "Step 3: TH reads from the DUT the ActiveModeInterval attribute"
       PICS: ICDM.S.A0001
       command: "readAttribute"
       attribute: "ActiveModeInterval"
@@ -52,7 +52,7 @@ tests:
               minValue: 300
               maxValue: IdleModeIntervalValue
 
-    - label: "TH reads from the DUT the ActiveModeThreshold attribute"
+    - label: "Step 4: TH reads from the DUT the ActiveModeThreshold attribute"
       PICS: ICDM.S.A0002
       command: "readAttribute"
       attribute: "ActiveModeThreshold"
@@ -61,7 +61,7 @@ tests:
               type: int16u
               minValue: 300
 
-    - label: "TH reads from the DUT the RegisteredClients attribute"
+    - label: "Step 5: TH reads from the DUT the RegisteredClients attribute"
       PICS: ICDM.S.A0003
       command: "readAttribute"
       attribute: "RegisteredClients"
@@ -69,7 +69,7 @@ tests:
           constraints:
               type: list
 
-    - label: "TH reads from the DUT the IcdCounter attribute"
+    - label: "Step 6: TH reads from the DUT the IcdCounter attribute"
       PICS: ICDM.S.A0004
       command: "readAttribute"
       attribute: "ICDCounter"
@@ -77,7 +77,8 @@ tests:
           constraints:
               type: int32u
 
-    - label: "TH reads from the DUT the ClientsSupportedPerFabric attribute"
+    - label:
+          "Step 7: TH reads from the DUT the ClientsSupportedPerFabric attribute"
       PICS: ICDM.S.A0005
       command: "readAttribute"
       attribute: "ClientsSupportedPerFabric"
