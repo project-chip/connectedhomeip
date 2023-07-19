@@ -4,9 +4,7 @@ steps:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - "-c"
-          - |
-            perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt
-            source ./scripts/bootstrap.sh
+          - source ./scripts/bootstrap.sh
       id: Bootstrap
       entrypoint: /usr/bin/bash
       volumes:

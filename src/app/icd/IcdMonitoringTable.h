@@ -16,8 +16,6 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
@@ -29,8 +27,7 @@ namespace chip {
 
 constexpr size_t kIcdMonitoringBufferSize = 40;
 
-struct IcdMonitoringEntry : public PersistentData<kIcdMonitoringBufferSize>,
-                            chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::Type
+struct IcdMonitoringEntry : public PersistentData<kIcdMonitoringBufferSize>
 {
     static constexpr size_t kKeyMaxSize = 16;
 
@@ -41,12 +38,15 @@ struct IcdMonitoringEntry : public PersistentData<kIcdMonitoringBufferSize>,
         this->monitoredSubject = nodeId;
     }
     bool IsValid() { return this->checkInNodeID != kUndefinedNodeId && this->fabricIndex != kUndefinedFabricIndex; }
-
     CHIP_ERROR UpdateKey(StorageKeyName & key) override;
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override;
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override;
     void Clear() override;
 
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::NodeId checkInNodeID    = static_cast<chip::NodeId>(0);
+    uint64_t monitoredSubject     = static_cast<uint64_t>(0);
+    chip::ByteSpan key;
     uint16_t index = 0;
 };
 

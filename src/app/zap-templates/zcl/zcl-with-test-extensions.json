@@ -194,6 +194,14 @@
             "MaxGroupKeysPerFabric",
             "FeatureMap"
         ],
+        "ICD Management": [
+            "IdleModeInterval",
+            "ActiveModeInterval",
+            "ActiveModeThreshold",
+            "RegisteredClients",
+            "ICDCounter",
+            "ClientsSupportedPerFabric"
+        ],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",
