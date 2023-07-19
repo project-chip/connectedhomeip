@@ -170,7 +170,8 @@ Clusters::ModeBase::Instance gDishwasherModeInstance(&gDishwasherModeDelegate, 0
 Clusters::LaundryWasherMode::LaundryWasherModeDelegate gLaundryWasherModeDelegate;
 Clusters::ModeBase::Instance gLaundryWasherModeInstance(&gLaundryWasherModeDelegate, 0x1, Clusters::LaundryWasherMode::Id, 1);
 Clusters::RefrigeratorAndTemperatureControlledCabinetMode::TccModeDelegate gTccModeDelegate;
-Clusters::ModeBase::Instance gTccModeInstance(&gTccModeDelegate, 0x1, Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id, 1);
+Clusters::ModeBase::Instance gTccModeInstance(&gTccModeDelegate, 0x1, Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id,
+                                              1);
 
 } // namespace
 

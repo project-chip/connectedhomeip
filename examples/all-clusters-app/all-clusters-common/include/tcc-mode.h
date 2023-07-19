@@ -39,28 +39,21 @@ const uint8_t ModeRapidFreeze = 2;
 class TccModeDelegate : public ModeBase::Delegate
 {
 private:
-    using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType modeTagsTccNormal[1]    = { { .value = to_underlying(ModeBase::ModeTag::kAuto) } };
-    ModeTagStructType modeTagsTccRapidCool[1] = {
-        { .value = to_underlying(ModeTag::kRapidCool) }
-    };
-    ModeTagStructType modeTagsTccRapidFreeze[1] = {
-        { .value = to_underlying(ModeTag::kRapidFreeze) }
-    };
+    using ModeTagStructType                     = detail::Structs::ModeTagStruct::Type;
+    ModeTagStructType modeTagsTccNormal[1]      = { { .value = to_underlying(ModeBase::ModeTag::kAuto) } };
+    ModeTagStructType modeTagsTccRapidCool[1]   = { { .value = to_underlying(ModeTag::kRapidCool) } };
+    ModeTagStructType modeTagsTccRapidFreeze[1] = { { .value = to_underlying(ModeTag::kRapidFreeze) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        detail::Structs::ModeOptionStruct::Type{
-            .label=CharSpan::fromCharString("Normal"),
-            .mode=ModeNormal,
-            .modeTags=DataModel::List<const ModeTagStructType>(modeTagsTccNormal)},
-        detail::Structs::ModeOptionStruct::Type{
-            .label=CharSpan::fromCharString("Rapid Cool"),
-            .mode=ModeRapidCool,
-            .modeTags=DataModel::List<const ModeTagStructType>(modeTagsTccRapidCool)},
-        detail::Structs::ModeOptionStruct::Type{
-            .label=CharSpan::fromCharString("Rapid Freeze"),
-            .mode=ModeRapidFreeze,
-            .modeTags=DataModel::List<const ModeTagStructType>(modeTagsTccRapidFreeze)},
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Normal"),
+                                                 .mode     = ModeNormal,
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsTccNormal) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Rapid Cool"),
+                                                 .mode     = ModeRapidCool,
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsTccRapidCool) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Rapid Freeze"),
+                                                 .mode     = ModeRapidFreeze,
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsTccRapidFreeze) },
     };
 
     CHIP_ERROR Init() override;

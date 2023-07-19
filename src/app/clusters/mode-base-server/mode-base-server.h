@@ -23,7 +23,7 @@
 #include <app/AttributePersistenceProvider.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/util/af.h>
-#include<set>
+#include <set>
 
 namespace chip {
 namespace app {
@@ -35,7 +35,7 @@ class Delegate;
 class Instance : public CommandHandlerInterface, public AttributeAccessInterface
 {
 private:
-    Delegate *mDelegate;
+    Delegate * mDelegate;
 
     EndpointId mEndpointId{};
     ClusterId mClusterId{};
@@ -76,7 +76,7 @@ private:
      * Helper function that encodes the supported modes.
      * @param encoder The encoder to encode the supported modes into.
      */
-    CHIP_ERROR EncodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper &encoder);
+    CHIP_ERROR EncodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
 public:
     /**
@@ -154,18 +154,18 @@ public:
      * @param aClusterId The ID of the ModeBase aliased cluster to be instantiated.
      * @param aFeature The bitmask value that identifies which features are supported by this instance.
      */
-    Instance(Delegate *aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature);
+    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature);
 
     ~Instance() override;
 
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
-
 };
 
-class Delegate{
+class Delegate
+{
 protected:
-    Instance *mInstance = nullptr;
+    Instance * mInstance = nullptr;
 
 public:
     Delegate() = default;
@@ -217,8 +217,7 @@ public:
      * @return Returns a CHIP_NO_ERROR if there was no error and the mode tags were returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available mode tags.
      */
-    virtual CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex,
-                                          DataModel::List<detail::Structs::ModeTagStruct::Type> & modeTags) = 0;
+    virtual CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<detail::Structs::ModeTagStruct::Type> & modeTags) = 0;
 
     /**
      * When a ChangeToMode command is received, if the NewMode value is a supported mode, this method is called to 1) decide if

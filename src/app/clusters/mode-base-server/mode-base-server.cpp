@@ -224,8 +224,7 @@ CHIP_ERROR Instance::Init()
                         return StatusIB(status).ToChipError();
                     }
 
-                    ChipLogProgress(Zcl, "ModeBase: Successfully initialized CurrentMode to the OnMode value %u",
-                                    mOnMode.Value());
+                    ChipLogProgress(Zcl, "ModeBase: Successfully initialized CurrentMode to the OnMode value %u", mOnMode.Value());
                 }
             }
         }
@@ -312,7 +311,7 @@ CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & clus
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::EncodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper &encoder)
+CHIP_ERROR Instance::EncodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
     for (uint8_t i = 0; true; i++)
     {
@@ -360,9 +359,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         break;
     case Attributes::SupportedModes::Id:
         Instance * d   = this;
-        CHIP_ERROR err = aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR {
-            return d->EncodeSupportedModes(encoder);
-        });
+        CHIP_ERROR err = aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR { return d->EncodeSupportedModes(encoder); });
         return err;
     }
     return CHIP_NO_ERROR;
@@ -399,8 +396,7 @@ Status Instance::UpdateCurrentMode(uint8_t aNewMode)
     if (mCurrentMode != oldMode)
     {
         // Write new value to persistent storage.
-        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId,
-                                                           Attributes::CurrentMode::Id);
+        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id);
         GetAttributePersistenceProvider()->WriteScalarValue(path, mCurrentMode);
         MatterReportingAttributeChangeCallback(path);
     }
@@ -421,8 +417,7 @@ Status Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
     if (mStartUpMode != oldStartUpMode)
     {
         // Write new value to persistent storage.
-        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId,
-                                                           Attributes::StartUpMode::Id);
+        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id);
         GetAttributePersistenceProvider()->WriteScalarValue(path, mStartUpMode);
         MatterReportingAttributeChangeCallback(path);
     }
@@ -443,8 +438,7 @@ Status Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
     if (mOnMode != oldOnMode)
     {
         // Write new value to persistent storage.
-        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId,
-                                                           Attributes::OnMode::Id);
+        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id);
         GetAttributePersistenceProvider()->WriteScalarValue(path, mOnMode);
         MatterReportingAttributeChangeCallback(path);
     }
@@ -480,11 +474,9 @@ bool Instance::IsSupportedMode(uint8_t modeValue)
     return false;
 }
 
-Instance::Instance(Delegate *aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
+Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
     CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-    mDelegate(aDelegate),
-    mEndpointId(aEndpointId),
+    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
     mClusterId(aClusterId),
     mCurrentMode(0), // This is a temporary value and may not be valid. We will change this to the value of the first
                      // mode in the list at the start of the Init function to ensure that it represents a valid mode.

@@ -38,9 +38,8 @@ namespace SupportedModes {
 static constexpr AttributeId Id = 0x00000000;
 struct TypeInfo
 {
-    using Type = DataModel::List<const detail::Structs::ModeOptionStruct::Type>;
-    using DecodableType =
-        DataModel::DecodableList<detail::Structs::ModeOptionStruct::DecodableType>;
+    using Type             = DataModel::List<const detail::Structs::ModeOptionStruct::Type>;
+    using DecodableType    = DataModel::DecodableList<detail::Structs::ModeOptionStruct::DecodableType>;
     using DecodableArgType = DecodableType &;
 
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
