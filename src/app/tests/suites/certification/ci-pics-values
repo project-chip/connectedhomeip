@@ -1828,6 +1828,19 @@ OPCREDS.C.C09.Tx=1
 OPCREDS.C.C0a.Tx=1
 OPCREDS.C.C0b.Tx=1
 
+# Operational State
+# Server Attributes
+OPSTATE.S.A0002=1
+
+# Server Events
+OPSTATE.S.E01=1
+
+# Server Commands
+OPSTATE.S.C00=1
+OPSTATE.S.C01=1
+OPSTATE.S.C02=1
+OPSTATE.S.C03=1
+
 # Thermostat
 # Server
 TSTAT.S=1
