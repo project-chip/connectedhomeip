@@ -448,7 +448,7 @@ bool emberAfFanControlClusterStepCallback(app::CommandHandler * commandObj, cons
 {
     Protocols::InteractionModel::Status status = Status::Success;
 
-    ChipLogProgress(Zcl, "FanControl emberAfFanControlClusterStepCallback:%u", commandPath.mEndpointId);
+    ChipLogProgress(Zcl, "FanControl emberAfFanControlClusterStepCallback: Endpoint %u", commandPath.mEndpointId);
 
     if (!SupportsStep(commandPath.mEndpointId))
     {
@@ -459,11 +459,9 @@ bool emberAfFanControlClusterStepCallback(app::CommandHandler * commandObj, cons
     {
         EndpointId endpoint         = commandPath.mEndpointId;
         StepDirectionEnum direction = commandData.direction;
-        Optional<bool> wrap         = commandData.wrap;
-        Optional<bool> lowestOff    = commandData.lowestOff;
 
-        bool wrapValue      = wrap.HasValue() ? wrap.Value() : false;
-        bool lowestOffValue = lowestOff.HasValue() ? lowestOff.Value() : false;
+        bool wrapValue      = commandData.wrap.HasValue() ? commandData.wrap.Value() : false;
+        bool lowestOffValue = commandData.lowestOff.HasValue() ? commandData.lowestOff.Value() : false;
 
         Delegate * delegate = GetDelegate(endpoint);
         if (delegate)

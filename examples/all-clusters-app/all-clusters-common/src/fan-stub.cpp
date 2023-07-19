@@ -82,7 +82,10 @@ CHIP_ERROR FanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEncoder)
 
 Status FanControlManager::HandleStep(StepDirectionEnum direction, bool wrap, bool lowestOff)
 {
-    Status status = Status::Success;
+    ChipLogProgress(NotSpecified, "FanControlManager::HandleStep direction %d, wrap %d, lowestOff %d", to_underlying(direction),
+                    wrap, lowestOff);
+
+    VerifyOrReturnError(direction != StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
     uint8_t speedMax;
     SpeedMax::Get(mEndpoint, &speedMax);
@@ -92,94 +95,55 @@ Status FanControlManager::HandleStep(StepDirectionEnum direction, bool wrap, boo
 
     uint8_t newSpeedSetting;
 
-    if ((speedSetting.Value() > 1) && (speedSetting.Value() < speedMax))
+    if (direction == StepDirectionEnum::kIncrease)
     {
-        if (direction == StepDirectionEnum::kIncrease)
+        if (speedSetting.IsNull())
+        {
+            newSpeedSetting = 1;
+        }
+        else if (speedSetting.Value() < speedMax)
         {
             newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() + 1);
-            status          = ToInteractionModelStatus(SpeedSetting::Set(mEndpoint, newSpeedSetting));
         }
-        else if (direction == StepDirectionEnum::kDecrease)
-        {
-            newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() - 1);
-            status          = ToInteractionModelStatus(SpeedSetting::Set(mEndpoint, newSpeedSetting));
-        }
-        else
-        {
-            status = Status::InvalidCommand;
-        }
-    }
-    else if (speedSetting.Value() == 1)
-    {
-        if (direction == StepDirectionEnum::kIncrease)
-        {
-            newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() + 1);
-            status          = ToInteractionModelStatus(SpeedSetting::Set(mEndpoint, newSpeedSetting));
-        }
-        else if (direction == StepDirectionEnum::kDecrease)
-        {
-            if (lowestOff)
-            {
-                newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() - 1);
-                status          = ToInteractionModelStatus(SpeedSetting::Set(mEndpoint, newSpeedSetting));
-            }
-            else if (wrap)
-            {
-                newSpeedSetting = speedMax;
-                status          = ToInteractionModelStatus(SpeedSetting::Set(mEndpoint, newSpeedSetting));
-            }
-        }
-        else
-        {
-            status = Status::InvalidCommand;
-        }
-    }
-    else if (speedSetting.Value() == 0)
-    {
-        if (direction == StepDirectionEnum::kIncrease)
-        {
-            newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() + 1);
-            status          = ToInteractionModelStatus(SpeedSetting::Set(mEndpoint, newSpeedSetting));
-        }
-        else if (direction == StepDirectionEnum::kDecrease)
-        {
-            if (wrap)
-            {
-                newSpeedSetting = speedMax;
-                status          = ToInteractionModelStatus(SpeedSetting::Set(mEndpoint, newSpeedSetting));
-            }
-            else if (!lowestOff)
-            {
-                newSpeedSetting = 1;
-                status          = ToInteractionModelStatus(SpeedSetting::Set(mEndpoint, newSpeedSetting));
-            }
-        }
-        else
-        {
-            status = Status::InvalidCommand;
-        }
-    }
-    else if (speedSetting.Value() == speedMax)
-    {
-        if (direction == StepDirectionEnum::kIncrease)
+        else if (speedSetting.Value() == speedMax)
         {
             if (wrap)
             {
                 newSpeedSetting = lowestOff ? 0 : 1;
-                status          = ToInteractionModelStatus(SpeedSetting::Set(mEndpoint, newSpeedSetting));
             }
         }
-        else if (direction == StepDirectionEnum::kDecrease)
+    }
+    else if (direction == StepDirectionEnum::kDecrease)
+    {
+        if (speedSetting.IsNull())
+        {
+            newSpeedSetting = lowestOff ? 0 : 1;
+        }
+        else if ((speedSetting.Value() > 1) && (speedSetting.Value() <= speedMax))
         {
             newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() - 1);
-            status          = ToInteractionModelStatus(SpeedSetting::Set(mEndpoint, newSpeedSetting));
         }
-        else
+        else if (speedSetting.Value() == 1)
         {
-            status = Status::InvalidCommand;
+            if (lowestOff)
+            {
+                newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() - 1);
+            }
+        }
+        else if (speedSetting.Value() == 0)
+        {
+            if (wrap)
+            {
+                newSpeedSetting = speedMax;
+            }
+            else if (!lowestOff)
+            {
+                newSpeedSetting = 1;
+            }
         }
     }
-    return status;
+
+    return ToInteractionModelStatus(SpeedSetting::Set(mEndpoint, newSpeedSetting));
 }
 
 CHIP_ERROR FanControlManager::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
