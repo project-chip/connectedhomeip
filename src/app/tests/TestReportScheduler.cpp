@@ -512,17 +512,13 @@ public:
         // Simulate waiting for the max interval to expire (2s)
         sTestTimerSynchronizedDelegate.IncrementMockTimestamp(System::Clock::Milliseconds64(2000));
 
-        // Confirm that both handlers are now reportable since the timer has expired
+        // Confirm that both handlers are now reportable since the timer has expired (readHandler1 from its max and readHandler2
+        // from its sync)
         NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler1));
         NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler2));
         // Confirm timeout has expired and no report is scheduled, an engine run would typically happen here
         NL_TEST_ASSERT(aSuite, !sScheduler.IsReportScheduled(readHandler1));
         NL_TEST_ASSERT(aSuite, !sScheduler.IsReportScheduled(readHandler2));
-
-        // Simulate that the OnBecameReportable callback was called on readHandler1
-        readHandler1->mObserver->OnBecameReportable(readHandler1);
-        // Confirm that the read handler is now reportable due to the sync mechanism that forced a dirty flag
-        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler2));
 
         // Simulate a report emission for readHandler1
         readHandler1->mObserver->OnSubscriptionAction(readHandler1);
