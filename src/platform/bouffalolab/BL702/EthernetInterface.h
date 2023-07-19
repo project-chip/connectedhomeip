@@ -17,15 +17,14 @@
 
 #pragma once
 
-#include <stdint.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-namespace chip {
-namespace DeviceLayer {
-struct ChipDeviceEvent;
-} // namespace DeviceLayer
-} // namespace chip
+void ethernetInterface_init(void);
+void ethernetInterface_eventGotIP(struct netif * interface);
+struct netif * deviceInterface_getNetif(void);
 
-// ==================== Platform Adaptations ====================
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS 1
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME 1
-#define CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *
+#ifdef __cplusplus
+}
+#endif
