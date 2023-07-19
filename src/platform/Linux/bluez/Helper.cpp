@@ -372,9 +372,8 @@ static gboolean BluezCharacteristicWriteValueError(BluezGattCharacteristic1 * aC
 static gboolean BluezCharacteristicWriteFD(GIOChannel * aChannel, GIOCondition aCond, gpointer apEndpoint)
 {
     GVariant * newVal;
-    gchar * buf;
+    uint8_t * buf = nullptr;
     ssize_t len;
-    int fd;
     bool isSuccess = false;
 
     BluezConnection * conn = static_cast<BluezConnection *>(apEndpoint);
@@ -387,21 +386,19 @@ static gboolean BluezCharacteristicWriteFD(GIOChannel * aChannel, GIOCondition a
 
     ChipLogDetail(DeviceLayer, "c1 %s mtu, %d", __func__, conn->mMtu);
 
-    buf = static_cast<gchar *>(g_malloc(conn->mMtu));
-    fd  = g_io_channel_unix_get_fd(aChannel);
-
-    len = read(fd, buf, conn->mMtu);
-
+    buf = new uint8_t[conn->mMtu];
+    len = read(g_io_channel_unix_get_fd(aChannel), buf, conn->mMtu);
     VerifyOrExit(len > 0, ChipLogError(DeviceLayer, "FAIL: short read in %s (%zd)", __func__, len));
 
     // Casting len to size_t is safe, since we ensured that it's not negative.
     newVal = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, buf, static_cast<size_t>(len), sizeof(uint8_t));
 
     bluez_gatt_characteristic1_set_value(conn->mpC1, newVal);
-    BLEManagerImpl::HandleRXCharWrite(conn, reinterpret_cast<uint8_t *>(buf), static_cast<size_t>(len));
+    BLEManagerImpl::HandleRXCharWrite(conn, buf, static_cast<size_t>(len));
     isSuccess = true;
 
 exit:
+    delete[] buf;
     return isSuccess ? G_SOURCE_CONTINUE : G_SOURCE_REMOVE;
 }
 
