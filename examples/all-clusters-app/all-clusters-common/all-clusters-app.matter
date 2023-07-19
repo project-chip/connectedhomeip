@@ -6489,12 +6489,12 @@ endpoint 0 {
   }
 
   server cluster IcdManagement {
-    ram      attribute idleModeInterval default = 500;
-    ram      attribute activeModeInterval default = 300;
-    ram      attribute activeModeThreshold default = 300;
+    callback attribute idleModeInterval default = 500;
+    callback attribute activeModeInterval default = 300;
+    callback attribute activeModeThreshold default = 300;
     callback attribute registeredClients;
-    ram      attribute ICDCounter default = 0;
-    ram      attribute clientsSupportedPerFabric default = 2;
+    callback attribute ICDCounter default = 0;
+    callback attribute clientsSupportedPerFabric default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

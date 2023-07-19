@@ -34,9 +34,22 @@
 #include <app/ReadHandler.h>
 #include <app/reporting/Engine.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/IcdManagementServer.h> // nogncheck
+#endif
+
 namespace chip {
 namespace app {
 using Status = Protocols::InteractionModel::Status;
+
+uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
+{
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    return static_cast<uint16_t>(IcdManagementServer::GetInstance().GetIdleModeInterval() / 1000);
+#else
+    return kSubscriptionMaxIntervalPublisherLimit;
+#endif
+}
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
                          InteractionType aInteractionType, Observer * observer) :
