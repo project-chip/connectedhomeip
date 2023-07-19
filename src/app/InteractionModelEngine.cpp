@@ -878,12 +878,10 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
         status =
             OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), ReadHandler::InteractionType::Subscribe);
     }
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
     {
         status = OnUnsolicitedReportData(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
-#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
     else if (aPayloadHeader.HasMessageType(MsgType::TimedRequest))
     {
         OnTimedRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), status);
@@ -1725,7 +1723,7 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
 
         return Loop::Continue;
     });
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
+
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
         if (readClient->GetFabricIndex() == fabricIndex)
@@ -1734,7 +1732,6 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
             readClient->Close(CHIP_ERROR_IM_FABRIC_DELETED, false);
         }
     }
-#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     for (auto & handler : mWriteHandlers)
     {
