@@ -15,17 +15,29 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <stdint.h>
+#include <platform/ConnectivityManager.h>
+
+#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
+
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <eth_bd.h>
+#include <platform/bouffalolab/BL702/EthernetInterface.h>
+#endif
+
+using namespace ::chip;
 
 namespace chip {
 namespace DeviceLayer {
-struct ChipDeviceEvent;
+
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WIFI
+extern "C" void ethernetInterface_eventGotIP(struct netif * interface)
+{
+    ChipLogProgress(DeviceLayer, "ethernetInterface_eventGotIP");
+    ConnectivityMgrImpl().OnConnectivityChanged(interface);
+}
+#endif
+
 } // namespace DeviceLayer
 } // namespace chip
-
-// ==================== Platform Adaptations ====================
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS 1
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME 1
-#define CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *

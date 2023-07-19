@@ -15,17 +15,29 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <platform/ConfigurationManager.h>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
-#include <stdint.h>
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD & !CHIP_DEVICE_CONFIG_ENABLE_WIFI
+extern "C" {
+#include <eth_bd.h>
+}
+#endif
 
 namespace chip {
 namespace DeviceLayer {
-struct ChipDeviceEvent;
+
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD & !CHIP_DEVICE_CONFIG_ENABLE_WIFI
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan buf)
+{
+    if (buf.size() != ConfigurationManager::kPrimaryMACAddressLength)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    eth_get_mac(buf.data());
+
+    return CHIP_NO_ERROR;
+}
+#endif
+
 } // namespace DeviceLayer
 } // namespace chip
-
-// ==================== Platform Adaptations ====================
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS 1
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME 1
-#define CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *
