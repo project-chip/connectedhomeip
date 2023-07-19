@@ -14648,11 +14648,11 @@ class IcdManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="checkInNodeID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="key", Tag=1, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="verificationKey", Tag=1, Type=typing.Optional[bytes]),
                     ])
 
             checkInNodeID: 'uint' = 0
-            key: 'typing.Optional[bytes]' = None
+            verificationKey: 'typing.Optional[bytes]' = None
 
         @dataclass
         class StayActiveRequest(ClusterCommand):

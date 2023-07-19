@@ -4183,7 +4183,7 @@ class ChipClusters:
                 "commandName": "UnregisterClient",
                 "args": {
                     "checkInNodeID": "int",
-                    "key": "bytes",
+                    "verificationKey": "bytes",
                 },
             },
             0x00000003: {

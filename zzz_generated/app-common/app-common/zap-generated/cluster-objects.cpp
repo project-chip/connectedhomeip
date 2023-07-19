@@ -11300,7 +11300,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kCheckInNodeID), checkInNodeID));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kKey), key));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kVerificationKey), verificationKey));
     ReturnErrorOnFailure(aWriter.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -11322,8 +11322,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kCheckInNodeID):
             ReturnErrorOnFailure(DataModel::Decode(reader, checkInNodeID));
             break;
-        case to_underlying(Fields::kKey):
-            ReturnErrorOnFailure(DataModel::Decode(reader, key));
+        case to_underlying(Fields::kVerificationKey):
+            ReturnErrorOnFailure(DataModel::Decode(reader, verificationKey));
             break;
         default:
             break;
