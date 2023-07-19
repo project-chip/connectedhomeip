@@ -91,7 +91,7 @@ EmberAfStatus DishwasherAlarmServer::GetMaskValue(EndpointId endpoint, BitMask<A
 
 EmberAfStatus DishwasherAlarmServer::GetLatchValue(EndpointId endpoint, BitMask<AlarmMap> * latch)
 {
-    if (!HasAlarmFeature(endpoint))
+    if (!HasResetFeature(endpoint))
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm feature: Unsupport Latch attribute");
         return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
@@ -195,7 +195,7 @@ EmberAfStatus DishwasherAlarmServer::SetMaskValue(EndpointId endpoint, const Bit
 
 EmberAfStatus DishwasherAlarmServer::SetLatchValue(EndpointId endpoint, const BitMask<AlarmMap> latch)
 {
-    if (!HasAlarmFeature(endpoint))
+    if (!HasResetFeature(endpoint))
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm feature: Unsupport Latch attribute");
         return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
@@ -234,7 +234,7 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const Bi
     ChipLogProgress(Zcl, "Dishwasher Alarm: State ep%d value: %" PRIx32 "", endpoint, newState.Raw());
 
     // If the feature is true, the latch operation can only be performed
-    if (HasAlarmFeature(endpoint))
+    if (HasResetFeature(endpoint))
     {
         BitMask<AlarmMap> latch;
         status = GetLatchValue(endpoint, &latch);
@@ -269,7 +269,7 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const Bi
     return status;
 }
 
-bool DishwasherAlarmServer::HasAlarmFeature(EndpointId endpoint)
+bool DishwasherAlarmServer::HasResetFeature(EndpointId endpoint)
 {
     uint32_t featureMap = 0;
     if (Attributes::FeatureMap::Get(endpoint, &featureMap) != EMBER_ZCL_STATUS_SUCCESS)
@@ -343,7 +343,7 @@ static Status ResetHandler(const app::ConcreteCommandPath & commandPath, const c
     }
 
     // If the feature is true, the latch operation can only be performed
-    if (DishwasherAlarmServer::Instance().HasAlarmFeature(endpoint))
+    if (DishwasherAlarmServer::Instance().HasResetFeature(endpoint))
     {
         BitMask<AlarmMap> latch;
         if (DishwasherAlarmServer::Instance().GetLatchValue(endpoint, &latch) != EMBER_ZCL_STATUS_SUCCESS)

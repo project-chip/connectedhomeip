@@ -48,8 +48,8 @@ public:
     // A change in supported value will result in a corresponding change in mask and state.
     EmberAfStatus SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported);
 
-    // check whether the Alarm featureMap has value
-    bool HasAlarmFeature(EndpointId endpoint);
+    // check whether the Alarm featureMap has enabled Reset feature.
+    bool HasResetFeature(EndpointId endpoint);
 
 private:
     static DishwasherAlarmServer instance;
