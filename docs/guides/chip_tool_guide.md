@@ -425,10 +425,11 @@ manipulating its brightness (using the `levelcontrol` cluster commands):
 
 Every Matter device supports the Basic Information cluster, which maintains the
 collection of attributes that a controller can obtain from a device. These
-attributes can include the vendor name, the product name, or the software version.
+attributes can include the vendor name, the product name, or the software
+version.
 
-Use the CHIP Tool's `read` command on the `basicinformation` cluster to read those
-values from the device:
+Use the CHIP Tool's `read` command on the `basicinformation` cluster to read
+those values from the device:
 
 ```
 $ ./chip-tool basicinformation read vendor-name <node_id> <endpoint_id>
@@ -442,8 +443,8 @@ In these commands:
 -   _<endpoint_id\>_ is the ID of the endpoint with Basic Information cluster
     implemented.
 
-You can also use the following command to list all available commands for the Basic
-Information cluster:
+You can also use the following command to list all available commands for the
+Basic Information cluster:
 
 ```
 $ ./chip-tool basicinformation
