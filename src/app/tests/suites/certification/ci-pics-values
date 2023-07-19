@@ -1169,6 +1169,7 @@ OO.S.C40.Rsp=1
 OO.S.C41.Rsp=1
 OO.S.C42.Rsp=1
 OO.S.F00=1
+OO.S.F01=0
 OO.S.A4003=1
 OO.M.ManuallyControlled=1
 
@@ -1827,6 +1828,19 @@ OPCREDS.C.C08.Rsp=1
 OPCREDS.C.C09.Tx=1
 OPCREDS.C.C0a.Tx=1
 OPCREDS.C.C0b.Tx=1
+
+# Operational State
+# Server Attributes
+OPSTATE.S.A0002=1
+
+# Server Events
+OPSTATE.S.E01=1
+
+# Server Commands
+OPSTATE.S.C00=1
+OPSTATE.S.C01=1
+OPSTATE.S.C02=1
+OPSTATE.S.C03=1
 
 # Thermostat
 # Server
@@ -2588,10 +2602,10 @@ RNCONC.S.Afffd=1
 #Features
 FAN.S.F00=1
 FAN.S.F01=1
-FAN.S.F02=0
-FAN.S.F03=0
-FAN.S.F04=0
-FAN.S.F05=0
+FAN.S.F02=1
+FAN.S.F03=1
+FAN.S.F04=1
+FAN.S.F05=1
 
 #Server Attributes
 FAN.S.A0000=1
