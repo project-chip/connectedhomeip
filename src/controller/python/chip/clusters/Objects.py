@@ -2824,13 +2824,13 @@ class Descriptor(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="namespace", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="namespaceID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="tag", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="label", Tag=3, Type=typing.Union[None, Nullable, str]),
                     ])
 
             mfgCode: 'typing.Union[Nullable, uint]' = NullValue
-            namespace: 'uint' = 0
+            namespaceID: 'uint' = 0
             tag: 'uint' = 0
             label: 'typing.Union[None, Nullable, str]' = None
 

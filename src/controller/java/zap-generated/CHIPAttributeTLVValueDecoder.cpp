@@ -1943,12 +1943,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         newElement_0_mfgCodeClassName.c_str(), newElement_0_mfgCodeCtorSignature.c_str(),
                         static_cast<uint16_t>(entry_0.mfgCode.Value()), newElement_0_mfgCode);
                 }
-                jobject newElement_0_namespace;
-                std::string newElement_0_namespaceClassName     = "java/lang/Integer";
-                std::string newElement_0_namespaceCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_namespaceClassName.c_str(),
-                                                                              newElement_0_namespaceCtorSignature.c_str(),
-                                                                              entry_0.namespace, newElement_0_namespace);
+                jobject newElement_0_namespaceID;
+                std::string newElement_0_namespaceIDClassName     = "java/lang/Integer";
+                std::string newElement_0_namespaceIDCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_namespaceIDClassName.c_str(),
+                                                                              newElement_0_namespaceIDCtorSignature.c_str(),
+                                                                              entry_0.namespaceID, newElement_0_namespaceID);
                 jobject newElement_0_tag;
                 std::string newElement_0_tagClassName     = "java/lang/Integer";
                 std::string newElement_0_tagCtorSignature = "(I)V";
@@ -1992,7 +1992,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 newElement_0 = env->NewObject(semanticTagStructStructClass_1, semanticTagStructStructCtor_1, newElement_0_mfgCode,
-                                              newElement_0_namespace, newElement_0_tag, newElement_0_label);
+                                              newElement_0_namespaceID, newElement_0_tag, newElement_0_label);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;

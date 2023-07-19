@@ -275,10 +275,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("Namespace", indent + 1, value.namespace);
+        CHIP_ERROR err = LogValue("NamespaceID", indent + 1, value.namespaceID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Namespace'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NamespaceID'");
             return err;
         }
     }

@@ -107,18 +107,18 @@ public Integer revision;
 
 public static class DescriptorClusterSemanticTagStruct {
 public @Nullable Integer mfgCode;
-public Integer namespace;
+public Integer namespaceID;
 public Integer tag;
 public @Nullable Optional<String> label;
 
   public DescriptorClusterSemanticTagStruct(
     @Nullable Integer mfgCode
-      , Integer namespace
+      , Integer namespaceID
       , Integer tag
       , @Nullable Optional<String> label
   ) {
     this.mfgCode = mfgCode;
-    this.namespace = namespace;
+    this.namespaceID = namespaceID;
     this.tag = tag;
     this.label = label;
   }
@@ -130,8 +130,8 @@ public @Nullable Optional<String> label;
     output.append("\tmfgCode: ");
     output.append(mfgCode);
         output.append("\n");
-    output.append("\tnamespace: ");
-    output.append(namespace);
+    output.append("\tnamespaceID: ");
+    output.append(namespaceID);
         output.append("\n");
     output.append("\ttag: ");
     output.append(tag);

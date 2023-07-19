@@ -327,7 +327,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("SemanticTagStruct.mfgCode", "mfgCode", value.isMember("mfgCode")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("SemanticTagStruct.namespace", "namespace", value.isMember("namespace")));
+        ComplexArgumentParser::EnsureMemberExist("SemanticTagStruct.namespaceID", "namespaceID", value.isMember("namespaceID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SemanticTagStruct.tag", "tag", value.isMember("tag")));
 
     char labelWithMember[kMaxLabelLength];
@@ -335,9 +335,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.mfgCode, value["mfgCode"]));
     valueCopy.removeMember("mfgCode");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "namespace");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.namespace, value["namespace"]));
-    valueCopy.removeMember("namespace");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "namespaceID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.namespaceID, value["namespaceID"]));
+    valueCopy.removeMember("namespaceID");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "tag");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.tag, value["tag"]));
@@ -356,7 +356,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 void ComplexArgumentParser::Finalize(chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.mfgCode);
-    ComplexArgumentParser::Finalize(request.namespace);
+    ComplexArgumentParser::Finalize(request.namespaceID);
     ComplexArgumentParser::Finalize(request.tag);
     ComplexArgumentParser::Finalize(request.label);
 }

@@ -153,7 +153,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _mfgCode = nil;
 
-        _namespace = @(0);
+        _namespaceID = @(0);
 
         _tag = @(0);
 
@@ -167,7 +167,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRDescriptorClusterSemanticTagStruct alloc] init];
 
     other.mfgCode = self.mfgCode;
-    other.namespace = self.namespace;
+    other.namespaceID = self.namespaceID;
     other.tag = self.tag;
     other.label = self.label;
 
@@ -176,45 +176,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; namespace:%@; tag:%@; label:%@; >",
-                                             NSStringFromClass([self class]), _mfgCode, _namespace, _tag, _label];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRDescriptorClusterSemanticTagStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mfgCode = nil;
-
-        _namespace = @(0);
-
-        _tag = @(0);
-
-        _label = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRDescriptorClusterSemanticTagStruct alloc] init];
-
-    other.mfgCode = self.mfgCode;
-    other.namespace = self.namespace;
-    other.tag = self.tag;
-    other.label = self.label;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; namespace:%@; tag:%@; label:%@; >",
-                                             NSStringFromClass([self class]), _mfgCode, _namespace, _tag, _label];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; namespaceID:%@; tag:%@; label:%@; >",
+                                             NSStringFromClass([self class]), _mfgCode, _namespaceID, _tag, _label];
     return descriptionString;
 }
 

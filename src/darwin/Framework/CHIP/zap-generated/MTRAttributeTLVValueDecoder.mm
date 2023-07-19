@@ -1425,7 +1425,7 @@ static id _Nullable DecodeAttributeValueForDescriptorCluster(
                 } else {
                     newElement_0.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.mfgCode.Value())];
                 }
-                newElement_0.namespace = [NSNumber numberWithUnsignedChar:entry_0.namespace];
+                newElement_0.namespaceID = [NSNumber numberWithUnsignedChar:entry_0.namespaceID];
                 newElement_0.tag = [NSNumber numberWithUnsignedChar:entry_0.tag];
                 if (entry_0.label.HasValue()) {
                     if (entry_0.label.Value().IsNull()) {

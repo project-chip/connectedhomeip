@@ -2857,7 +2857,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kMfgCode), mfgCode));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kNamespace), namespace));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kNamespaceID), namespaceID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kTag), tag));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kLabel), label));
     ReturnErrorOnFailure(writer.EndContainer(outer));
@@ -2882,8 +2882,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kMfgCode):
             ReturnErrorOnFailure(DataModel::Decode(reader, mfgCode));
             break;
-        case to_underlying(Fields::kNamespace):
-            ReturnErrorOnFailure(DataModel::Decode(reader, namespace));
+        case to_underlying(Fields::kNamespaceID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, namespaceID));
             break;
         case to_underlying(Fields::kTag):
             ReturnErrorOnFailure(DataModel::Decode(reader, tag));
