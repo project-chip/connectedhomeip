@@ -1,0 +1,29 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Matter
+Upstream-Contact: https://github.com/project-chip/connectedhomeip/issues
+Source: https://github.com/project-chip/connectedhomeip
+
+Files:
+  credentials/**/*.pem
+License: Apache-2.0
+Copyright: Project CHIP Authors
+
+Files:
+  credentials/**/*.der
+License: Apache-2.0
+Copyright: Project CHIP Authors
+
+Files:
+  credentials/**/*.json
+License: Apache-2.0
+Copyright: Project CHIP Authors
+
+Files:
+  credentials/**/*.chip
+License: Apache-2.0
+Copyright: Project CHIP Authors
+
+Files:
+  credentials/**/*.chip-b64
+License: Apache-2.0
+Copyright: Project CHIP Authors
