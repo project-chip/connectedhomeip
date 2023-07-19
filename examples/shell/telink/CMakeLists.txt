@@ -18,7 +18,6 @@ cmake_minimum_required(VERSION 3.13.1)
 set(BOARD tlsr9518adk80d)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
-get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
 
@@ -55,39 +54,18 @@ include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
 target_compile_options(app PRIVATE -fpermissive)
-#target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
 
 target_include_directories(app PRIVATE
                            include
                            ${GEN_DIR}/app-common
-                           ${APP_ROOT}/shell_common/include
-                           ${TELINK_COMMON}/common/include
-                           ${TELINK_COMMON}/util/include
-                           )
+                           ${APP_ROOT}/shell_common/include)
 
 add_definitions(
     "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )
 
 target_sources(app PRIVATE
-               src/AppTask.cpp
-               #${TELINK_COMMON}/common/src/mainCommon.cpp
-               #${TELINK_COMMON}/common/src/AppTaskCommon.cpp
-               #${TELINK_COMMON}/util/src/LEDWidget.cpp
-               #${TELINK_COMMON}/util/src/ButtonManager.cpp
-               ${TELINK_COMMON}/util/src/ThreadUtil.cpp
-               #${TELINK_COMMON}/util/src/PWMDevice.cpp
                ${APP_ROOT}/shell_common/globals.cpp
                ${APP_ROOT}/shell_common/cmd_misc.cpp
                ${APP_ROOT}/shell_common/cmd_otcli.cpp
-#               ${APP_ROOT}/standalone/main.cpp
-               )
-
-# chip_configure_data_model(app
-#     INCLUDE_SERVER
-#     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../smoke-co-alarm-common/smoke-co-alarm-app.zap
-# )
-
-if(CONFIG_CHIP_OTA_REQUESTOR)
-    target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
-endif()
+               ${APP_ROOT}/standalone/main.cpp)
