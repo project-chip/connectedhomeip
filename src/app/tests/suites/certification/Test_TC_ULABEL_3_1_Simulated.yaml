@@ -27,12 +27,12 @@ tests:
     #  cluster: "DelayCommands"
     #  command: "WaitForCommissioning"
 
-    - label: "Read attribute: LabelList"
+    - label: "Step 1: Read attribute: LabelList"
       PICS: ULABEL.C.A0000
       wait: "readAttribute"
       attribute: "LabelList"
 
-    - label: "write attribute: LabelList"
+    - label: "Step 2: write attribute: LabelList"
       PICS: ULABEL.C.A0000
       wait: "writeAttribute"
       attribute: "LabelList"

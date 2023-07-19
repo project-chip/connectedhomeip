@@ -2049,12 +2049,12 @@ private:
         switch (testIndex)
         {
         case 0: {
-            LogStep(0, "Read attribute: LabelList");
+            LogStep(0, "Step 1: Read attribute: LabelList");
             VerifyOrDo(!ShouldSkip("ULABEL.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(1), UserLabel::Id, UserLabel::Attributes::LabelList::Id);
         }
         case 1: {
-            LogStep(1, "write attribute: LabelList");
+            LogStep(1, "Step 2: write attribute: LabelList");
             VerifyOrDo(!ShouldSkip("ULABEL.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(1), UserLabel::Id, UserLabel::Attributes::LabelList::Id);
         }

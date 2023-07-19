@@ -127,6 +127,8 @@
         "Disabled due to OperationalState not being enabled in Matter.framework for now:",
         "Test_TC_OPSTATE_1_1",
         "Disabled due to Events verification not supported",
-        "Test_TC_BINFO_2_2"
+        "Test_TC_BINFO_2_2",
+        "Test_TC_ACL_2_5",
+        "Test_TC_ACL_2_6"
     ]
 }

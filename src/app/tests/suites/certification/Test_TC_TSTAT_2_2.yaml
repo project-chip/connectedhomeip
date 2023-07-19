@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -132,7 +132,7 @@ tests:
           saveAs: AbsMaxCoolSetpointLimitValue
 
     #Using saved values when optional attributes are available
-    - label: "Read attribute OccupiedCoolingSetpoint from the DUT"
+    - label: "Step 2a: Read attribute OccupiedCoolingSetpoint from the DUT"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0018
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
@@ -144,8 +144,8 @@ tests:
 
     #Using hard coded values when optional attributes are not available
     - label:
-          "Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies
-          that the value is within range"
+          "Step 2a: Reads OccupiedCoolingSetpoint attribute from Server DUT and
+          verifies that the value is within range"
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01 && !TSTAT.S.A0017 && !TSTAT.S.A0018
@@ -156,7 +156,7 @@ tests:
               maxValue: 3200
 
     - label:
-          "Writes a value back that is different but valid for
+          "Step 2a: Writes a value back that is different but valid for
           OccupiedCoolingSetpoint attribute"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
@@ -165,7 +165,7 @@ tests:
           value: 2500
 
     - label:
-          "Reads it back again to confirm the successful write of
+          "Step 2a: Reads it back again to confirm the successful write of
           OccupiedCoolingSetpoint attribute"
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
@@ -174,7 +174,7 @@ tests:
           value: 2500
 
     - label:
-          "Writes OccupiedCoolingSetpoint to value below the
+          "Step 2b: Writes OccupiedCoolingSetpoint to value below the
           MinCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
@@ -186,7 +186,7 @@ tests:
 
     #MinCoolSetPointLimit might be negative if not checked before decrement
     - label:
-          "Writes OccupiedCoolingSetpoint to value below the
+          "Step 2b: Writes OccupiedCoolingSetpoint to value below the
           MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && PICS_SKIP_SAMPLE_APP
       verification: |
@@ -210,7 +210,7 @@ tests:
                 value: "y"
 
     - label:
-          "Writes OccupiedCoolingSetpoint to value above the
+          "Step 2b: Writes OccupiedCoolingSetpoint to value above the
           MaxCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
@@ -221,7 +221,7 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes OccupiedCoolingSetpoint to value above the
+          "Step 2b: Writes OccupiedCoolingSetpoint to value above the
           MaxCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
@@ -232,8 +232,8 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint
-          attribute"
+          "Step 2c: Writes the limit of MaxCoolSetpointLimit to
+          OccupiedCoolingSetpoint attribute"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01 && !TSTAT.S.A0017
@@ -241,8 +241,8 @@ tests:
           value: 3200
 
     - label:
-          "Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint
-          attribute"
+          "Step 2c: Writes the limit of MaxCoolSetpointLimit to
+          OccupiedCoolingSetpoint attribute"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017
@@ -250,8 +250,8 @@ tests:
           value: MaxCoolSetpointLimitValue
 
     - label:
-          "Writes the limit of MinCoolSetpointLimit to OccupiedCoolingSetpoint
-          attribute"
+          "Step 2c: Writes the limit of MinCoolSetpointLimit to
+          OccupiedCoolingSetpoint attribute"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01 && !TSTAT.S.F05 && !TSTAT.S.A0017
@@ -259,8 +259,8 @@ tests:
           value: 1600
 
     - label:
-          "Writes the limit of MinCoolSetpointLimit to OccupiedCoolingSetpoint
-          attribute"
+          "Step 2c: Writes the limit of MinCoolSetpointLimit to
+          OccupiedCoolingSetpoint attribute"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01 && !TSTAT.S.F05 && TSTAT.S.A0017
@@ -269,9 +269,10 @@ tests:
 
     #LowerLimit = Max(MinCoolSetpointLimit,(OccupiedHeatingSetpoint + MinSetpointDeadBand)) not possible in YAML
     - label:
-          "Writes If TSTAT.S.F05(AUTO) LowerLimit = Max(MinCoolSetpointLimit,
-          (OccupiedHeatingSetpoint + MinSetpointDeadBand)) to
-          OccupiedCoolingSetpoint attribute when Auto is enabled"
+          "Step 2c: Writes If TSTAT.S.F05(AUTO) LowerLimit =
+          Max(MinCoolSetpointLimit, (OccupiedHeatingSetpoint +
+          MinSetpointDeadBand)) to OccupiedCoolingSetpoint attribute when Auto
+          is enabled"
       PICS: TSTAT.S.F05 && TSTAT.S.A0011 && PICS_SKIP_SAMPLE_APP
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
@@ -294,8 +295,8 @@ tests:
 
     #Using saved values when optional attributes are available
     - label:
-          "Reads OccupiedHeatingSetpoint attribute from Server DUT and verifies
-          that the value is within range"
+          "Step 3a: Reads OccupiedHeatingSetpoint attribute from Server DUT and
+          verifies that the value is within range"
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && TSTAT.S.A0015 && TSTAT.S.A0016
@@ -307,8 +308,8 @@ tests:
 
     #Using hard coded values when optional attributes are not available
     - label:
-          "Reads OccupiedHeatingSetpoint attribute from Server DUT and verifies
-          that the value is within range"
+          "Step 3a: Reads OccupiedHeatingSetpoint attribute from Server DUT and
+          verifies that the value is within range"
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && !TSTAT.S.A0015 && !TSTAT.S.A0016
@@ -319,7 +320,7 @@ tests:
               maxValue: 3000
 
     - label:
-          "Writes a value back that is different but valid for
+          "Step 3a: Writes a value back that is different but valid for
           OccupiedHeatingSetpoint attribute"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
@@ -328,7 +329,7 @@ tests:
           value: 2100
 
     - label:
-          "Reads it back again to confirm the successful write of
+          "Step 3a: Reads it back again to confirm the successful write of
           OccupiedHeatingSetpoint attribute"
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
@@ -337,7 +338,7 @@ tests:
           value: 2100
 
     - label:
-          "Writes OccupiedHeatingSetpoint to value below the
+          "Step 3b: Writes OccupiedHeatingSetpoint to value below the
           MinHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
@@ -349,7 +350,7 @@ tests:
 
     #MinHeatSetpointLimit might be negative if not checked before decrement
     - label:
-          "Writes OccupiedHeatingSetpoint to value below the
+          "Step 3b: Writes OccupiedHeatingSetpoint to value below the
           MinHeatSetpointLimit"
       PICS: TSTAT.S.F00 && TSTAT.S.A0015 && PICS_SKIP_SAMPLE_APP
       verification: |
@@ -372,7 +373,7 @@ tests:
                 value: "y"
 
     - label:
-          "Writes OccupiedHeatingSetpoint to value above the
+          "Step 3b: Writes OccupiedHeatingSetpoint to value above the
           MaxHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
@@ -383,7 +384,7 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes OccupiedHeatingSetpoint to value above the
+          "Step 3b: Writes OccupiedHeatingSetpoint to value above the
           MaxHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
@@ -394,8 +395,8 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint
-          attribute"
+          "Step 3c: Writes the limit of MaxHeatSetpointLimit to
+          OccupiedHeatingSetpoint attribute"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && !TSTAT.S.F05 && !TSTAT.S.A0016
@@ -403,8 +404,8 @@ tests:
           value: 3000
 
     - label:
-          "Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint
-          attribute"
+          "Step 3c: Writes the limit of MaxHeatSetpointLimit to
+          OccupiedHeatingSetpoint attribute"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && !TSTAT.S.F05 && TSTAT.S.A0016
@@ -412,8 +413,8 @@ tests:
           value: MaxHeatSetpointLimitValue
 
     - label:
-          "Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint
-          attribute"
+          "Step 3c: Writes the limit of MaxHeatSetpointLimit to
+          OccupiedHeatingSetpoint attribute If TSTAT.S.F05 is true"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F05 && !TSTAT.S.A0015
@@ -424,9 +425,10 @@ tests:
 
     #UpperLimit = Min(MaxHeatSetpointLimit,(OccupiedCoolingSetpoint - MinSetpointDeadBand)) not possible in YAML
     - label:
-          "Writes If TSTAT.S.F05(AUTO) UpperLimit = Min(MaxHeatSetpointLimit,
-          (OccupiedCoolingSetpoint - MinSetpointDeadBand)) to
-          OccupiedHeatingSetpoint attribute when Auto is enabled"
+          "Step 3c: Writes If TSTAT.S.F05(AUTO) UpperLimit =
+          Min(MaxHeatSetpointLimit, (OccupiedCoolingSetpoint -
+          MinSetpointDeadBand)) to OccupiedHeatingSetpoint attribute when Auto
+          is enabled"
       PICS:
           TSTAT.S.F05 && TSTAT.S.A0011 && TSTAT.S.A0012 && PICS_SKIP_SAMPLE_APP
       verification: |
@@ -461,8 +463,8 @@ tests:
                 value: "y"
 
     - label:
-          "Writes the limit of MinHeatSetpointLimit to OccupiedHeatingSetpoint
-          attribute"
+          "Step 3c: Writes the limit of MinHeatSetpointLimit to
+          OccupiedHeatingSetpoint attribute"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && !TSTAT.S.A0015
@@ -470,8 +472,8 @@ tests:
           value: 700
 
     - label:
-          "Writes the limit of MinHeatSetpointLimit to OccupiedHeatingSetpoint
-          attribute"
+          "Step 3c: Writes the limit of MinHeatSetpointLimit to
+          OccupiedHeatingSetpoint attribute"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && TSTAT.S.A0015
@@ -479,8 +481,8 @@ tests:
           value: MinHeatSetpointLimitValue
 
     - label:
-          "Reads UnoccupiedCoolingSetpoint attribute from Server DUT and
-          verifies that the value is within range"
+          "Step 4a: Reads UnoccupiedCoolingSetpoint attribute from Server DUT
+          and verifies that the value is within range"
       command: "readAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0018
@@ -491,8 +493,8 @@ tests:
               maxValue: MaxCoolSetpointLimitValue
 
     - label:
-          "Reads UnoccupiedCoolingSetpoint attribute from Server DUT and
-          verifies that the value is within range"
+          "Step 4a: Reads UnoccupiedCoolingSetpoint attribute from Server DUT
+          and verifies that the value is within range"
       command: "readAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && !TSTAT.S.A0017 && !TSTAT.S.A0018
@@ -503,7 +505,7 @@ tests:
               maxValue: 3200
 
     - label:
-          "Writes a value back that is different but valid for
+          "Step 4a: Writes a value back that is different but valid for
           UnoccupiedCoolingSetpoint attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
@@ -512,7 +514,7 @@ tests:
           value: 2500
 
     - label:
-          "Reads it back again to confirm the successful write of
+          "Step 4a: Reads it back again to confirm the successful write of
           UnoccupiedCoolingSetpoint attribute"
       command: "readAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
@@ -521,7 +523,7 @@ tests:
           value: 2500
 
     - label:
-          "Writes UnoccupiedCoolingSetpoint to value below the
+          "Step 4b: Writes UnoccupiedCoolingSetpoint to value below the
           MinCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
@@ -533,7 +535,7 @@ tests:
 
     #MinCoolSetpointLimit might be negative if not checked before decrement
     - label:
-          "Writes UnoccupiedCoolingSetpoint to value below the
+          "Step 4b: Writes UnoccupiedCoolingSetpoint to value below the
           MinCoolSetpointLimit"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && TSTAT.S.A0017 && PICS_SKIP_SAMPLE_APP
       verification: |
@@ -556,7 +558,7 @@ tests:
                 value: "y"
 
     - label:
-          "Writes UnoccupiedCoolingSetpoint to value above the
+          "Step 4b: Writes UnoccupiedCoolingSetpoint to value above the
           MaxCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
@@ -567,7 +569,7 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes UnoccupiedCoolingSetpoint to value above the
+          "Step 4b: Writes UnoccupiedCoolingSetpoint to value above the
           MaxCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
@@ -578,8 +580,8 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes the limit of MaxCoolSetpointLimit to UnoccupiedCoolingSetpoint
-          attribute"
+          "Step 4c: Writes the limit of MaxCoolSetpointLimit to
+          UnoccupiedCoolingSetpoint attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && !TSTAT.S.A0018 && !TSTAT.S.F05
@@ -587,8 +589,8 @@ tests:
           value: 3200
 
     - label:
-          "Writes the limit of MaxCoolSetpointLimit to UnoccupiedCoolingSetpoint
-          attribute"
+          "Step 4c: Writes the limit of MaxCoolSetpointLimit to
+          UnoccupiedCoolingSetpoint attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.F05
@@ -597,9 +599,9 @@ tests:
 
     #LowerLimit = Max(MinCoolSetpointLimit,(UnoccupiedCoolingSetpoint + MinSetpointDeadBand)) not possible in YAML
     - label:
-          "Writes If TSTAT.S.F05(AUTO) LowerLimit = Max(MinCoolSetpointLimit,
-          (UnoccupiedCoolingSetpoint + MinSetpointDeadBand)) to
-          UnoccupiedCoolingSetpoint attribute"
+          "Step 4c: Writes If TSTAT.S.F05(AUTO) LowerLimit =
+          Max(MinCoolSetpointLimit, (UnoccupiedCoolingSetpoint +
+          MinSetpointDeadBand)) to UnoccupiedCoolingSetpoint attribute"
       PICS:
           TSTAT.S.F02 && TSTAT.S.F01 && TSTAT.S.A0013 && TSTAT.S.F05 &&
           PICS_SKIP_SAMPLE_APP
@@ -625,8 +627,8 @@ tests:
                 value: "y"
 
     - label:
-          "Writes the limit of MinCoolSetpointLimit to UnoccupiedCoolingSetpoint
-          attribute"
+          "Step 4c: Writes the limit of MinCoolSetpointLimit to
+          UnoccupiedCoolingSetpoint attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && !TSTAT.S.A0017 && !TSTAT.S.F05
@@ -634,8 +636,8 @@ tests:
           value: 1600
 
     - label:
-          "Writes the limit of MinCoolSetpointLimit to UnoccupiedCoolingSetpoint
-          attribute"
+          "Step 4c: Writes the limit of MinCoolSetpointLimit to
+          UnoccupiedCoolingSetpoint attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && !TSTAT.S.A0017 && TSTAT.S.F05
@@ -645,8 +647,8 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes the limit of MinCoolSetpointLimit to UnoccupiedCoolingSetpoint
-          attribute"
+          "Step 4c: Writes the limit of MinCoolSetpointLimit to
+          UnoccupiedCoolingSetpoint attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && TSTAT.S.A0017 && !TSTAT.S.F05
@@ -655,8 +657,8 @@ tests:
 
     #Using saved values when optional attributes are available
     - label:
-          "Reads UnoccupiedHeatingSetpoint attribute from Server DUT and
-          verifies that the value is within range"
+          "Step 5a: Reads UnoccupiedHeatingSetpoint attribute from Server DUT
+          and verifies that the value is within range"
       command: "readAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && TSTAT.S.A0015 && TSTAT.S.A0016
@@ -668,8 +670,8 @@ tests:
 
     #Using hardcoded values when optional attributes are not available
     - label:
-          "Reads UnoccupiedHeatingSetpoint attribute from Server DUT and
-          verifies that the value is within range"
+          "Step 5a: Reads UnoccupiedHeatingSetpoint attribute from Server DUT
+          and verifies that the value is within range"
       command: "readAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && !TSTAT.S.A0015 && !TSTAT.S.A0016
@@ -680,7 +682,7 @@ tests:
               maxValue: 3000
 
     - label:
-          "Writes a value back that is different but valid for
+          "Step 5a: Writes a value back that is different but valid for
           UnoccupiedHeatingSetpoint attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
@@ -689,7 +691,7 @@ tests:
           value: 2500
 
     - label:
-          "Reads it back again to confirm the successful write of
+          "Step 5a: Reads it back again to confirm the successful write of
           UnoccupiedHeatingSetpoint attribute"
       command: "readAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
@@ -698,7 +700,7 @@ tests:
           value: 2500
 
     - label:
-          "Writes UnoccupiedHeatingSetpoint to value below the
+          "Step 5b: Writes UnoccupiedHeatingSetpoint to value below the
           MinHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
@@ -710,7 +712,7 @@ tests:
 
     #MinHeatSetpointLimit might be negative if not checked before decrement
     - label:
-          "Writes UnoccupiedHeatingSetpoint to value below the
+          "Step 5b: Writes UnoccupiedHeatingSetpoint to value below the
           MinHeatSetpointLimit"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && TSTAT.S.A0015 && PICS_SKIP_SAMPLE_APP
       verification: |
@@ -735,7 +737,7 @@ tests:
                 value: "y"
 
     - label:
-          "Writes UnoccupiedHeatingSetpoint to value above the
+          "Step 5b: Writes UnoccupiedHeatingSetpoint to value above the
           MaxHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
@@ -746,7 +748,7 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes UnoccupiedHeatingSetpoint to value above the
+          "Step 5b: Writes UnoccupiedHeatingSetpoint to value above the
           MaxHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
@@ -757,8 +759,8 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes the limit of MaxHeatSetpointLimit to UnoccupiedHeatingSetpoint
-          attribute"
+          "Step 5c: Writes the limit of MaxHeatSetpointLimit to
+          UnoccupiedHeatingSetpoint attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && !TSTAT.S.A0016 && !TSTAT.S.F05
@@ -766,8 +768,8 @@ tests:
           value: 3000
 
     - label:
-          "Writes the limit of MaxHeatSetpointLimit to UnoccupiedHeatingSetpoint
-          attribute"
+          "Step 5c: Writes the limit of MaxHeatSetpointLimit to
+          UnoccupiedHeatingSetpoint attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && TSTAT.S.A0016 && !TSTAT.S.F05
@@ -775,8 +777,8 @@ tests:
           value: MaxHeatSetpointLimitValue
 
     - label:
-          "Writes the limit of MaxHeatSetpointLimit to UnoccupiedHeatingSetpoint
-          attribute"
+          "Step 5c: Writes the limit of MaxHeatSetpointLimit to
+          UnoccupiedHeatingSetpoint attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && !TSTAT.S.A0016 && TSTAT.S.F05
@@ -787,9 +789,10 @@ tests:
 
     #UpperLimit = Min(MaxHeatSetpointLimit,(UnoccupiedCoolingSetpoint - MinSetpointDeadBand)) not possible in YAML
     - label:
-          "Writes If TSTAT.S.F05(AUTO) UpperLimit = Min(MaxHeatSetpointLimit,
-          (UnoccupiedCoolingSetpoint - MinSetpointDeadBand)) to
-          UnoccupiedHeatingSetpoint attribute when Auto is enabled."
+          "Step 5c: Writes If TSTAT.S.F05(AUTO) UpperLimit =
+          Min(MaxHeatSetpointLimit, (UnoccupiedCoolingSetpoint -
+          MinSetpointDeadBand)) to UnoccupiedHeatingSetpoint attribute when Auto
+          is enabled."
       PICS:
           TSTAT.S.F02 && TSTAT.S.F00 && TSTAT.S.A0013 && TSTAT.S.F05 &&
           PICS_SKIP_SAMPLE_APP
@@ -817,8 +820,8 @@ tests:
                 value: "y"
 
     - label:
-          "Writes the limit of MinHeatSetpointLimit to UnoccupiedHeatingSetpoint
-          attribute"
+          "Step 5c: Writes the limit of MinHeatSetpointLimit to
+          UnoccupiedHeatingSetpoint attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && !TSTAT.S.A0015
@@ -826,8 +829,8 @@ tests:
           value: 700
 
     - label:
-          "Writes the limit of MinHeatSetpointLimit to UnoccupiedHeatingSetpoint
-          attribute"
+          "Step 5c: Writes the limit of MinHeatSetpointLimit to
+          UnoccupiedHeatingSetpoint attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && TSTAT.S.A0015
@@ -836,8 +839,8 @@ tests:
 
     #Using saved values when optional attributes are available
     - label:
-          "Reads MinHeatSetpointLimit attribute from Server DUT and verifies
-          that the value is within range"
+          "Step 6a: Reads MinHeatSetpointLimit attribute from Server DUT and
+          verifies that the value is within range"
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00 && TSTAT.S.A0015 && TSTAT.S.A0016 && TSTAT.S.A0003
@@ -849,8 +852,8 @@ tests:
 
     #Using hard coded values when optional attributes are not available
     - label:
-          "Reads MinHeatSetpointLimit attribute from Server DUT and verifies
-          that the value is within range"
+          "Step 6a: Reads MinHeatSetpointLimit attribute from Server DUT and
+          verifies that the value is within range"
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00 && TSTAT.S.A0015 && !TSTAT.S.A0016 && !TSTAT.S.A0003
@@ -861,7 +864,7 @@ tests:
               maxValue: 3000
 
     - label:
-          "Writes a value back that is different but valid for
+          "Step 6a: Writes a value back that is different but valid for
           MinHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
@@ -870,7 +873,7 @@ tests:
           value: 800
 
     - label:
-          "Reads it back again to confirm the successful write of
+          "Step 6a: Reads it back again to confirm the successful write of
           MinHeatSetpointLimit attribute"
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
@@ -878,7 +881,9 @@ tests:
       response:
           value: 800
 
-    - label: "Writes a value back that is different but violates the deadband"
+    - label:
+          "Step 6b: Writes a value back that is different but violates the
+          deadband"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.A0015 && TSTAT.S.F05
@@ -888,7 +893,7 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes MinHeatSetpointLimit to value below the
+          "Step 6b: Writes MinHeatSetpointLimit to value below the
           AbsMinHeatSetpointLimit "
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
@@ -900,7 +905,7 @@ tests:
 
     #AbsMinHeatSetpointLimit might be negative if not checked before decrement
     - label:
-          "Writes MinHeatSetpointLimit to value below the
+          "Step 6b: Writes MinHeatSetpointLimit to value below the
           AbsMinHeatSetpointLimit "
       PICS:
           TSTAT.S.F00 && TSTAT.S.A0015 && TSTAT.S.A0003 && PICS_SKIP_SAMPLE_APP
@@ -923,7 +928,7 @@ tests:
                 value: "y"
 
     - label:
-          "Writes MinHeatSetpointLimit to value above the
+          "Step 6b: Writes MinHeatSetpointLimit to value above the
           AbsMaxHeatSetpointLimit "
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
@@ -934,7 +939,7 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes MinHeatSetpointLimit to value above the
+          "Step 6b: Writes MinHeatSetpointLimit to value above the
           AbsMaxHeatSetpointLimit "
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
@@ -945,8 +950,8 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes the limit of MaxHeatSetpointLimit to MinHeatSetpointLimit
-          attribute"
+          "Step 6c: Writes the limit of MaxHeatSetpointLimit to
+          MinHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0015 && !TSTAT.S.F05 && !TSTAT.S.A0016
@@ -954,8 +959,8 @@ tests:
           value: 3000
 
     - label:
-          "Writes the limit of MaxHeatSetpointLimit to MinHeatSetpointimit
-          attribute"
+          "Step 6c: Writes the limit of MaxHeatSetpointLimit to
+          MinHeatSetpointimit attribute"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0015 && !TSTAT.S.F05 && TSTAT.S.A0016
@@ -964,9 +969,10 @@ tests:
 
     #UpperLimit = Min(MaxHeatSetpointLimit,(MinCoolSetpointLimit - MinSetpointDeadBand)) not possible in YAML
     - label:
-          "Writes If TSTAT.S.F05(AUTO) UpperLimit = Min(MaxHeatSetpointLimit,
-          (MinCoolSetpointLimit - MinSetpointDeadBand)) to MinHeatSetpointLimit
-          attribute when Auto is enabled"
+          "Step 6c: Writes If TSTAT.S.F05(AUTO) UpperLimit =
+          Min(MaxHeatSetpointLimit, (MinCoolSetpointLimit -
+          MinSetpointDeadBand)) to MinHeatSetpointLimit attribute when Auto is
+          enabled"
       PICS:
           TSTAT.S.F00  && TSTAT.S.A0015 && TSTAT.S.F05 && TSTAT.S.A0005 &&
           PICS_SKIP_SAMPLE_APP
@@ -995,8 +1001,8 @@ tests:
                 value: "y"
 
     - label:
-          "Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit
-          attribute"
+          "Step 6c: Writes the limit of AbsMinHeatSetpointLimit to
+          MinHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0015 && !TSTAT.S.A0003
@@ -1004,8 +1010,8 @@ tests:
           value: 700
 
     - label:
-          "Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit
-          attribute"
+          "Step 6c: Writes the limit of AbsMinHeatSetpointLimit to
+          MinHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0015 && TSTAT.S.A0003
@@ -1014,8 +1020,8 @@ tests:
 
     #Using saved values when optional attributes are available
     - label:
-          "Reads MaxHeatSetpointLimit attribute from Server DUT and verifies
-          that the value is within range"
+          "Step 7a: Reads MaxHeatSetpointLimit attribute from Server DUT and
+          verifies that the value is within range"
       command: "readAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS:
@@ -1029,8 +1035,8 @@ tests:
 
     #Using hard coded values when optional attributes are not available
     - label:
-          "Reads MaxHeatSetpointLimit attribute from Server DUT and verifies
-          that the value is within range"
+          "Step 7a: Reads MaxHeatSetpointLimit attribute from Server DUT and
+          verifies that the value is within range"
       command: "readAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS:
@@ -1043,8 +1049,8 @@ tests:
               maxValue: 3000
 
     - label:
-          "Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit
-          attribute"
+          "Step 7b: Writes the limit of AbsMinHeatSetpointLimit to
+          MinHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0015
@@ -1052,8 +1058,8 @@ tests:
           value: 700
 
     - label:
-          "Writes the limit of AbsMaxHeatSetpointLimit to MinHeatSetpointLimit
-          attribute"
+          "Step 7b: Writes the limit of AbsMaxHeatSetpointLimit to
+          MinHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.A0015 && TSTAT.S.F05
@@ -1063,7 +1069,7 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes a value back that is different but valid for
+          "Step 7b: Writes a value back that is different but valid for
           MaxHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
@@ -1072,7 +1078,7 @@ tests:
           value: 2900
 
     - label:
-          "Reads it back again to confirm the successful write of
+          "Step 7b: Reads it back again to confirm the successful write of
           MaxHeatSetpointLimit attribute"
       command: "readAttribute"
       attribute: "MaxHeatSetpointLimit"
@@ -1081,7 +1087,7 @@ tests:
           value: 2900
 
     - label:
-          "Writes MaxHeatSetpointLimit to value below the
+          "Step 7b: Writes MaxHeatSetpointLimit to value below the
           AbsMinHeatSetpointLimit "
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
@@ -1093,7 +1099,8 @@ tests:
 
     #MinHeatSetpointLimit might be negative if not checked before decrement
     - label:
-          "Writes MaxHeatSetpointLimit to value below the MinHeatSetpointLimit"
+          "Step 7b: Writes MaxHeatSetpointLimit to value below the
+          MinHeatSetpointLimit"
       PICS:
           TSTAT.S.F00  && TSTAT.S.A0016 && TSTAT.S.A0015 && PICS_SKIP_SAMPLE_APP
       verification: |
@@ -1115,7 +1122,7 @@ tests:
                 value: "y"
 
     - label:
-          "Writes MaxHeatSetpointLimit to value above the
+          "Step 7b: Writes MaxHeatSetpointLimit to value above the
           AbsMaxHeatSetpointLimit "
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
@@ -1126,7 +1133,7 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes MaxHeatSetpointLimit to value above the
+          "Step 7b: Writes MaxHeatSetpointLimit to value above the
           AbsMaxHeatSetpointLimit "
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
@@ -1137,8 +1144,8 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes the limit of AbsMaxHeatSetpointLimit to MaxHeatSetpointLimit
-          attribute"
+          "Step 7c: Writes the limit of AbsMaxHeatSetpointLimit to
+          MaxHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0016 && !TSTAT.S.F05 && !TSTAT.S.A0004
@@ -1146,8 +1153,8 @@ tests:
           value: 3000
 
     - label:
-          "Writes the limit of AbsMaxHeatSetpointLimit to MaxHeatSetpointLimit
-          attribute"
+          "Step 7c: Writes the limit of AbsMaxHeatSetpointLimit to
+          MaxHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00 && TSTAT.S.A0016 && !TSTAT.S.F05 && TSTAT.S.A0004
@@ -1156,9 +1163,9 @@ tests:
 
     #UpperLimit = Min(AbsMaxHeatSetpointLimit,(MaxCoolSetpointLimit - MinSetpointDeadBand)) not possible in YAML
     - label:
-          "Writes If TSTAT.S.F05(AUTO) UpperLimit = Min(AbsMaxHeatSetpointLimit,
-          (MaxCoolSetpointLimit - MinSetpointDeadBand)) to MaxHeatSetpointLimit
-          attribute"
+          "Step 7c: Writes If TSTAT.S.F05(AUTO) UpperLimit =
+          Min(AbsMaxHeatSetpointLimit, (MaxCoolSetpointLimit -
+          MinSetpointDeadBand)) to MaxHeatSetpointLimit attribute"
       PICS:
           TSTAT.S.F00 && TSTAT.S.A0016 && TSTAT.S.F05 && TSTAT.S.A0018 &&
           PICS_SKIP_SAMPLE_APP
@@ -1192,8 +1199,8 @@ tests:
                 value: "y"
 
     - label:
-          "Writes the limit of MinHeatSetpointLimit to MaxHeatSetpointLimit
-          attribute"
+          "Step 7c: Writes the limit of MinHeatSetpointLimit to
+          MaxHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0016 && !TSTAT.S.A0015
@@ -1201,8 +1208,8 @@ tests:
           value: 700
 
     - label:
-          "Writes the limit of MinHeatSetpointLimit to MaxHeatSetpointLimit
-          attribute"
+          "Step 7c: Writes the limit of MinHeatSetpointLimit to
+          MaxHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00 && TSTAT.S.A0016 && TSTAT.S.A0015
@@ -1211,8 +1218,8 @@ tests:
 
     #Using saved values when optional attributes are available
     - label:
-          "Reads MinCoolSetpointLimit attribute from Server DUT and verifies
-          that the value is within range"
+          "Step 8a: Reads MinCoolSetpointLimit attribute from Server DUT and
+          verifies that the value is within range"
       command: "readAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0018 && TSTAT.S.A0005
@@ -1224,8 +1231,8 @@ tests:
 
     #Using hard coded values when optional attributes are not available
     - label:
-          "Reads MinCoolSetpointLimit attribute from Server DUT and verifies
-          that the value is within range"
+          "Step 8a: Reads MinCoolSetpointLimit attribute from Server DUT and
+          verifies that the value is within range"
       command: "readAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && !TSTAT.S.A0018 && !TSTAT.S.A0005
@@ -1236,7 +1243,7 @@ tests:
               maxValue: 3200
 
     - label:
-          "Writes a value back that is different but valid for
+          "Step 8a: Writes a value back that is different but valid for
           MinCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
@@ -1245,7 +1252,7 @@ tests:
           value: 2000
 
     - label:
-          "Reads it back again to confirm the successful write of
+          "Step 8a: Reads it back again to confirm the successful write of
           MinCoolSetpointLimit attribute"
       command: "readAttribute"
       attribute: "MinCoolSetpointLimit"
@@ -1254,7 +1261,7 @@ tests:
           value: 2000
 
     - label:
-          "Writes MinCoolSetpointLimit to value below the
+          "Step 8b: Writes MinCoolSetpointLimit to value below the
           AbsMinCoolSetpointLimit "
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
@@ -1266,7 +1273,7 @@ tests:
 
     #AbsMinCoolSetpointLimit might be negative if not checked before decrement
     - label:
-          "Writes MinCoolSetpointLimit to value below the
+          "Step 8b: Writes MinCoolSetpointLimit to value below the
           AbsMinCoolSetpointLimit"
       PICS:
           TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0005 && PICS_SKIP_SAMPLE_APP
@@ -1291,7 +1298,8 @@ tests:
               - name: "expectedValue"
                 value: "y"
     - label:
-          "Writes MinCoolSetpointLimit to value above the MaxCoolSetpointLimit "
+          "Step 8b: Writes MinCoolSetpointLimit to value above the
+          MaxCoolSetpointLimit "
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && !TSTAT.S.A0018
@@ -1301,7 +1309,8 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes MinCoolSetpointLimit to value above the MaxCoolSetpointLimit "
+          "Step 8b: Writes MinCoolSetpointLimit to value above the
+          MaxCoolSetpointLimit "
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0018
@@ -1311,8 +1320,8 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit
-          attribute"
+          "Step 8c: Writes the limit of MaxCoolSetpointLimit to
+          MinCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && !TSTAT.S.A0018
@@ -1320,8 +1329,8 @@ tests:
           value: 3200
 
     - label:
-          "Writes the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit
-          attribute"
+          "Step 8c: Writes the limit of MaxCoolSetpointLimit to
+          MinCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0018
@@ -1329,8 +1338,8 @@ tests:
           value: MaxCoolSetpointLimitValue
 
     - label:
-          "Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit
-          attribute"
+          "Step 8c: Writes the limit of AbsMinCoolSetpointLimit to
+          MinCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && !TSTAT.S.A0005 && !TSTAT.S.F05
@@ -1338,8 +1347,8 @@ tests:
           value: 1600
 
     - label:
-          "Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit
-          attribute"
+          "Step 8c: Writes the limit of AbsMinCoolSetpointLimit to
+          MinCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0005 && !TSTAT.S.F05
@@ -1348,9 +1357,9 @@ tests:
 
     #LowerLimit = Max(AbsMinCoolSetpointLimit,(MinHeatSetpointLimit + MinSetpointDeadBand)) not possible in YAML
     - label:
-          "Writes If TSTAT.S.F05(AUTO) LowerLimit = Max(AbsMinCoolSetpointLimit,
-          (MinHeatSetpointLimit + MinSetpointDeadBand)) to MinCoolSetpointLimit
-          attribute"
+          "Step 8c: Writes If TSTAT.S.F05(AUTO) LowerLimit =
+          Max(AbsMinCoolSetpointLimit, (MinHeatSetpointLimit +
+          MinSetpointDeadBand)) to MinCoolSetpointLimit attribute"
       PICS:
           TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0015 && TSTAT.S.F05 &&
           PICS_SKIP_SAMPLE_APP
@@ -1381,8 +1390,8 @@ tests:
 
     #Using saved values when optional attributes are available
     - label:
-          "Reads MaxCoolSetpointLimit attribute from Server DUT and verifies
-          that the value is within range"
+          "Step 9a: Reads MaxCoolSetpointLimit attribute from Server DUT and
+          verifies that the value is within range"
       command: "readAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0017 && TSTAT.S.A0006
@@ -1394,8 +1403,8 @@ tests:
 
     #Using hard coded values when optional attributes are not available
     - label:
-          "Reads MaxCoolSetpointLimit attribute from Server DUT and verifies
-          that the value is within range"
+          "Step 9a: Reads MaxCoolSetpointLimit attribute from Server DUT and
+          verifies that the value is within range"
       command: "readAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.A0017 && !TSTAT.S.A0006
@@ -1406,7 +1415,7 @@ tests:
               maxValue: 3200
 
     - label:
-          "Writes a value back that is different but valid for
+          "Step 9a: Writes a value back that is different but valid for
           MaxCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
@@ -1415,7 +1424,7 @@ tests:
           value: 2000
 
     - label:
-          "Reads it back again to confirm the successful write of
+          "Step 9a: Reads it back again to confirm the successful write of
           MaxCoolSetpointLimit attribute"
       command: "readAttribute"
       attribute: "MaxCoolSetpointLimit"
@@ -1424,7 +1433,7 @@ tests:
           value: 2000
 
     - label:
-          "Writes MaxCoolSetpointLimit to value below the
+          "Step 9b: Writes MaxCoolSetpointLimit to value below the
           AbsMinCoolSetpointLimit "
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
@@ -1436,7 +1445,7 @@ tests:
 
     #AbsMinCoolSetpointLimit might be negative if not checked before decrement
     - label:
-          "Writes MaxCoolSetpointLimit to value below the
+          "Step 9b: Writes MaxCoolSetpointLimit to value below the
           AbsMinCoolSetpointLimit"
       PICS:
           TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0017 && PICS_SKIP_SAMPLE_APP
@@ -1462,7 +1471,8 @@ tests:
                 value: "y"
 
     - label:
-          "Writes MaxCoolSetpointLimit to value above the MaxCoolSetpointLimit "
+          "Step 9b: Writes MaxCoolSetpointLimit to value above the
+          MaxCoolSetpointLimit "
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.A0006
@@ -1472,7 +1482,8 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes MaxCoolSetpointLimit to value above the MaxCoolSetpointLimit "
+          "Step 9b: Writes MaxCoolSetpointLimit to value above the
+          MaxCoolSetpointLimit "
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0006
@@ -1482,8 +1493,8 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes the limit of AbsMaxCoolSetpointLimit to MaxCoolSetpointLimit
-          attribute"
+          "Step 9c: Writes the limit of AbsMaxCoolSetpointLimit to
+          MaxCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.A0006
@@ -1491,8 +1502,8 @@ tests:
           value: 3200
 
     - label:
-          "Writes the limit of AbsMaxCoolSetpointLimit to MaxCoolSetpointLimit
-          attribute"
+          "Step 9c: Writes the limit of AbsMaxCoolSetpointLimit to
+          MaxCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0006
@@ -1500,8 +1511,8 @@ tests:
           value: AbsMaxCoolSetpointLimitValue
 
     - label:
-          "Writes the limit of MinCoolSetpointLimit to MaxCoolSetpointLimit
-          attribute"
+          "Step 9c: Writes the limit of MinCoolSetpointLimit to
+          MaxCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.A0017 && !TSTAT.S.F05
@@ -1509,8 +1520,8 @@ tests:
           value: 1600
 
     - label:
-          "Writes the limit of MinCoolSetpointLimit to MaxCoolSetpointLimit
-          attribute"
+          "Step 9c: Writes the limit of MinCoolSetpointLimit to
+          MaxCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.A0017 && TSTAT.S.F05
@@ -1520,8 +1531,8 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Writes the limit of MinCoolSetpointLimit to MaxCoolSetpointLimit
-          attribute"
+          "Step 9c: Writes the limit of MinCoolSetpointLimit to
+          MaxCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0017 && !TSTAT.S.F05
@@ -1530,9 +1541,9 @@ tests:
 
     #LowerLimit = Max(MinCoolSetpointLimit,(MaxHeatSetpointLimit + MinSetpointDeadBand)) not possible in YAML
     - label:
-          "Writes If TSTAT.S.F05(AUTO) LowerLimit = Max(MinCoolSetpointLimit,
-          (MaxHeatSetpointLimit + MinSetpointDeadBand)) to MaxCoolSetpointLimit
-          attribute"
+          "Step 9c: Writes If TSTAT.S.F05(AUTO) LowerLimit =
+          Max(MinCoolSetpointLimit, (MaxHeatSetpointLimit +
+          MinSetpointDeadBand)) to MaxCoolSetpointLimit attribute"
       PICS:
           TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0016 && TSTAT.S.F05 &&
           PICS_SKIP_SAMPLE_APP
@@ -1562,63 +1573,70 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Writes (sets back) default value of MinHeatSetpointLimit"
+    - label:
+          "Step 10a: Writes (sets back) default value of MinHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0015 && TSTAT.S.A0003
       arguments:
           value: AbsMinHeatSetpointLimitValue
 
-    - label: "Writes (sets back) default value of MinHeatSetpointLimit"
+    - label:
+          "Step 10a: Writes (sets back) default value of MinHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0015 && !TSTAT.S.A0003
       arguments:
           value: 700
 
-    - label: "Writes (sets back)default value of MaxHeatSetpointLimit"
+    - label: "Step 10a: Writes (sets back)default value of MaxHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0016 && !TSTAT.S.F05 && TSTAT.S.A0004
       arguments:
           value: AbsMaxHeatSetpointLimitValue
 
-    - label: "Writes (sets back)default value of MaxHeatSetpointLimit"
+    - label: "Step 10a: Writes (sets back)default value of MaxHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0016 && !TSTAT.S.F05 && !TSTAT.S.A0004
       arguments:
           value: 3000
 
-    - label: "Writes MaxHeatSetpointLimit That meets the deadband of 2.5C"
+    - label:
+          "Step 10a: Writes MaxHeatSetpointLimit That meets the deadband of 2.5C"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0016 && TSTAT.S.F05
       arguments:
           value: 2950
 
-    - label: "Writes (sets back) default value of MinCoolSetpointLimit"
+    - label:
+          "Step 10b: Writes (sets back) default value of MinCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0005
       arguments:
           value: AbsMinCoolSetpointLimitValue
 
-    - label: "Writes (sets back) default value of MinCoolSetpointLimit"
+    - label:
+          "Step 10b: Writes (sets back) default value of MinCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && !TSTAT.S.A0005
       arguments:
           value: 1600
 
-    - label: "Writes (sets back) default value of MaxCoolSetpointLimit"
+    - label:
+          "Step 10b: Writes (sets back) default value of MaxCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0006
       arguments:
           value: AbsMaxCoolSetpointLimitValue
 
-    - label: "Writes (sets back) default value of MaxCoolSetpointLimit"
+    - label:
+          "Step 10b: Writes (sets back) default value of MaxCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.A0006
@@ -1626,8 +1644,8 @@ tests:
           value: 3200
 
     - label:
-          "Reads MinSetpointDeadBand attribute from Server DUT and verifies that
-          the value is within range"
+          "Step 11a: Reads MinSetpointDeadBand attribute from Server DUT and
+          verifies that the value is within range"
       command: "readAttribute"
       attribute: "MinSetpointDeadBand"
       PICS: TSTAT.S.F05
@@ -1638,7 +1656,7 @@ tests:
               maxValue: 25
 
     - label:
-          "Writes a value back that is different but valid for
+          "Step 11a: Writes a value back that is different but valid for
           MinSetpointDeadBand attribute"
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
@@ -1647,7 +1665,7 @@ tests:
           value: 5
 
     - label:
-          "Reads it back again to confirm the successful write of
+          "Step 11a: Reads it back again to confirm the successful write of
           MinSetpointDeadBand attribute"
       command: "readAttribute"
       attribute: "MinSetpointDeadBand"
@@ -1655,7 +1673,7 @@ tests:
       response:
           value: 5
 
-    - label: "Writes the value below MinSetpointDeadBand"
+    - label: "Step 11b: Writes the value below MinSetpointDeadBand"
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
       PICS: TSTAT.S.F05 && TSTAT.S.M.MinSetpointDeadBandWritable
@@ -1664,7 +1682,7 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "Writes the value above MinSetpointDeadBand "
+    - label: "Step 11b: Writes the value above MinSetpointDeadBand "
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
       PICS: TSTAT.S.F05 && TSTAT.S.M.MinSetpointDeadBandWritable
@@ -1673,14 +1691,14 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "Writes the min limit of MinSetpointDeadBand"
+    - label: "Step 11c: Writes the min limit of MinSetpointDeadBand"
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
       PICS: TSTAT.S.F05 && TSTAT.S.M.MinSetpointDeadBandWritable
       arguments:
           value: 0
 
-    - label: "Writes the max limit of MinSetpointDeadBand"
+    - label: "Step 11c: Writes the max limit of MinSetpointDeadBand"
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
       PICS: TSTAT.S.F05 && TSTAT.S.M.MinSetpointDeadBandWritable
@@ -1688,8 +1706,8 @@ tests:
           value: 25
 
     - label:
-          "Reads ControlSequenceOfOperation from Server DUT, if TSTAT.S.F01 is
-          true"
+          "Step 12: Reads ControlSequenceOfOperation from Server DUT, if
+          TSTAT.S.F01 is true"
       command: "readAttribute"
       attribute: "ControlSequenceOfOperation"
       PICS: TSTAT.S.F01 && !TSTAT.S.F00
@@ -1698,8 +1716,8 @@ tests:
               anyOf: [0, 1]
 
     - label:
-          "Reads ControlSequenceOfOperation from Server DUT, if TSTAT.S.F00 is
-          true"
+          "Step 12: Reads ControlSequenceOfOperation from Server DUT, if
+          TSTAT.S.F00 is true"
       command: "readAttribute"
       attribute: "ControlSequenceOfOperation"
       PICS: TSTAT.S.F00 && !TSTAT.S.F01
@@ -1708,8 +1726,8 @@ tests:
               anyOf: [2, 3]
 
     - label:
-          "Reads ControlSequenceOfOperation from Server DUT, if both TSTAT.S.F01
-          and TSTAT.S.F01 are true"
+          "Step 12: Reads ControlSequenceOfOperation from Server DUT, if both
+          TSTAT.S.F01 and TSTAT.S.F01 are true"
       command: "readAttribute"
       attribute: "ControlSequenceOfOperation"
       PICS: TSTAT.S.F00 && TSTAT.S.F01
@@ -1718,15 +1736,15 @@ tests:
               anyOf: [4, 5]
 
     - label:
-          "Write Attribute command for ControlSequenceOfOperation with a new
-          valid value"
+          "Step 12: Write Attribute command for ControlSequenceOfOperation with
+          a new valid value"
       command: "writeAttribute"
       attribute: "ControlSequenceOfOperation"
       PICS: TSTAT.S.F00 || TSTAT.S.F01
       arguments:
           value: 2
 
-    - label: "Read it back again to confirm the successful write"
+    - label: "Step 12: Read it back again to confirm the successful write"
       command: "readAttribute"
       attribute: "ControlSequenceOfOperation"
       PICS: TSTAT.S.F00 || TSTAT.S.F01
@@ -1742,21 +1760,21 @@ tests:
       arguments:
           value: 2950
 
-    - label: "Sets OccupiedCoolingSetpoint to default value"
+    - label: "Step 13: Sets OccupiedCoolingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01
       arguments:
           value: 2600
 
-    - label: "Sets OccupiedHeatingSetpoint to default value"
+    - label: "Step 13: Sets OccupiedHeatingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00
       arguments:
           value: 2000
 
-    - label: "Sends SetpointRaise Command Heat Only"
+    - label: "Step 13: Sends SetpointRaise Command Heat Only"
       PICS: TSTAT.S.F00
       command: "SetpointRaiseLower"
       arguments:
@@ -1767,22 +1785,22 @@ tests:
                 value: -30
 
     - label:
-          "Reads back OccupiedHeatingSetpoint to confirm the success of the
-          write"
+          "Step 13: Reads back OccupiedHeatingSetpoint to confirm the success of
+          the write"
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00
       response:
           value: 1700
 
-    - label: "Sets OccupiedHeatingSetpoint to default value"
+    - label: "Step 14: Sets OccupiedHeatingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00
       arguments:
           value: 2000
 
-    - label: "Sends SetpointRaise Command Heat Only"
+    - label: "Step 14: Sends SetpointRaise Command Heat Only"
       PICS: TSTAT.S.F00
       command: "SetpointRaiseLower"
       arguments:
@@ -1793,15 +1811,15 @@ tests:
                 value: 30
 
     - label:
-          "Reads back OccupiedHeatingSetpoint to confirm the success of the
-          write"
+          "Step 14: Reads back OccupiedHeatingSetpoint to confirm the success of
+          the write"
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00
       response:
           value: 2300
 
-    - label: "Sends SetpointRaise Command Cool Only"
+    - label: "Step 15: Sends SetpointRaise Command Cool Only"
       PICS: TSTAT.S.F01
       command: "SetpointRaiseLower"
       arguments:
@@ -1812,22 +1830,22 @@ tests:
                 value: -30
 
     - label:
-          "Reads back OccupiedCoolingSetpoint to confirm the success of the
-          write"
+          "Step 15: Reads back OccupiedCoolingSetpoint to confirm the success of
+          the write"
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01
       response:
           value: 2300
 
-    - label: "Sets OccupiedCoolingSetpoint to default value"
+    - label: "Step 16: Sets OccupiedCoolingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01
       arguments:
           value: 2600
 
-    - label: "Sends SetpointRaise Command Cool Only"
+    - label: "Step 16: Sends SetpointRaise Command Cool Only"
       PICS: TSTAT.S.F01
       command: "SetpointRaiseLower"
       arguments:
@@ -1838,29 +1856,29 @@ tests:
                 value: 30
 
     - label:
-          "Reads back OccupiedCoolingSetpoint to confirm the success of the
-          write"
+          "Step 16: Reads back OccupiedCoolingSetpoint to confirm the success of
+          the write"
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01
       response:
           value: 2900
 
-    - label: "Sets OccupiedCoolingSetpoint to default value"
+    - label: "Step 17: Sets OccupiedCoolingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01
       arguments:
           value: 2600
 
-    - label: "Sets OccupiedHeatingSetpoint to default value"
+    - label: "Step 17: Sets OccupiedHeatingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00
       arguments:
           value: 2000
 
-    - label: "Sends SetpointRaise Command Heat & Cool"
+    - label: "Step 17: Sends SetpointRaise Command Heat & Cool"
       PICS: TSTAT.S.F00 || TSTAT.S.F01
       command: "SetpointRaiseLower"
       arguments:
@@ -1871,8 +1889,8 @@ tests:
                 value: -30
 
     - label:
-          "Reads back OccupiedCoolingSetpoint to confirm the success of the
-          write"
+          "Step 17: Reads back OccupiedCoolingSetpoint to confirm the success of
+          the write"
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01
@@ -1880,29 +1898,29 @@ tests:
           value: 2300
 
     - label:
-          "Reads back OccupiedHeatingSetpoint to confirm the success of the
-          write"
+          "Step 17: Reads back OccupiedHeatingSetpoint to confirm the success of
+          the write"
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00
       response:
           value: 1700
 
-    - label: "Sets OccupiedCoolingSetpoint to default value"
+    - label: "Step 18: Sets OccupiedCoolingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01
       arguments:
           value: 2600
 
-    - label: "Sets OccupiedHeatingSetpoint to default value"
+    - label: "Step 18: Sets OccupiedHeatingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00
       arguments:
           value: 2000
 
-    - label: "Sends SetpointRaise Command Heat & Cool"
+    - label: "Step 18: Sends SetpointRaise Command Heat & Cool"
       PICS: TSTAT.S.F00 || TSTAT.S.F01
       command: "SetpointRaiseLower"
       arguments:
@@ -1913,8 +1931,8 @@ tests:
                 value: 30
 
     - label:
-          "Reads back OccupiedCoolingSetpoint to confirm the success of the
-          write"
+          "Step 18: Reads back OccupiedCoolingSetpoint to confirm the success of
+          the write"
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01
@@ -1922,8 +1940,8 @@ tests:
           value: 2900
 
     - label:
-          "Reads back OccupiedHeatingSetpoint to confirm the success of the
-          write"
+          "Step 18: Reads back OccupiedHeatingSetpoint to confirm the success of
+          the write"
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00
