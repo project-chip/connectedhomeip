@@ -208,9 +208,7 @@ static_library("app") {
   }
 
   if (chip_enable_read_client) {
-    sources += [
-      "ReadClient.cpp",
-    ]
+    sources += [ "ReadClient.cpp" ]
   }
 
   public_deps = [
