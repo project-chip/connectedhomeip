@@ -252,7 +252,7 @@ RUN case ${TARGETPLATFORM} in \
     && source scripts/activate.sh \
     && scripts/build/build_examples.py \
     --target linux-arm64-chip-tool-ipv6only-platform-mdns \
-    --target linux-arm64-chip-tool-ipv6only-platform-mdns \
+    --target linux-arm64-shell-ipv6only-platform-mdns \
     --target linux-arm64-chip-cert-ipv6only-platform-mdns \
     --target linux-arm64-all-clusters-ipv6only \
     --target linux-arm64-all-clusters-minimal-ipv6only \
