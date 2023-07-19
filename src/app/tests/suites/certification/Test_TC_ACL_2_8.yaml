@@ -585,3 +585,27 @@ tests:
                 value: "Enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
+
+    - label: "Remove TH2 FabricIndex"
+      identity: "beta"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: TH2FabricIndex
+
+    - label: "Remove TH2 FabricIndex"
+      verification: |
+          ./chip-tool operationalcredentials remove-fabric 2 1 0
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"

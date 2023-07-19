@@ -58,10 +58,8 @@
     "bridge": ["Test_TC_BR_1", "Test_TC_BR_2", "Test_TC_BR_3", "Test_TC_BR_4"],
     "DeviceAttestation": [
         "Test_TC_DA_1_1",
-        "Test_TC_DA_1_2",
         "Test_TC_DA_1_3",
         "Test_TC_DA_1_4",
-        "Test_TC_DA_1_5",
         "Test_TC_DA_1_6"
     ],
     "DeviceManagement": [
@@ -109,7 +107,6 @@
     "IlluminanceMeasurement": [],
     "InteractionDataModel": [
         "Test_TC_IDM_1_1",
-        "Test_TC_IDM_1_2",
         "Test_TC_IDM_2_1",
         "Test_TC_IDM_2_2",
         "Test_TC_IDM_3_1",
@@ -271,13 +268,13 @@
         "Test_TC_S_3_1"
     ],
     "PumpConfigurationControl": [],
-    "AccessControl": ["Test_TC_ACL_2_5", "Test_TC_ACL_2_6"],
+    "AccessControl": [],
     "UserLabel": [],
     "BridgedDeviceBasicInformation": [
         "Test_TC_BRBINFO_2_2",
         "Test_TC_BRBINFO_2_3"
     ],
-    "AccessControlEnforcement": ["Test_TC_ACE_1_2"],
+    "AccessControlEnforcement": [],
     "collection": [
         "DeviceDiscovery",
         "Groups",
