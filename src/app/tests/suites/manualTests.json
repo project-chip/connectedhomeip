@@ -277,7 +277,7 @@
         "Test_TC_BRBINFO_2_2",
         "Test_TC_BRBINFO_2_3"
     ],
-    "AccessControlEnforcement": ["Test_TC_ACE_1_2", "Test_TC_ACE_1_6"],
+    "AccessControlEnforcement": ["Test_TC_ACE_1_2"],
     "collection": [
         "DeviceDiscovery",
         "Groups",
