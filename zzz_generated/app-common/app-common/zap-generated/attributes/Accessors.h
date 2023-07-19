@@ -1282,31 +1282,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace IcdManagement {
 namespace Attributes {
 
-namespace IdleModeInterval {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace IdleModeInterval
-
-namespace ActiveModeInterval {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace ActiveModeInterval
-
-namespace ActiveModeThreshold {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace ActiveModeThreshold
-
-namespace ICDCounter {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace ICDCounter
-
-namespace ClientsSupportedPerFabric {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace ClientsSupportedPerFabric
-
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
