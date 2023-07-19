@@ -18,3 +18,14 @@ Enumerators:
       SwiftName: type80211ac
     - Name: MTRWiFiNetworkDiagnosticsWiFiVersionType80211ax
       SwiftName: type80211ax
+
+    # Make the names for MTRWiFiNetworkDiagnosticsWiFiVersion all be
+    # lowercase instead of having uppercase A and lowercase ax.
+    - Name: MTRWiFiNetworkDiagnosticsWiFiVersionA
+      SwiftName: a
+    - Name: MTRWiFiNetworkDiagnosticsWiFiVersionB
+      SwiftName: b
+    - Name: MTRWiFiNetworkDiagnosticsWiFiVersionG
+      SwiftName: g
+    - Name: MTRWiFiNetworkDiagnosticsWiFiVersionN
+      SwiftName: n
