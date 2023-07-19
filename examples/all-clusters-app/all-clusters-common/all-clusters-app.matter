@@ -2773,15 +2773,12 @@ server cluster HepaFilterMonitoring = 113 {
   readonly attribute DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute boolean inPlaceIndicator = 3;
-  attribute nullable epoch_s lastChangedTime = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-  command ResetCondition(): DefaultSuccess = 0;
 }
 
 /** Attributes and commands for monitoring activated carbon filters in a device */
@@ -2819,15 +2816,12 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
   readonly attribute DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute boolean inPlaceIndicator = 3;
-  attribute nullable epoch_s lastChangedTime = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-  command ResetCondition(): DefaultSuccess = 0;
 }
 
 /** An interface to a generic way to secure a door */
@@ -6327,11 +6321,10 @@ endpoint 1 {
   }
 
   server cluster HepaFilterMonitoring {
-    callback attribute condition;
-    callback attribute degradationDirection;
-    callback attribute changeIndication default = 0;
-    callback attribute inPlaceIndicator;
-    callback attribute lastChangedTime;
+    ram      attribute condition;
+    ram      attribute degradationDirection;
+    ram      attribute changeIndication default = 0;
+    ram      attribute inPlaceIndicator;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6341,11 +6334,10 @@ endpoint 1 {
   }
 
   server cluster ActivatedCarbonFilterMonitoring {
-    callback attribute condition;
-    callback attribute degradationDirection;
-    callback attribute changeIndication default = 0;
-    callback attribute inPlaceIndicator;
-    callback attribute lastChangedTime;
+    ram      attribute condition;
+    ram      attribute degradationDirection;
+    ram      attribute changeIndication default = 0;
+    ram      attribute inPlaceIndicator;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
