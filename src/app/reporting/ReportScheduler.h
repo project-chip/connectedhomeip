@@ -80,7 +80,7 @@ public:
         }
 
         bool IsEngineRunScheduled() const { return mEngineRunScheduled; }
-        void SetEngineRunScheduled(bool aEnginRunScheduled) { mEnginRunScheduled = aEnginRunScheduled; }
+        void SetEngineRunScheduled(bool aEnginRunScheduled) { mEngineRunScheduled = aEnginRunScheduled; }
 
         void SetIntervalTimeStamps(ReadHandler * aReadHandler)
         {
@@ -100,7 +100,8 @@ public:
 
         void SetSyncTimestamp(System::Clock::Timestamp aSyncTimestamp)
         {
-            // Prevents the sync timestamp being set to a value lower than the min timestamp
+            // Prevents the sync timestamp being set to a value lower than the min timestamp to prevent it to appear as reportable
+            // on the next timeout calculation and cause the scheduler to run the engine too early
             VerifyOrReturn(aSyncTimestamp >= mMinTimestamp);
             mSyncTimestamp = aSyncTimestamp;
         }
@@ -117,8 +118,8 @@ public:
         Timestamp mMaxTimestamp;
         Timestamp mSyncTimestamp; // Timestamp at which the read handler will be allowed to emit a report so it can be synced with
                                   // other handlers that have an earlier max timestamp
-        bool mEnginRunScheduled = false; // Flag to indicate if the engine run is already scheduled so the scheduler can ignore
-                                         // it when calculating the next run time
+        bool mEngineRunScheduled = false; // Flag to indicate if the engine run is already scheduled so the scheduler can ignore
+                                          // it when calculating the next run time
     };
 
     ReportScheduler(TimerDelegate * aTimerDelegate) : mTimerDelegate(aTimerDelegate) {}

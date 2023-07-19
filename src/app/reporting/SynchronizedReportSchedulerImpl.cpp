@@ -28,8 +28,8 @@ using ReadHandlerNode = ReportScheduler::ReadHandlerNode;
 
 void SynchronizedReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aReadHandler)
 {
-    // Verify list is populated and handler is not null
-    VerifyOrReturn((!mReadHandlerList.Empty() || (nullptr == aReadHandler)));
+    // Verify list is populated
+    VerifyOrReturn((!mReadHandlerList.Empty()));
 
     ReadHandlerNode * removeNode = FindReadHandlerNode(aReadHandler);
     // Nothing to remove if the handler is not found in the list
@@ -154,6 +154,7 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::CalculateNextReportTimeout(Timeout &
     }
     else
     {
+        // Schedule report at next max otherwise
         timeout = mNextMaxTimestamp - now;
     }
 

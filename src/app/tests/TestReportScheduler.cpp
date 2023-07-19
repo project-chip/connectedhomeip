@@ -677,19 +677,23 @@ public:
         NL_TEST_ASSERT(aSuite, syncScheduler.GetNumReadHandlers() == 4);
         ReadHandlerNode * node4 = syncScheduler.FindReadHandlerNode(readHandler4);
 
-        // Confirm next report is scheduled on the max timestamp of readHandler4 and other handlers be synced
+        // Confirm next report is scheduled on the max timestamp of readHandler4 and other handlers 1 and 2 are synced
         NL_TEST_ASSERT(aSuite, syncScheduler.mTestNextReportTimestamp == node4->GetMaxTimestamp());
         NL_TEST_ASSERT(aSuite, node1->GetSyncTimestamp() == node4->GetMaxTimestamp());
         NL_TEST_ASSERT(aSuite, node2->GetSyncTimestamp() == node4->GetMaxTimestamp());
+
+        // Confirm handler 3 is synched on a later timestamp since its min is higher than the max of readHandler4
         NL_TEST_ASSERT(aSuite, node3->GetSyncTimestamp() == node1->GetMaxTimestamp());
 
         sTestTimerSynchronizedDelegate.IncrementMockTimestamp(System::Clock::Milliseconds64(1100));
 
-        // Confirm readHandler4, 1 and 1 are reportable
+        // Confirm readHandler1, 2 and 4 are reportable
         NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler1));
         NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler2));
-        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler3));
         NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler4));
+
+        // Confirm readHandler3 is not reportable
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler3));
         readHandler4->mObserver->OnBecameReportable(readHandler1);
         readHandler4->mObserver->OnBecameReportable(readHandler2);
         readHandler4->mObserver->OnBecameReportable(readHandler4);
@@ -720,20 +724,23 @@ public:
         NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler3));
         NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler4));
 
-        // Next emission should be scheduled on the max timestamp of readHandler4 as it is the most restrictive, and other handlers
-        // should get synced except handler 3 as its min is higher
+        // Next emission should be scheduled on the max timestamp of readHandler4 as it is the most restrictive, and handlers 1 and
+        // 2 should be synced to handler 4
         NL_TEST_ASSERT(aSuite, syncScheduler.mTestNextReportTimestamp == node4->GetMaxTimestamp());
         NL_TEST_ASSERT(aSuite, node1->GetSyncTimestamp() == node4->GetMaxTimestamp());
         NL_TEST_ASSERT(aSuite, node2->GetSyncTimestamp() == node4->GetMaxTimestamp());
+        // handler 3 should have a sync on a different point as its min is higher, in this case it is the max timestamp of handler 1
         NL_TEST_ASSERT(aSuite, node3->GetSyncTimestamp() == node1->GetMaxTimestamp());
 
         sTestTimerSynchronizedDelegate.IncrementMockTimestamp(System::Clock::Milliseconds64(1000));
 
-        // Confirm  readHandler 1-2-4 are reportable and handler 3 is not because of its min interval
+        // Confirm  readHandler 1-2-4 are reportable
         NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler1));
         NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler2));
-        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler3));
         NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler4));
+
+        // Confirm readHandler3 is not reportable because of its min interval
+        NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler3));
 
         syncScheduler.OnReadHandlerDestroyed(readHandler1);
         syncScheduler.OnReadHandlerDestroyed(readHandler2);
