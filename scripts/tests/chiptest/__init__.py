@@ -139,26 +139,6 @@ def _GetInDevelopmentTests() -> Set[str]:
         "TestCommandsById.yaml",             # chip-repl does not support AnyCommands (06/06/2023)
         "TestEventsById.yaml",               # chip-repl does not support AnyCommands (06/06/2023)
         "Test_TC_DRLK_2_8.yaml",  # Test fails only in chip-repl: Refer--> https://github.com/project-chip/connectedhomeip/pull/27011#issuecomment-1593339855
-        "Test_TC_CFREMON_1_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_CFREMON_2_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_ESFREMON_1_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_ESFREMON_2_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_FTREMON_1_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_FTREMON_2_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_INKCREMON_1_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_INKCREMON_2_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_IONFREMON_1_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_IONFREMON_2_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_OZFREMON_1_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_OZFREMON_2_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_TCREMON_1_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_TCREMON_2_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_UVFREMON_1_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_UVFREMON_2_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_WTREMON_1_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_WTREMON_2_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_ZEOFREMON_1_2.yaml",         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
-        "Test_TC_ZEOFREMON_2_2.yaml"         # provisional, will be removed, this is so the ciJobs can run until the yaml file is removed
     }
 
 
