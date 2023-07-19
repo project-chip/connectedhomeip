@@ -27,35 +27,30 @@ namespace reporting {
 class ReportSchedulerImpl : public ReportScheduler
 {
 public:
+    using Timeout = System::Clock::Timeout;
+
     ReportSchedulerImpl(TimerDelegate * aTimerDelegate);
     ~ReportSchedulerImpl() override { UnregisterAllHandlers(); }
 
     // ReadHandlerObserver
-    void OnReadHandlerCreated(ReadHandler * aReadHandler) override;
-    void OnBecameReportable(ReadHandler * aReadHandler) override;
-    void OnSubscriptionAction(ReadHandler * aReadHandler) override;
+    void OnReadHandlerCreated(ReadHandler * aReadHandler) final;
+    void OnBecameReportable(ReadHandler * aReadHandler) final;
+    void OnSubscriptionAction(ReadHandler * aReadHandler) final;
     void OnReadHandlerDestroyed(ReadHandler * aReadHandler) override;
 
+    bool IsReportScheduled(ReadHandler * aReadHandler);
+
+    void ReportTimerCallback() override;
+
 protected:
-    virtual CHIP_ERROR RegisterReadHandler(ReadHandler * aReadHandler);
-    virtual CHIP_ERROR ScheduleReport(System::Clock::Timeout timeout, ReadHandlerNode * node);
-    virtual void CancelReport(ReadHandler * aReadHandler);
-    virtual void UnregisterReadHandler(ReadHandler * aReadHandler);
+    virtual CHIP_ERROR ScheduleReport(Timeout timeout, ReadHandlerNode * node);
+    void CancelReport(ReadHandler * aReadHandler);
     virtual void UnregisterAllHandlers();
 
 private:
     friend class chip::app::reporting::TestReportScheduler;
 
-    bool IsReportScheduled(ReadHandler * aReadHandler) override;
-
-    /// @brief Start a timer for a given ReadHandlerNode, ensures that if a timer is already running for this node, it is cancelled
-    /// @param node Node of the ReadHandler list to start a timer for
-    /// @param aTimeout Delay before the timer expires
-    virtual CHIP_ERROR StartSchedulerTimer(ReadHandlerNode * node, System::Clock::Timeout aTimeout);
-    /// @brief Cancel the timer for a given ReadHandlerNode
-    virtual void CancelSchedulerTimer(ReadHandlerNode * node);
-    /// @brief Check if the timer for a given ReadHandlerNode is active
-    virtual bool CheckSchedulerTimerActive(ReadHandlerNode * node);
+    virtual CHIP_ERROR CalculateNextReportTimeout(Timeout & timeout, ReadHandlerNode * aNode);
 };
 
 } // namespace reporting
