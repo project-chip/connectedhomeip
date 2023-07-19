@@ -69,7 +69,7 @@ bool DishwasherAlarmDelegate::ResetAlarmsCallback(const chip::BitMask<AlarmMap> 
 /*
  * An example to present device's endpointId
  */
-constexpr chip::EndpointId kDemoEndpointId = 1;
+static constexpr chip::EndpointId kDemoEndpointId = 1;
 
 void MatterDishwasherAlarmServerInit()
 {
