@@ -405,12 +405,10 @@ exit:
 static void Bluez_gatt_characteristic1_complete_acquire_write_with_fd(GDBusMethodInvocation * invocation, int fd, guint16 mtu)
 {
     GUnixFDList * fd_list = g_unix_fd_list_new();
-    int index;
-
-    index = g_unix_fd_list_append(fd_list, fd, nullptr);
-
+    int index             = g_unix_fd_list_append(fd_list, fd, nullptr);
     g_dbus_method_invocation_return_value_with_unix_fd_list(invocation, g_variant_new("(@hq)", g_variant_new_handle(index), mtu),
                                                             fd_list);
+    g_object_unref(fd_list);
 }
 
 static gboolean bluezCharacteristicDestroyFD(GIOChannel * aChannel, GIOCondition aCond, gpointer apEndpoint)
