@@ -30,7 +30,6 @@ constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(Feature::k
 constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
                                                      static_cast<uint32_t>(Feature::kWarning) };
 
-
 static HepaFilterMonitoringInstance * gHepafilterInstance;
 static ActivatedCarbonFilterMonitoringInstance * gActivatedCarbonFilterInstance;
 
