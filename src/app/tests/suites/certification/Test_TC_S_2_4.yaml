@@ -39,7 +39,8 @@ tests:
       command: "RemoveAllGroups"
 
     - label:
-          "preparation step for using commands from Groups cluster: Add KeySet"
+          "Step 0a: preparation step for using commands from Groups cluster: Add
+          KeySet"
       cluster: "Group Key Management"
       endpoint: 0
       command: "KeySetWrite"
@@ -59,8 +60,8 @@ tests:
                     }
 
     - label:
-          "Preparation step for using commands from Groups cluster: Write Group
-          Keys"
+          "Step 0b: Preparation step for using commands from Groups cluster:
+          Write Group Keys"
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -69,8 +70,8 @@ tests:
           value: [{ FabricIndex: 1, GroupId: 0x0001, GroupKeySetID: 0x01a1 }]
 
     - label:
-          "TH sends a AddGroup command to DUT with the GroupID field set to
-          0x0001."
+          "Step 2a: TH sends a AddGroup command to DUT with the GroupID field
+          set to 0x0001."
       PICS: G.S.C00.Rsp
       cluster: "Groups"
       command: "AddGroup"
@@ -88,8 +89,8 @@ tests:
                 value: 0x0001
 
     - label:
-          "TH sends a RemoveAllScenes command to DUT with the GroupID field set
-          to 0x0001."
+          "Step 2b: TH sends a RemoveAllScenes command to DUT with the GroupID
+          field set to 0x0001."
       PICS: S.S.C03.Rsp
       command: "RemoveAllScenes"
       arguments:
@@ -104,9 +105,9 @@ tests:
                 value: 0x0001
 
     - label:
-          "TH sends a AddScene command to DUT with the GroupID field set to
-          0x0001, the SceneID field set to 0x01, the TransitionTime field set to
-          0x0001 and a set of extension fields appropriate to AC1."
+          "Step 3: TH sends a AddScene command to DUT with the GroupID field set
+          to 0x0001, the SceneID field set to 0x01, the TransitionTime field set
+          to 0x0001 and a set of extension fields appropriate to AC1."
       PICS: S.S.C00.Rsp
       command: "AddScene"
       arguments:
@@ -132,8 +133,8 @@ tests:
                 value: 0x01
 
     - label:
-          "TH configures AC1 on DUT for all implemented application clusters
-          supporting scenes."
+          "Step 4a: TH configures AC1 on DUT for all implemented application
+          clusters supporting scenes."
       PICS: PICS_SDK_CI_ONLY
       cluster: "Level Control"
       command: "MoveToLevelWithOnOff"
@@ -149,8 +150,8 @@ tests:
                 value: 0
 
     - label:
-          "TH configures AC1 on DUT for all implemented application clusters
-          supporting scenes."
+          "Step 4a: TH configures AC1 on DUT for all implemented application
+          clusters supporting scenes."
       verification: |
           Is DUT configured with AC1?
       cluster: "LogCommands"
@@ -166,8 +167,8 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends a StoreScene command to DUT with the GroupID field set to
-          0x0001 and the SceneID field set to 0x01."
+          "Step 4b: TH sends a StoreScene command to DUT with the GroupID field
+          set to 0x0001 and the SceneID field set to 0x01."
       PICS: S.S.C04.Rsp
       command: "StoreScene"
       arguments:
@@ -186,8 +187,8 @@ tests:
                 value: 0x01
 
     - label:
-          "TH configures AC2 on DUT for all implemented application clusters
-          supporting scenes."
+          "Step 5a: TH configures AC2 on DUT for all implemented application
+          clusters supporting scenes."
       PICS: PICS_SDK_CI_ONLY
       cluster: "Level Control"
       command: "MoveToLevelWithOnOff"
@@ -222,8 +223,8 @@ tests:
           value: 200
 
     - label:
-          "TH configures AC2 on DUT for all implemented application clusters
-          supporting scenes."
+          "Step 5a: TH configures AC2 on DUT for all implemented application
+          clusters supporting scenes."
       verification: |
           Is DUT configured with AC2?
       cluster: "LogCommands"
@@ -239,9 +240,9 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends a RecallScene command to DUT with the GroupID field set to
-          0x0001 and the SceneID field set to 0x01 and the TransitionTime field
-          omitted."
+          "Step 5b: TH sends a RecallScene command to DUT with the GroupID field
+          set to 0x0001 and the SceneID field set to 0x01 and the TransitionTime
+          field omitted."
       PICS: S.S.C05.Rsp
       command: "RecallScene"
       arguments:
@@ -317,9 +318,9 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends a RecallScene command to DUT with the GroupID field set to
-          0x0001, the SceneID field set to 0x01 and the TransitionTime field set
-          to 0x0032 (5s)."
+          "Step 6a: TH sends a RecallScene command to DUT with the GroupID field
+          set to 0x0001, the SceneID field set to 0x01 and the TransitionTime
+          field set to 0x0032 (5s)."
       PICS: S.S.C05.Rsp
       command: "RecallScene"
       arguments:
@@ -363,8 +364,8 @@ tests:
                 value: "y"
 
     - label:
-          "TH configures AC2 on DUT for all implemented application clusters
-          supporting scenes."
+          "Step 7a: TH configures AC2 on DUT for all implemented application
+          clusters supporting scenes."
       PICS: PICS_SDK_CI_ONLY
       cluster: "Level Control"
       command: "MoveToLevelWithOnOff"
@@ -380,8 +381,8 @@ tests:
                 value: 0
 
     - label:
-          "TH configures AC2 on DUT for all implemented application clusters
-          supporting scenes."
+          "Step 7a: TH configures AC2 on DUT for all implemented application
+          clusters supporting scenes."
       verification: |
           Is DUT configured with AC2?
       cluster: "LogCommands"
@@ -397,9 +398,9 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends a RecallScene command to DUT with the GroupID field set to
-          0x0001, the SceneID field set to 0x01 and the TransitionTime field set
-          to null (no transition time override)."
+          "Step 7b: TH sends a RecallScene command to DUT with the GroupID field
+          set to 0x0001, the SceneID field set to 0x01 and the TransitionTime
+          field set to null (no transition time override)."
       PICS: S.S.C05.Rsp
       command: "RecallScene"
       arguments:

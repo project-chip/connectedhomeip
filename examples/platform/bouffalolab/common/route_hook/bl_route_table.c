@@ -1,7 +1,7 @@
-#include "bl_route_table.h"
 #include <stdbool.h>
 #include <string.h>
 
+#include "bl_route_table.h"
 #include "lwip/ip6_addr.h"
 #include "lwip/netif.h"
 #include "lwip/timeouts.h"

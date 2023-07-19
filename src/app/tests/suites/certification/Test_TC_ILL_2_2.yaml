@@ -24,7 +24,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -32,7 +32,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads MinMeasuredValue attribute from DUT"
+    - label: "Step 2a: TH reads MinMeasuredValue attribute from DUT"
       PICS: ILL.S.A0001
       command: "readAttribute"
       attribute: "MinMeasuredValue"
@@ -41,7 +41,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "TH reads MaxMeasuredValue attribute from DUT"
+    - label: "Step 2b: TH reads MaxMeasuredValue attribute from DUT"
       PICS: ILL.S.A0002
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
@@ -50,7 +50,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Cover the sensor or darken the room"
+    - label: "Step 3: Cover the sensor or darken the room"
       verification: |
           Manual operation
       cluster: "LogCommands"
@@ -71,7 +71,9 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label: "After a few seconds, TH reads MeasuredValue attribute from DUT."
+    - label:
+          "Step 4: After a few seconds, TH reads MeasuredValue attribute from
+          DUT."
       PICS: ILL.S.A0000 && PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "MeasuredValue"
@@ -80,7 +82,7 @@ tests:
               type: int16u
               minValue: 0
 
-    - label: "Expose the sensor again to light"
+    - label: "Step 5: Expose the sensor again to light"
       verification: |
           Manual operation
       cluster: "LogCommands"
@@ -101,7 +103,9 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label: "After a few seconds, TH reads MeasuredValue attribute from DUT."
+    - label:
+          "Step 6: After a few seconds, TH reads MeasuredValue attribute from
+          DUT."
       PICS: ILL.S.A0000 && PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "MeasuredValue"

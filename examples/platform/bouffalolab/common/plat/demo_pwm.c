@@ -4,11 +4,12 @@
  * Contact information:
  * web site:    https://www.bouffalolab.com/
  */
-
-#include "demo_pwm.h"
-#include "board.h"
-#include <hosal_pwm.h>
 #include <stdio.h>
+
+#include <hosal_pwm.h>
+
+#include "board.h"
+#include "demo_pwm.h"
 
 #define PWM_FREQ 1000
 #define PWM_DUTY_CYCLE 10000

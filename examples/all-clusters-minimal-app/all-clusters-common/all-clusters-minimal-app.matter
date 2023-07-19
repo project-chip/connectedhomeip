@@ -2081,6 +2081,31 @@ server cluster ModeSelect = 80 {
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
+/** Attributes and commands for configuring the temperature control, and reporting temperature. */
+server cluster TemperatureControl = 86 {
+  bitmap Feature : BITMAP32 {
+    kTemperatureNumber = 0x1;
+    kTemperatureLevel = 0x2;
+    kTemperatureStep = 0x4;
+  }
+
+  readonly attribute int8u selectedTemperatureLevel = 4;
+  readonly attribute char_string supportedTemperatureLevels[] = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetTemperatureRequest {
+    optional temperature targetTemperature = 0;
+    optional INT8U targetTemperatureLevel = 1;
+  }
+
+  command SetTemperature(SetTemperatureRequest): DefaultSuccess = 0;
+}
+
 /** An interface to a generic way to secure a door */
 server cluster DoorLock = 257 {
   enum AlarmCodeEnum : ENUM8 {
@@ -4285,6 +4310,17 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TemperatureControl {
+    ram      attribute selectedTemperatureLevel default = 0;
+    callback attribute supportedTemperatureLevels;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
   }
 
