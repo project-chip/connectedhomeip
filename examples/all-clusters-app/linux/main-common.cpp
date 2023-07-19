@@ -31,6 +31,7 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
+#include <static-supported-temperature-levels.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
@@ -49,6 +50,7 @@ NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
 Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 } // namespace
 
 #ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
@@ -174,6 +176,7 @@ void ApplicationInit()
 #ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
     MatterOperationalStateServerInit();
 #endif
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 void ApplicationExit()

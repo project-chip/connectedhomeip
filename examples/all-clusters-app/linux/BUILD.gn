@@ -29,6 +29,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-helper.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
     "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common/src/instances/ActivatedCarbonFilterMonitoring.cpp",
     "${chip_root}/examples/resource-monitoring-app/resource-monitoring-common/src/instances/HepafilterMonitoring.cpp",
     "AllClustersCommandDelegate.cpp",
