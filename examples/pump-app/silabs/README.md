@@ -143,8 +143,6 @@ Labs platform.
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
           $ ninja -C out/debug
 
-    [Running Pigweed RPC console](#running-rpc-console)
-
 For more build options, help is provided when running the build script without
 arguments
 
