@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -47,20 +47,20 @@ class BindingClusterTargetStruct (
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
     if (node.isPresent) {
-      val opt_node = node.get()
-      tlvWriter.put(ContextSpecificTag(1), opt_node)
+      val optnode = node.get()
+      tlvWriter.put(ContextSpecificTag(1), optnode)
     }
     if (group.isPresent) {
-      val opt_group = group.get()
-      tlvWriter.put(ContextSpecificTag(2), opt_group)
+      val optgroup = group.get()
+      tlvWriter.put(ContextSpecificTag(2), optgroup)
     }
     if (endpoint.isPresent) {
-      val opt_endpoint = endpoint.get()
-      tlvWriter.put(ContextSpecificTag(3), opt_endpoint)
+      val optendpoint = endpoint.get()
+      tlvWriter.put(ContextSpecificTag(3), optendpoint)
     }
     if (cluster.isPresent) {
-      val opt_cluster = cluster.get()
-      tlvWriter.put(ContextSpecificTag(4), opt_cluster)
+      val optcluster = cluster.get()
+      tlvWriter.put(ContextSpecificTag(4), optcluster)
     }
     tlvWriter.put(ContextSpecificTag(254), fabricIndex)
     tlvWriter.endStructure()

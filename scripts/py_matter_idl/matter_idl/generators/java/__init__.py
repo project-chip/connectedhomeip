@@ -805,6 +805,9 @@ class JavaClassGenerator(__JavaCodeGenerator):
                 )
 
             for event in cluster.events:
+                if not event.fields:
+                    continue
+
                 output_name = "java/chip/devicecontroller/cluster/eventstructs/{cluster_name}Cluster{event_name}Event.kt"
                 self.internal_render_one_output(
                     template_path="ChipEventStructs.jinja",

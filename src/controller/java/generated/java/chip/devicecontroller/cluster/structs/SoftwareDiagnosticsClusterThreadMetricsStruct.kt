@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -48,20 +48,20 @@ class SoftwareDiagnosticsClusterThreadMetricsStruct (
     tlvWriter.startStructure(tag)
     tlvWriter.put(ContextSpecificTag(0), id)
     if (name.isPresent) {
-      val opt_name = name.get()
-      tlvWriter.put(ContextSpecificTag(1), opt_name)
+      val optname = name.get()
+      tlvWriter.put(ContextSpecificTag(1), optname)
     }
     if (stackFreeCurrent.isPresent) {
-      val opt_stackFreeCurrent = stackFreeCurrent.get()
-      tlvWriter.put(ContextSpecificTag(2), opt_stackFreeCurrent)
+      val optstackFreeCurrent = stackFreeCurrent.get()
+      tlvWriter.put(ContextSpecificTag(2), optstackFreeCurrent)
     }
     if (stackFreeMinimum.isPresent) {
-      val opt_stackFreeMinimum = stackFreeMinimum.get()
-      tlvWriter.put(ContextSpecificTag(3), opt_stackFreeMinimum)
+      val optstackFreeMinimum = stackFreeMinimum.get()
+      tlvWriter.put(ContextSpecificTag(3), optstackFreeMinimum)
     }
     if (stackSize.isPresent) {
-      val opt_stackSize = stackSize.get()
-      tlvWriter.put(ContextSpecificTag(4), opt_stackSize)
+      val optstackSize = stackSize.get()
+      tlvWriter.put(ContextSpecificTag(4), optstackSize)
     }
     tlvWriter.endStructure()
   }

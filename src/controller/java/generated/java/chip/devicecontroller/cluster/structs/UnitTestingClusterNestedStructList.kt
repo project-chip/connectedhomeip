@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -54,30 +54,30 @@ class UnitTestingClusterNestedStructList (
     tlvWriter.put(ContextSpecificTag(1), b)
     c.toTlv(ContextSpecificTag(2), tlvWriter)
     tlvWriter.startList(ContextSpecificTag(3))
-      val iter_d = d.iterator()
-      while(iter_d.hasNext()) {
-        val next = iter_d.next()
+      val iterd = d.iterator()
+      while(iterd.hasNext()) {
+        val next = iterd.next()
         next.toTlv(AnonymousTag, tlvWriter)
       }
       tlvWriter.endList()
     tlvWriter.startList(ContextSpecificTag(4))
-      val iter_e = e.iterator()
-      while(iter_e.hasNext()) {
-        val next = iter_e.next()
+      val itere = e.iterator()
+      while(itere.hasNext()) {
+        val next = itere.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()
     tlvWriter.startList(ContextSpecificTag(5))
-      val iter_f = f.iterator()
-      while(iter_f.hasNext()) {
-        val next = iter_f.next()
+      val iterf = f.iterator()
+      while(iterf.hasNext()) {
+        val next = iterf.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()
     tlvWriter.startList(ContextSpecificTag(6))
-      val iter_g = g.iterator()
-      while(iter_g.hasNext()) {
-        val next = iter_g.next()
+      val iterg = g.iterator()
+      while(iterg.hasNext()) {
+        val next = iterg.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()

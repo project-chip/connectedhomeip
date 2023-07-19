@@ -21,14 +21,14 @@
     }
   {%- elif encodable.is_optional -%}
     if ({{name}}.isPresent) {
-      val opt_{{name}} = {{name}}.get()
-      {{encode_tlv(encodable.without_optional(), tag, "opt_" + name, depth + 1)}}
+      val opt{{name}} = {{name}}.get()
+      {{encode_tlv(encodable.without_optional(), tag, "opt" + name, depth + 1)}}
     }
   {%- elif encodable.is_list -%}
       tlvWriter.startList({{tag}})
-      val iter_{{name}} = {{name}}.iterator()
-      while(iter_{{name}}.hasNext()) {
-        val next = iter_{{name}}.next()
+      val iter{{name}} = {{name}}.iterator()
+      while(iter{{name}}.hasNext()) {
+        val next = iter{{name}}.next()
         {{encode_tlv(encodable.without_list(), "AnonymousTag", "next", depth + 1)}}
       }
       tlvWriter.endList()

@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -43,16 +43,16 @@ class ContentLauncherClusterStyleInformationStruct (
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
     if (imageURL.isPresent) {
-      val opt_imageURL = imageURL.get()
-      tlvWriter.put(ContextSpecificTag(0), opt_imageURL)
+      val optimageURL = imageURL.get()
+      tlvWriter.put(ContextSpecificTag(0), optimageURL)
     }
     if (color.isPresent) {
-      val opt_color = color.get()
-      tlvWriter.put(ContextSpecificTag(1), opt_color)
+      val optcolor = color.get()
+      tlvWriter.put(ContextSpecificTag(1), optcolor)
     }
     if (size.isPresent) {
-      val opt_size = size.get()
-      opt_size.toTlv(ContextSpecificTag(2), tlvWriter)
+      val optsize = size.get()
+      optsize.toTlv(ContextSpecificTag(2), tlvWriter)
     }
     tlvWriter.endStructure()
   }

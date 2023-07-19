@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -41,16 +41,16 @@ class GeneralDiagnosticsClusterHardwareFaultChangeEvent (
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
     tlvWriter.startList(ContextSpecificTag(0))
-      val iter_current = current.iterator()
-      while(iter_current.hasNext()) {
-        val next = iter_current.next()
+      val itercurrent = current.iterator()
+      while(itercurrent.hasNext()) {
+        val next = itercurrent.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()
     tlvWriter.startList(ContextSpecificTag(1))
-      val iter_previous = previous.iterator()
-      while(iter_previous.hasNext()) {
-        val next = iter_previous.next()
+      val iterprevious = previous.iterator()
+      while(iterprevious.hasNext()) {
+        val next = iterprevious.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()

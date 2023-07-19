@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -44,12 +44,12 @@ class SoftwareDiagnosticsClusterSoftwareFaultEvent (
     tlvWriter.startStructure(tag)
     tlvWriter.put(ContextSpecificTag(0), id)
     if (name.isPresent) {
-      val opt_name = name.get()
-      tlvWriter.put(ContextSpecificTag(1), opt_name)
+      val optname = name.get()
+      tlvWriter.put(ContextSpecificTag(1), optname)
     }
     if (faultRecording.isPresent) {
-      val opt_faultRecording = faultRecording.get()
-      tlvWriter.put(ContextSpecificTag(2), opt_faultRecording)
+      val optfaultRecording = faultRecording.get()
+      tlvWriter.put(ContextSpecificTag(2), optfaultRecording)
     }
     tlvWriter.endStructure()
   }

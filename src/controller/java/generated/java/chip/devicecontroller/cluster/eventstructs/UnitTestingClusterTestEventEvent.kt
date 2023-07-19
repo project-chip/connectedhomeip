@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -53,16 +53,16 @@ class UnitTestingClusterTestEventEvent (
     tlvWriter.put(ContextSpecificTag(3), arg3)
     arg4.toTlv(ContextSpecificTag(4), tlvWriter)
     tlvWriter.startList(ContextSpecificTag(5))
-      val iter_arg5 = arg5.iterator()
-      while(iter_arg5.hasNext()) {
-        val next = iter_arg5.next()
+      val iterarg5 = arg5.iterator()
+      while(iterarg5.hasNext()) {
+        val next = iterarg5.next()
         next.toTlv(AnonymousTag, tlvWriter)
       }
       tlvWriter.endList()
     tlvWriter.startList(ContextSpecificTag(6))
-      val iter_arg6 = arg6.iterator()
-      while(iter_arg6.hasNext()) {
-        val next = iter_arg6.next()
+      val iterarg6 = arg6.iterator()
+      while(iterarg6.hasNext()) {
+        val next = iterarg6.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()

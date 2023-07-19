@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -46,15 +46,15 @@ class RvcOperationalStateClusterOperationCompletionEvent (
     if (totalOperationalTime == null) { tlvWriter.putNull(ContextSpecificTag(1)) }
     else {
       if (totalOperationalTime.isPresent) {
-      val opt_totalOperationalTime = totalOperationalTime.get()
-      tlvWriter.put(ContextSpecificTag(1), opt_totalOperationalTime)
+      val opttotalOperationalTime = totalOperationalTime.get()
+      tlvWriter.put(ContextSpecificTag(1), opttotalOperationalTime)
     }
     }
     if (pausedTime == null) { tlvWriter.putNull(ContextSpecificTag(2)) }
     else {
       if (pausedTime.isPresent) {
-      val opt_pausedTime = pausedTime.get()
-      tlvWriter.put(ContextSpecificTag(2), opt_pausedTime)
+      val optpausedTime = pausedTime.get()
+      tlvWriter.put(ContextSpecificTag(2), optpausedTime)
     }
     }
     tlvWriter.endStructure()

@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -46,15 +46,15 @@ class GroupKeyManagementClusterGroupInfoMapStruct (
     tlvWriter.startStructure(tag)
     tlvWriter.put(ContextSpecificTag(1), groupId)
     tlvWriter.startList(ContextSpecificTag(2))
-      val iter_endpoints = endpoints.iterator()
-      while(iter_endpoints.hasNext()) {
-        val next = iter_endpoints.next()
+      val iterendpoints = endpoints.iterator()
+      while(iterendpoints.hasNext()) {
+        val next = iterendpoints.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()
     if (groupName.isPresent) {
-      val opt_groupName = groupName.get()
-      tlvWriter.put(ContextSpecificTag(3), opt_groupName)
+      val optgroupName = groupName.get()
+      tlvWriter.put(ContextSpecificTag(3), optgroupName)
     }
     tlvWriter.put(ContextSpecificTag(254), fabricIndex)
     tlvWriter.endStructure()

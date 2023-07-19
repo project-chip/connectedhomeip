@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -45,9 +45,9 @@ class RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct (
     tlvWriter.put(ContextSpecificTag(0), label)
     tlvWriter.put(ContextSpecificTag(1), mode)
     tlvWriter.startList(ContextSpecificTag(2))
-      val iter_modeTags = modeTags.iterator()
-      while(iter_modeTags.hasNext()) {
-        val next = iter_modeTags.next()
+      val itermodeTags = modeTags.iterator()
+      while(itermodeTags.hasNext()) {
+        val next = itermodeTags.next()
         next.toTlv(AnonymousTag, tlvWriter)
       }
       tlvWriter.endList()

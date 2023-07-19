@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -49,16 +49,16 @@ class ChannelClusterChannelInfoStruct (
     tlvWriter.put(ContextSpecificTag(0), majorNumber)
     tlvWriter.put(ContextSpecificTag(1), minorNumber)
     if (name.isPresent) {
-      val opt_name = name.get()
-      tlvWriter.put(ContextSpecificTag(2), opt_name)
+      val optname = name.get()
+      tlvWriter.put(ContextSpecificTag(2), optname)
     }
     if (callSign.isPresent) {
-      val opt_callSign = callSign.get()
-      tlvWriter.put(ContextSpecificTag(3), opt_callSign)
+      val optcallSign = callSign.get()
+      tlvWriter.put(ContextSpecificTag(3), optcallSign)
     }
     if (affiliateCallSign.isPresent) {
-      val opt_affiliateCallSign = affiliateCallSign.get()
-      tlvWriter.put(ContextSpecificTag(4), opt_affiliateCallSign)
+      val optaffiliateCallSign = affiliateCallSign.get()
+      tlvWriter.put(ContextSpecificTag(4), optaffiliateCallSign)
     }
     tlvWriter.endStructure()
   }

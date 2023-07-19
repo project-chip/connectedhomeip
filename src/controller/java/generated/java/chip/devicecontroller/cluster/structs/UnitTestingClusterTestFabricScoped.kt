@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -54,8 +54,8 @@ class UnitTestingClusterTestFabricScoped (
     tlvWriter.startStructure(tag)
     tlvWriter.put(ContextSpecificTag(1), fabricSensitiveInt8u)
     if (optionalFabricSensitiveInt8u.isPresent) {
-      val opt_optionalFabricSensitiveInt8u = optionalFabricSensitiveInt8u.get()
-      tlvWriter.put(ContextSpecificTag(2), opt_optionalFabricSensitiveInt8u)
+      val optoptionalFabricSensitiveInt8u = optionalFabricSensitiveInt8u.get()
+      tlvWriter.put(ContextSpecificTag(2), optoptionalFabricSensitiveInt8u)
     }
     if (nullableFabricSensitiveInt8u == null) { tlvWriter.putNull(ContextSpecificTag(3)) }
     else {
@@ -64,16 +64,16 @@ class UnitTestingClusterTestFabricScoped (
     if (nullableOptionalFabricSensitiveInt8u == null) { tlvWriter.putNull(ContextSpecificTag(4)) }
     else {
       if (nullableOptionalFabricSensitiveInt8u.isPresent) {
-      val opt_nullableOptionalFabricSensitiveInt8u = nullableOptionalFabricSensitiveInt8u.get()
-      tlvWriter.put(ContextSpecificTag(4), opt_nullableOptionalFabricSensitiveInt8u)
+      val optnullableOptionalFabricSensitiveInt8u = nullableOptionalFabricSensitiveInt8u.get()
+      tlvWriter.put(ContextSpecificTag(4), optnullableOptionalFabricSensitiveInt8u)
     }
     }
     tlvWriter.put(ContextSpecificTag(5), fabricSensitiveCharString)
     fabricSensitiveStruct.toTlv(ContextSpecificTag(6), tlvWriter)
     tlvWriter.startList(ContextSpecificTag(7))
-      val iter_fabricSensitiveInt8uList = fabricSensitiveInt8uList.iterator()
-      while(iter_fabricSensitiveInt8uList.hasNext()) {
-        val next = iter_fabricSensitiveInt8uList.next()
+      val iterfabricSensitiveInt8uList = fabricSensitiveInt8uList.iterator()
+      while(iterfabricSensitiveInt8uList.hasNext()) {
+        val next = iterfabricSensitiveInt8uList.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()

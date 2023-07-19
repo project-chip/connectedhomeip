@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -68,11 +68,11 @@ class DoorLockClusterLockOperationErrorEvent (
     if (credentials == null) { tlvWriter.putNull(ContextSpecificTag(6)) }
     else {
       if (credentials.isPresent) {
-      val opt_credentials = credentials.get()
+      val optcredentials = credentials.get()
       tlvWriter.startList(ContextSpecificTag(6))
-      val iter_opt_credentials = opt_credentials.iterator()
-      while(iter_opt_credentials.hasNext()) {
-        val next = iter_opt_credentials.next()
+      val iteroptcredentials = optcredentials.iterator()
+      while(iteroptcredentials.hasNext()) {
+        val next = iteroptcredentials.next()
         next.toTlv(AnonymousTag, tlvWriter)
       }
       tlvWriter.endList()

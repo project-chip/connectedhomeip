@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -39,9 +39,9 @@ class ContentLauncherClusterContentSearchStruct (
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
     tlvWriter.startList(ContextSpecificTag(0))
-      val iter_parameterList = parameterList.iterator()
-      while(iter_parameterList.hasNext()) {
-        val next = iter_parameterList.next()
+      val iterparameterList = parameterList.iterator()
+      while(iterparameterList.hasNext()) {
+        val next = iterparameterList.next()
         next.toTlv(AnonymousTag, tlvWriter)
       }
       tlvWriter.endList()

@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -65,14 +65,14 @@ class UnitTestingClusterNullablesAndOptionalsStruct (
       tlvWriter.put(ContextSpecificTag(0), nullableInt)
     }
     if (optionalInt.isPresent) {
-      val opt_optionalInt = optionalInt.get()
-      tlvWriter.put(ContextSpecificTag(1), opt_optionalInt)
+      val optoptionalInt = optionalInt.get()
+      tlvWriter.put(ContextSpecificTag(1), optoptionalInt)
     }
     if (nullableOptionalInt == null) { tlvWriter.putNull(ContextSpecificTag(2)) }
     else {
       if (nullableOptionalInt.isPresent) {
-      val opt_nullableOptionalInt = nullableOptionalInt.get()
-      tlvWriter.put(ContextSpecificTag(2), opt_nullableOptionalInt)
+      val optnullableOptionalInt = nullableOptionalInt.get()
+      tlvWriter.put(ContextSpecificTag(2), optnullableOptionalInt)
     }
     }
     if (nullableString == null) { tlvWriter.putNull(ContextSpecificTag(3)) }
@@ -80,14 +80,14 @@ class UnitTestingClusterNullablesAndOptionalsStruct (
       tlvWriter.put(ContextSpecificTag(3), nullableString)
     }
     if (optionalString.isPresent) {
-      val opt_optionalString = optionalString.get()
-      tlvWriter.put(ContextSpecificTag(4), opt_optionalString)
+      val optoptionalString = optionalString.get()
+      tlvWriter.put(ContextSpecificTag(4), optoptionalString)
     }
     if (nullableOptionalString == null) { tlvWriter.putNull(ContextSpecificTag(5)) }
     else {
       if (nullableOptionalString.isPresent) {
-      val opt_nullableOptionalString = nullableOptionalString.get()
-      tlvWriter.put(ContextSpecificTag(5), opt_nullableOptionalString)
+      val optnullableOptionalString = nullableOptionalString.get()
+      tlvWriter.put(ContextSpecificTag(5), optnullableOptionalString)
     }
     }
     if (nullableStruct == null) { tlvWriter.putNull(ContextSpecificTag(6)) }
@@ -95,32 +95,32 @@ class UnitTestingClusterNullablesAndOptionalsStruct (
       nullableStruct.toTlv(ContextSpecificTag(6), tlvWriter)
     }
     if (optionalStruct.isPresent) {
-      val opt_optionalStruct = optionalStruct.get()
-      opt_optionalStruct.toTlv(ContextSpecificTag(7), tlvWriter)
+      val optoptionalStruct = optionalStruct.get()
+      optoptionalStruct.toTlv(ContextSpecificTag(7), tlvWriter)
     }
     if (nullableOptionalStruct == null) { tlvWriter.putNull(ContextSpecificTag(8)) }
     else {
       if (nullableOptionalStruct.isPresent) {
-      val opt_nullableOptionalStruct = nullableOptionalStruct.get()
-      opt_nullableOptionalStruct.toTlv(ContextSpecificTag(8), tlvWriter)
+      val optnullableOptionalStruct = nullableOptionalStruct.get()
+      optnullableOptionalStruct.toTlv(ContextSpecificTag(8), tlvWriter)
     }
     }
     if (nullableList == null) { tlvWriter.putNull(ContextSpecificTag(9)) }
     else {
       tlvWriter.startList(ContextSpecificTag(9))
-      val iter_nullableList = nullableList.iterator()
-      while(iter_nullableList.hasNext()) {
-        val next = iter_nullableList.next()
+      val iternullableList = nullableList.iterator()
+      while(iternullableList.hasNext()) {
+        val next = iternullableList.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()
     }
     if (optionalList.isPresent) {
-      val opt_optionalList = optionalList.get()
+      val optoptionalList = optionalList.get()
       tlvWriter.startList(ContextSpecificTag(10))
-      val iter_opt_optionalList = opt_optionalList.iterator()
-      while(iter_opt_optionalList.hasNext()) {
-        val next = iter_opt_optionalList.next()
+      val iteroptoptionalList = optoptionalList.iterator()
+      while(iteroptoptionalList.hasNext()) {
+        val next = iteroptoptionalList.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()
@@ -128,11 +128,11 @@ class UnitTestingClusterNullablesAndOptionalsStruct (
     if (nullableOptionalList == null) { tlvWriter.putNull(ContextSpecificTag(11)) }
     else {
       if (nullableOptionalList.isPresent) {
-      val opt_nullableOptionalList = nullableOptionalList.get()
+      val optnullableOptionalList = nullableOptionalList.get()
       tlvWriter.startList(ContextSpecificTag(11))
-      val iter_opt_nullableOptionalList = opt_nullableOptionalList.iterator()
-      while(iter_opt_nullableOptionalList.hasNext()) {
-        val next = iter_opt_nullableOptionalList.next()
+      val iteroptnullableOptionalList = optnullableOptionalList.iterator()
+      while(iteroptnullableOptionalList.hasNext()) {
+        val next = iteroptnullableOptionalList.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()

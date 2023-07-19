@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -64,16 +64,16 @@ class GeneralDiagnosticsClusterNetworkInterface (
     }
     tlvWriter.put(ContextSpecificTag(4), hardwareAddress)
     tlvWriter.startList(ContextSpecificTag(5))
-      val iter_IPv4Addresses = IPv4Addresses.iterator()
-      while(iter_IPv4Addresses.hasNext()) {
-        val next = iter_IPv4Addresses.next()
+      val iterIPv4Addresses = IPv4Addresses.iterator()
+      while(iterIPv4Addresses.hasNext()) {
+        val next = iterIPv4Addresses.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()
     tlvWriter.startList(ContextSpecificTag(6))
-      val iter_IPv6Addresses = IPv6Addresses.iterator()
-      while(iter_IPv6Addresses.hasNext()) {
-        val next = iter_IPv6Addresses.next()
+      val iterIPv6Addresses = IPv6Addresses.iterator()
+      while(iterIPv6Addresses.hasNext()) {
+        val next = iterIPv6Addresses.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()

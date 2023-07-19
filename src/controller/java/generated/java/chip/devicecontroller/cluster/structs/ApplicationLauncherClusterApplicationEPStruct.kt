@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -42,8 +42,8 @@ class ApplicationLauncherClusterApplicationEPStruct (
     tlvWriter.startStructure(tag)
     application.toTlv(ContextSpecificTag(0), tlvWriter)
     if (endpoint.isPresent) {
-      val opt_endpoint = endpoint.get()
-      tlvWriter.put(ContextSpecificTag(1), opt_endpoint)
+      val optendpoint = endpoint.get()
+      tlvWriter.put(ContextSpecificTag(1), optendpoint)
     }
     tlvWriter.endStructure()
   }

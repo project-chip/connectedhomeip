@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -45,11 +45,11 @@ class ContentLauncherClusterParameterStruct (
     tlvWriter.put(ContextSpecificTag(0), type)
     tlvWriter.put(ContextSpecificTag(1), value)
     if (externalIDList.isPresent) {
-      val opt_externalIDList = externalIDList.get()
+      val optexternalIDList = externalIDList.get()
       tlvWriter.startList(ContextSpecificTag(2))
-      val iter_opt_externalIDList = opt_externalIDList.iterator()
-      while(iter_opt_externalIDList.hasNext()) {
-        val next = iter_opt_externalIDList.next()
+      val iteroptexternalIDList = optexternalIDList.iterator()
+      while(iteroptexternalIDList.hasNext()) {
+        val next = iteroptexternalIDList.next()
         next.toTlv(AnonymousTag, tlvWriter)
       }
       tlvWriter.endList()

@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -42,9 +42,9 @@ class ScenesClusterExtensionFieldSet (
     tlvWriter.startStructure(tag)
     tlvWriter.put(ContextSpecificTag(0), clusterID)
     tlvWriter.startList(ContextSpecificTag(1))
-      val iter_attributeValueList = attributeValueList.iterator()
-      while(iter_attributeValueList.hasNext()) {
-        val next = iter_attributeValueList.next()
+      val iterattributeValueList = attributeValueList.iterator()
+      while(iterattributeValueList.hasNext()) {
+        val next = iterattributeValueList.next()
         next.toTlv(AnonymousTag, tlvWriter)
       }
       tlvWriter.endList()

@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -42,8 +42,8 @@ class OperationalStateClusterOperationalStateStruct (
     tlvWriter.startStructure(tag)
     tlvWriter.put(ContextSpecificTag(0), operationalStateID)
     if (operationalStateLabel.isPresent) {
-      val opt_operationalStateLabel = operationalStateLabel.get()
-      tlvWriter.put(ContextSpecificTag(1), opt_operationalStateLabel)
+      val optoperationalStateLabel = operationalStateLabel.get()
+      tlvWriter.put(ContextSpecificTag(1), optoperationalStateLabel)
     }
     tlvWriter.endStructure()
   }

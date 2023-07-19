@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -50,24 +50,24 @@ class ContentLauncherClusterBrandingInformationStruct (
     tlvWriter.startStructure(tag)
     tlvWriter.put(ContextSpecificTag(0), providerName)
     if (background.isPresent) {
-      val opt_background = background.get()
-      opt_background.toTlv(ContextSpecificTag(1), tlvWriter)
+      val optbackground = background.get()
+      optbackground.toTlv(ContextSpecificTag(1), tlvWriter)
     }
     if (logo.isPresent) {
-      val opt_logo = logo.get()
-      opt_logo.toTlv(ContextSpecificTag(2), tlvWriter)
+      val optlogo = logo.get()
+      optlogo.toTlv(ContextSpecificTag(2), tlvWriter)
     }
     if (progressBar.isPresent) {
-      val opt_progressBar = progressBar.get()
-      opt_progressBar.toTlv(ContextSpecificTag(3), tlvWriter)
+      val optprogressBar = progressBar.get()
+      optprogressBar.toTlv(ContextSpecificTag(3), tlvWriter)
     }
     if (splash.isPresent) {
-      val opt_splash = splash.get()
-      opt_splash.toTlv(ContextSpecificTag(4), tlvWriter)
+      val optsplash = splash.get()
+      optsplash.toTlv(ContextSpecificTag(4), tlvWriter)
     }
     if (waterMark.isPresent) {
-      val opt_waterMark = waterMark.get()
-      opt_waterMark.toTlv(ContextSpecificTag(5), tlvWriter)
+      val optwaterMark = waterMark.get()
+      optwaterMark.toTlv(ContextSpecificTag(5), tlvWriter)
     }
     tlvWriter.endStructure()
   }

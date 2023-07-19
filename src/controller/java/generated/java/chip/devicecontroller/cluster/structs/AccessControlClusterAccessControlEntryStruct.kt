@@ -17,9 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.Tag
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
+import chip.tlv.Tag
 import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
@@ -51,9 +51,9 @@ class AccessControlClusterAccessControlEntryStruct (
     if (subjects == null) { tlvWriter.putNull(ContextSpecificTag(3)) }
     else {
       tlvWriter.startList(ContextSpecificTag(3))
-      val iter_subjects = subjects.iterator()
-      while(iter_subjects.hasNext()) {
-        val next = iter_subjects.next()
+      val itersubjects = subjects.iterator()
+      while(itersubjects.hasNext()) {
+        val next = itersubjects.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()
@@ -61,9 +61,9 @@ class AccessControlClusterAccessControlEntryStruct (
     if (targets == null) { tlvWriter.putNull(ContextSpecificTag(4)) }
     else {
       tlvWriter.startList(ContextSpecificTag(4))
-      val iter_targets = targets.iterator()
-      while(iter_targets.hasNext()) {
-        val next = iter_targets.next()
+      val itertargets = targets.iterator()
+      while(itertargets.hasNext()) {
+        val next = itertargets.next()
         next.toTlv(AnonymousTag, tlvWriter)
       }
       tlvWriter.endList()
