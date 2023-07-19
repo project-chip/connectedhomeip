@@ -53,9 +53,9 @@ tests:
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 1
           constraints:
               type: bitmap32
+              hasMasksSet: [0x1]
 
     - label: "TH reads the AttributeList attribute from the DUT"
       command: "readAttribute"
@@ -95,7 +95,6 @@ tests:
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
-          value: []
           constraints:
               type: list
               contains: [1]
@@ -107,7 +106,6 @@ tests:
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
-          value: []
           constraints:
               type: list
               contains: [0]

@@ -37,7 +37,7 @@ tests:
       command: "writeAttribute"
       attribute: "State"
       arguments:
-          value: 2
+          value: 1
 
     - label: "TH reads from the DUT the State attribute"
       PICS: DISHALM.S.A0002
@@ -45,7 +45,7 @@ tests:
       attribute: "State"
       response:
           constraints:
-              value: 2
+              hasMasksSet: [0x1]
 
     - label: "Operate device to set State attribute bit 0 (Inflow) to 0"
       PICS: DISHALM.M.ManuallyControlled
@@ -68,7 +68,7 @@ tests:
       attribute: "State"
       response:
           constraints:
-              value: 1
+              hasMasksSet: [0x1]
 
     - label:
           "TH sends command Reset to DUT with bit 0 (Inflow) of Alarms set to 1"
@@ -105,7 +105,7 @@ tests:
       attribute: "State"
       response:
           constraints:
-              value: 1
+              hasMasksSet: [0x1]
 
     - label: "Operate device to set State attribute bit 0 (Inflow) to 0"
       PICS: DISHALM.S.A0002 && DISHALM.S.C00.Rsp

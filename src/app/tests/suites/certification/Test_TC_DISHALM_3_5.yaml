@@ -39,7 +39,7 @@ tests:
       command: "writeAttribute"
       attribute: "State"
       arguments:
-          value: 10
+          value: 16
 
     - label: "TH reads from the DUT the State attribute"
       PICS: DISHALM.S.A0002
@@ -47,7 +47,7 @@ tests:
       attribute: "State"
       response:
           constraints:
-              value: 10
+              hasMasksSet: [0x10]
 
     - label: "Operate device to set State attribute bit 4 (TempHigh) to 0"
       PICS: DISHALM.M.ManuallyControlled
@@ -70,7 +70,7 @@ tests:
       attribute: "State"
       response:
           constraints:
-              value: 10
+              hasMasksSet: [0x10]
 
     - label:
           "TH sends command Reset to DUT with bit 4 (TempHigh) of Alarms set to
@@ -98,7 +98,7 @@ tests:
       command: "writeAttribute"
       attribute: "State"
       arguments:
-          value: 10
+          value: 16
       response:
           value: { Notify: TRUE }
 
@@ -108,7 +108,7 @@ tests:
       attribute: "State"
       response:
           constraints:
-              value: 10
+              hasMasksSet: [0x10]
 
     - label: "Operate device to set State attribute bit 4 (TempHigh) to 0"
       PICS: DISHALM.S.A0002 && DISHALM.S.C00.Rsp

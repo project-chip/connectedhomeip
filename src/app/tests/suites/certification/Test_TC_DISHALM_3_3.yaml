@@ -45,7 +45,7 @@ tests:
       attribute: "State"
       response:
           constraints:
-              value: 4
+              hasMasksSet: [0x4]
 
     - label: "Operate device to set State attribute bit 2 (Door) to 0"
       PICS: DISHALM.M.ManuallyControlled
@@ -68,7 +68,7 @@ tests:
       attribute: "State"
       response:
           constraints:
-              value: 4
+              hasMasksSet: [0x4]
 
     - label:
           "TH sends command Reset to DUT with bit 2 (Door) of Alarms set to 1"
@@ -105,7 +105,7 @@ tests:
       attribute: "State"
       response:
           constraints:
-              value: 4
+              hasMasksSet: [0x4]
 
     - label: "Operate device to set State attribute bit 2 (Door) to 0"
       PICS: DISHALM.S.A0002 && DISHALM.S.C00.Rsp

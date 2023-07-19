@@ -9540,7 +9540,6 @@ PICS:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: RVCCLEANMS.S.C03.Tx
 
-<<<<<<< HEAD
 ##  Dishwasher Alarm
 
     # Features
@@ -9582,7 +9581,6 @@ PICS:
 
     - label: "Does the device implement receiving the Modify command?"
       id: DISHALM.S.C01.Rsp
-=======
     #
     #Operational State
     #
@@ -9606,4 +9604,3 @@ PICS:
 
     - label: "Does the device implement receiving the Resume command?"
       id: OPSTATE.S.C03
->>>>>>> master

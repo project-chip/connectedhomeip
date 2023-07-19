@@ -38,7 +38,7 @@ tests:
       command: "writeAttribute"
       attribute: "State"
       arguments:
-          value: 20
+          value: 32
 
     - label: "TH reads from the DUT the State attribute"
       PICS: DISHALM.S.A0002
@@ -46,7 +46,7 @@ tests:
       attribute: "State"
       response:
           constraints:
-              value: 20
+              hasMasksSet: [0x20]
 
     - label: "Operate device to set State attribute bit 5 (WaterLevel) to 0"
       PICS: DISHALM.M.ManuallyControlled
@@ -69,7 +69,7 @@ tests:
       attribute: "State"
       response:
           constraints:
-              value: 20
+              hasMasksSet: [0x20]
 
     - label:
           "TH sends command Reset to DUT with bit 5 (WaterLevel) of Alarms set
@@ -97,7 +97,7 @@ tests:
       command: "writeAttribute"
       attribute: "State"
       arguments:
-          value: 20
+          value: 32
       response:
           value: { Notify: TRUE }
 
@@ -107,7 +107,7 @@ tests:
       attribute: "State"
       response:
           constraints:
-              value: 20
+              hasMasksSet: [0x20]
 
     - label: "Operate device to set State attribute bit 5 (WaterLevel) to 0"
       PICS: DISHALM.S.A0002 && DISHALM.S.C00.Rsp

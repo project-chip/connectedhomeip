@@ -47,7 +47,7 @@ tests:
       attribute: "State"
       response:
           constraints:
-              value: 8
+              hasMasksSet: [0x8]
 
     - label: "Operate device to set State attribute bit 3 (TempLow) to 0"
       PICS: DISHALM.M.ManuallyControlled
@@ -70,7 +70,7 @@ tests:
       attribute: "State"
       response:
           constraints:
-              value: 8
+              hasMasksSet: [0x8]
 
     - label:
           "TH sends command Reset to DUT with bit 3 (TempLow) of Alarms set to 1"
@@ -107,7 +107,7 @@ tests:
       attribute: "State"
       response:
           constraints:
-              value: 8
+              hasMasksSet: [0x8]
 
     - label: "Operate device to set State attribute bit 3 (TempLow) to 0"
       PICS: DISHALM.S.A0002 && DISHALM.S.C00.Rsp
