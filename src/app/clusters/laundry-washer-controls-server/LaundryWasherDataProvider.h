@@ -20,17 +20,15 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 
 #include <lib/support/Span.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::LaundryWasherControls;
 
-
 namespace chip {
-
 
 constexpr size_t kSpinSpeedMaxSize               = 32u;
 constexpr size_t kLaundryWasherMaxSerializedSize = 512u;
@@ -60,7 +58,7 @@ struct SupportedRinsesListSpan
 class LaundryWasherDataProvider
 {
 public:
-    using SpinSpeedList = chip::app::DataModel::List<const chip::CharSpan>;
+    using SpinSpeedList       = chip::app::DataModel::List<const chip::CharSpan>;
     using SupportedRinsesList = chip::app::DataModel::List<const NumberOfRinsesEnum>;
 
     ~LaundryWasherDataProvider() {}
@@ -123,7 +121,8 @@ public:
      * @param size The number of phase list's item.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR LoadSupportedRinsesList(EndpointId endpoint, ClusterId clusterId, SupportedRinsesListSpan ** pSupportedRinsesList, size_t & size);
+    CHIP_ERROR LoadSupportedRinsesList(EndpointId endpoint, ClusterId clusterId, SupportedRinsesListSpan ** pSupportedRinsesList,
+                                       size_t & size);
 
     /**
      * Rlease SupportedRinsesListSpan
@@ -150,7 +149,5 @@ private:
     CHIP_ERROR Load(const char * key, MutableByteSpan & buffer);
     PersistentStorageDelegate * mPersistentStorage = nullptr;
 };
-
-
 
 } // namespace chip

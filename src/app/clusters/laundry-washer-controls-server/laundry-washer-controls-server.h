@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af.h>
-#include <app/AttributeAccessInterface.h>
 #include "LaundryWasherDataProvider.h"
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
+#include <app/util/af.h>
 
 namespace chip {
 namespace app {
@@ -37,7 +37,7 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     static LaundryWasherControlsServer & Instance();
 
-    using SpinSpeedList = DataModel::List<const chip::CharSpan>;
+    using SpinSpeedList       = DataModel::List<const chip::CharSpan>;
     using SupportedRinsesList = DataModel::List<const NumberOfRinsesEnum>;
 
     /**
@@ -116,6 +116,7 @@ public:
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     EmberAfStatus GetSupportedRinsesList(EndpointId endpointId, SupportedRinsesListSpan ** supportedRinsesList, size_t & size);
+
 private:
     /**
      * Rlease SpinSpeedListCharSpan
@@ -136,7 +137,7 @@ private:
      * @param supportedRinsesList The pointer for which to clear the SupportedRinsesListSpan.
      * @return void
      */
-    void ReleaseSupportedRinsesList(SupportedRinsesListSpan* supportedRinsesList);
+    void ReleaseSupportedRinsesList(SupportedRinsesListSpan * supportedRinsesList);
 
     /**
      * Clear supported rinses list.

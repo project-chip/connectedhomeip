@@ -20,7 +20,8 @@
 #include <lib/core/TLV.h>
 namespace chip {
 
-CHIP_ERROR LaundryWasherDataProvider::StoreSpinSpeedList(EndpointId endpoint, ClusterId clusterId, const SpinSpeedList & spinSpeedList)
+CHIP_ERROR LaundryWasherDataProvider::StoreSpinSpeedList(EndpointId endpoint, ClusterId clusterId,
+                                                         const SpinSpeedList & spinSpeedList)
 {
     uint8_t buffer[kLaundryWasherMaxSerializedSize];
     TLV::TLVWriter writer;
@@ -32,23 +33,26 @@ CHIP_ERROR LaundryWasherDataProvider::StoreSpinSpeedList(EndpointId endpoint, Cl
         ReturnErrorOnFailure(writer.PutString(TLV::AnonymousTag(), spinSpeed.data()));
     }
     ReturnErrorOnFailure(writer.EndContainer(outerType));
-    return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::LaundryWasherCtrlSpinSpeedsList(endpoint, clusterId).KeyName(),
-                                               buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
+    return mPersistentStorage->SyncSetKeyValue(
+        DefaultStorageKeyAllocator::LaundryWasherCtrlSpinSpeedsList(endpoint, clusterId).KeyName(), buffer,
+        static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
-CHIP_ERROR LaundryWasherDataProvider::LoadSpinSpeedList(EndpointId endpoint, ClusterId clusterId, SpinSpeedListCharSpan ** pSpinSpeedList, size_t & size)
+CHIP_ERROR LaundryWasherDataProvider::LoadSpinSpeedList(EndpointId endpoint, ClusterId clusterId,
+                                                        SpinSpeedListCharSpan ** pSpinSpeedList, size_t & size)
 {
     uint8_t buffer[kLaundryWasherMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
     size           = 0;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::LaundryWasherCtrlSpinSpeedsList(endpoint, clusterId).KeyName(), bufferSpan));
+    ReturnErrorOnFailure(
+        Load(DefaultStorageKeyAllocator::LaundryWasherCtrlSpinSpeedsList(endpoint, clusterId).KeyName(), bufferSpan));
     TLV::TLVReader reader;
     TLV::TLVType outerType;
     reader.Init(bufferSpan.data(), bufferSpan.size());
     ReturnErrorOnFailure(reader.Next(TLV::TLVType::kTLVType_Array, TLV::AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
-    size_t i                 = 0;
+    size_t i                     = 0;
     SpinSpeedListCharSpan * head = nullptr;
     while (reader.Next() != CHIP_ERROR_END_OF_TLV)
     {
@@ -97,7 +101,7 @@ CHIP_ERROR LaundryWasherDataProvider::LoadSpinSpeedList(EndpointId endpoint, Clu
         }
     }
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
-    size       = i;
+    size            = i;
     *pSpinSpeedList = head;
     return err;
 }
@@ -107,7 +111,7 @@ void LaundryWasherDataProvider::ReleaseSpinSpeedList(SpinSpeedListCharSpan * spi
     while (spinSpeedList)
     {
         SpinSpeedListCharSpan * del = spinSpeedList;
-        spinSpeedList           = spinSpeedList->Next;
+        spinSpeedList               = spinSpeedList->Next;
         chip::Platform::Delete(del);
     }
 }
@@ -118,7 +122,8 @@ CHIP_ERROR LaundryWasherDataProvider::ClearSpinSpeedList(EndpointId endpoint, Cl
         DefaultStorageKeyAllocator::LaundryWasherCtrlSpinSpeedsList(endpoint, clusterId).KeyName());
 }
 
-CHIP_ERROR LaundryWasherDataProvider::StoreSupportedRinsesList(EndpointId endpoint, ClusterId clusterId, const SupportedRinsesList & supportedRinsesList)
+CHIP_ERROR LaundryWasherDataProvider::StoreSupportedRinsesList(EndpointId endpoint, ClusterId clusterId,
+                                                               const SupportedRinsesList & supportedRinsesList)
 {
     uint8_t buffer[kLaundryWasherMaxSerializedSize];
     TLV::TLVWriter writer;
@@ -127,33 +132,36 @@ CHIP_ERROR LaundryWasherDataProvider::StoreSupportedRinsesList(EndpointId endpoi
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType));
     for (auto const & supportedRinse : supportedRinsesList)
     {
-        //ReturnErrorOnFailure(writer.PutString(TLV::AnonymousTag(), supportedRinse.data()));
-        //ReturnErrorOnFailure(supportedRinse.Encode(writer, TLV::AnonymousTag()));
+        // ReturnErrorOnFailure(writer.PutString(TLV::AnonymousTag(), supportedRinse.data()));
+        // ReturnErrorOnFailure(supportedRinse.Encode(writer, TLV::AnonymousTag()));
         ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), supportedRinse));
     }
     ReturnErrorOnFailure(writer.EndContainer(outerType));
-    return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::LaundryWasherCtrlSupportedRinsesList(endpoint, clusterId).KeyName(),
-                                               buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
+    return mPersistentStorage->SyncSetKeyValue(
+        DefaultStorageKeyAllocator::LaundryWasherCtrlSupportedRinsesList(endpoint, clusterId).KeyName(), buffer,
+        static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
-CHIP_ERROR LaundryWasherDataProvider::LoadSupportedRinsesList(EndpointId endpoint, ClusterId clusterId, SupportedRinsesListSpan ** pSupportedRinsesList, size_t & size)
+CHIP_ERROR LaundryWasherDataProvider::LoadSupportedRinsesList(EndpointId endpoint, ClusterId clusterId,
+                                                              SupportedRinsesListSpan ** pSupportedRinsesList, size_t & size)
 {
     uint8_t buffer[kLaundryWasherMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
     size           = 0;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::LaundryWasherCtrlSupportedRinsesList(endpoint, clusterId).KeyName(), bufferSpan));
+    ReturnErrorOnFailure(
+        Load(DefaultStorageKeyAllocator::LaundryWasherCtrlSupportedRinsesList(endpoint, clusterId).KeyName(), bufferSpan));
     TLV::TLVReader reader;
     TLV::TLVType outerType;
     reader.Init(bufferSpan.data(), bufferSpan.size());
     ReturnErrorOnFailure(reader.Next(TLV::TLVType::kTLVType_Array, TLV::AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
-    size_t i                 = 0;
+    size_t i                       = 0;
     SupportedRinsesListSpan * head = nullptr;
     while (reader.Next() != CHIP_ERROR_END_OF_TLV)
     {
-        SupportedRinsesListSpan* newSupportedRinse = chip::Platform::New<SupportedRinsesListSpan>();
-        if (newSupportedRinse== nullptr)
+        SupportedRinsesListSpan * newSupportedRinse = chip::Platform::New<SupportedRinsesListSpan>();
+        if (newSupportedRinse == nullptr)
         {
             ChipLogProgress(Zcl, "Malloc error");
             break;
@@ -169,7 +177,7 @@ CHIP_ERROR LaundryWasherDataProvider::LoadSupportedRinsesList(EndpointId endpoin
         }
         else
         {
-            SupportedRinsesListSpan* pList = head;
+            SupportedRinsesListSpan * pList = head;
             while (pList->Next != nullptr)
             {
                 pList = pList->Next;
@@ -178,7 +186,7 @@ CHIP_ERROR LaundryWasherDataProvider::LoadSupportedRinsesList(EndpointId endpoin
         }
     }
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
-    size       = i;
+    size                  = i;
     *pSupportedRinsesList = head;
     return err;
 }
@@ -187,8 +195,8 @@ void LaundryWasherDataProvider::ReleaseSupportedRinsesList(SupportedRinsesListSp
 {
     while (supportedRinsesList)
     {
-        SupportedRinsesListSpan* del = supportedRinsesList;
-        supportedRinsesList = supportedRinsesList->Next;
+        SupportedRinsesListSpan * del = supportedRinsesList;
+        supportedRinsesList           = supportedRinsesList->Next;
         chip::Platform::Delete(del);
     }
 }
@@ -207,4 +215,4 @@ CHIP_ERROR LaundryWasherDataProvider::Load(const char * key, MutableByteSpan & b
     return CHIP_NO_ERROR;
 }
 
-}
+} // namespace chip
