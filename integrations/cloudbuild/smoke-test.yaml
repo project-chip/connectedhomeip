@@ -12,7 +12,9 @@ steps:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - "-c"
-          - source ./scripts/bootstrap.sh
+          - |
+            perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt
+            source ./scripts/bootstrap.sh
       id: Bootstrap
       waitFor:
           - Submodules
