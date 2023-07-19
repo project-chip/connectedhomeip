@@ -35,7 +35,8 @@ tests:
                 value: nodeId
 
     - label:
-          "TH reads NumberOfHoliday SchedulesSupported and saves for future use."
+          "Step 1: TH reads NumberOfHoliday SchedulesSupported and saves for
+          future use."
       PICS: DRLK.S.F0b && DRLK.S.A0016
       command: "readAttribute"
       attribute: "NumberOfHolidaySchedulesSupported"
@@ -45,7 +46,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "Create Holiday schedule with 1 index"
+    - label: "Step 2: Create Holiday schedule with 1 index"
       PICS: DRLK.S.F0b && DRLK.S.C11.Rsp
       command: "SetHolidaySchedule"
       arguments:
@@ -59,7 +60,7 @@ tests:
               - name: "OperatingMode"
                 value: 0
 
-    - label: "Get Holiday Schedule with HolidayIndex as 1"
+    - label: "Step 3a: Get Holiday Schedule with HolidayIndex as 1"
       PICS: DRLK.S.F0b && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
       command: "GetHolidaySchedule"
       arguments:
@@ -81,7 +82,7 @@ tests:
               - name: "OperatingMode"
                 value: 0
 
-    - label: "Create Holiday schedule with invalid operating mode"
+    - label: "Step 4: Create Holiday schedule with invalid operating mode"
       PICS: DRLK.S.C11.Rsp
       command: "SetHolidaySchedule"
       arguments:
@@ -97,7 +98,7 @@ tests:
       response:
           error: INVALID_COMMAND
 
-    - label: "Get Holiday Schedule with Invalid HolidayIndex 15."
+    - label: "Step 5: Get Holiday Schedule with Invalid HolidayIndex 15."
       PICS: DRLK.S.F0b && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
       command: "GetHolidaySchedule"
       arguments:
@@ -111,7 +112,7 @@ tests:
               - name: "Status"
                 value: 133
 
-    - label: "Get Holiday Schedule with the Non-scheduled HolidayIndex"
+    - label: "Step 6: Get Holiday Schedule with the Non-scheduled HolidayIndex"
       PICS: DRLK.S.F0b && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
       command: "GetHolidaySchedule"
       arguments:
@@ -125,7 +126,7 @@ tests:
               - name: "Status"
                 value: 139
 
-    - label: "Clear Holiday schedule with 1 index"
+    - label: "Step 7: Clear Holiday schedule with 1 index"
       PICS: DRLK.S.F0b && DRLK.S.C13.Rsp
       command: "ClearHolidaySchedule"
       arguments:
@@ -133,7 +134,7 @@ tests:
               - name: "HolidayIndex"
                 value: 1
 
-    - label: "Make sure that holiday schedule was deleted"
+    - label: "Step 8: Make sure that holiday schedule was deleted"
       PICS: DRLK.S.F0b && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
       command: "GetHolidaySchedule"
       arguments:

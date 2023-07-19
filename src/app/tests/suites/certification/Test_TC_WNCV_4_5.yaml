@@ -27,7 +27,7 @@ config:
 
 tests:
     ################ Init Phase #############
-    - label: "0a: Wait for the commissioned device to be retrieved"
+    - label: "Step 0a: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -36,14 +36,14 @@ tests:
                 value: nodeId
 
     ### Trying to randomize DUT's positions
-    - label: "0b: TH sends UpOrOpen command to preposition the DUT"
+    - label: "Step 0b: TH sends UpOrOpen command to preposition the DUT"
       command: "UpOrOpen"
 
     ######## Command GoTo 1 #######
     ### Step 1x -> Check GoToLiftPercentage NVM effects
     - label:
-          "1a: If (PA_LF & LF) TH sends GoToLiftPercentage command with 90%% to
-          DUT"
+          "Step 1a: If (PA_LF & LF) TH sends GoToLiftPercentage command with
+          90%% to DUT"
       command: "GoToLiftPercentage"
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.C05.Rsp
       arguments:
@@ -55,7 +55,7 @@ tests:
     # TODO: For some reason, the window-covering server impl arms a 5s timer before it actually
     #       processes the GoToLiftPercentage command's effect on the current tile value.
     #
-    - label: "1b: TH Waits for 100ms-1s"
+    - label: "Step 1b: TH Waits for 100ms-1s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -63,11 +63,11 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "1c: TH sends StopMotion command to DUT"
+    - label: "Step 1c: TH sends StopMotion command to DUT"
       command: "StopMotion"
       PICS: WNCV.S.C02.Rsp
 
-    - label: "1d: TH Waits for 100ms-1s"
+    - label: "Step 1d: TH Waits for 100ms-1s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -78,8 +78,8 @@ tests:
     ######## Command GoTo 2 ######
     ### Step 2x -> Check GoToTiltPercentage NVM effects
     - label:
-          "2a: If (PA_TL & TL) TH sends GoToTiltPercentage command with 90%% to
-          DUT"
+          "Step 2a: If (PA_TL & TL) TH sends GoToTiltPercentage command with
+          90%% to DUT"
       command: "GoToTiltPercentage"
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.C08.Rsp
       arguments:
@@ -91,7 +91,7 @@ tests:
     # TODO: For some reason, the window-covering server impl arms a 5s timer before it actually
     #       processes the GoToTiltPercentage command's effect on the current tile value.
     #
-    - label: "2b: TH Waits for 100ms-1s"
+    - label: "Step 2b: TH Waits for 100ms-1s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -99,11 +99,11 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "2c: TH sends StopMotion command to DUT"
+    - label: "Step 2c: TH sends StopMotion command to DUT"
       command: "StopMotion"
       PICS: WNCV.S.C02.Rsp
 
-    - label: "2d: TH Waits for 100ms-1s"
+    - label: "Step 2d: TH Waits for 100ms-1s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -114,7 +114,7 @@ tests:
     ######## Check NVM ######
     ### Step 3x -> Store Positions and Reboot
     ### CONDITIONAL Lift Store CurrentPositionLiftPercent100ths this value for step 3e
-    - label: "3a: TH reads CurrentPositionLiftPercent100ths from DUT"
+    - label: "Step 3a: TH reads CurrentPositionLiftPercent100ths from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
@@ -124,7 +124,7 @@ tests:
               notValue: 0
 
     ### CONDITIONAL Tilt Store CurrentPositionTiltPercent100ths this value for step 3f
-    - label: "3b: TH reads CurrentPositionTiltPercent100ths from DUT"
+    - label: "Step 3b: TH reads CurrentPositionTiltPercent100ths from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
@@ -134,13 +134,13 @@ tests:
               notValue: 0
 
     ### DUT TurnOff
-    - label: "3c: reboot/restart the DUT"
+    - label: "Step 3c: reboot/restart the DUT"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
 
-    - label: "Reboot target device(DUT)"
+    - label: "Step Reboot target device(DUT)"
       verification: |
           Did the DUT successfully reboot?
       cluster: "LogCommands"
@@ -154,7 +154,7 @@ tests:
                 value: "y"
 
     ### DUT GoesOff
-    - label: "3d: Wait for the commissioned device to be retrieved"
+    - label: "Step 3d: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -163,7 +163,7 @@ tests:
                 value: nodeId
 
     ### CONDITIONAL Lift Compare CurrentPositionLiftPercent100ths with value for step 3a
-    - label: "3e: TH reads CurrentPositionLiftPercent100ths from DUT"
+    - label: "Step 3e: TH reads CurrentPositionLiftPercent100ths from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
@@ -171,7 +171,7 @@ tests:
           value: attrCurrentPositionLiftPercent100ths
 
     ### CONDITIONAL Tilt Compare CurrentPositionTiltPercent100ths with value for step 3b
-    - label: "3f: TH reads CurrentPositionTiltPercent100ths from DUT"
+    - label: "Step 3f: TH reads CurrentPositionTiltPercent100ths from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
