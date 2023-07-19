@@ -48,7 +48,9 @@ class TestInteractionModelEngine
 public:
     static void TestAttributePathParamsPushRelease(nlTestSuite * apSuite, void * apContext);
     static void TestRemoveDuplicateConcreteAttribute(nlTestSuite * apSuite, void * apContext);
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     static void TestSubscriptionResumptionTimer(nlTestSuite * apSuite, void * apContext);
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     static int GetAttributePathListLength(ObjectList<AttributePathParams> * apattributePathParamsList);
 };
 
@@ -224,6 +226,7 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
 }
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 void TestInteractionModelEngine::TestSubscriptionResumptionTimer(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -252,6 +255,7 @@ void TestInteractionModelEngine::TestSubscriptionResumptionTimer(nlTestSuite * a
     timeTillNextResubscriptionMs = InteractionModelEngine::GetInstance()->ComputeTimeTillNextSubscriptionResumption();
     NL_TEST_ASSERT(apSuite, timeTillNextResubscriptionMs == CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS);
 }
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
 } // namespace app
 } // namespace chip
@@ -263,7 +267,9 @@ const nlTest sTests[] =
         {
                 NL_TEST_DEF("TestAttributePathParamsPushRelease", chip::app::TestInteractionModelEngine::TestAttributePathParamsPushRelease),
                 NL_TEST_DEF("TestRemoveDuplicateConcreteAttribute", chip::app::TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute),
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
                 NL_TEST_DEF("TestSubscriptionResumptionTimer", chip::app::TestInteractionModelEngine::TestSubscriptionResumptionTimer),
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
                 NL_TEST_SENTINEL()
         };
 // clang-format on

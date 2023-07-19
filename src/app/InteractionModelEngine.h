@@ -614,7 +614,7 @@ private:
     bool mForceHandlerQuota = false;
 #endif
 
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     bool HasSubscriptionsToResume();
     uint32_t ComputeTimeTillNextSubscriptionResumption();
     uint32_t mNumSubscriptionResumptionRetries = 0;

@@ -326,7 +326,7 @@ void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
 
     mReadHandlers.ReleaseObject(&apReadObj);
 
-#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     if (!mSubscriptionResumptionScheduled && HasSubscriptionsToResume())
     {
         mSubscriptionResumptionScheduled  = true;
@@ -1763,7 +1763,10 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
 CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    ReturnErrorCodeIf(!mpSubscriptionResumptionStorage || mSubscriptionResumptionScheduled, CHIP_NO_ERROR);
+    ReturnErrorCodeIf(!mpSubscriptionResumptionStorage, CHIP_NO_ERROR);
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    ReturnErrorCodeIf(mSubscriptionResumptionScheduled, CHIP_NO_ERROR);
+#endif
 
     // To avoid the case of a reboot loop causing rapid traffic generation / power consumption, subscription resumption should make
     // use of the persisted min-interval values, and wait before resumption. Ideally, each persisted subscription should wait their
@@ -1788,7 +1791,9 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
 
     if (subscriptionsToResume)
     {
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
         mSubscriptionResumptionScheduled = true;
+#endif
         ChipLogProgress(InteractionModel, "Resuming %d subscriptions in %u seconds", subscriptionsToResume, minInterval);
         ReturnErrorOnFailure(mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(System::Clock::Seconds16(minInterval),
                                                                                            ResumeSubscriptionsTimerCallback, this));
@@ -1806,11 +1811,13 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     VerifyOrReturn(apAppState != nullptr);
-    InteractionModelEngine * imEngine          = static_cast<InteractionModelEngine *>(apAppState);
+    InteractionModelEngine * imEngine = static_cast<InteractionModelEngine *>(apAppState);
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     imEngine->mSubscriptionResumptionScheduled = false;
+    bool resumedSubscriptions                  = false;
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
-    auto * iterator           = imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions();
-    bool resumedSubscriptions = false;
+    auto * iterator = imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions();
     while (iterator->Next(subscriptionInfo))
     {
         // If subscription happens between reboot and this timer callback, it's already live and should skip resumption
@@ -1848,19 +1855,24 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
 
         ChipLogProgress(InteractionModel, "Resuming subscriptionId %" PRIu32, subscriptionInfo.mSubscriptionId);
         handler->ResumeSubscription(*imEngine->mpCASESessionMgr, subscriptionInfo);
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
         resumedSubscriptions = true;
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     }
     iterator->Release();
 
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     // If no persisted subscriptions needed resumption then all resumption retries are done
     if (!resumedSubscriptions)
     {
         imEngine->mNumSubscriptionResumptionRetries = 0;
     }
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 }
 
-#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 uint32_t InteractionModelEngine::ComputeTimeTillNextSubscriptionResumption()
 {
     uint32_t waitTimeInSeconds = 0;
@@ -1909,7 +1921,7 @@ bool InteractionModelEngine::HasSubscriptionsToResume()
 
     return foundSubscriptionToResume;
 }
-#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
 } // namespace app
 } // namespace chip
