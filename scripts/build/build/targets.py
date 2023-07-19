@@ -129,6 +129,7 @@ def BuildHostTarget():
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
         TargetPart('contact-sensor', app=HostApp.CONTACT_SENSOR),
+        TargetPart('dishwasher', app=HostApp.DISHWASHER),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -415,6 +416,7 @@ def BuildASRTarget():
     target.AppendFixedTargets([
         TargetPart('asr582x', board=ASRBoard.ASR582X),
         TargetPart('asr595x', board=ASRBoard.ASR595X),
+        TargetPart('asr550x', board=ASRBoard.ASR550X),
     ])
 
     # apps
@@ -436,6 +438,7 @@ def BuildASRTarget():
     target.AppendModifier('no_logging', chip_logging=False)
     target.AppendModifier('factory', enable_factory=True)
     target.AppendModifier('rotating_id', enable_rotating_device_id=True)
+    target.AppendModifier('rio', enable_lwip_ip6_hook=True)
 
     return target
 

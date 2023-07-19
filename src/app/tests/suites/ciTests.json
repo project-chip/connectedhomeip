@@ -157,6 +157,7 @@
         "Test_TC_OO_2_2",
         "Test_TC_OO_2_4"
     ],
+    "OperationalState": ["Test_TC_OPSTATE_1_1"],
     "PowerSource": ["Test_TC_PS_1_1", "Test_TC_PS_2_1"],
     "PressureMeasurement": [
         "Test_TC_PRS_1_1",
@@ -368,6 +369,7 @@
         "OTASoftwareUpdate",
         "OccupancySensing",
         "OnOff",
+        "OperationalState",
         "PowerSource",
         "PressureMeasurement",
         "PumpConfigurationControl",
