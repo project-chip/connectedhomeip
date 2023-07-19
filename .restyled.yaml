@@ -81,11 +81,11 @@ exclude:
     - "src/controller/java/generated/java/**/*" # not formatted: generated files
     - "src/controller/java/zap-generated/**/*" # not formatted: generated files
     - "scripts/setup/bootstrap.sh" # tries to quote loop variable
-
+    - "integrations/docker/build-all.sh" # tries to quote loop variable
 
 changed_paths:
-  maximum: 100000
-  outcome: error
+    maximum: 100000
+    outcome: error
 
 # Restylers to run, and how
 restylers:
@@ -220,21 +220,21 @@ restylers:
           - "**/*.sh"
           - "**/*.bash"
     - name: autopep8
-      image: 'restyled/restyler-autopep8:v2.0.0'
+      image: restyled/restyler-autopep8:v2.0.0
       command:
-        - autopep8
-        - '--in-place'
+          - autopep8
+          - "--in-place"
       arguments: []
       include:
-        - '**/*.py'
+          - "**/*.py"
       interpreters:
-        - python
+          - python
     - name: isort
-      image: 'restyled/restyler-isort:v5.11.2'
+      image: restyled/restyler-isort:v5.11.2
       command:
-        - isort
+          - isort
       arguments: []
       include:
-        - '**/*.py'
+          - "**/*.py"
       interpreters:
-        - python
+          - python

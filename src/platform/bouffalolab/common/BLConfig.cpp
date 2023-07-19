@@ -15,26 +15,14 @@
  *    limitations under the License.
  */
 
+#include <easyflash.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/bouffalolab/common/BLConfig.h>
 
-#include <lib/core/CHIPEncoding.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CHIPMemString.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
-
-#include <easyflash.h>
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-CHIP_ERROR BLConfig::Init()
-{
-    return CHIP_NO_ERROR;
-}
 
 CHIP_ERROR BLConfig::ReadConfigValue(const char * key, uint8_t * val, size_t size, size_t & readsize)
 {

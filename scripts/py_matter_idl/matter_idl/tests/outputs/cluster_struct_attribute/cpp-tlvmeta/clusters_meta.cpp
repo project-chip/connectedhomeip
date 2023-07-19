@@ -19,7 +19,7 @@ const Entry<ItemInfo> _DemoCluster_ArmFailSafeRequest[] = {
 };
 
 const Entry<ItemInfo> _DemoCluster_ArmFailSafeRequest_list_[] = {
-  { { AnonymousTag(), "[]", ItemType::kDefault }, 3 }, // DemoCluster_ArmFailSafeRequest[]
+  { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 3 }, // DemoCluster_ArmFailSafeRequest[]
 };
 
 const Entry<ItemInfo> _all_clusters[] = {
@@ -29,7 +29,7 @@ const Entry<ItemInfo> _all_clusters[] = {
 
 // For any non-structure list like u64[] or similar.
 const Entry<ItemInfo> _primitive_type_list[] = {
-  { { AnonymousTag(), "[]", ItemType::kDefault }, kInvalidNodeIndex },
+  { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, kInvalidNodeIndex },
 };
 
 } // namespace

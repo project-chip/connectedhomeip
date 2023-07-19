@@ -1,8 +1,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "bl_route_hook.h"
-#include "bl_route_table.h"
 #include "utils_log.h"
 
 #include "lwip/icmp6.h"
@@ -12,7 +10,9 @@
 #include "lwip/prot/ip6.h"
 #include "lwip/prot/nd6.h"
 #include "lwip/raw.h"
-#include <wifi_mgmr_ext.h>
+
+#include "bl_route_hook.h"
+#include "bl_route_table.h"
 
 typedef struct bl_route_hook_t
 {
@@ -35,6 +35,8 @@ PACK_STRUCT_END
 typedef struct rio_header_t rio_header_t;
 
 static bl_route_hook_t * s_hooks;
+
+extern struct netif * deviceInterface_getNetif(void);
 
 static bool is_self_address(struct netif * netif, const ip6_addr_t * addr)
 {
@@ -79,7 +81,7 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
             const uint8_t * rio_data = &icmp_payload[sizeof(rio_header_t)];
             uint8_t rio_data_len     = opt_len - sizeof(rio_header_t);
 
-            log_info("Received RIO\n");
+            log_info("Received RIO\r\n");
             if (rio_data_len >= prefix_len_bytes)
             {
                 ip6_addr_t prefix;
@@ -93,14 +95,14 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
                 route.prefix           = prefix;
                 route.preference       = preference;
                 route.lifetime_seconds = lwip_ntohl(rio_header.route_lifetime);
-                log_info("prefix %s lifetime %u\n", ip6addr_ntoa(&prefix), route.lifetime_seconds);
+                log_info("prefix %s lifetime %u\r\n", ip6addr_ntoa(&prefix), route.lifetime_seconds);
                 if (bl_route_table_add_route_entry(&route) == NULL)
                 {
-                    log_error("Failed to add route table entry\n");
+                    log_error("Failed to add route table entry\r\n");
                 }
                 else
                 {
-                    log_info("Added entry to route table\n");
+                    log_info("Added entry to route table\r\n");
                 }
             }
         }
@@ -127,12 +129,12 @@ static uint8_t icmp6_raw_recv_handler(void * arg, struct raw_pcb * pcb, struct p
 
     if (p->tot_len != p->len)
     {
-        log_error("Ignore segmented ICMP packet\n");
+        log_error("Ignore segmented ICMP packet\r\n");
         return 0;
     }
     if (p->tot_len <= sizeof(struct ip6_hdr) + sizeof(struct icmp6_hdr))
     {
-        log_error("Ignore invalid ICMP packet\n");
+        log_error("Ignore invalid ICMP packet\r\n");
         return 0;
     }
     if (!ip6_addr_islinklocal(&dest) && !ip6_addr_isallnodes_linklocal(&dest) && !ip6_addr_isallrouters_linklocal(&dest))
@@ -151,16 +153,16 @@ static uint8_t icmp6_raw_recv_handler(void * arg, struct raw_pcb * pcb, struct p
     return 0;
 }
 
-int8_t bl_route_hook_init()
+int8_t bl_route_hook_init(void)
 {
-    struct netif * lwip_netif = wifi_mgmr_sta_netif_get();
     ip_addr_t router_group    = IPADDR6_INIT_HOST(0xFF020000, 0, 0, 0x02);
     bl_route_hook_t * hook    = NULL;
     uint8_t ret               = 0;
+    struct netif * lwip_netif = deviceInterface_getNetif();
 
     if (lwip_netif == NULL)
     {
-        log_error("Invalid network interface\n");
+        log_error("Invalid network interface\r\n");
         return -1;
     }
 
@@ -168,7 +170,6 @@ int8_t bl_route_hook_init()
     {
         if (iter->netif == lwip_netif)
         {
-            log_error("Hook already installed on netif, skip...\n");
             return 0;
         }
     }
@@ -176,13 +177,13 @@ int8_t bl_route_hook_init()
     hook = (bl_route_hook_t *) malloc(sizeof(bl_route_hook_t));
     if (hook == NULL)
     {
-        log_error("Cannot allocate hook\n");
+        log_error("Cannot allocate hook\r\n");
         return -1;
     }
 
     if (mld6_joingroup_netif(lwip_netif, ip_2_ip6(&router_group)) != ERR_OK)
     {
-        log_error("Failed to join multicast group\n");
+        log_error("Failed to join multicast group\r\n");
         ret = -1;
         goto exit;
     }
