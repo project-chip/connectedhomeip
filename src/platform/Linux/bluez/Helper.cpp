@@ -867,10 +867,10 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-/// Update the table of open BLE connections whevener a new device is spotted or its attributes have changed.
+/// Update the table of open BLE connections whenever a new device is spotted or its attributes have changed.
 static void UpdateConnectionTable(BluezDevice1 * apDevice, BluezEndpoint & aEndpoint)
 {
-    const gchar * objectPath     = g_dbus_proxy_get_object_path(G_DBUS_PROXY(apDevice));
+    const char * objectPath      = g_dbus_proxy_get_object_path(G_DBUS_PROXY(apDevice));
     BluezConnection * connection = static_cast<BluezConnection *>(g_hash_table_lookup(aEndpoint.mpConnMap, objectPath));
 
     if (connection != nullptr && !bluez_device1_get_connected(apDevice))
@@ -900,7 +900,7 @@ static void UpdateConnectionTable(BluezDevice1 * apDevice, BluezEndpoint & aEndp
         aEndpoint.mpPeerDevicePath = g_strdup(objectPath);
         g_hash_table_insert(aEndpoint.mpConnMap, aEndpoint.mpPeerDevicePath, connection);
 
-        ChipLogDetail(DeviceLayer, "New BLE connection %p, device %s, path %s", connection, connection->mpPeerAddress,
+        ChipLogDetail(DeviceLayer, "New BLE connection: conn %p, device %s, path %s", connection, connection->mpPeerAddress,
                       aEndpoint.mpPeerDevicePath);
 
         BLEManagerImpl::HandleNewConnection(connection);
@@ -931,7 +931,7 @@ static void BluezHandleNewDevice(BluezDevice1 * device, BluezEndpoint * apEndpoi
     }
 
     // We need to handle device connection both this function and BluezSignalInterfacePropertiesChanged
-    // When a device is connected for first time, this function will be triggerred.
+    // When a device is connected for first time, this function will be triggered.
     // The future connections for the same device will trigger ``Connect'' property change.
     // TODO: Factor common code in the two function.
     BluezConnection * conn;
@@ -949,8 +949,10 @@ static void BluezHandleNewDevice(BluezDevice1 * device, BluezEndpoint * apEndpoi
     conn->mpEndpoint    = apEndpoint;
     BluezConnectionInit(conn);
     apEndpoint->mpPeerDevicePath = g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
-    ChipLogDetail(DeviceLayer, "Device %s (Path: %s) Connected", conn->mpPeerAddress, apEndpoint->mpPeerDevicePath);
-    g_hash_table_insert(apEndpoint->mpConnMap, g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))), conn);
+    g_hash_table_insert(apEndpoint->mpConnMap, apEndpoint->mpPeerDevicePath, conn);
+
+    ChipLogDetail(DeviceLayer, "BLE device connected: conn %p, device %s, path %s", conn, conn->mpPeerAddress,
+                  apEndpoint->mpPeerDevicePath);
 
 exit:
     return;
