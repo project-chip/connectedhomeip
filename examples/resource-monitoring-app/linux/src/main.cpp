@@ -42,8 +42,8 @@ static ActivatedCarbonFilterMonitoringInstance
 
 void ApplicationInit()
 {
-    HepafilterInstance.Init();
-    ActivatedCarbonFilterInstance.Init();
+    gHepaFilterInstance.Init();
+    gActivatedCarbonFilterInstance.Init();
 }
 
 int main(int argc, char * argv[])
