@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *          Stub platform manager for fake platform.
+ *          Stub platform manager for renesas platform.
  */
 
 #pragma once

@@ -49,5 +49,3 @@ chip_project_config_include_dirs =
     "//../../../../../../common/generic/",
     "//../../../../../segger-rtt/rtt/"
     ]
-
-    print("=========renesas include paths: ${chip_project_config_include_dirs}")

@@ -31,13 +31,13 @@
 // -------------------- Device Identification Configuration --------------------
 
 /* The VendorName attribute of the Basic cluster. */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME "Infineon"
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME "renesas"
 
 /* The VendorID attribute of the Basic cluster. */
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF2
 
 /* The ProductName attribute of the Basic cluster. */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "CYW30739 Lock App"
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "renesas Lock App"
 
 /* The ProductID attribute of the Basic cluster. */
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8002

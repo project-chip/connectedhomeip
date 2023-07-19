@@ -15,7 +15,7 @@
 import("//build_overrides/chip.gni")
 
 declare_args() {
-  # Build target to use for CYW30739 SDK. Use this to set global SDK defines.
+  # Build target to use for renesas SDK. Use this to set global SDK defines.
   renesas_sdk_target = ""
 }
 

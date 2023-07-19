@@ -20,7 +20,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer on MW320 platforms using the NXP SDK.
+ *          Layer on renesas platforms.
  *
  */
 

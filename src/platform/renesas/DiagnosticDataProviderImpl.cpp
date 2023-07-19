@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides an implementation of the DiagnosticDataProvider object
- *          for CYW30739 platform.
+ *          for renesas platform.
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>

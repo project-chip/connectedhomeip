@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *          Stub for PlatformManagerImpl for fake platform.
+ *          Stub for PlatformManagerImpl for renesas platform.
  */
 #include <platform/PlatformManager.h>
 

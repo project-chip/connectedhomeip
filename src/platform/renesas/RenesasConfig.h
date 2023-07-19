@@ -21,7 +21,7 @@
 /**
  *    @file
  *          Utilities for accessing persisted device configuration on
- *          CYW30739 platforms.
+ *          renesas platforms.
  */
 
 #pragma once

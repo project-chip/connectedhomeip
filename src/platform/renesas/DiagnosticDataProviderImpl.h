@@ -43,21 +43,6 @@ public:
     CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
     CHIP_ERROR GetBootReason(BootReasonType & bootReason) override;
 
-
-    /// @Neethu Maybe we need to implement ethernet methods as well.
-    /**
-     * Ethernet network diagnostics methods
-     */
-    // CHIP_ERROR GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate);
-    // CHIP_ERROR GetEthFullDuplex(bool & fullDuplex);
-    // CHIP_ERROR GetEthCarrierDetect(bool & carrierDetect);
-    // CHIP_ERROR GetEthTimeSinceReset(uint64_t & timeSinceReset);
-    // CHIP_ERROR GetEthPacketRxCount(uint64_t & packetRxCount);
-    // CHIP_ERROR GetEthPacketTxCount(uint64_t & packetTxCount);
-    // CHIP_ERROR GetEthTxErrCount(uint64_t & txErrCount);
-    // CHIP_ERROR GetEthCollisionCount(uint64_t & collisionCount);
-    // CHIP_ERROR GetEthOverrunCount(uint64_t & overrunCount);
-    // CHIP_ERROR ResetEthNetworkDiagnosticsCounts();
 };
 
 /**
