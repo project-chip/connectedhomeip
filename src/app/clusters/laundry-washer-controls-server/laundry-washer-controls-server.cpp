@@ -222,4 +222,3 @@ void MatterLaundryWasherControlsPluginServerInitCallback()
     registerAttributeAccessOverride(&laundryWasherControlsServer);
     laundryWasherControlsServer.Init();
 }
-
