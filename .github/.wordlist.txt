@@ -875,6 +875,7 @@ mlan
 MLD
 mmevk
 moal
+ModeBase
 ModeSelect
 modprobe
 Modustoolbox
