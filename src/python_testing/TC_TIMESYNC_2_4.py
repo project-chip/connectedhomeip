@@ -46,7 +46,8 @@ class TC_TIMESYNC_2_4(MatterBaseTest):
     @async_test_body
     async def test_TC_TIMESYNC_2_4(self):
 
-        self.endpoint = self.user_params.get("endpoint", 0)
+        # Time sync is required to be on endpoint 0 if it is present
+        self.endpoint = 0
 
         time_cluster = Clusters.Objects.TimeSynchronization
         tz_struct = time_cluster.Structs.TimeZoneStruct

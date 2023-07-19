@@ -21,15 +21,14 @@ on:
     workflow_dispatch:
 
 concurrency:
-    group:
-        ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
         'pull_request' && github.event.number) || (github.event_name ==
         'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-
+    
 jobs:
     test_suites_linux:
         name: Test Suites - Linux
@@ -41,9 +40,7 @@ jobs:
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
-            TSAN_OPTIONS:
-                "halt_on_error=1
-                suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
             LSAN_OPTIONS: detect_leaks=1
 
         if: github.actor != 'restyled-io[bot]'
@@ -51,8 +48,7 @@ jobs:
 
         container:
             image: ghcr.io/project-chip/chip-build:1
-            options:
-                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
@@ -70,12 +66,9 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  platform: linux
-                  bootstrap-log-name:
-                      bootstrap-logs-linux-${{ matrix.build_variant }}${{
-                      matrix.chip_tool }}
-            - name:
-                  Try to ensure the directories for core dumping exist and we
+                platform: linux
+                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+            - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
                   mkdir /tmp/cores || true
@@ -219,9 +212,7 @@ jobs:
                      --bridge-app ./out/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
                   "
 
-            - name:
-                  Run Tests using the python parser sending commands to
-                  chip-tool
+            - name: Run Tests using the python parser sending commands to chip-tool
               #   https://github.com/project-chip/connectedhomeip/issues/27673
               if: matrix.build_variant != 'no-ble-tsan-clang'
               run: |
@@ -280,9 +271,7 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name:
-                      crash-core-linux-${{ matrix.build_variant }}${{
-                      matrix.chip_tool }}
+                  name: crash-core-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -290,9 +279,7 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name:
-                      crash-objdir-linux-${{ matrix.build_variant }}${{
-                      matrix.chip_tool }}
+                  name: crash-objdir-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
@@ -302,16 +289,14 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-asan-clang]
+                build_variant: [no-ble-asan-clang] 
                 # Since no-ble-tsan-clang doesn't run any tests, this is just wasted CI time for now
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             TSAN_OPTIONS: "halt_on_error=1"
-            LSAN_OPTIONS:
-                detect_leaks=1
-                suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
+            LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
@@ -332,10 +317,9 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  platform: darwin
-                  bootstrap-log-name:
-                      bootstrap-logs-darwin-${{ matrix.build_variant }}${{
-                      matrix.chip_tool }}
+                platform: darwin
+                bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+
 
             - name: Build Apps
               run: |
@@ -369,10 +353,8 @@ jobs:
                      --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
                   "
 
-            - name:
-                  Run Tests using the python parser sending commands to
-                  chip-tool
-              #   https://github.com/project-chip/connectedhomeip/issues/27673
+            - name: Run Tests using the python parser sending commands to chip-tool
+            #   https://github.com/project-chip/connectedhomeip/issues/27673
               if: matrix.build_variant != 'no-ble-tsan-clang'
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -395,9 +377,7 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name:
-                      crash-core-darwin-${{ matrix.build_variant }}${{
-                      matrix.chip_tool }}
+                  name: crash-core-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: /cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -405,17 +385,13 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name:
-                      crash-log-darwin-${{ matrix.build_variant }}${{
-                      matrix.chip_tool }}
+                  name: crash-log-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name:
-                      crash-objdir-darwin-${{ matrix.build_variant }}${{
-                      matrix.chip_tool }}
+                  name: crash-objdir-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
@@ -424,17 +400,14 @@ jobs:
         name: REPL Tests - Linux
 
         env:
-            TSAN_OPTIONS:
-                "halt_on_error=1
-                suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
 
         container:
             image: ghcr.io/project-chip/chip-build:1
-            options:
-                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
@@ -443,12 +416,9 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  platform: linux
-                  bootstrap-log-name:
-                      bootstrap-logs-linux-${{ matrix.build_variant }}${{
-                      matrix.chip_tool }}
-            - name:
-                  Try to ensure the directories for core dumping exist and we
+                platform: linux
+                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+            - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
                   mkdir /tmp/cores || true
@@ -478,15 +448,8 @@ jobs:
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_ACE_1_3.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_CGEN_2_4.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_DA_1_2.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values"'
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_TIMESYNC_2_1.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values"'
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_TIMESYNC_2_2.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values"'
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_TIMESYNC_2_4.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values"'
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_TIMESYNC_2_5.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values"'
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_TIMESYNC_2_6.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values"'
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_TIMESYNC_2_9.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values"'
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_TIMESYNC_3_1.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values"'
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_TIMESYNC_3_1.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_DA_1_5.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values"'
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TestCommissioningTimeSync.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_IDM_1_2.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --script "src/python_testing/TestMatterTestingSupport.py"'
             - name: Uploading core files
@@ -535,10 +498,8 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  platform: darwin
-                  bootstrap-log-name:
-                      bootstrap-logs-darwin-${{ matrix.build_variant }}${{
-                      matrix.chip_tool }}
+                platform: darwin
+                bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
             - name: Build Python REPL and example apps
               run: |
