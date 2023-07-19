@@ -58,13 +58,33 @@ tests:
       response:
           saveAs: CurrentFabricIndex
 
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/24081
     - label:
           "Step 3: TH reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
-      PICS: ACL.S.E01
-      command: "readEvent"
-      event: "AccessControlExtensionChanged"
-      response: {}
+      verification: |
+          ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
+
+          Via the TH (chip-tool), Verify  AccessControl cluster AccessControlExtensionChanged event value is an empty list
+
+          848.856174][2311:2316] CHIP:EM: Removed CHIP MessageCounter:265690133 from RetransTable on exchange 23190i
+          [1657283848.856239][2311:2316] CHIP:DMG: ReportDataMessage =
+          [1657283848.856278][2311:2316] CHIP:DMG: {
+          [1657283848.856313][2311:2316] CHIP:DMG:        SuppressResponse = true,
+          [1657283848.856351][2311:2316] CHIP:DMG:        InteractionModelRevision = 1
+          [1657283848.856385][2311:2316] CHIP:DMG: }
+          [1657283848.856483][2311:2316] CHIP:EM: Sending Standalone Ack for MessageCounter:33251086 on exchange 23190i
+          [1657283848.856560][2311:2316] CHIP:IN: Prepared secure message 0xffff877ed958 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 23190i with MessageCounter:265690134.
+          [1657283848.856638][2311:2316] CHIP:IN: Sending encrypted msg 0xffff877ed958 with MessageCounter:265690134 to 0x0000000000000001 (1) at monotonic time: 00000000000A1C64 msec
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.E01
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Step 4: TH writes DUT Endpoint 0 AccessControl cluster Extension
