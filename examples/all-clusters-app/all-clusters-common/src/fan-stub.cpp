@@ -93,7 +93,7 @@ Status FanControlManager::HandleStep(StepDirectionEnum direction, bool wrap, boo
     DataModel::Nullable<uint8_t> speedSetting;
     SpeedSetting::Get(mEndpoint, speedSetting);
 
-    uint8_t newSpeedSetting;
+    uint8_t newSpeedSetting = speedSetting.Value();
 
     if (direction == StepDirectionEnum::kIncrease)
     {
