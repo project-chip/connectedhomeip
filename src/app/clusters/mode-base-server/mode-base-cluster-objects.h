@@ -25,7 +25,6 @@
 
 #define EMBER_AF_PLUGIN_MODE_BASE
 
-// todo have this be part of the auto generated code
 namespace chip {
 namespace app {
 namespace Clusters {

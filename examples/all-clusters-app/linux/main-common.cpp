@@ -201,6 +201,7 @@ CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductPrimaryColor(Clusters::B
 
 ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
 
+// todo use Clusters::XxxMode::Feature::kXxxx to set features.
 Clusters::RvcRunMode::RvcRunModeInstance gRvcRunModeInstance(0x1, Clusters::RvcRunMode::Id, 1);
 Clusters::RvcCleanMode::RvcCleanModeInstance gRvcCleanModeInstance(0x1, Clusters::RvcCleanMode::Id, 1);
 Clusters::DishwasherMode::DishwasherModeInstance gDishwasherModeInstance(0x1, Clusters::DishwasherMode::Id, 1);

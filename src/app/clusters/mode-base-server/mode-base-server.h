@@ -166,7 +166,7 @@ public:
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
 
     // The following functions should be overridden by the SDK user to implement the business logic of their application.
-
+protected:
     /**
      * This init function will be called during the ModeBase server initialization after the Instance information has been
      * validated and the Instance has been registered. This can be used to initialise app logic.

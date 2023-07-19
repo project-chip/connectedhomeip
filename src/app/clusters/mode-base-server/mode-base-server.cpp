@@ -156,36 +156,11 @@ CHIP_ERROR Instance::Init()
 
     ModeBaseAliasesInstances.insert(this);
 
-    // Read the StartUpMode attribute and set the CurrentMode attribute
+    // If the StartUpMode is set, the CurrentMode attribute SHALL be set to the StartUpMode value, when the server is powered up.
     if (!mStartUpMode.IsNull())
     {
-#ifdef EMBER_AF_PLUGIN_ON_OFF
-        // OnMode with Power Up
-        // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
-        // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
-        // value when the server is supplied with power, except if the OnMode attribute is null.
-        if (emberAfContainsServer(mEndpointId, OnOff::Id) &&
-            emberAfContainsAttribute(mEndpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
-            emberAfContainsAttribute(mEndpointId, mClusterId, ModeBase::Attributes::OnMode::Id) &&
-            HasFeature(ModeBase::Feature::kOnOff))
-        {
-            DataModel::Nullable<uint8_t> onMode = GetOnMode();
-            bool onOffValueForStartUp           = false;
-            if (!emberAfIsKnownVolatileAttribute(mEndpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
-                OnOffServer::Instance().getOnOffValueForStartUp(mEndpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
-            {
-                if (onOffValueForStartUp && !onMode.IsNull())
-                {
-                    ChipLogDetail(Zcl, "ModeBase: CurrentMode is overwritten by OnMode");
-                    // it is overwritten by the on/off cluster.
-                    return CHIP_NO_ERROR;
-                }
-            }
-        }
-#endif // EMBER_AF_PLUGIN_ON_OFF
-
-        // todo should we move this before the OnMode section and check for boot reason in the onoff server code?
-        // If we have powered up because of an OTA, do not override the CurrentMode.
+        // This behavior does not apply to reboots associated with OTA.
+        // After an OTA restart, the CurrentMode attribute SHALL return to its value prior to the restart.
         BootReasonType bootReason = BootReasonType::kUnspecified;
         CHIP_ERROR error          = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
 
@@ -200,22 +175,59 @@ CHIP_ERROR Instance::Init()
         if (bootReason == BootReasonType::kSoftwareUpdateCompleted)
         {
             ChipLogDetail(Zcl, "ModeBase: StartUpMode is ignored for OTA reboot.");
-            return CHIP_NO_ERROR;
         }
-
-        // Set CurrentMode to StartUpMode
-        if (mStartUpMode.Value() != mCurrentMode)
+        else
         {
-            ChipLogProgress(Zcl, "ModeBase: Changing CurrentMode to the StartUpMode value.");
-            Status status = UpdateCurrentMode(mStartUpMode.Value());
-            if (status != Status::Success)
+            // Set CurrentMode to StartUpMode
+            if (mStartUpMode.Value() != mCurrentMode)
             {
-                ChipLogError(Zcl, "ModeBase: Failed to change the CurrentMode to the StartUpMode value: %u", to_underlying(status));
-                return StatusIB(status).ToChipError();
-            }
+                ChipLogProgress(Zcl, "ModeBase: Changing CurrentMode to the StartUpMode value.");
+                Status status = UpdateCurrentMode(mStartUpMode.Value());
+                if (status != Status::Success)
+                {
+                    ChipLogError(Zcl, "ModeBase: Failed to change the CurrentMode to the StartUpMode value: %u",
+                                 to_underlying(status));
+                    return StatusIB(status).ToChipError();
+                }
 
-            ChipLogProgress(Zcl, "ModeBase: Successfully initialized CurrentMode to the StartUpMode value %u",
-                            mStartUpMode.Value());
+                ChipLogProgress(Zcl, "ModeBase: Successfully initialized CurrentMode to the StartUpMode value %u",
+                                mStartUpMode.Value());
+            }
+        }
+    }
+
+    // OnMode with Power Up
+    // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
+    // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
+    // value when the server is supplied with power, except if the OnMode attribute is null.
+    if (emberAfContainsServer(mEndpointId, OnOff::Id) &&
+        emberAfContainsAttribute(mEndpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
+        emberAfContainsAttribute(mEndpointId, mClusterId, ModeBase::Attributes::OnMode::Id) &&
+        HasFeature(ModeBase::Feature::kOnOff))
+    {
+        DataModel::Nullable<uint8_t> onMode = GetOnMode();
+        bool onOffValueForStartUp           = false;
+        if (!emberAfIsKnownVolatileAttribute(mEndpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
+            OnOffServer::Instance().getOnOffValueForStartUp(mEndpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
+        {
+            if (onOffValueForStartUp && !onMode.IsNull())
+            {
+                // Set CurrentMode to OnMode
+                if (mOnMode.Value() != mCurrentMode)
+                {
+                    ChipLogProgress(Zcl, "ModeBase: Changing CurrentMode to the OnMode value.");
+                    Status status = UpdateCurrentMode(mOnMode.Value());
+                    if (status != Status::Success)
+                    {
+                        ChipLogError(Zcl, "ModeBase: Failed to change the CurrentMode to the OnMode value: %u",
+                                     to_underlying(status));
+                        return StatusIB(status).ToChipError();
+                    }
+
+                    ChipLogProgress(Zcl, "ModeBase: Successfully initialized CurrentMode to the OnMode value %u",
+                                    mOnMode.Value());
+                }
+            }
         }
     }
 

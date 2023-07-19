@@ -30,6 +30,7 @@ CHIP_ERROR DishwasherModeInstance::AppInit()
     return CHIP_NO_ERROR;
 }
 
+// todo refactor code by making a parent class for all ModeInstance classes to reduce flash usage.
 void DishwasherModeInstance::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);

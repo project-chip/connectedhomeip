@@ -605,10 +605,6 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
             }
         }
 #endif
-#ifdef EMBER_AF_PLUGIN_MODE_BASE
-        // If OnMode is not a null value, then change the current mode to it.
-        UpdateModeBaseCurrentModeToOnMode(endpoint);
-#endif
     }
 #endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
 
