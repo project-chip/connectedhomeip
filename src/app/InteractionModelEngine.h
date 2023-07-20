@@ -305,20 +305,14 @@ public:
     //
     // Get direct access to the underlying read handler pool
     //
-    auto & GetReadHandlerPool()
-    {
-        return mReadHandlers;
-    }
+    auto & GetReadHandlerPool() { return mReadHandlers; }
 
     //
     // Override the maximal capacity of the fabric table only for interaction model engine
     //
     // If -1 is passed in, no override is instituted and default behavior resumes.
     //
-    void SetConfigMaxFabrics(int32_t sz)
-    {
-        mMaxNumFabricsOverride = sz;
-    }
+    void SetConfigMaxFabrics(int32_t sz) { mMaxNumFabricsOverride = sz; }
 
     //
     // Override the maximal capacity of the underlying read handler pool to mimic
@@ -327,14 +321,8 @@ public:
     //
     // If -1 is passed in, no override is instituted and default behavior resumes.
     //
-    void SetHandlerCapacityForReads(int32_t sz)
-    {
-        mReadHandlerCapacityForReadsOverride = sz;
-    }
-    void SetHandlerCapacityForSubscriptions(int32_t sz)
-    {
-        mReadHandlerCapacityForSubscriptionsOverride = sz;
-    }
+    void SetHandlerCapacityForReads(int32_t sz) { mReadHandlerCapacityForReadsOverride = sz; }
+    void SetHandlerCapacityForSubscriptions(int32_t sz) { mReadHandlerCapacityForSubscriptionsOverride = sz; }
 
     //
     // Override the maximal capacity of the underlying attribute path pool and event path pool to mimic
@@ -342,24 +330,15 @@ public:
     //
     // If -1 is passed in, no override is instituted and default behavior resumes.
     //
-    void SetPathPoolCapacityForReads(int32_t sz)
-    {
-        mPathPoolCapacityForReadsOverride = sz;
-    }
-    void SetPathPoolCapacityForSubscriptions(int32_t sz)
-    {
-        mPathPoolCapacityForSubscriptionsOverride = sz;
-    }
+    void SetPathPoolCapacityForReads(int32_t sz) { mPathPoolCapacityForReadsOverride = sz; }
+    void SetPathPoolCapacityForSubscriptions(int32_t sz) { mPathPoolCapacityForSubscriptionsOverride = sz; }
 
     //
     // We won't limit the handler used per fabric on platforms that are using heap for memory pools, so we introduces a flag to
     // enforce such check based on the configured size. This flag is used for unit tests only, there is another compare time flag
     // CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK for stress tests.
     //
-    void SetForceHandlerQuota(bool forceHandlerQuota)
-    {
-        mForceHandlerQuota = forceHandlerQuota;
-    }
+    void SetForceHandlerQuota(bool forceHandlerQuota) { mForceHandlerQuota = forceHandlerQuota; }
 
     //
     // When testing subscriptions using the high-level APIs in src/controller/ReadInteraction.h,
@@ -396,10 +375,7 @@ private:
     void OnDone(CommandHandler & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
 
-    ReadHandler::ApplicationCallback * GetAppCallback() override
-    {
-        return mpReadHandlerApplicationCallback;
-    }
+    ReadHandler::ApplicationCallback * GetAppCallback() override { return mpReadHandlerApplicationCallback; }
 
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 

@@ -3520,7 +3520,7 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedInvalidReportMess
 
         ctx.GetLoopback().mSentMessageCount = 0;
         auto exchange                       = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(
-                                  delegate.mpReadHandler->mSessionHandle.Get().Value(), delegate.mpReadHandler);
+            delegate.mpReadHandler->mSessionHandle.Get().Value(), delegate.mpReadHandler);
         delegate.mpReadHandler->mExchangeCtx.Grab(exchange);
         err = delegate.mpReadHandler->mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(msgBuf),
                                                                 Messaging::SendMessageFlags::kExpectResponse);
@@ -3689,7 +3689,7 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedReportMessageWith
 
         ctx.GetLoopback().mSentMessageCount = 0;
         auto exchange                       = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(
-                                  delegate.mpReadHandler->mSessionHandle.Get().Value(), delegate.mpReadHandler);
+            delegate.mpReadHandler->mSessionHandle.Get().Value(), delegate.mpReadHandler);
         delegate.mpReadHandler->mExchangeCtx.Grab(exchange);
         err = delegate.mpReadHandler->mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(msgBuf),
                                                                 Messaging::SendMessageFlags::kExpectResponse);

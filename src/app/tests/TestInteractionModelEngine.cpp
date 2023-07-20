@@ -72,7 +72,7 @@ void TestInteractionModelEngine::TestAttributePathParamsPushRelease(nlTestSuite 
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
     err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
-                                                                    app::reporting::GetDefaultReportScheduler());
+                                                      app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ObjectList<AttributePathParams> * attributePathParamsList = nullptr;
     AttributePathParams attributePathParams1;
@@ -110,7 +110,7 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
     err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
-                                                                    app::reporting::GetDefaultReportScheduler());
+                                                      app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ObjectList<AttributePathParams> * attributePathParamsList = nullptr;
     AttributePathParams attributePathParams1;
