@@ -82,8 +82,17 @@ tests:
     - label:
           "TH sends command Reset to DUT with bit 5 (WaterLevel) of Alarms set
           to 1"
-      PICS: DISHALM.S.F00 && DISHALM.S.C00.Rsp
-      command: "reset"
+      verification: |
+          ./chip-tool dishwasheralarm reset 32 1 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads from the DUT the State attribute"
       PICS: DISHALM.S.F00 && DISHALM.S.A0002
@@ -135,11 +144,16 @@ tests:
     - label:
           "TH sends command Reset to DUT with bit 5 (WaterLevel) of Alarms set
           to 1"
-      PICS: DISHALM.S.F00 && DISHALM.S.C00.Rsp
-      command: "reset"
+      verification: |
+          ./chip-tool dishwasheralarm reset 32 1 1
+
+          value: { Notify: FALSE }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
-          value: 32
-      response:
-          values: 
-            - name: "Notification"
-              value: "{ Notify: FALSE }"
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
