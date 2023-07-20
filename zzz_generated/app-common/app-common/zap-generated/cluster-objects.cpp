@@ -2852,15 +2852,15 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace DeviceTypeStruct
 namespace SemanticTagStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kMfgCode), mfgCode));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kNamespaceID), namespaceID));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kTag), tag));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kLabel), label));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMfgCode), mfgCode));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kNamespaceID), namespaceID));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kTag), tag));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kLabel), label));
+    ReturnErrorOnFailure(aWriter.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
 

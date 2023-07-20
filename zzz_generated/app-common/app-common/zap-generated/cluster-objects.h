@@ -3332,7 +3332,7 @@ public:
 
     static constexpr bool kIsFabricScoped = false;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 using DecodableType = Type;
