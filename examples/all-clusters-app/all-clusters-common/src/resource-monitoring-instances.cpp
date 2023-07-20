@@ -38,19 +38,18 @@ static HepaFilterMonitoringInstance * gHepaFilterInstance                       
 static ActivatedCarbonFilterMonitoringInstance * gActivatedCarbonFilterInstance = nullptr;
 
 static ResourceMonitoring::Attributes::ReplacementProductStruct::Type sReplacementProductsList[] = {
-    { .productIdentifierType = ProductIdentifierTypeEnum::kUpc,
+    { .productIdentifierType  = ProductIdentifierTypeEnum::kUpc,
       .productIdentifierValue = CharSpan::fromCharString("111112222233") },
-    { .productIdentifierType = ProductIdentifierTypeEnum::kGtin8,
-      .productIdentifierValue = CharSpan::fromCharString("gtin8xxx") },
-    { .productIdentifierType = ProductIdentifierTypeEnum::kEan,
+    { .productIdentifierType = ProductIdentifierTypeEnum::kGtin8, .productIdentifierValue = CharSpan::fromCharString("gtin8xxx") },
+    { .productIdentifierType  = ProductIdentifierTypeEnum::kEan,
       .productIdentifierValue = CharSpan::fromCharString("4444455555666") },
-    { .productIdentifierType = ProductIdentifierTypeEnum::kGtin14,
+    { .productIdentifierType  = ProductIdentifierTypeEnum::kGtin14,
       .productIdentifierValue = CharSpan::fromCharString("gtin14xxxxxxxx") },
-    { .productIdentifierType = ProductIdentifierTypeEnum::kOem,
+    { .productIdentifierType  = ProductIdentifierTypeEnum::kOem,
       .productIdentifierValue = CharSpan::fromCharString("oem20xxxxxxxxxxxxxxx") },
 };
-StaticReplacementProductListManager sReplacementProductListManager(
-    &sReplacementProductsList[0], ArraySize(sReplacementProductsList));
+StaticReplacementProductListManager sReplacementProductListManager(&sReplacementProductsList[0],
+                                                                   ArraySize(sReplacementProductsList));
 
 //-- Activated Carbon Filter Monitoring Instance methods
 CHIP_ERROR ActivatedCarbonFilterMonitoringInstance::AppInit()

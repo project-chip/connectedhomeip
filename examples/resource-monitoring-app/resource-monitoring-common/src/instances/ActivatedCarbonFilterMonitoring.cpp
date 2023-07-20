@@ -46,8 +46,9 @@ static ResourceMonitoring::Attributes::ReplacementProductStruct::Type sActivated
     { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kOem,
       .productIdentifierValue = CharSpan::fromCharString("oem20xcarbonxxxxxxxx") },
 };
-StaticReplacementProductListManager sActivatedCarbonFilterReplacementProductListManager(
-    &sActivatedCarbonFilterReplacementProductsList[0], ArraySize(sActivatedCarbonFilterReplacementProductsList));
+StaticReplacementProductListManager
+    sActivatedCarbonFilterReplacementProductListManager(&sActivatedCarbonFilterReplacementProductsList[0],
+                                                        ArraySize(sActivatedCarbonFilterReplacementProductsList));
 
 //-- Activated carbon filter Monitoring Instance methods
 CHIP_ERROR ActivatedCarbonFilterMonitoringInstance::AppInit()

@@ -45,8 +45,8 @@ static ResourceMonitoring::Attributes::ReplacementProductStruct::Type sHepaFilte
     { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kOem,
       .productIdentifierValue = CharSpan::fromCharString("oem20xhepaxxxxxxxxxx") },
 };
-StaticReplacementProductListManager sHepaFilterReplacementProductListManager(
-    &sHepaFilterReplacementProductsList[0], ArraySize(sHepaFilterReplacementProductsList));
+StaticReplacementProductListManager sHepaFilterReplacementProductListManager(&sHepaFilterReplacementProductsList[0],
+                                                                             ArraySize(sHepaFilterReplacementProductsList));
 
 //-- Hepa filter Monitoring instance methods
 CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
