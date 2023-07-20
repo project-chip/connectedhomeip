@@ -48,6 +48,9 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     // Set up the group state provider that persists across all handshakes.
     GetSession().SetGroupDataProvider(mGroupDataProvider);
 
+    ChipLogProgress(Inet, "CASE Server enabling CASE session setups");
+    mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1, this);
+
     PrepareForSessionEstablishment();
 
     return CHIP_NO_ERROR;
@@ -113,11 +116,6 @@ exit:
 
 void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyEstablishedPeer)
 {
-    // Let's re-register for CASE Sigma1 message, so that the next CASE session setup request can be processed.
-    // https://github.com/project-chip/connectedhomeip/issues/8342
-    ChipLogProgress(Inet, "CASE Server enabling CASE session setups");
-    mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1, this);
-
     GetSession().Clear();
 
     //

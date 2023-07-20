@@ -804,6 +804,9 @@ static BOOL AttributeIsSpecifiedInPowerSourceCluster(AttributeId aAttributeId)
     case Attributes::ActiveBatChargeFaults::Id: {
         return YES;
     }
+    case Attributes::EndpointList::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
