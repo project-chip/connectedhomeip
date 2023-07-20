@@ -417,9 +417,8 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegateAccessory;
     CASESession pairingAccessory;
-    ReliableMessageProtocolConfig verySleepyAccessoryRmpConfig(System::Clock::Milliseconds32(360000),
-                                                               System::Clock::Milliseconds32(100000)), 
-                                                               System::Clock::Milliseconds16(300));
+    ReliableMessageProtocolConfig verySleepyAccessoryRmpConfig(
+        System::Clock::Milliseconds32(360000), System::Clock::Milliseconds32(100000), System::Clock::Milliseconds16(300));
     ReliableMessageProtocolConfig nonSleepyCommissionerRmpConfig(
         System::Clock::Milliseconds32(5000), System::Clock::Milliseconds32(300), System::Clock::Milliseconds16(4000));
 

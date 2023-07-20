@@ -252,20 +252,29 @@ CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, chip::Optional<u
 }
 
 CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, const chip::Optional<ReliableMessageProtocolConfig> optional,
-                               bool isIdle)
+                               TxtFieldKey key)
 {
+    VerifyOrReturnError((key == TxtFieldKey::kSessionIdleInterval || key == TxtFieldKey::kSessionActiveInterval ||
+                         key == TxtFieldKey::kSessionActiveThreshold),
+                        CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(optional.HasValue(), CHIP_ERROR_WELL_UNINITIALIZED);
 
-    auto retryInterval = isIdle ? optional.Value().mIdleRetransTimeout : optional.Value().mActiveRetransTimeout;
-
-    if (retryInterval > kMaxRetryInterval)
+    if (key == TxtFieldKey::kSessionActiveThreshold)
     {
-        ChipLogProgress(Discovery, "MRP retry interval %s value exceeds allowed range of 1 hour, using maximum available",
-                        isIdle ? "idle" : "active");
-        retryInterval = kMaxRetryInterval;
+        return CopyTextRecordValue(buffer, bufferLen, optional.Value().mActiveThresholdTime.count());
     }
-
-    return CopyTextRecordValue(buffer, bufferLen, retryInterval.count());
+    else
+    {
+        bool isIdle        = (key == TxtFieldKey::kSessionIdleInterval);
+        auto retryInterval = isIdle ? optional.Value().mIdleRetransTimeout : optional.Value().mActiveRetransTimeout;
+        if (retryInterval > kMaxRetryInterval)
+        {
+            ChipLogProgress(Discovery, "MRP retry interval %s value exceeds allowed range of 1 hour, using maximum available",
+                            isIdle ? "idle" : "active");
+            retryInterval = kMaxRetryInterval;
+        }
+        return CopyTextRecordValue(buffer, bufferLen, retryInterval.count());
+    }
 }
 
 template <class T>
@@ -277,9 +286,8 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
         return CopyTextRecordValue(buffer, bufferLen, params.GetTcpSupported());
     case TxtFieldKey::kSessionIdleInterval:
     case TxtFieldKey::kSessionActiveInterval:
-        return CopyTextRecordValue(buffer, bufferLen, params.GetLocalMRPConfig(), key == TxtFieldKey::kSessionIdleInterval);
     case TxtFieldKey::kSessionActiveThreshold:
-        return CopyTextRecordValue(buffer, bufferLen, params.GetLocalMRPConfig().Value().mActiveThresholdTime.count());
+        return CopyTextRecordValue(buffer, bufferLen, params.GetLocalMRPConfig(), key);
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

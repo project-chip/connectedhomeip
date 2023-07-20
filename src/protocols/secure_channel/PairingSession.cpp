@@ -116,7 +116,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
 
     ChipLogDetail(SecureChannel, "Found MRP parameters in the message");
 
-    // Both TLV elements in the structure are optional. If the first element is present, process it and move
+    // All TLV elements in the structure are optional. If the first element is present, process it and move
     // the TLV reader to the next element.
     if (TLV::TagNumFromTag(tlvReader.GetTag()) == 1)
     {
@@ -146,9 +146,12 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
         ReturnErrorOnFailure(err);
     }
 
-    VerifyOrReturnError(TLV::TagNumFromTag(tlvReader.GetTag()) == 3, CHIP_ERROR_INVALID_TLV_TAG);
-    ReturnErrorOnFailure(tlvReader.Get(tlvElementValue));
-    mRemoteMRPConfig.mActiveThresholdTime = System::Clock::Milliseconds16(tlvElementValue);
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == 3)
+    {
+        ReturnErrorOnFailure(tlvReader.Get(tlvElementValue));
+        mRemoteMRPConfig.mActiveThresholdTime = System::Clock::Milliseconds16(tlvElementValue);
+    }
+    // Future proofing - Don't error out out if there is other tags
 
     return tlvReader.ExitContainer(containerType);
 }

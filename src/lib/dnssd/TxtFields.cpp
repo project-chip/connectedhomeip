@@ -184,6 +184,18 @@ Optional<System::Clock::Milliseconds32> GetRetryInterval(const ByteSpan & value)
     return NullOptional;
 }
 
+Optional<System::Clock::Milliseconds16> GetRetryActiveThreshold(const ByteSpan & value)
+{
+    const auto retryInterval = MakeU16FromAsciiDecimal(value);
+
+    if (retryInterval == 0)
+    {
+        return NullOptional;
+    }
+
+    return MakeOptional(System::Clock::Milliseconds16(retryInterval));
+}
+
 TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
 {
     for (auto & info : txtFieldInfo)
@@ -242,6 +254,9 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonRes
         break;
     case TxtFieldKey::kSessionActiveInterval:
         nodeData.mrpRetryIntervalActive = Internal::GetRetryInterval(value);
+        break;
+    case TxtFieldKey::kSessionActiveThreshold:
+        nodeData.mrpRetryActiveThreshold = Internal::GetRetryActiveThreshold(value);
         break;
     case TxtFieldKey::kTcpSupported:
         nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
