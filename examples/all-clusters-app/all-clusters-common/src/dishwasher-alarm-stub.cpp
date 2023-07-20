@@ -19,6 +19,8 @@
 #include <app/clusters/dishwasher-alarm-server/dishwasher-alarm-server.h>
 #include <app/util/af-enums.h>
 
+using namespace chip;
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -35,7 +37,7 @@ public:
      *   @return The cluster will do this update if ModifyEnabledAlarmsCallback() returns true.
      *   The cluster will not do this update if ModifyEnabledAlarmsCallback() returns false.
      */
-    bool ModifyEnabledAlarmsCallback(const chip::BitMask<AlarmMap> mask) override;
+    bool ModifyEnabledAlarmsCallback(const BitMask<AlarmMap> mask) override;
 
     /**
      *   @brief
@@ -44,18 +46,18 @@ public:
      *   @return The cluster will do this update if ResetAlarmsCallback() returns true.
      *   The cluster will not do this update if ResetAlarmsCallback() returns false.
      */
-    bool ResetAlarmsCallback(const chip::BitMask<AlarmMap> alarms) override;
+    bool ResetAlarmsCallback(const BitMask<AlarmMap> alarms) override;
 
     ~DishwasherAlarmDelegate() = default;
 };
 
-bool DishwasherAlarmDelegate::ModifyEnabledAlarmsCallback(const chip::BitMask<AlarmMap> mask)
+bool DishwasherAlarmDelegate::ModifyEnabledAlarmsCallback(const BitMask<AlarmMap> mask)
 {
     // placeholder implementation
     return true;
 }
 
-bool DishwasherAlarmDelegate::ResetAlarmsCallback(const chip::BitMask<AlarmMap> alarms)
+bool DishwasherAlarmDelegate::ResetAlarmsCallback(const BitMask<AlarmMap> alarms)
 {
     // placeholder implementation
     return true;
@@ -69,15 +71,15 @@ bool DishwasherAlarmDelegate::ResetAlarmsCallback(const chip::BitMask<AlarmMap> 
 /*
  * An example to present device's endpointId
  */
-static constexpr chip::EndpointId kDemoEndpointId = 1;
+static constexpr EndpointId kDemoEndpointId = 1;
 
 void MatterDishwasherAlarmServerInit()
 {
-    using namespace chip::app::Clusters;
-    using namespace chip::app::Clusters::DishwasherAlarm;
+    using namespace app::Clusters;
+    using namespace app::Clusters::DishwasherAlarm;
 
     static DishwasherAlarm::DishwasherAlarmDelegate delegate;
-    chip::app::Clusters::DishwasherAlarm::SetDefaultDelegate(kDemoEndpointId, &delegate);
+    DishwasherAlarm::SetDefaultDelegate(kDemoEndpointId, &delegate);
 
     //Set Supported attribute = 0x2F = 47
     //Bit Name              Value
@@ -87,7 +89,7 @@ void MatterDishwasherAlarmServerInit()
     //3   TempTooLow        1
     //4   TempTooHigh       0
     //5   WaterLevelError   1
-    chip::BitMask<AlarmMap> supported;
+    BitMask<AlarmMap> supported;
     supported.SetField(AlarmMap::kInflowError, 1);
     supported.SetField(AlarmMap::kDrainError, 1);
     supported.SetField(AlarmMap::kDoorError, 1);
@@ -103,7 +105,7 @@ void MatterDishwasherAlarmServerInit()
     //3   TempTooLow        1
     //4   TempTooHigh       0
     //5   WaterLevelError   1
-    chip::BitMask<AlarmMap> mask;
+    BitMask<AlarmMap> mask;
     mask.SetField(AlarmMap::kInflowError, 1);
     mask.SetField(AlarmMap::kDrainError, 1);
     mask.SetField(AlarmMap::kDoorError, 1);
@@ -119,7 +121,7 @@ void MatterDishwasherAlarmServerInit()
     //3   TempTooLow        0
     //4   TempTooHigh       0
     //5   WaterLevelError   0
-    chip::BitMask<AlarmMap> latch;
+    BitMask<AlarmMap> latch;
     latch.SetField(AlarmMap::kInflowError, 1);
     latch.SetField(AlarmMap::kDrainError, 1);
     DishwasherAlarmServer::Instance().SetLatchValue(kDemoEndpointId, latch);
@@ -132,10 +134,9 @@ void MatterDishwasherAlarmServerInit()
     //3   TempTooLow        0
     //4   TempTooHigh       0
     //5   WaterLevelError   0
-    chip::BitMask<AlarmMap> state;
+    BitMask<AlarmMap> state;
     state.SetField(AlarmMap::kInflowError, 1);
     state.SetField(AlarmMap::kDrainError, 1);
     state.SetField(AlarmMap::kDoorError, 1);
     DishwasherAlarmServer::Instance().SetStateValue(kDemoEndpointId, state);
-
 }

@@ -42,7 +42,7 @@ public:
      *   @return The cluster will do this update if ModifyEnabledAlarmsCallback() returns true.
      *   the cluster will not do this update if ModifyEnabledAlarmsCallback() returns false.
      */
-    virtual bool ModifyEnabledAlarmsCallback(const chip::BitMask<AlarmMap> mask) = 0;
+    virtual bool ModifyEnabledAlarmsCallback(const BitMask<AlarmMap> mask) = 0;
 
     /**
      *   @brief
@@ -51,7 +51,7 @@ public:
      *   @return The cluster will do this update if ResetAlarmsCallback() returns true.
      *   The cluster will not do this update if ResetAlarmsCallback() returns false.
      */
-    virtual bool ResetAlarmsCallback(const chip::BitMask<AlarmMap> alarms) = 0;
+    virtual bool ResetAlarmsCallback(const BitMask<AlarmMap> alarms) = 0;
 
     Delegate(EndpointId endpoint) : mEndpoint(endpoint) {}
 
