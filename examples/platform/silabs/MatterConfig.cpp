@@ -19,7 +19,7 @@
 
 #include "AppConfig.h"
 #include "OTAConfig.h"
-#include <matter_config.h>
+#include <MatterConfig.h>
 
 #include <FreeRTOS.h>
 
