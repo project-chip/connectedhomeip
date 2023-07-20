@@ -137,17 +137,7 @@ void MatterProxyDiscoveryPluginServerInitCallback() {}
 void MatterProxyConfigurationPluginServerInitCallback() {}
 void MatterFanControlPluginServerInitCallback() {}
 void MatterActivatedCarbonFilterMonitoringPluginServerInitCallback() {}
-void MatterCeramicFilterMonitoringPluginServerInitCallback() {}
-void MatterElectrostaticFilterMonitoringPluginServerInitCallback() {}
-void MatterFuelTankMonitoringPluginServerInitCallback() {}
 void MatterHepaFilterMonitoringPluginServerInitCallback() {}
-void MatterInkCartridgeMonitoringPluginServerInitCallback() {}
-void MatterIonizingFilterMonitoringPluginServerInitCallback() {}
-void MatterOzoneFilterMonitoringPluginServerInitCallback() {}
-void MatterTonerCartridgeMonitoringPluginServerInitCallback() {}
-void MatterUvFilterMonitoringPluginServerInitCallback() {}
-void MatterWaterTankMonitoringPluginServerInitCallback() {}
-void MatterZeoliteFilterMonitoringPluginServerInitCallback() {}
 void MatterAirQualityPluginServerInitCallback() {}
 void MatterCarbonMonoxideConcentrationMeasurementPluginServerInitCallback() {}
 void MatterCarbonDioxideConcentrationMeasurementPluginServerInitCallback() {}

@@ -23,7 +23,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: TWait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -34,11 +34,11 @@ tests:
     #issue #13645
     # Also, ResetCounts may not work on some platforms yet?
     # And on Linux since we don't have actual Wi-Fi these error out.
-    - label: "TH sends ResetCounts command to DUT"
+    - label: "Step 2: TH sends ResetCounts command to DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp
       command: "ResetCounts"
 
-    - label: "Reads BeaconLostCount attribute from DUT"
+    - label: "Step 2a: Reads BeaconLostCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0005
       command: "readAttribute"
       attribute: "BeaconLostCount"
@@ -48,7 +48,7 @@ tests:
               minValue: 0
               maxValue: 4294967295
 
-    - label: "Reads BeaconRxCount attribute from DUT"
+    - label: "Step 2b: Reads BeaconRxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0006
       command: "readAttribute"
       attribute: "BeaconRxCount"
@@ -58,7 +58,7 @@ tests:
               minValue: 0
               maxValue: 4294967295
 
-    - label: "Reads PacketMulticastRxCount attribute from DUT"
+    - label: "Step 2c: Reads PacketMulticastRxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0007
       command: "readAttribute"
       attribute: "PacketMulticastRxCount"
@@ -68,7 +68,7 @@ tests:
               minValue: 0
               maxValue: 4294967295
 
-    - label: "Reads PacketMulticastTxCount attribute from DUT"
+    - label: "Step 2d: Reads PacketMulticastTxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0008
       command: "readAttribute"
       attribute: "PacketMulticastTxCount"
@@ -78,7 +78,7 @@ tests:
               minValue: 0
               maxValue: 4294967295
 
-    - label: "Reads PacketUnicastRxCount attribute from DUT"
+    - label: "Step 2e: Reads PacketUnicastRxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0009
       command: "readAttribute"
       attribute: "PacketUnicastRxCount"
@@ -88,7 +88,7 @@ tests:
               minValue: 0
               maxValue: 4294967295
 
-    - label: "Reads PacketUnicastTxCount attribute from DUT"
+    - label: "Step 2f: Reads PacketUnicastTxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A000a
       command: "readAttribute"
       attribute: "PacketUnicastTxCount"

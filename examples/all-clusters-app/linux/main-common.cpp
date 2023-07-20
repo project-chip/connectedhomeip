@@ -53,7 +53,7 @@ constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_all_clusters_fifo_"
 LowPowerManager sLowPowerManager;
 NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
-chip::app::Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
+Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 } // namespace
@@ -195,12 +195,12 @@ void ApplicationExit()
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(NotSpecified, "Setting LowPower default delegate to global manager");
-    chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &sLowPowerManager);
+    Clusters::LowPower::SetDefaultDelegate(endpoint, &sLowPowerManager);
 }
 
 void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
 {
     sWindowCoveringManager.Init(endpoint);
-    chip::app::Clusters::WindowCovering::SetDefaultDelegate(endpoint, &sWindowCoveringManager);
-    chip::app::Clusters::WindowCovering::ConfigStatusUpdateFeatures(endpoint);
+    Clusters::WindowCovering::SetDefaultDelegate(endpoint, &sWindowCoveringManager);
+    Clusters::WindowCovering::ConfigStatusUpdateFeatures(endpoint);
 }
