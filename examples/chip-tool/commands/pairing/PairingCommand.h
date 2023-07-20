@@ -58,10 +58,8 @@ public:
                    chip::Dnssd::DiscoveryFilterType filterType = chip::Dnssd::DiscoveryFilterType::kNone) :
         CHIPCommand(commandName, credIssuerCmds),
         mPairingMode(mode), mNetworkType(networkType),
-        mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() },
-        mComplex_TimeZones(&mTimeZoneList),
-        mComplex_DSTOffsets(&mDSTOffsetList),
-        mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this)
+        mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }, mComplex_TimeZones(&mTimeZoneList),
+        mComplex_DSTOffsets(&mDSTOffsetList), mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("bypass-attestation-verifier", 0, 1, &mBypassAttestationVerifier,
@@ -175,7 +173,8 @@ public:
             // Since optional Complex arguments are not currently supported via the <chip::Optional> class,
             // we explicitly set the kOptional flag.
             AddArgument("dst-offset", &mComplex_DSTOffsets,
-                        "DSTOffset list to use when setting Time Synchronization cluster's DSTOffset attribute", Argument::kOptional);
+                        "DSTOffset list to use when setting Time Synchronization cluster's DSTOffset attribute",
+                        Argument::kOptional);
         }
 
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
