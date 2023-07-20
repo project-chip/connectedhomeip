@@ -24,7 +24,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -32,14 +32,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads from the DUT the MeasuredValue attribute"
+    - label: "Step 2: TH reads from the DUT the MeasuredValue attribute"
       PICS: PRS.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:
           saveAs: ValueBeforeChange
 
-    - label: "Operate on device to change the pressure significantly"
+    - label: "Step 3: Operate on device to change the pressure significantly"
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && PRS.M.PressureChange
@@ -59,7 +59,7 @@ tests:
                 value: 2000
 
     - label:
-          "After a few seconds, TH reads from the DUT the MeasuredValue
+          "Step 4: After a few seconds, TH reads from the DUT the MeasuredValue
           attribute"
       PICS: PRS.S.A0000 && PRS.M.PressureChange
       command: "readAttribute"

@@ -25,7 +25,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -36,7 +36,7 @@ tests:
     ### MANDATORY Attributes
     ### 1 MANDATORY Attributes
     ### Attribute[  0]: Type  =======================================
-    - label: "1a: read the RO mandatory attribute default: Type"
+    - label: "Step 1a: read the RO mandatory attribute default: Type"
       command: "readAttribute"
       attribute: "Type"
       PICS: WNCV.S.A0000
@@ -47,7 +47,7 @@ tests:
               maxValue: 9
 
     ### Attribute[  7]: ConfigStatus  ===============================
-    - label: "1b: read the RO mandatory attribute default: ConfigStatus"
+    - label: "Step 1b: read the RO mandatory attribute default: ConfigStatus"
       command: "readAttribute"
       attribute: "ConfigStatus"
       PICS: WNCV.S.A0007
@@ -58,7 +58,8 @@ tests:
               maxValue: 127
 
     ### Attribute[ 10]: OperationalStatus  ==========================
-    - label: "1c: read the RO mandatory attribute default: OperationalStatus"
+    - label:
+          "Step 1c: read the RO mandatory attribute default: OperationalStatus"
       command: "readAttribute"
       attribute: "OperationalStatus"
       PICS: WNCV.S.A000a
@@ -69,7 +70,7 @@ tests:
               maxValue: 127
 
     ### Attribute[ 13]: EndProductType ==============================
-    - label: "1d: read the RO mandatory attribute default: EndProductType"
+    - label: "Step 1d: read the RO mandatory attribute default: EndProductType"
       command: "readAttribute"
       attribute: "EndProductType"
       PICS: WNCV.S.A000d
@@ -80,7 +81,7 @@ tests:
               maxValue: 23
 
     ### Attribute[ 23]: Mode ========================================
-    - label: "1e: read the RW mandatory attribute default: Mode"
+    - label: "Step 1e: read the RW mandatory attribute default: Mode"
       command: "readAttribute"
       attribute: "Mode"
       PICS: WNCV.S.A0017
@@ -90,7 +91,7 @@ tests:
               minValue: 0
               maxValue: 15
 
-    - label: "1f: write a value into the RW mandatory attribute:: Mode"
+    - label: "Step 1f: write a value into the RW mandatory attribute:: Mode"
       command: "writeAttribute"
       attribute: "Mode"
       PICS: WNCV.S.A0017
@@ -100,7 +101,7 @@ tests:
     ### 2 CONDITIONALLY MANDATORY Attributes
     ### Attribute[ 11]: TargetPositionLiftPercent100ths  ====================
     - label:
-          "2a: read the RO optional attribute default:
+          "Step 2a: read the RO optional attribute default:
           TargetPositionLiftPercent100ths"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
@@ -113,7 +114,7 @@ tests:
 
     ### Attribute[ 12]: TargetPositionTiltPercent100ths  ====================
     - label:
-          "2b: read the RO optional attribute default:
+          "Step 2b: read the RO optional attribute default:
           TargetPositionTiltPercent100ths"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
@@ -126,7 +127,7 @@ tests:
 
     ### Attribute[ 14]: CurrentPositionLiftPercent100ths  ====================
     - label:
-          "2c: read the RO optional attribute default:
+          "Step 2c: read the RO optional attribute default:
           CurrentPositionLiftPercent100ths"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
@@ -139,7 +140,7 @@ tests:
 
     ### Attribute[ 15]: CurrentPositionTiltPercent100ths  ====================
     - label:
-          "2d: read the RO optional attribute default:
+          "Step 2d: read the RO optional attribute default:
           CurrentPositionTiltPercent100ths"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
@@ -152,7 +153,8 @@ tests:
 
     ### Attribute[ 16]: InstalledOpenLimitLift  ====================
     - label:
-          "2e: read the RO optional attribute default: InstalledOpenLimitLift"
+          "Step 2e: read the RO optional attribute default:
+          InstalledOpenLimitLift"
       command: "readAttribute"
       attribute: "InstalledOpenLimitLift"
       PICS: WNCV.S.A0010
@@ -165,7 +167,8 @@ tests:
 
     ### Attribute[ 17]: InstalledClosedLimitLift  ====================
     - label:
-          "2f: read the RO optional attribute default: InstalledClosedLimitLift"
+          "Step 2f: read the RO optional attribute default:
+          InstalledClosedLimitLift"
       command: "readAttribute"
       attribute: "InstalledClosedLimitLift"
       PICS: WNCV.S.A0011
@@ -178,7 +181,8 @@ tests:
 
     ### Attribute[ 18]: InstalledOpenLimitTilt  ====================
     - label:
-          "2g: read the RO optional attribute default: InstalledOpenLimitTilt"
+          "Step 2g: read the RO optional attribute default:
+          InstalledOpenLimitTilt"
       command: "readAttribute"
       attribute: "InstalledOpenLimitTilt"
       PICS: WNCV.S.A0012
@@ -191,7 +195,8 @@ tests:
 
     ### Attribute[ 19]: InstalledClosedLimitTilt  ====================
     - label:
-          "2h: read the RO optional attribute default: InstalledClosedLimitTilt"
+          "Step 2h: read the RO optional attribute default:
+          InstalledClosedLimitTilt"
       command: "readAttribute"
       attribute: "InstalledClosedLimitTilt"
       PICS: WNCV.S.A0013
@@ -204,7 +209,7 @@ tests:
 
     ### 3 CONDITIONALLY and PURELY OPTIONAL Attributes
     ### Attribute[ 26]: SafetyStatus  ==========================
-    - label: "3a: read the RO mandatory attribute default: SafetyStatus"
+    - label: "Step 3a: read the RO mandatory attribute default: SafetyStatus"
       command: "readAttribute"
       attribute: "SafetyStatus"
       PICS: WNCV.S.A001a
@@ -216,7 +221,8 @@ tests:
 
     ### Attribute[  1]: PhysicalClosedLimitLift  ====================
     - label:
-          "3b: read the RO optional attribute default: PhysicalClosedLimitLift"
+          "Step 3b: read the RO optional attribute default:
+          PhysicalClosedLimitLift"
       command: "readAttribute"
       attribute: "PhysicalClosedLimitLift"
       PICS: WNCV.S.A0001
@@ -228,7 +234,8 @@ tests:
 
     ### Attribute[  2]: PhysicalClosedLimitTilt  ====================
     - label:
-          "3c: read the RO optional attribute default: PhysicalClosedLimitTilt"
+          "Step 3c: read the RO optional attribute default:
+          PhysicalClosedLimitTilt"
       command: "readAttribute"
       attribute: "PhysicalClosedLimitTilt"
       PICS: WNCV.S.A0002
@@ -239,7 +246,8 @@ tests:
               maxValue: 65535
 
     ### Attribute[  3]: CurrentPositionLift  ====================
-    - label: "3d: read the RO optional attribute default: CurrentPositionLift"
+    - label:
+          "Step 3d: read the RO optional attribute default: CurrentPositionLift"
       command: "readAttribute"
       attribute: "CurrentPositionLift"
       PICS: WNCV.S.A0003 && !WNCV.S.A0010 && !WNCV.S.A0011
@@ -250,7 +258,8 @@ tests:
               maxValue: 65535
 
     ### Attribute[  3]: CurrentPositionLift  ====================
-    - label: "3d: read the RO optional attribute default: CurrentPositionLift"
+    - label:
+          "Step 3d: read the RO optional attribute default: CurrentPositionLift"
       command: "readAttribute"
       attribute: "CurrentPositionLift"
       PICS: WNCV.S.A0003 && WNCV.S.A0010 && WNCV.S.A0011
@@ -261,7 +270,8 @@ tests:
               maxValue: InstalledClosedLimitLift
 
     ### Attribute[  4]: CurrentPositionTilt  ====================
-    - label: "3e: read the RO optional attribute default: CurrentPositionTilt"
+    - label:
+          "Step 3e: read the RO optional attribute default: CurrentPositionTilt"
       command: "readAttribute"
       attribute: "CurrentPositionTilt"
       PICS: WNCV.S.A0004 && !WNCV.S.A0012 && !WNCV.S.A0013
@@ -272,7 +282,8 @@ tests:
               maxValue: 65535
 
     ### Attribute[  4]: CurrentPositionTilt  ====================
-    - label: "3e: read the RO optional attribute default: CurrentPositionTilt"
+    - label:
+          "Step 3e: read the RO optional attribute default: CurrentPositionTilt"
       command: "readAttribute"
       attribute: "CurrentPositionTilt"
       PICS: WNCV.S.A0004 && WNCV.S.A0012 && WNCV.S.A0013
@@ -284,7 +295,8 @@ tests:
 
     ### Attribute[  5]: NumberOfActuationsLift  ====================
     - label:
-          "3f: read the RO optional attribute default: NumberOfActuationsLift"
+          "Step 3f: read the RO optional attribute default:
+          NumberOfActuationsLift"
       command: "readAttribute"
       attribute: "NumberOfActuationsLift"
       PICS: WNCV.S.A0005
@@ -296,7 +308,8 @@ tests:
 
     ### Attribute[  6]: NumberOfActuationsTilt  ====================
     - label:
-          "3g: read the RO optional attribute default: NumberOfActuationsTilt"
+          "Step 3g: read the RO optional attribute default:
+          NumberOfActuationsTilt"
       command: "readAttribute"
       attribute: "NumberOfActuationsTilt"
       PICS: WNCV.S.A0006
@@ -308,7 +321,7 @@ tests:
 
     ### Attribute[  8]: CurrentPositionLiftPercentage  ====================
     - label:
-          "3h: read the RO optional attribute default:
+          "Step 3h: read the RO optional attribute default:
           CurrentPositionLiftPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
@@ -321,7 +334,7 @@ tests:
 
     ### Attribute[  9]: CurrentPositionTiltPercentage  ====================
     - label:
-          "3i:read the RO optional attribute default:
+          "Step 3i:read the RO optional attribute default:
           CurrentPositionTiltPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
