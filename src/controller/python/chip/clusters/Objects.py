@@ -19123,6 +19123,7 @@ class HepaFilterMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+            kReplacementProductList = 0x3
 
     class Structs:
         @dataclass
@@ -19417,6 +19418,7 @@ class ActivatedCarbonFilterMonitoring(Cluster):
         class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
+            kReplacementProductList = 0x3
 
     class Structs:
         @dataclass
