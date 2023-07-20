@@ -16,23 +16,3 @@
  */
 
 #pragma once
-
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/CommandHandler.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/util/af-types.h>
-#include <app/util/basic-types.h>
-
-using chip::Protocols::InteractionModel::Status;
-
-class IcdManagementServer
-{
-public:
-    Status RegisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                          const chip::app::Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData);
-
-    Status UnregisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                            const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
-
-    Status StayActiveRequest(const chip::app::ConcreteCommandPath & commandPath);
-};

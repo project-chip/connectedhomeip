@@ -47,6 +47,7 @@ declare_args() {
   ota_auto_reboot_delay_seconds = 5
 
   enable_heap_monitoring = false
+  enable_reset_counter = false
 
   setupPinCode = 20202021
   setupDiscriminator = 3840
@@ -102,18 +103,20 @@ bouffalolab_executable("lighting_app") {
     "SYS_AOS_LOOP_ENABLE",
   ]
 
+  if (false == enable_reset_counter) {
+    defines += [ "BOOT_PIN_RESET=8" ]
+  }
+
   bl_plat_name = "bl602"
   sources = [
-    "${examples_plat_dir}/route_hook/bl_route_hook.c",
-    "${examples_plat_dir}/route_hook/bl_route_table.c",
+    "${examples_plat_common_dir}/route_hook/bl_route_hook.c",
+    "${examples_plat_common_dir}/route_hook/bl_route_table.c",
   ]
 
   if ("BL602-IoT-Matter-V1" == board) {
     defines += [ "BL602_IoT_Matter_V1" ]
   } else if ("BL602-NIGHT-LIGHT" == board) {
     defines += [ "BL602_NIGHT_LIGHT" ]
-  } else if ("BL602-IOT-DVK-3S" == board) {
-    defines += [ "BL602_IOT_DVK_3S" ]
   }
 
   sources += [
@@ -121,6 +124,7 @@ bouffalolab_executable("lighting_app") {
     "${example_common_dir}/AppTask.cpp",
     "${example_common_dir}/ZclCallbacks.cpp",
     "${examples_plat_common_dir}/plat/LEDWidget.cpp",
+    "${examples_plat_common_dir}/plat/OTAConfig.cpp",
     "${examples_plat_common_dir}/plat/aos_task.c",
     "${examples_plat_common_dir}/plat/demo_pwm.c",
     "${examples_plat_common_dir}/plat/main.cpp",
@@ -140,6 +144,7 @@ bouffalolab_executable("lighting_app") {
   include_dirs = [
     "${chip_root}/src/platform/bouffalolab/BL602",
     "${example_common_dir}",
+    "${examples_plat_common_dir}/route_hook",
     "${examples_plat_common_dir}/plat",
     "${examples_plat_dir}",
   ]
@@ -206,11 +211,6 @@ bouffalolab_executable("lighting_app") {
   if (enable_heap_monitoring) {
     sources += [ "${examples_plat_common_dir}/plat/MemMonitoring.cpp" ]
     defines += [ "HEAP_MONITORING=1" ]
-  }
-
-  if (chip_enable_ota_requestor) {
-    defines += [ "OTA_ENABLED" ]
-    sources += [ "${examples_plat_common_dir}/plat/OTAConfig.cpp" ]
   }
 
   cflags_c = [ "-Wno-sign-compare" ]

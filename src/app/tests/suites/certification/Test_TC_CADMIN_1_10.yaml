@@ -62,7 +62,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+    - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       PICS: CADMIN.S
@@ -71,7 +71,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+    - label: "Step 2: TH_CR1 opens a commissioning window on DUT_CE"
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       PICS: CADMIN.S.C01.Rsp
@@ -81,7 +81,7 @@ tests:
               - name: "CommissioningTimeout"
                 value: 900
 
-    - label: "Waiting after opening commissioning window"
+    - label: "Step 2a: Waiting after opening commissioning window"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -90,7 +90,7 @@ tests:
                 value: waitAfterCommissioning
 
     #Check for DNS-SD advertisement CM is not possible in YAML
-    - label: "Verify that the DNS-SD advertisement shows CM=1"
+    - label: "Step 3: Verify that the DNS-SD advertisement shows CM=1"
       verification: |
           On TH_CR1 send the below command
 
@@ -113,8 +113,8 @@ tests:
 
     #As per issue https://github.com/CHIP-Specifications/chip-test-scripts/issues/495 adding --discover-once flag
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.1: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -131,8 +131,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.2: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -149,8 +149,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.3: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -167,8 +167,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.4: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -185,8 +185,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.5: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -203,8 +203,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.6: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -221,8 +221,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.7: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -239,8 +239,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.8: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -257,8 +257,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.9: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -275,8 +275,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.10: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -292,26 +292,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
-      identity: "beta"
-      cluster: "CommissionerCommands"
-      command: "PairWithCode"
-      PICS: CADMIN.S
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId2
-              - name: "payload"
-                value: incorrectSetupCodePayload
-              - name: discoverOnce
-                value: true
-      response:
-          error: FAILURE
-
-    - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.11: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -328,8 +310,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.12: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -346,8 +328,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.13: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -364,8 +346,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.14: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -382,8 +364,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.15: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -400,8 +382,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.16: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -418,8 +400,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.17: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -436,8 +418,8 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.18: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -454,8 +436,26 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
+          "Step 4.19: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.20: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -473,8 +473,8 @@ tests:
 
     # This step must match the verification step above where we checked `correctPayload`
     - label:
-          "TH_CR2 attempts to do PASE to DUT_CE using the correct onboarding
-          payload"
+          "Step 5a: TH_CR2 attempts to do PASE to DUT_CE using the correct
+          onboarding payload"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -488,7 +488,7 @@ tests:
       response:
           error: FAILURE
 
-    - label: "TH_CR3 starts a commissioning process with DUT_CE"
+    - label: "Step 5b: TH_CR3 starts a commissioning process with DUT_CE"
       identity: "gamma"
       cluster: "CommissionerCommands"
       command: "PairWithCode"

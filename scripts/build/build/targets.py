@@ -231,7 +231,8 @@ def BuildEfr32Target():
         TargetPart('unit-test', app=Efr32App.UNIT_TEST),
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
-        TargetPart('thermostat', app=Efr32App.THERMOSTAT)
+        TargetPart('thermostat', app=Efr32App.THERMOSTAT),
+        TargetPart('pump', app=Efr32App.PUMP)
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
@@ -327,6 +328,8 @@ def BuildAndroidTarget():
         TargetPart('tv-casting-app', app=AndroidApp.TV_CASTING_APP),
         TargetPart('java-matter-controller',
                    app=AndroidApp.JAVA_MATTER_CONTROLLER),
+        TargetPart('virtual-device-app',
+                   app=AndroidApp.VIRTUAL_DEVICE_APP),
     ])
 
     # Modifiers
@@ -588,12 +591,16 @@ def BuildBouffalolabTarget():
 
     # Boards
     target.AppendFixedTargets([
-        TargetPart('BL602-IoT-Matter-V1', board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
-        TargetPart('BL602-IOT-DVK-3S', board=BouffalolabBoard.BL602_IOT_DVK_3S, module_type="BL602"),
-        TargetPart('BL602-NIGHT-LIGHT', board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
-        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit, module_type="BL706C-22"),
-        TargetPart('BL706-IoT-DVK', board=BouffalolabBoard.BL706_IoT_DVK, module_type="BL706C-22"),
-        TargetPart('BL706-NIGHT-LIGHT', board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
+        TargetPart('BL602-IoT-Matter-V1',
+                   board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
+        TargetPart('BL602-NIGHT-LIGHT',
+                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
+        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit,
+                   module_type="BL706C-22"),
+        TargetPart('BL706-NIGHT-LIGHT',
+                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
+        TargetPart('BL706-ETH',
+                   board=BouffalolabBoard.BL706_ETH, module_type="BL706C-22"),
         TargetPart('BL704L-DVK', board=BouffalolabBoard.BL704L_DVK, module_type="BL704L"),
     ])
 
@@ -606,6 +613,7 @@ def BuildBouffalolabTarget():
     target.AppendModifier('115200', baudrate=115200)
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('cdc', enable_cdc=True)
+    target.AppendModifier('resetCnt', enable_resetCnt=True)
     target.AppendModifier('rotating_device_id', enable_rotating_device_id=True)
 
     return target
