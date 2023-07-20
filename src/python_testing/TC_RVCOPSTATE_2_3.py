@@ -27,7 +27,7 @@ import time
 
 # This test requires several additional command line arguments
 # run with
-# --int-arg PIXIT_ENDPOINT:<endpoint> PIXIT_MODEOK:<mode id> PIXIT_MODEFAIL:<mode id>
+# --int-arg PIXIT_ENDPOINT:<endpoint>
 
 class TC_RVCOPSTATE_2_3(MatterBaseTest):
 

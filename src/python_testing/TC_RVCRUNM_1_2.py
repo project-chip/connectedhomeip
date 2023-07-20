@@ -19,6 +19,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
+from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -108,14 +109,14 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
                 on_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OnMode)
 
                 logging.info("OnMode: %s" % (on_mode))
-                asserts.assert_true(on_mode in modes, "OnMode is not a supported mode!")    
+                asserts.assert_true(on_mode in modes or on_mode == NullValue, "OnMode is not a supported mode!")    
 
             if self.check_pics("RVCRUNM.S.A0002"):
                 self.print_step(5, "Read StartUpMode attribute")
                 startup_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.StartUpMode)
 
                 logging.info("StartUpMode: %s" % (startup_mode))
-                asserts.assert_true(startup_mode in modes, "StartUpMode is not a supported mode!")    
+                asserts.assert_true(startup_mode in modes or startup_mode == NullValue, "StartUpMode is not a supported mode!")    
 
 if __name__ == "__main__":
     default_matter_test_main()
