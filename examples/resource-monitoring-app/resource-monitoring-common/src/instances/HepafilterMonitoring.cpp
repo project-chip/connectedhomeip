@@ -35,19 +35,18 @@ using chip::Protocols::InteractionModel::Status;
 
 static ResourceMonitoring::Attributes::ReplacementProductStruct::Type sHepaFilterReplacementProductsList[] = {
     { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kUpc,
-      .productIdentifierValue = CharSpan("upc12xhepaxx") },
+      .productIdentifierValue = CharSpan::fromCharString("111112222233") },
     { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8,
-      .productIdentifierValue = CharSpan("gtin8xhe") },
+      .productIdentifierValue = CharSpan::fromCharString("gtin8xhe") },
     { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kEan,
-      .productIdentifierValue = CharSpan("ean13xhepaxxx") },
+      .productIdentifierValue = CharSpan::fromCharString("4444455555666") },
     { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14,
-      .productIdentifierValue = CharSpan("gtin14xhepaxxx") },
+      .productIdentifierValue = CharSpan::fromCharString("gtin14xhepaxxx") },
     { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kOem,
-      .productIdentifierValue = CharSpan("oem20xhepaxxxxxxxxxx") },
+      .productIdentifierValue = CharSpan::fromCharString("oem20xhepaxxxxxxxxxx") },
 };
 StaticReplacementProductListManager sHepaFilterReplacementProductListManager(
-    &sHepaFilterReplacementProductsList[0],
-    sizeof(sHepaFilterReplacementProductsList) / sizeof(ResourceMonitoring::Attributes::ReplacementProductStruct::Type));
+    &sHepaFilterReplacementProductsList[0], ArraySize(sHepaFilterReplacementProductsList));
 
 //-- Hepa filter Monitoring instance methods
 CHIP_ERROR HepaFilterMonitoringInstance::AppInit()

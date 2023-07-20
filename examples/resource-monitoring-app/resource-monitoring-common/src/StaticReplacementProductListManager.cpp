@@ -27,9 +27,7 @@ using namespace chip::app::Clusters::ResourceMonitoring;
 
 CHIP_ERROR StaticReplacementProductListManager::Next(Attributes::ReplacementProductStruct::Type & item)
 {
-    ChipLogDetail(Zcl, "StaticReplacementProductListManager::Next()");
-
-    if (mReplacementProductListSize > mIndex)
+    if (mIndex < mReplacementProductListSize)
     {
         item = mReplacementProductsList[mIndex];
         mIndex++;

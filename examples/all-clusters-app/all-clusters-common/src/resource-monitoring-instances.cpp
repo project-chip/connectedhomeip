@@ -38,15 +38,19 @@ static HepaFilterMonitoringInstance * gHepaFilterInstance                       
 static ActivatedCarbonFilterMonitoringInstance * gActivatedCarbonFilterInstance = nullptr;
 
 static ResourceMonitoring::Attributes::ReplacementProductStruct::Type sReplacementProductsList[] = {
-    { .productIdentifierType = ProductIdentifierTypeEnum::kUpc, .productIdentifierValue = CharSpan("upc12xxxxxxx") },
-    { .productIdentifierType = ProductIdentifierTypeEnum::kGtin8, .productIdentifierValue = CharSpan("gtin8xxx") },
-    { .productIdentifierType = ProductIdentifierTypeEnum::kEan, .productIdentifierValue = CharSpan("ean13xxxxxxxx") },
-    { .productIdentifierType = ProductIdentifierTypeEnum::kGtin14, .productIdentifierValue = CharSpan("gtin14xxxxxxxx") },
-    { .productIdentifierType = ProductIdentifierTypeEnum::kOem, .productIdentifierValue = CharSpan("oem20xxxxxxxxxxxxxxx") },
+    { .productIdentifierType = ProductIdentifierTypeEnum::kUpc,
+      .productIdentifierValue = CharSpan::fromCharString("111112222233") },
+    { .productIdentifierType = ProductIdentifierTypeEnum::kGtin8,
+      .productIdentifierValue = CharSpan::fromCharString("gtin8xxx") },
+    { .productIdentifierType = ProductIdentifierTypeEnum::kEan,
+      .productIdentifierValue = CharSpan::fromCharString("4444455555666") },
+    { .productIdentifierType = ProductIdentifierTypeEnum::kGtin14, 
+      .productIdentifierValue = CharSpan::fromCharString("gtin14xxxxxxxx") },
+    { .productIdentifierType = ProductIdentifierTypeEnum::kOem,
+      .productIdentifierValue = CharSpan::fromCharString("oem20xxxxxxxxxxxxxxx") },
 };
 StaticReplacementProductListManager sReplacementProductListManager(
-    &sReplacementProductsList[0],
-    sizeof(sReplacementProductsList) / sizeof(ResourceMonitoring::Attributes::ReplacementProductStruct::Type));
+    &sReplacementProductsList[0], ArraySize(sReplacementProductsList));
 
 //-- Activated Carbon Filter Monitoring Instance methods
 CHIP_ERROR ActivatedCarbonFilterMonitoringInstance::AppInit()
@@ -104,9 +108,7 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 
 CHIP_ERROR StaticReplacementProductListManager::Next(Attributes::ReplacementProductStruct::Type & item)
 {
-    ChipLogDetail(Zcl, "StaticReplacementProductListManager::Next()");
-
-    if (mReplacementProductListSize > mIndex)
+    if (mIndex < mReplacementProductListSize)
     {
         item = mReplacementProductsList[mIndex];
         mIndex++;

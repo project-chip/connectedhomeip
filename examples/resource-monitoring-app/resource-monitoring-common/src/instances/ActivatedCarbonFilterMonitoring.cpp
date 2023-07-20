@@ -36,19 +36,18 @@ using chip::Protocols::InteractionModel::Status;
 
 static ResourceMonitoring::Attributes::ReplacementProductStruct::Type sActivatedCarbonFilterReplacementProductsList[] = {
     { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kUpc,
-      .productIdentifierValue = CharSpan("upc12xcarbon") },
+      .productIdentifierValue = CharSpan::fromCharString("111112222233") },
     { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8,
-      .productIdentifierValue = CharSpan("gtin8xca") },
+      .productIdentifierValue = CharSpan::fromCharString("gtin8xca") },
     { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kEan,
-      .productIdentifierValue = CharSpan("ean13xacarbon") },
+      .productIdentifierValue = CharSpan::fromCharString("4444455555666") },
     { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14,
-      .productIdentifierValue = CharSpan("gtin14xcarbonx") },
+      .productIdentifierValue = CharSpan::fromCharString("gtin14xcarbonx") },
     { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kOem,
-      .productIdentifierValue = CharSpan("oem20xcarbonxxxxxxxx") },
+      .productIdentifierValue = CharSpan::fromCharString("oem20xcarbonxxxxxxxx") },
 };
 StaticReplacementProductListManager sActivatedCarbonFilterReplacementProductListManager(
-    &sActivatedCarbonFilterReplacementProductsList[0],
-    sizeof(sActivatedCarbonFilterReplacementProductsList) / sizeof(ResourceMonitoring::Attributes::ReplacementProductStruct::Type));
+    &sActivatedCarbonFilterReplacementProductsList[0], ArraySize(sActivatedCarbonFilterReplacementProductsList));
 
 //-- Activated carbon filter Monitoring Instance methods
 CHIP_ERROR ActivatedCarbonFilterMonitoringInstance::AppInit()
