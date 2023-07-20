@@ -35,6 +35,9 @@ config:
     TEST_EVENT_TRIGGER_SMOKE_ALARM_CLEAR:
         type: int64u
         defaultValue: "0xffffffff000000a0"
+    EVENT_NUMBER:
+        type: int64u
+        defaultValue: 0
 
 tests:
     - label: "Commission DUT to TH"
@@ -44,23 +47,6 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
-    # Get the latest eventNumber
-    - label: "Generate an event on the accessory"
-      cluster: "Unit Testing"
-      command: "TestEmitTestEventRequest"
-      arguments:
-          values:
-              - name: "arg1"
-                value: 1
-              - name: "arg2"
-                value: 2
-              - name: "arg3"
-                value: true
-      response:
-          values:
-              - name: "value"
-                saveAs: eventNumber
 
     - label: "TH subscribes to SmokeState attribute from DUT"
       PICS: SMOKECO.S.A0001
@@ -134,7 +120,7 @@ tests:
       PICS: SMOKECO.S.E00
       command: "readEvent"
       event: "SmokeAlarm"
-      eventNumber: eventNumber + 1
+      EVENT_NUMBER: EVENT_NUMBER + 1
       response:
           value: { AlarmSeverityLevel: 1 }
 
@@ -214,7 +200,7 @@ tests:
       PICS: SMOKECO.S.E00
       command: "readEvent"
       event: "SmokeAlarm"
-      eventNumber: eventNumber + 2
+      EVENT_NUMBER: EVENT_NUMBER + 2
       response:
           value: { AlarmSeverityLevel: 2 }
 
@@ -259,6 +245,6 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      eventNumber: eventNumber + 3
+      EVENT_NUMBER: EVENT_NUMBER + 3
       response:
           value: {}

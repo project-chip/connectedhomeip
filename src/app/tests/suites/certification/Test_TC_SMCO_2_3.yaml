@@ -34,6 +34,9 @@ config:
     TEST_EVENT_TRIGGER_CO_ALARM_CLEAR:
         type: int64u
         defaultValue: "0xffffffff000000a1"
+    EVENT_NUMBER:
+        type: int64u
+        defaultValue: 0
 
 tests:
     - label: "Commission DUT to TH"
@@ -43,23 +46,6 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
-    # Get the latest eventNumber
-    - label: "Generate an event on the accessory"
-      cluster: "Unit Testing"
-      command: "TestEmitTestEventRequest"
-      arguments:
-          values:
-              - name: "arg1"
-                value: 1
-              - name: "arg2"
-                value: 2
-              - name: "arg3"
-                value: true
-      response:
-          values:
-              - name: "value"
-                saveAs: eventNumber
 
     - label: "TH subscribes to COState attribute from DUT"
       PICS: SMOKECO.S.A0002
@@ -133,7 +119,7 @@ tests:
       PICS: SMOKECO.S.E01
       command: "readEvent"
       event: "COAlarm"
-      eventNumber: eventNumber + 1
+      EVENT_NUMBER: EVENT_NUMBER + 1
       response:
           value: { AlarmSeverityLevel: 1 }
 
@@ -213,7 +199,7 @@ tests:
       PICS: SMOKECO.S.E01
       command: "readEvent"
       event: "COAlarm"
-      eventNumber: eventNumber + 2
+      EVENT_NUMBER: EVENT_NUMBER + 2
       response:
           value: { AlarmSeverityLevel: 2 }
 
@@ -258,6 +244,6 @@ tests:
       PICS: SMOKECO.S.E0a
       command: "readEvent"
       event: "AllClear"
-      eventNumber: eventNumber + 3
+      EVENT_NUMBER: EVENT_NUMBER + 3
       response:
           value: {}
