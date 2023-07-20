@@ -22,6 +22,9 @@ To use a ModeBase derived cluster, you need to
 -   Call the `.Init()` function of your instance after the root `Server::Init()`.
 -   Alternatively, the last two steps can be done in the 
     `emberAf<ClusterName>ClusterInitCallback` function.
+-   Add `#define EMBER_AF_PLUGIN_MODE_BASE` to your 
+    `chip_device_project_config_include` file. In the examples, this file is
+    `CHIPProjectAAConfig.h`.
 
 **Note** Zap accessor functions for these clusters will not return correct
 values. Use the instance's `Update...` and `Get...` functions to access the

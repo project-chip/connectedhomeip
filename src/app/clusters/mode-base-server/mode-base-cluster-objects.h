@@ -23,8 +23,6 @@
 #include <app/util/util.h>
 #include <utility>
 
-#define EMBER_AF_PLUGIN_MODE_BASE
-
 namespace chip {
 namespace app {
 namespace Clusters {

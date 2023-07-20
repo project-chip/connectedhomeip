@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#define EMBER_AF_PLUGIN_MODE_BASE
+
 #include "AppMain.h"
 #include "AppOptions.h"
 #include "binding-handler.h"
