@@ -35,18 +35,19 @@ using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
 using namespace std;
 
-constexpr size_t kDishwasherAlarmDelegateTableSize =
+static constexpr size_t kDishwasherAlarmDelegateTableSize =
     EMBER_AF_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 static_assert(kDishwasherAlarmDelegateTableSize <= kEmberInvalidEndpointIndex, "Dishwasher Alarm Delegate table size error");
 
-static Delegate * gDelegateTable[kDishwasherAlarmDelegateTableSize] = { nullptr };
-static uint32_t SetStateByLatch(uint32_t latch, uint32_t currentState, uint32_t newState);
+static BitMask<AlarmMap> SetStateByLatch(const BitMask<AlarmMap> latch, const BitMask<AlarmMap> currentState, const BitMask<AlarmMap> newState);
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace DishwasherAlarm {
+
+Delegate * gDelegateTable[kDishwasherAlarmDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
@@ -247,9 +248,8 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const Bi
     BitMask<AlarmMap> latch;
     if (GetLatchValue(endpoint, &latch) == EMBER_ZCL_STATUS_SUCCESS)
     {
-        uint32_t finalState = 0;
-        finalState = SetStateByLatch(latch.Raw(), currentState.Raw(), finalNewState.Raw());
-        finalNewState.SetRaw(finalState);
+        BitMask<AlarmMap> finalState = SetStateByLatch(latch, currentState, finalNewState);
+        finalNewState.Set(finalState);
     }
 
     status = Attributes::State::Set(endpoint, finalNewState);
@@ -271,7 +271,7 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const Bi
 
 EmberAfStatus DishwasherAlarmServer::ResetStateValue(EndpointId endpoint, const BitMask<AlarmMap> alarms)
 {
-    chip::BitMask<AlarmMap> supported;
+    BitMask<AlarmMap> supported;
     if (GetSupportedValue(endpoint, &supported) || !supported.HasAll(alarms))
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: State is not supported");
@@ -336,18 +336,18 @@ void DishwasherAlarmServer::SendNotifyEvent(EndpointId endpointId, BitMask<Alarm
     }
 }
 
-static Status modifyEnabledHandler(const app::ConcreteCommandPath & commandPath, const chip::BitMask<AlarmMap> mask)
+static Status modifyEnabledHandler(const app::ConcreteCommandPath & commandPath, const BitMask<AlarmMap> mask)
 {
     EndpointId endpoint = commandPath.mEndpointId;
-    chip::BitMask<AlarmMap> support;
+    BitMask<AlarmMap> supported;
 
-    if (DishwasherAlarmServer::Instance().GetSupportedValue(endpoint, &support) != EMBER_ZCL_STATUS_SUCCESS)
+    if (DishwasherAlarmServer::Instance().GetSupportedValue(endpoint, &supported) != EMBER_ZCL_STATUS_SUCCESS)
     {
         return Status::Failure;
     }
 
     // receives this command with a Mask that includes bits that are set for alarms which are not supported
-    if (!support.HasAll(mask))
+    if (!supported.HasAll(mask))
     {
         return Status::InvalidCommand;
     }
@@ -369,7 +369,7 @@ static Status modifyEnabledHandler(const app::ConcreteCommandPath & commandPath,
     return Status::Success;
 }
 
-static Status ResetHandler(const app::ConcreteCommandPath & commandPath, const chip::BitMask<AlarmMap> alarms)
+static Status ResetHandler(const app::ConcreteCommandPath & commandPath, const BitMask<AlarmMap> alarms)
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
@@ -418,14 +418,26 @@ bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(app::CommandHandle
     return true;
 }
 
-static uint32_t SetStateByLatch(uint32_t latch, uint32_t currentState, uint32_t newState)
+/**
+ * If the Dishwasher Alarm Cluster has Latch attribute, should call this function to handle the
+ * State attribute.
+ * If each bit set in the Latch attribute is true, the corresponding bit set in the
+ * State attribute can change from false to true, but unable to change from true to false;
+ * If each bit set in the Latch attribute is flase, the corresponding bit set in the
+ * State attribute can change to true or false.
+ * @param[in] latch The current latch attribute.
+ * @param[in] currentState The current State attribute.
+ * @param[in] newState The State attribute which want to set.
+ * @return The State attribute which want to set.
+ */
+static BitMask<AlarmMap> SetStateByLatch(const BitMask<AlarmMap> latch, const BitMask<AlarmMap> currentState, const BitMask<AlarmMap> newState)
 {
-    uint32_t rawLatch = latch;
-    uint32_t rawCurrentStateLatch = currentState;
-    uint32_t rawNewState = newState;
+    uint32_t rawLatch = latch.Raw();
+    uint32_t rawCurrentStateLatch = currentState.Raw();
+    uint32_t rawNewState = newState.Raw();
     uint32_t newStateBit = 0;
     uint32_t finalState = 0;
-
+    BitMask<AlarmMap> state;
     for (size_t i = 0; i < sizeof(rawLatch) * 8; ++i)
     {
         if (rawLatch & 0x1)
@@ -441,6 +453,6 @@ static uint32_t SetStateByLatch(uint32_t latch, uint32_t currentState, uint32_t 
         rawCurrentStateLatch  >>= 1;
         rawNewState >>= 1;
     }
-    return finalState;
+    return state.SetRaw(finalState);
 }
 
