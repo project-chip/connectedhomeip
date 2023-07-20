@@ -343,6 +343,9 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::OnMode::Id:
         ReturnErrorOnFailure(aEncoder.Encode(mOnMode));
         break;
+    case Attributes::FeatureMap::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mFeature));
+        break;
     case Attributes::SupportedModes::Id:
         Instance * d   = this;
         CHIP_ERROR err = aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR { return d->EncodeSupportedModes(encoder); });
