@@ -290,7 +290,7 @@
         "Test_TC_G_2_1"
     ],
     "Scenes": ["Test_TC_S_1_1"],
-    "ReplaceableMonitoring": [
+    "ResourceMonitoring": [
         "Test_TC_ACFREMON_1_1",
         "Test_TC_ACFREMON_2_1",
         "Test_TC_HEPAFREMON_1_1",
@@ -374,6 +374,6 @@
         "Subscriptions",
         "DoorLock",
         "Groups",
-        "ReplaceableMonitoring"
+        "ResourceMonitoring"
     ]
 }

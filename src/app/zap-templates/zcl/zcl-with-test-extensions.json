@@ -325,6 +325,22 @@
             "OperationalError",
             "CurrentPhase",
             "CountdownTime"
+        ],
+        "Activated Carbon Filter Monitoring": [
+            "Condition",
+            "DegradationDirection",
+            "ChangeIndication",
+            "InPlaceIndicator",
+            "LastChangedTime",
+            "FeatureMap"
+        ],
+        "HEPA Filter Monitoring": [
+            "Condition",
+            "DegradationDirection",
+            "ChangeIndication",
+            "InPlaceIndicator",
+            "LastChangedTime",
+            "FeatureMap"
         ]
     },
     "defaultReportingPolicy": "mandatory",
