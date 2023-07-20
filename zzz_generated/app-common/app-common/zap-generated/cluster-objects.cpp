@@ -2851,6 +2851,58 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace DeviceTypeStruct
+namespace SemanticTagStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kMfgCode), mfgCode));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kNamespaceID), namespaceID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kTag), tag));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kLabel), label));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kMfgCode):
+            ReturnErrorOnFailure(DataModel::Decode(reader, mfgCode));
+            break;
+        case to_underlying(Fields::kNamespaceID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, namespaceID));
+            break;
+        case to_underlying(Fields::kTag):
+            ReturnErrorOnFailure(DataModel::Decode(reader, tag));
+            break;
+        case to_underlying(Fields::kLabel):
+            ReturnErrorOnFailure(DataModel::Decode(reader, label));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace SemanticTagStruct
 } // namespace Structs
 
 namespace Commands {} // namespace Commands
@@ -2871,6 +2923,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         break;
     case Attributes::PartsList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, partsList));
+        break;
+    case Attributes::TagList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, tagList));
         break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
