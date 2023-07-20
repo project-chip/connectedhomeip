@@ -48,7 +48,9 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label: "Step 3: TH reads from the DUT the AirflowDirection attribute and check it is forwards"
+    - label:
+          "Step 3: TH reads from the DUT the AirflowDirection attribute and
+          check it is forwards"
       PICS: FAN.S.A000B
       command: "readAttribute"
       attribute: "AirflowDirection"
@@ -71,7 +73,9 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label: "Step 5: TH reads from the DUT the AirflowDirection attribute and check it is reverse"
+    - label:
+          "Step 5: TH reads from the DUT the AirflowDirection attribute and
+          check it is reverse"
       PICS: FAN.S.A000B
       command: "readAttribute"
       attribute: "AirflowDirection"

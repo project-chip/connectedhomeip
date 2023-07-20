@@ -39,7 +39,9 @@ tests:
       response:
           saveAs: rSpeedMax
 
-    - label: "Step 3: TH writes TH writes to the DUT the a value less than or equal to the value read in step 2"
+    - label:
+          "Step 3: TH writes TH writes to the DUT the a value less than or equal
+          to the value read in step 2"
       PICS: FAN.S.A0005
       command: "writeAttribute"
       attribute: "SpeedSetting"
