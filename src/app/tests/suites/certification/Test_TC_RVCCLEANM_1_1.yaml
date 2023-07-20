@@ -68,7 +68,8 @@ tests:
               contains: [4]
 
     - label:
-          "Read the Feature dependent(RVCCLEANM.S.F00 - DEPONOFF) and optional attribute(OnMode) is in AttributeList from the DUT"
+          "Read the Feature dependent(RVCCLEANM.S.F00 - DEPONOFF) and optional
+          attribute(OnMode) is in AttributeList from the DUT"
       PICS: RVCCLEANM.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
@@ -78,7 +79,8 @@ tests:
               contains: [5]
 
     - label:
-          "Read the Feature dependent(RVCCLEANM.S.F00 - DEPONOFF) and optional attribute(OnMode) is not in AttributeList from the DUT"
+          "Read the Feature dependent(RVCCLEANM.S.F00 - DEPONOFF) and optional
+          attribute(OnMode) is not in AttributeList from the DUT"
       PICS: " !RVCCLEANM.S.F00 "
       command: "readAttribute"
       attribute: "AttributeList"
@@ -87,7 +89,9 @@ tests:
               type: list
               excludes: [5]
 
-    - label: "Read the global attribute AcceptedCommandList. Check if it contains id 0x0 (ChangeToMode)"
+    - label:
+          "Read the global attribute AcceptedCommandList. Check if it contains
+          id 0x0 (ChangeToMode)"
       PICS: RVCCLEANM.S.Afff9
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -96,7 +100,9 @@ tests:
           constraints:
               type: list
 
-    - label: "Read the global attribute: GeneratedCommandList. Check if it contains id 0x1 (ChangeToModeResponse)"
+    - label:
+          "Read the global attribute: GeneratedCommandList. Check if it contains
+          id 0x1 (ChangeToModeResponse)"
       PICS: RVCCLEANM.S.Afff8
       command: "readAttribute"
       attribute: "GeneratedCommandList"
