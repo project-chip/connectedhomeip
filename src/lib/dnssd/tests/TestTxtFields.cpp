@@ -632,7 +632,7 @@ void TxtFieldTcpSupport(nlTestSuite * inSuite, void * inContext)
 
 // Test IsDeviceTreatedAsSleepy() with CRI
 template <class NodeData>
-void TestIsDeviceSleepyIdle(nlTestSuite * inSuite, void * inContext)
+void TestIsDeviceSessionIdle(nlTestSuite * inSuite, void * inContext)
 {
     char key[4];
     char val[32];
@@ -658,7 +658,7 @@ void TestIsDeviceSleepyIdle(nlTestSuite * inSuite, void * inContext)
 
 // Test IsDeviceTreatedAsSleepy() with CRA
 template <class NodeData>
-void TestIsDeviceSleepyActive(nlTestSuite * inSuite, void * inContext)
+void TestIsDeviceSessionActive(nlTestSuite * inSuite, void * inContext)
 {
     char key[4];
     char val[32];
@@ -699,14 +699,14 @@ const nlTest sTests[] = {
     NL_TEST_DEF("TxtDiscoveredFieldMrpRetryIntervalActive", TxtFieldSessionActiveInterval<DiscoveredNodeData>),
     NL_TEST_DEF("TxtDiscoveredFieldMrpRetryActiveThreshold", TxtFieldSessionActiveThreshold<DiscoveredNodeData>),
     NL_TEST_DEF("TxtDiscoveredFieldTcpSupport", (TxtFieldTcpSupport<DiscoveredNodeData>) ),
-    NL_TEST_DEF("TxtDiscoveredIsDeviceSleepyIdle", TestIsDeviceSleepyIdle<DiscoveredNodeData>),
-    NL_TEST_DEF("TxtDiscoveredIsDeviceSleepyActive", TestIsDeviceSleepyActive<DiscoveredNodeData>),
+    NL_TEST_DEF("TxtDiscoveredIsDeviceSessiondle", TestIsDeviceSessionIdle<DiscoveredNodeData>),
+    NL_TEST_DEF("TxtDiscoveredIsDeviceSessionActive", TestIsDeviceSessionActive<DiscoveredNodeData>),
     NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalIdle", TxtFieldSessionIdleInterval<ResolvedNodeData>),
     NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalActive", TxtFieldSessionActiveInterval<ResolvedNodeData>),
     NL_TEST_DEF("TxtResolvedFieldMrpRetryActiveThreshold", TxtFieldSessionActiveThreshold<ResolvedNodeData>),
     NL_TEST_DEF("TxtResolvedFieldTcpSupport", (TxtFieldTcpSupport<ResolvedNodeData>) ),
-    NL_TEST_DEF("TxtResolvedIsDeviceSleepyIdle", TestIsDeviceSleepyIdle<ResolvedNodeData>),
-    NL_TEST_DEF("TxtResolvedIsDeviceSleepyActive", TestIsDeviceSleepyActive<ResolvedNodeData>),
+    NL_TEST_DEF("TxtResolvedIsDeviceSessionIdle", TestIsDeviceSessionIdle<ResolvedNodeData>),
+    NL_TEST_DEF("TxtResolvedIsDeviceSessionActive", TestIsDeviceSessionActive<ResolvedNodeData>),
     NL_TEST_SENTINEL()
 };
 
