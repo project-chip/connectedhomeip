@@ -129,6 +129,10 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
             {
                 newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() - 1);
             }
+            else if (aWrap)
+            {
+                newSpeedSetting = speedMax;
+            }
         }
         else if (speedSetting.Value() == 0)
         {
