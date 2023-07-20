@@ -22,6 +22,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
+#include <app/clusters/resource-monitoring-server/replacement-product-list-manager.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/data-model/Nullable.h>
 #include <app/util/basic-types.h>
@@ -68,12 +69,15 @@ public:
     chip::Protocols::InteractionModel::Status UpdateInPlaceIndicator(bool aNewInPlaceIndicator);
     chip::Protocols::InteractionModel::Status UpdateLastChangedTime(DataModel::Nullable<uint32_t> aNewLastChangedTime);
 
+    void SetReplacementProductListManagerInstance(ReplacementProductListManager * instance);
+
     // Attribute getters
     uint8_t GetCondition() const;
     ChangeIndicationEnum GetChangeIndication() const;
     DegradationDirectionEnum GetDegradationDirection() const;
     bool GetInPlaceIndicator() const;
     DataModel::Nullable<uint32_t> GetLastChangedTime() const;
+
     EndpointId GetEndpointId() const { return mEndpointId; }
 
     /**
@@ -161,10 +165,15 @@ private:
     ChangeIndicationEnum mChangeIndication         = ChangeIndicationEnum::kOk;
     bool mInPlaceIndicator                         = true;
     DataModel::Nullable<uint32_t> mLastChangedTime;
+    ReplacementProductListManager * mReplacementProductListManager = nullptr;
 
     uint32_t mFeatureMap;
 
     bool mResetConditionCommandSupported = false;
+
+    ReplacementProductListManager * GetReplacementProductListManagerInstance();
+
+    CHIP_ERROR ReadReplacableProductList(AttributeValueEncoder & aEncoder);
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;

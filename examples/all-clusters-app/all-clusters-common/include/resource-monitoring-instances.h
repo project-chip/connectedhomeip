@@ -54,3 +54,24 @@ public:
         Instance(aEndpointId, chip::app::Clusters::HepaFilterMonitoring::Id, aFeature, aDegradationDirection,
                  aResetConditionCommandSupported){};
 };
+
+class StaticReplacementProductListManager : public chip::app::Clusters::ResourceMonitoring::ReplacementProductListManager
+{
+public:
+    uint8_t Size() override { return mReplacementProductListSize; };
+
+    CHIP_ERROR Next(chip::app::Clusters::ResourceMonitoring::Attributes::ReplacementProductStruct::Type & item) override;
+
+    ~StaticReplacementProductListManager() {}
+    StaticReplacementProductListManager(
+        chip::app::Clusters::ResourceMonitoring::Attributes::ReplacementProductStruct::Type * aReplacementProductsList,
+        uint8_t aReplacementProductListSize)
+    {
+        mReplacementProductsList    = aReplacementProductsList;
+        mReplacementProductListSize = aReplacementProductListSize;
+    }
+
+private:
+    chip::app::Clusters::ResourceMonitoring::Attributes::ReplacementProductStruct::Type * mReplacementProductsList;
+    uint8_t mReplacementProductListSize;
+};
