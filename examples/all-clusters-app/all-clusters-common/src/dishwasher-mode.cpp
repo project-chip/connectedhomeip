@@ -26,7 +26,7 @@ using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
 static DishwasherModeDelegate * gDishwasherModeDelegate = nullptr;
-static ModeBase::Instance * gDishwasherModeInstance = nullptr;
+static ModeBase::Instance * gDishwasherModeInstance     = nullptr;
 
 CHIP_ERROR DishwasherModeDelegate::Init()
 {

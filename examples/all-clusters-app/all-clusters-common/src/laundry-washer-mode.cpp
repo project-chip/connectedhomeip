@@ -26,7 +26,7 @@ using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
 static LaundryWasherModeDelegate * gLaundryWasherModeDelegate = nullptr;
-static ModeBase::Instance * gLaundryWasherModeInstance = nullptr;
+static ModeBase::Instance * gLaundryWasherModeInstance        = nullptr;
 
 CHIP_ERROR LaundryWasherModeDelegate::Init()
 {

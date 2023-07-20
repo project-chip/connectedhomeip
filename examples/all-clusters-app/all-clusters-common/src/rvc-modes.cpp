@@ -98,8 +98,7 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
 
 // RVC Clean
 static RvcCleanModeDelegate * gRvcCleanModeDelegate = nullptr;
-static ModeBase::Instance * gRvcCleanModeInstance = nullptr;
-
+static ModeBase::Instance * gRvcCleanModeInstance   = nullptr;
 
 CHIP_ERROR RvcCleanModeDelegate::Init()
 {

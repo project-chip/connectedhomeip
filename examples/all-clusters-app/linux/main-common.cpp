@@ -160,7 +160,6 @@ CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductPrimaryColor(Clusters::B
 
 ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
 
-
 } // namespace
 
 void ApplicationInit()

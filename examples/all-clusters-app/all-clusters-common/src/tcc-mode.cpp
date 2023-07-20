@@ -25,7 +25,7 @@ template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
-static TccModeDelegate * gTccModeDelegate = nullptr;
+static TccModeDelegate * gTccModeDelegate    = nullptr;
 static ModeBase::Instance * gTccModeInstance = nullptr;
 
 CHIP_ERROR TccModeDelegate::Init()
