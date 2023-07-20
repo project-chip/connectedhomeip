@@ -3056,12 +3056,12 @@ JNI_METHOD(void, DishwasherModeCluster, writeOnModeAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, SmokeCoAlarmCluster, writeSensitivityLevelAttribute)
+JNI_METHOD(void, SmokeCoAlarmCluster, writeSmokeSensitivityLevelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::SmokeCoAlarm::Attributes::SensitivityLevel::TypeInfo;
+    using TypeInfo = chip::app::Clusters::SmokeCoAlarm::Attributes::SmokeSensitivityLevel::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;

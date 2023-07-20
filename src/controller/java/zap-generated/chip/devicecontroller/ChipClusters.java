@@ -5712,6 +5712,11 @@ public class ChipClusters {
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
+      public interface EndpointListAttributeCallback {
+        void onSuccess( List<Integer> valueList);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
       public interface GeneratedCommandListAttributeCallback {
         void onSuccess( List<Long> valueList);
         void onError(Exception ex);
@@ -6105,6 +6110,18 @@ public class ChipClusters {
       subscribeActiveBatChargeFaultsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readEndpointListAttribute(
+      EndpointListAttributeCallback callback
+    ) {
+      readEndpointListAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeEndpointListAttribute(
+        EndpointListAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeEndpointListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(
       GeneratedCommandListAttributeCallback callback
     ) {
@@ -6392,6 +6409,13 @@ public class ChipClusters {
     );
     private native void subscribeActiveBatChargeFaultsAttribute(long chipClusterPtr,
         ActiveBatChargeFaultsAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readEndpointListAttribute(long chipClusterPtr,
+        EndpointListAttributeCallback callback
+    );
+    private native void subscribeEndpointListAttribute(long chipClusterPtr,
+        EndpointListAttributeCallback callback
       , int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(long chipClusterPtr,
@@ -16254,23 +16278,23 @@ public class ChipClusters {
       subscribeContaminationStateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readSensitivityLevelAttribute(
+    public void readSmokeSensitivityLevelAttribute(
       IntegerAttributeCallback callback
     ) {
-      readSensitivityLevelAttribute(chipClusterPtr, callback);
+      readSmokeSensitivityLevelAttribute(chipClusterPtr, callback);
     }
-    public void writeSensitivityLevelAttribute(DefaultClusterCallback callback, Integer value) {
-      writeSensitivityLevelAttribute(chipClusterPtr, callback, value, null);
+    public void writeSmokeSensitivityLevelAttribute(DefaultClusterCallback callback, Integer value) {
+      writeSmokeSensitivityLevelAttribute(chipClusterPtr, callback, value, null);
     }
 
-    public void writeSensitivityLevelAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      writeSensitivityLevelAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    public void writeSmokeSensitivityLevelAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeSmokeSensitivityLevelAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
-    public void subscribeSensitivityLevelAttribute(
+    public void subscribeSmokeSensitivityLevelAttribute(
         IntegerAttributeCallback callback
 ,
       int minInterval, int maxInterval) {
-      subscribeSensitivityLevelAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+      subscribeSmokeSensitivityLevelAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readExpiryDateAttribute(
@@ -16434,12 +16458,12 @@ public class ChipClusters {
         IntegerAttributeCallback callback
 , int minInterval, int maxInterval);
 
-    private native void readSensitivityLevelAttribute(long chipClusterPtr,
+    private native void readSmokeSensitivityLevelAttribute(long chipClusterPtr,
         IntegerAttributeCallback callback
     );
 
-    private native void writeSensitivityLevelAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
-    private native void subscribeSensitivityLevelAttribute(long chipClusterPtr,
+    private native void writeSmokeSensitivityLevelAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
+    private native void subscribeSmokeSensitivityLevelAttribute(long chipClusterPtr,
         IntegerAttributeCallback callback
 , int minInterval, int maxInterval);
 

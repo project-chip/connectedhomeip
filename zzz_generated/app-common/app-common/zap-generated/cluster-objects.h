@@ -6623,6 +6623,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveBatChargeFaults
+namespace EndpointList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::EndpointId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::EndpointId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::EndpointId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EndpointList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace EndpointList
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -6706,6 +6718,7 @@ struct TypeInfo
         Attributes::BatFunctionalWhileCharging::TypeInfo::DecodableType batFunctionalWhileCharging = static_cast<bool>(0);
         Attributes::BatChargingCurrent::TypeInfo::DecodableType batChargingCurrent;
         Attributes::ActiveBatChargeFaults::TypeInfo::DecodableType activeBatChargeFaults;
+        Attributes::EndpointList::TypeInfo::DecodableType endpointList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -16018,7 +16031,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ContaminationState
-namespace SensitivityLevel {
+namespace SmokeSensitivityLevel {
 struct TypeInfo
 {
     using Type             = chip::app::Clusters::SmokeCoAlarm::SensitivityEnum;
@@ -16026,10 +16039,10 @@ struct TypeInfo
     using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::SensitivityEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SensitivityLevel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SmokeSensitivityLevel::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace SensitivityLevel
+} // namespace SmokeSensitivityLevel
 namespace ExpiryDate {
 struct TypeInfo
 {
@@ -16106,7 +16119,7 @@ struct TypeInfo
             static_cast<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>(0);
         Attributes::ContaminationState::TypeInfo::DecodableType contaminationState =
             static_cast<chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum>(0);
-        Attributes::SensitivityLevel::TypeInfo::DecodableType sensitivityLevel =
+        Attributes::SmokeSensitivityLevel::TypeInfo::DecodableType smokeSensitivityLevel =
             static_cast<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum>(0);
         Attributes::ExpiryDate::TypeInfo::DecodableType expiryDate = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;

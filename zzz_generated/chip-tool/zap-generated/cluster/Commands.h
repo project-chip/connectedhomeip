@@ -2240,6 +2240,7 @@ private:
 | * BatFunctionalWhileCharging                                        | 0x001C |
 | * BatChargingCurrent                                                | 0x001D |
 | * ActiveBatChargeFaults                                             | 0x001E |
+| * EndpointList                                                      | 0x001F |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -4461,7 +4462,7 @@ private:
 | * InterconnectSmokeAlarm                                            | 0x0008 |
 | * InterconnectCOAlarm                                               | 0x0009 |
 | * ContaminationState                                                | 0x000A |
-| * SensitivityLevel                                                  | 0x000B |
+| * SmokeSensitivityLevel                                             | 0x000B |
 | * ExpiryDate                                                        | 0x000C |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
@@ -12044,6 +12045,7 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
                                    credsIssuerConfig),                                                                        //
         make_unique<ReadAttribute>(Id, "bat-charging-current", Attributes::BatChargingCurrent::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "active-bat-charge-faults", Attributes::ActiveBatChargeFaults::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "endpoint-list", Attributes::EndpointList::Id, credsIssuerConfig),                     //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),    //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),      //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                           //
@@ -12128,6 +12130,8 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
             WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::PowerSource::BatChargeFaultEnum>>>(
             Id, "active-bat-charge-faults", Attributes::ActiveBatChargeFaults::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EndpointId>>>(
+            Id, "endpoint-list", Attributes::EndpointList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -12178,6 +12182,7 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
         make_unique<SubscribeAttribute>(Id, "bat-charging-current", Attributes::BatChargingCurrent::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "active-bat-charge-faults", Attributes::ActiveBatChargeFaults::Id,
                                         credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "endpoint-list", Attributes::EndpointList::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -14836,7 +14841,7 @@ void registerClusterSmokeCoAlarm(Commands & commands, CredentialIssuerCommands *
         make_unique<ReadAttribute>(Id, "interconnect-smoke-alarm", Attributes::InterconnectSmokeAlarm::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "interconnect-coalarm", Attributes::InterconnectCOAlarm::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "contamination-state", Attributes::ContaminationState::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "sensitivity-level", Attributes::SensitivityLevel::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "smoke-sensitivity-level", Attributes::SmokeSensitivityLevel::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "expiry-date", Attributes::ExpiryDate::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
@@ -14873,7 +14878,7 @@ void registerClusterSmokeCoAlarm(Commands & commands, CredentialIssuerCommands *
             Id, "contamination-state", 0, UINT8_MAX, Attributes::ContaminationState::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum>>(
-            Id, "sensitivity-level", 0, UINT8_MAX, Attributes::SensitivityLevel::Id, WriteCommandType::kWrite,
+            Id, "smoke-sensitivity-level", 0, UINT8_MAX, Attributes::SmokeSensitivityLevel::Id, WriteCommandType::kWrite,
             credsIssuerConfig), //
         make_unique<WriteAttribute<uint32_t>>(Id, "expiry-date", 0, UINT32_MAX, Attributes::ExpiryDate::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -14900,17 +14905,17 @@ void registerClusterSmokeCoAlarm(Commands & commands, CredentialIssuerCommands *
         make_unique<SubscribeAttribute>(Id, "hardware-fault-alert", Attributes::HardwareFaultAlert::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "end-of-service-alert", Attributes::EndOfServiceAlert::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "interconnect-smoke-alarm", Attributes::InterconnectSmokeAlarm::Id,
-                                        credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "interconnect-coalarm", Attributes::InterconnectCOAlarm::Id, credsIssuerConfig),    //
-        make_unique<SubscribeAttribute>(Id, "contamination-state", Attributes::ContaminationState::Id, credsIssuerConfig),      //
-        make_unique<SubscribeAttribute>(Id, "sensitivity-level", Attributes::SensitivityLevel::Id, credsIssuerConfig),          //
-        make_unique<SubscribeAttribute>(Id, "expiry-date", Attributes::ExpiryDate::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+                                        credsIssuerConfig),                                                                       //
+        make_unique<SubscribeAttribute>(Id, "interconnect-coalarm", Attributes::InterconnectCOAlarm::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "contamination-state", Attributes::ContaminationState::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "smoke-sensitivity-level", Attributes::SmokeSensitivityLevel::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "expiry-date", Attributes::ExpiryDate::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
         //
         // Events
         //

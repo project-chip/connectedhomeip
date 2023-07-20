@@ -752,6 +752,7 @@ server cluster PowerSource = 47 {
   readonly attribute BatChargeLevelEnum batChargeLevel = 14;
   readonly attribute boolean batReplacementNeeded = 15;
   readonly attribute BatReplaceabilityEnum batReplaceability = 16;
+  readonly attribute endpoint_no endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1705,7 +1706,7 @@ server cluster SmokeCoAlarm = 92 {
   readonly attribute AlarmStateEnum interconnectSmokeAlarm = 8;
   readonly attribute AlarmStateEnum interconnectCOAlarm = 9;
   readonly attribute ContaminationStateEnum contaminationState = 10;
-  attribute SensitivityEnum sensitivityLevel = 11;
+  attribute SensitivityEnum smokeSensitivityLevel = 11;
   readonly attribute epoch_s expiryDate = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1987,8 +1988,9 @@ endpoint 1 {
     ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
+    callback attribute endpointList;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster SmokeCoAlarm {
@@ -2014,7 +2016,7 @@ endpoint 1 {
     ram      attribute interconnectSmokeAlarm default = 0;
     ram      attribute interconnectCOAlarm default = 0;
     ram      attribute contaminationState default = 0;
-    ram      attribute sensitivityLevel default = 1;
+    ram      attribute smokeSensitivityLevel default = 1;
     ram      attribute expiryDate default = 0;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;

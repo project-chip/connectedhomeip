@@ -1698,10 +1698,10 @@ EmberAfStatus Get(chip::EndpointId endpoint,
 EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum value);
 } // namespace ContaminationState
 
-namespace SensitivityLevel {
+namespace SmokeSensitivityLevel {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum * value); // SensitivityEnum
 EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum value);
-} // namespace SensitivityLevel
+} // namespace SmokeSensitivityLevel
 
 namespace ExpiryDate {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // epoch_s
