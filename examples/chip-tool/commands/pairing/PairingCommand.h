@@ -59,6 +59,8 @@ public:
         CHIPCommand(commandName, credIssuerCmds),
         mPairingMode(mode), mNetworkType(networkType),
         mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() },
+        mComplex_TimeZones(&mTimeZoneList),
+        mComplex_DSTOffsets(&mDSTOffsetList),
         mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
@@ -162,6 +164,18 @@ public:
         {
             AddArgument("country-code", &mCountryCode,
                         "Country code to use to set the Basic Information cluster's Location attribute");
+
+            // mTimeZoneList is an optional argument managed by TypedComplexArgument mComplex_TimeZones.
+            // Since optional Complex arguments are not currently supported via the <chip::Optional> class,
+            // we explicitly set the kOptional flag.
+            AddArgument("time-zone", &mComplex_TimeZones,
+                        "TimeZone list to use when setting Time Synchronization cluster's TimeZone attribute", Argument::kOptional);
+
+            // mDSTOffsetList is an optional argument managed by TypedComplexArgument mComplex_DSTOffsets.
+            // Since optional Complex arguments are not currently supported via the <chip::Optional> class,
+            // we explicitly set the kOptional flag.
+            AddArgument("dst-offset", &mComplex_DSTOffsets,
+                        "DSTOffset list to use when setting Time Synchronization cluster's DSTOffset attribute", Argument::kOptional);
         }
 
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
@@ -210,6 +224,12 @@ private:
     chip::Optional<bool> mBypassAttestationVerifier;
     chip::Optional<std::vector<uint32_t>> mCASEAuthTags;
     chip::Optional<char *> mCountryCode;
+    chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> mTimeZoneList;
+    TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>>
+        mComplex_TimeZones;
+    chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type> mDSTOffsetList;
+    TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>>
+        mComplex_DSTOffsets;
     uint16_t mRemotePort;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
