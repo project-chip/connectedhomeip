@@ -84,14 +84,13 @@ public:
         /// report has elapsed
         bool IsReportableNow() const
         {
-#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
             Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
-
+            
+#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
             return (mReadHandler->IsGeneratingReports() && (now >= mMinTimestamp || mFlags.Has(TestFlags::MinIntervalElapsed)) &&
                     (mReadHandler->IsDirty() || (now >= mMaxTimestamp || mFlags.Has(TestFlags::MaxIntervalElapsed)) ||
                      now >= mSyncTimestamp));
 #else
-            Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
             return (mReadHandler->IsGeneratingReports() &&
                     (now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || now >= mSyncTimestamp)));
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
