@@ -52,7 +52,7 @@ declare_args() {
 if (wifi_soc) {
   siwx917_sdk("sdk") {
     sources = [
-      "${examples_plat_dir}/FreeRTOSConfig.h",
+      "${examples_common_plat_dir}/FreeRTOSConfig.h",
       "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
 
@@ -75,7 +75,7 @@ if (wifi_soc) {
 } else {
   efr32_sdk("sdk") {
     sources = [
-      "${examples_plat_dir}/FreeRTOSConfig.h",
+      "${examples_common_plat_dir}/FreeRTOSConfig.h",
       "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
 

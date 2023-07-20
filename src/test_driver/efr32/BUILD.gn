@@ -45,7 +45,7 @@ pw_proto_library("nl_test_service") {
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${examples_plat_dir}/FreeRTOSConfig.h",
+    "${examples_common_plat_dir}/FreeRTOSConfig.h",
   ]
 
   include_dirs = [

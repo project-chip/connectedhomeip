@@ -56,7 +56,7 @@ chip_data_model("chef-common") {
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${examples_plat_dir}/FreeRTOSConfig.h",
+    "${examples_common_plat_dir}/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
