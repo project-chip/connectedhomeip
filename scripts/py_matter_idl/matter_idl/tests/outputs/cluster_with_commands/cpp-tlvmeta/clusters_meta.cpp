@@ -9,7 +9,7 @@ using namespace chip::TLV;
 
 const Entry<ItemInfo> _OnOff[] = {
   { { AttributeTag(0), "onOff", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::boolean
-  { { AttributeTag(65532), "featureMap", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::bitmap32
+  { { AttributeTag(65532), "featureMap", ItemType::kBitmap }, 8 }, // OnOff::OnOffFeature
   { { AttributeTag(65533), "clusterRevision", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::int16u
   { { CommandTag(0), "Off", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::Off::()
   { { CommandTag(1), "On", ItemType::kDefault }, kInvalidNodeIndex }, // OnOff::On::()
