@@ -144,7 +144,10 @@ public:
     size_t AddArgument(const char * name, chip::ByteSpan * value, const char * desc = "", uint8_t flags = 0);
     size_t AddArgument(const char * name, chip::Span<const char> * value, const char * desc = "", uint8_t flags = 0);
     size_t AddArgument(const char * name, AddressWithInterface * out, const char * desc = "", uint8_t flags = 0);
-    size_t AddArgument(const char * name, ComplexArgument * value, const char * desc = "");
+    // Optional Complex arguments are not currently supported via the <chip::Optional> class.
+    // Instead, they must be explicitly specified as optional using kOptional in the flags parameter,
+    // and the base TypedComplexArgument<T> class is referenced.
+    size_t AddArgument(const char * name, ComplexArgument * value, const char * desc = "", uint8_t flags = 0);
     size_t AddArgument(const char * name, CustomArgument * value, const char * desc = "");
     size_t AddArgument(const char * name, int64_t min, uint64_t max, bool * out, const char * desc = "", uint8_t flags = 0)
     {
