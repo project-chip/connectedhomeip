@@ -13245,14 +13245,14 @@ public class ChipClusters {
     }
 
     public void unregisterClient(DefaultClusterCallback callback
-      , Long checkInNodeID, Optional<byte[]> key) {
-      unregisterClient(chipClusterPtr, callback, checkInNodeID, key, null);
+      , Long checkInNodeID, Optional<byte[]> verificationKey) {
+      unregisterClient(chipClusterPtr, callback, checkInNodeID, verificationKey, null);
     }
 
     public void unregisterClient(DefaultClusterCallback callback
-      , Long checkInNodeID, Optional<byte[]> key
+      , Long checkInNodeID, Optional<byte[]> verificationKey
       , int timedInvokeTimeoutMs) {
-      unregisterClient(chipClusterPtr, callback, checkInNodeID, key, timedInvokeTimeoutMs);
+      unregisterClient(chipClusterPtr, callback, checkInNodeID, verificationKey, timedInvokeTimeoutMs);
     }
 
     public void stayActiveRequest(DefaultClusterCallback callback
@@ -13269,7 +13269,7 @@ public class ChipClusters {
       , Long checkInNodeID, Long monitoredSubject, byte[] key, Optional<byte[]> verificationKey
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void unregisterClient(long chipClusterPtr, DefaultClusterCallback Callback
-      , Long checkInNodeID, Optional<byte[]> key
+      , Long checkInNodeID, Optional<byte[]> verificationKey
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void stayActiveRequest(long chipClusterPtr, DefaultClusterCallback Callback
       

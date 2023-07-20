@@ -6044,7 +6044,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum UnregisterClientCommandField {CheckInNodeID(0),Key(1),;
+                }public enum UnregisterClientCommandField {CheckInNodeID(0),VerificationKey(1),;
                     private final int id;
                     UnregisterClientCommandField(int id) {
                         this.id = id;

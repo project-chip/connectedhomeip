@@ -17487,8 +17487,8 @@ public class ClusterInfoMapping {
        CommandParameterInfo icdManagementunregisterClientcheckInNodeIDCommandParameterInfo = new CommandParameterInfo("checkInNodeID", Long.class, Long.class);
        icdManagementunregisterClientCommandParams.put("checkInNodeID",icdManagementunregisterClientcheckInNodeIDCommandParameterInfo);
       
-       CommandParameterInfo icdManagementunregisterClientkeyCommandParameterInfo = new CommandParameterInfo("key", Optional.class, byte[].class);
-       icdManagementunregisterClientCommandParams.put("key",icdManagementunregisterClientkeyCommandParameterInfo);
+       CommandParameterInfo icdManagementunregisterClientverificationKeyCommandParameterInfo = new CommandParameterInfo("verificationKey", Optional.class, byte[].class);
+       icdManagementunregisterClientCommandParams.put("verificationKey",icdManagementunregisterClientverificationKeyCommandParameterInfo);
      
        InteractionInfo icdManagementunregisterClientInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -17497,7 +17497,7 @@ public class ClusterInfoMapping {
            , (Long)
            commandArguments.get("checkInNodeID")
            , (Optional<byte[]>)
-           commandArguments.get("key")
+           commandArguments.get("verificationKey")
            
            );
          },
