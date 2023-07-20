@@ -62,7 +62,7 @@ test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .AddSubtype("_I5555666677778888")
                                           .AddTxt("SII", "32")
                                           .AddTxt("SAI", "30")
-                                          .AddTxt("STA", "10")
+                                          .AddTxt("SAT", "10")
                                           .AddTxt("T", "1");
 
 CommissionAdvertisingParameters commissionableNodeParamsSmall =
@@ -114,7 +114,7 @@ test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .AddTxt("T", "1")
                                                   .AddTxt("SII", "3600000")
                                                   .AddTxt("SAI", "3600000")
-                                                  .AddTxt("SAI", "65535")
+                                                  .AddTxt("SAT", "65535")
                                                   .AddSubtype("_S2")
                                                   .AddSubtype("_L22")
                                                   .AddSubtype("_V555")
