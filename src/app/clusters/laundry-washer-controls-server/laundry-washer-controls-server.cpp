@@ -152,8 +152,7 @@ void LaundryWasherControlsServer::ReleaseSpinSpeedList(SpinSpeedListCharSpan * s
 
 EmberAfStatus LaundryWasherControlsServer::ClearSpinSpeedList(EndpointId endpointId)
 {
-    CHIP_ERROR err =
-        mLaundryWasherDataProvider.ClearSpinSpeedList(endpointId, LaundryWasherControls::Id);
+    CHIP_ERROR err = mLaundryWasherDataProvider.ClearSpinSpeedList(endpointId, LaundryWasherControls::Id);
     return (err == CHIP_NO_ERROR) ? (EMBER_ZCL_STATUS_SUCCESS) : (EMBER_ZCL_STATUS_FAILURE);
 }
 
@@ -164,8 +163,7 @@ void LaundryWasherControlsServer::ReleaseSupportedRinsesList(SupportedRinsesList
 
 EmberAfStatus LaundryWasherControlsServer::ClearSupportedRinsesList(EndpointId endpointId)
 {
-    CHIP_ERROR err =
-        mLaundryWasherDataProvider.ClearSupportedRinsesList(endpointId, LaundryWasherControls::Id);
+    CHIP_ERROR err = mLaundryWasherDataProvider.ClearSupportedRinsesList(endpointId, LaundryWasherControls::Id);
     return (err == CHIP_NO_ERROR) ? (EMBER_ZCL_STATUS_SUCCESS) : (EMBER_ZCL_STATUS_FAILURE);
 }
 
