@@ -510,7 +510,9 @@ void BLEManagerImpl::OnChipDeviceScanned(void * device, const Ble::ChipBLEDevice
 
     /* Set CHIP Connecting state */
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectionTimeout, nullptr);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     mDeviceScanner->StopChipScan();
 
     /* Initiate Connect */
