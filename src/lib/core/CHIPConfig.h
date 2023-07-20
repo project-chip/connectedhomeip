@@ -1560,7 +1560,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *
  * @brief Controls whether the synchronized report scheduler is used.
  *
- * The use of the syncrhonous reports feature aims to reduce the number of times an ICD needs to wake up to emit repots to its
+ * The use of the synchronous reports feature aims to reduce the number of times an ICD needs to wake up to emit reports to its
  * various subscribers.
  */
 #ifndef CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED

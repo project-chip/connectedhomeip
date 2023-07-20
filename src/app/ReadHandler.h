@@ -170,9 +170,9 @@ public:
         /// @param[in] apReadHandler  ReadHandler getting added
         virtual void OnReadHandlerCreated(ReadHandler * apReadHandler) = 0;
 
-        /// @brief Callback invoked when a ReadHandler's reporting intervals is changed through SetMaxReportingInterval or
+        /// @brief Callback invoked when a ReadHandler's reporting intervals are changed through SetMaxReportingInterval or
         /// SetMinReportingIntervalForTests
-        /// @param[in] apReadHandler  ReadHandler that change its read intervals
+        /// @param[in] apReadHandler  ReadHandler that changed its read intervals
         virtual void OnReportingIntervalsChanged(ReadHandler * apReadHandler) = 0;
 
         /// @brief Callback invoked when a ReadHandler went from a non reportable state to a reportable state so a report can be
