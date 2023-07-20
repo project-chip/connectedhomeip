@@ -215,18 +215,9 @@ public:
     ReadHandler(ManagementCallback & apCallback, Observer * observer);
 #endif
 
-    const ObjectList<AttributePathParams> * GetAttributePathList() const
-    {
-        return mpAttributePathList;
-    }
-    const ObjectList<EventPathParams> * GetEventPathList() const
-    {
-        return mpEventPathList;
-    }
-    const ObjectList<DataVersionFilter> * GetDataVersionFilterList() const
-    {
-        return mpDataVersionFilterList;
-    }
+    const ObjectList<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
+    const ObjectList<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
+    const ObjectList<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
 
     void GetReportingIntervals(uint16_t & aMinInterval, uint16_t & aMaxInterval) const
     {
@@ -260,14 +251,8 @@ public:
     }
 
 private:
-    PriorityLevel GetCurrentPriority() const
-    {
-        return mCurrentPriority;
-    }
-    EventNumber & GetEventMin()
-    {
-        return mEventMin;
-    }
+    PriorityLevel GetCurrentPriority() const { return mCurrentPriority; }
+    EventNumber & GetEventMin() { return mEventMin; }
 
     /**
      * Returns SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT
@@ -345,10 +330,7 @@ private:
      */
     bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext) const;
 
-    bool IsIdle() const
-    {
-        return mState == HandlerState::Idle;
-    }
+    bool IsIdle() const { return mState == HandlerState::Idle; }
 
     /// @brief Returns whether the ReadHandler is in a state where it can send a report and there is data to report.
     bool IsReportable() const
@@ -357,14 +339,8 @@ private:
         // to plan the next run accordingly.
         return mState == HandlerState::GeneratingReports && IsDirty();
     }
-    bool IsGeneratingReports() const
-    {
-        return mState == HandlerState::GeneratingReports;
-    }
-    bool IsAwaitingReportResponse() const
-    {
-        return mState == HandlerState::AwaitingReportResponse;
-    }
+    bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
+    bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
 
     // Resets the path iterator to the beginning of the whole report for generating a series of new reports.
     void ResetPathIterator();
@@ -376,41 +352,17 @@ private:
     // sanpshotted last event, check with latest last event number, re-setup snapshoted checkpoint, and compare again.
     bool CheckEventClean(EventManagement & aEventManager);
 
-    bool IsType(InteractionType type) const
-    {
-        return (mInteractionType == type);
-    }
-    bool IsChunkedReport() const
-    {
-        return mFlags.Has(ReadHandlerFlags::ChunkedReport);
-    }
+    bool IsType(InteractionType type) const { return (mInteractionType == type); }
+    bool IsChunkedReport() const { return mFlags.Has(ReadHandlerFlags::ChunkedReport); }
     // Is reporting indicates whether we are in the middle of a series chunks. As we will set mIsChunkedReport on the first chunk
     // and clear that flag on the last chunk, we can use mIsChunkedReport to indicate this state.
-    bool IsReporting() const
-    {
-        return mFlags.Has(ReadHandlerFlags::ChunkedReport);
-    }
-    bool IsPriming() const
-    {
-        return mFlags.Has(ReadHandlerFlags::PrimingReports);
-    }
-    bool IsActiveSubscription() const
-    {
-        return mFlags.Has(ReadHandlerFlags::ActiveSubscription);
-    }
-    bool IsFabricFiltered() const
-    {
-        return mFlags.Has(ReadHandlerFlags::FabricFiltered);
-    }
+    bool IsReporting() const { return mFlags.Has(ReadHandlerFlags::ChunkedReport); }
+    bool IsPriming() const { return mFlags.Has(ReadHandlerFlags::PrimingReports); }
+    bool IsActiveSubscription() const { return mFlags.Has(ReadHandlerFlags::ActiveSubscription); }
+    bool IsFabricFiltered() const { return mFlags.Has(ReadHandlerFlags::FabricFiltered); }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
-    void GetSubscriptionId(SubscriptionId & aSubscriptionId) const
-    {
-        aSubscriptionId = mSubscriptionId;
-    }
-    AttributePathExpandIterator * GetAttributePathExpandIterator()
-    {
-        return &mAttributePathExpandIterator;
-    }
+    void GetSubscriptionId(SubscriptionId & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
+    AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
 
     /// @brief Notifies the read handler that a set of attribute paths has been marked dirty. This will schedule a reporting engine
     /// run if the change to the attribute path makes the ReadHandler reportable.
@@ -420,10 +372,7 @@ private:
     {
         return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
     }
-    void ClearForceDirtyFlag()
-    {
-        ClearStateFlag(ReadHandlerFlags::ForceDirty);
-    }
+    void ClearForceDirtyFlag() { ClearStateFlag(ReadHandlerFlags::ForceDirty); }
     NodeId GetInitiatorNodeId() const
     {
         auto session = GetSession();
@@ -437,47 +386,23 @@ private:
     }
 
     Transport::SecureSession * GetSession() const;
-    SubjectDescriptor GetSubjectDescriptor() const
-    {
-        return GetSession()->GetSubjectDescriptor();
-    }
+    SubjectDescriptor GetSubjectDescriptor() const { return GetSession()->GetSubjectDescriptor(); }
 
-    auto GetTransactionStartGeneration() const
-    {
-        return mTransactionStartGeneration;
-    }
+    auto GetTransactionStartGeneration() const { return mTransactionStartGeneration; }
 
     /// @brief Forces the read handler into a dirty state, regardless of what's going on with attributes.
     /// This can lead to scheduling of a reporting run immediately, if the min interval has been reached,
     /// or after the min interval is reached if it has not yet been reached.
     void ForceDirtyState();
 
-    const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const
-    {
-        return mAttributeEncoderState;
-    }
-    void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState)
-    {
-        mAttributeEncoderState = aState;
-    }
-    uint32_t GetLastWrittenEventsBytes() const
-    {
-        return mLastWrittenEventsBytes;
-    }
+    const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
+    void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
+    uint32_t GetLastWrittenEventsBytes() const { return mLastWrittenEventsBytes; }
 
     // Returns the number of interested paths, including wildcard and concrete paths.
-    size_t GetAttributePathCount() const
-    {
-        return mpAttributePathList == nullptr ? 0 : mpAttributePathList->Count();
-    };
-    size_t GetEventPathCount() const
-    {
-        return mpEventPathList == nullptr ? 0 : mpEventPathList->Count();
-    };
-    size_t GetDataVersionFilterCount() const
-    {
-        return mpDataVersionFilterList == nullptr ? 0 : mpDataVersionFilterList->Count();
-    };
+    size_t GetAttributePathCount() const { return mpAttributePathList == nullptr ? 0 : mpAttributePathList->Count(); };
+    size_t GetEventPathCount() const { return mpEventPathList == nullptr ? 0 : mpEventPathList->Count(); };
+    size_t GetDataVersionFilterCount() const { return mpDataVersionFilterList == nullptr ? 0 : mpDataVersionFilterList->Count(); };
 
     CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
