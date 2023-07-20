@@ -1,0 +1,26 @@
+*.iml
+.gradle
+/local.properties
+/.idea/misc.xml
+/.idea/gradle.xml
+/.idea/compiler.xml
+/.idea/.name
+/.idea/jarRepositories.xml
+/.idea/vcs.xml
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.idea/**
+.DS_Store
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Shared libs & JAR libs (those libs are copied into source tree for easy Android build).
+*.so
+*.jar
+*.map

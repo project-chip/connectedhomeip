@@ -52,7 +52,7 @@
 #include <system/SystemPacketBuffer.h>
 
 // https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/61a9d19e6af12fdfb0872bcff26d19de6c680a1a/src/Ch02_Architecture.adoc#1122-subscribe-interaction-limits
-constexpr uint16_t kSubscriptionMaxIntervalPublisherLimit = 3600; // 3600 seconds
+constexpr uint16_t kSubscriptionMaxIntervalPublisherLimit = 3600; // seconds (60 minutes)
 
 namespace chip {
 namespace app {
@@ -244,7 +244,7 @@ public:
     {
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mMinIntervalFloorSeconds <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(aMaxInterval <= std::max(kSubscriptionMaxIntervalPublisherLimit, mMaxInterval),
+        VerifyOrReturnError(aMaxInterval <= std::max(GetPublisherSelectedIntervalLimit(), mMaxInterval),
                             CHIP_ERROR_INVALID_ARGUMENT);
         mMaxInterval = aMaxInterval;
         return CHIP_NO_ERROR;
@@ -265,6 +265,13 @@ public:
 private:
     PriorityLevel GetCurrentPriority() const { return mCurrentPriority; }
     EventNumber & GetEventMin() { return mEventMin; }
+
+    /**
+     * Returns SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT
+     * For an ICD publisher, this SHALL be set to the idle mode interval.
+     * Otherwise, this SHALL be set to 60 minutes.
+     */
+    uint16_t GetPublisherSelectedIntervalLimit();
 
     enum class ReadHandlerFlags : uint8_t
     {

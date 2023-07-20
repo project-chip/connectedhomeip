@@ -43,7 +43,6 @@ declare_args() {
   chip_im_force_fabric_quota_check = false
 
   enable_eventlist_attribute = true
-  chip_enable_read_client = true
 }
 
 buildconfig_header("app_buildconfig") {
@@ -58,7 +57,6 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_PERSIST_SUBSCRIPTIONS=${chip_persist_subscriptions}",
     "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
     "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
-    "CHIP_CONFIG_ENABLE_READ_CLIENT=${chip_enable_read_client}",
   ]
 }
 
@@ -180,6 +178,7 @@ static_library("app") {
     "OperationalSessionSetup.cpp",
     "OperationalSessionSetup.h",
     "OperationalSessionSetupPool.h",
+    "ReadClient.cpp",
     "ReadHandler.cpp",
     "RequiredPrivilege.cpp",
     "RequiredPrivilege.h",
@@ -197,6 +196,8 @@ static_library("app") {
     "reporting/ReportScheduler.h",
     "reporting/ReportSchedulerImpl.cpp",
     "reporting/ReportSchedulerImpl.h",
+    "reporting/SynchronizedReportSchedulerImpl.cpp",
+    "reporting/SynchronizedReportSchedulerImpl.h",
     "reporting/reporting.h",
   ]
 
@@ -207,13 +208,10 @@ static_library("app") {
     ]
   }
 
-  if (chip_enable_read_client) {
-    sources += [ "ReadClient.cpp" ]
-  }
-
   public_deps = [
     ":app_config",
     "${chip_root}/src/access",
+    "${chip_root}/src/app/icd:cluster-srcs",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",

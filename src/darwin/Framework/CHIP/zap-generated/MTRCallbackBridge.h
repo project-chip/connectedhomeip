@@ -560,9 +560,6 @@ typedef void (*NullableApplicationBasicClusterApplicationStatusEnumAttributeCall
 typedef void (*UnitTestingClusterSimpleEnumAttributeCallback)(void *, chip::app::Clusters::UnitTesting::SimpleEnum);
 typedef void (*NullableUnitTestingClusterSimpleEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> &);
-typedef void (*FaultInjectionClusterFaultTypeAttributeCallback)(void *, chip::app::Clusters::FaultInjection::FaultType);
-typedef void (*NullableFaultInjectionClusterFaultTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FaultInjection::FaultType> &);
 
 typedef void (*IdentifyGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
@@ -724,6 +721,8 @@ typedef void (*PowerSourceActiveBatFaultsListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFaultEnum> & data);
 typedef void (*PowerSourceActiveBatChargeFaultsListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFaultEnum> & data);
+typedef void (*PowerSourceEndpointListListAttributeCallback)(void * context,
+                                                             const chip::app::DataModel::DecodableList<chip::EndpointId> & data);
 typedef void (*PowerSourceGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PowerSourceAcceptedCommandListListAttributeCallback)(
@@ -4445,6 +4444,37 @@ public:
     void OnSubscriptionEstablished();
     using MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPowerSourceEndpointListListAttributeCallbackBridge : public MTRCallbackBridge<PowerSourceEndpointListListAttributeCallback>
+{
+public:
+    MTRPowerSourceEndpointListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PowerSourceEndpointListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPowerSourceEndpointListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<PowerSourceEndpointListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & value);
+};
+
+class MTRPowerSourceEndpointListListAttributeCallbackSubscriptionBridge
+    : public MTRPowerSourceEndpointListListAttributeCallbackBridge
+{
+public:
+    MTRPowerSourceEndpointListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action,
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPowerSourceEndpointListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPowerSourceEndpointListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceEndpointListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -20173,73 +20203,6 @@ public:
     void OnSubscriptionEstablished();
     using MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<FaultInjectionClusterFaultTypeAttributeCallback>
-{
-public:
-    MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<FaultInjectionClusterFaultTypeAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             MTRActionBlock action) :
-        MTRCallbackBridge<FaultInjectionClusterFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::FaultInjection::FaultType value);
-};
-
-class MTRFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge
-    : public MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge
-{
-public:
-    MTRFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         MTRActionBlock action,
-                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableFaultInjectionClusterFaultTypeAttributeCallback>
-{
-public:
-    MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableFaultInjectionClusterFaultTypeAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     MTRActionBlock action) :
-        MTRCallbackBridge<NullableFaultInjectionClusterFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::FaultInjection::FaultType> & value);
-};
-
-class MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge
-    : public MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge
-{
-public:
-    MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
