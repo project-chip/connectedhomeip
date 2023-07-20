@@ -47,6 +47,7 @@ public:
     EmberAfStatus SetLatchValue(EndpointId endpoint, const BitMask<AlarmMap> latch);
     // A change in supported value will result in a corresponding change in mask and state.
     EmberAfStatus SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported);
+    EmberAfStatus ResetStateValue(EndpointId endpoint, const BitMask<AlarmMap> alarms);
 
     // check whether the Alarm featureMap has enabled Reset feature.
     bool HasResetFeature(EndpointId endpoint);
