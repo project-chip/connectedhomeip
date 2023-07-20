@@ -134,7 +134,7 @@ silabs_executable("window_app") {
   } else {
     deps += [ "${examples_plat_dir}:efr32-common" ]
   }
-  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
+  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 

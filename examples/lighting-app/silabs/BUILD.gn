@@ -202,7 +202,7 @@ silabs_executable("lighting_app") {
     ]
   }
 
-  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
+  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 

@@ -199,7 +199,7 @@ silabs_executable("smoke_co_alarm_app") {
     ]
   }
 
-  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
+  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 
