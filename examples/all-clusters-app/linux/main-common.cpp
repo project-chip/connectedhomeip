@@ -160,29 +160,11 @@ CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductPrimaryColor(Clusters::B
 
 ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
 
-// todo use Clusters::XxxMode::Feature::kXxxx to set features.
-Clusters::RvcRunMode::RvcRunModeDelegate gRvcRunModeDelegate;
-Clusters::ModeBase::Instance gRvcRunModeInstance(&gRvcRunModeDelegate, 0x1, Clusters::RvcRunMode::Id, 1);
-Clusters::RvcCleanMode::RvcCleanModeDelegate gRvcCleanModeDelegate;
-Clusters::ModeBase::Instance gRvcCleanModeInstance(&gRvcCleanModeDelegate, 0x1, Clusters::RvcCleanMode::Id, 1);
-Clusters::DishwasherMode::DishwasherModeDelegate gDishwasherModeDelegate;
-Clusters::ModeBase::Instance gDishwasherModeInstance(&gDishwasherModeDelegate, 0x1, Clusters::DishwasherMode::Id, 1);
-Clusters::LaundryWasherMode::LaundryWasherModeDelegate gLaundryWasherModeDelegate;
-Clusters::ModeBase::Instance gLaundryWasherModeInstance(&gLaundryWasherModeDelegate, 0x1, Clusters::LaundryWasherMode::Id, 1);
-Clusters::RefrigeratorAndTemperatureControlledCabinetMode::TccModeDelegate gTccModeDelegate;
-Clusters::ModeBase::Instance gTccModeInstance(&gTccModeDelegate, 0x1, Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id,
-                                              1);
 
 } // namespace
 
 void ApplicationInit()
 {
-    gRvcRunModeInstance.Init();
-    gRvcCleanModeInstance.Init();
-    gDishwasherModeInstance.Init();
-    gLaundryWasherModeInstance.Init();
-    gTccModeInstance.Init();
-
     std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
 
     if (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR)

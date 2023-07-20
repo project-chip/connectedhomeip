@@ -25,6 +25,9 @@ template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
+static LaundryWasherModeDelegate * gLaundryWasherModeDelegate = nullptr;
+static ModeBase::Instance * gLaundryWasherModeInstance = nullptr;
+
 CHIP_ERROR LaundryWasherModeDelegate::Init()
 {
     return CHIP_NO_ERROR;
@@ -70,4 +73,13 @@ CHIP_ERROR LaundryWasherModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List
     tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
 
     return CHIP_NO_ERROR;
+}
+
+void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(gLaundryWasherModeDelegate == nullptr && gLaundryWasherModeInstance == nullptr);
+    gLaundryWasherModeDelegate = new LaundryWasherMode::LaundryWasherModeDelegate;
+    gLaundryWasherModeInstance = new ModeBase::Instance(gLaundryWasherModeDelegate, 0x1, LaundryWasherMode::Id, 1);
+    gLaundryWasherModeInstance->Init();
 }

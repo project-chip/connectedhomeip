@@ -25,6 +25,9 @@ template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
+static DishwasherModeDelegate * gDishwasherModeDelegate = nullptr;
+static ModeBase::Instance * gDishwasherModeInstance = nullptr;
+
 CHIP_ERROR DishwasherModeDelegate::Init()
 {
     return CHIP_NO_ERROR;
@@ -71,4 +74,14 @@ CHIP_ERROR DishwasherModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<Mo
     tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
 
     return CHIP_NO_ERROR;
+}
+
+void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(gDishwasherModeDelegate == nullptr && gDishwasherModeInstance == nullptr);
+    gDishwasherModeDelegate = new DishwasherMode::DishwasherModeDelegate;
+    // todo use Clusters::XxxMode::Feature::kXxxx to set features.
+    gDishwasherModeInstance = new ModeBase::Instance(gDishwasherModeDelegate, 0x1, DishwasherMode::Id, 1);
+    gDishwasherModeInstance->Init();
 }

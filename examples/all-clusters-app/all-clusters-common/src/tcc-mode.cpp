@@ -25,6 +25,9 @@ template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
+static TccModeDelegate * gTccModeDelegate = nullptr;
+static ModeBase::Instance * gTccModeInstance = nullptr;
+
 CHIP_ERROR TccModeDelegate::Init()
 {
     return CHIP_NO_ERROR;
@@ -70,4 +73,13 @@ CHIP_ERROR TccModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagSt
     tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
 
     return CHIP_NO_ERROR;
+}
+
+void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(chip::EndpointId endpointId)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(gTccModeDelegate == nullptr && gTccModeInstance == nullptr);
+    gTccModeDelegate = new RefrigeratorAndTemperatureControlledCabinetMode::TccModeDelegate;
+    gTccModeInstance = new ModeBase::Instance(gTccModeDelegate, 0x1, RefrigeratorAndTemperatureControlledCabinetMode::Id, 1);
+    gTccModeInstance->Init();
 }

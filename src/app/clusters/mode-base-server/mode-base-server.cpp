@@ -146,6 +146,7 @@ CHIP_ERROR Instance::Init()
     {
         // This behavior does not apply to reboots associated with OTA.
         // After an OTA restart, the CurrentMode attribute SHALL return to its value prior to the restart.
+        // todo this only works for matter OTAs. According to the spec, this should also work for general OTAs.
         BootReasonType bootReason = BootReasonType::kUnspecified;
         CHIP_ERROR error          = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
 

@@ -26,6 +26,11 @@ template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
+// RVC Run
+
+static RvcRunModeDelegate * gRvcRunModeDelegate = nullptr;
+static ModeBase::Instance * gRvcRunModeInstance = nullptr;
+
 CHIP_ERROR RvcRunModeDelegate::Init()
 {
     return CHIP_NO_ERROR;
@@ -82,6 +87,20 @@ CHIP_ERROR RvcRunModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTa
     return CHIP_NO_ERROR;
 }
 
+void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(gRvcRunModeDelegate == nullptr && gRvcRunModeInstance == nullptr);
+    gRvcRunModeDelegate = new RvcRunMode::RvcRunModeDelegate;
+    gRvcRunModeInstance = new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id, 1);
+    gRvcRunModeInstance->Init();
+}
+
+// RVC Clean
+static RvcCleanModeDelegate * gRvcCleanModeDelegate = nullptr;
+static ModeBase::Instance * gRvcCleanModeInstance = nullptr;
+
+
 CHIP_ERROR RvcCleanModeDelegate::Init()
 {
     return CHIP_NO_ERROR;
@@ -135,4 +154,13 @@ CHIP_ERROR RvcCleanModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<Mode
     tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
 
     return CHIP_NO_ERROR;
+}
+
+void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(gRvcCleanModeDelegate == nullptr && gRvcCleanModeInstance == nullptr);
+    gRvcCleanModeDelegate = new RvcCleanMode::RvcCleanModeDelegate;
+    gRvcCleanModeInstance = new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id, 1);
+    gRvcCleanModeInstance->Init();
 }
