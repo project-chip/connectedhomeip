@@ -13453,9 +13453,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                     }
                 }
                 request.checkInNodeID = params.checkInNodeID.unsignedLongLongValue;
-                if (params.key != nil) {
-                    auto & definedValue_0 = request.key.Emplace();
-                    definedValue_0 = [self asByteSpan:params.key];
+                if (params.verificationKey != nil) {
+                    auto & definedValue_0 = request.verificationKey.Emplace();
+                    definedValue_0 = [self asByteSpan:params.verificationKey];
                 }
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,

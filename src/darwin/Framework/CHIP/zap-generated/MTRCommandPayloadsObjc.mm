@@ -6740,7 +6740,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _checkInNodeID = @(0);
 
-        _key = nil;
+        _verificationKey = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -6752,7 +6752,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRICDManagementClusterUnregisterClientParams alloc] init];
 
     other.checkInNodeID = self.checkInNodeID;
-    other.key = self.key;
+    other.verificationKey = self.verificationKey;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -6761,8 +6761,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: checkInNodeID:%@; key:%@; >", NSStringFromClass([self class]),
-                                             _checkInNodeID, [_key base64EncodedStringWithOptions:0]];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: checkInNodeID:%@; verificationKey:%@; >", NSStringFromClass([self class]), _checkInNodeID,
+                  [_verificationKey base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
