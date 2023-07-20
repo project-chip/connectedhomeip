@@ -1053,28 +1053,28 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeAirQualityInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("airQuality", writeAirQualityInteractionInfo);
     Map<String, InteractionInfo> writeSmokeCoAlarmInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeSmokeCoAlarmSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo smokeCoAlarmsensitivityLevelCommandParameterInfo =
+    Map<String, CommandParameterInfo> writeSmokeCoAlarmSmokeSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo smokeCoAlarmsmokeSensitivityLevelCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Integer.class, 
             Integer.class 
         );
-    writeSmokeCoAlarmSensitivityLevelCommandParams.put(
+    writeSmokeCoAlarmSmokeSensitivityLevelCommandParams.put(
         "value",
-        smokeCoAlarmsensitivityLevelCommandParameterInfo
+        smokeCoAlarmsmokeSensitivityLevelCommandParameterInfo
     );
-    InteractionInfo writeSmokeCoAlarmSensitivityLevelAttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeSmokeCoAlarmSmokeSensitivityLevelAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.SmokeCoAlarmCluster) cluster).writeSensitivityLevelAttribute(
+        ((ChipClusters.SmokeCoAlarmCluster) cluster).writeSmokeSensitivityLevelAttribute(
           (DefaultClusterCallback) callback,
           (Integer) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeSmokeCoAlarmSensitivityLevelCommandParams
+      writeSmokeCoAlarmSmokeSensitivityLevelCommandParams
     );
-    writeSmokeCoAlarmInteractionInfo.put("writeSensitivityLevelAttribute", writeSmokeCoAlarmSensitivityLevelAttributeInteractionInfo);
+    writeSmokeCoAlarmInteractionInfo.put("writeSmokeSensitivityLevelAttribute", writeSmokeCoAlarmSmokeSensitivityLevelAttributeInteractionInfo);
     writeAttributeMap.put("smokeCoAlarm", writeSmokeCoAlarmInteractionInfo);
     Map<String, InteractionInfo> writeDishwasherAlarmInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("dishwasherAlarm", writeDishwasherAlarmInteractionInfo);
