@@ -425,9 +425,9 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
 #if CHIP_ERROR_LOGGING
     char * errStr;
 #endif // CHIP_ERROR_LOGGING
-    GVariantDict options;
-    bool isSuccess         = false;
     BluezConnection * conn = nullptr;
+    GVariantDict * options = nullptr;
+    bool isSuccess         = false;
 
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
     VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
@@ -448,10 +448,10 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
         goto exit;
     }
 
-    g_variant_dict_init(&options, aOptions);
-    if (g_variant_dict_contains(&options, "mtu") == TRUE)
+    options = g_variant_dict_new(aOptions);
+    if (g_variant_dict_contains(options, "mtu") == TRUE)
     {
-        GVariant * v = g_variant_dict_lookup_value(&options, "mtu", G_VARIANT_TYPE_UINT16);
+        GVariant * v = g_variant_dict_lookup_value(options, "mtu", G_VARIANT_TYPE_UINT16);
         conn->mMtu   = g_variant_get_uint16(v);
     }
     else
@@ -460,9 +460,6 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed");
         goto exit;
     }
-
-    // Stack-allocated dict still needs to be cleared after initialization
-    g_variant_dict_clear(&options);
 
     channel = g_io_channel_unix_new(fds[0]);
     g_io_channel_set_encoding(channel, nullptr, nullptr);
@@ -482,6 +479,10 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
     isSuccess = true;
 
 exit:
+    if (options != nullptr)
+    {
+        g_variant_dict_unref(options);
+    }
     return isSuccess ? TRUE : FALSE;
 }
 
@@ -503,8 +504,8 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
 #if CHIP_ERROR_LOGGING
     char * errStr;
 #endif // CHIP_ERROR_LOGGING
-    GVariantDict options;
     BluezConnection * conn = nullptr;
+    GVariantDict * options = nullptr;
     bool isSuccess         = false;
 
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
@@ -514,15 +515,12 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
     VerifyOrExit(conn != nullptr,
                  g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No Chipoble connection"));
 
-    g_variant_dict_init(&options, aOptions);
-    if ((g_variant_dict_contains(&options, "mtu") == TRUE))
+    options = g_variant_dict_new(aOptions);
+    if ((g_variant_dict_contains(options, "mtu") == TRUE))
     {
-        GVariant * v = g_variant_dict_lookup_value(&options, "mtu", G_VARIANT_TYPE_UINT16);
+        GVariant * v = g_variant_dict_lookup_value(options, "mtu", G_VARIANT_TYPE_UINT16);
         conn->mMtu   = g_variant_get_uint16(v);
     }
-
-    // Stack-allocated dict still needs to be cleared after initialization
-    g_variant_dict_clear(&options);
 
     if (bluez_gatt_characteristic1_get_notifying(aChar))
     {
@@ -560,6 +558,10 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
     isSuccess = true;
 
 exit:
+    if (options != nullptr)
+    {
+        g_variant_dict_unref(options);
+    }
     return isSuccess ? TRUE : FALSE;
 }
 
@@ -1075,7 +1077,7 @@ static BluezConnection * BluezCharacteristicGetBluezConnection(BluezGattCharacte
                                                                BluezEndpoint * apEndpoint)
 {
     BluezConnection * retval = nullptr;
-    GVariantDict options;
+    GVariantDict * options   = nullptr;
     GVariant * v;
 
     VerifyOrExit(apEndpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
@@ -1127,18 +1129,18 @@ static BluezConnection * BluezCharacteristicGetBluezConnection(BluezGattCharacte
     }
     else
     {
-        g_variant_dict_init(&options, aOptions);
-
-        v = g_variant_dict_lookup_value(&options, "device", G_VARIANT_TYPE_OBJECT_PATH);
+        options = g_variant_dict_new(aOptions);
+        v       = g_variant_dict_lookup_value(options, "device", G_VARIANT_TYPE_OBJECT_PATH);
         VerifyOrExit(v != nullptr, ChipLogError(DeviceLayer, "FAIL: No device option in dictionary (%s)", __func__));
-
-        // Stack-allocated dict still needs to be cleared after initialization
-        g_variant_dict_clear(&options);
 
         retval = static_cast<BluezConnection *>(g_hash_table_lookup(apEndpoint->mpConnMap, g_variant_get_string(v, nullptr)));
     }
 
 exit:
+    if (options != nullptr)
+    {
+        g_variant_dict_unref(options);
+    }
     return retval;
 }
 #endif // CHIP_BLUEZ_CENTRAL_SUPPORT
