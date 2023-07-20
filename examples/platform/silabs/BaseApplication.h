@@ -33,6 +33,7 @@
 #include <app/util/config.h>
 #include <ble/BLEEndPoint.h>
 #include <lib/core/CHIPError.h>
+#include <platform/CHIPDeviceEvent.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
@@ -152,13 +153,6 @@ protected:
     static void FunctionTimerEventHandler(TimerHandle_t xTimer);
 
     /**
-     * @brief Factory reset trigger function
-     *        Trigger factory if called
-     *
-     */
-    static void FunctionFactoryReset(void);
-
-    /**
      * @brief Timer Event processing function
      *        Trigger factory if Press and Hold duration is respected
      *
@@ -184,6 +178,11 @@ protected:
     static void LightTimerEventHandler(TimerHandle_t xTimer);
 
     /**
+     * @brief Updates device LEDs
+     */
+    static void LightEventHandler();
+
+    /**
      * @brief Activate a set of Led patterns of the Status led
      *        Identify patterns and Trigger effects have priority
      *        If no identification patterns are in progress, we provide
@@ -194,10 +193,15 @@ protected:
     static bool ActivateStatusLedPatterns();
 
     /**
-     * @brief Updates device LEDs
+     * @brief Start the factory Reset process
+     *  Almost identical to Server::ScheduleFactoryReset()
+     *  but doesn't call GetFabricTable().DeleteAllFabrics(); which deletes Key per key.
+     *  With our KVS platform implementation this is a lot slower than deleting the whole kvs section
+     *  our silabs nvm3 driver which end up being doing in ConfigurationManagerImpl::DoFactoryReset(intptr_t arg).
      */
-    static void LightEventHandler();
+    static void ScheduleFactoryReset();
 
+    static void OnPlatformEvent(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t);
     /**********************************************************
      * Protected Attributes declaration
      *********************************************************/

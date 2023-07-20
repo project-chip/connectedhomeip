@@ -166,10 +166,10 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     // Init Chip memory management before the stack
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
 
-    // WiFi needs to be initialized after Memory Init for some reason
-    #ifdef SL_WIFI
+// WiFi needs to be initialized after Memory Init for some reason
+#ifdef SL_WIFI
     InitWiFi();
-    #endif
+#endif
 
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
@@ -260,8 +260,7 @@ void SilabsMatterConfig::InitWiFi(void)
         SILABS_LOG("RSI init failed");
         return CHIP_ERROR_INTERNAL;
     }
-#endif                           /* WF200_WIFI */
-
+#endif /* WF200_WIFI */
 }
 #endif // SL_WIFI
 

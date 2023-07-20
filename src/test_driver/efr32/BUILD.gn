@@ -73,7 +73,6 @@ silabs_executable("efr32_device_tests") {
     "${examples_common_plat_dir}/PigweedLogger.cpp",
     "${examples_common_plat_dir}/heap_4_silabs.c",
     "${examples_common_plat_dir}/syscalls_stubs.cpp",
-    "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/uart.cpp",
     "src/main.cpp",
   ]

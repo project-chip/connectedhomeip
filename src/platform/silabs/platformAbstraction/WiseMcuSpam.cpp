@@ -39,9 +39,9 @@ CHIP_ERROR SilabsPlatform::Init(void)
     RSI_Wakeupsw_config();
 
     RSI_Wakeupsw_config_gpio0();
-    #if SILABS_LOG_ENABLED
+#if SILABS_LOG_ENABLED
     silabsInitLog();
-    #endif
+#endif
     return CHIP_NO_ERROR;
 }
 

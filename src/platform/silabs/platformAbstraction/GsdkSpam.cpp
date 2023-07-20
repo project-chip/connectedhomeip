@@ -29,7 +29,6 @@ extern "C" {
 #include "sl_simple_button_instances.h"
 #endif
 
-
 extern "C" {
 #include <mbedtls/platform.h>
 
@@ -52,7 +51,6 @@ extern "C" {
 #if SL_SYSTEM_VIEW
 #include "SEGGER_SYSVIEW.h"
 #endif
-
 }
 
 #if SILABS_LOG_ENABLED
@@ -74,7 +72,7 @@ CHIP_ERROR SilabsPlatform::Init(void)
 
 #if CHIP_ENABLE_OPENTHREAD
     sl_ot_sys_init();
-#endif 
+#endif
 
 #if SL_SYSTEM_VIEW
     SEGGER_SYSVIEW_Conf();

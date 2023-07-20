@@ -181,8 +181,9 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/driver/debug/inc",
       "${silabs_gen_folder}/config",
       "${silabs_gen_folder}/autogen",
+
       # Headers needed for Init no function will be called if OT is not used
-      "${sl_ot_efr32_root}",       
+      "${sl_ot_efr32_root}",
     ]
 
     if (silabs_family != "mgm24") {
