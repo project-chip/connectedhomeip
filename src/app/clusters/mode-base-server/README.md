@@ -16,9 +16,9 @@ To use a Mode Base derived cluster, you need to
     documentation in `mode-base-server.h` for more information about these
     methods. Cluster-specific enums can be accessed from the cluster namespace.
 -   Optionally implement the `Init` function.
--   In some translation unit (.c or .cpp file), instantiate your 
-    `ModeBase::Instance` inherited class. See the constructor documentation 
-    in `mode-base-server.h`.
+-   In some translation unit (.c or .cpp file), instantiate your
+    `ModeBase::Instance` inherited class. See the constructor documentation in
+    `mode-base-server.h`.
 -   Call the `.Init()` function of your instance after the root
     `Server::Init()`.
 -   Alternatively, the last two steps can be done in the
@@ -27,8 +27,8 @@ To use a Mode Base derived cluster, you need to
     `chip_device_project_config_include` file. In the examples, this file is
     `CHIPProjectAppConfig.h`.
 
-**Note** Zap accessor functions for these clusters do not exist. 
-Use the instance's `Update...` and `Get...` functions to access the attributes.
+**Note** Zap accessor functions for these clusters do not exist. Use the
+instance's `Update...` and `Get...` functions to access the attributes.
 
 # How to add new derived clusters
 
