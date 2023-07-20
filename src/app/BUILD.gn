@@ -196,6 +196,8 @@ static_library("app") {
     "reporting/ReportScheduler.h",
     "reporting/ReportSchedulerImpl.cpp",
     "reporting/ReportSchedulerImpl.h",
+    "reporting/SynchronizedReportSchedulerImpl.cpp",
+    "reporting/SynchronizedReportSchedulerImpl.h",
     "reporting/reporting.h",
   ]
 
@@ -209,6 +211,7 @@ static_library("app") {
   public_deps = [
     ":app_config",
     "${chip_root}/src/access",
+    "${chip_root}/src/app/icd:cluster-srcs",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",

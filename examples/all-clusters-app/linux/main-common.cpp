@@ -31,6 +31,7 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
+#include <static-supported-temperature-levels.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
@@ -47,8 +48,9 @@ constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_all_clusters_fifo_"
 LowPowerManager sLowPowerManager;
 NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
-chip::app::Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
+Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 } // namespace
 
 #ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
@@ -174,6 +176,7 @@ void ApplicationInit()
 #ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
     MatterOperationalStateServerInit();
 #endif
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 void ApplicationExit()
@@ -187,12 +190,12 @@ void ApplicationExit()
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(NotSpecified, "Setting LowPower default delegate to global manager");
-    chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &sLowPowerManager);
+    Clusters::LowPower::SetDefaultDelegate(endpoint, &sLowPowerManager);
 }
 
 void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
 {
     sWindowCoveringManager.Init(endpoint);
-    chip::app::Clusters::WindowCovering::SetDefaultDelegate(endpoint, &sWindowCoveringManager);
-    chip::app::Clusters::WindowCovering::ConfigStatusUpdateFeatures(endpoint);
+    Clusters::WindowCovering::SetDefaultDelegate(endpoint, &sWindowCoveringManager);
+    Clusters::WindowCovering::ConfigStatusUpdateFeatures(endpoint);
 }

@@ -29,7 +29,7 @@ config:
         defaultValue: "exampleid"
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -37,7 +37,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Launch an app with the provided a application ID"
+    - label: "Step 1: Launch an app with the provided a application ID"
       PICS: APPLAUNCHER.S.C00.Rsp
       command: "LaunchApp"
       arguments:
@@ -56,8 +56,8 @@ tests:
                 value: 0
 
     - label:
-          "TH sends a LaunchApp command to DUT to launch an app which is not
-          available"
+          "Step 2: TH sends a LaunchApp command to DUT to launch an app which is
+          not available"
       PICS: APPLAUNCHER.S.C00.Rsp
       command: "LaunchApp"
       arguments:

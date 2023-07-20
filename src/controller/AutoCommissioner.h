@@ -54,6 +54,7 @@ protected:
      * be used for sending the relevant command.
      */
     Optional<System::Clock::Timeout> GetCommandTimeout(DeviceProxy * device, CommissioningStage stage) const;
+    CommissioningParameters mParams = CommissioningParameters();
 
 private:
     DeviceProxy * GetDeviceProxyForStep(CommissioningStage nextStage);
@@ -94,7 +95,6 @@ private:
     DeviceCommissioner * mCommissioner                               = nullptr;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy               = nullptr;
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate = nullptr;
-    CommissioningParameters mParams                                  = CommissioningParameters();
     OperationalDeviceProxy mOperationalDeviceProxy;
     // Memory space for the commisisoning parameters that come in as ByteSpans - the caller is not guaranteed to retain this memory
     uint8_t mSsid[CommissioningParameters::kMaxSsidLen];
@@ -104,6 +104,7 @@ private:
 
     bool mNeedsNetworkSetup = false;
     ReadCommissioningInfo mDeviceCommissioningInfo;
+    bool mNeedsDST = false;
 
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
     uint8_t * mDAC   = nullptr;
