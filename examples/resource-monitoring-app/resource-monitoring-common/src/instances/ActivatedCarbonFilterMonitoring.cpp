@@ -21,37 +21,39 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/data-model/Nullable.h>
+#include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
 #include <instances/ActivatedCarbonFilterMonitoring.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <system/SystemClock.h>
 
-#define ACTIVATED_CARBON_FILTER_REPLACEMENT_PRODUCT_LIST_SIZE 3
-
+using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ActivatedCarbonFilterMonitoring;
 using namespace chip::app::Clusters::ResourceMonitoring;
 using chip::Protocols::InteractionModel::Status;
 
-static ResourceMonitoring::Attributes::ReplacementProductStruct::Type
-    sActivatedCarbonFilterReplacementProductsList[ACTIVATED_CARBON_FILTER_REPLACEMENT_PRODUCT_LIST_SIZE];
-StaticReplacementProductListManager
-    sActivatedCarbonFilterReplacementProductListManager(&sActivatedCarbonFilterReplacementProductsList[0],
-                                                        ACTIVATED_CARBON_FILTER_REPLACEMENT_PRODUCT_LIST_SIZE);
+static ResourceMonitoring::Attributes::ReplacementProductStruct::Type sActivatedCarbonFilterReplacementProductsList[] = {
+    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kUpc,
+      .productIdentifierValue = CharSpan("upc12xcarbon") },
+    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8,
+      .productIdentifierValue = CharSpan("gtin8xca") },
+    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kEan,
+      .productIdentifierValue = CharSpan("ean13xacarbon") },
+    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14,
+      .productIdentifierValue = CharSpan("gtin14xcarbonx") },
+    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kOem,
+      .productIdentifierValue = CharSpan("oem20xcarbonxxxxxxxx") },
+};
+StaticReplacementProductListManager sActivatedCarbonFilterReplacementProductListManager(
+    &sActivatedCarbonFilterReplacementProductsList[0],
+    sizeof(sActivatedCarbonFilterReplacementProductsList) / sizeof(ResourceMonitoring::Attributes::ReplacementProductStruct::Type));
 
 //-- Activated carbon filter Monitoring Instance methods
 CHIP_ERROR ActivatedCarbonFilterMonitoringInstance::AppInit()
 {
     ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringDelegate::Init()");
-
-    sActivatedCarbonFilterReplacementProductsList[0].productIdentifierType  = ProductIdentifierTypeEnum::kUpc;
-    sActivatedCarbonFilterReplacementProductsList[0].productIdentifierValue = "upc12xcarbon";
-    sActivatedCarbonFilterReplacementProductsList[1].productIdentifierType  = ProductIdentifierTypeEnum::kGtin8;
-    sActivatedCarbonFilterReplacementProductsList[1].productIdentifierValue = "gtin8xca";
-    sActivatedCarbonFilterReplacementProductsList[2].productIdentifierType  = ProductIdentifierTypeEnum::kEan;
-    sActivatedCarbonFilterReplacementProductsList[2].productIdentifierValue = "ean13xacarbon";
 
     SetReplacementProductListManagerInstance(&sActivatedCarbonFilterReplacementProductListManager);
 

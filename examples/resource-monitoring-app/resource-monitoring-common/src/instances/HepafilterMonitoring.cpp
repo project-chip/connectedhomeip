@@ -27,31 +27,32 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <system/SystemClock.h>
-#include <zap-generated/gen_config.h>
 
-#define HEPA_FILTER_REPLACEMENT_PRODUCT_LIST_SIZE 3
-
+using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
 using chip::Protocols::InteractionModel::Status;
 
-static ResourceMonitoring::Attributes::ReplacementProductStruct::Type
-    sHepaFilterReplacementProductsList[HEPA_FILTER_REPLACEMENT_PRODUCT_LIST_SIZE];
-StaticReplacementProductListManager sHepaFilterReplacementProductListManager(&sHepaFilterReplacementProductsList[0],
-                                                                             HEPA_FILTER_REPLACEMENT_PRODUCT_LIST_SIZE);
+static ResourceMonitoring::Attributes::ReplacementProductStruct::Type sHepaFilterReplacementProductsList[] = {
+    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kUpc,
+      .productIdentifierValue = CharSpan("upc12xhepaxx") },
+    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8,
+      .productIdentifierValue = CharSpan("gtin8xhe") },
+    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kEan,
+      .productIdentifierValue = CharSpan("ean13xhepaxxx") },
+    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14,
+      .productIdentifierValue = CharSpan("gtin14xhepaxxx") },
+    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kOem,
+      .productIdentifierValue = CharSpan("oem20xhepaxxxxxxxxxx") },
+};
+StaticReplacementProductListManager sHepaFilterReplacementProductListManager(
+    &sHepaFilterReplacementProductsList[0],
+    sizeof(sHepaFilterReplacementProductsList) / sizeof(ResourceMonitoring::Attributes::ReplacementProductStruct::Type));
 
 //-- Hepa filter Monitoring instance methods
 CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
 {
     ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::Init()");
-
-    sHepaFilterReplacementProductsList[0].productIdentifierType  = ProductIdentifierTypeEnum::kUpc;
-    sHepaFilterReplacementProductsList[0].productIdentifierValue = "upc12xhepaxx";
-    sHepaFilterReplacementProductsList[1].productIdentifierType  = ProductIdentifierTypeEnum::kGtin8;
-    sHepaFilterReplacementProductsList[1].productIdentifierValue = "gtin8xhe";
-    sHepaFilterReplacementProductsList[2].productIdentifierType  = ProductIdentifierTypeEnum::kEan;
-    sHepaFilterReplacementProductsList[2].productIdentifierValue = "ean13xhepaxxx";
 
     SetReplacementProductListManagerInstance(&sHepaFilterReplacementProductListManager);
 
