@@ -68,7 +68,7 @@ Delegate * GetDelegate(EndpointId aEndpoint)
 void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(aEndpoint, FanControl::Id, EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(aEndpoint, FanControl::Id, EMBER_AF_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kFanControlDelegateTableSize)
     {
