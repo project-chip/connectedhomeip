@@ -219,7 +219,7 @@ jobs:
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-shell' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d shell \
-                    out/telink-tlsr9518adk80d-smoke-co-alarm/zephyr/zephyr.elf \
+                    out/telink-tlsr9518adk80d-shell/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output
