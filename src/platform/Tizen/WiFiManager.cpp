@@ -376,12 +376,12 @@ void WiFiManager::_ScanFinishedCb(wifi_manager_error_e wifiErr, void * userData)
 
 bool WiFiManager::_FoundAPOnScanCb(wifi_manager_ap_h ap, void * userData)
 {
-    bool cbRet     = true;
-    int wifiErr    = WIFI_MANAGER_ERROR_NONE;
-    char * essid   = nullptr;
-    char * bssid   = nullptr;
-    int rssi       = 0;
-    int freq       = 0;
+    bool cbRet   = true;
+    int wifiErr  = WIFI_MANAGER_ERROR_NONE;
+    char * essid = nullptr;
+    char * bssid = nullptr;
+    int rssi     = 0;
+    int freq     = 0;
 
     auto networkScanned = static_cast<std::vector<WiFiScanResponse> *>(userData);
     std::pair<WiFiBand, int> bandInfo;
