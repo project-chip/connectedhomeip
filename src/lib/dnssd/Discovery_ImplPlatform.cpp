@@ -259,9 +259,10 @@ CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, const chip::Opti
                         CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(optional.HasValue(), CHIP_ERROR_WELL_UNINITIALIZED);
 
+    CHIP_ERROR err;
     if (key == TxtFieldKey::kSessionActiveThreshold)
     {
-        return CopyTextRecordValue(buffer, bufferLen, optional.Value().mActiveThresholdTime.count());
+        err = CopyTextRecordValue(buffer, bufferLen, optional.Value().mActiveThresholdTime.count());
     }
     else
     {
@@ -273,8 +274,10 @@ CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, const chip::Opti
                             isIdle ? "idle" : "active");
             retryInterval = kMaxRetryInterval;
         }
-        return CopyTextRecordValue(buffer, bufferLen, retryInterval.count());
+        err = CopyTextRecordValue(buffer, bufferLen, retryInterval.count());
     }
+
+    return err;
 }
 
 template <class T>
