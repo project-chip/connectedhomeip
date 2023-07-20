@@ -2517,21 +2517,3 @@ RVCCLEANMS.S.A0005=1
 RVCCLEANMS.S.C00.Rsp=1
 RVCCLEANMS.S.C01.Rsp=1
 RVCCLEANMS.S.C03.Tx=1
-
-# Dishwasher Mode Cluster
-DISHM.S=1
-
-#Server Features
-DISHM.S.F00=1
-
-#Server Attributes
-DISHM.S.A0000=1
-DISHM.S.A0001=1
-DISHM.S.A0002=1
-DISHM.S.A0003=1
-
-#Server Commands Received:
-DISHM.S.C00.Rsp=1
-
-#Server Commands Generated:
-DISHM.S.C01.Tx=1
