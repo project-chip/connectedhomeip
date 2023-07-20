@@ -265,7 +265,7 @@ private:
             {
                 size_t writtenCharactersNumber =
                     static_cast<size_t>(snprintf(storage.sessionActiveThresholdBuf, sizeof(storage.sessionActiveThresholdBuf),
-                                                 "SAT=%" PRIu16, mrp.mActiveThresholdTime.count()));
+                                                 "SAT=%u", mrp.mActiveThresholdTime.count()));
                 VerifyOrReturnError((writtenCharactersNumber > 0) &&
                                         (writtenCharactersNumber < sizeof(storage.sessionActiveThresholdBuf)),
                                     CHIP_ERROR_INVALID_STRING_LENGTH);
