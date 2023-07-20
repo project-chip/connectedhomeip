@@ -142,7 +142,9 @@
         "ACCESS_CONTROL_CLUSTER": ["access-control-server"],
         "ACCOUNT_LOGIN_CLUSTER": ["account-login-server"],
         "ACTIONS_CLUSTER": [],
-        "ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER": [],
+        "ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER": [
+            "resource-monitoring-server"
+        ],
         "ADMINISTRATOR_COMMISSIONING_CLUSTER": [
             "administrator-commissioning-server"
         ],
@@ -199,7 +201,7 @@
         "GROUPS_CLUSTER": ["groups-server"],
         "GROUP_KEY_MANAGEMENT_CLUSTER": ["group-key-mgmt-server"],
         "HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER": [],
-        "HEPA_FILTER_MONITORING_CLUSTER": [],
+        "HEPA_FILTER_MONITORING_CLUSTER": ["resource-monitoring-server"],
         "HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "HYDROGEN_SULFIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "IAS_ZONE_CLUSTER": [],

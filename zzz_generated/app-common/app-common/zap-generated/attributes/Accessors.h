@@ -1792,35 +1792,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace HepaFilterMonitoring {
 namespace Attributes {
 
-namespace Condition {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
-EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
-} // namespace Condition
-
-namespace DegradationDirection {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum * value); // DegradationDirectionEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum value);
-} // namespace DegradationDirection
-
-namespace ChangeIndication {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum * value); // ChangeIndicationEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum value);
-} // namespace ChangeIndication
-
-namespace InPlaceIndicator {
-EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
-EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace InPlaceIndicator
-
-namespace LastChangedTime {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
-} // namespace LastChangedTime
-
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -1836,36 +1807,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace ActivatedCarbonFilterMonitoring {
 namespace Attributes {
-
-namespace Condition {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
-EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
-} // namespace Condition
-
-namespace DegradationDirection {
-EmberAfStatus
-Get(chip::EndpointId endpoint,
-    chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum * value); // DegradationDirectionEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum value);
-} // namespace DegradationDirection
-
-namespace ChangeIndication {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum * value); // ChangeIndicationEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum value);
-} // namespace ChangeIndication
-
-namespace InPlaceIndicator {
-EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
-EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace InPlaceIndicator
-
-namespace LastChangedTime {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
-} // namespace LastChangedTime
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
