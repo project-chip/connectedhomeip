@@ -3231,6 +3231,7 @@ public class ClusterIDMapping {
             BatFunctionalWhileCharging(28L),
             BatChargingCurrent(29L),
             ActiveBatChargeFaults(30L),
+            EndpointList(31L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

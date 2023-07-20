@@ -2240,6 +2240,7 @@ private:
 | * BatFunctionalWhileCharging                                        | 0x001C |
 | * BatChargingCurrent                                                | 0x001D |
 | * ActiveBatChargeFaults                                             | 0x001E |
+| * EndpointList                                                      | 0x001F |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -12044,6 +12045,7 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
                                    credsIssuerConfig),                                                                        //
         make_unique<ReadAttribute>(Id, "bat-charging-current", Attributes::BatChargingCurrent::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "active-bat-charge-faults", Attributes::ActiveBatChargeFaults::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "endpoint-list", Attributes::EndpointList::Id, credsIssuerConfig),                     //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),    //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),      //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                           //
@@ -12128,6 +12130,8 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
             WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::PowerSource::BatChargeFaultEnum>>>(
             Id, "active-bat-charge-faults", Attributes::ActiveBatChargeFaults::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EndpointId>>>(
+            Id, "endpoint-list", Attributes::EndpointList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -12178,6 +12182,7 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
         make_unique<SubscribeAttribute>(Id, "bat-charging-current", Attributes::BatChargingCurrent::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "active-bat-charge-faults", Attributes::ActiveBatChargeFaults::Id,
                                         credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "endpoint-list", Attributes::EndpointList::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
