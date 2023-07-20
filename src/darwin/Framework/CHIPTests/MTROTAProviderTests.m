@@ -929,8 +929,8 @@ static BOOL sNeedsStackShutdown = YES;
 - (void)test006_DoBDXTransferWithTwoOTARequesters
 {
     // Note: This test has a dependency on test005_DoBDXTransferAllowUpdateRequest since we update device1 to version
-    // number 5 in the above test. We reuse device1 for this test and we need to use an OTA image with a higher version number (10) for
-    // device1 to update itself again. We need to fix this when we want to run tests out of order.
+    // number 5 in the above test. We reuse device1 for this test and we need to use an OTA image with a higher version number (10)
+    // for device1 to update itself again. We need to fix this when we want to run tests out of order.
 
     // In this test, we test BDX transfers between one provider and two OTA requestors device1 and device2.
     //
@@ -954,8 +954,7 @@ static BOOL sNeedsStackShutdown = YES;
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath1]);
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath2]);
 
-    XCTestExpectation * queryExpectation1 =
-        [self expectationWithDescription:@"handleQueryImageForNodeID called for device1"];
+    XCTestExpectation * queryExpectation1 = [self expectationWithDescription:@"handleQueryImageForNodeID called for device1"];
     XCTestExpectation * queryExpectation2 =
         [self expectationWithDescription:@"handleQueryImageForNodeID called for device2 - busy"];
     XCTestExpectation * queryExpectation3 =
@@ -966,10 +965,8 @@ static BOOL sNeedsStackShutdown = YES;
     XCTestExpectation * bdxBeginExpectation2 =
         [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called for device2"];
 
-    XCTestExpectation * bdxQueryExpectation1 =
-        [self expectationWithDescription:@"handleBDXQueryForNodeID called for device1"];
-    XCTestExpectation * bdxQueryExpectation2 =
-        [self expectationWithDescription:@"handleBDXQueryForNodeID called for device2"];
+    XCTestExpectation * bdxQueryExpectation1 = [self expectationWithDescription:@"handleBDXQueryForNodeID called for device1"];
+    XCTestExpectation * bdxQueryExpectation2 = [self expectationWithDescription:@"handleBDXQueryForNodeID called for device2"];
 
     XCTestExpectation * bdxEndExpectation1 =
         [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called for device1"];

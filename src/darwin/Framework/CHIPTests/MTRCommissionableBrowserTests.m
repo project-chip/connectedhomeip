@@ -78,7 +78,8 @@ static MTRDeviceController * sController = nil;
     XCTAssertEqualObjects(vendorId, @(kTestVendorId));
     XCTAssertTrue([productId isEqual:@(kTestProductId1)] || [productId isEqual:@(kTestProductId2)]);
     XCTAssertTrue([discriminator isEqual:@(kTestDiscriminator1)] || [discriminator isEqual:@(kTestDiscriminator2)] ||
-        [discriminator isEqual:@(kTestDiscriminator3)] || [discriminator isEqual:@(kTestDiscriminator4)] || [discriminator isEqual:@(kTestDiscriminator5)]);
+        [discriminator isEqual:@(kTestDiscriminator3)] || [discriminator isEqual:@(kTestDiscriminator4)] ||
+        [discriminator isEqual:@(kTestDiscriminator5)]);
     XCTAssertEqual(commissioningMode, YES);
 
     NSLog(@"Found Device (%@) with discriminator: %@ (vendor: %@, product: %@)", instanceName, discriminator, vendorId, productId);
