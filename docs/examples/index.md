@@ -84,7 +84,7 @@ java-matter-controller/README
 :glob:
 :maxdepth: 1
 
-st-device-app/**/README
+virtual-device-app/**/README
 ```
 
 ## Lighting example

@@ -71,7 +71,7 @@ class AndroidApp(Enum):
     TV_SERVER = auto()
     TV_CASTING_APP = auto()
     JAVA_MATTER_CONTROLLER = auto()
-    ST_DEVICE_APP = auto()
+    VIRTUAL_DEVICE_APP = auto()
 
     def AppName(self):
         if self == AndroidApp.CHIP_TOOL:
@@ -82,8 +82,8 @@ class AndroidApp(Enum):
             return "tv-server"
         elif self == AndroidApp.TV_CASTING_APP:
             return "tv-casting"
-        elif self == AndroidApp.ST_DEVICE_APP:
-            return "st-device-app"
+        elif self == AndroidApp.VIRTUAL_DEVICE_APP:
+            return "virtual-device-app"
         else:
             raise Exception("Unknown app type: %r" % self)
 
@@ -94,7 +94,7 @@ class AndroidApp(Enum):
             gn_args["chip_config_network_layer_ble"] = False
         elif self == AndroidApp.TV_CASTING_APP:
             gn_args["chip_config_network_layer_ble"] = False
-        elif self == AndroidApp.ST_DEVICE_APP:
+        elif self == AndroidApp.VIRTUAL_DEVICE_APP:
             gn_args["chip_config_network_layer_ble"] = True
         return gn_args
 
@@ -103,8 +103,8 @@ class AndroidApp(Enum):
             return "tv-app"
         elif self == AndroidApp.TV_CASTING_APP:
             return "tv-casting-app"
-        elif self == AndroidApp.ST_DEVICE_APP:
-            return "st-device-app"
+        elif self == AndroidApp.VIRTUAL_DEVICE_APP:
+            return "virtual-device-app"
         else:
             return None
 
@@ -308,7 +308,7 @@ class AndroidBuilder(Builder):
                         self.identifier, module),
                 )
         else:
-            if self.app.ExampleName() == "st-device-app":
+            if self.app.ExampleName() == "virtual-device-app":
                 self._Execute(
                     [
                         "%s/examples/%s/android/App/gradlew"
@@ -508,7 +508,7 @@ class AndroidBuilder(Builder):
 
                 self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
                 self.gradlewBuildExampleAndroid()
-            elif exampleName == "st-device-app":
+            elif exampleName == "virtual-device-app":
                 jnilibs_dir = os.path.join(
                     self.root,
                     "examples/",
@@ -521,13 +521,13 @@ class AndroidBuilder(Builder):
                     self.root, "examples/", self.app.ExampleName(), "android/App/app/libs"
                 )
 
-                libs = ["libc++_shared.so", "libStDeviceApp.so"]
+                libs = ["libc++_shared.so", "libDeviceApp.so"]
 
                 jars = {
                     "OnboardingPayload.jar": "third_party/connectedhomeip/src/controller/java/OnboardingPayload.jar",
                     "AndroidPlatform.jar": "third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar",
                     "CHIPAppServer.jar": "third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar",
-                    "StDeviceApp.jar": "StDeviceApp.jar",
+                    "DeviceApp.jar": "DeviceApp.jar",
                 }
 
                 self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
