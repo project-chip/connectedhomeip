@@ -43,18 +43,6 @@ bool Instance::HasFeature(Feature feature) const
     return (mFeature & to_underlying(feature)) != 0;
 }
 
-bool Instance::IsDerivedCluster() const
-{
-    for (unsigned int AliasedCluster : AliasedClusters)
-    {
-        if (mClusterId == AliasedCluster)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
 void Instance::LoadPersistentAttributes()
 {
     // Load Current Mode
@@ -141,9 +129,6 @@ CHIP_ERROR Instance::Init()
 {
     // Initialise the current mode with the value of the first mode. This ensures that it is representing a valid mode.
     ReturnErrorOnFailure(mDelegate->GetModeValueByIndex(0, mCurrentMode));
-
-    // Check that the cluster ID given is a valid mode base derived cluster ID.
-    VerifyOrDie(IsDerivedCluster() == true);
 
     // Check if the cluster has been selected in zap
     VerifyOrDie(emberAfContainsServer(mEndpointId, mClusterId) == true);

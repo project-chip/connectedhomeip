@@ -32,6 +32,5 @@ implementation using the following steps
 
 1.  Translate the spec as an XML in `src/app/zap-templates/zcl/data-model/chip`.
     You can look at similar files on how to do this.
-2.  Add the cluster ID to `AliasedClusters` in `mode-base-cluster-objects.h`.
-3.  Regenerate the zap code.
-4.  Extend the all-clusters-app example to include your new cluster.
+2.  Regenerate the zap code.
+3.  Extend the all-clusters-app example to include your new cluster.

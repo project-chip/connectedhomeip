@@ -56,12 +56,6 @@ private:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     /**
-     * This checks to see if this clusters instance is a valid ModeBase aliased cluster based on the AliasedClusters list.
-     * @return true if the clusterId of this instance is a valid ModeBase cluster.
-     */
-    bool IsDerivedCluster() const;
-
-    /**
      * Internal change-to-mode command handler function.
      */
     void HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & req);

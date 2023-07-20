@@ -30,8 +30,6 @@ namespace app {
 namespace Clusters {
 namespace ModeBase {
 
-static constexpr std::array<ClusterId, 5> AliasedClusters = { 0x51, 0x52, 0x54, 0x55, 0x59 };
-
 namespace Attributes {
 
 namespace SupportedModes {
