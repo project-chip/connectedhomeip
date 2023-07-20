@@ -682,8 +682,8 @@ SMOKECO.S.E07=1
 SMOKECO.S.E08=1
 SMOKECO.S.E09=1
 SMOKECO.S.E0a=1
-SMCO.M.ManuallyControlledTest=1
-SMCO.M.ManuallyControlledMute=1
+SMOKECO.M.ManuallyControlledTest=1
+SMOKECO.M.ManuallyControlledMute=1
 SMOKECO.S.C00.Rsp=1
 
 SMOKECO.C=1

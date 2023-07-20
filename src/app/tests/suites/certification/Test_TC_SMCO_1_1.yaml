@@ -125,7 +125,7 @@ tests:
               contains: [10]
 
     - label:
-          "TH reads from the DUT the AttributeList attribute(SensitivityLevel)"
+          "TH reads from the DUT the AttributeList attribute(SmokeSensitivityLevel)"
       PICS: SMOKECO.S.A000b
       command: "readAttribute"
       attribute: "AttributeList"

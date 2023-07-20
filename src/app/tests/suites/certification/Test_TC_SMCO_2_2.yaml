@@ -21,6 +21,7 @@ PICS:
 config:
     nodeId: 0x12344321
     cluster: "Smoke CO Alarm"
+    endpoint: 1
     timeout: 990
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
@@ -38,7 +39,6 @@ config:
 tests:
     - label: "Commission DUT to TH"
       cluster: "DelayCommands"
-      endpoint: 1
       command: "WaitForCommissionee"
       arguments:
           values:
@@ -48,7 +48,6 @@ tests:
     # Get the latest eventNumber
     - label: "Generate an event on the accessory"
       cluster: "Unit Testing"
-      endpoint: 1
       command: "TestEmitTestEventRequest"
       arguments:
           values:
@@ -63,11 +62,12 @@ tests:
               - name: "value"
                 saveAs: eventNumber
 
-    - label: "TH reads SmokeState attribute from DUT"
+    - label: "TH subscribes to SmokeState attribute from DUT"
       PICS: SMOKECO.S.A0001
-      endpoint: 1
-      command: "readAttribute"
+      command: "subscribeAttribute"
       attribute: "SmokeState"
+      minInterval: 3
+      maxInterval: 30
       response:
           value: 0
           constraints:
@@ -75,7 +75,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -93,14 +92,6 @@ tests:
       attribute: "TestEventTriggersEnabled"
       response:
           value: 1
-
-    - label: "TH subscribes to SmokeState attribute from DUT"
-      PICS: SMOKECO.S.A0001
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "SmokeState"
-      minInterval: 3
-      maxInterval: 60
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
@@ -122,7 +113,6 @@ tests:
           "TH waits for a report of SmokeState attribute from DUT with a timeout
           of 300 seconds"
       PICS: SMOKECO.S.A0001
-      endpoint: 1
       command: "waitForReport"
       attribute: "SmokeState"
       timeout: 300
@@ -133,7 +123,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -143,7 +132,6 @@ tests:
 
     - label: "TH reads SmokeAlarm event from DUT"
       PICS: SMOKECO.S.E00
-      endpoint: 1
       command: "readEvent"
       event: "SmokeAlarm"
       eventNumber: eventNumber + 1
@@ -153,7 +141,6 @@ tests:
     - label: "Start manually DUT self-test"
       cluster: "LogCommands"
       PICS: PICS_USER_PROMPT && SMOKECO.M.ManuallyControlledTest
-      endpoint: 1
       command: "UserPrompt"
       arguments:
           values:
@@ -164,7 +151,6 @@ tests:
 
     - label: "TH reads TestInProgress attribute from DUT"
       PICS: SMOKECO.S.A0005
-      endpoint: 1
       command: "readAttribute"
       attribute: "TestInProgress"
       response:
@@ -174,14 +160,12 @@ tests:
 
     - label: "TH sends SelfTestRequest command to DUT"
       PICS: SMOKECO.S.C00.Rsp
-      endpoint: 1
       command: "SelfTestRequest"
       response:
           error: BUSY
 
     - label: "TH reads TestInProgress attribute from DUT"
       PICS: SMOKECO.S.A0005
-      endpoint: 1
       command: "readAttribute"
       attribute: "TestInProgress"
       response:
@@ -209,7 +193,6 @@ tests:
           "TH waits for a report of SmokeState attribute from DUT with a timeout
           of 300 seconds"
       PICS: SMOKECO.S.A0001
-      endpoint: 1
       command: "waitForReport"
       attribute: "SmokeState"
       timeout: 300
@@ -220,7 +203,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -230,7 +212,6 @@ tests:
 
     - label: "TH reads SmokeAlarm event from DUT"
       PICS: SMOKECO.S.E00
-      endpoint: 1
       command: "readEvent"
       event: "SmokeAlarm"
       eventNumber: eventNumber + 2
@@ -257,7 +238,6 @@ tests:
           "TH waits for a report of SmokeState attribute from DUT with a timeout
           of 300 seconds"
       PICS: SMOKECO.S.A0001
-      endpoint: 1
       command: "waitForReport"
       attribute: "SmokeState"
       timeout: 300
@@ -268,7 +248,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -278,7 +257,6 @@ tests:
 
     - label: "TH reads AllClear event from DUT"
       PICS: SMOKECO.S.E0a
-      endpoint: 1
       command: "readEvent"
       event: "AllClear"
       eventNumber: eventNumber + 3

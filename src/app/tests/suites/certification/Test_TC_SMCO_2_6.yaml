@@ -22,6 +22,7 @@ PICS:
 config:
     nodeId: 0x12344321
     cluster: "Smoke CO Alarm"
+    endpoint: 1
     timeout: 3090
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
@@ -75,7 +76,6 @@ config:
 tests:
     - label: "Commission DUT to TH"
       cluster: "DelayCommands"
-      endpoint: 1
       command: "WaitForCommissionee"
       arguments:
           values:
@@ -84,13 +84,51 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
           value: 0
           constraints:
               type: enum8
+
+    - label: "TH subscribes to BatteryAlert attribute from DUT"
+      PICS: SMOKECO.S.A0003
+      command: "subscribeAttribute"
+      attribute: "BatteryAlert"
+      minInterval: 3
+      maxInterval: 30
+
+    - label: "TH subscribes to InterconnectSmokeAlarm attribute from DUT"
+      PICS: SMOKECO.S.A0008
+      command: "subscribeAttribute"
+      attribute: "InterconnectSmokeAlarm"
+      minInterval: 3
+      maxInterval: 30
+      keepSubscriptions: true
+
+    - label: "TH subscribes to InterconnectCOAlarm attribute from DUT"
+      PICS: SMOKECO.S.A0009
+      command: "subscribeAttribute"
+      attribute: "InterconnectCOAlarm"
+      minInterval: 3
+      maxInterval: 30
+      keepSubscriptions: true
+
+    - label: "TH subscribes to COState attribute from DUT"
+      PICS: SMOKECO.S.A0002
+      command: "subscribeAttribute"
+      attribute: "COState"
+      minInterval: 3
+      maxInterval: 30
+      keepSubscriptions: true
+
+    - label: "TH subscribes to SmokeState attribute from DUT"
+      PICS: SMOKECO.S.A0001
+      command: "subscribeAttribute"
+      attribute: "SmokeState"
+      minInterval: 3
+      maxInterval: 30
+      keepSubscriptions: true
 
     - label:
           "TH reads TestEventTriggersEnabled attribute from General Diagnostics
@@ -102,14 +140,6 @@ tests:
       attribute: "TestEventTriggersEnabled"
       response:
           value: 1
-
-    - label: "TH subscribes to BatteryAlert attribute from DUT"
-      PICS: SMOKECO.S.A0003
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "BatteryAlert"
-      minInterval: 3
-      maxInterval: 60
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
@@ -131,7 +161,6 @@ tests:
           "TH waits for a report of BatteryAlert attribute from DUT with a
           timeout of 300 seconds"
       PICS: SMOKECO.S.A0003
-      endpoint: 1
       command: "waitForReport"
       attribute: "BatteryAlert"
       timeout: 300
@@ -139,15 +168,6 @@ tests:
           value: 1
           constraints:
               type: enum8
-
-    - label: "TH subscribes to InterconnectSmokeAlarm attribute from DUT"
-      PICS: SMOKECO.S.A0008
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "InterconnectSmokeAlarm"
-      minInterval: 3
-      maxInterval: 60
-      keepSubscriptions: true
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
@@ -169,7 +189,6 @@ tests:
           "TH waits for a report of InterconnectSmokeAlarm attribute from DUT
           with a timeout of 300 seconds"
       PICS: SMOKECO.S.A0008
-      endpoint: 1
       command: "waitForReport"
       attribute: "InterconnectSmokeAlarm"
       timeout: 300
@@ -178,15 +197,6 @@ tests:
               type: enum8
               minValue: 1
               maxValue: 2
-
-    - label: "TH subscribes to InterconnectCOAlarm attribute from DUT"
-      PICS: SMOKECO.S.A0009
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "InterconnectCOAlarm"
-      minInterval: 3
-      maxInterval: 60
-      keepSubscriptions: true
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
@@ -208,7 +218,6 @@ tests:
           "TH waits for a report of InterconnectCOAlarm attribute from DUT with
           a timeout of 300 seconds"
       PICS: SMOKECO.S.A0009
-      endpoint: 1
       command: "waitForReport"
       attribute: "InterconnectCOAlarm"
       timeout: 300
@@ -217,15 +226,6 @@ tests:
               type: enum8
               minValue: 1
               maxValue: 2
-
-    - label: "TH subscribes to COState attribute from DUT"
-      PICS: SMOKECO.S.A0002
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "COState"
-      minInterval: 3
-      maxInterval: 60
-      keepSubscriptions: true
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
@@ -247,7 +247,6 @@ tests:
           "TH waits for a report of COState attribute from DUT with a timeout of
           300 seconds"
       PICS: SMOKECO.S.A0002
-      endpoint: 1
       command: "waitForReport"
       attribute: "COState"
       timeout: 300
@@ -255,15 +254,6 @@ tests:
           value: 1
           constraints:
               type: enum8
-
-    - label: "TH subscribes to SmokeState attribute from DUT"
-      PICS: SMOKECO.S.A0001
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "SmokeState"
-      minInterval: 3
-      maxInterval: 60
-      keepSubscriptions: true
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
@@ -285,7 +275,6 @@ tests:
           "TH waits for a report of SmokeState attribute from DUT with a timeout
           of 300 seconds"
       PICS: SMOKECO.S.A0001
-      endpoint: 1
       command: "waitForReport"
       attribute: "SmokeState"
       timeout: 300
@@ -296,7 +285,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -324,7 +312,6 @@ tests:
           "TH waits for a report of SmokeState attribute from DUT with a timeout
           of 300 seconds"
       PICS: SMOKECO.S.A0001
-      endpoint: 1
       command: "waitForReport"
       attribute: "SmokeState"
       timeout: 300
@@ -335,7 +322,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -363,7 +349,6 @@ tests:
           "TH waits for a report of COState attribute from DUT with a timeout of
           300 seconds"
       PICS: SMOKECO.S.A0002
-      endpoint: 1
       command: "waitForReport"
       attribute: "COState"
       timeout: 300
@@ -374,7 +359,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -403,7 +387,6 @@ tests:
           "TH waits for a report of InterconnectCOAlarm attribute from DUT with
           a timeout of 300 seconds"
       PICS: SMOKECO.S.A0009
-      endpoint: 1
       command: "waitForReport"
       attribute: "InterconnectCOAlarm"
       timeout: 300
@@ -414,7 +397,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -443,7 +425,6 @@ tests:
           "TH waits for a report of InterconnectSmokeAlarm attribute from DUT
           with a timeout of 300 seconds"
       PICS: SMOKECO.S.A0008
-      endpoint: 1
       command: "waitForReport"
       attribute: "InterconnectSmokeAlarm"
       timeout: 300
@@ -454,7 +435,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -482,7 +462,6 @@ tests:
           "TH waits for a report of BatteryAlert attribute from DUT with a
           timeout of 300 seconds"
       PICS: SMOKECO.S.A0003
-      endpoint: 1
       command: "waitForReport"
       attribute: "BatteryAlert"
       timeout: 300
@@ -493,7 +472,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:

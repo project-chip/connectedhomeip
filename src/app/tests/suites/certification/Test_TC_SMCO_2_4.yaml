@@ -21,6 +21,7 @@ PICS:
 config:
     nodeId: 0x12344321
     cluster: "Smoke CO Alarm"
+    endpoint: 1
     timeout: 2910
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
@@ -50,7 +51,6 @@ config:
 tests:
     - label: "Commission DUT to TH"
       cluster: "DelayCommands"
-      endpoint: 1
       command: "WaitForCommissionee"
       arguments:
           values:
@@ -60,7 +60,6 @@ tests:
     # Get the latest eventNumber
     - label: "Generate an event on the accessory"
       cluster: "Unit Testing"
-      endpoint: 1
       command: "TestEmitTestEventRequest"
       arguments:
           values:
@@ -75,11 +74,12 @@ tests:
               - name: "value"
                 saveAs: eventNumber
 
-    - label: "TH reads BatteryAlert attribute from DUT"
+    - label: "TH subscribes to BatteryAlert attribute from DUT"
       PICS: SMOKECO.S.A0003
-      endpoint: 1
-      command: "readAttribute"
+      command: "subscribeAttribute"
       attribute: "BatteryAlert"
+      minInterval: 3
+      maxInterval: 30
       response:
           value: 0
           constraints:
@@ -87,7 +87,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -105,14 +104,6 @@ tests:
       attribute: "TestEventTriggersEnabled"
       response:
           value: 1
-
-    - label: "TH subscribes to BatteryAlert attribute from DUT"
-      PICS: SMOKECO.S.A0003
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "BatteryAlert"
-      minInterval: 3
-      maxInterval: 60
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
@@ -134,7 +125,6 @@ tests:
           "TH waits for a report of BatteryAlert attribute from DUT with a
           timeout of 300 seconds"
       PICS: SMOKECO.S.A0003
-      endpoint: 1
       command: "waitForReport"
       attribute: "BatteryAlert"
       timeout: 300
@@ -145,7 +135,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -155,7 +144,6 @@ tests:
 
     - label: "TH reads LowBattery event from DUT"
       PICS: SMOKECO.S.E02
-      endpoint: 1
       command: "readEvent"
       event: "LowBattery"
       eventNumber: eventNumber + 1
@@ -182,7 +170,6 @@ tests:
           "TH waits for a report of BatteryAlert attribute from DUT with a
           timeout of 300 seconds"
       PICS: SMOKECO.S.A0003
-      endpoint: 1
       command: "waitForReport"
       attribute: "BatteryAlert"
       timeout: 300
@@ -193,7 +180,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -203,7 +189,6 @@ tests:
 
     - label: "TH reads LowBattery event from DUT"
       PICS: SMOKECO.S.E02
-      endpoint: 1
       command: "readEvent"
       event: "LowBattery"
       eventNumber: eventNumber + 2
@@ -230,7 +215,6 @@ tests:
           "TH waits for a report of BatteryAlert attribute from DUT with a
           timeout of 300 seconds"
       PICS: SMOKECO.S.A0003
-      endpoint: 1
       command: "waitForReport"
       attribute: "BatteryAlert"
       timeout: 300
@@ -241,7 +225,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -251,30 +234,22 @@ tests:
 
     - label: "TH reads AllClear event from DUT"
       PICS: SMOKECO.S.E0a
-      endpoint: 1
       command: "readEvent"
       event: "AllClear"
       eventNumber: eventNumber + 3
       response:
           value: {}
 
-    - label: "TH reads HardwareFaultAlert attribute from DUT"
+    - label: "TH subscribes to HardwareFaultAlert attribute from DUT"
       PICS: SMOKECO.S.A0006
-      endpoint: 1
-      command: "readAttribute"
+      command: "subscribeAttribute"
       attribute: "HardwareFaultAlert"
+      minInterval: 3
+      maxInterval: 30
       response:
           value: 0
           constraints:
               type: boolean
-
-    - label: "TH subscribes to HardwareFaultAlert attribute from DUT"
-      PICS: SMOKECO.S.A0006
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "HardwareFaultAlert"
-      minInterval: 3
-      maxInterval: 60
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
@@ -296,7 +271,6 @@ tests:
           "TH waits for a report of HardwareFaultAlert attribute from DUT with a
           timeout of 300 seconds"
       PICS: SMOKECO.S.A0006
-      endpoint: 1
       command: "waitForReport"
       attribute: "HardwareFaultAlert"
       timeout: 300
@@ -307,7 +281,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -317,7 +290,6 @@ tests:
 
     - label: "TH reads HardwareFault event from DUT"
       PICS: SMOKECO.S.E03
-      endpoint: 1
       command: "readEvent"
       event: "HardwareFault"
       eventNumber: eventNumber + 4
@@ -345,7 +317,6 @@ tests:
           "TH waits for a report of HardwareFaultAlert attribute from DUT with a
           timeout of 300 seconds"
       PICS: SMOKECO.S.A0006
-      endpoint: 1
       command: "waitForReport"
       attribute: "HardwareFaultAlert"
       timeout: 300
@@ -356,7 +327,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -366,30 +336,22 @@ tests:
 
     - label: "TH reads AllClear event from DUT"
       PICS: SMOKECO.S.E0a
-      endpoint: 1
       command: "readEvent"
       event: "AllClear"
       eventNumber: eventNumber + 5
       response:
           value: {}
 
-    - label: "TH reads EndOfServiceAlert attribute from DUT"
+    - label: "TH subscribes to EndOfServiceAlert attribute from DUT"
       PICS: SMOKECO.S.A0007
-      endpoint: 1
-      command: "readAttribute"
+      command: "subscribeAttribute"
       attribute: "EndOfServiceAlert"
+      minInterval: 3
+      maxInterval: 30
       response:
           value: 0
           constraints:
               type: enum8
-
-    - label: "TH subscribes to EndOfServiceAlert attribute from DUT"
-      PICS: SMOKECO.S.A0007
-      endpoint: 1
-      command: "subscribeAttribute"
-      attribute: "EndOfServiceAlert"
-      minInterval: 3
-      maxInterval: 60
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
@@ -411,7 +373,6 @@ tests:
           "TH waits for a report of EndOfServiceAlert attribute from DUT with a
           timeout of 300 seconds"
       PICS: SMOKECO.S.A0007
-      endpoint: 1
       command: "waitForReport"
       attribute: "EndOfServiceAlert"
       timeout: 300
@@ -422,7 +383,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -432,7 +392,6 @@ tests:
 
     - label: "TH reads EndOfService event from DUT"
       PICS: SMOKECO.S.E04
-      endpoint: 1
       command: "readEvent"
       event: "EndOfService"
       eventNumber: eventNumber + 6
@@ -460,7 +419,6 @@ tests:
           "TH waits for a report of EndOfServiceAlert attribute from DUT with a
           timeout of 300 seconds"
       PICS: SMOKECO.S.A0007
-      endpoint: 1
       command: "waitForReport"
       attribute: "EndOfServiceAlert"
       timeout: 300
@@ -471,7 +429,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -481,7 +438,6 @@ tests:
 
     - label: "TH reads AllClear event from DUT"
       PICS: SMOKECO.S.E0a
-      endpoint: 1
       command: "readEvent"
       event: "AllClear"
       eventNumber: eventNumber + 7
@@ -490,7 +446,6 @@ tests:
 
     - label: "TH reads TestInProgress attribute from DUT"
       PICS: SMOKECO.S.A0005
-      endpoint: 1
       command: "readAttribute"
       attribute: "TestInProgress"
       response:
@@ -500,7 +455,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -510,16 +464,14 @@ tests:
 
     - label: "TH subscribes to TestInProgress attribute from DUT"
       PICS: SMOKECO.S.A0005
-      endpoint: 1
       command: "subscribeAttribute"
       attribute: "TestInProgress"
       minInterval: 3
-      maxInterval: 60
+      maxInterval: 30
 
     - label: "Start manually DUT self-test"
       cluster: "LogCommands"
       PICS: PICS_USER_PROMPT && SMOKECO.M.ManuallyControlledTest
-      endpoint: 1
       command: "UserPrompt"
       arguments:
           values:
@@ -532,7 +484,6 @@ tests:
           "TH waits for a report of TestInProgress attribute from DUT with a
           timeout of 180 seconds"
       PICS: SMOKECO.S.A0005
-      endpoint: 1
       command: "waitForReport"
       attribute: "TestInProgress"
       timeout: 180
@@ -543,7 +494,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -555,7 +505,6 @@ tests:
           "TH waits for a report of TestInProgress attribute from DUT with a
           timeout of 180 seconds"
       PICS: SMOKECO.S.A0005
-      endpoint: 1
       command: "waitForReport"
       attribute: "TestInProgress"
       timeout: 180
@@ -566,7 +515,6 @@ tests:
 
     - label: "TH reads SelfTestComplete event from DUT"
       PICS: SMOKECO.S.E05
-      endpoint: 1
       command: "readEvent"
       event: "SelfTestComplete"
       eventNumber: eventNumber + 8
@@ -575,7 +523,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -585,7 +532,6 @@ tests:
 
     - label: "TH reads AllClear event from DUT"
       PICS: SMOKECO.S.E0a
-      endpoint: 1
       command: "readEvent"
       event: "AllClear"
       eventNumber: eventNumber + 9
@@ -594,14 +540,12 @@ tests:
 
     - label: "TH sends SelfTestRequest command to DUT"
       PICS: SMOKECO.S.C00.Rsp
-      endpoint: 1
       command: "SelfTestRequest"
 
     - label:
           "TH waits for a report of TestInProgress attribute from DUT with a
           timeout of 180 seconds"
       PICS: SMOKECO.S.A0005
-      endpoint: 1
       command: "waitForReport"
       attribute: "TestInProgress"
       timeout: 180
@@ -612,7 +556,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -624,7 +567,6 @@ tests:
           "TH waits for a report of TestInProgress attribute from DUT with a
           timeout of 180 seconds"
       PICS: SMOKECO.S.A0005
-      endpoint: 1
       command: "waitForReport"
       attribute: "TestInProgress"
       timeout: 180
@@ -635,7 +577,6 @@ tests:
 
     - label: "TH reads SelfTestComplete event from DUT"
       PICS: SMOKECO.S.E05
-      endpoint: 1
       command: "readEvent"
       event: "SelfTestComplete"
       eventNumber: eventNumber + 10
@@ -644,7 +585,6 @@ tests:
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0000
-      endpoint: 1
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -654,7 +594,6 @@ tests:
 
     - label: "TH reads AllClear event from DUT"
       PICS: SMOKECO.S.E0a
-      endpoint: 1
       command: "readEvent"
       event: "AllClear"
       eventNumber: eventNumber + 11

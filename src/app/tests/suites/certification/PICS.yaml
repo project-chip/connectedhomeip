@@ -5982,12 +5982,12 @@ PICS:
     - label:
           "Can the TestInProgress attribute be changed by physical control at
           the device?"
-      id: SMCO.M.ManuallyControlledTest
+      id: SMOKECO.M.ManuallyControlledTest
 
     - label:
           "Can the DeviceMuted attribute be changed by physical control at the
           device?"
-      id: SMCO.M.ManuallyControlledMute
+      id: SMOKECO.M.ManuallyControlledMute
 
     #
     # server / commandsReceived

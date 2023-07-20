@@ -137,10 +137,10 @@ tests:
               minValue: 0
               maxValue: 3
 
-    - label: "TH reads from the DUT the SensitivityLevel attribute"
+    - label: "TH reads from the DUT the SmokeSensitivityLevel attribute"
       PICS: SMOKECO.S.A000b
       command: "readAttribute"
-      attribute: "SensitivityLevel"
+      attribute: "SmokeSensitivityLevel"
       response:
           constraints:
               type: enum8
