@@ -181,7 +181,7 @@ void RunRpcService(void *)
 
 int main(void)
 {
-    init_efrPlatform();
+    chip::Platform::DeviceLayer::SilabsPlatform::Init();
     PigweedLogger::init();
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 

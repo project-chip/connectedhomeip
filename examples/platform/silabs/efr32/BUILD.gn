@@ -291,7 +291,6 @@ source_set("efr32-common") {
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
     "BaseApplication.cpp",
-    "init_efrPlatform.cpp",
     "${silabs_common_plat_dir}/MatterConfig.cpp",
   ]
 

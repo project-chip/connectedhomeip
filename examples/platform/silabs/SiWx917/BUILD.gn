@@ -259,7 +259,6 @@ source_set("siwx917-common") {
     "BaseApplication.cpp",
     "SiWx917/rsi_if.c",
     "SiWx917/wfx_rsi_host.c",
-    "init_ccpPlatform.cpp",
     "${silabs_common_plat_dir}/MatterConfig.cpp",
   ]
 

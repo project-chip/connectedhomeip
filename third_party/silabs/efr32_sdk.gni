@@ -181,6 +181,8 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/driver/debug/inc",
       "${silabs_gen_folder}/config",
       "${silabs_gen_folder}/autogen",
+      # Headers needed for Init no function will be called if OT is not used
+      "${sl_ot_efr32_root}",       
     ]
 
     if (silabs_family != "mgm24") {
@@ -414,6 +416,7 @@ template("efr32_sdk") {
         "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG21/GCC/libbluetooth.a",
         "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg21_gcc_release.a",
         "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
+        "${sdk_support_root}/protocol/openthread/libs/libsl_openthread_efr32mg1x_gcc.a",
       ]
 
       defines += [
@@ -435,6 +438,7 @@ template("efr32_sdk") {
         "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG24/GCC/libbluetooth.a",
         "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a",
         "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
+        "${sdk_support_root}/protocol/openthread/libs/libsl_openthread_efr32mg2x_gcc.a",
       ]
 
       defines += [
