@@ -117,7 +117,6 @@ public:
      */
     EmberAfStatus GetSupportedRinsesList(EndpointId endpointId, SupportedRinsesListSpan ** supportedRinsesList, size_t & size);
 
-private:
     /**
      * Rlease SpinSpeedListCharSpan
      * @param spinSpeedList The pointer for which to clear the SpinSpeedListCharSpan.
@@ -130,7 +129,7 @@ private:
      * @param endpointId ID of the endpoint
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR ClearSpinSpeedList(EndpointId endpointId);
+    EmberAfStatus ClearSpinSpeedList(EndpointId endpointId);
 
     /**
      * Rlease SupportedRinsesListSpan
@@ -144,8 +143,9 @@ private:
      * @param endpointId ID of the endpoint
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR ClearSupportedRinsesList(EndpointId endpointId);
+    EmberAfStatus ClearSupportedRinsesList(EndpointId endpointId);
 
+private:
     CHIP_ERROR ReadSpinSpeeds(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadSupportedRinses(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
 

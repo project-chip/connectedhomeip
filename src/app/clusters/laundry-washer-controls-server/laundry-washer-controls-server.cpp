@@ -145,17 +145,16 @@ EmberAfStatus LaundryWasherControlsServer::GetSupportedRinsesList(EndpointId end
     return (err == CHIP_NO_ERROR) ? (EMBER_ZCL_STATUS_SUCCESS) : (EMBER_ZCL_STATUS_FAILURE);
 }
 
-/**********************************************************
- * LaundryWasherControlsServer private methods
- *********************************************************/
 void LaundryWasherControlsServer::ReleaseSpinSpeedList(SpinSpeedListCharSpan * spinSpeedList)
 {
     mLaundryWasherDataProvider.ReleaseSpinSpeedList(spinSpeedList);
 }
 
-CHIP_ERROR LaundryWasherControlsServer::ClearSpinSpeedList(EndpointId endpointId)
+EmberAfStatus LaundryWasherControlsServer::ClearSpinSpeedList(EndpointId endpointId)
 {
-    return mLaundryWasherDataProvider.ClearSpinSpeedList(endpointId, LaundryWasherControls::Id);
+    CHIP_ERROR err =
+        mLaundryWasherDataProvider.ClearSpinSpeedList(endpointId, LaundryWasherControls::Id);
+    return (err == CHIP_NO_ERROR) ? (EMBER_ZCL_STATUS_SUCCESS) : (EMBER_ZCL_STATUS_FAILURE);
 }
 
 void LaundryWasherControlsServer::ReleaseSupportedRinsesList(SupportedRinsesListSpan * supportedRinsesList)
@@ -163,11 +162,16 @@ void LaundryWasherControlsServer::ReleaseSupportedRinsesList(SupportedRinsesList
     mLaundryWasherDataProvider.ReleaseSupportedRinsesList(supportedRinsesList);
 }
 
-CHIP_ERROR LaundryWasherControlsServer::ClearSupportedRinsesList(EndpointId endpointId)
+EmberAfStatus LaundryWasherControlsServer::ClearSupportedRinsesList(EndpointId endpointId)
 {
-    return mLaundryWasherDataProvider.ClearSupportedRinsesList(endpointId, LaundryWasherControls::Id);
+    CHIP_ERROR err =
+        mLaundryWasherDataProvider.ClearSupportedRinsesList(endpointId, LaundryWasherControls::Id);
+    return (err == CHIP_NO_ERROR) ? (EMBER_ZCL_STATUS_SUCCESS) : (EMBER_ZCL_STATUS_FAILURE);
 }
 
+/**********************************************************
+ * LaundryWasherControlsServer private methods
+ *********************************************************/
 CHIP_ERROR LaundryWasherControlsServer::ReadSpinSpeeds(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     SpinSpeedListCharSpan * spinSpeedList = nullptr;
