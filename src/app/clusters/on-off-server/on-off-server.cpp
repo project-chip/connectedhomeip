@@ -38,8 +38,8 @@
 // conditional includes, so will fail in an application that has an On/Off
 // cluster but no ModeBase-derived cluster.
 #include <app/clusters/mode-base-server/mode-base-cluster-objects.h> // nogncheck
-#include <app/clusters/mode-base-server/mode-base-server.h> // nogncheck
-#endif // EMBER_AF_PLUGIN_MODE_BASE
+#include <app/clusters/mode-base-server/mode-base-server.h>          // nogncheck
+#endif                                                               // EMBER_AF_PLUGIN_MODE_BASE
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
