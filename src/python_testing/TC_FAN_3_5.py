@@ -26,6 +26,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class TC_FAN_3_4(MatterBaseTest):
 
     SLEEP_WIND = 0x01
@@ -54,13 +55,12 @@ class TC_FAN_3_4(MatterBaseTest):
 
     async def send_step_command(self, endpoint,
                                 direction: Clusters.Objects.FanControl.Enums.StepDirectionEnum,
-                                wrap : bool = False, lowestOff : bool = False, expected_status : Status = Status.Success):
+                                wrap: bool = False, lowestOff: bool = False, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.Objects.FanControl.Commands.Step(direction=direction, wrap=wrap, lowestOff=lowestOff), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
             pass
-
 
     @async_test_body
     async def test_TC_FAN_3_5(self):
@@ -186,7 +186,8 @@ class TC_FAN_3_4(MatterBaseTest):
 
         self.print_step("8d", "Read from the DUT the SpeedCurrent attribute and check its equal to SpeedMax")
         speed_current = await self.read_speed_current(endpoint=endpoint)
-        asserts.assert_equal(speed_current, speed_max, "SpeedCurrent did not wrap to SpeedMax when wrap was true and lowestOff was false")
+        asserts.assert_equal(speed_current, speed_max,
+                             "SpeedCurrent did not wrap to SpeedMax when wrap was true and lowestOff was false")
 
         # Part 9
         self.print_step("9a", "TH writes to the DUT the SpeedSetting attribute with the value of 0")
@@ -201,7 +202,8 @@ class TC_FAN_3_4(MatterBaseTest):
 
         self.print_step("9c", "Read from the DUT the SpeedCurrent attribute and check its equal to SpeedMax")
         speed_current = await self.read_speed_current(endpoint=endpoint)
-        asserts.assert_equal(speed_current, speed_max, "SpeedCurrent did not wrap to SpeedMax when wrap was true and lowestOff was true")
+        asserts.assert_equal(speed_current, speed_max,
+                             "SpeedCurrent did not wrap to SpeedMax when wrap was true and lowestOff was true")
 
 
 if __name__ == "__main__":

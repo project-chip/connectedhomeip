@@ -26,6 +26,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class TC_FAN_3_4(MatterBaseTest):
 
     SLEEP_WIND = 0x01

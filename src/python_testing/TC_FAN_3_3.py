@@ -26,6 +26,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class TC_FAN_3_3(MatterBaseTest):
 
     ROCK_LEFT_RIGHT = 0x01
