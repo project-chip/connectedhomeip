@@ -475,7 +475,7 @@ Instance::~Instance()
 {
     ModeBaseAliasesInstances.erase(this);
     chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
-    // todo unregister the AttributeAccessOverride. Waiting for issue #28072.
+    unregisterAttributeAccessOverride(this);
 }
 
 std::set<Instance *> * GetModeBaseInstances()
