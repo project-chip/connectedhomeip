@@ -14505,8 +14505,8 @@ void registerClusterHepaFilterMonitoring(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
                                                                               Attributes::LastChangedTime::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
-            chip::app::DataModel::List<const chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type>>>>(
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
             Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -14587,8 +14587,8 @@ void registerClusterActivatedCarbonFilterMonitoring(Commands & commands, Credent
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
                                                                               Attributes::LastChangedTime::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<
-            const chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type>>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
             Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(

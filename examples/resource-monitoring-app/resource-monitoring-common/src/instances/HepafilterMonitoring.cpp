@@ -16,13 +16,13 @@
  *    limitations under the License.
  */
 
+#include <StaticReplacementProductListManager.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/data-model/Nullable.h>
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
-#include <StaticReplacementProductListManager.h>
 #include <instances/HepaFilterMonitoring.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>

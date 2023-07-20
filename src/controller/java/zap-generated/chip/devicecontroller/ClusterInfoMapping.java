@@ -7708,7 +7708,7 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess(@Nullable List<ChipStructs.HepaFilterMonitoringClusterReplacementProductStruct> valueList) {
+        public void onSuccess( List<ChipStructs.HepaFilterMonitoringClusterReplacementProductStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.HepaFilterMonitoringClusterReplacementProductStruct>");
           responseValues.put(commandResponseInfo, valueList);
@@ -7823,7 +7823,7 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess(@Nullable List<ChipStructs.ActivatedCarbonFilterMonitoringClusterReplacementProductStruct> valueList) {
+        public void onSuccess( List<ChipStructs.ActivatedCarbonFilterMonitoringClusterReplacementProductStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ActivatedCarbonFilterMonitoringClusterReplacementProductStruct>");
           responseValues.put(commandResponseInfo, valueList);

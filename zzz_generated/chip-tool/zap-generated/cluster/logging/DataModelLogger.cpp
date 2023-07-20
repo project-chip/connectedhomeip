@@ -8851,8 +8851,8 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("LastChangedTime", 1, value);
         }
         case HepaFilterMonitoring::Attributes::ReplacementProductList::Id: {
-            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-                chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>>
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ReplacementProductList", 1, value);
@@ -8919,8 +8919,8 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("LastChangedTime", 1, value);
         }
         case ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::Id: {
-            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-                chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>>
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ReplacementProductList", 1, value);

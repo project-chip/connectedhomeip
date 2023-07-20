@@ -29,8 +29,7 @@ namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
 
-static constexpr std::array<ClusterId, 2> AliasedClusters = { 
-    HepaFilterMonitoring::Id, ActivatedCarbonFilterMonitoring::Id };
+static constexpr std::array<ClusterId, 2> AliasedClusters = { HepaFilterMonitoring::Id, ActivatedCarbonFilterMonitoring::Id };
 
 // Enum for ChangeIndicationEnum
 enum class ChangeIndicationEnum : uint8_t
@@ -58,16 +57,11 @@ enum class DegradationDirectionEnum : uint8_t
 };
 
 // Bitmap for Feature
-enum class Feature : uint8_t
+enum class Feature : uint32_t
 {
     kCondition              = 0x1,
     kWarning                = 0x2,
-    kReplacementProductList = 0x3,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = UINT8_MAX,
+    kReplacementProductList = 0x3
 };
 
 // Enum for ProductIdentifierTypeEnum
@@ -77,12 +71,7 @@ enum class ProductIdentifierTypeEnum : uint8_t
     kGtin8  = 0x01,
     kEan    = 0x02,
     kGtin14 = 0x03,
-    kOem    = 0x04,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = UINT8_MAX,
+    kOem    = 0x04
 };
 
 namespace Attributes {
