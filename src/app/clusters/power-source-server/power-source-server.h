@@ -84,9 +84,7 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-PowerSourceAttrAccess & GetPowerSourceAttrAccess();
-#endif
+PowerSourceAttrAccess & TestOnlyGetPowerSourceAttrAccess();
 
 } // namespace Clusters
 } // namespace app

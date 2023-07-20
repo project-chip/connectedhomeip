@@ -83,12 +83,10 @@ CHIP_ERROR PowerSourceAttrAccess::Read(const ConcreteReadAttributePath & aPath, 
     return err;
 }
 
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-PowerSourceAttrAccess & GetPowerSourceAttrAccess()
+PowerSourceAttrAccess & TestOnlyGetPowerSourceAttrAccess()
 {
     return gAttrAccess;
 }
-#endif
 
 PowerSourceServer & PowerSourceServer::Instance()
 {

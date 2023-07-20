@@ -45,7 +45,7 @@ public:
 
 std::vector<EndpointId> ReadEndpointsThroughAttributeReader(nlTestSuite * apSuite, EndpointId endpoint)
 {
-    Clusters::PowerSourceAttrAccess & attrAccess = Clusters::GetPowerSourceAttrAccess();
+    Clusters::PowerSourceAttrAccess & attrAccess = Clusters::TestOnlyGetPowerSourceAttrAccess();
     CHIP_ERROR err                               = CHIP_NO_ERROR;
 
     // Write TLV through the attribute access interface into the buffer
