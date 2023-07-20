@@ -95,7 +95,7 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-               
+
     - label: "TH reads from the DUT the State attribute"
       PICS: DISHALM.S.F00 && DISHALM.S.A0002
       command: "readAttribute"
@@ -123,7 +123,7 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-          
+
     - label: "TH reads from the DUT the State attribute"
       PICS: DISHALM.S.A0002
       command: "readAttribute"
