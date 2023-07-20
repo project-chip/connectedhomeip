@@ -44,7 +44,7 @@ static ResourceMonitoring::Attributes::ReplacementProductStruct::Type sReplaceme
       .productIdentifierValue = CharSpan::fromCharString("gtin8xxx") },
     { .productIdentifierType = ProductIdentifierTypeEnum::kEan,
       .productIdentifierValue = CharSpan::fromCharString("4444455555666") },
-    { .productIdentifierType = ProductIdentifierTypeEnum::kGtin14, 
+    { .productIdentifierType = ProductIdentifierTypeEnum::kGtin14,
       .productIdentifierValue = CharSpan::fromCharString("gtin14xxxxxxxx") },
     { .productIdentifierType = ProductIdentifierTypeEnum::kOem,
       .productIdentifierValue = CharSpan::fromCharString("oem20xxxxxxxxxxxxxxx") },
