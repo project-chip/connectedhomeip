@@ -3880,6 +3880,12 @@ PICS:
     - label: "Does the device implement the InPlaceIndicator attribute?"
       id: HEPAFREMON.S.A0003
 
+    - label: "Does the device implement the LastChangedTime attribute?"
+      id: HEPAFREMON.S.A0004
+
+    - label: "Does the device implement the ReplacementProductList attribute?"
+      id: HEPAFREMON.S.A0005
+
     #
     # server / features
     #
@@ -3888,6 +3894,9 @@ PICS:
 
     - label: "Does the device support the Warning feature?"
       id: HEPAFREMON.S.F01
+
+    - label: "Does the device support the ReplacementProductList feature?"
+      id: HEPAFREMON.S.F02
 
     #
     # server / commandsReceived
@@ -3921,6 +3930,12 @@ PICS:
     - label: "Does the device implement the InPlaceIndicator attribute?"
       id: ACFREMON.S.A0003
 
+    - label: "Does the device implement the LastChangedTime attribute?"
+      id: ACFREMON.S.A0004
+
+    - label: "Does the device implement the ReplacementProductList attribute?"
+      id: ACFREMON.S.A0005
+
     #
     # server / features
     #
@@ -3930,421 +3945,14 @@ PICS:
     - label: "Does the device support the Warning feature?"
       id: ACFREMON.S.F01
 
+    - label: "Does the device support the ReplacementProductList feature?"
+      id: ACFREMON.S.F02
+
     #
     # server / commandsReceived
     #
     - label: "Does the device implement receiving the ResetCondition command?"
       id: ACFREMON.S.C00.Rsp
-
-    # Ceramic Filter Monitoring Cluster Test Plan
-    - label:
-          "Does the device implement the Ceramic Filter Monitoring cluster as a
-          server?"
-      id: CFREMON.S
-
-    - label:
-          "Does the device implement the Ceramic Filter Monitoring cluster as a
-          client?"
-      id: CFREMON.C
-
-    #
-    # server / attributes
-    #
-    - label: "Does the device implement the Condition attribute?"
-      id: CFREMON.S.A0000
-
-    - label: "Does the device implement the DegradationDirection attribute?"
-      id: CFREMON.S.A0001
-
-    - label: "Does the device implement the ChangeIndication attribute?"
-      id: CFREMON.S.A0002
-
-    - label: "Does the device implement the InPlaceIndicator attribute?"
-      id: CFREMON.S.A0003
-
-    #
-    # server / features
-    #
-    - label: "Does the device support the Condition feature?"
-      id: CFREMON.S.F00
-
-    - label: "Does the device support the Warning feature?"
-      id: CFREMON.S.F01
-
-    #
-    # server / commandsReceived
-    #
-    - label: "Does the device implement receiving the ResetCondition command?"
-      id: CFREMON.S.C00.Rsp
-
-    # Electrostatic Filter Monitoring Cluster Test Plan
-    - label:
-          "Does the device implement the Electrostatic Filter Monitoring cluster
-          as a server?"
-      id: ESFREMON.S
-
-    - label:
-          "Does the device implement the Electrostatic Filter Monitoring cluster
-          as a client?"
-      id: ESFREMON.C
-
-    #
-    # server / attributes
-    #
-    - label: "Does the device implement the Condition attribute?"
-      id: ESFREMON.S.A0000
-
-    - label: "Does the device implement the DegradationDirection attribute?"
-      id: ESFREMON.S.A0001
-
-    - label: "Does the device implement the ChangeIndication attribute?"
-      id: ESFREMON.S.A0002
-
-    - label: "Does the device implement the InPlaceIndicator attribute?"
-      id: ESFREMON.S.A0003
-
-    #
-    # server / features
-    #
-    - label: "Does the device support the Condition feature?"
-      id: ESFREMON.S.F00
-
-    - label: "Does the device support the Warning feature?"
-      id: ESFREMON.S.F01
-
-    #
-    # server / commandsReceived
-    #
-    - label: "Does the device implement receiving the ResetCondition command?"
-      id: ESFREMON.S.C00.Rsp
-
-    # Fuel Tank Monitoring Cluster Test Plan
-    - label:
-          "Does the device implement the Fuel Tank Monitoring cluster as a
-          server?"
-      id: FTREMON.S
-
-    - label:
-          "Does the device implement the Fuel Tank Monitoring cluster as a
-          client?"
-      id: FTREMON.C
-
-    #
-    # server / attributes
-    #
-    - label: "Does the device implement the Condition attribute?"
-      id: FTREMON.S.A0000
-
-    - label: "Does the device implement the DegradationDirection attribute?"
-      id: FTREMON.S.A0001
-
-    - label: "Does the device implement the ChangeIndication attribute?"
-      id: FTREMON.S.A0002
-
-    - label: "Does the device implement the InPlaceIndicator attribute?"
-      id: FTREMON.S.A0003
-
-    #
-    # server / features
-    #
-    - label: "Does the device support the Condition feature?"
-      id: FTREMON.S.F00
-
-    - label: "Does the device support the Warning feature?"
-      id: FTREMON.S.F01
-
-    #
-    # server / commandsReceived
-    #
-    - label: "Does the device implement receiving the ResetCondition command?"
-      id: FTREMON.S.C00.Rsp
-
-    # Ink Cartridge Monitoring Cluster Test Plan
-    - label:
-          "Does the device implement the Ink Cartridge Monitoring cluster as a
-          server?"
-      id: INKCREMON.S
-
-    - label:
-          "Does the device implement the Ink Cartridge Monitoring cluster as a
-          client?"
-      id: INKCREMON.C
-
-    #
-    # server / attributes
-    #
-    - label: "Does the device implement the Condition attribute?"
-      id: INKCREMON.S.A0000
-
-    - label: "Does the device implement the DegradationDirection attribute?"
-      id: INKCREMON.S.A0001
-
-    - label: "Does the device implement the ChangeIndication attribute?"
-      id: INKCREMON.S.A0002
-
-    - label: "Does the device implement the InPlaceIndicator attribute?"
-      id: INKCREMON.S.A0003
-
-    #
-    # server / features
-    #
-    - label: "Does the device support the Condition feature?"
-      id: INKCREMON.S.F00
-
-    - label: "Does the device support the Warning feature?"
-      id: INKCREMON.S.F01
-
-    #
-    # server / commandsReceived
-    #
-    - label: "Does the device implement receiving the ResetCondition command?"
-      id: INKCREMON.S.C00.Rsp
-
-    # Ionizing Filter Monitoring Cluster Test Plan
-    - label:
-          "Does the device implement the Ionizing Filter Monitoring cluster as a
-          server?"
-      id: IONFREMON.S
-
-    - label:
-          "Does the device implement the Ionizing Filter Monitoring cluster as a
-          client?"
-      id: IONFREMON.C
-
-    #
-    # server / attributes
-    #
-    - label: "Does the device implement the Condition attribute?"
-      id: IONFREMON.S.A0000
-
-    - label: "Does the device implement the DegradationDirection attribute?"
-      id: IONFREMON.S.A0001
-
-    - label: "Does the device implement the ChangeIndication attribute?"
-      id: IONFREMON.S.A0002
-
-    - label: "Does the device implement the InPlaceIndicator attribute?"
-      id: IONFREMON.S.A0003
-
-    #
-    # server / features
-    #
-    - label: "Does the device support the Condition feature?"
-      id: IONFREMON.S.F00
-
-    - label: "Does the device support the Warning feature?"
-      id: IONFREMON.S.F01
-
-    #
-    # server / commandsReceived
-    #
-    - label: "Does the device implement receiving the ResetCondition command?"
-      id: IONFREMON.S.C00.Rsp
-
-    # Ozone Filter Monitoring Cluster Test Plan
-    - label:
-          "Does the device implement the Ozone Filter Monitoring cluster as a
-          server?"
-      id: OZFREMON.S
-
-    - label:
-          "Does the device implement the Ozone Filter Monitoring cluster as a
-          client?"
-      id: OZFREMON.C
-
-    #
-    # server / attributes
-    #
-    - label: "Does the device implement the Condition attribute?"
-      id: OZFREMON.S.A0000
-
-    - label: "Does the device implement the DegradationDirection attribute?"
-      id: OZFREMON.S.A0001
-
-    - label: "Does the device implement the ChangeIndication attribute?"
-      id: OZFREMON.S.A0002
-
-    - label: "Does the device implement the InPlaceIndicator attribute?"
-      id: OZFREMON.S.A0003
-
-    #
-    # server / features
-    #
-    - label: "Does the device support the Condition feature?"
-      id: OZFREMON.S.F00
-
-    - label: "Does the device support the Warning feature?"
-      id: OZFREMON.S.F01
-
-    #
-    # server / commandsReceived
-    #
-    - label: "Does the device implement receiving the ResetCondition command?"
-      id: OZFREMON.S.C00.Rsp
-
-    # Toner Cartridge Monitoring Cluster Test Plan
-    - label:
-          "Does the device implement the Toner Cartridge Monitoring cluster as a
-          server?"
-      id: TCREMON.S
-
-    - label:
-          "Does the device implement the Toner Cartridge Monitoring cluster as a
-          client?"
-      id: TCREMON.C
-
-    #
-    # server / attributes
-    #
-    - label: "Does the device implement the Condition attribute?"
-      id: TCREMON.S.A0000
-
-    - label: "Does the device implement the DegradationDirection attribute?"
-      id: TCREMON.S.A0001
-
-    - label: "Does the device implement the ChangeIndication attribute?"
-      id: TCREMON.S.A0002
-
-    - label: "Does the device implement the InPlaceIndicator attribute?"
-      id: TCREMON.S.A0003
-
-    #
-    # server / features
-    #
-    - label: "Does the device support the Condition feature?"
-      id: TCREMON.S.F00
-
-    - label: "Does the device support the Warning feature?"
-      id: TCREMON.S.F01
-
-    #
-    # server / commandsReceived
-    #
-    - label: "Does the device implement receiving the ResetCondition command?"
-      id: TCREMON.S.C00.Rsp
-
-    # UV Filter Monitoring Cluster Test Plan
-    - label:
-          "Does the device implement the UV Filter Monitoring cluster as a
-          server?"
-      id: UVFREMON.S
-
-    - label:
-          "Does the device implement the UV Filter Monitoring cluster as a
-          client?"
-      id: UVFREMON.C
-
-    #
-    # server / attributes
-    #
-    - label: "Does the device implement the Condition attribute?"
-      id: UVFREMON.S.A0000
-
-    - label: "Does the device implement the DegradationDirection attribute?"
-      id: UVFREMON.S.A0001
-
-    - label: "Does the device implement the ChangeIndication attribute?"
-      id: UVFREMON.S.A0002
-
-    - label: "Does the device implement the InPlaceIndicator attribute?"
-      id: UVFREMON.S.A0003
-
-    #
-    # server / features
-    #
-    - label: "Does the device support the Condition feature?"
-      id: UVFREMON.S.F00
-
-    - label: "Does the device support the Warning feature?"
-      id: UVFREMON.S.F01
-
-    #
-    # server / commandsReceived
-    #
-    - label: "Does the device implement receiving the ResetCondition command?"
-      id: UVFREMON.S.C00.Rsp
-
-    # Water Tank Monitoring Cluster Test Plan
-    - label:
-          "Does the device implement the Water Tank Monitoring cluster as a
-          server?"
-      id: WTREMON.S
-
-    - label:
-          "Does the device implement the Water Tank Monitoring cluster as a
-          client?"
-      id: WTREMON.C
-
-    #
-    # server / attributes
-    #
-    - label: "Does the device implement the Condition attribute?"
-      id: WTREMON.S.A0000
-
-    - label: "Does the device implement the DegradationDirection attribute?"
-      id: WTREMON.S.A0001
-
-    - label: "Does the device implement the ChangeIndication attribute?"
-      id: WTREMON.S.A0002
-
-    - label: "Does the device implement the InPlaceIndicator attribute?"
-      id: WTREMON.S.A0003
-
-    #
-    # server / features
-    #
-    - label: "Does the device support the Condition feature?"
-      id: WTREMON.S.F00
-
-    - label: "Does the device support the Warning feature?"
-      id: WTREMON.S.F01
-
-    #
-    # server / commandsReceived
-    #
-    - label: "Does the device implement receiving the ResetCondition command?"
-      id: WTREMON.S.C00.Rsp
-
-    # Zeolite Filter Monitoring Cluster Test Plan
-    - label:
-          "Does the device implement the Zeolite Filter Monitoring cluster as a
-          server?"
-      id: ZEOFREMON.S
-
-    - label:
-          "Does the device implement the Zeolite Filter Monitoring cluster as a
-          client?"
-      id: ZEOFREMON.C
-
-    #
-    # server / attributes
-    #
-    - label: "Does the device implement the Condition attribute?"
-      id: ZEOFREMON.S.A0000
-
-    - label: "Does the device implement the DegradationDirection attribute?"
-      id: ZEOFREMON.S.A0001
-
-    - label: "Does the device implement the ChangeIndication attribute?"
-      id: ZEOFREMON.S.A0002
-
-    - label: "Does the device implement the InPlaceIndicator attribute?"
-      id: ZEOFREMON.S.A0003
-
-    #
-    # server / features
-    #
-    - label: "Does the device support the Condition feature?"
-      id: ZEOFREMON.S.F00
-
-    - label: "Does the device support the Warning feature?"
-      id: ZEOFREMON.S.F01
-
-    #
-    # server / commandsReceived
-    #
-    - label: "Does the device implement receiving the ResetCondition command?"
-      id: ZEOFREMON.S.C00.Rsp
 
     # Identify Cluster Test Plan
     - label: "Does the device implement the Identify cluster as a server?"
@@ -5738,6 +5346,9 @@ PICS:
 
     - label: "Does the device implement the ActiveBatChargeFaults attribute?"
       id: PS.S.A001e
+
+    - label: "Does the device implement the EndpointList attribute?"
+      id: PS.S.A001f
 
     #
     # server / Events
@@ -8440,102 +8051,6 @@ PICS:
     - label:
           "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
       id: CDOCONC.S.Afffd
-
-    # Carbon Monoxide Concentration Measurement Cluster Test Plan
-    - label:
-          "Does the device implement the Carbon Monoxide Concentration
-          Measurement Cluster as a server?"
-      id: CMOCONC.S
-
-    - label:
-          "Does the device implement the Carbon Monoxide Concentration
-          Measurement Cluster as a client?"
-      id: CMOCONC.C
-
-    #
-    # server / features
-    #
-
-    - label: "Does the DUT(server) support the Numeric Measurement feature?"
-      id: CMOCONC.S.F00
-
-    - label: "Does the DUT(server) support the Level Indication feature?"
-      id: CMOCONC.S.F01
-
-    - label: "Does the DUT(server) support the Medium Level feature?"
-      id: CMOCONC.S.F02
-
-    - label: "Does the DUT(server) support the Critical Level feature?"
-      id: CMOCONC.S.F03
-
-    - label: "Does the DUT(server) support the Peak Measurement feature?"
-      id: CMOCONC.S.F04
-
-    - label: "Does the DUT(server) support the Average Measurement feature?"
-      id: CMOCONC.S.F05
-
-    #
-    # server / attributes
-    #
-
-    - label: "Does the DUT(server) implement the MeasuredValue attribute?"
-      id: CMOCONC.S.A0000
-
-    - label: "Does the DUT(server) implement the MinMeasuredValue attribute?"
-      id: CMOCONC.S.A0001
-
-    - label: "Does the DUT(server) implement the MaxMeasuredValue attribute?"
-      id: CMOCONC.S.A0002
-
-    - label: "Does the DUT(server) implement the PeakMeasuredValue attribute?"
-      id: CMOCONC.S.A0003
-
-    - label:
-          "Does the DUT(server) implement the PeakMeasuredValueWindow attribute?"
-      id: CMOCONC.S.A0004
-
-    - label:
-          "Does the DUT(server) implement the AverageMeasuredValue attribute?"
-      id: CMOCONC.S.A0005
-
-    - label:
-          "Does the DUT(server) implement the AverageMeasuredValueWindow
-          attribute?"
-      id: CMOCONC.S.A0006
-
-    - label: "Does the DUT(server) implement the Uncertainty attribute?"
-      id: CMOCONC.S.A0007
-
-    - label: "Does the DUT(server) implement the MeasurementUnit attribute?"
-      id: CMOCONC.S.A0008
-
-    - label: "Does the DUT(server) implement the MeasurementMedium attribute?"
-      id: CMOCONC.S.A0009
-
-    - label: "Does the DUT(server) implement the LevelValue attribute?"
-      id: CMOCONC.S.A000a
-
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: CMOCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: CMOCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: CMOCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: CMOCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: CMOCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: CMOCONC.S.Afffd
 
     # Carbon Monoxide Concentration Measurement Cluster Test Plan
     - label:

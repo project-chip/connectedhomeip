@@ -62,268 +62,19 @@ limitations under the License.
     </command>
   </cluster>
 
-  <cluster>
-    <name>Ceramic Filter Monitoring</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for monitoring ceramic filters in a device</description>
-    <code>0x0073</code>
-    <define>CERAMIC_FILTER_MONITORING_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-
-    <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="CERAMIC_FILTER_MONITORING" type="percent" min="0" max="100" writable="false" isNullable="false">Condition</attribute>
-    <attribute side="server" code="0x0001" define="CERAMIC_FILTER_MONITORING" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="CERAMIC_FILTER_MONITORING" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="CERAMIC_FILTER_MONITORING" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
-    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
-    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="ARRAY" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
-
-    <!-- Commands -->
-    <command source="client" code="0x00" name="ResetCondition" optional="true">
-      <description>Reset the condition of the replaceable to the non degraded state</description>
-    </command>
-  </cluster>
-
-  <cluster>
-    <name>Electrostatic Filter Monitoring</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for monitoring electrostatic filters in a device</description>
-    <code>0x0074</code>
-    <define>ELECTROSTATIC_FILTER_MONITORING_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-
-    <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
-    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
-    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
-    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="ARRAY" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
-
-    <!-- Commands -->
-    <command source="client" code="0x00" name="ResetCondition" optional="true">
-      <description>Reset the condition of the replaceable to the non degraded state</description>
-    </command>
-  </cluster>
-
-  <cluster>
-    <name>UV Filter Monitoring</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for monitoring UV filters in a device</description>
-    <code>0x0075</code>
-    <define>UV_FILTER_MONITORING_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-
-    <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
-    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
-    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
-    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="ARRAY" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
-
-    <!-- Commands -->
-    <command source="client" code="0x00" name="ResetCondition" optional="true">
-      <description>Reset the condition of the replaceable to the non degraded state</description>
-    </command>
-  </cluster>
-
-  <cluster>
-    <name>Ionizing Filter Monitoring</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for monitoring ionizing filters in a device</description>
-    <code>0x0076</code>
-    <define>IONIZING_FILTER_MONITORING_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-
-    <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
-    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
-    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
-    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="ARRAY" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
-
-    <!-- Commands -->
-    <command source="client" code="0x00" name="ResetCondition" optional="true">
-      <description>Reset the condition of the replaceable to the non degraded state</description>
-    </command>
-  </cluster>
-
-  <cluster>
-    <name>Zeolite Filter Monitoring</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for monitoring zeolite filters in a device</description>
-    <code>0x0077</code>
-    <define>ZEOLITE_FILTER_MONITORING_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-
-    <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
-    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
-    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
-    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="ARRAY" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
-
-    <!-- Commands -->
-    <command source="client" code="0x00" name="ResetCondition" optional="true">
-      <description>Reset the condition of the replaceable to the non degraded state</description>
-    </command>
-  </cluster>
-
-  <cluster>
-    <name>Ozone Filter Monitoring</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for monitoring ozone filters in a device</description>
-    <code>0x0078</code>
-    <define>OZONE_FILTER_MONITORING_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-
-    <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
-    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
-    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
-    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="ARRAY" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
-
-    <!-- Commands -->
-    <command source="client" code="0x00" name="ResetCondition" optional="true">
-      <description>Reset the condition of the replaceable to the non degraded state</description>
-    </command>
-  </cluster>
-
-  <cluster>
-    <name>Water Tank Monitoring</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for monitoring water tanks in a device</description>
-    <code>0x0079</code>
-    <define>WATER_TANK_MONITORING_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-
-    <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
-    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
-    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
-    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="ARRAY" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
-
-    <!-- Commands -->
-    <command source="client" code="0x00" name="ResetCondition" optional="true">
-      <description>Reset the condition of the replaceable to the non degraded state</description>
-    </command>
-  </cluster>
-
-  <cluster>
-    <name>Fuel Tank Monitoring</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for monitoring fuel tanks in a device</description>
-    <code>0x007A</code>
-    <define>FUEL_TANK_MONITORING_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-
-    <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
-    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
-    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
-    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="ARRAY" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
-
-    <!-- Commands -->
-    <command source="client" code="0x00" name="ResetCondition" optional="true">
-      <description>Reset the condition of the replaceable to the non degraded state</description>
-    </command>
-  </cluster>
-
-  <cluster>
-    <name>Ink Cartridge Monitoring</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for monitoring ink cartridges in a device</description>
-    <code>0x007B</code>
-    <define>INK_CARTRIDGE_MONITORING_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-
-    <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
-    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
-    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
-    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="ARRAY" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
-
-    <!-- Commands -->
-    <command source="client" code="0x00" name="ResetCondition" optional="true">
-      <description>Reset the condition of the replaceable to the non degraded state</description>
-    </command>
-  </cluster>
-
-  <cluster>
-    <name>Toner Cartridge Monitoring</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for monitoring toner cartridges in a device</description>
-    <code>0x007C</code>
-    <define>TONER_CARTRIDGE_MONITORING_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-
-    <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
-    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
-    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
-    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="ARRAY" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
-
-    <!-- Commands -->
-    <command source="client" code="0x00" name="ResetCondition" optional="true">
-      <description>Reset the condition of the replaceable to the non degraded state</description>
-    </command>
-  </cluster>
-
   <!-- Feature Map -->
   <bitmap name="Feature" type="BITMAP32">
     <cluster code="0x0071" />
     <cluster code="0x0072" />
-    <cluster code="0x0073" />
-    <cluster code="0x0074" />
-    <cluster code="0x0075" />
-    <cluster code="0x0076" />
-    <cluster code="0x0077" />
-    <cluster code="0x0078" />
-    <cluster code="0x0079" />
-    <cluster code="0x007A" />
-    <cluster code="0x007B" />
-    <cluster code="0x007C" />
     <field name="Condition" mask="0x01" />
     <field name="Warning" mask="0x02" />
+    <field name="ReplacementProductList" mask="0x03" />
   </bitmap>
 
   <!-- Cluster Data Types -->
   <enum name="DegradationDirectionEnum" type="ENUM8">
     <cluster code="0x0071" />
     <cluster code="0x0072" />
-    <cluster code="0x0073" />
-    <cluster code="0x0074" />
-    <cluster code="0x0075" />
-    <cluster code="0x0076" />
-    <cluster code="0x0077" />
-    <cluster code="0x0078" />
-    <cluster code="0x0079" />
-    <cluster code="0x007A" />
-    <cluster code="0x007B" />
-    <cluster code="0x007C" />
     <item value="0" name="Up" />
     <item value="1" name="Down" />
   </enum>
@@ -331,16 +82,6 @@ limitations under the License.
   <enum name="ChangeIndicationEnum" type="ENUM8">
     <cluster code="0x0071" />
     <cluster code="0x0072" />
-    <cluster code="0x0073" />
-    <cluster code="0x0074" />
-    <cluster code="0x0075" />
-    <cluster code="0x0076" />
-    <cluster code="0x0077" />
-    <cluster code="0x0078" />
-    <cluster code="0x0079" />
-    <cluster code="0x007A" />
-    <cluster code="0x007B" />
-    <cluster code="0x007C" />
     <item value="0" name="OK" />
     <item value="1" name="Warning" />
     <item value="2" name="Critical" />
@@ -349,16 +90,6 @@ limitations under the License.
   <enum name="ProductIdentifierTypeEnum" type="ENUM8">
     <cluster code="0x0071" />
     <cluster code="0x0072" />
-    <cluster code="0x0073" />
-    <cluster code="0x0074" />
-    <cluster code="0x0075" />
-    <cluster code="0x0076" />
-    <cluster code="0x0077" />
-    <cluster code="0x0078" />
-    <cluster code="0x0079" />
-    <cluster code="0x007A" />
-    <cluster code="0x007B" />
-    <cluster code="0x007C" />
     <item value="0" name="UPC" />
     <item value="1" name="GTIN-8" />
     <item value="2" name="EAN" />
@@ -382,65 +113,4 @@ limitations under the License.
     <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
     <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
   </struct>
-
-  <struct name="ReplacementProductStruct">
-    <cluster code="0x0073" />
-    <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
-    <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
-  </struct>
-
-  <struct name="ReplacementProductStruct">
-    <cluster code="0x0074" />
-    <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
-    <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
-  </struct>
-
-  <struct name="ReplacementProductStruct">
-    <cluster code="0x0075" />
-    <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
-    <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
-  </struct>
-
-  <struct name="ReplacementProductStruct">
-    <cluster code="0x0076" />
-    <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
-    <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
-  </struct>
-
-  <struct name="ReplacementProductStruct">
-    <cluster code="0x0077" />
-    <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
-    <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
-  </struct>
-
-  <struct name="ReplacementProductStruct">
-    <cluster code="0x0078" />
-    <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
-    <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
-  </struct>
-
-  <struct name="ReplacementProductStruct">
-    <cluster code="0x0079" />
-    <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
-    <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
-  </struct>
-
-  <struct name="ReplacementProductStruct">
-    <cluster code="0x007A" />
-    <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
-    <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
-  </struct>
-
-  <struct name="ReplacementProductStruct">
-    <cluster code="0x007B" />
-    <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
-    <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
-  </struct>
-
-  <struct name="ReplacementProductStruct">
-    <cluster code="0x007C" />
-    <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
-    <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
-  </struct>
-
 </configurator>

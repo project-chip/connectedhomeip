@@ -78,6 +78,15 @@ darwin-framework-tool/README
 java-matter-controller/README
 ```
 
+## Virtual Device App example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+virtual-device-app/**/README
+```
+
 ## Lighting example
 
 ```{toctree}
@@ -255,4 +264,13 @@ tv-casting-app/**/README
 :maxdepth: 1
 
 window-app/**/README
+```
+
+## Resource monitoring example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+resource-monitoring-app/**/README
 ```

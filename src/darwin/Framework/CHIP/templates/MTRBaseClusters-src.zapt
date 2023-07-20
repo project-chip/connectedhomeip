@@ -256,7 +256,8 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 {{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandImpl"}}
-{{#if (isSupported cluster command=command)}}
+{{#if (and (wasIntroducedBeforeRelease "First major API revamp" cluster command=command)
+           (isSupported cluster command=command))}}
 - (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
 {
   [self {{asLowerCamelCase name}}WithParams:params completion:

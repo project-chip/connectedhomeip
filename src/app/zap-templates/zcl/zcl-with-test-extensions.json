@@ -194,6 +194,14 @@
             "MaxGroupKeysPerFabric",
             "FeatureMap"
         ],
+        "ICD Management": [
+            "IdleModeInterval",
+            "ActiveModeInterval",
+            "ActiveModeThreshold",
+            "RegisteredClients",
+            "ICDCounter",
+            "ClientsSupportedPerFabric"
+        ],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",
@@ -317,6 +325,24 @@
             "OperationalError",
             "CurrentPhase",
             "CountdownTime"
+        ],
+        "Activated Carbon Filter Monitoring": [
+            "Condition",
+            "DegradationDirection",
+            "ChangeIndication",
+            "InPlaceIndicator",
+            "LastChangedTime",
+            "ReplacementProductList",
+            "FeatureMap"
+        ],
+        "HEPA Filter Monitoring": [
+            "Condition",
+            "DegradationDirection",
+            "ChangeIndication",
+            "InPlaceIndicator",
+            "LastChangedTime",
+            "ReplacementProductList",
+            "FeatureMap"
         ]
     },
     "defaultReportingPolicy": "mandatory",

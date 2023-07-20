@@ -1,6 +1,6 @@
 ameba-amebad-{all-clusters,all-clusters-minimal,light,light-switch,pigweed}
 asr-{asr582x,asr595x,asr550x}-{all-clusters,all-clusters-minimal,lighting,light-switch,lock,bridge,temperature-measurement,thermostat,ota-requestor}[-ota][-shell][-no_logging][-factory][-rotating_id][-rio]
-android-{arm,arm64,x86,x64,androidstudio-arm,androidstudio-arm64,androidstudio-x86,androidstudio-x64}-{chip-tool,chip-test,tv-server,tv-casting-app,java-matter-controller}[-no-debug]
+android-{arm,arm64,x86,x64,androidstudio-arm,androidstudio-arm64,androidstudio-x86,androidstudio-x64}-{chip-tool,chip-test,tv-server,tv-casting-app,java-matter-controller,virtual-device-app}[-no-debug]
 bouffalolab-{bl602-iot-matter-v1,bl602-night-light,xt-zb6-devkit,bl706-night-light,bl706-eth,bl704l-dvk}-light[-shell][-115200][-rpc][-cdc][-resetcnt][-rotating_device_id]
 cc32xx-lock
 ti-cc13x2x7_26x2x7-{lighting,lock,pump,pump-controller}[-mtd]
@@ -21,5 +21,5 @@ nrf-{nrf5340dk,nrf52840dk,nrf52840dongle}-{all-clusters,all-clusters-minimal,loc
 nrf-native-posix-64-tests
 qpg-qpg6105-{lock,light,shell,persistent-storage}
 tizen-arm-{all-clusters,all-clusters-minimal,chip-tool,light,tests}[-no-ble][-no-thread][-no-wifi][-asan][-ubsan]
-telink-tlsr9518adk80d-{all-clusters,all-clusters-minimal,bridge,contact-sensor,light,light-switch,lock,ota-requestor,pump,pump-controller,smoke-co-alarm,temperature-measurement,thermostat,window-covering}[-shell][-rpc][-factory-data]
+telink-tlsr9518adk80d-{all-clusters,all-clusters-minimal,bridge,contact-sensor,light,light-switch,lock,ota-requestor,pump,pump-controller,shell,smoke-co-alarm,temperature-measurement,thermostat,window-covering}[-shell][-rpc][-factory-data]
 openiotsdk-{shell,lock}[-mbedtls][-psa]
