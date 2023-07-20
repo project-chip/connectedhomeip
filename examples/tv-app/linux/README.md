@@ -58,12 +58,13 @@ Try the "commission-onnetwork <pincode> <disc> <IP> <port>" command
 When the tv-app receives a UDC request from a commissionable node (like a
 tv-casting-app), it will print out
 
-    CHIP:SVR: UserDirectedCommissioningServer::OnMessageReceived
-    CHIP:SVR: UDC instance=F879911BF17129AA
-    CHIP:SVR: OnCommissionableNodeFound instance: name=F879911BF17129AA old_state=1 new_state=3
-    CHIP:CTL: ------PROMPT USER: Test TV casting app is requesting permission to cast to this TV, approve? [0x0000_FFF1,0x0000_8001,F879911BF17129AA,01005DD9BB0990AF18F19C35C30C670532BC]
-    CHIP:CTL: ------Via Shell Enter: controller ux ok|cancel
-    CHIP:CTL: Unknown filter type; all matches will fail
+```
+CHIP:SVR: UserDirectedCommissioningServer::OnMessageReceived
+CHIP:SVR: UDC instance=F879911BF17129AA
+CHIP:SVR: OnCommissionableNodeFound instance: name=F879911BF17129AA old_state=1 new_state=3
+CHIP:CTL: ------PROMPT USER: Test TV casting app is requesting permission to cast to this TV, approve? [0x0000_FFF1,0x0000_8001,F879911BF17129AA,01005DD9BB0990AF18F19C35C30C670532BC]
+CHIP:CTL: ------Via Shell Enter: controller ux ok|cancel
+```
 
 Begin commissioning it by running
 
