@@ -59,7 +59,7 @@ class TelinkApp(Enum):
         elif self == TelinkApp.PUMP_CONTROLLER:
             return 'pump-controller-app'
         elif self == TelinkApp.SHELL:
-            return 'shell-app'            
+            return 'shell-app'
         elif self == TelinkApp.SMOKE_CO_ALARM:
             return 'smoke-co-alarm-app'
         elif self == TelinkApp.TEMPERATURE_MEASUREMENT:
@@ -93,7 +93,7 @@ class TelinkApp(Enum):
         elif self == TelinkApp.PUMP_CONTROLLER:
             return 'chip-telink-pump-controller-example'
         elif self == TelinkApp.SHELL:
-            return 'chip-telink-shell-example'            
+            return 'chip-telink-shell-example'
         elif self == TelinkApp.SMOKE_CO_ALARM:
             return 'chip-telink-smoke-co-alarm-example'
         elif self == TelinkApp.TEMPERATURE_MEASUREMENT:

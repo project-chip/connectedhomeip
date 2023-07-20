@@ -29,7 +29,6 @@
 #include <zephyr/net/openthread.h>
 
 #include <openthread/thread.h>
-//#include <openthread/cli.h>
 #if !CONFIG_SOC_SERIES_RISCV_TELINK_B91
 #include <platform/Zephyr/BLEManagerImpl.h>
 #endif // !CONFIG_SOC_SERIES_RISCV_TELINK_B91
