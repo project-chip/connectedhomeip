@@ -348,25 +348,20 @@ void WiFiManager::_ScanFinishedCb(wifi_manager_error_e wifiErr, void * userData)
 {
     if (wifiErr == WIFI_MANAGER_ERROR_NONE)
     {
-        ChipLogProgress(DeviceLayer, "WiFi scan finished");
         std::vector<WiFiScanResponse> networkScanned;
-
         int err = wifi_manager_foreach_found_specific_ap(sInstance.mWiFiManagerHandle, _FoundAPOnScanCb, &networkScanned);
-        if (err == WIFI_MANAGER_ERROR_NONE)
+
+        VerifyOrReturn(err == WIFI_MANAGER_ERROR_NONE,
+                       ChipLogError(DeviceLayer, "FAIL: get scan list [%s]", get_error_message(err)));
+
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        if (sInstance.mpScanCallback != nullptr)
         {
-            chip::DeviceLayer::PlatformMgr().LockChipStack();
-            if (sInstance.mpScanCallback != nullptr)
-            {
-                TizenScanResponseIterator<WiFiScanResponse> iter(&networkScanned);
-                sInstance.mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
-                sInstance.mpScanCallback = nullptr;
-            }
-            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+            TizenScanResponseIterator<WiFiScanResponse> iter(&networkScanned);
+            sInstance.mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
+            sInstance.mpScanCallback = nullptr;
         }
-        else
-        {
-            ChipLogError(DeviceLayer, "FAIL: get scan list [%s]", get_error_message(wifiErr));
-        }
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
     else
     {
