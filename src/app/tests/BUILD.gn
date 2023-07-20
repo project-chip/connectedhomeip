@@ -24,10 +24,10 @@ static_library("helpers") {
   output_dir = "${root_out_dir}/lib"
 
   sources = [
+    "${chip_root}/src/app/reporting/tests/MockReportScheduler.cpp",
     "AppTestContext.cpp",
     "AppTestContext.h",
     "integration/RequiredPrivilegeStubs.cpp",
-    "${chip_root}/src/app/reporting/tests/MockReportScheduler.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
