@@ -3631,6 +3631,18 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                                          (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+- (void)readAttributeEndpointListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeEndpointListWithParams:(MTRSubscribeParams *)params
+                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                   reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+    MTR_NEWLY_AVAILABLE;
++ (void)readAttributeEndpointListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                              endpoint:(NSNumber *)endpoint
+                                                 queue:(dispatch_queue_t)queue
+                                            completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -18913,6 +18925,7 @@ typedef NS_ENUM(uint8_t, MTROnOffStartUpOnOff) {
 
 typedef NS_OPTIONS(uint32_t, MTROnOffFeature) {
     MTROnOffFeatureLighting API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
+    MTROnOffFeatureDeadFront MTR_NEWLY_AVAILABLE = 0x2,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint8_t, MTROnOffControl) {
@@ -19572,6 +19585,7 @@ typedef NS_OPTIONS(uint8_t, MTRNetworkCommissioningWiFiSecurity) {
     = 0x4,
     MTRNetworkCommissioningWiFiSecurityWpaPersonal MTR_DEPRECATED("Please use MTRNetworkCommissioningWiFiSecurityBitmapWPAPersonal",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+        NS_SWIFT_UNAVAILABLE("Please use MTRNetworkCommissioningWiFiSecurityBitmapWPAPersonal")
     = 0x4,
     MTRNetworkCommissioningWiFiSecurityWPA2Personal MTR_DEPRECATED(
         "Please use MTRNetworkCommissioningWiFiSecurityBitmapWPA2Personal", ios(16.4, 17.0), macos(13.3, 14.0), watchos(9.4, 10.0),
@@ -19579,7 +19593,7 @@ typedef NS_OPTIONS(uint8_t, MTRNetworkCommissioningWiFiSecurity) {
     = 0x8,
     MTRNetworkCommissioningWiFiSecurityWpa2Personal MTR_DEPRECATED(
         "Please use MTRNetworkCommissioningWiFiSecurityBitmapWPA2Personal", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
-        tvos(16.1, 16.4))
+        tvos(16.1, 16.4)) NS_SWIFT_UNAVAILABLE("Please use MTRNetworkCommissioningWiFiSecurityBitmapWPA2Personal")
     = 0x8,
     MTRNetworkCommissioningWiFiSecurityWPA3Personal MTR_DEPRECATED(
         "Please use MTRNetworkCommissioningWiFiSecurityBitmapWPA3Personal", ios(16.4, 17.0), macos(13.3, 14.0), watchos(9.4, 10.0),
@@ -19587,7 +19601,7 @@ typedef NS_OPTIONS(uint8_t, MTRNetworkCommissioningWiFiSecurity) {
     = 0x10,
     MTRNetworkCommissioningWiFiSecurityWpa3Personal MTR_DEPRECATED(
         "Please use MTRNetworkCommissioningWiFiSecurityBitmapWPA3Personal", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
-        tvos(16.1, 16.4))
+        tvos(16.1, 16.4)) NS_SWIFT_UNAVAILABLE("Please use MTRNetworkCommissioningWiFiSecurityBitmapWPA3Personal")
     = 0x10,
 } MTR_DEPRECATED("Please use MTRNetworkCommissioningWiFiSecurityBitmap", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0),
     tvos(16.1, 17.0));
@@ -21825,14 +21839,6 @@ typedef NS_OPTIONS(uint8_t, MTRTestClusterSimpleBitmap) {
         "Please use MTRUnitTestingSimpleBitmapValueC", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x4,
 } MTR_DEPRECATED("Please use MTRUnitTestingSimpleBitmap", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-
-typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
-    MTRFaultInjectionFaultTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRFaultInjectionFaultTypeSystemFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRFaultInjectionFaultTypeInetFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRFaultInjectionFaultTypeChipFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRFaultInjectionFaultTypeCertFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 @interface MTRBaseClusterIdentify (Deprecated)
 

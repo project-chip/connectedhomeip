@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Create new user"
+    - label: "Precondition: Create new user"
       command: "SetUser"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -51,7 +51,7 @@ tests:
               - name: "CredentialRule"
                 value: 0
 
-    - label: "Read the user back and verify its fields"
+    - label: "Precondition: Read the user back and verify its fields"
       command: "GetUser"
       arguments:
           values:
@@ -80,7 +80,7 @@ tests:
               - name: "NextUserIndex"
                 value: null
 
-    - label: "Create new PIN credential and lock/unlock user"
+    - label: "Precondition: Create new PIN credential and lock/unlock user"
       command: "SetCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -106,7 +106,7 @@ tests:
               - name: "NextCredentialIndex"
                 value: 2
 
-    - label: "Verify created PIN credential"
+    - label: "Precondition: Verify created PIN credential"
       command: "GetCredentialStatus"
       arguments:
           values:

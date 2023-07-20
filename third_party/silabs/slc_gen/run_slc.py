@@ -4,7 +4,7 @@ import os
 import subprocess
 import sys
 
-if len(sys.argv) != 8:
+if len(sys.argv) != 9:
     print("wrong number of arguments")
     sys.exit(1)
 
@@ -27,10 +27,10 @@ use_wstk_buttons = asBoolean(sys.argv[4])
 use_wstk_leds = asBoolean(sys.argv[5])
 use_external_flash = asBoolean(sys.argv[6])
 silabs_mcu = str(sys.argv[7])
+output_path = str(sys.argv[8])
 
 slcp_file_path = os.path.join(root_path, "examples/platform/silabs/matter-platform.slcp")
 template_path = os.path.join(root_path, "third_party/silabs/slc_gen/")
-output_path = template_path + sys.argv[2] + '/'
 
 slc_arguments = ""
 
@@ -57,6 +57,16 @@ if use_external_flash:
 slc_arguments += silabs_board
 
 print(slc_arguments)
+
+if "GSDK_ROOT" in os.environ:
+    gsdk_root = os.getenv('GSDK_ROOT')
+else:
+    # If no gsdk path is set in the environment, use the standard path to the submodule
+    gsdk_root = os.path.join(root_path, "third_party/silabs/gecko_sdk/")
+
+# make sure we have a configured and trusted gsdk in slc
+subprocess.run(["slc", "configuration", "--sdk", gsdk_root], check=True)
+subprocess.run(["slc", "signature", "trust", "--sdk", gsdk_root], check=True)
 
 subprocess.run(["slc", "generate", slcp_file_path, "-d", output_path, "--with", slc_arguments], check=True)
 

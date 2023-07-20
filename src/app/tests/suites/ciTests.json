@@ -5,6 +5,8 @@
         "Test_TC_ACL_2_1",
         "Test_TC_ACL_2_3",
         "Test_TC_ACL_2_4",
+        "Test_TC_ACL_2_5",
+        "Test_TC_ACL_2_6",
         "Test_TC_ACL_2_7",
         "Test_TC_ACL_2_8",
         "Test_TC_ACL_2_9",
@@ -157,6 +159,7 @@
         "Test_TC_OO_2_2",
         "Test_TC_OO_2_4"
     ],
+    "OperationalState": ["Test_TC_OPSTATE_1_1"],
     "PowerSource": ["Test_TC_PS_1_1", "Test_TC_PS_2_1"],
     "PressureMeasurement": [
         "Test_TC_PRS_1_1",
@@ -243,6 +246,7 @@
         "TestIdentifyCluster",
         "TestOperationalCredentialsCluster",
         "TestModeSelectCluster",
+        "TestTemperatureControl",
         "TestSelfFabricRemoval",
         "TestSystemCommands",
         "TestBinding",
@@ -286,31 +290,11 @@
         "Test_TC_G_2_1"
     ],
     "Scenes": ["Test_TC_S_1_1"],
-    "ReplaceableMonitoring": [
+    "ResourceMonitoring": [
         "Test_TC_ACFREMON_1_1",
         "Test_TC_ACFREMON_2_1",
-        "Test_TC_CFREMON_1_1",
-        "Test_TC_CFREMON_2_1",
-        "Test_TC_ESFREMON_1_1",
-        "Test_TC_ESFREMON_2_1",
-        "Test_TC_FTREMON_1_1",
-        "Test_TC_FTREMON_2_1",
         "Test_TC_HEPAFREMON_1_1",
-        "Test_TC_HEPAFREMON_2_1",
-        "Test_TC_INKCREMON_1_1",
-        "Test_TC_INKCREMON_2_1",
-        "Test_TC_IONFREMON_1_1",
-        "Test_TC_IONFREMON_2_1",
-        "Test_TC_OZFREMON_1_1",
-        "Test_TC_OZFREMON_2_1",
-        "Test_TC_TCREMON_1_1",
-        "Test_TC_TCREMON_2_1",
-        "Test_TC_UVFREMON_1_1",
-        "Test_TC_UVFREMON_2_1",
-        "Test_TC_WTREMON_1_1",
-        "Test_TC_WTREMON_2_1",
-        "Test_TC_ZEOFREMON_1_1",
-        "Test_TC_ZEOFREMON_2_1"
+        "Test_TC_HEPAFREMON_2_1"
     ],
     "AirQuality": ["Test_TC_AIRQUAL_1_1", "Test_TC_AIRQUAL_2_1"],
     "ConcentrationMeasurement": [
@@ -367,6 +351,7 @@
         "OTASoftwareUpdate",
         "OccupancySensing",
         "OnOff",
+        "OperationalState",
         "PowerSource",
         "PressureMeasurement",
         "PumpConfigurationControl",
@@ -389,6 +374,6 @@
         "Subscriptions",
         "DoorLock",
         "Groups",
-        "ReplaceableMonitoring"
+        "ResourceMonitoring"
     ]
 }

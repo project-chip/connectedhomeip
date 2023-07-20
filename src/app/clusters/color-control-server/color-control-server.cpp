@@ -629,14 +629,14 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
     colorHueTransitionState->up     = (direction == to_underlying(ColorLoopDirection::kIncrementHue));
     colorHueTransitionState->repeat = true;
 
-    colorHueTransitionState->stepsRemaining = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
-    colorHueTransitionState->stepsTotal     = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
+    colorHueTransitionState->stepsRemaining = static_cast<uint16_t>(time * TRANSITION_STEPS_PER_1S);
+    colorHueTransitionState->stepsTotal     = static_cast<uint16_t>(time * TRANSITION_STEPS_PER_1S);
     colorHueTransitionState->timeRemaining  = MAX_INT16U_VALUE;
     colorHueTransitionState->endpoint       = endpoint;
 
     Attributes::RemainingTime::Set(endpoint, MAX_INT16U_VALUE);
 
-    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
 }
 
 /**
@@ -937,8 +937,8 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
         colorHueTransitionState->up = false;
     }
 
-    colorHueTransitionState->stepsRemaining = TRANSITION_TIME_1S;
-    colorHueTransitionState->stepsTotal     = TRANSITION_TIME_1S;
+    colorHueTransitionState->stepsRemaining = TRANSITION_STEPS_PER_1S;
+    colorHueTransitionState->stepsTotal     = TRANSITION_STEPS_PER_1S;
     colorHueTransitionState->timeRemaining  = MAX_INT16U_VALUE;
     colorHueTransitionState->endpoint       = endpoint;
     colorHueTransitionState->repeat         = true;
@@ -947,7 +947,7 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
     Attributes::RemainingTime::Set(endpoint, MAX_INT16U_VALUE);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1079,7 +1079,7 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
     SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), transitionTime ? UPDATE_TIME_MS : 0);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1188,7 +1188,7 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
     SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), transitionTime ? UPDATE_TIME_MS : 0);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1286,7 +1286,7 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
     SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), transitionTime ? UPDATE_TIME_MS : 0);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1360,7 +1360,7 @@ bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj,
     SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1423,7 +1423,7 @@ bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandOb
     SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), transitionTime ? UPDATE_TIME_MS : 0);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1486,7 +1486,7 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
     SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), transitionTime ? UPDATE_TIME_MS : 0);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1557,7 +1557,7 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
         // Checks if color loop is active and stays active
         if (isColorLoopActive && !deactiveColorLoop)
         {
-            colorHueTransitionState->stepsTotal         = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
+            colorHueTransitionState->stepsTotal         = static_cast<uint16_t>(time * TRANSITION_STEPS_PER_1S);
             colorHueTransitionState->initialEnhancedHue = colorHueTransitionState->currentEnhancedHue;
 
             if (colorHueTransitionState->up)
@@ -1636,7 +1636,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
     }
     else
     {
-        scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+        scheduleTimerCallbackMs(configureHSVEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
     }
 
     if (colorHueTransitionState->isEnhancedHue)
@@ -1804,7 +1804,7 @@ bool ColorControlServer::moveToColorCommand(app::CommandHandler * commandObj, co
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureXYEventControl(endpoint), transitionTime ? UPDATE_TIME_MS : 0);
+    scheduleTimerCallbackMs(configureXYEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1899,7 +1899,7 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     }
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureXYEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureXYEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1970,7 +1970,7 @@ bool ColorControlServer::stepColorCommand(app::CommandHandler * commandObj, cons
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureXYEventControl(endpoint), transitionTime ? UPDATE_TIME_MS : 0);
+    scheduleTimerCallbackMs(configureXYEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -2000,7 +2000,7 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
     }
     else
     {
-        scheduleTimerCallbackMs(configureXYEventControl(endpoint), UPDATE_TIME_MS);
+        scheduleTimerCallbackMs(configureXYEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
     }
 
     // update the attributes
@@ -2084,7 +2084,7 @@ Status ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorT
     colorTempTransitionState->highLimit      = temperatureMax;
 
     // kick off the state machine
-    scheduleTimerCallbackMs(configureTempEventControl(endpoint), transitionTime ? UPDATE_TIME_MS : 0);
+    scheduleTimerCallbackMs(configureTempEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
     return Status::Success;
 }
 
@@ -2198,7 +2198,7 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
     }
     else
     {
-        scheduleTimerCallbackMs(configureTempEventControl(endpoint), UPDATE_TIME_MS);
+        scheduleTimerCallbackMs(configureTempEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
     }
 
     Attributes::ColorTemperatureMireds::Set(endpoint, colorTempTransitionState->currentValue);
@@ -2313,7 +2313,7 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureTempEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureTempEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -2429,7 +2429,7 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureTempEventControl(endpoint), transitionTime ? UPDATE_TIME_MS : 0);
+    scheduleTimerCallbackMs(configureTempEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
 
 exit:
     commandObj->AddStatus(commandPath, status);

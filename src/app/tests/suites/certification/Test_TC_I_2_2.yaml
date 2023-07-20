@@ -24,7 +24,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -33,8 +33,8 @@ tests:
                 value: nodeId
 
     - label:
-          "TH sends Identify command to DUT, with the IdentifyTime field set to
-          0x003c (60s)."
+          "Step 2a: TH sends Identify command to DUT, with the IdentifyTime
+          field set to 0x003c (60s)."
       PICS: I.S.C00.Rsp
       command: "Identify"
       arguments:
@@ -42,7 +42,7 @@ tests:
               - name: "IdentifyTime"
                 value: 60
 
-    - label: "TH reads immediately IdentifyTime attribute from DUT"
+    - label: "Step 2b: TH reads immediately IdentifyTime attribute from DUT"
       PICS: I.S.A0000
       command: "readAttribute"
       attribute: "IdentifyTime"
@@ -59,7 +59,9 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "After 10 seconds, the TH reads IdentifyTime attribute from DUT"
+    - label:
+          "Step 2c: After 10 seconds, the TH reads IdentifyTime attribute from
+          DUT"
       PICS: I.S.A0000
       command: "readAttribute"
       attribute: "IdentifyTime"
@@ -69,7 +71,7 @@ tests:
               maxValue: 58
 
     - label:
-          "TH sends IdentifyQuery command to DUT and Verify
+          "Step 3: TH sends IdentifyQuery command to DUT and Verify
           IdentifyQueryResponse command to TH,with the Timeout field set to a
           value in the range 0x0000 to 0x0032"
       verification: |
@@ -85,8 +87,8 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends Identify command to DUT, with the IdentifyTime field set to
-          0x0000 (stop identifying)."
+          "Step 4a: TH sends Identify command to DUT, with the IdentifyTime
+          field set to 0x0000 (stop identifying)."
       PICS: I.S.C00.Rsp
       command: "Identify"
       arguments:
@@ -94,7 +96,7 @@ tests:
               - name: "IdentifyTime"
                 value: 0
 
-    - label: "TH reads immediately IdentifyTime attribute from DUT"
+    - label: "Step 4b: TH reads immediately IdentifyTime attribute from DUT"
       PICS: I.S.A0000
       command: "readAttribute"
       attribute: "IdentifyTime"
@@ -102,7 +104,7 @@ tests:
           value: 0
 
     # disabled due to IdentifyQuery not supported for matter V1.0
-    #- label: "TH sends IdentifyQuery command to DUT "
+    #- label: "Step 5: TH sends IdentifyQuery command to DUT "
     #  verification: |
     #      IdentifyQuery is not supported by Matter
     #  cluster: "LogCommands"
@@ -116,7 +118,8 @@ tests:
     #            value: "y"
 
     - label:
-          "TH writes a value of 0x000f (15s) to IdentifyTime attribute of DUT"
+          "Step 6a: TH writes a value of 0x000f (15s) to IdentifyTime attribute
+          of DUT"
       PICS: I.S.A0000
       command: "writeAttribute"
       attribute: "IdentifyTime"
@@ -131,7 +134,9 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "After 5 seconds, the TH reads IdentifyTime attribute from DUT"
+    - label:
+          "Step 6b: After 5 seconds, the TH reads IdentifyTime attribute from
+          DUT"
       PICS: I.S.A0000
       command: "readAttribute"
       attribute: "IdentifyTime"

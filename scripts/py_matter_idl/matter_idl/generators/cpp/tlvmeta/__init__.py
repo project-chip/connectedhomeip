@@ -187,7 +187,7 @@ class ClusterTablesGenerator:
                 entries=[
                     TableEntry(
                         code="AnonymousTag()",
-                        name="[]",
+                        name="Anonymous<>",
                         reference=name,
                         real_type="%s[]" % name,
                     )
