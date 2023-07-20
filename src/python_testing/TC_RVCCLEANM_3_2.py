@@ -58,9 +58,9 @@ class TC_RVCCLEANM_3_2(MatterBaseTest):
         from enum import Enum
 
         class CommonCodes(Enum):
-            SUCCESS          = 0x00
+            SUCCESS = 0x00
             UNSUPPORTED_MODE = 0x01
-            GENERIC_FAILURE  = 0x02
+            GENERIC_FAILURE = 0x02
 
         self.print_step(1, "Commissioning, already done")
 

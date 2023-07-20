@@ -26,6 +26,7 @@ from mobly import asserts
 # run with
 # --int-arg PIXIT_ENDPOINT:<endpoint>
 
+
 class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
@@ -34,7 +35,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_RVCOPSTATE_2_1(self):
-
 
         asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
                             "PIXIT_ENDPOINT must be included on the command line in "

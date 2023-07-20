@@ -27,6 +27,7 @@ from mobly import asserts
 # run with
 # --int-arg PIXIT_ENDPOINT:<endpoint>
 
+
 class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):

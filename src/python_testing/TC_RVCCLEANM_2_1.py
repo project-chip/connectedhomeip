@@ -126,7 +126,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st in [i.value for i in RvcCleanCodes]) or is_mfg_code
         asserts.assert_true(is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.modefail))
         st_text_len = len(ret.statusText)
-        asserts.assert_true(st_text_len in range(1,65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
+        asserts.assert_true(st_text_len in range(1, 65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
 
         self.print_step(8, "Read CurrentMode attribute")
         current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)

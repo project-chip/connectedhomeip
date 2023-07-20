@@ -115,5 +115,6 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
             logging.info("StartUpMode: %s" % (startup_mode))
             asserts.assert_true(startup_mode in modes or startup_mode == NullValue, "StartUpMode is not a supported mode!")
 
+
 if __name__ == "__main__":
     default_matter_test_main()

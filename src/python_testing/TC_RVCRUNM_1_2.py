@@ -37,7 +37,6 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
     @async_test_body
     async def test_TC_RVCRUNM_1_2(self):
 
-
         asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
                             "PIXIT_ENDPOINT must be included on the command line in "
                             "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
@@ -116,6 +115,7 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
 
             logging.info("StartUpMode: %s" % (startup_mode))
             asserts.assert_true(startup_mode in modes or startup_mode == NullValue, "StartUpMode is not a supported mode!")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
