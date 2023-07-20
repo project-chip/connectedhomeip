@@ -146,7 +146,9 @@ class ClusterTablesGenerator:
 
         cluster_feature_map = None
         for b in self.cluster.bitmaps:
-            if b.name == f'{self.cluster.name}Feature' and b.base_type.lower() == 'bitmap32':
+            # Older matter files use `ClusterNameFeature` as naming, newer code was
+            # updated to just `Feature`. For now support both.
+            if b.name in {'Feature', f'{self.cluster.name}Feature'} and b.base_type.lower() == 'bitmap32':
                 cluster_feature_map = b.name
 
         # Clusters have attributes. They are direct descendants for
