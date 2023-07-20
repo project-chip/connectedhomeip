@@ -38,7 +38,7 @@ config:
         defaultValue: "exampleName"
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -47,8 +47,8 @@ tests:
                 value: nodeId
 
     - label:
-          "TH sends a LaunchURL command to the DUT with a known good content URL
-          string"
+          "Step 1: TH sends a LaunchURL command to the DUT with a known good
+          content URL string"
       PICS: CONTENTLAUNCHER.S.C01.Rsp
       command: "LaunchURL"
       arguments:
@@ -76,8 +76,8 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends a LaunchURL command to the DUT with a known good content URL
-          string and a display string"
+          "Step 2: TH sends a LaunchURL command to the DUT with a known good
+          content URL string and a display string"
       PICS: CONTENTLAUNCHER.S.C01.Rsp
       command: "LaunchURL"
       arguments:
@@ -112,8 +112,8 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends a LaunchURL command to the DUT with a known good content URL
-          string and a brand information object."
+          "Step 3: TH sends a LaunchURL command to the DUT with a known good
+          content URL string and a brand information object."
       PICS: CONTENTLAUNCHER.S.C01.Rsp
       command: "LaunchURL"
       arguments:
@@ -144,8 +144,8 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends a LaunchURL command to the DUT with a known unreachable
-          content URL string."
+          "Step 4: TH sends a LaunchURL command to the DUT with a known
+          unreachable content URL string."
       PICS: CONTENTLAUNCHER.S.C01.Rsp
       command: "LaunchURL"
       arguments:
@@ -160,8 +160,8 @@ tests:
                 value: 1 #URL_NOT_AVAILABLE
 
     - label:
-          "TH sends a LaunchURL command to the DUT with a known un-authorized
-          content URL string."
+          "Step 5: TH sends a LaunchURL command to the DUT with a known
+          un-authorized content URL string."
       PICS: CONTENTLAUNCHER.S.C01.Rsp
       command: "LaunchURL"
       arguments:

@@ -31,30 +31,30 @@
  * Defines and Macros
  *********************************************************/
 
-#define UPDATE_TIME_MS 100
-#define TRANSITION_TIME_1S 10
+static constexpr chip::System::Clock::Milliseconds32 TRANSITION_UPDATE_TIME_MS = chip::System::Clock::Milliseconds32(100);
+static constexpr uint16_t TRANSITION_STEPS_PER_1S                              = 10;
 
-#define MIN_CIE_XY_VALUE 0
-#define MAX_CIE_XY_VALUE 0xfeff // this value comes directly from the ZCL specification table 5.3
+static constexpr uint16_t MIN_CIE_XY_VALUE = 0;
+static constexpr uint16_t MAX_CIE_XY_VALUE = 0xfeff; // this value comes directly from the ZCL specification table 5.3
 
-#define MIN_TEMPERATURE_VALUE 0
-#define MAX_TEMPERATURE_VALUE 0xfeff
+static constexpr uint16_t MIN_TEMPERATURE_VALUE = 0;
+static constexpr uint16_t MAX_TEMPERATURE_VALUE = 0xfeff;
 
-#define MIN_HUE_VALUE 0
-#define MAX_HUE_VALUE 254
+static constexpr uint8_t MIN_HUE_VALUE = 0;
+static constexpr uint8_t MAX_HUE_VALUE = 254;
 
-#define MIN_SATURATION_VALUE 0
-#define MAX_SATURATION_VALUE 254
+static constexpr uint8_t MIN_SATURATION_VALUE = 0;
+static constexpr uint8_t MAX_SATURATION_VALUE = 254;
 
-#define HALF_MAX_UINT8T 127
-#define HALF_MAX_UINT16T 0x7FFF
+static constexpr uint8_t HALF_MAX_UINT8T   = 127;
+static constexpr uint16_t HALF_MAX_UINT16T = 0x7FFF;
 
-#define MAX_ENHANCED_HUE_VALUE 0xFFFF
+static constexpr uint16_t MAX_ENHANCED_HUE_VALUE = 0xFFFF;
 
-#define MIN_CURRENT_LEVEL 0x01
-#define MAX_CURRENT_LEVEL 0xFE
+static constexpr uint8_t MIN_CURRENT_LEVEL = 0x01;
+static constexpr uint8_t MAX_CURRENT_LEVEL = 0xFE;
 
-#define REPORT_FAILED 0xFF
+static constexpr uint8_t REPORT_FAILED = 0xFF;
 
 /**
  * @brief color-control-server class

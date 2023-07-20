@@ -143,7 +143,8 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/util/attribute-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-table.cpp
         ${CHIP_APP_BASE_DIR}/util/binding-table.cpp
-        ${CHIP_APP_BASE_DIR}/util/IcdMonitoringTable.cpp
+        ${CHIP_APP_BASE_DIR}/icd/IcdMonitoringTable.cpp
+        ${CHIP_APP_BASE_DIR}/icd/IcdManagementServer.cpp
         ${CHIP_APP_BASE_DIR}/util/DataModelHandler.cpp
         ${CHIP_APP_BASE_DIR}/util/ember-compatibility-functions.cpp
         ${CHIP_APP_BASE_DIR}/util/error-mapping.cpp

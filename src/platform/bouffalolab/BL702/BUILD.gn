@@ -18,6 +18,8 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "bl702")
+assert(false == (chip_enable_wifi && chip_enable_openthread),
+       "Not support Wi-Fi and Thread together")
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
@@ -82,6 +84,14 @@ static_library("BL702") {
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
+  } else {
+    sources += [
+      "ConfigurationManagerImpl.cpp",
+      "ConnectivityManagerImpl.cpp",
+      "EthernetInterface.c",
+    ]
+
+    deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
