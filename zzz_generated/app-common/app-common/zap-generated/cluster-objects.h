@@ -13885,8 +13885,8 @@ public:
 namespace UnregisterClient {
 enum class Fields : uint8_t
 {
-    kCheckInNodeID = 0,
-    kKey           = 1,
+    kCheckInNodeID   = 0,
+    kVerificationKey = 1,
 };
 
 struct Type
@@ -13897,7 +13897,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
 
     chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
-    Optional<chip::ByteSpan> key;
+    Optional<chip::ByteSpan> verificationKey;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -13913,7 +13913,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
 
     chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
-    Optional<chip::ByteSpan> key;
+    Optional<chip::ByteSpan> verificationKey;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UnregisterClient

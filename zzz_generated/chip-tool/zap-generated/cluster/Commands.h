@@ -3944,7 +3944,7 @@ public:
         ClusterCommand("unregister-client", credsIssuerConfig)
     {
         AddArgument("CheckInNodeID", 0, UINT64_MAX, &mRequest.checkInNodeID);
-        AddArgument("Key", &mRequest.key);
+        AddArgument("VerificationKey", &mRequest.verificationKey);
         ClusterCommand::AddArguments();
     }
 
