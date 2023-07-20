@@ -129,15 +129,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterUserLabelID MTR_DEPRECATED(
         "Please use MTRClusterIDTypeUserLabelID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00000041,
-    MTRClusterProxyConfigurationID MTR_DEPRECATED(
-        "Please use MTRClusterIDTypeProxyConfigurationID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000042,
-    MTRClusterProxyDiscoveryID MTR_DEPRECATED(
-        "Please use MTRClusterIDTypeProxyDiscoveryID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000043,
-    MTRClusterProxyValidID MTR_DEPRECATED(
-        "Please use MTRClusterIDTypeProxyValidID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000044,
     MTRClusterBooleanStateID MTR_DEPRECATED(
         "Please use MTRClusterIDTypeBooleanStateID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00000045,
@@ -232,9 +223,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterTestClusterID MTR_DEPRECATED(
         "Please use MTRClusterIDTypeUnitTestingID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0xFFF1FC05,
-    MTRClusterFaultInjectionID MTR_DEPRECATED(
-        "Please use MTRClusterIDTypeFaultInjectionID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0xFFF1FC06,
     MTRClusterIDTypeIdentifyID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000003,
     MTRClusterIDTypeGroupsID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000004,
     MTRClusterIDTypeScenesID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000005,
@@ -271,9 +259,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeGroupKeyManagementID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000003F,
     MTRClusterIDTypeFixedLabelID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000040,
     MTRClusterIDTypeUserLabelID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000041,
-    MTRClusterIDTypeProxyConfigurationID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000042,
-    MTRClusterIDTypeProxyDiscoveryID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000043,
-    MTRClusterIDTypeProxyValidID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000044,
     MTRClusterIDTypeBooleanStateID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000045,
     MTRClusterIDTypeModeSelectID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000050,
     MTRClusterIDTypeDoorLockID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000101,
@@ -306,7 +291,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeAccountLoginID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000050E,
     MTRClusterIDTypeElectricalMeasurementID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000B04,
     MTRClusterIDTypeUnitTestingID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0xFFF1FC05,
-    MTRClusterIDTypeFaultInjectionID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0xFFF1FC06,
 };
 
 #pragma mark - Attributes IDs
@@ -3434,116 +3418,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterUserLabelAttributeFeatureMapID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterUserLabelAttributeClusterRevisionID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-
-    // Cluster ProxyConfiguration deprecated attribute names
-    MTRClusterProxyConfigurationAttributeGeneratedCommandListID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyConfigurationAttributeGeneratedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterProxyConfigurationAttributeAcceptedCommandListID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyConfigurationAttributeAcceptedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterProxyConfigurationAttributeAttributeListID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyConfigurationAttributeAttributeListID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterProxyConfigurationAttributeFeatureMapID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyConfigurationAttributeFeatureMapID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterProxyConfigurationAttributeClusterRevisionID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyConfigurationAttributeClusterRevisionID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster ProxyConfiguration attributes
-    MTRAttributeIDTypeClusterProxyConfigurationAttributeGeneratedCommandListID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterProxyConfigurationAttributeAcceptedCommandListID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterProxyConfigurationAttributeAttributeListID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterProxyConfigurationAttributeFeatureMapID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterProxyConfigurationAttributeClusterRevisionID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-
-    // Cluster ProxyDiscovery deprecated attribute names
-    MTRClusterProxyDiscoveryAttributeGeneratedCommandListID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyDiscoveryAttributeGeneratedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterProxyDiscoveryAttributeAcceptedCommandListID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyDiscoveryAttributeAcceptedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterProxyDiscoveryAttributeAttributeListID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyDiscoveryAttributeAttributeListID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterProxyDiscoveryAttributeFeatureMapID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyDiscoveryAttributeFeatureMapID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterProxyDiscoveryAttributeClusterRevisionID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyDiscoveryAttributeClusterRevisionID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster ProxyDiscovery attributes
-    MTRAttributeIDTypeClusterProxyDiscoveryAttributeGeneratedCommandListID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterProxyDiscoveryAttributeAcceptedCommandListID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterProxyDiscoveryAttributeAttributeListID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterProxyDiscoveryAttributeFeatureMapID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterProxyDiscoveryAttributeClusterRevisionID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-
-    // Cluster ProxyValid deprecated attribute names
-    MTRClusterProxyValidAttributeGeneratedCommandListID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyValidAttributeGeneratedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterProxyValidAttributeAcceptedCommandListID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyValidAttributeAcceptedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterProxyValidAttributeAttributeListID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyValidAttributeAttributeListID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterProxyValidAttributeFeatureMapID MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterProxyValidAttributeFeatureMapID",
-        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterProxyValidAttributeClusterRevisionID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyValidAttributeClusterRevisionID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster ProxyValid attributes
-    MTRAttributeIDTypeClusterProxyValidAttributeGeneratedCommandListID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterProxyValidAttributeAcceptedCommandListID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterProxyValidAttributeAttributeListID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterProxyValidAttributeFeatureMapID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterProxyValidAttributeClusterRevisionID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster BooleanState deprecated attribute names
@@ -7969,43 +7843,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterUnitTestingAttributeClusterRevisionID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
-    // Cluster FaultInjection deprecated attribute names
-    MTRClusterFaultInjectionAttributeGeneratedCommandListID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFaultInjectionAttributeGeneratedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterFaultInjectionAttributeAcceptedCommandListID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFaultInjectionAttributeAcceptedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterFaultInjectionAttributeAttributeListID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFaultInjectionAttributeAttributeListID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterFaultInjectionAttributeFeatureMapID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFaultInjectionAttributeFeatureMapID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterFaultInjectionAttributeClusterRevisionID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFaultInjectionAttributeClusterRevisionID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster FaultInjection attributes
-    MTRAttributeIDTypeClusterFaultInjectionAttributeGeneratedCommandListID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterFaultInjectionAttributeAcceptedCommandListID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterFaultInjectionAttributeAttributeListID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterFaultInjectionAttributeFeatureMapID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterFaultInjectionAttributeClusterRevisionID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-
 };
 
 #pragma mark - Commands IDs
@@ -9599,23 +9436,6 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestFabricScopedEventRequestID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000015,
-
-    // Cluster FaultInjection deprecated command id names
-    MTRClusterFaultInjectionCommandFailAtFaultID MTR_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterFaultInjectionCommandFailAtFaultID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000000,
-    MTRClusterFaultInjectionCommandFailRandomlyAtFaultID MTR_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterFaultInjectionCommandFailRandomlyAtFaultID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000001,
-
-    // Cluster FaultInjection commands
-    MTRCommandIDTypeClusterFaultInjectionCommandFailAtFaultID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = 0x00000000,
-    MTRCommandIDTypeClusterFaultInjectionCommandFailRandomlyAtFaultID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = 0x00000001,
 
 };
 
