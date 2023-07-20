@@ -256,3 +256,12 @@ tv-casting-app/**/README
 
 window-app/**/README
 ```
+
+## Resource monitoring example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+resource-monitoring-app/**/README
+```
