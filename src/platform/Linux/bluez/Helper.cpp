@@ -386,7 +386,7 @@ static gboolean BluezCharacteristicWriteFD(GIOChannel * aChannel, GIOCondition a
 
     ChipLogDetail(DeviceLayer, "c1 %s mtu, %d", __func__, conn->mMtu);
 
-    buf = new uint8_t[conn->mMtu];
+    buf = g_new(uint8_t, conn->mMtu);
     len = read(g_io_channel_unix_get_fd(aChannel), buf, conn->mMtu);
     VerifyOrExit(len > 0, ChipLogError(DeviceLayer, "FAIL: short read in %s (%zd)", __func__, len));
 
@@ -398,7 +398,7 @@ static gboolean BluezCharacteristicWriteFD(GIOChannel * aChannel, GIOCondition a
     isSuccess = true;
 
 exit:
-    delete[] buf;
+    g_free(buf);
     return isSuccess ? G_SOURCE_CONTINUE : G_SOURCE_REMOVE;
 }
 
