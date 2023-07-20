@@ -98,9 +98,9 @@ jobs:
             - name: Build OTA image files with software version number 5
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0 chip_device_config_device_software_version=5 chip_device_config_device_software_version_string='"5.0"'
-                  cp out/debug/chip-ota-requestor-app /tmp/ota-test006-raw-image
+                  cp out/debug/chip-ota-requestor-app /tmp/ota-raw-image-v5
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0 chip_device_config_device_software_version=10 chip_device_config_device_software_version_string='"10.0"'
-                  cp out/debug/chip-ota-requestor-app /tmp/ota-test007-raw-image
+                  cp out/debug/chip-ota-requestor-app /tmp/ota-raw-image-v10
             - name: Build example OTA Requestor
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0

@@ -32,13 +32,13 @@
 #define ENABLE_OTA_TESTS 1
 #endif
 
-// TODO: Disable test006_DoBDXTransferAllowUpdateRequest,
-// test007_DoBDXTransferWithTwoOTARequesters and
-// test008_DoBDXTransferIncrementalOtaUpdate until PR #26040 is merged.
+// TODO: Disable test005_DoBDXTransferAllowUpdateRequest,
+// test006_DoBDXTransferWithTwoOTARequesters and
+// test007_DoBDXTransferIncrementalOtaUpdate until PR #26040 is merged.
 // Currently the poll interval causes delays in the BDX transfer and
 // results in the test taking a long time.
-#ifdef ENABLE_TESTS
-#undef ENABLE_TESTS
+#ifdef ENABLE_REAL_OTA_UPDATE_TESTS
+#undef ENABLE_REAL_OTA_UPDATE_TESTS
 #endif
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
@@ -50,12 +50,11 @@ static const uint64_t kDeviceId3 = 0x12341236;
 // NOTE: These onboarding payloads are for the chip-ota-requestor-app, not chip-all-clusters-app
 static NSString * kOnboardingPayload1 = @"MT:-24J0SO527K10648G00"; // Discriminator: 1111
 static NSString * kOnboardingPayload2 = @"MT:-24J0AFN00L10648G00"; // Discriminator: 1112
-static NSString * kOnboardingPayload3 = @"MT:-24J0CEK01L10648G00"; // Discriminator: 1113
+static NSString * kOnboardingPayload3 = @"MT:-24J0AFN00KA0648G00"; // Discriminator: 3840
 
 static const uint16_t kLocalPort = 5541;
 static const uint16_t kTestVendorId = 0xFFF1u;
 static const uint16_t kOTAProviderEndpointId = 0;
-static const uint64_t kOTAProviderNodeId = 0x12341236;
 
 static MTRDevice * sConnectedDevice1;
 static MTRDevice * sConnectedDevice2;
@@ -662,66 +661,7 @@ static BOOL sNeedsStackShutdown = YES;
     return responseExpectation;
 }
 
-/**
- * Helper that checks if the OTA provider locations match.
- */
-- (bool)AreEqual:(MTROtaSoftwareUpdateRequestorClusterProviderLocation *)pl1
-    providerLocation:(MTROtaSoftwareUpdateRequestorClusterProviderLocation *)pl2
-{
-    return [pl1.providerNodeID isEqualToNumber:pl2.providerNodeID] && [pl1.endpoint isEqualToNumber:pl2.endpoint] &&
-        [pl1.fabricIndex isEqualToNumber:pl2.fabricIndex];
-}
-
-- (void)test001_UpdateDefaultOTAProviderAndVerify
-{
-    // Test to update the default OTA provider for a device and verify that it's updated correctly.
-
-    MTROtaSoftwareUpdateRequestorClusterProviderLocation * providerLocation =
-        [[MTROtaSoftwareUpdateRequestorClusterProviderLocation alloc] init];
-    providerLocation.providerNodeID = @(kOTAProviderNodeId);
-    providerLocation.endpoint = @(kOTAProviderEndpointId);
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    XCTestExpectation * updateDefaultOTAProviderExpectation =
-        [self expectationWithDescription:@"UpdateDefaultOTAProvider verified"];
-
-    [sController
-            getBaseDevice:kDeviceId1
-                    queue:queue
-        completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-            XCTAssertEqual(error.code, 0);
-            XCTAssertNotNil(device);
-
-            MTRBaseClusterOtaSoftwareUpdateRequestor * cluster =
-                [[MTRBaseClusterOtaSoftwareUpdateRequestor alloc] initWithDevice:device endpointID:@(0) queue:queue];
-            NSArray * value = [NSArray arrayWithObject:providerLocation];
-            [cluster
-                writeAttributeDefaultOTAProvidersWithValue:value
-                                                completion:^(NSError * _Nullable error) {
-                                                    XCTAssertNil(error);
-                                                    MTRReadParams * params = [[MTRReadParams alloc] init];
-                                                    params.filterByFabric = true;
-                                                    [cluster
-                                                        readAttributeDefaultOTAProvidersWithParams:params
-                                                                                        completion:^(NSArray * _Nullable readValue,
-                                                                                            NSError * _Nullable err) {
-                                                                                            XCTAssertEqual(error.code, 0);
-                                                                                            XCTAssertNotNil(readValue);
-                                                                                            XCTAssertTrue(
-                                                                                                [self AreEqual:[readValue
-                                                                                                                   objectAtIndex:0]
-                                                                                                    providerLocation:
-                                                                                                        providerLocation]);
-                                                                                            [updateDefaultOTAProviderExpectation
-                                                                                                fulfill];
-                                                                                        }];
-                                                }];
-        }];
-
-    [self waitForExpectations:@[ updateDefaultOTAProviderExpectation ] timeout:kPairingTimeoutInSeconds];
-}
-
-- (void)test002_ReceiveQueryImageRequest_RespondUpdateNotAvailable
+- (void)test001_ReceiveQueryImageRequest_RespondUpdateNotAvailable
 {
     // Test that if we advertise ourselves as a provider we end up getting a
     // QueryImage callbacks that we can respond to.
@@ -744,7 +684,7 @@ static BOOL sNeedsStackShutdown = YES;
     sOTAProviderDelegate.queryImageHandler = nil;
 }
 
-- (void)test003_ReceiveTwoQueryImageRequests_RespondExplicitBusy
+- (void)test002_ReceiveTwoQueryImageRequests_RespondExplicitBusy
 {
     // Test that if we advertise ourselves as a provider and respond BUSY to
     // QueryImage callback, then we get a second QueryImage callback later on
@@ -783,7 +723,7 @@ static BOOL sNeedsStackShutdown = YES;
     [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
 }
 
-- (void)test004_ReceiveQueryImageRequestWhileHandlingBDX_RespondImplicitBusy
+- (void)test003_ReceiveQueryImageRequestWhileHandlingBDX_RespondImplicitBusy
 {
     // In this test we do the following:
     //
@@ -871,7 +811,7 @@ static BOOL sNeedsStackShutdown = YES;
     [self waitForExpectations:@[ announceResponseExpectation1, announceResponseExpectation2 ] timeout:kTimeoutInSeconds];
 }
 
-- (void)test005_DoBDXTransferDenyUpdateRequest
+- (void)test004_DoBDXTransferDenyUpdateRequest
 {
     // In this test we do the following:
     //
@@ -931,11 +871,11 @@ static BOOL sNeedsStackShutdown = YES;
     [self waitForExpectations:@[ checker.notifyUpdateAppliedExpectation ] timeout:kTimeoutInSeconds];
 }
 
-// TODO: Enable tests 006, 007 and 008 when PR #26040 is merged. Currently the poll interval causes delays in the BDX transfer
+// TODO: Enable tests 005, 006 and 007 when PR #26040 is merged. Currently the poll interval causes delays in the BDX transfer
 // and results in the tests taking a long time. With PR #26040 we eliminate the poll interval completely and hence the tests can run
 // in a short time.
-#ifdef ENABLE_TESTS
-- (void)test006_DoBDXTransferAllowUpdateRequest
+#ifdef ENABLE_REAL_OTA_UPDATE_TESTS
+- (void)test005_DoBDXTransferAllowUpdateRequest
 {
     // In this test we do the following:
     //
@@ -949,7 +889,7 @@ static BOOL sNeedsStackShutdown = YES;
     // 8) Wait for the app to restart and wait for the NotifyUpdateApplied message to confirm the app has updated to the new version
 
     // This test expects a pre-generated raw image at otaRawImagePath.
-    NSString * otaRawImagePath = @"/tmp/ota-test006-raw-image";
+    NSString * otaRawImagePath = @"/tmp/ota-raw-image-v5";
 
     // Check if the ota raw image exists at kOtaRawImagePath
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath]);
@@ -986,71 +926,65 @@ static BOOL sNeedsStackShutdown = YES;
     [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
 }
 
-- (void)test007_DoBDXTransferWithTwoOTARequesters
+- (void)test006_DoBDXTransferWithTwoOTARequesters
 {
-    // In this test we do the following:
-    //
-    // 1) Check that the ota image files and raw image files required for this test exist for both OTA requestors
-    // 2) Advertise ourselves to the first OTA requestor.
-    // 3) When device1 queries for an image, pass the image path for the ota file generated beforehand as a pre-requisite for first
-    // OTA requestor 4) When device1 tries to start a bdx transfer, respond with success for the first OTA requestor
-    //    Set queryHandler to return busy with a busy delay of 30 secs and advertise ourselves to the second OTA requestor
-    // 5) When second OTA requestor queries send image available with busy delay of 30 secs indicating the provider is busy.
-    // 6) Send the data as the BDX transfer proceeds for the first OTA requestor
-    // 7) When BDX transfer ends, set up the query handler to return available for second OTA requestor and populate all the other
-    // BDX handlers
-    //    to handle BDX for the second requestor.
-    // 8) When device2 queries for an image, pass the image path for the ota file generated beforehand as a pre-requisite for second
-    // OTA requestor 9) Send the data as the BDX transfer proceeds for second OTA requestor 8) Confirm the downloaded ota image
-    // matches the raw image file that was generated before the test was run as a pre-requisite for the first OTA requestor 9) When
-    // device1 invokes ApplyUpdateRequest, respond with Proceed so that the update proceeds for the first OTA requestor 10) Wait for
-    // the app to restart and wait for the NotifyUpdateApplied message to confirm the app has updated to the new version for the
-    // first OTA requestor 11) Update the handlers for ApplyUpdateRequest and NotifyUpdateApplied for the second OTA requestor 12)
-    // Confirm the downloaded ota image matches the raw image file that was generated before the test was run as a pre-requisite for
-    // the second OTA requestor 13) When device2 invokes ApplyUpdateRequest, respond with Proceed so that the update proceeds for
-    // the second OTA requestor 14) Wait for the app to restart and wait for the NotifyUpdateApplied message to confirm the app has
-    // updated to the new version for the second OTA requestor
+    // Note: This test has a dependency on test005_DoBDXTransferAllowUpdateRequest since we update device1 to version
+    // number 5 in the above test. We reuse device1 for this test and we need to use an OTA image with a higher version number (10) for
+    // device1 to update itself again. We need to fix this when we want to run tests out of order.
 
-    // This test expects a pre-generated raw image at otaRawImagePath1 for ota requestor 1 and at otaRawImagePath2 for ota
-    // requestor 2.
-    NSString * otaRawImagePath1 = @"/tmp/ota-test007-raw-image";
-    NSString * otaRawImagePath2 = @"/tmp/ota-test006-raw-image";
+    // In this test, we test BDX transfers between one provider and two OTA requestors device1 and device2.
+    //
+    // 1) We announce ourselves to device1 first.
+    // 2) When device1 queries, we return image available at imagePath1.
+    // 3) We set the BDX begin and end handlers for device1 and device1 starts the BDX transfer.
+    // 4) At this time, we announce ourselves to device2.
+    // 5) When device2 queries, we return image available with a busy delay of 30 secs.
+    // 6) When device1 completes the BDX transfer, we wait for device2 to query.
+    // 7) When device 2 queries again, we return image available at imagePath2.
+    // 8) We set the BDX begin and end handlers for device2 and device2 starts the BDX transfer.
+    // 9) Device1 applies the update independently and reboots with the new image.
+    // 10) At this point, we set the apply update handlers for device2.
+    // 11) Device2 applies the update and reboots with its new image.
+
+    // This test expects a pre-generated raw image at otaRawImagePath1 for device1 and at otaRawImagePath2 for device2.
+    NSString * otaRawImagePath1 = @"/tmp/ota-raw-image-v10";
+    NSString * otaRawImagePath2 = @"/tmp/ota-raw-image-v5";
 
     // Check if the ota raw image exists at kOtaRawImagePath1 and kOtaRawImagePath2
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath1]);
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath2]);
 
     XCTestExpectation * queryExpectation1 =
-        [self expectationWithDescription:@"handleQueryImageForNodeID called for first OTA requestor"];
+        [self expectationWithDescription:@"handleQueryImageForNodeID called for device1"];
     XCTestExpectation * queryExpectation2 =
-        [self expectationWithDescription:@"handleQueryImageForNodeID called for second OTA requestor - busy"];
+        [self expectationWithDescription:@"handleQueryImageForNodeID called for device2 - busy"];
     XCTestExpectation * queryExpectation3 =
-        [self expectationWithDescription:@"handleQueryImageForNodeID called for second OTA requestor - available"];
+        [self expectationWithDescription:@"handleQueryImageForNodeID called for device2 - available"];
 
     XCTestExpectation * bdxBeginExpectation1 =
-        [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called for first OTA requestor"];
+        [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called for device1"];
     XCTestExpectation * bdxBeginExpectation2 =
-        [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called for second OTA requestor"];
+        [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called for device2"];
 
     XCTestExpectation * bdxQueryExpectation1 =
-        [self expectationWithDescription:@"handleBDXQueryForNodeID called for first OTA requestor"];
+        [self expectationWithDescription:@"handleBDXQueryForNodeID called for device1"];
     XCTestExpectation * bdxQueryExpectation2 =
-        [self expectationWithDescription:@"handleBDXQueryForNodeID called for second OTA requestor"];
+        [self expectationWithDescription:@"handleBDXQueryForNodeID called for device2"];
 
     XCTestExpectation * bdxEndExpectation1 =
-        [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called for first OTA requestor"];
+        [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called for device1"];
     XCTestExpectation * bdxEndExpectation2 =
-        [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called for second OTA requestor"];
+        [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called for device2"];
 
     XCTestExpectation * applyUpdateRequestExpectation1 =
-        [self expectationWithDescription:@"handleApplyUpdateRequestForNodeID called for first OTA requestor"];
+        [self expectationWithDescription:@"handleApplyUpdateRequestForNodeID called for device1"];
     XCTestExpectation * applyUpdateRequestExpectation2 =
-        [self expectationWithDescription:@"handleApplyUpdateRequestForNodeID called for second OTA requestor"];
+        [self expectationWithDescription:@"handleApplyUpdateRequestForNodeID called for device2"];
 
     XCTestExpectation * notifyUpdateAppliedExpectation1 =
-        [self expectationWithDescription:@"handleNotifyUpdateAppliedForNodeID called for first OTA requestor"];
+        [self expectationWithDescription:@"handleNotifyUpdateAppliedForNodeID called for device1"];
     XCTestExpectation * notifyUpdateAppliedExpectation2 =
-        [self expectationWithDescription:@"handleNotifyUpdateAppliedForNodeID called for second OTA requestor"];
+        [self expectationWithDescription:@"handleNotifyUpdateAppliedForNodeID called for device2"];
 
     __block XCTestExpectation * announceResponseExpectation2;
 
@@ -1099,7 +1033,7 @@ static BOOL sNeedsStackShutdown = YES;
     __auto_type * device1 = sConnectedDevice1;
     __auto_type * device2 = sConnectedDevice2;
 
-    // Set up the query handlers and BDX transfer handlers for the first OTA requestor
+    // Set up the query handler for device 1 to return image available at imagePath1
     sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
         MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
         XCTAssertEqualObjects(nodeID, @(kDeviceId1));
@@ -1115,6 +1049,7 @@ static BOOL sNeedsStackShutdown = YES;
         [queryExpectation1 fulfill];
     };
 
+    // Set up the BDX transfer begin, block query and transfer end handlers for device1 so it can go ahead with the BDX transfer
     sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSString * fileDesignator,
         NSNumber * offset, MTRStatusCompletion completion) {
         XCTAssertEqualObjects(nodeID, @(kDeviceId1));
@@ -1129,7 +1064,7 @@ static BOOL sNeedsStackShutdown = YES;
         XCTAssertTrue([readHandle seekToEndReturningOffset:&imageSize error:&endSeekError]);
         XCTAssertNil(endSeekError);
 
-        // Set up the query handler to return busy for the second OTA requestor as BDX has begun with first OTA requestor
+        // Set up the query handler for device2 to return image available at imagePath2 but a busy delay of 30 secs
         sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
             MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
             XCTAssertEqualObjects(nodeID, @(kDeviceId2));
@@ -1148,7 +1083,7 @@ static BOOL sNeedsStackShutdown = YES;
         [sOTAProviderDelegate respondSuccess:completion];
         [bdxBeginExpectation1 fulfill];
 
-        // Announce to the second requestor
+        // Announce ourselves to device2
         announceResponseExpectation2 = [self announceProviderToDevice:device2];
     };
     sOTAProviderDelegate.blockQueryHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSNumber * blockSize,
@@ -1193,8 +1128,8 @@ static BOOL sNeedsStackShutdown = YES;
         sOTAProviderDelegate.transferEndHandler = nil;
         [bdxEndExpectation1 fulfill];
 
-        // BDX transfer with first OTA requestor has completed
-        // Set up the query handlers and BDX transfer handlers for the second OTA requestor
+        // BDX transfer with device1 has completed
+        // Set up the query handler for device2 to return image available at imagePath2
         sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
             MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
             XCTAssertEqualObjects(nodeID, @(kDeviceId2));
@@ -1209,6 +1144,8 @@ static BOOL sNeedsStackShutdown = YES;
                                                  completion:completion];
             [queryExpectation3 fulfill];
         };
+
+        // Set up the BDX transfer begin, block query and transfer end handlers for device2 so it can go ahead with the BDX transfer
         sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
             NSString * fileDesignator, NSNumber * offset, MTRStatusCompletion completion) {
             XCTAssertEqualObjects(nodeID, @(kDeviceId2));
@@ -1271,6 +1208,8 @@ static BOOL sNeedsStackShutdown = YES;
                   [bdxEndExpectation2 fulfill];
               };
     };
+
+    // Set up the apply update request and update applied handlers for device1
     sOTAProviderDelegate.applyUpdateRequestHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
         MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams * params, ApplyUpdateRequestCompletion completion) {
         XCTAssertEqualObjects(nodeID, @(kDeviceId1));
@@ -1296,8 +1235,8 @@ static BOOL sNeedsStackShutdown = YES;
         [sOTAProviderDelegate respondSuccess:completion];
         [notifyUpdateAppliedExpectation1 fulfill];
 
-        // Update has been applied for the first OTA requestor
-        // Set up the applyUpdate and notifyUpdateApplied handlers for the second OTA requestor
+        // Update has been applied for device1
+        // Set up the apply update request and update applied handlers for device2
         sOTAProviderDelegate.applyUpdateRequestHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
             MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams * params, ApplyUpdateRequestCompletion completion) {
             XCTAssertEqualObjects(nodeID, @(kDeviceId2));
@@ -1358,29 +1297,26 @@ static BOOL sNeedsStackShutdown = YES;
                  enforceOrder:YES];
 }
 
-- (void)test008_DoBDXTransferIncrementalOtaUpdate
+- (void)test007_DoBDXTransferIncrementalOtaUpdate
 {
-    // In this test we do the following:
+    // In this test, we test incremental OTA update with device3. First we update device3
+    // to version 5 using image at imagePath1. Once device3 updates and reboots, we update
+    // it to version 10 using image at imagePath2.
     //
-    // 1) Check if the ota image file and raw image file required for this test exist.
-    //    Two versions must be present with one version greater than the other.
-    // 2) Advertise ourselves to device.
-    // 3) When device queries for an image, pass the image path for the ota file generated beforehand as a pre-requisite with a
-    // lower version number. 4) When device tries to start a bdx transfer, respond with success. 5) Send the data as the BDX
-    // transfer proceeds. 6) Confirm the downloaded ota image matches the raw image file that was generated before the test was run
-    // as a pre-requisite with the lower version number 7) When device invokes ApplyUpdateRequest, respond with Proceed so that the
-    // update proceeds 8) Wait for the app to restart and wait for the NotifyUpdateApplied message to confirm the app has updated to
-    // the new version 9) Advertise ourselves again to device. 3) When device queries for an image, pass the image path for the ota
-    // file generated beforehand as a pre-requisite with a higher version number. 4) When device tries to start a bdx transfer,
-    // respond with success. 5) Send the data as the BDX transfer proceeds. 6) Confirm the downloaded ota image matches the raw
-    // image file that was generated before the test was run as a pre-requisite with the higher version number 7) When device
-    // invokes ApplyUpdateRequest, respond with Proceed so that the update proceeds 8) Wait for the app to restart and wait for the
-    // NotifyUpdateApplied message to confirm the app has updated to the new version
+    // 1) We announce ourselves to device3.
+    // 2) When device3 queries, we return image available at imagePath1 with version number 5.
+    // 3) We set the BDX begin and end handlers for device3 and device3 starts the BDX transfer.
+    // 4) Device3 completes the BDX transfer
+    // 5) Device3 applies the update and reboots with the new image with version number 5
+    // 6) We announce ourselves to device 3 again.
+    // 7) When device3 queries again, we return image available at imagePath2 with version number 10.
+    // 8) We set the BDX begin and end handlers for device3 and device3 starts the BDX transfer.
+    // 4) Device3 completes the BDX transfer
+    // 5) Device3 applies the update and reboots with the new image with version number 10
 
-    // This test expects a pre-generated raw image at otaRawImagePath1 with lower version number and a raw image at otaRawImagePath2
-    // with higher version number
-    NSString * otaRawImagePath1 = @"/tmp/ota-test006-raw-image";
-    NSString * otaRawImagePath2 = @"/tmp/ota-test007-raw-image";
+    // This test expects a pre-generated raw image at otaRawImagePath1 and a raw image at otaRawImagePath2
+    NSString * otaRawImagePath1 = @"/tmp/ota-raw-image-v5";
+    NSString * otaRawImagePath2 = @"/tmp/ota-raw-image-v10";
 
     // Check if the ota raw image exists at kOtaRawImagePath1 and kOtaRawImagePath2
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath1]);
@@ -1450,7 +1386,7 @@ static BOOL sNeedsStackShutdown = YES;
     // to _any_ of the above expectations.
     [self waitForExpectations:@[ announceResponseExpectation1 ] timeout:kTimeoutInSeconds];
 }
-#endif // ENABLE_TESTS
+#endif // ENABLE_REAL_OTA_UPDATE_TESTS
 
 - (void)test999_TearDown
 {
