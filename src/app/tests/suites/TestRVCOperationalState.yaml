@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Operational State Tests
+name: RVC Operational State Tests
 
 config:
     nodeId: 0x12344321
@@ -76,15 +76,13 @@ tests:
     - label: "Start Command"
       command: "Start"
       response:
-          values:
-              - name: "CommandResponseState"
-                value: { ErrorStateID: 0 }
+          error: UNSUPPORTED_COMMAND
 
     - label: "Read current Operational State"
       command: "readAttribute"
       attribute: "OperationalState"
       response:
-          value: 1
+          value: 0
 
     - label: "Pause Command"
       command: "Pause"
@@ -115,12 +113,10 @@ tests:
     - label: "Stop Command"
       command: "Stop"
       response:
-          values:
-              - name: "CommandResponseState"
-                value: { ErrorStateID: 0 }
+          error: UNSUPPORTED_COMMAND
 
     - label: "Read current Operational State"
       command: "readAttribute"
       attribute: "OperationalState"
       response:
-          value: 0
+          value: 1
