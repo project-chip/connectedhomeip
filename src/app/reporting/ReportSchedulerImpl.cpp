@@ -59,18 +59,6 @@ void ReportSchedulerImpl::OnReadHandlerCreated(ReadHandler * aReadHandler)
     ScheduleReport(newTimeout, newNode);
 }
 
-/// @brief When a ReadHandler's interval get changed after creation, update the min and max timestamps and reschedule the
-/// next timer callback.
-void ReportSchedulerImpl::OnReportingIntervalsChanged(ReadHandler * aReadHandler)
-{
-    ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
-    VerifyOrReturn(nullptr != node);
-    node->SetIntervalTimeStamps(aReadHandler);
-    Milliseconds32 newTimeout;
-    CalculateNextReportTimeout(newTimeout, node);
-    ScheduleReport(newTimeout, node);
-}
-
 /// @brief When a ReadHandler becomes reportable, schedule, recalculate and reschedule the report.
 void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
 {

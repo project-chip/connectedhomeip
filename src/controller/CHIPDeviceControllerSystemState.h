@@ -170,25 +170,64 @@ public:
         return mSystemLayer != nullptr && mUDPEndPointManager != nullptr && mTransportMgr != nullptr && mSessionMgr != nullptr &&
             mUnsolicitedStatusHandler != nullptr && mExchangeMgr != nullptr && mMessageCounterManager != nullptr &&
             mFabrics != nullptr && mCASESessionManager != nullptr && mSessionSetupPool != nullptr && mCASEClientPool != nullptr &&
-            mGroupDataProvider != nullptr && mReportScheduler != nullptr && mSessionKeystore != nullptr;
+            mGroupDataProvider != nullptr && mSessionKeystore != nullptr;
     };
 
-    System::Layer * SystemLayer() const { return mSystemLayer; };
-    Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager() const { return mTCPEndPointManager; };
-    Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager() const { return mUDPEndPointManager; };
-    DeviceTransportMgr * TransportMgr() const { return mTransportMgr; };
-    SessionManager * SessionMgr() const { return mSessionMgr; };
-    Messaging::ExchangeManager * ExchangeMgr() const { return mExchangeMgr; }
-    secure_channel::MessageCounterManager * MessageCounterManager() const { return mMessageCounterManager; };
-    FabricTable * Fabrics() const { return mFabrics; };
+    System::Layer * SystemLayer() const
+    {
+        return mSystemLayer;
+    };
+    Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager() const
+    {
+        return mTCPEndPointManager;
+    };
+    Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager() const
+    {
+        return mUDPEndPointManager;
+    };
+    DeviceTransportMgr * TransportMgr() const
+    {
+        return mTransportMgr;
+    };
+    SessionManager * SessionMgr() const
+    {
+        return mSessionMgr;
+    };
+    Messaging::ExchangeManager * ExchangeMgr() const
+    {
+        return mExchangeMgr;
+    }
+    secure_channel::MessageCounterManager * MessageCounterManager() const
+    {
+        return mMessageCounterManager;
+    };
+    FabricTable * Fabrics() const
+    {
+        return mFabrics;
+    };
 #if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * BleLayer() const { return mBleLayer; };
+    Ble::BleLayer * BleLayer() const
+    {
+        return mBleLayer;
+    };
 #endif
-    CASESessionManager * CASESessionMgr() const { return mCASESessionManager; }
-    Credentials::GroupDataProvider * GetGroupDataProvider() const { return mGroupDataProvider; }
-    chip::app::reporting::ReportScheduler * GetReportScheduler() const { return mReportScheduler; }
+    CASESessionManager * CASESessionMgr() const
+    {
+        return mCASESessionManager;
+    }
+    Credentials::GroupDataProvider * GetGroupDataProvider() const
+    {
+        return mGroupDataProvider;
+    }
+    chip::app::reporting::ReportScheduler * GetReportScheduler() const
+    {
+        return mReportScheduler;
+    }
 
-    Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
+    Crypto::SessionKeystore * GetSessionKeystore() const
+    {
+        return mSessionKeystore;
+    }
     void SetTempFabricTable(FabricTable * tempFabricTable, bool enableServerInteractions)
     {
         mTempFabricTable          = tempFabricTable;

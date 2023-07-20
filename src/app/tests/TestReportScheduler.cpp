@@ -138,8 +138,8 @@ public:
         // Normaly we would call the callback here, thus scheduling an engine run, but we don't need it for this test as we simulate
         // all the callbacks related to report emissions. The actual callback should look like this:
         //
-        // ReadHandlerNode * node = static_cast<ReadHandlerNode *>(aAppState);
-        // node->RunCallback();
+        ReadHandlerNode * node = static_cast<ReadHandlerNode *>(aAppState);
+        node->RunCallback();
         ChipLogProgress(DataManagement, "Simluating engine run for Handler: %p", aAppState);
     }
     virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) override
@@ -334,8 +334,9 @@ public:
 
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMaxReportingInterval(2));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMinReportingIntervalForTests(1));
-        // Do those manually to avoid scheduling an engine run
-        readHandler1->mState = ReadHandler::HandlerState::GeneratingReports;
+        ReadHandlerNode * node = sScheduler.FindReadHandlerNode(readHandler1);
+        node->SetIntervalTimeStamps(readHandler1);
+        readHandler1->MoveToState(ReadHandler::HandlerState::GeneratingReports);
         readHandler1->ForceDirtyState();
 
         // Clean read handler, will be triggered at max interval
@@ -343,16 +344,18 @@ public:
             readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler2->SetMaxReportingInterval(3));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler2->SetMinReportingIntervalForTests(0));
-        // Do those manually to avoid scheduling an engine run
-        readHandler2->mState = ReadHandler::HandlerState::GeneratingReports;
+        node = sScheduler.FindReadHandlerNode(readHandler2);
+        node->SetIntervalTimeStamps(readHandler2);
+        readHandler2->MoveToState(ReadHandler::HandlerState::GeneratingReports);
 
         // Clean read handler, will be triggered at max interval, but will be cancelled before
         ReadHandler * readHandler3 =
             readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler3->SetMaxReportingInterval(3));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler3->SetMinReportingIntervalForTests(0));
-        // Do those manually to avoid scheduling an engine run
-        readHandler3->mState = ReadHandler::HandlerState::GeneratingReports;
+        node = sScheduler.FindReadHandlerNode(readHandler3);
+        node->SetIntervalTimeStamps(readHandler3);
+        readHandler3->MoveToState(ReadHandler::HandlerState::GeneratingReports);
 
         // Confirms that none of the ReadHandlers are currently reportable
         NL_TEST_ASSERT(aSuite, !sScheduler.IsReportableNow(readHandler1));
@@ -411,18 +414,18 @@ public:
 
         // Should have registered the read handler in the scheduler and scheduled a report
         NL_TEST_ASSERT(aSuite, sScheduler.GetNumReadHandlers() == 1);
-        ReadHandlerNode * node = sScheduler.FindReadHandlerNode(readHandler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler->SetMaxReportingInterval(2));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler->SetMinReportingIntervalForTests(1));
+        ReadHandlerNode * node = sScheduler.FindReadHandlerNode(readHandler);
+        node->SetIntervalTimeStamps(readHandler);
 
         // Test OnReportingIntervalsChanged modified the intervals and re-scheduled a report
         NL_TEST_ASSERT(aSuite, node->GetMinTimestamp().count() == 1000);
         NL_TEST_ASSERT(aSuite, node->GetMaxTimestamp().count() == 2000);
-        NL_TEST_ASSERT(aSuite, sScheduler.IsReportScheduled(readHandler));
 
         // Do those manually to avoid scheduling an engine run
-        readHandler->mState = ReadHandler::HandlerState::GeneratingReports;
-        readHandler->SetObserver(&sScheduler);
+        readHandler->MoveToState(ReadHandler::HandlerState::GeneratingReports);
+        NL_TEST_ASSERT(aSuite, sScheduler.IsReportScheduled(readHandler));
 
         NL_TEST_ASSERT(aSuite, nullptr != node);
         VerifyOrReturn(nullptr != node);
@@ -486,21 +489,20 @@ public:
             readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMaxReportingInterval(2));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMinReportingIntervalForTests(0));
+        ReadHandlerNode * node1 = syncScheduler.FindReadHandlerNode(readHandler1);
+        node1->SetIntervalTimeStamps(readHandler1);
         readHandler1->MoveToState(ReadHandler::HandlerState::GeneratingReports);
-        readHandler1->SetObserver(&syncScheduler);
 
         ReadHandler * readHandler2 =
             readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler2->SetMaxReportingInterval(3));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler2->SetMinReportingIntervalForTests(1));
+        ReadHandlerNode * node2 = syncScheduler.FindReadHandlerNode(readHandler2);
+        node2->SetIntervalTimeStamps(readHandler2);
         readHandler2->MoveToState(ReadHandler::HandlerState::GeneratingReports);
-        readHandler2->SetObserver(&syncScheduler);
 
         // Confirm all handler are currently registered in the scheduler
         NL_TEST_ASSERT(aSuite, syncScheduler.GetNumReadHandlers() == 2);
-
-        ReadHandlerNode * node1 = syncScheduler.FindReadHandlerNode(readHandler1);
-        ReadHandlerNode * node2 = syncScheduler.FindReadHandlerNode(readHandler2);
 
         // Confirm that a report emission is scheduled
         NL_TEST_ASSERT(aSuite, syncScheduler.IsReportScheduled());
@@ -600,12 +602,12 @@ public:
             readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler3->SetMaxReportingInterval(3));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler3->SetMinReportingIntervalForTests(2));
+        ReadHandlerNode * node3 = syncScheduler.FindReadHandlerNode(readHandler3);
+        node3->SetIntervalTimeStamps(readHandler3);
         readHandler3->MoveToState(ReadHandler::HandlerState::GeneratingReports);
-        readHandler3->SetObserver(&syncScheduler);
 
         // Confirm all handler are currently registered in the scheduler
         NL_TEST_ASSERT(aSuite, syncScheduler.GetNumReadHandlers() == 3);
-        ReadHandlerNode * node3 = syncScheduler.FindReadHandlerNode(readHandler3);
 
         // Since the min interval on readHandler3 is 2, it should be above the current max timestamp, therefore the next report
         // should still happen on the max timestamp of readHandler1 and the sync should be done on future reports
@@ -657,12 +659,12 @@ public:
             readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler4->SetMaxReportingInterval(1));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler4->SetMinReportingIntervalForTests(0));
+        ReadHandlerNode * node4 = syncScheduler.FindReadHandlerNode(readHandler4);
+        node4->SetIntervalTimeStamps(readHandler4);
         readHandler4->MoveToState(ReadHandler::HandlerState::GeneratingReports);
-        readHandler4->SetObserver(&syncScheduler);
 
         // Confirm all handler are currently registered in the scheduler
         NL_TEST_ASSERT(aSuite, syncScheduler.GetNumReadHandlers() == 4);
-        ReadHandlerNode * node4 = syncScheduler.FindReadHandlerNode(readHandler4);
 
         // Confirm next report is scheduled on the max timestamp of readHandler4 and other handlers 1 and 2 are synced
         NL_TEST_ASSERT(aSuite, syncScheduler.mTestNextReportTimestamp == node4->GetMaxTimestamp());

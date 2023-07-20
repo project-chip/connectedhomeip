@@ -77,7 +77,8 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
 
     mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
 
-    VerifyOrDie(CHIP_NO_ERROR == SetObserver(observer));
+    VerifyOrDie(observer != nullptr);
+    mObserver = observer;
     mObserver->OnReadHandlerCreated(this);
 }
 
@@ -89,7 +90,8 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer) :
     mInteractionType = InteractionType::Subscribe;
     mFlags.ClearAll();
 
-    VerifyOrDie(CHIP_NO_ERROR == SetObserver(observer));
+    VerifyOrDie(observer != nullptr);
+    mObserver = observer;
     mObserver->OnReadHandlerCreated(this);
 }
 
@@ -134,10 +136,7 @@ void ReadHandler::ResumeSubscription(CASESessionManager & caseSessionManager,
 
 ReadHandler::~ReadHandler()
 {
-    if (nullptr != mObserver)
-    {
-        mObserver->OnReadHandlerDestroyed(this);
-    }
+    mObserver->OnReadHandlerDestroyed(this);
 
     auto * appCallback = mManagementCallback.GetAppCallback();
     if (mFlags.Has(ReadHandlerFlags::ActiveSubscription) && appCallback)
@@ -332,13 +331,11 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
             InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
         }
 
-        if (IsType(InteractionType::Subscribe) && !IsPriming())
+        // If we just finished a non-priming subscription report, notify our observers.
+        // Priming reports are handled when we send SubscribeResponse.
+        if (IsType(InteractionType::Subscribe) && !IsPriming() && !IsChunkedReport())
         {
-            // Check if this is a chunked report, this will make the reschedule only happen on the last chunk if this is the case
-            if (!IsChunkedReport())
-            {
-                mObserver->OnSubscriptionAction(this);
-            }
+            mObserver->OnSubscriptionAction(this);
         }
     }
     if (!aMoreChunks)
@@ -650,10 +647,7 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
     ReturnErrorOnFailure(writer.Finalize(&packet));
     VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
 
-    if (nullptr != mObserver)
-    {
-        mObserver->OnSubscriptionAction(this);
-    }
+    mObserver->OnSubscriptionAction(this);
 
     ClearStateFlag(ReadHandlerFlags::PrimingReports);
     return mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeResponse, std::move(packet));

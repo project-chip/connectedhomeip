@@ -1597,8 +1597,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         dirtyPath5.mAttributeId = 4;
 
         // Test report with 2 different path
-        ReadHandlerNode * delegateNode = reportScheduler->FindReadHandlerNode(delegate.mpReadHandler);
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
         delegate.mGotReport            = false;
         delegate.mGotEventResponse     = false;
         delegate.mNumAttributeResponse = 0;
@@ -1610,13 +1609,15 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
 
         ctx.DrainAndServiceIO();
 
-        NL_TEST_ASSERT(apSuite, !delegateNode->GetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed));
+        NL_TEST_ASSERT(
+            apSuite,
+            !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse == true);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 2 different path, and 1 same path
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -1628,12 +1629,14 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
 
         ctx.DrainAndServiceIO();
 
-        NL_TEST_ASSERT(apSuite, !delegateNode->GetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed));
+        NL_TEST_ASSERT(
+            apSuite,
+            !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 3 different path, and one path is overlapped with another
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -1645,12 +1648,14 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
 
         ctx.DrainAndServiceIO();
 
-        NL_TEST_ASSERT(apSuite, !delegateNode->GetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed));
+        NL_TEST_ASSERT(
+            apSuite,
+            !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 3 different path, all are not overlapped, one path is not interested for current subscription
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -1662,16 +1667,18 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
 
         ctx.DrainAndServiceIO();
 
-        NL_TEST_ASSERT(apSuite, !delegateNode->GetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed));
+        NL_TEST_ASSERT(
+            apSuite,
+            !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test empty report
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MaxIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MaxIntervalElapsed, true);
         // Manually trigger the callback that would schedule the next report as it would normally have been called if the time had
         // elapsed as simulated above
-        delegateNode->RunCallback();
+        reportScheduler->RunNodeCallbackForHandler(delegate.mpReadHandler);
 
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
         delegate.mGotReport            = false;
@@ -1760,15 +1767,12 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
 
         GenerateEvents(apSuite, apContext);
 
-        ReadHandlerNode * nonUrgentDelegateNode = reportScheduler->FindReadHandlerNode(nonUrgentDelegate.mpReadHandler);
-        ReadHandlerNode * delegateNode          = reportScheduler->FindReadHandlerNode(delegate.mpReadHandler);
-
-        NL_TEST_ASSERT(apSuite, delegateNode->GetMinTimestamp() > startTime);
+        NL_TEST_ASSERT(apSuite, reportScheduler->GetMinTimestampForHandler(delegate.mpReadHandler) > startTime);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
         delegate.mGotEventResponse = false;
         delegate.mGotReport        = false;
 
-        NL_TEST_ASSERT(apSuite, nonUrgentDelegateNode->GetMinTimestamp() > startTime);
+        NL_TEST_ASSERT(apSuite, reportScheduler->GetMinTimestampForHandler(nonUrgentDelegate.mpReadHandler) > startTime);
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
         nonUrgentDelegate.mGotEventResponse = false;
         nonUrgentDelegate.mGotReport        = false;
@@ -1804,13 +1808,17 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
 
         // Since we just sent a report for our urgent subscription, the min interval of the urgent subcription should have been
         // updated
-        NL_TEST_ASSERT(apSuite, delegateNode->GetMinTimestamp() > System::SystemClock().GetMonotonicTimestamp());
+        NL_TEST_ASSERT(apSuite,
+                       reportScheduler->GetMinTimestampForHandler(delegate.mpReadHandler) >
+                           System::SystemClock().GetMonotonicTimestamp());
         NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
         delegate.mGotEventResponse = false;
 
         // For our non-urgent subscription, we did not send anything, so the min interval should of the non urgent subcription
         // should be in the past
-        NL_TEST_ASSERT(apSuite, nonUrgentDelegateNode->GetMinTimestamp() < System::SystemClock().GetMonotonicTimestamp());
+        NL_TEST_ASSERT(apSuite,
+                       reportScheduler->GetMinTimestampForHandler(nonUrgentDelegate.mpReadHandler) <
+                           System::SystemClock().GetMonotonicTimestamp());
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
 
         // Wait for the min interval timer to fire.
@@ -1830,14 +1838,20 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
 
         // min-interval should have elapsed for urgen subscription, and our handler should still
         // not be dirty or even reportable.
-        NL_TEST_ASSERT(apSuite, delegateNode->GetMinTimestamp() < System::SystemClock().GetMonotonicTimestamp());
+        NL_TEST_ASSERT(apSuite,
+                       reportScheduler->GetMinTimestampForHandler(delegate.mpReadHandler) <
+                           System::SystemClock().GetMonotonicTimestamp());
         NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
         NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsReportable());
 
         // And the non-urgent one should not have changed state either, since
         // it's waiting for the max-interval.
-        NL_TEST_ASSERT(apSuite, nonUrgentDelegateNode->GetMinTimestamp() < System::SystemClock().GetMonotonicTimestamp());
-        NL_TEST_ASSERT(apSuite, nonUrgentDelegateNode->GetMaxTimestamp() > System::SystemClock().GetMonotonicTimestamp());
+        NL_TEST_ASSERT(apSuite,
+                       reportScheduler->GetMinTimestampForHandler(nonUrgentDelegate.mpReadHandler) <
+                           System::SystemClock().GetMonotonicTimestamp());
+        NL_TEST_ASSERT(apSuite,
+                       reportScheduler->GetMaxTimestampForHandler(nonUrgentDelegate.mpReadHandler) >
+                           System::SystemClock().GetMonotonicTimestamp());
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsReportable());
 
@@ -1852,7 +1866,7 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         // Urgent read handler should now be dirty, and reportable.
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsReportable());
-        NL_TEST_ASSERT(apSuite, delegateNode->IsReportableNow());
+        NL_TEST_ASSERT(apSuite, reportScheduler->IsReadHandlerReportable(delegate.mpReadHandler));
 
         // Non-urgent read handler should not be reportable.
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
@@ -1940,8 +1954,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
         // Set a concrete path dirty
         {
-            ReadHandlerNode * delegateNode = reportScheduler->FindReadHandlerNode(delegate.mpReadHandler);
-            delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+            reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
 
@@ -1955,7 +1968,9 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
             ctx.DrainAndServiceIO();
 
-            NL_TEST_ASSERT(apSuite, !delegateNode->GetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed));
+            NL_TEST_ASSERT(
+                apSuite,
+                !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             // We subscribed wildcard path twice, so we will receive two reports here.
             NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
@@ -1963,8 +1978,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
         // Set a endpoint dirty
         {
-            ReadHandlerNode * delegateNode = reportScheduler->FindReadHandlerNode(delegate.mpReadHandler);
-            delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+            reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
             delegate.mNumArrayItems        = 0;
@@ -1986,7 +2000,9 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
                 ctx.DrainAndServiceIO();
             } while (last != delegate.mNumAttributeResponse);
 
-            NL_TEST_ASSERT(apSuite, !delegateNode->GetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed));
+            NL_TEST_ASSERT(
+                apSuite,
+                !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             // Mock endpoint3 has 13 attributes in total, and we subscribed twice.
             // And attribute 3/2/4 is a list with 6 elements and list chunking
@@ -2058,8 +2074,7 @@ void TestReadInteraction::TestSubscribePartialOverlap(nlTestSuite * apSuite, voi
 
         // Set a partial overlapped path dirty
         {
-            ReadHandlerNode * delegateNode = reportScheduler->FindReadHandlerNode(delegate.mpReadHandler);
-            delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+            reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
 
@@ -2072,7 +2087,9 @@ void TestReadInteraction::TestSubscribePartialOverlap(nlTestSuite * apSuite, voi
 
             ctx.DrainAndServiceIO();
 
-            NL_TEST_ASSERT(apSuite, !delegateNode->GetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed));
+            NL_TEST_ASSERT(
+                apSuite,
+                !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
             NL_TEST_ASSERT(apSuite, delegate.mReceivedAttributePaths[0].mEndpointId == Test::kMockEndpoint2);
@@ -2138,8 +2155,7 @@ void TestReadInteraction::TestSubscribeSetDirtyFullyOverlap(nlTestSuite * apSuit
 
         // Set a full overlapped path dirty and expect to receive one E2C3A1
         {
-            ReadHandlerNode * delegateNode = reportScheduler->FindReadHandlerNode(delegate.mpReadHandler);
-            delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+            reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
 
@@ -2149,7 +2165,9 @@ void TestReadInteraction::TestSubscribeSetDirtyFullyOverlap(nlTestSuite * apSuit
 
             ctx.DrainAndServiceIO();
 
-            NL_TEST_ASSERT(apSuite, !delegateNode->GetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed));
+            NL_TEST_ASSERT(
+                apSuite,
+                !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
             NL_TEST_ASSERT(apSuite, delegate.mReceivedAttributePaths[0].mEndpointId == Test::kMockEndpoint2);
@@ -2264,12 +2282,11 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
-        ReadHandlerNode * delegateNode = reportScheduler->FindReadHandlerNode(delegate.mpReadHandler);
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MaxIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MaxIntervalElapsed, true);
         // Manually trigger the callback that would schedule the next report as it would normally have been called if the time had
         // elapsed as simulated above
-        delegateNode->RunCallback();
+        reportScheduler->RunNodeCallbackForHandler(delegate.mpReadHandler);
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
 
         ctx.DrainAndServiceIO();
@@ -2445,8 +2462,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         dirtyPath2.mAttributeId = 2;
 
         // Test report with 2 different path
-        ReadHandlerNode * delegateNode = reportScheduler->FindReadHandlerNode(delegate.mpReadHandler);
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
 
@@ -2457,12 +2473,14 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
 
         ctx.DrainAndServiceIO();
 
-        NL_TEST_ASSERT(apSuite, !delegateNode->GetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed));
+        NL_TEST_ASSERT(
+            apSuite,
+            !reportScheduler->CheckFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MaxIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MaxIntervalElapsed, true);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         ctx.ExpireSessionBobToAlice();
@@ -2810,9 +2828,8 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
 
-        ReadHandlerNode * delegateNode = reportScheduler->FindReadHandlerNode(delegate.mpReadHandler);
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MaxIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MaxIntervalElapsed, true);
         err = engine->GetReportingEngine().SetDirty(dirtyPath1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         delegate.mGotReport            = false;
@@ -2914,9 +2931,8 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
 
-        ReadHandlerNode * delegateNode = reportScheduler->FindReadHandlerNode(delegate.mpReadHandler);
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MaxIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(delegate.mpReadHandler, ReadHandlerNode::TestFlags::MaxIntervalElapsed, true);
         err = engine->GetReportingEngine().SetDirty(dirtyPath1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         delegate.mGotReport            = false;
@@ -3520,7 +3536,7 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedInvalidReportMess
 
         ctx.GetLoopback().mSentMessageCount = 0;
         auto exchange                       = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(
-            delegate.mpReadHandler->mSessionHandle.Get().Value(), delegate.mpReadHandler);
+                                  delegate.mpReadHandler->mSessionHandle.Get().Value(), delegate.mpReadHandler);
         delegate.mpReadHandler->mExchangeCtx.Grab(exchange);
         err = delegate.mpReadHandler->mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(msgBuf),
                                                                 Messaging::SendMessageFlags::kExpectResponse);
@@ -3689,7 +3705,7 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedReportMessageWith
 
         ctx.GetLoopback().mSentMessageCount = 0;
         auto exchange                       = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(
-            delegate.mpReadHandler->mSessionHandle.Get().Value(), delegate.mpReadHandler);
+                                  delegate.mpReadHandler->mSessionHandle.Get().Value(), delegate.mpReadHandler);
         delegate.mpReadHandler->mExchangeCtx.Grab(exchange);
         err = delegate.mpReadHandler->mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(msgBuf),
                                                                 Messaging::SendMessageFlags::kExpectResponse);
@@ -4297,15 +4313,14 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
         NL_TEST_ASSERT(apSuite, SessionHandle(*readHandler->GetSession()) == ctx.GetSessionAliceToBob());
 
         // Test that we send reports as needed.
-        ReadHandlerNode * delegateNode = reportScheduler->FindReadHandlerNode(readHandler);
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(readHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         engine->GetReportingEngine().SetDirty(subscribePath);
 
         ctx.DrainAndServiceIO();
-
-        NL_TEST_ASSERT(apSuite, !delegateNode->GetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed));
+        NL_TEST_ASSERT(apSuite,
+                       !reportScheduler->CheckFlagsForHandler(readHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed));
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
@@ -4315,7 +4330,7 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
         // Test that if the session is defunct we don't send reports and clean
         // up properly.
         readHandler->GetSession()->MarkAsDefunct();
-        delegateNode->SetTestFlags(ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
+        reportScheduler->SetFlagsForHandler(readHandler, ReadHandlerNode::TestFlags::MinIntervalElapsed, true);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         engine->GetReportingEngine().SetDirty(subscribePath);

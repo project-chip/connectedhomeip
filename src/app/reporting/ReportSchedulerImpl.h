@@ -34,7 +34,6 @@ public:
 
     // ReadHandlerObserver
     void OnReadHandlerCreated(ReadHandler * aReadHandler) final;
-    void OnReportingIntervalsChanged(ReadHandler * aReadHandler) final;
     void OnBecameReportable(ReadHandler * aReadHandler) final;
     void OnSubscriptionAction(ReadHandler * aReadHandler) final;
     void OnReadHandlerDestroyed(ReadHandler * aReadHandler) override;
