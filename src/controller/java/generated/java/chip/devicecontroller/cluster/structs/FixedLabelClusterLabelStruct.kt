@@ -40,16 +40,19 @@ class FixedLabelClusterLabelStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), label)
-    tlvWriter.put(ContextSpecificTag(1), value)
+    tlvWriter.put(ContextSpecificTag(TAG_LABEL), label)
+    tlvWriter.put(ContextSpecificTag(TAG_VALUE), value)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_LABEL = 0
+    private const val TAG_VALUE = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : FixedLabelClusterLabelStruct {
       tlvReader.enterStructure(tag)
-      val label: String = tlvReader.getString(ContextSpecificTag(0))
-      val value: String = tlvReader.getString(ContextSpecificTag(1))
+      val label: String = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
+      val value: String = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
       
       tlvReader.exitContainer()
 

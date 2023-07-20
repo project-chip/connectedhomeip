@@ -40,16 +40,19 @@ class SwitchClusterMultiPressOngoingEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), newPosition)
-    tlvWriter.put(ContextSpecificTag(1), currentNumberOfPressesCounted)
+    tlvWriter.put(ContextSpecificTag(TAG_NEW_POSITION), newPosition)
+    tlvWriter.put(ContextSpecificTag(TAG_CURRENT_NUMBER_OF_PRESSES_COUNTED), currentNumberOfPressesCounted)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_NEW_POSITION = 0
+    private const val TAG_CURRENT_NUMBER_OF_PRESSES_COUNTED = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : SwitchClusterMultiPressOngoingEvent {
       tlvReader.enterStructure(tag)
-      val newPosition: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val currentNumberOfPressesCounted: Int = tlvReader.getInt(ContextSpecificTag(1))
+      val newPosition: Int = tlvReader.getInt(ContextSpecificTag(TAG_NEW_POSITION))
+      val currentNumberOfPressesCounted: Int = tlvReader.getInt(ContextSpecificTag(TAG_CURRENT_NUMBER_OF_PRESSES_COUNTED))
       
       tlvReader.exitContainer()
 

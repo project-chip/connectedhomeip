@@ -40,20 +40,23 @@ class RvcOperationalStateClusterOperationalStateStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), operationalStateID)
+    tlvWriter.put(ContextSpecificTag(TAG_OPERATIONAL_STATE_I_D), operationalStateID)
     if (operationalStateLabel.isPresent) {
       val optoperationalStateLabel = operationalStateLabel.get()
-      tlvWriter.put(ContextSpecificTag(1), optoperationalStateLabel)
+      tlvWriter.put(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL), optoperationalStateLabel)
     }
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_OPERATIONAL_STATE_I_D = 0
+    private const val TAG_OPERATIONAL_STATE_LABEL = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : RvcOperationalStateClusterOperationalStateStruct {
       tlvReader.enterStructure(tag)
-      val operationalStateID: Int = tlvReader.getInt(ContextSpecificTag(0))
+      val operationalStateID: Int = tlvReader.getInt(ContextSpecificTag(TAG_OPERATIONAL_STATE_I_D))
       val operationalStateLabel: Optional<String> = try {
-      Optional.of(tlvReader.getString(ContextSpecificTag(1)))
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }

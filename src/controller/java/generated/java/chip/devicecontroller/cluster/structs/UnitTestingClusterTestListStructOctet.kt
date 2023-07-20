@@ -40,16 +40,19 @@ class UnitTestingClusterTestListStructOctet (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), member1)
-    tlvWriter.put(ContextSpecificTag(1), member2)
+    tlvWriter.put(ContextSpecificTag(TAG_MEMBER1), member1)
+    tlvWriter.put(ContextSpecificTag(TAG_MEMBER2), member2)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_MEMBER1 = 0
+    private const val TAG_MEMBER2 = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : UnitTestingClusterTestListStructOctet {
       tlvReader.enterStructure(tag)
-      val member1: Long = tlvReader.getLong(ContextSpecificTag(0))
-      val member2: ByteArray = tlvReader.getByteArray(ContextSpecificTag(1))
+      val member1: Long = tlvReader.getLong(ContextSpecificTag(TAG_MEMBER1))
+      val member2: ByteArray = tlvReader.getByteArray(ContextSpecificTag(TAG_MEMBER2))
       
       tlvReader.exitContainer()
 

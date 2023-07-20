@@ -40,16 +40,19 @@ class TargetNavigatorClusterTargetInfoStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), identifier)
-    tlvWriter.put(ContextSpecificTag(1), name)
+    tlvWriter.put(ContextSpecificTag(TAG_IDENTIFIER), identifier)
+    tlvWriter.put(ContextSpecificTag(TAG_NAME), name)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_IDENTIFIER = 0
+    private const val TAG_NAME = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : TargetNavigatorClusterTargetInfoStruct {
       tlvReader.enterStructure(tag)
-      val identifier: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val name: String = tlvReader.getString(ContextSpecificTag(1))
+      val identifier: Int = tlvReader.getInt(ContextSpecificTag(TAG_IDENTIFIER))
+      val name: String = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       
       tlvReader.exitContainer()
 

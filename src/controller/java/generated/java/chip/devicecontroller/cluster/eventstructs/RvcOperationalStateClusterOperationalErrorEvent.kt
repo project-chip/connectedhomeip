@@ -38,14 +38,16 @@ class RvcOperationalStateClusterOperationalErrorEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    errorState.toTlv(ContextSpecificTag(0), tlvWriter)
+    errorState.toTlv(ContextSpecificTag(TAG_ERROR_STATE), tlvWriter)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_ERROR_STATE = 0
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : RvcOperationalStateClusterOperationalErrorEvent {
       tlvReader.enterStructure(tag)
-      val errorState: chip.devicecontroller.cluster.structs.RvcOperationalStateClusterErrorStateStruct = chip.devicecontroller.cluster.structs.RvcOperationalStateClusterErrorStateStruct.fromTlv(ContextSpecificTag(0), tlvReader)
+      val errorState: chip.devicecontroller.cluster.structs.RvcOperationalStateClusterErrorStateStruct = chip.devicecontroller.cluster.structs.RvcOperationalStateClusterErrorStateStruct.fromTlv(ContextSpecificTag(TAG_ERROR_STATE), tlvReader)
       
       tlvReader.exitContainer()
 

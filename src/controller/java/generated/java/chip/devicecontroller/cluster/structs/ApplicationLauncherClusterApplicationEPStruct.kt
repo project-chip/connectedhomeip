@@ -40,20 +40,23 @@ class ApplicationLauncherClusterApplicationEPStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    application.toTlv(ContextSpecificTag(0), tlvWriter)
+    application.toTlv(ContextSpecificTag(TAG_APPLICATION), tlvWriter)
     if (endpoint.isPresent) {
       val optendpoint = endpoint.get()
-      tlvWriter.put(ContextSpecificTag(1), optendpoint)
+      tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT), optendpoint)
     }
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_APPLICATION = 0
+    private const val TAG_ENDPOINT = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ApplicationLauncherClusterApplicationEPStruct {
       tlvReader.enterStructure(tag)
-      val application: ApplicationLauncherClusterApplicationStruct = ApplicationLauncherClusterApplicationStruct.fromTlv(ContextSpecificTag(0), tlvReader)
+      val application: ApplicationLauncherClusterApplicationStruct = ApplicationLauncherClusterApplicationStruct.fromTlv(ContextSpecificTag(TAG_APPLICATION), tlvReader)
       val endpoint: Optional<Int> = try {
-      Optional.of(tlvReader.getInt(ContextSpecificTag(1)))
+      Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }

@@ -44,34 +44,39 @@ class ChannelClusterLineupInfoStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), operatorName)
+    tlvWriter.put(ContextSpecificTag(TAG_OPERATOR_NAME), operatorName)
     if (lineupName.isPresent) {
       val optlineupName = lineupName.get()
-      tlvWriter.put(ContextSpecificTag(1), optlineupName)
+      tlvWriter.put(ContextSpecificTag(TAG_LINEUP_NAME), optlineupName)
     }
     if (postalCode.isPresent) {
       val optpostalCode = postalCode.get()
-      tlvWriter.put(ContextSpecificTag(2), optpostalCode)
+      tlvWriter.put(ContextSpecificTag(TAG_POSTAL_CODE), optpostalCode)
     }
-    tlvWriter.put(ContextSpecificTag(3), lineupInfoType)
+    tlvWriter.put(ContextSpecificTag(TAG_LINEUP_INFO_TYPE), lineupInfoType)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_OPERATOR_NAME = 0
+    private const val TAG_LINEUP_NAME = 1
+    private const val TAG_POSTAL_CODE = 2
+    private const val TAG_LINEUP_INFO_TYPE = 3
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ChannelClusterLineupInfoStruct {
       tlvReader.enterStructure(tag)
-      val operatorName: String = tlvReader.getString(ContextSpecificTag(0))
+      val operatorName: String = tlvReader.getString(ContextSpecificTag(TAG_OPERATOR_NAME))
       val lineupName: Optional<String> = try {
-      Optional.of(tlvReader.getString(ContextSpecificTag(1)))
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LINEUP_NAME)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
       val postalCode: Optional<String> = try {
-      Optional.of(tlvReader.getString(ContextSpecificTag(2)))
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_POSTAL_CODE)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
-      val lineupInfoType: Int = tlvReader.getInt(ContextSpecificTag(3))
+      val lineupInfoType: Int = tlvReader.getInt(ContextSpecificTag(TAG_LINEUP_INFO_TYPE))
       
       tlvReader.exitContainer()
 

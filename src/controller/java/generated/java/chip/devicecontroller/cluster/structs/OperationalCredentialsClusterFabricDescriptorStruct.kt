@@ -48,24 +48,31 @@ class OperationalCredentialsClusterFabricDescriptorStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(1), rootPublicKey)
-    tlvWriter.put(ContextSpecificTag(2), vendorID)
-    tlvWriter.put(ContextSpecificTag(3), fabricID)
-    tlvWriter.put(ContextSpecificTag(4), nodeID)
-    tlvWriter.put(ContextSpecificTag(5), label)
-    tlvWriter.put(ContextSpecificTag(254), fabricIndex)
+    tlvWriter.put(ContextSpecificTag(TAG_ROOT_PUBLIC_KEY), rootPublicKey)
+    tlvWriter.put(ContextSpecificTag(TAG_VENDOR_I_D), vendorID)
+    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_I_D), fabricID)
+    tlvWriter.put(ContextSpecificTag(TAG_NODE_I_D), nodeID)
+    tlvWriter.put(ContextSpecificTag(TAG_LABEL), label)
+    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_ROOT_PUBLIC_KEY = 1
+    private const val TAG_VENDOR_I_D = 2
+    private const val TAG_FABRIC_I_D = 3
+    private const val TAG_NODE_I_D = 4
+    private const val TAG_LABEL = 5
+    private const val TAG_FABRIC_INDEX = 254
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : OperationalCredentialsClusterFabricDescriptorStruct {
       tlvReader.enterStructure(tag)
-      val rootPublicKey: ByteArray = tlvReader.getByteArray(ContextSpecificTag(1))
-      val vendorID: Int = tlvReader.getInt(ContextSpecificTag(2))
-      val fabricID: Long = tlvReader.getLong(ContextSpecificTag(3))
-      val nodeID: Long = tlvReader.getLong(ContextSpecificTag(4))
-      val label: String = tlvReader.getString(ContextSpecificTag(5))
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(254))
+      val rootPublicKey: ByteArray = tlvReader.getByteArray(ContextSpecificTag(TAG_ROOT_PUBLIC_KEY))
+      val vendorID: Int = tlvReader.getInt(ContextSpecificTag(TAG_VENDOR_I_D))
+      val fabricID: Long = tlvReader.getLong(ContextSpecificTag(TAG_FABRIC_I_D))
+      val nodeID: Long = tlvReader.getLong(ContextSpecificTag(TAG_NODE_I_D))
+      val label: String = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
+      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
       tlvReader.exitContainer()
 

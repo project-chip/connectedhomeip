@@ -44,20 +44,25 @@ class ActionsClusterActionFailedEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), actionID)
-    tlvWriter.put(ContextSpecificTag(1), invokeID)
-    tlvWriter.put(ContextSpecificTag(2), newState)
-    tlvWriter.put(ContextSpecificTag(3), error)
+    tlvWriter.put(ContextSpecificTag(TAG_ACTION_I_D), actionID)
+    tlvWriter.put(ContextSpecificTag(TAG_INVOKE_I_D), invokeID)
+    tlvWriter.put(ContextSpecificTag(TAG_NEW_STATE), newState)
+    tlvWriter.put(ContextSpecificTag(TAG_ERROR), error)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_ACTION_I_D = 0
+    private const val TAG_INVOKE_I_D = 1
+    private const val TAG_NEW_STATE = 2
+    private const val TAG_ERROR = 3
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ActionsClusterActionFailedEvent {
       tlvReader.enterStructure(tag)
-      val actionID: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val invokeID: Long = tlvReader.getLong(ContextSpecificTag(1))
-      val newState: Int = tlvReader.getInt(ContextSpecificTag(2))
-      val error: Int = tlvReader.getInt(ContextSpecificTag(3))
+      val actionID: Int = tlvReader.getInt(ContextSpecificTag(TAG_ACTION_I_D))
+      val invokeID: Long = tlvReader.getLong(ContextSpecificTag(TAG_INVOKE_I_D))
+      val newState: Int = tlvReader.getInt(ContextSpecificTag(TAG_NEW_STATE))
+      val error: Int = tlvReader.getInt(ContextSpecificTag(TAG_ERROR))
       
       tlvReader.exitContainer()
 

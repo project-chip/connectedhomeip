@@ -64,56 +64,71 @@ class ThreadNetworkDiagnosticsClusterNeighborTableStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), extAddress)
-    tlvWriter.put(ContextSpecificTag(1), age)
-    tlvWriter.put(ContextSpecificTag(2), rloc16)
-    tlvWriter.put(ContextSpecificTag(3), linkFrameCounter)
-    tlvWriter.put(ContextSpecificTag(4), mleFrameCounter)
-    tlvWriter.put(ContextSpecificTag(5), lqi)
-    if (averageRssi == null) { tlvWriter.putNull(ContextSpecificTag(6)) }
+    tlvWriter.put(ContextSpecificTag(TAG_EXT_ADDRESS), extAddress)
+    tlvWriter.put(ContextSpecificTag(TAG_AGE), age)
+    tlvWriter.put(ContextSpecificTag(TAG_RLOC16), rloc16)
+    tlvWriter.put(ContextSpecificTag(TAG_LINK_FRAME_COUNTER), linkFrameCounter)
+    tlvWriter.put(ContextSpecificTag(TAG_MLE_FRAME_COUNTER), mleFrameCounter)
+    tlvWriter.put(ContextSpecificTag(TAG_LQI), lqi)
+    if (averageRssi == null) { tlvWriter.putNull(ContextSpecificTag(TAG_AVERAGE_RSSI)) }
     else {
-      tlvWriter.put(ContextSpecificTag(6), averageRssi)
+      tlvWriter.put(ContextSpecificTag(TAG_AVERAGE_RSSI), averageRssi)
     }
-    if (lastRssi == null) { tlvWriter.putNull(ContextSpecificTag(7)) }
+    if (lastRssi == null) { tlvWriter.putNull(ContextSpecificTag(TAG_LAST_RSSI)) }
     else {
-      tlvWriter.put(ContextSpecificTag(7), lastRssi)
+      tlvWriter.put(ContextSpecificTag(TAG_LAST_RSSI), lastRssi)
     }
-    tlvWriter.put(ContextSpecificTag(8), frameErrorRate)
-    tlvWriter.put(ContextSpecificTag(9), messageErrorRate)
-    tlvWriter.put(ContextSpecificTag(10), rxOnWhenIdle)
-    tlvWriter.put(ContextSpecificTag(11), fullThreadDevice)
-    tlvWriter.put(ContextSpecificTag(12), fullNetworkData)
-    tlvWriter.put(ContextSpecificTag(13), isChild)
+    tlvWriter.put(ContextSpecificTag(TAG_FRAME_ERROR_RATE), frameErrorRate)
+    tlvWriter.put(ContextSpecificTag(TAG_MESSAGE_ERROR_RATE), messageErrorRate)
+    tlvWriter.put(ContextSpecificTag(TAG_RX_ON_WHEN_IDLE), rxOnWhenIdle)
+    tlvWriter.put(ContextSpecificTag(TAG_FULL_THREAD_DEVICE), fullThreadDevice)
+    tlvWriter.put(ContextSpecificTag(TAG_FULL_NETWORK_DATA), fullNetworkData)
+    tlvWriter.put(ContextSpecificTag(TAG_IS_CHILD), isChild)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_EXT_ADDRESS = 0
+    private const val TAG_AGE = 1
+    private const val TAG_RLOC16 = 2
+    private const val TAG_LINK_FRAME_COUNTER = 3
+    private const val TAG_MLE_FRAME_COUNTER = 4
+    private const val TAG_LQI = 5
+    private const val TAG_AVERAGE_RSSI = 6
+    private const val TAG_LAST_RSSI = 7
+    private const val TAG_FRAME_ERROR_RATE = 8
+    private const val TAG_MESSAGE_ERROR_RATE = 9
+    private const val TAG_RX_ON_WHEN_IDLE = 10
+    private const val TAG_FULL_THREAD_DEVICE = 11
+    private const val TAG_FULL_NETWORK_DATA = 12
+    private const val TAG_IS_CHILD = 13
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ThreadNetworkDiagnosticsClusterNeighborTableStruct {
       tlvReader.enterStructure(tag)
-      val extAddress: Long = tlvReader.getLong(ContextSpecificTag(0))
-      val age: Long = tlvReader.getLong(ContextSpecificTag(1))
-      val rloc16: Int = tlvReader.getInt(ContextSpecificTag(2))
-      val linkFrameCounter: Long = tlvReader.getLong(ContextSpecificTag(3))
-      val mleFrameCounter: Long = tlvReader.getLong(ContextSpecificTag(4))
-      val lqi: Int = tlvReader.getInt(ContextSpecificTag(5))
+      val extAddress: Long = tlvReader.getLong(ContextSpecificTag(TAG_EXT_ADDRESS))
+      val age: Long = tlvReader.getLong(ContextSpecificTag(TAG_AGE))
+      val rloc16: Int = tlvReader.getInt(ContextSpecificTag(TAG_RLOC16))
+      val linkFrameCounter: Long = tlvReader.getLong(ContextSpecificTag(TAG_LINK_FRAME_COUNTER))
+      val mleFrameCounter: Long = tlvReader.getLong(ContextSpecificTag(TAG_MLE_FRAME_COUNTER))
+      val lqi: Int = tlvReader.getInt(ContextSpecificTag(TAG_LQI))
       val averageRssi: Int? = try {
-      tlvReader.getInt(ContextSpecificTag(6))
+      tlvReader.getInt(ContextSpecificTag(TAG_AVERAGE_RSSI))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(6))
+      tlvReader.getNull(ContextSpecificTag(TAG_AVERAGE_RSSI))
       null
     }
       val lastRssi: Int? = try {
-      tlvReader.getInt(ContextSpecificTag(7))
+      tlvReader.getInt(ContextSpecificTag(TAG_LAST_RSSI))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(7))
+      tlvReader.getNull(ContextSpecificTag(TAG_LAST_RSSI))
       null
     }
-      val frameErrorRate: Int = tlvReader.getInt(ContextSpecificTag(8))
-      val messageErrorRate: Int = tlvReader.getInt(ContextSpecificTag(9))
-      val rxOnWhenIdle: Boolean = tlvReader.getBoolean(ContextSpecificTag(10))
-      val fullThreadDevice: Boolean = tlvReader.getBoolean(ContextSpecificTag(11))
-      val fullNetworkData: Boolean = tlvReader.getBoolean(ContextSpecificTag(12))
-      val isChild: Boolean = tlvReader.getBoolean(ContextSpecificTag(13))
+      val frameErrorRate: Int = tlvReader.getInt(ContextSpecificTag(TAG_FRAME_ERROR_RATE))
+      val messageErrorRate: Int = tlvReader.getInt(ContextSpecificTag(TAG_MESSAGE_ERROR_RATE))
+      val rxOnWhenIdle: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_RX_ON_WHEN_IDLE))
+      val fullThreadDevice: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_FULL_THREAD_DEVICE))
+      val fullNetworkData: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_FULL_NETWORK_DATA))
+      val isChild: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_IS_CHILD))
       
       tlvReader.exitContainer()
 

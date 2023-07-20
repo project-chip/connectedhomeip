@@ -48,48 +48,54 @@ class BindingClusterTargetStruct (
     tlvWriter.startStructure(tag)
     if (node.isPresent) {
       val optnode = node.get()
-      tlvWriter.put(ContextSpecificTag(1), optnode)
+      tlvWriter.put(ContextSpecificTag(TAG_NODE), optnode)
     }
     if (group.isPresent) {
       val optgroup = group.get()
-      tlvWriter.put(ContextSpecificTag(2), optgroup)
+      tlvWriter.put(ContextSpecificTag(TAG_GROUP), optgroup)
     }
     if (endpoint.isPresent) {
       val optendpoint = endpoint.get()
-      tlvWriter.put(ContextSpecificTag(3), optendpoint)
+      tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT), optendpoint)
     }
     if (cluster.isPresent) {
       val optcluster = cluster.get()
-      tlvWriter.put(ContextSpecificTag(4), optcluster)
+      tlvWriter.put(ContextSpecificTag(TAG_CLUSTER), optcluster)
     }
-    tlvWriter.put(ContextSpecificTag(254), fabricIndex)
+    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_NODE = 1
+    private const val TAG_GROUP = 2
+    private const val TAG_ENDPOINT = 3
+    private const val TAG_CLUSTER = 4
+    private const val TAG_FABRIC_INDEX = 254
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : BindingClusterTargetStruct {
       tlvReader.enterStructure(tag)
       val node: Optional<Long> = try {
-      Optional.of(tlvReader.getLong(ContextSpecificTag(1)))
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_NODE)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
       val group: Optional<Int> = try {
-      Optional.of(tlvReader.getInt(ContextSpecificTag(2)))
+      Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_GROUP)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
       val endpoint: Optional<Int> = try {
-      Optional.of(tlvReader.getInt(ContextSpecificTag(3)))
+      Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
       val cluster: Optional<Long> = try {
-      Optional.of(tlvReader.getLong(ContextSpecificTag(4)))
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_CLUSTER)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(254))
+      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
       tlvReader.exitContainer()
 

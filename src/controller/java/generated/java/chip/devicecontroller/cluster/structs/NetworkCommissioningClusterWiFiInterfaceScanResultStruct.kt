@@ -48,24 +48,31 @@ class NetworkCommissioningClusterWiFiInterfaceScanResultStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), security)
-    tlvWriter.put(ContextSpecificTag(1), ssid)
-    tlvWriter.put(ContextSpecificTag(2), bssid)
-    tlvWriter.put(ContextSpecificTag(3), channel)
-    tlvWriter.put(ContextSpecificTag(4), wiFiBand)
-    tlvWriter.put(ContextSpecificTag(5), rssi)
+    tlvWriter.put(ContextSpecificTag(TAG_SECURITY), security)
+    tlvWriter.put(ContextSpecificTag(TAG_SSID), ssid)
+    tlvWriter.put(ContextSpecificTag(TAG_BSSID), bssid)
+    tlvWriter.put(ContextSpecificTag(TAG_CHANNEL), channel)
+    tlvWriter.put(ContextSpecificTag(TAG_WI_FI_BAND), wiFiBand)
+    tlvWriter.put(ContextSpecificTag(TAG_RSSI), rssi)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_SECURITY = 0
+    private const val TAG_SSID = 1
+    private const val TAG_BSSID = 2
+    private const val TAG_CHANNEL = 3
+    private const val TAG_WI_FI_BAND = 4
+    private const val TAG_RSSI = 5
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : NetworkCommissioningClusterWiFiInterfaceScanResultStruct {
       tlvReader.enterStructure(tag)
-      val security: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val ssid: ByteArray = tlvReader.getByteArray(ContextSpecificTag(1))
-      val bssid: ByteArray = tlvReader.getByteArray(ContextSpecificTag(2))
-      val channel: Int = tlvReader.getInt(ContextSpecificTag(3))
-      val wiFiBand: Int = tlvReader.getInt(ContextSpecificTag(4))
-      val rssi: Int = tlvReader.getInt(ContextSpecificTag(5))
+      val security: Int = tlvReader.getInt(ContextSpecificTag(TAG_SECURITY))
+      val ssid: ByteArray = tlvReader.getByteArray(ContextSpecificTag(TAG_SSID))
+      val bssid: ByteArray = tlvReader.getByteArray(ContextSpecificTag(TAG_BSSID))
+      val channel: Int = tlvReader.getInt(ContextSpecificTag(TAG_CHANNEL))
+      val wiFiBand: Int = tlvReader.getInt(ContextSpecificTag(TAG_WI_FI_BAND))
+      val rssi: Int = tlvReader.getInt(ContextSpecificTag(TAG_RSSI))
       
       tlvReader.exitContainer()
 

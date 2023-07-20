@@ -40,16 +40,19 @@ class AccessControlClusterAccessControlExtensionStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(1), data)
-    tlvWriter.put(ContextSpecificTag(254), fabricIndex)
+    tlvWriter.put(ContextSpecificTag(TAG_DATA), data)
+    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_DATA = 1
+    private const val TAG_FABRIC_INDEX = 254
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : AccessControlClusterAccessControlExtensionStruct {
       tlvReader.enterStructure(tag)
-      val data: ByteArray = tlvReader.getByteArray(ContextSpecificTag(1))
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(254))
+      val data: ByteArray = tlvReader.getByteArray(ContextSpecificTag(TAG_DATA))
+      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
       tlvReader.exitContainer()
 

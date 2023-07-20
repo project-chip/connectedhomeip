@@ -42,26 +42,30 @@ class OperationalCredentialsClusterNOCStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(1), noc)
-    if (icac == null) { tlvWriter.putNull(ContextSpecificTag(2)) }
+    tlvWriter.put(ContextSpecificTag(TAG_NOC), noc)
+    if (icac == null) { tlvWriter.putNull(ContextSpecificTag(TAG_ICAC)) }
     else {
-      tlvWriter.put(ContextSpecificTag(2), icac)
+      tlvWriter.put(ContextSpecificTag(TAG_ICAC), icac)
     }
-    tlvWriter.put(ContextSpecificTag(254), fabricIndex)
+    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_NOC = 1
+    private const val TAG_ICAC = 2
+    private const val TAG_FABRIC_INDEX = 254
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : OperationalCredentialsClusterNOCStruct {
       tlvReader.enterStructure(tag)
-      val noc: ByteArray = tlvReader.getByteArray(ContextSpecificTag(1))
+      val noc: ByteArray = tlvReader.getByteArray(ContextSpecificTag(TAG_NOC))
       val icac: ByteArray? = try {
-      tlvReader.getByteArray(ContextSpecificTag(2))
+      tlvReader.getByteArray(ContextSpecificTag(TAG_ICAC))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(2))
+      tlvReader.getNull(ContextSpecificTag(TAG_ICAC))
       null
     }
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(254))
+      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
       tlvReader.exitContainer()
 

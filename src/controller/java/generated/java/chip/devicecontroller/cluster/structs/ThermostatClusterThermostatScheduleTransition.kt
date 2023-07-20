@@ -42,32 +42,36 @@ class ThermostatClusterThermostatScheduleTransition (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), transitionTime)
-    if (heatSetpoint == null) { tlvWriter.putNull(ContextSpecificTag(1)) }
+    tlvWriter.put(ContextSpecificTag(TAG_TRANSITION_TIME), transitionTime)
+    if (heatSetpoint == null) { tlvWriter.putNull(ContextSpecificTag(TAG_HEAT_SETPOINT)) }
     else {
-      tlvWriter.put(ContextSpecificTag(1), heatSetpoint)
+      tlvWriter.put(ContextSpecificTag(TAG_HEAT_SETPOINT), heatSetpoint)
     }
-    if (coolSetpoint == null) { tlvWriter.putNull(ContextSpecificTag(2)) }
+    if (coolSetpoint == null) { tlvWriter.putNull(ContextSpecificTag(TAG_COOL_SETPOINT)) }
     else {
-      tlvWriter.put(ContextSpecificTag(2), coolSetpoint)
+      tlvWriter.put(ContextSpecificTag(TAG_COOL_SETPOINT), coolSetpoint)
     }
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_TRANSITION_TIME = 0
+    private const val TAG_HEAT_SETPOINT = 1
+    private const val TAG_COOL_SETPOINT = 2
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ThermostatClusterThermostatScheduleTransition {
       tlvReader.enterStructure(tag)
-      val transitionTime: Int = tlvReader.getInt(ContextSpecificTag(0))
+      val transitionTime: Int = tlvReader.getInt(ContextSpecificTag(TAG_TRANSITION_TIME))
       val heatSetpoint: Int? = try {
-      tlvReader.getInt(ContextSpecificTag(1))
+      tlvReader.getInt(ContextSpecificTag(TAG_HEAT_SETPOINT))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(1))
+      tlvReader.getNull(ContextSpecificTag(TAG_HEAT_SETPOINT))
       null
     }
       val coolSetpoint: Int? = try {
-      tlvReader.getInt(ContextSpecificTag(2))
+      tlvReader.getInt(ContextSpecificTag(TAG_COOL_SETPOINT))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(2))
+      tlvReader.getNull(ContextSpecificTag(TAG_COOL_SETPOINT))
       null
     }
       

@@ -40,16 +40,19 @@ class ContentLauncherClusterAdditionalInfoStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), name)
-    tlvWriter.put(ContextSpecificTag(1), value)
+    tlvWriter.put(ContextSpecificTag(TAG_NAME), name)
+    tlvWriter.put(ContextSpecificTag(TAG_VALUE), value)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_NAME = 0
+    private const val TAG_VALUE = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ContentLauncherClusterAdditionalInfoStruct {
       tlvReader.enterStructure(tag)
-      val name: String = tlvReader.getString(ContextSpecificTag(0))
-      val value: String = tlvReader.getString(ContextSpecificTag(1))
+      val name: String = tlvReader.getString(ContextSpecificTag(TAG_NAME))
+      val value: String = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
       
       tlvReader.exitContainer()
 

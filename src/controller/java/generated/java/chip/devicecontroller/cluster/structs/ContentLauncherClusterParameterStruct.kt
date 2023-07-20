@@ -42,11 +42,11 @@ class ContentLauncherClusterParameterStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), type)
-    tlvWriter.put(ContextSpecificTag(1), value)
+    tlvWriter.put(ContextSpecificTag(TAG_TYPE), type)
+    tlvWriter.put(ContextSpecificTag(TAG_VALUE), value)
     if (externalIDList.isPresent) {
       val optexternalIDList = externalIDList.get()
-      tlvWriter.startList(ContextSpecificTag(2))
+      tlvWriter.startList(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))
       val iteroptexternalIDList = optexternalIDList.iterator()
       while(iteroptexternalIDList.hasNext()) {
         val next = iteroptexternalIDList.next()
@@ -58,13 +58,17 @@ class ContentLauncherClusterParameterStruct (
   }
 
   companion object {
+    private const val TAG_TYPE = 0
+    private const val TAG_VALUE = 1
+    private const val TAG_EXTERNAL_I_D_LIST = 2
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ContentLauncherClusterParameterStruct {
       tlvReader.enterStructure(tag)
-      val type: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val value: String = tlvReader.getString(ContextSpecificTag(1))
+      val type: Int = tlvReader.getInt(ContextSpecificTag(TAG_TYPE))
+      val value: String = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
       val externalIDList: Optional<List<ContentLauncherClusterAdditionalInfoStruct>> = try {
       Optional.of(mutableListOf<ContentLauncherClusterAdditionalInfoStruct>().apply {
-      tlvReader.enterList(ContextSpecificTag(2))
+      tlvReader.enterList(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))
       while(true) {
         try {
           this.add(ContentLauncherClusterAdditionalInfoStruct.fromTlv(AnonymousTag, tlvReader))

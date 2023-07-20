@@ -38,14 +38,16 @@ class BasicInformationClusterLeaveEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), fabricIndex)
+    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_FABRIC_INDEX = 0
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : BasicInformationClusterLeaveEvent {
       tlvReader.enterStructure(tag)
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(0))
+      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
       tlvReader.exitContainer()
 

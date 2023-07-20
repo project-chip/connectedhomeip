@@ -40,20 +40,23 @@ class TimeSynchronizationClusterTimeZoneStatusEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), offset)
+    tlvWriter.put(ContextSpecificTag(TAG_OFFSET), offset)
     if (name.isPresent) {
       val optname = name.get()
-      tlvWriter.put(ContextSpecificTag(1), optname)
+      tlvWriter.put(ContextSpecificTag(TAG_NAME), optname)
     }
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_OFFSET = 0
+    private const val TAG_NAME = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : TimeSynchronizationClusterTimeZoneStatusEvent {
       tlvReader.enterStructure(tag)
-      val offset: Long = tlvReader.getLong(ContextSpecificTag(0))
+      val offset: Long = tlvReader.getLong(ContextSpecificTag(TAG_OFFSET))
       val name: Optional<String> = try {
-      Optional.of(tlvReader.getString(ContextSpecificTag(1)))
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }

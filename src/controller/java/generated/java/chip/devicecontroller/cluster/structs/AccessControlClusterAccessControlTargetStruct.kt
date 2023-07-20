@@ -42,40 +42,44 @@ class AccessControlClusterAccessControlTargetStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    if (cluster == null) { tlvWriter.putNull(ContextSpecificTag(0)) }
+    if (cluster == null) { tlvWriter.putNull(ContextSpecificTag(TAG_CLUSTER)) }
     else {
-      tlvWriter.put(ContextSpecificTag(0), cluster)
+      tlvWriter.put(ContextSpecificTag(TAG_CLUSTER), cluster)
     }
-    if (endpoint == null) { tlvWriter.putNull(ContextSpecificTag(1)) }
+    if (endpoint == null) { tlvWriter.putNull(ContextSpecificTag(TAG_ENDPOINT)) }
     else {
-      tlvWriter.put(ContextSpecificTag(1), endpoint)
+      tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT), endpoint)
     }
-    if (deviceType == null) { tlvWriter.putNull(ContextSpecificTag(2)) }
+    if (deviceType == null) { tlvWriter.putNull(ContextSpecificTag(TAG_DEVICE_TYPE)) }
     else {
-      tlvWriter.put(ContextSpecificTag(2), deviceType)
+      tlvWriter.put(ContextSpecificTag(TAG_DEVICE_TYPE), deviceType)
     }
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_CLUSTER = 0
+    private const val TAG_ENDPOINT = 1
+    private const val TAG_DEVICE_TYPE = 2
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : AccessControlClusterAccessControlTargetStruct {
       tlvReader.enterStructure(tag)
       val cluster: Long? = try {
-      tlvReader.getLong(ContextSpecificTag(0))
+      tlvReader.getLong(ContextSpecificTag(TAG_CLUSTER))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(0))
+      tlvReader.getNull(ContextSpecificTag(TAG_CLUSTER))
       null
     }
       val endpoint: Int? = try {
-      tlvReader.getInt(ContextSpecificTag(1))
+      tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(1))
+      tlvReader.getNull(ContextSpecificTag(TAG_ENDPOINT))
       null
     }
       val deviceType: Long? = try {
-      tlvReader.getLong(ContextSpecificTag(2))
+      tlvReader.getLong(ContextSpecificTag(TAG_DEVICE_TYPE))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(2))
+      tlvReader.getNull(ContextSpecificTag(TAG_DEVICE_TYPE))
       null
     }
       

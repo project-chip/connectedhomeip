@@ -46,47 +46,53 @@ class SoftwareDiagnosticsClusterThreadMetricsStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), id)
+    tlvWriter.put(ContextSpecificTag(TAG_ID), id)
     if (name.isPresent) {
       val optname = name.get()
-      tlvWriter.put(ContextSpecificTag(1), optname)
+      tlvWriter.put(ContextSpecificTag(TAG_NAME), optname)
     }
     if (stackFreeCurrent.isPresent) {
       val optstackFreeCurrent = stackFreeCurrent.get()
-      tlvWriter.put(ContextSpecificTag(2), optstackFreeCurrent)
+      tlvWriter.put(ContextSpecificTag(TAG_STACK_FREE_CURRENT), optstackFreeCurrent)
     }
     if (stackFreeMinimum.isPresent) {
       val optstackFreeMinimum = stackFreeMinimum.get()
-      tlvWriter.put(ContextSpecificTag(3), optstackFreeMinimum)
+      tlvWriter.put(ContextSpecificTag(TAG_STACK_FREE_MINIMUM), optstackFreeMinimum)
     }
     if (stackSize.isPresent) {
       val optstackSize = stackSize.get()
-      tlvWriter.put(ContextSpecificTag(4), optstackSize)
+      tlvWriter.put(ContextSpecificTag(TAG_STACK_SIZE), optstackSize)
     }
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_ID = 0
+    private const val TAG_NAME = 1
+    private const val TAG_STACK_FREE_CURRENT = 2
+    private const val TAG_STACK_FREE_MINIMUM = 3
+    private const val TAG_STACK_SIZE = 4
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : SoftwareDiagnosticsClusterThreadMetricsStruct {
       tlvReader.enterStructure(tag)
-      val id: Long = tlvReader.getLong(ContextSpecificTag(0))
+      val id: Long = tlvReader.getLong(ContextSpecificTag(TAG_ID))
       val name: Optional<String> = try {
-      Optional.of(tlvReader.getString(ContextSpecificTag(1)))
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
       val stackFreeCurrent: Optional<Long> = try {
-      Optional.of(tlvReader.getLong(ContextSpecificTag(2)))
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_STACK_FREE_CURRENT)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
       val stackFreeMinimum: Optional<Long> = try {
-      Optional.of(tlvReader.getLong(ContextSpecificTag(3)))
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_STACK_FREE_MINIMUM)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
       val stackSize: Optional<Long> = try {
-      Optional.of(tlvReader.getLong(ContextSpecificTag(4)))
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_STACK_SIZE)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }

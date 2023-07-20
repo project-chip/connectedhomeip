@@ -40,16 +40,19 @@ class WiFiNetworkDiagnosticsClusterAssociationFailureEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), associationFailure)
-    tlvWriter.put(ContextSpecificTag(1), status)
+    tlvWriter.put(ContextSpecificTag(TAG_ASSOCIATION_FAILURE), associationFailure)
+    tlvWriter.put(ContextSpecificTag(TAG_STATUS), status)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_ASSOCIATION_FAILURE = 0
+    private const val TAG_STATUS = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
       tlvReader.enterStructure(tag)
-      val associationFailure: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val status: Int = tlvReader.getInt(ContextSpecificTag(1))
+      val associationFailure: Int = tlvReader.getInt(ContextSpecificTag(TAG_ASSOCIATION_FAILURE))
+      val status: Int = tlvReader.getInt(ContextSpecificTag(TAG_STATUS))
       
       tlvReader.exitContainer()
 

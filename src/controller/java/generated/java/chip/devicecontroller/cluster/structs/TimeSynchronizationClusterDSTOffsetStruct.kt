@@ -42,24 +42,28 @@ class TimeSynchronizationClusterDSTOffsetStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), offset)
-    tlvWriter.put(ContextSpecificTag(1), validStarting)
-    if (validUntil == null) { tlvWriter.putNull(ContextSpecificTag(2)) }
+    tlvWriter.put(ContextSpecificTag(TAG_OFFSET), offset)
+    tlvWriter.put(ContextSpecificTag(TAG_VALID_STARTING), validStarting)
+    if (validUntil == null) { tlvWriter.putNull(ContextSpecificTag(TAG_VALID_UNTIL)) }
     else {
-      tlvWriter.put(ContextSpecificTag(2), validUntil)
+      tlvWriter.put(ContextSpecificTag(TAG_VALID_UNTIL), validUntil)
     }
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_OFFSET = 0
+    private const val TAG_VALID_STARTING = 1
+    private const val TAG_VALID_UNTIL = 2
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : TimeSynchronizationClusterDSTOffsetStruct {
       tlvReader.enterStructure(tag)
-      val offset: Long = tlvReader.getLong(ContextSpecificTag(0))
-      val validStarting: Long = tlvReader.getLong(ContextSpecificTag(1))
+      val offset: Long = tlvReader.getLong(ContextSpecificTag(TAG_OFFSET))
+      val validStarting: Long = tlvReader.getLong(ContextSpecificTag(TAG_VALID_STARTING))
       val validUntil: Long? = try {
-      tlvReader.getLong(ContextSpecificTag(2))
+      tlvReader.getLong(ContextSpecificTag(TAG_VALID_UNTIL))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(2))
+      tlvReader.getNull(ContextSpecificTag(TAG_VALID_UNTIL))
       null
     }
       

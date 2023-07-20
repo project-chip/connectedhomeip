@@ -40,22 +40,25 @@ class BridgedDeviceBasicInformationClusterProductAppearanceStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), finish)
-    if (primaryColor == null) { tlvWriter.putNull(ContextSpecificTag(1)) }
+    tlvWriter.put(ContextSpecificTag(TAG_FINISH), finish)
+    if (primaryColor == null) { tlvWriter.putNull(ContextSpecificTag(TAG_PRIMARY_COLOR)) }
     else {
-      tlvWriter.put(ContextSpecificTag(1), primaryColor)
+      tlvWriter.put(ContextSpecificTag(TAG_PRIMARY_COLOR), primaryColor)
     }
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_FINISH = 0
+    private const val TAG_PRIMARY_COLOR = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : BridgedDeviceBasicInformationClusterProductAppearanceStruct {
       tlvReader.enterStructure(tag)
-      val finish: Int = tlvReader.getInt(ContextSpecificTag(0))
+      val finish: Int = tlvReader.getInt(ContextSpecificTag(TAG_FINISH))
       val primaryColor: Int? = try {
-      tlvReader.getInt(ContextSpecificTag(1))
+      tlvReader.getInt(ContextSpecificTag(TAG_PRIMARY_COLOR))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(1))
+      tlvReader.getNull(ContextSpecificTag(TAG_PRIMARY_COLOR))
       null
     }
       

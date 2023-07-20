@@ -42,29 +42,33 @@ class SoftwareDiagnosticsClusterSoftwareFaultEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), id)
+    tlvWriter.put(ContextSpecificTag(TAG_ID), id)
     if (name.isPresent) {
       val optname = name.get()
-      tlvWriter.put(ContextSpecificTag(1), optname)
+      tlvWriter.put(ContextSpecificTag(TAG_NAME), optname)
     }
     if (faultRecording.isPresent) {
       val optfaultRecording = faultRecording.get()
-      tlvWriter.put(ContextSpecificTag(2), optfaultRecording)
+      tlvWriter.put(ContextSpecificTag(TAG_FAULT_RECORDING), optfaultRecording)
     }
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_ID = 0
+    private const val TAG_NAME = 1
+    private const val TAG_FAULT_RECORDING = 2
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : SoftwareDiagnosticsClusterSoftwareFaultEvent {
       tlvReader.enterStructure(tag)
-      val id: Long = tlvReader.getLong(ContextSpecificTag(0))
+      val id: Long = tlvReader.getLong(ContextSpecificTag(TAG_ID))
       val name: Optional<String> = try {
-      Optional.of(tlvReader.getString(ContextSpecificTag(1)))
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
       val faultRecording: Optional<ByteArray> = try {
-      Optional.of(tlvReader.getByteArray(ContextSpecificTag(2)))
+      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_FAULT_RECORDING)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }

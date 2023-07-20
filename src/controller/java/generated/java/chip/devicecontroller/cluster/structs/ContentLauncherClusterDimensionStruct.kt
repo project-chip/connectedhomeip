@@ -42,18 +42,22 @@ class ContentLauncherClusterDimensionStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), width)
-    tlvWriter.put(ContextSpecificTag(1), height)
-    tlvWriter.put(ContextSpecificTag(2), metric)
+    tlvWriter.put(ContextSpecificTag(TAG_WIDTH), width)
+    tlvWriter.put(ContextSpecificTag(TAG_HEIGHT), height)
+    tlvWriter.put(ContextSpecificTag(TAG_METRIC), metric)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_WIDTH = 0
+    private const val TAG_HEIGHT = 1
+    private const val TAG_METRIC = 2
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ContentLauncherClusterDimensionStruct {
       tlvReader.enterStructure(tag)
-      val width: Double = tlvReader.getDouble(ContextSpecificTag(0))
-      val height: Double = tlvReader.getDouble(ContextSpecificTag(1))
-      val metric: Int = tlvReader.getInt(ContextSpecificTag(2))
+      val width: Double = tlvReader.getDouble(ContextSpecificTag(TAG_WIDTH))
+      val height: Double = tlvReader.getDouble(ContextSpecificTag(TAG_HEIGHT))
+      val metric: Int = tlvReader.getInt(ContextSpecificTag(TAG_METRIC))
       
       tlvReader.exitContainer()
 

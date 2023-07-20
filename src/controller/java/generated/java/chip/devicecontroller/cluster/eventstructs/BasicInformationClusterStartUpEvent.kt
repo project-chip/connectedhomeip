@@ -38,14 +38,16 @@ class BasicInformationClusterStartUpEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), softwareVersion)
+    tlvWriter.put(ContextSpecificTag(TAG_SOFTWARE_VERSION), softwareVersion)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_SOFTWARE_VERSION = 0
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : BasicInformationClusterStartUpEvent {
       tlvReader.enterStructure(tag)
-      val softwareVersion: Long = tlvReader.getLong(ContextSpecificTag(0))
+      val softwareVersion: Long = tlvReader.getLong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
       
       tlvReader.exitContainer()
 

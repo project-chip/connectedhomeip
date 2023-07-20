@@ -52,74 +52,83 @@ class GroupKeyManagementClusterGroupKeySetStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), groupKeySetID)
-    tlvWriter.put(ContextSpecificTag(1), groupKeySecurityPolicy)
-    if (epochKey0 == null) { tlvWriter.putNull(ContextSpecificTag(2)) }
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D), groupKeySetID)
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_KEY_SECURITY_POLICY), groupKeySecurityPolicy)
+    if (epochKey0 == null) { tlvWriter.putNull(ContextSpecificTag(TAG_EPOCH_KEY0)) }
     else {
-      tlvWriter.put(ContextSpecificTag(2), epochKey0)
+      tlvWriter.put(ContextSpecificTag(TAG_EPOCH_KEY0), epochKey0)
     }
-    if (epochStartTime0 == null) { tlvWriter.putNull(ContextSpecificTag(3)) }
+    if (epochStartTime0 == null) { tlvWriter.putNull(ContextSpecificTag(TAG_EPOCH_START_TIME0)) }
     else {
-      tlvWriter.put(ContextSpecificTag(3), epochStartTime0)
+      tlvWriter.put(ContextSpecificTag(TAG_EPOCH_START_TIME0), epochStartTime0)
     }
-    if (epochKey1 == null) { tlvWriter.putNull(ContextSpecificTag(4)) }
+    if (epochKey1 == null) { tlvWriter.putNull(ContextSpecificTag(TAG_EPOCH_KEY1)) }
     else {
-      tlvWriter.put(ContextSpecificTag(4), epochKey1)
+      tlvWriter.put(ContextSpecificTag(TAG_EPOCH_KEY1), epochKey1)
     }
-    if (epochStartTime1 == null) { tlvWriter.putNull(ContextSpecificTag(5)) }
+    if (epochStartTime1 == null) { tlvWriter.putNull(ContextSpecificTag(TAG_EPOCH_START_TIME1)) }
     else {
-      tlvWriter.put(ContextSpecificTag(5), epochStartTime1)
+      tlvWriter.put(ContextSpecificTag(TAG_EPOCH_START_TIME1), epochStartTime1)
     }
-    if (epochKey2 == null) { tlvWriter.putNull(ContextSpecificTag(6)) }
+    if (epochKey2 == null) { tlvWriter.putNull(ContextSpecificTag(TAG_EPOCH_KEY2)) }
     else {
-      tlvWriter.put(ContextSpecificTag(6), epochKey2)
+      tlvWriter.put(ContextSpecificTag(TAG_EPOCH_KEY2), epochKey2)
     }
-    if (epochStartTime2 == null) { tlvWriter.putNull(ContextSpecificTag(7)) }
+    if (epochStartTime2 == null) { tlvWriter.putNull(ContextSpecificTag(TAG_EPOCH_START_TIME2)) }
     else {
-      tlvWriter.put(ContextSpecificTag(7), epochStartTime2)
+      tlvWriter.put(ContextSpecificTag(TAG_EPOCH_START_TIME2), epochStartTime2)
     }
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_GROUP_KEY_SET_I_D = 0
+    private const val TAG_GROUP_KEY_SECURITY_POLICY = 1
+    private const val TAG_EPOCH_KEY0 = 2
+    private const val TAG_EPOCH_START_TIME0 = 3
+    private const val TAG_EPOCH_KEY1 = 4
+    private const val TAG_EPOCH_START_TIME1 = 5
+    private const val TAG_EPOCH_KEY2 = 6
+    private const val TAG_EPOCH_START_TIME2 = 7
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : GroupKeyManagementClusterGroupKeySetStruct {
       tlvReader.enterStructure(tag)
-      val groupKeySetID: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val groupKeySecurityPolicy: Int = tlvReader.getInt(ContextSpecificTag(1))
+      val groupKeySetID: Int = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D))
+      val groupKeySecurityPolicy: Int = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_KEY_SECURITY_POLICY))
       val epochKey0: ByteArray? = try {
-      tlvReader.getByteArray(ContextSpecificTag(2))
+      tlvReader.getByteArray(ContextSpecificTag(TAG_EPOCH_KEY0))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(2))
+      tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_KEY0))
       null
     }
       val epochStartTime0: Long? = try {
-      tlvReader.getLong(ContextSpecificTag(3))
+      tlvReader.getLong(ContextSpecificTag(TAG_EPOCH_START_TIME0))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(3))
+      tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME0))
       null
     }
       val epochKey1: ByteArray? = try {
-      tlvReader.getByteArray(ContextSpecificTag(4))
+      tlvReader.getByteArray(ContextSpecificTag(TAG_EPOCH_KEY1))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(4))
+      tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_KEY1))
       null
     }
       val epochStartTime1: Long? = try {
-      tlvReader.getLong(ContextSpecificTag(5))
+      tlvReader.getLong(ContextSpecificTag(TAG_EPOCH_START_TIME1))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(5))
+      tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME1))
       null
     }
       val epochKey2: ByteArray? = try {
-      tlvReader.getByteArray(ContextSpecificTag(6))
+      tlvReader.getByteArray(ContextSpecificTag(TAG_EPOCH_KEY2))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(6))
+      tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_KEY2))
       null
     }
       val epochStartTime2: Long? = try {
-      tlvReader.getLong(ContextSpecificTag(7))
+      tlvReader.getLong(ContextSpecificTag(TAG_EPOCH_START_TIME2))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(7))
+      tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME2))
       null
     }
       

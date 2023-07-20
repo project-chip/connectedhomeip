@@ -42,18 +42,22 @@ class TimeSynchronizationClusterTrustedTimeSourceStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), fabricIndex)
-    tlvWriter.put(ContextSpecificTag(1), nodeID)
-    tlvWriter.put(ContextSpecificTag(2), endpoint)
+    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
+    tlvWriter.put(ContextSpecificTag(TAG_NODE_I_D), nodeID)
+    tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT), endpoint)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_FABRIC_INDEX = 0
+    private const val TAG_NODE_I_D = 1
+    private const val TAG_ENDPOINT = 2
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : TimeSynchronizationClusterTrustedTimeSourceStruct {
       tlvReader.enterStructure(tag)
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val nodeID: Long = tlvReader.getLong(ContextSpecificTag(1))
-      val endpoint: Int = tlvReader.getInt(ContextSpecificTag(2))
+      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val nodeID: Long = tlvReader.getLong(ContextSpecificTag(TAG_NODE_I_D))
+      val endpoint: Int = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
       
       tlvReader.exitContainer()
 

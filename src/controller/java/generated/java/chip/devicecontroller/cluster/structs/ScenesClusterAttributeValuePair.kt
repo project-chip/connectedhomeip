@@ -40,16 +40,19 @@ class ScenesClusterAttributeValuePair (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), attributeID)
-    tlvWriter.put(ContextSpecificTag(1), attributeValue)
+    tlvWriter.put(ContextSpecificTag(TAG_ATTRIBUTE_I_D), attributeID)
+    tlvWriter.put(ContextSpecificTag(TAG_ATTRIBUTE_VALUE), attributeValue)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_ATTRIBUTE_I_D = 0
+    private const val TAG_ATTRIBUTE_VALUE = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ScenesClusterAttributeValuePair {
       tlvReader.enterStructure(tag)
-      val attributeID: Long = tlvReader.getLong(ContextSpecificTag(0))
-      val attributeValue: Long = tlvReader.getLong(ContextSpecificTag(1))
+      val attributeID: Long = tlvReader.getLong(ContextSpecificTag(TAG_ATTRIBUTE_I_D))
+      val attributeValue: Long = tlvReader.getLong(ContextSpecificTag(TAG_ATTRIBUTE_VALUE))
       
       tlvReader.exitContainer()
 

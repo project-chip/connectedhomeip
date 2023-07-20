@@ -44,26 +44,31 @@ class OtaSoftwareUpdateRequestorClusterStateTransitionEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), previousState)
-    tlvWriter.put(ContextSpecificTag(1), newState)
-    tlvWriter.put(ContextSpecificTag(2), reason)
-    if (targetSoftwareVersion == null) { tlvWriter.putNull(ContextSpecificTag(3)) }
+    tlvWriter.put(ContextSpecificTag(TAG_PREVIOUS_STATE), previousState)
+    tlvWriter.put(ContextSpecificTag(TAG_NEW_STATE), newState)
+    tlvWriter.put(ContextSpecificTag(TAG_REASON), reason)
+    if (targetSoftwareVersion == null) { tlvWriter.putNull(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION)) }
     else {
-      tlvWriter.put(ContextSpecificTag(3), targetSoftwareVersion)
+      tlvWriter.put(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION), targetSoftwareVersion)
     }
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_PREVIOUS_STATE = 0
+    private const val TAG_NEW_STATE = 1
+    private const val TAG_REASON = 2
+    private const val TAG_TARGET_SOFTWARE_VERSION = 3
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : OtaSoftwareUpdateRequestorClusterStateTransitionEvent {
       tlvReader.enterStructure(tag)
-      val previousState: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val newState: Int = tlvReader.getInt(ContextSpecificTag(1))
-      val reason: Int = tlvReader.getInt(ContextSpecificTag(2))
+      val previousState: Int = tlvReader.getInt(ContextSpecificTag(TAG_PREVIOUS_STATE))
+      val newState: Int = tlvReader.getInt(ContextSpecificTag(TAG_NEW_STATE))
+      val reason: Int = tlvReader.getInt(ContextSpecificTag(TAG_REASON))
       val targetSoftwareVersion: Long? = try {
-      tlvReader.getLong(ContextSpecificTag(3))
+      tlvReader.getLong(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(3))
+      tlvReader.getNull(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
       null
     }
       

@@ -46,40 +46,46 @@ class ChannelClusterChannelInfoStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), majorNumber)
-    tlvWriter.put(ContextSpecificTag(1), minorNumber)
+    tlvWriter.put(ContextSpecificTag(TAG_MAJOR_NUMBER), majorNumber)
+    tlvWriter.put(ContextSpecificTag(TAG_MINOR_NUMBER), minorNumber)
     if (name.isPresent) {
       val optname = name.get()
-      tlvWriter.put(ContextSpecificTag(2), optname)
+      tlvWriter.put(ContextSpecificTag(TAG_NAME), optname)
     }
     if (callSign.isPresent) {
       val optcallSign = callSign.get()
-      tlvWriter.put(ContextSpecificTag(3), optcallSign)
+      tlvWriter.put(ContextSpecificTag(TAG_CALL_SIGN), optcallSign)
     }
     if (affiliateCallSign.isPresent) {
       val optaffiliateCallSign = affiliateCallSign.get()
-      tlvWriter.put(ContextSpecificTag(4), optaffiliateCallSign)
+      tlvWriter.put(ContextSpecificTag(TAG_AFFILIATE_CALL_SIGN), optaffiliateCallSign)
     }
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_MAJOR_NUMBER = 0
+    private const val TAG_MINOR_NUMBER = 1
+    private const val TAG_NAME = 2
+    private const val TAG_CALL_SIGN = 3
+    private const val TAG_AFFILIATE_CALL_SIGN = 4
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ChannelClusterChannelInfoStruct {
       tlvReader.enterStructure(tag)
-      val majorNumber: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val minorNumber: Int = tlvReader.getInt(ContextSpecificTag(1))
+      val majorNumber: Int = tlvReader.getInt(ContextSpecificTag(TAG_MAJOR_NUMBER))
+      val minorNumber: Int = tlvReader.getInt(ContextSpecificTag(TAG_MINOR_NUMBER))
       val name: Optional<String> = try {
-      Optional.of(tlvReader.getString(ContextSpecificTag(2)))
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
       val callSign: Optional<String> = try {
-      Optional.of(tlvReader.getString(ContextSpecificTag(3)))
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_CALL_SIGN)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
       val affiliateCallSign: Optional<String> = try {
-      Optional.of(tlvReader.getString(ContextSpecificTag(4)))
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_AFFILIATE_CALL_SIGN)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }

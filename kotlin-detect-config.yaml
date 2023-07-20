@@ -23,7 +23,6 @@ style:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairingCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImSubscribeCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/Main.kt"
-            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/jsontlv/JsonToTlv.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/Base38.kt"
             - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadParser.kt"

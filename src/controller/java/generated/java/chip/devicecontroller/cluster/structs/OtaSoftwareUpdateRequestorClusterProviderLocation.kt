@@ -42,18 +42,22 @@ class OtaSoftwareUpdateRequestorClusterProviderLocation (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(1), providerNodeID)
-    tlvWriter.put(ContextSpecificTag(2), endpoint)
-    tlvWriter.put(ContextSpecificTag(254), fabricIndex)
+    tlvWriter.put(ContextSpecificTag(TAG_PROVIDER_NODE_I_D), providerNodeID)
+    tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT), endpoint)
+    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_PROVIDER_NODE_I_D = 1
+    private const val TAG_ENDPOINT = 2
+    private const val TAG_FABRIC_INDEX = 254
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : OtaSoftwareUpdateRequestorClusterProviderLocation {
       tlvReader.enterStructure(tag)
-      val providerNodeID: Long = tlvReader.getLong(ContextSpecificTag(1))
-      val endpoint: Int = tlvReader.getInt(ContextSpecificTag(2))
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(254))
+      val providerNodeID: Long = tlvReader.getLong(ContextSpecificTag(TAG_PROVIDER_NODE_I_D))
+      val endpoint: Int = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
+      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
       tlvReader.exitContainer()
 

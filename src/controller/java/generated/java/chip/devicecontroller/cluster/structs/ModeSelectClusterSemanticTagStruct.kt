@@ -40,16 +40,19 @@ class ModeSelectClusterSemanticTagStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), mfgCode)
-    tlvWriter.put(ContextSpecificTag(1), value)
+    tlvWriter.put(ContextSpecificTag(TAG_MFG_CODE), mfgCode)
+    tlvWriter.put(ContextSpecificTag(TAG_VALUE), value)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_MFG_CODE = 0
+    private const val TAG_VALUE = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ModeSelectClusterSemanticTagStruct {
       tlvReader.enterStructure(tag)
-      val mfgCode: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val value: Int = tlvReader.getInt(ContextSpecificTag(1))
+      val mfgCode: Int = tlvReader.getInt(ContextSpecificTag(TAG_MFG_CODE))
+      val value: Int = tlvReader.getInt(ContextSpecificTag(TAG_VALUE))
       
       tlvReader.exitContainer()
 

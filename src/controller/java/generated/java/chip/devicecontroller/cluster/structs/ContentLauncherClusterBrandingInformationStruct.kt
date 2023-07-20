@@ -48,56 +48,63 @@ class ContentLauncherClusterBrandingInformationStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), providerName)
+    tlvWriter.put(ContextSpecificTag(TAG_PROVIDER_NAME), providerName)
     if (background.isPresent) {
       val optbackground = background.get()
-      optbackground.toTlv(ContextSpecificTag(1), tlvWriter)
+      optbackground.toTlv(ContextSpecificTag(TAG_BACKGROUND), tlvWriter)
     }
     if (logo.isPresent) {
       val optlogo = logo.get()
-      optlogo.toTlv(ContextSpecificTag(2), tlvWriter)
+      optlogo.toTlv(ContextSpecificTag(TAG_LOGO), tlvWriter)
     }
     if (progressBar.isPresent) {
       val optprogressBar = progressBar.get()
-      optprogressBar.toTlv(ContextSpecificTag(3), tlvWriter)
+      optprogressBar.toTlv(ContextSpecificTag(TAG_PROGRESS_BAR), tlvWriter)
     }
     if (splash.isPresent) {
       val optsplash = splash.get()
-      optsplash.toTlv(ContextSpecificTag(4), tlvWriter)
+      optsplash.toTlv(ContextSpecificTag(TAG_SPLASH), tlvWriter)
     }
     if (waterMark.isPresent) {
       val optwaterMark = waterMark.get()
-      optwaterMark.toTlv(ContextSpecificTag(5), tlvWriter)
+      optwaterMark.toTlv(ContextSpecificTag(TAG_WATER_MARK), tlvWriter)
     }
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_PROVIDER_NAME = 0
+    private const val TAG_BACKGROUND = 1
+    private const val TAG_LOGO = 2
+    private const val TAG_PROGRESS_BAR = 3
+    private const val TAG_SPLASH = 4
+    private const val TAG_WATER_MARK = 5
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ContentLauncherClusterBrandingInformationStruct {
       tlvReader.enterStructure(tag)
-      val providerName: String = tlvReader.getString(ContextSpecificTag(0))
+      val providerName: String = tlvReader.getString(ContextSpecificTag(TAG_PROVIDER_NAME))
       val background: Optional<ContentLauncherClusterStyleInformationStruct> = try {
-      Optional.of(ContentLauncherClusterStyleInformationStruct.fromTlv(ContextSpecificTag(1), tlvReader))
+      Optional.of(ContentLauncherClusterStyleInformationStruct.fromTlv(ContextSpecificTag(TAG_BACKGROUND), tlvReader))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
       val logo: Optional<ContentLauncherClusterStyleInformationStruct> = try {
-      Optional.of(ContentLauncherClusterStyleInformationStruct.fromTlv(ContextSpecificTag(2), tlvReader))
+      Optional.of(ContentLauncherClusterStyleInformationStruct.fromTlv(ContextSpecificTag(TAG_LOGO), tlvReader))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
       val progressBar: Optional<ContentLauncherClusterStyleInformationStruct> = try {
-      Optional.of(ContentLauncherClusterStyleInformationStruct.fromTlv(ContextSpecificTag(3), tlvReader))
+      Optional.of(ContentLauncherClusterStyleInformationStruct.fromTlv(ContextSpecificTag(TAG_PROGRESS_BAR), tlvReader))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
       val splash: Optional<ContentLauncherClusterStyleInformationStruct> = try {
-      Optional.of(ContentLauncherClusterStyleInformationStruct.fromTlv(ContextSpecificTag(4), tlvReader))
+      Optional.of(ContentLauncherClusterStyleInformationStruct.fromTlv(ContextSpecificTag(TAG_SPLASH), tlvReader))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
       val waterMark: Optional<ContentLauncherClusterStyleInformationStruct> = try {
-      Optional.of(ContentLauncherClusterStyleInformationStruct.fromTlv(ContextSpecificTag(5), tlvReader))
+      Optional.of(ContentLauncherClusterStyleInformationStruct.fromTlv(ContextSpecificTag(TAG_WATER_MARK), tlvReader))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }

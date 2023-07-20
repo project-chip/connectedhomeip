@@ -40,16 +40,19 @@ class BasicInformationClusterCapabilityMinimaStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), caseSessionsPerFabric)
-    tlvWriter.put(ContextSpecificTag(1), subscriptionsPerFabric)
+    tlvWriter.put(ContextSpecificTag(TAG_CASE_SESSIONS_PER_FABRIC), caseSessionsPerFabric)
+    tlvWriter.put(ContextSpecificTag(TAG_SUBSCRIPTIONS_PER_FABRIC), subscriptionsPerFabric)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_CASE_SESSIONS_PER_FABRIC = 0
+    private const val TAG_SUBSCRIPTIONS_PER_FABRIC = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : BasicInformationClusterCapabilityMinimaStruct {
       tlvReader.enterStructure(tag)
-      val caseSessionsPerFabric: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val subscriptionsPerFabric: Int = tlvReader.getInt(ContextSpecificTag(1))
+      val caseSessionsPerFabric: Int = tlvReader.getInt(ContextSpecificTag(TAG_CASE_SESSIONS_PER_FABRIC))
+      val subscriptionsPerFabric: Int = tlvReader.getInt(ContextSpecificTag(TAG_SUBSCRIPTIONS_PER_FABRIC))
       
       tlvReader.exitContainer()
 

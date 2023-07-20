@@ -40,16 +40,19 @@ class ElectrostaticFilterMonitoringClusterReplacementProductStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), productIdentifierType)
-    tlvWriter.put(ContextSpecificTag(1), productIdentifierValue)
+    tlvWriter.put(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE), productIdentifierType)
+    tlvWriter.put(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE), productIdentifierValue)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_PRODUCT_IDENTIFIER_TYPE = 0
+    private const val TAG_PRODUCT_IDENTIFIER_VALUE = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ElectrostaticFilterMonitoringClusterReplacementProductStruct {
       tlvReader.enterStructure(tag)
-      val productIdentifierType: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val productIdentifierValue: String = tlvReader.getString(ContextSpecificTag(1))
+      val productIdentifierType: Int = tlvReader.getInt(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE))
+      val productIdentifierValue: String = tlvReader.getString(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE))
       
       tlvReader.exitContainer()
 

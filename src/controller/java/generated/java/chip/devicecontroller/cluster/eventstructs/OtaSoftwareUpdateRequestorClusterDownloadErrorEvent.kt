@@ -44,34 +44,39 @@ class OtaSoftwareUpdateRequestorClusterDownloadErrorEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), softwareVersion)
-    tlvWriter.put(ContextSpecificTag(1), bytesDownloaded)
-    if (progressPercent == null) { tlvWriter.putNull(ContextSpecificTag(2)) }
+    tlvWriter.put(ContextSpecificTag(TAG_SOFTWARE_VERSION), softwareVersion)
+    tlvWriter.put(ContextSpecificTag(TAG_BYTES_DOWNLOADED), bytesDownloaded)
+    if (progressPercent == null) { tlvWriter.putNull(ContextSpecificTag(TAG_PROGRESS_PERCENT)) }
     else {
-      tlvWriter.put(ContextSpecificTag(2), progressPercent)
+      tlvWriter.put(ContextSpecificTag(TAG_PROGRESS_PERCENT), progressPercent)
     }
-    if (platformCode == null) { tlvWriter.putNull(ContextSpecificTag(3)) }
+    if (platformCode == null) { tlvWriter.putNull(ContextSpecificTag(TAG_PLATFORM_CODE)) }
     else {
-      tlvWriter.put(ContextSpecificTag(3), platformCode)
+      tlvWriter.put(ContextSpecificTag(TAG_PLATFORM_CODE), platformCode)
     }
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_SOFTWARE_VERSION = 0
+    private const val TAG_BYTES_DOWNLOADED = 1
+    private const val TAG_PROGRESS_PERCENT = 2
+    private const val TAG_PLATFORM_CODE = 3
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : OtaSoftwareUpdateRequestorClusterDownloadErrorEvent {
       tlvReader.enterStructure(tag)
-      val softwareVersion: Long = tlvReader.getLong(ContextSpecificTag(0))
-      val bytesDownloaded: Long = tlvReader.getLong(ContextSpecificTag(1))
+      val softwareVersion: Long = tlvReader.getLong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
+      val bytesDownloaded: Long = tlvReader.getLong(ContextSpecificTag(TAG_BYTES_DOWNLOADED))
       val progressPercent: Int? = try {
-      tlvReader.getInt(ContextSpecificTag(2))
+      tlvReader.getInt(ContextSpecificTag(TAG_PROGRESS_PERCENT))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(2))
+      tlvReader.getNull(ContextSpecificTag(TAG_PROGRESS_PERCENT))
       null
     }
       val platformCode: Long? = try {
-      tlvReader.getLong(ContextSpecificTag(3))
+      tlvReader.getLong(ContextSpecificTag(TAG_PLATFORM_CODE))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(3))
+      tlvReader.getNull(ContextSpecificTag(TAG_PLATFORM_CODE))
       null
     }
       

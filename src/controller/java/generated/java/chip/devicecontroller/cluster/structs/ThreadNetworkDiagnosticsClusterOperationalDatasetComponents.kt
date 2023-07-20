@@ -60,36 +60,49 @@ class ThreadNetworkDiagnosticsClusterOperationalDatasetComponents (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), activeTimestampPresent)
-    tlvWriter.put(ContextSpecificTag(1), pendingTimestampPresent)
-    tlvWriter.put(ContextSpecificTag(2), masterKeyPresent)
-    tlvWriter.put(ContextSpecificTag(3), networkNamePresent)
-    tlvWriter.put(ContextSpecificTag(4), extendedPanIdPresent)
-    tlvWriter.put(ContextSpecificTag(5), meshLocalPrefixPresent)
-    tlvWriter.put(ContextSpecificTag(6), delayPresent)
-    tlvWriter.put(ContextSpecificTag(7), panIdPresent)
-    tlvWriter.put(ContextSpecificTag(8), channelPresent)
-    tlvWriter.put(ContextSpecificTag(9), pskcPresent)
-    tlvWriter.put(ContextSpecificTag(10), securityPolicyPresent)
-    tlvWriter.put(ContextSpecificTag(11), channelMaskPresent)
+    tlvWriter.put(ContextSpecificTag(TAG_ACTIVE_TIMESTAMP_PRESENT), activeTimestampPresent)
+    tlvWriter.put(ContextSpecificTag(TAG_PENDING_TIMESTAMP_PRESENT), pendingTimestampPresent)
+    tlvWriter.put(ContextSpecificTag(TAG_MASTER_KEY_PRESENT), masterKeyPresent)
+    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_NAME_PRESENT), networkNamePresent)
+    tlvWriter.put(ContextSpecificTag(TAG_EXTENDED_PAN_ID_PRESENT), extendedPanIdPresent)
+    tlvWriter.put(ContextSpecificTag(TAG_MESH_LOCAL_PREFIX_PRESENT), meshLocalPrefixPresent)
+    tlvWriter.put(ContextSpecificTag(TAG_DELAY_PRESENT), delayPresent)
+    tlvWriter.put(ContextSpecificTag(TAG_PAN_ID_PRESENT), panIdPresent)
+    tlvWriter.put(ContextSpecificTag(TAG_CHANNEL_PRESENT), channelPresent)
+    tlvWriter.put(ContextSpecificTag(TAG_PSKC_PRESENT), pskcPresent)
+    tlvWriter.put(ContextSpecificTag(TAG_SECURITY_POLICY_PRESENT), securityPolicyPresent)
+    tlvWriter.put(ContextSpecificTag(TAG_CHANNEL_MASK_PRESENT), channelMaskPresent)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_ACTIVE_TIMESTAMP_PRESENT = 0
+    private const val TAG_PENDING_TIMESTAMP_PRESENT = 1
+    private const val TAG_MASTER_KEY_PRESENT = 2
+    private const val TAG_NETWORK_NAME_PRESENT = 3
+    private const val TAG_EXTENDED_PAN_ID_PRESENT = 4
+    private const val TAG_MESH_LOCAL_PREFIX_PRESENT = 5
+    private const val TAG_DELAY_PRESENT = 6
+    private const val TAG_PAN_ID_PRESENT = 7
+    private const val TAG_CHANNEL_PRESENT = 8
+    private const val TAG_PSKC_PRESENT = 9
+    private const val TAG_SECURITY_POLICY_PRESENT = 10
+    private const val TAG_CHANNEL_MASK_PRESENT = 11
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ThreadNetworkDiagnosticsClusterOperationalDatasetComponents {
       tlvReader.enterStructure(tag)
-      val activeTimestampPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(0))
-      val pendingTimestampPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(1))
-      val masterKeyPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(2))
-      val networkNamePresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(3))
-      val extendedPanIdPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(4))
-      val meshLocalPrefixPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(5))
-      val delayPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(6))
-      val panIdPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(7))
-      val channelPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(8))
-      val pskcPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(9))
-      val securityPolicyPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(10))
-      val channelMaskPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(11))
+      val activeTimestampPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_ACTIVE_TIMESTAMP_PRESENT))
+      val pendingTimestampPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_PENDING_TIMESTAMP_PRESENT))
+      val masterKeyPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_MASTER_KEY_PRESENT))
+      val networkNamePresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_NETWORK_NAME_PRESENT))
+      val extendedPanIdPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_EXTENDED_PAN_ID_PRESENT))
+      val meshLocalPrefixPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_MESH_LOCAL_PREFIX_PRESENT))
+      val delayPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_DELAY_PRESENT))
+      val panIdPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_PAN_ID_PRESENT))
+      val channelPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_CHANNEL_PRESENT))
+      val pskcPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_PSKC_PRESENT))
+      val securityPolicyPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_SECURITY_POLICY_PRESENT))
+      val channelMaskPresent: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_CHANNEL_MASK_PRESENT))
       
       tlvReader.exitContainer()
 

@@ -38,14 +38,16 @@ class SwitchClusterLongReleaseEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), previousPosition)
+    tlvWriter.put(ContextSpecificTag(TAG_PREVIOUS_POSITION), previousPosition)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_PREVIOUS_POSITION = 0
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : SwitchClusterLongReleaseEvent {
       tlvReader.enterStructure(tag)
-      val previousPosition: Int = tlvReader.getInt(ContextSpecificTag(0))
+      val previousPosition: Int = tlvReader.getInt(ContextSpecificTag(TAG_PREVIOUS_POSITION))
       
       tlvReader.exitContainer()
 

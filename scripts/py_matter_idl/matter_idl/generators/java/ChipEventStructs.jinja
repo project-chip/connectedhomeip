@@ -74,8 +74,8 @@
   {%- endif -%}
 {%- endmacro -%}
 
-{%- macro contextSpecificTag(id) -%}
-  ContextSpecificTag({{id}})
+{%- macro contextSpecificTag(field) -%}
+  ContextSpecificTag(TAG_{{field.name | constcase}})
 {%- endmacro -%}
 
 /*
@@ -126,19 +126,23 @@ class {{cluster.name}}Cluster{{event.name}}Event (
     tlvWriter.startStructure(tag)
     {% for field in event.fields %}
       {%- set encodable = field | asEncodable(typeLookup) %}
-      {%- set tag = contextSpecificTag(field.code) -%}
+      {%- set tag = contextSpecificTag(field) -%}
       {{encode_tlv(encodable, tag, field.name, 0)}}
     {% endfor -%}
     tlvWriter.endStructure()
   }
 
   companion object {
+    {%- for field in event.fields %}
+    private const val TAG_{{field.name | constcase}} = {{field.code}}
+    {%- endfor %}
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : {{cluster.name}}Cluster{{event.name}}Event {
       tlvReader.enterStructure(tag)
       {% for field in event.fields %}
         {%- set encodable = field | asEncodable(typeLookup) %}
         {%- set decodable = field | asEncodable(typeLookup) %}
-        {%- set tag = contextSpecificTag(field.code) -%}
+        {%- set tag = contextSpecificTag(field) -%}
         val {{field.name}}: {{encode_value(cluster, encodable, 0)}} = {{decode_tlv(cluster, decodable, tag, 0)}}
       {% endfor %}
       tlvReader.exitContainer()

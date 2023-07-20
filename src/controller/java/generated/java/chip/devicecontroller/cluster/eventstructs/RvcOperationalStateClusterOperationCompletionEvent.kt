@@ -42,46 +42,50 @@ class RvcOperationalStateClusterOperationCompletionEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), completionErrorCode)
-    if (totalOperationalTime == null) { tlvWriter.putNull(ContextSpecificTag(1)) }
+    tlvWriter.put(ContextSpecificTag(TAG_COMPLETION_ERROR_CODE), completionErrorCode)
+    if (totalOperationalTime == null) { tlvWriter.putNull(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME)) }
     else {
       if (totalOperationalTime.isPresent) {
       val opttotalOperationalTime = totalOperationalTime.get()
-      tlvWriter.put(ContextSpecificTag(1), opttotalOperationalTime)
+      tlvWriter.put(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME), opttotalOperationalTime)
     }
     }
-    if (pausedTime == null) { tlvWriter.putNull(ContextSpecificTag(2)) }
+    if (pausedTime == null) { tlvWriter.putNull(ContextSpecificTag(TAG_PAUSED_TIME)) }
     else {
       if (pausedTime.isPresent) {
       val optpausedTime = pausedTime.get()
-      tlvWriter.put(ContextSpecificTag(2), optpausedTime)
+      tlvWriter.put(ContextSpecificTag(TAG_PAUSED_TIME), optpausedTime)
     }
     }
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_COMPLETION_ERROR_CODE = 0
+    private const val TAG_TOTAL_OPERATIONAL_TIME = 1
+    private const val TAG_PAUSED_TIME = 2
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : RvcOperationalStateClusterOperationCompletionEvent {
       tlvReader.enterStructure(tag)
-      val completionErrorCode: Int = tlvReader.getInt(ContextSpecificTag(0))
+      val completionErrorCode: Int = tlvReader.getInt(ContextSpecificTag(TAG_COMPLETION_ERROR_CODE))
       val totalOperationalTime: Optional<Long>? = try {
       try {
-      Optional.of(tlvReader.getLong(ContextSpecificTag(1)))
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(1))
+      tlvReader.getNull(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))
       null
     }
       val pausedTime: Optional<Long>? = try {
       try {
-      Optional.of(tlvReader.getLong(ContextSpecificTag(2)))
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_PAUSED_TIME)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(2))
+      tlvReader.getNull(ContextSpecificTag(TAG_PAUSED_TIME))
       null
     }
       

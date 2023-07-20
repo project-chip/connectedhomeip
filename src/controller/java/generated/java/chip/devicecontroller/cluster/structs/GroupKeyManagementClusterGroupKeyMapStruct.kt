@@ -42,18 +42,22 @@ class GroupKeyManagementClusterGroupKeyMapStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(1), groupId)
-    tlvWriter.put(ContextSpecificTag(2), groupKeySetID)
-    tlvWriter.put(ContextSpecificTag(254), fabricIndex)
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID), groupId)
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D), groupKeySetID)
+    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_GROUP_ID = 1
+    private const val TAG_GROUP_KEY_SET_I_D = 2
+    private const val TAG_FABRIC_INDEX = 254
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : GroupKeyManagementClusterGroupKeyMapStruct {
       tlvReader.enterStructure(tag)
-      val groupId: Int = tlvReader.getInt(ContextSpecificTag(1))
-      val groupKeySetID: Int = tlvReader.getInt(ContextSpecificTag(2))
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(254))
+      val groupId: Int = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_ID))
+      val groupKeySetID: Int = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D))
+      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
       tlvReader.exitContainer()
 

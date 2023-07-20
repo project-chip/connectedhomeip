@@ -38,14 +38,16 @@ class SwitchClusterInitialPressEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), newPosition)
+    tlvWriter.put(ContextSpecificTag(TAG_NEW_POSITION), newPosition)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_NEW_POSITION = 0
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : SwitchClusterInitialPressEvent {
       tlvReader.enterStructure(tag)
-      val newPosition: Int = tlvReader.getInt(ContextSpecificTag(0))
+      val newPosition: Int = tlvReader.getInt(ContextSpecificTag(TAG_NEW_POSITION))
       
       tlvReader.exitContainer()
 

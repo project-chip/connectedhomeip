@@ -38,14 +38,16 @@ class BasicInformationClusterReachableChangedEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), reachableNewValue)
+    tlvWriter.put(ContextSpecificTag(TAG_REACHABLE_NEW_VALUE), reachableNewValue)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_REACHABLE_NEW_VALUE = 0
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : BasicInformationClusterReachableChangedEvent {
       tlvReader.enterStructure(tag)
-      val reachableNewValue: Boolean = tlvReader.getBoolean(ContextSpecificTag(0))
+      val reachableNewValue: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_REACHABLE_NEW_VALUE))
       
       tlvReader.exitContainer()
 

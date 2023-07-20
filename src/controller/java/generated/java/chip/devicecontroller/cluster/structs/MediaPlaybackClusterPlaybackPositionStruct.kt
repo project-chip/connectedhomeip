@@ -40,22 +40,25 @@ class MediaPlaybackClusterPlaybackPositionStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), updatedAt)
-    if (position == null) { tlvWriter.putNull(ContextSpecificTag(1)) }
+    tlvWriter.put(ContextSpecificTag(TAG_UPDATED_AT), updatedAt)
+    if (position == null) { tlvWriter.putNull(ContextSpecificTag(TAG_POSITION)) }
     else {
-      tlvWriter.put(ContextSpecificTag(1), position)
+      tlvWriter.put(ContextSpecificTag(TAG_POSITION), position)
     }
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_UPDATED_AT = 0
+    private const val TAG_POSITION = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : MediaPlaybackClusterPlaybackPositionStruct {
       tlvReader.enterStructure(tag)
-      val updatedAt: Long = tlvReader.getLong(ContextSpecificTag(0))
+      val updatedAt: Long = tlvReader.getLong(ContextSpecificTag(TAG_UPDATED_AT))
       val position: Long? = try {
-      tlvReader.getLong(ContextSpecificTag(1))
+      tlvReader.getLong(ContextSpecificTag(TAG_POSITION))
     } catch (e: TlvParsingException) {
-      tlvReader.getNull(ContextSpecificTag(1))
+      tlvReader.getNull(ContextSpecificTag(TAG_POSITION))
       null
     }
       

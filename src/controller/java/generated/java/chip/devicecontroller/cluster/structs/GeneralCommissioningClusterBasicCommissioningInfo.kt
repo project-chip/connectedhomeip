@@ -40,16 +40,19 @@ class GeneralCommissioningClusterBasicCommissioningInfo (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), failSafeExpiryLengthSeconds)
-    tlvWriter.put(ContextSpecificTag(1), maxCumulativeFailsafeSeconds)
+    tlvWriter.put(ContextSpecificTag(TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS), failSafeExpiryLengthSeconds)
+    tlvWriter.put(ContextSpecificTag(TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS), maxCumulativeFailsafeSeconds)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS = 0
+    private const val TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : GeneralCommissioningClusterBasicCommissioningInfo {
       tlvReader.enterStructure(tag)
-      val failSafeExpiryLengthSeconds: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val maxCumulativeFailsafeSeconds: Int = tlvReader.getInt(ContextSpecificTag(1))
+      val failSafeExpiryLengthSeconds: Int = tlvReader.getInt(ContextSpecificTag(TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS))
+      val maxCumulativeFailsafeSeconds: Int = tlvReader.getInt(ContextSpecificTag(TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS))
       
       tlvReader.exitContainer()
 

@@ -44,8 +44,8 @@ class GroupKeyManagementClusterGroupInfoMapStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(1), groupId)
-    tlvWriter.startList(ContextSpecificTag(2))
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID), groupId)
+    tlvWriter.startList(ContextSpecificTag(TAG_ENDPOINTS))
       val iterendpoints = endpoints.iterator()
       while(iterendpoints.hasNext()) {
         val next = iterendpoints.next()
@@ -54,18 +54,23 @@ class GroupKeyManagementClusterGroupInfoMapStruct (
       tlvWriter.endList()
     if (groupName.isPresent) {
       val optgroupName = groupName.get()
-      tlvWriter.put(ContextSpecificTag(3), optgroupName)
+      tlvWriter.put(ContextSpecificTag(TAG_GROUP_NAME), optgroupName)
     }
-    tlvWriter.put(ContextSpecificTag(254), fabricIndex)
+    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_GROUP_ID = 1
+    private const val TAG_ENDPOINTS = 2
+    private const val TAG_GROUP_NAME = 3
+    private const val TAG_FABRIC_INDEX = 254
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : GroupKeyManagementClusterGroupInfoMapStruct {
       tlvReader.enterStructure(tag)
-      val groupId: Int = tlvReader.getInt(ContextSpecificTag(1))
+      val groupId: Int = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_ID))
       val endpoints: List<Int> = mutableListOf<Int>().apply {
-      tlvReader.enterList(ContextSpecificTag(2))
+      tlvReader.enterList(ContextSpecificTag(TAG_ENDPOINTS))
       while(true) {
         try {
           this.add(tlvReader.getInt(AnonymousTag))
@@ -76,11 +81,11 @@ class GroupKeyManagementClusterGroupInfoMapStruct (
       tlvReader.exitContainer()
     }
       val groupName: Optional<String> = try {
-      Optional.of(tlvReader.getString(ContextSpecificTag(3)))
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_GROUP_NAME)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(254))
+      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
       tlvReader.exitContainer()
 

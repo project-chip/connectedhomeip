@@ -42,21 +42,24 @@ class RvcCleanModeClusterModeTagStruct (
     tlvWriter.startStructure(tag)
     if (mfgCode.isPresent) {
       val optmfgCode = mfgCode.get()
-      tlvWriter.put(ContextSpecificTag(0), optmfgCode)
+      tlvWriter.put(ContextSpecificTag(TAG_MFG_CODE), optmfgCode)
     }
-    tlvWriter.put(ContextSpecificTag(1), value)
+    tlvWriter.put(ContextSpecificTag(TAG_VALUE), value)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_MFG_CODE = 0
+    private const val TAG_VALUE = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : RvcCleanModeClusterModeTagStruct {
       tlvReader.enterStructure(tag)
       val mfgCode: Optional<Int> = try {
-      Optional.of(tlvReader.getInt(ContextSpecificTag(0)))
+      Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_MFG_CODE)))
     } catch (e: TlvParsingException) {
       Optional.empty()
     }
-      val value: Int = tlvReader.getInt(ContextSpecificTag(1))
+      val value: Int = tlvReader.getInt(ContextSpecificTag(TAG_VALUE))
       
       tlvReader.exitContainer()
 

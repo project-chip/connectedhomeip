@@ -50,31 +50,31 @@ class UnitTestingClusterNestedStructList (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), a)
-    tlvWriter.put(ContextSpecificTag(1), b)
-    c.toTlv(ContextSpecificTag(2), tlvWriter)
-    tlvWriter.startList(ContextSpecificTag(3))
+    tlvWriter.put(ContextSpecificTag(TAG_A), a)
+    tlvWriter.put(ContextSpecificTag(TAG_B), b)
+    c.toTlv(ContextSpecificTag(TAG_C), tlvWriter)
+    tlvWriter.startList(ContextSpecificTag(TAG_D))
       val iterd = d.iterator()
       while(iterd.hasNext()) {
         val next = iterd.next()
         next.toTlv(AnonymousTag, tlvWriter)
       }
       tlvWriter.endList()
-    tlvWriter.startList(ContextSpecificTag(4))
+    tlvWriter.startList(ContextSpecificTag(TAG_E))
       val itere = e.iterator()
       while(itere.hasNext()) {
         val next = itere.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()
-    tlvWriter.startList(ContextSpecificTag(5))
+    tlvWriter.startList(ContextSpecificTag(TAG_F))
       val iterf = f.iterator()
       while(iterf.hasNext()) {
         val next = iterf.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()
-    tlvWriter.startList(ContextSpecificTag(6))
+    tlvWriter.startList(ContextSpecificTag(TAG_G))
       val iterg = g.iterator()
       while(iterg.hasNext()) {
         val next = iterg.next()
@@ -85,13 +85,21 @@ class UnitTestingClusterNestedStructList (
   }
 
   companion object {
+    private const val TAG_A = 0
+    private const val TAG_B = 1
+    private const val TAG_C = 2
+    private const val TAG_D = 3
+    private const val TAG_E = 4
+    private const val TAG_F = 5
+    private const val TAG_G = 6
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : UnitTestingClusterNestedStructList {
       tlvReader.enterStructure(tag)
-      val a: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val b: Boolean = tlvReader.getBoolean(ContextSpecificTag(1))
-      val c: UnitTestingClusterSimpleStruct = UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(2), tlvReader)
+      val a: Int = tlvReader.getInt(ContextSpecificTag(TAG_A))
+      val b: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
+      val c: UnitTestingClusterSimpleStruct = UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_C), tlvReader)
       val d: List<UnitTestingClusterSimpleStruct> = mutableListOf<UnitTestingClusterSimpleStruct>().apply {
-      tlvReader.enterList(ContextSpecificTag(3))
+      tlvReader.enterList(ContextSpecificTag(TAG_D))
       while(true) {
         try {
           this.add(UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader))
@@ -102,7 +110,7 @@ class UnitTestingClusterNestedStructList (
       tlvReader.exitContainer()
     }
       val e: List<Long> = mutableListOf<Long>().apply {
-      tlvReader.enterList(ContextSpecificTag(4))
+      tlvReader.enterList(ContextSpecificTag(TAG_E))
       while(true) {
         try {
           this.add(tlvReader.getLong(AnonymousTag))
@@ -113,7 +121,7 @@ class UnitTestingClusterNestedStructList (
       tlvReader.exitContainer()
     }
       val f: List<ByteArray> = mutableListOf<ByteArray>().apply {
-      tlvReader.enterList(ContextSpecificTag(5))
+      tlvReader.enterList(ContextSpecificTag(TAG_F))
       while(true) {
         try {
           this.add(tlvReader.getByteArray(AnonymousTag))
@@ -124,7 +132,7 @@ class UnitTestingClusterNestedStructList (
       tlvReader.exitContainer()
     }
       val g: List<Int> = mutableListOf<Int>().apply {
-      tlvReader.enterList(ContextSpecificTag(6))
+      tlvReader.enterList(ContextSpecificTag(TAG_G))
       while(true) {
         try {
           this.add(tlvReader.getInt(AnonymousTag))

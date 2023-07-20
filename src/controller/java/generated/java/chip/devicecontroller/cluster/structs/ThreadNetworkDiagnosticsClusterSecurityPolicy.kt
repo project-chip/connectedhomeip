@@ -40,16 +40,19 @@ class ThreadNetworkDiagnosticsClusterSecurityPolicy (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), rotationTime)
-    tlvWriter.put(ContextSpecificTag(1), flags)
+    tlvWriter.put(ContextSpecificTag(TAG_ROTATION_TIME), rotationTime)
+    tlvWriter.put(ContextSpecificTag(TAG_FLAGS), flags)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_ROTATION_TIME = 0
+    private const val TAG_FLAGS = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ThreadNetworkDiagnosticsClusterSecurityPolicy {
       tlvReader.enterStructure(tag)
-      val rotationTime: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val flags: Int = tlvReader.getInt(ContextSpecificTag(1))
+      val rotationTime: Int = tlvReader.getInt(ContextSpecificTag(TAG_ROTATION_TIME))
+      val flags: Int = tlvReader.getInt(ContextSpecificTag(TAG_FLAGS))
       
       tlvReader.exitContainer()
 

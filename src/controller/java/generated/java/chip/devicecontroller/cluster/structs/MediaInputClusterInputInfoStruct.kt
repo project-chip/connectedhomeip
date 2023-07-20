@@ -44,20 +44,25 @@ class MediaInputClusterInputInfoStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), index)
-    tlvWriter.put(ContextSpecificTag(1), inputType)
-    tlvWriter.put(ContextSpecificTag(2), name)
-    tlvWriter.put(ContextSpecificTag(3), description)
+    tlvWriter.put(ContextSpecificTag(TAG_INDEX), index)
+    tlvWriter.put(ContextSpecificTag(TAG_INPUT_TYPE), inputType)
+    tlvWriter.put(ContextSpecificTag(TAG_NAME), name)
+    tlvWriter.put(ContextSpecificTag(TAG_DESCRIPTION), description)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_INDEX = 0
+    private const val TAG_INPUT_TYPE = 1
+    private const val TAG_NAME = 2
+    private const val TAG_DESCRIPTION = 3
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : MediaInputClusterInputInfoStruct {
       tlvReader.enterStructure(tag)
-      val index: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val inputType: Int = tlvReader.getInt(ContextSpecificTag(1))
-      val name: String = tlvReader.getString(ContextSpecificTag(2))
-      val description: String = tlvReader.getString(ContextSpecificTag(3))
+      val index: Int = tlvReader.getInt(ContextSpecificTag(TAG_INDEX))
+      val inputType: Int = tlvReader.getInt(ContextSpecificTag(TAG_INPUT_TYPE))
+      val name: String = tlvReader.getString(ContextSpecificTag(TAG_NAME))
+      val description: String = tlvReader.getString(ContextSpecificTag(TAG_DESCRIPTION))
       
       tlvReader.exitContainer()
 

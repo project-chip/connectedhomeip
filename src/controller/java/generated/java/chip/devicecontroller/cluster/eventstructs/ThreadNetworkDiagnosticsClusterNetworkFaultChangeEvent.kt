@@ -40,14 +40,14 @@ class ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.startList(ContextSpecificTag(0))
+    tlvWriter.startList(ContextSpecificTag(TAG_CURRENT))
       val itercurrent = current.iterator()
       while(itercurrent.hasNext()) {
         val next = itercurrent.next()
         tlvWriter.put(AnonymousTag, next)
       }
       tlvWriter.endList()
-    tlvWriter.startList(ContextSpecificTag(1))
+    tlvWriter.startList(ContextSpecificTag(TAG_PREVIOUS))
       val iterprevious = previous.iterator()
       while(iterprevious.hasNext()) {
         val next = iterprevious.next()
@@ -58,10 +58,13 @@ class ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent (
   }
 
   companion object {
+    private const val TAG_CURRENT = 0
+    private const val TAG_PREVIOUS = 1
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent {
       tlvReader.enterStructure(tag)
       val current: List<Int> = mutableListOf<Int>().apply {
-      tlvReader.enterList(ContextSpecificTag(0))
+      tlvReader.enterList(ContextSpecificTag(TAG_CURRENT))
       while(true) {
         try {
           this.add(tlvReader.getInt(AnonymousTag))
@@ -72,7 +75,7 @@ class ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent (
       tlvReader.exitContainer()
     }
       val previous: List<Int> = mutableListOf<Int>().apply {
-      tlvReader.enterList(ContextSpecificTag(1))
+      tlvReader.enterList(ContextSpecificTag(TAG_PREVIOUS))
       while(true) {
         try {
           this.add(tlvReader.getInt(AnonymousTag))

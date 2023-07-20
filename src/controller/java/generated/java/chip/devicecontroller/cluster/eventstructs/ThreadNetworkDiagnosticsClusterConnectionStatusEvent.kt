@@ -38,14 +38,16 @@ class ThreadNetworkDiagnosticsClusterConnectionStatusEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), connectionStatus)
+    tlvWriter.put(ContextSpecificTag(TAG_CONNECTION_STATUS), connectionStatus)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_CONNECTION_STATUS = 0
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ThreadNetworkDiagnosticsClusterConnectionStatusEvent {
       tlvReader.enterStructure(tag)
-      val connectionStatus: Int = tlvReader.getInt(ContextSpecificTag(0))
+      val connectionStatus: Int = tlvReader.getInt(ContextSpecificTag(TAG_CONNECTION_STATUS))
       
       tlvReader.exitContainer()
 

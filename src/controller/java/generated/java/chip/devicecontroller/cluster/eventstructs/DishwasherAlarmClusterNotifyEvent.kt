@@ -44,20 +44,25 @@ class DishwasherAlarmClusterNotifyEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), active)
-    tlvWriter.put(ContextSpecificTag(1), inactive)
-    tlvWriter.put(ContextSpecificTag(2), state)
-    tlvWriter.put(ContextSpecificTag(3), mask)
+    tlvWriter.put(ContextSpecificTag(TAG_ACTIVE), active)
+    tlvWriter.put(ContextSpecificTag(TAG_INACTIVE), inactive)
+    tlvWriter.put(ContextSpecificTag(TAG_STATE), state)
+    tlvWriter.put(ContextSpecificTag(TAG_MASK), mask)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_ACTIVE = 0
+    private const val TAG_INACTIVE = 1
+    private const val TAG_STATE = 2
+    private const val TAG_MASK = 3
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : DishwasherAlarmClusterNotifyEvent {
       tlvReader.enterStructure(tag)
-      val active: Long = tlvReader.getLong(ContextSpecificTag(0))
-      val inactive: Long = tlvReader.getLong(ContextSpecificTag(1))
-      val state: Long = tlvReader.getLong(ContextSpecificTag(2))
-      val mask: Long = tlvReader.getLong(ContextSpecificTag(3))
+      val active: Long = tlvReader.getLong(ContextSpecificTag(TAG_ACTIVE))
+      val inactive: Long = tlvReader.getLong(ContextSpecificTag(TAG_INACTIVE))
+      val state: Long = tlvReader.getLong(ContextSpecificTag(TAG_STATE))
+      val mask: Long = tlvReader.getLong(ContextSpecificTag(TAG_MASK))
       
       tlvReader.exitContainer()
 

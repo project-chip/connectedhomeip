@@ -42,18 +42,22 @@ class UnitTestingClusterNestedStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), a)
-    tlvWriter.put(ContextSpecificTag(1), b)
-    c.toTlv(ContextSpecificTag(2), tlvWriter)
+    tlvWriter.put(ContextSpecificTag(TAG_A), a)
+    tlvWriter.put(ContextSpecificTag(TAG_B), b)
+    c.toTlv(ContextSpecificTag(TAG_C), tlvWriter)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_A = 0
+    private const val TAG_B = 1
+    private const val TAG_C = 2
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : UnitTestingClusterNestedStruct {
       tlvReader.enterStructure(tag)
-      val a: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val b: Boolean = tlvReader.getBoolean(ContextSpecificTag(1))
-      val c: UnitTestingClusterSimpleStruct = UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(2), tlvReader)
+      val a: Int = tlvReader.getInt(ContextSpecificTag(TAG_A))
+      val b: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
+      val c: UnitTestingClusterSimpleStruct = UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_C), tlvReader)
       
       tlvReader.exitContainer()
 

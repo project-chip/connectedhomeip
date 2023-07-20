@@ -48,24 +48,31 @@ class ActionsClusterActionStruct (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), actionID)
-    tlvWriter.put(ContextSpecificTag(1), name)
-    tlvWriter.put(ContextSpecificTag(2), type)
-    tlvWriter.put(ContextSpecificTag(3), endpointListID)
-    tlvWriter.put(ContextSpecificTag(4), supportedCommands)
-    tlvWriter.put(ContextSpecificTag(5), state)
+    tlvWriter.put(ContextSpecificTag(TAG_ACTION_I_D), actionID)
+    tlvWriter.put(ContextSpecificTag(TAG_NAME), name)
+    tlvWriter.put(ContextSpecificTag(TAG_TYPE), type)
+    tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D), endpointListID)
+    tlvWriter.put(ContextSpecificTag(TAG_SUPPORTED_COMMANDS), supportedCommands)
+    tlvWriter.put(ContextSpecificTag(TAG_STATE), state)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_ACTION_I_D = 0
+    private const val TAG_NAME = 1
+    private const val TAG_TYPE = 2
+    private const val TAG_ENDPOINT_LIST_I_D = 3
+    private const val TAG_SUPPORTED_COMMANDS = 4
+    private const val TAG_STATE = 5
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ActionsClusterActionStruct {
       tlvReader.enterStructure(tag)
-      val actionID: Int = tlvReader.getInt(ContextSpecificTag(0))
-      val name: String = tlvReader.getString(ContextSpecificTag(1))
-      val type: Int = tlvReader.getInt(ContextSpecificTag(2))
-      val endpointListID: Int = tlvReader.getInt(ContextSpecificTag(3))
-      val supportedCommands: Int = tlvReader.getInt(ContextSpecificTag(4))
-      val state: Int = tlvReader.getInt(ContextSpecificTag(5))
+      val actionID: Int = tlvReader.getInt(ContextSpecificTag(TAG_ACTION_I_D))
+      val name: String = tlvReader.getString(ContextSpecificTag(TAG_NAME))
+      val type: Int = tlvReader.getInt(ContextSpecificTag(TAG_TYPE))
+      val endpointListID: Int = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D))
+      val supportedCommands: Int = tlvReader.getInt(ContextSpecificTag(TAG_SUPPORTED_COMMANDS))
+      val state: Int = tlvReader.getInt(ContextSpecificTag(TAG_STATE))
       
       tlvReader.exitContainer()
 

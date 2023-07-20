@@ -38,14 +38,16 @@ class BooleanStateClusterStateChangeEvent (
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(0), stateValue)
+    tlvWriter.put(ContextSpecificTag(TAG_STATE_VALUE), stateValue)
     tlvWriter.endStructure()
   }
 
   companion object {
+    private const val TAG_STATE_VALUE = 0
+
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : BooleanStateClusterStateChangeEvent {
       tlvReader.enterStructure(tag)
-      val stateValue: Boolean = tlvReader.getBoolean(ContextSpecificTag(0))
+      val stateValue: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_STATE_VALUE))
       
       tlvReader.exitContainer()
 
