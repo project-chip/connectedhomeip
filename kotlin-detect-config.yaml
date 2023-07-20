@@ -105,7 +105,6 @@ style:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkShortCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkVendorCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/UnpairCommand.kt"
-            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/onboardingpayload/Verhoeff.kt"
     MaxLineLength:
         excludes:
@@ -153,20 +152,17 @@ style:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterInteractionFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/EnterNetworkFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/MatterCommand.kt"
-            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/onboardingpayload/Base38.kt"
     ForbiddenComment:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/MultiAdminClientFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterInteractionFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/AddressCommissioningFragment.kt"
-            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/onboardingpayload/QRCodeOnboardingPayloadParser.kt"
     ExplicitItLambdaParameter:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterDetailFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/HistoryCommandAdapter.kt"
-            - "**/src/controller/java/generated/java/**/*"
     ThrowsCount:
         excludes:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
@@ -180,7 +176,6 @@ style:
     SerialVersionUIDInSerializableClass:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/HistoryCommand.kt"
-            - "**/src/controller/java/generated/java/**/*"
     UnusedPrivateMember:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/setuppayloadscanner/BarcodeFragment.kt"
@@ -198,7 +193,6 @@ style:
             - "**/src/controller/java/src/chip/onboardingpayload/Verhoeff10.kt"
     UtilityClassWithPublicConstructor:
         excludes:
-            - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/onboardingpayload/Verhoeff.kt"
     MayBeConst:
         excludes:
@@ -225,7 +219,6 @@ exceptions:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/SensorClientFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Argument.kt"
-            - "**/src/controller/java/generated/java/**/*"
     TooGenericExceptionThrown:
         excludes:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/discover/DiscoverCommissionablesCommand.kt"
