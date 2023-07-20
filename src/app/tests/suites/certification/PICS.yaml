@@ -9055,7 +9055,7 @@ PICS:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: RVCCLEANMS.S.C03.Tx
 
-##  Dishwasher Alarm
+    ##  Dishwasher Alarm
 
     # Features
     - label: "Does the device support the Reset command"
@@ -9076,10 +9076,12 @@ PICS:
     - label: "Does the device implement the Supported attribute?"
       id: DISHALM.S.A0003
 
-#
+    #
     #Server manual controllable
     #
-    - label: "Can the Dishwasher Alarm attribute changed by physical control at the device?"
+    - label:
+          "Can the Dishwasher Alarm attribute changed by physical control at the
+          device?"
       id: DISHALM.M.ManuallyControlled
 
     #
