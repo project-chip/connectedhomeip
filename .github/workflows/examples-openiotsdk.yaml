@@ -26,7 +26,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     openiotsdk:
         name: Open IoT SDK examples building
@@ -38,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-openiotsdk:0.7.3
+            image: ghcr.io/project-chip/chip-build-openiotsdk:1
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
             options: --privileged
@@ -49,7 +49,7 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: openiotsdk
+                platform: openiotsdk linux
                 extra-submodule-parameters: " --recursive"
 
             - name: Set up environment for size reports
@@ -73,6 +73,8 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build lock-app example (mbedtls)
+              # Disabled being tracked here: https://github.com/project-chip/connectedhomeip/issues/28026
+              if: false
               id: build_lock_app_mbedtls
               run: |
                   scripts/examples/openiotsdk_example.sh -b mbedtls lock-app
@@ -81,10 +83,49 @@ jobs:
                     examples/lock-app/openiotsdk/build/chip-openiotsdk-lock-app-example.elf \
                     /tmp/bloat_reports/
 
+            - name: Build tv-app example
+              id: build_tv_app
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/openiotsdk_example.sh tv-app
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    openiotsdk release tv-app \
+                    examples/tv-app/openiotsdk/build/chip-openiotsdk-tv-app-example.elf \
+                    /tmp/bloat_reports/
+
+            - name: Build all-clusters-app example
+              id: build_all_clusters_app
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/openiotsdk_example.sh all-clusters-app
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    openiotsdk release all-clusters-app \
+                    examples/all-clusters-app/openiotsdk/build/chip-openiotsdk-all-clusters-app-example.elf \
+                    /tmp/bloat_reports/
+
+            - name: Build ota-requestor-app example
+              id: build_ota_requestor_app
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/openiotsdk_example.sh -v 1 -V 0.0.1 ota-requestor-app
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    openiotsdk release ota-requestor-app \
+                    examples/ota-requestor-app/openiotsdk/build/chip-openiotsdk-ota-requestor-app-example.elf \
+                    /tmp/bloat_reports/
+
             - name: Build unit tests (mbedtls)
+              # Disabled being tracked here: https://github.com/project-chip/connectedhomeip/issues/28026
+              if: false
               id: build_unit_tests_mbedtls
               run: |
                   scripts/examples/openiotsdk_example.sh -b mbedtls unit-tests
+
+            - name: Build the OTA provider (Linux)
+              id: build_ota_provider_app
+              if: steps.build_ota_requestor_app.outcome == 'success'
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/gn_build_example.sh examples/ota-provider-app/linux/ out/ota-provider chip_config_network_layer_ble=false
 
             - name: "Test: shell example"
               if: steps.build_shell.outcome == 'success'
@@ -100,6 +141,37 @@ jobs:
                     'scripts/run_in_ns.sh ${TEST_NETWORK_NAME}ns scripts/examples/openiotsdk_example.sh --no-activate -C test -n ${TEST_NETWORK_NAME}tap lock-app'
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME down
 
+            - name: "Test: tv-app example"
+              if: steps.build_tv_app.outcome == 'success'
+              timeout-minutes: 10
+              run: |
+                  scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
+                  scripts/run_in_python_env.sh out/venv \
+                    'scripts/run_in_ns.sh ${TEST_NETWORK_NAME}ns scripts/examples/openiotsdk_example.sh --no-activate -C test -n ${TEST_NETWORK_NAME}tap tv-app'
+                  scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME down
+
+            - name: "Test: all-clusters-app example"
+              if: steps.build_all_clusters_app.outcome == 'success'
+              timeout-minutes: 5
+              run: |
+                  scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
+                  scripts/run_in_python_env.sh out/venv \
+                    'scripts/run_in_ns.sh ${TEST_NETWORK_NAME}ns scripts/examples/openiotsdk_example.sh --no-activate -C test -n ${TEST_NETWORK_NAME}tap all-clusters-app'
+                  scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME down
+
+            - name: "Test: ota-requestor-app example"
+              if: steps.build_ota_requestor_app.outcome == 'success' && steps.build_ota_provider_app.outcome == 'success'
+              timeout-minutes: 30
+              run: |
+                  mkdir out/binaries
+                  cp examples/ota-requestor-app/openiotsdk/build/chip-openiotsdk-ota-requestor-app-example.elf out/binaries/
+                  scripts/examples/openiotsdk_example.sh -c -v 2 -V 0.0.2 ota-requestor-app
+                  cp examples/ota-requestor-app/openiotsdk/build/chip-openiotsdk-ota-requestor-app-example.ota out/binaries/
+                  scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
+                  scripts/run_in_python_env.sh out/venv \
+                    'scripts/run_in_ns.sh ${TEST_NETWORK_NAME}ns scripts/examples/openiotsdk_example.sh --no-activate -p out/binaries -v 2 -V 0.0.2 -C test -n ${TEST_NETWORK_NAME}tap ota-requestor-app'
+                  scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME down
+
             - name: "Test: unit-tests (mbedtls)"
               if: steps.build_unit_tests_mbedtls.outcome == 'success'
               run: |
@@ -107,6 +179,8 @@ jobs:
                     'scripts/examples/openiotsdk_example.sh --no-activate -C test unit-tests'
 
             - name: Build lock-app example (psa)
+              # Disabled being tracked here: https://github.com/project-chip/connectedhomeip/issues/28026
+              if: false
               id: build_lock_app_psa
               run: |
                   scripts/examples/openiotsdk_example.sh -c -b psa lock-app

@@ -58,14 +58,11 @@
     "bridge": ["Test_TC_BR_1", "Test_TC_BR_2", "Test_TC_BR_3", "Test_TC_BR_4"],
     "DeviceAttestation": [
         "Test_TC_DA_1_1",
-        "Test_TC_DA_1_2",
         "Test_TC_DA_1_3",
         "Test_TC_DA_1_4",
-        "Test_TC_DA_1_5",
         "Test_TC_DA_1_6"
     ],
     "DeviceManagement": [
-        "Test_TC_BINFO_2_2",
         "Test_TC_BINFO_2_4",
         "Test_TC_OPCREDS_3_1",
         "Test_TC_OPCREDS_3_2",
@@ -110,7 +107,6 @@
     "IlluminanceMeasurement": [],
     "InteractionDataModel": [
         "Test_TC_IDM_1_1",
-        "Test_TC_IDM_1_2",
         "Test_TC_IDM_2_1",
         "Test_TC_IDM_2_2",
         "Test_TC_IDM_3_1",
@@ -145,10 +141,7 @@
         "Test_TC_MEDIAPLAYBACK_6_7",
         "Test_TC_AUDIOOUTPUT_7_3",
         "Test_TC_AUDIOOUTPUT_7_4",
-        "Test_TC_CONTENTLAUNCHER_10_3",
         "Test_TC_CONTENTLAUNCHER_10_4",
-        "Test_TC_CONTENTLAUNCHER_10_5",
-        "Test_TC_CONTENTLAUNCHER_10_7",
         "Test_TC_MC_11_1",
         "Test_TC_MC_11_2",
         "Test_TC_ALOGIN_12_2",
@@ -275,13 +268,13 @@
         "Test_TC_S_3_1"
     ],
     "PumpConfigurationControl": [],
-    "AccessControl": ["Test_TC_ACL_2_5", "Test_TC_ACL_2_6"],
+    "AccessControl": [],
     "UserLabel": [],
     "BridgedDeviceBasicInformation": [
         "Test_TC_BRBINFO_2_2",
         "Test_TC_BRBINFO_2_3"
     ],
-    "AccessControlEnforcement": ["Test_TC_ACE_1_2", "Test_TC_ACE_1_6"],
+    "AccessControlEnforcement": [],
     "collection": [
         "DeviceDiscovery",
         "Groups",

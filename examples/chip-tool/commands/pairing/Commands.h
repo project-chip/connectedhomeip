@@ -255,5 +255,5 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         make_unique<IssueNOCChainCommand>(credsIssuerConfig),
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for commissioning devices.");
 }

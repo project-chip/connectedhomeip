@@ -2022,6 +2022,60 @@ public Optional<String> operationalStateLabel;
   }
 }
 
+public static class HepaFilterMonitoringClusterReplacementProductStruct {
+public Integer productIdentifierType;
+public String productIdentifierValue;
+
+  public HepaFilterMonitoringClusterReplacementProductStruct(
+    Integer productIdentifierType
+      , String productIdentifierValue
+  ) {
+    this.productIdentifierType = productIdentifierType;
+    this.productIdentifierValue = productIdentifierValue;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("HepaFilterMonitoringClusterReplacementProductStruct {\n");
+    output.append("\tproductIdentifierType: ");
+    output.append(productIdentifierType);
+        output.append("\n");
+    output.append("\tproductIdentifierValue: ");
+    output.append(productIdentifierValue);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class ActivatedCarbonFilterMonitoringClusterReplacementProductStruct {
+public Integer productIdentifierType;
+public String productIdentifierValue;
+
+  public ActivatedCarbonFilterMonitoringClusterReplacementProductStruct(
+    Integer productIdentifierType
+      , String productIdentifierValue
+  ) {
+    this.productIdentifierType = productIdentifierType;
+    this.productIdentifierValue = productIdentifierValue;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ActivatedCarbonFilterMonitoringClusterReplacementProductStruct {\n");
+    output.append("\tproductIdentifierType: ");
+    output.append(productIdentifierType);
+        output.append("\n");
+    output.append("\tproductIdentifierValue: ");
+    output.append(productIdentifierValue);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
 public static class DoorLockClusterCredentialStruct {
 public Integer credentialType;
 public Integer credentialIndex;

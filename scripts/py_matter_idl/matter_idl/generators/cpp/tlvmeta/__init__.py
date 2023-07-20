@@ -62,14 +62,16 @@ class ClusterTablesGenerator:
         for b in self.cluster.bitmaps:
             self.item_type_map[b.name] = "kBitmap"
 
-    def FieldEntry(self, field: Field, tag_type: str = 'ContextTag') -> TableEntry:
-        type_reference = "%s_%s" % (self.cluster.name, field.data_type.name)
+    def FieldEntry(self, field: Field, tag_type: str = 'ContextTag', type_override: Optional[str] = None) -> TableEntry:
+        data_type_name = type_override or field.data_type.name
+        type_reference = "%s_%s" % (self.cluster.name, data_type_name)
+
         if type_reference not in self.known_types:
             type_reference = None
 
-        item_type = self.item_type_map.get(field.data_type.name, 'kDefault')
+        item_type = self.item_type_map.get(data_type_name, 'kDefault')
 
-        real_type = "%s::%s" % (self.cluster.name, field.data_type.name)
+        real_type = "%s::%s" % (self.cluster.name, data_type_name)
         if field.is_list:
             real_type = real_type + "[]"
             item_type = "kList"
@@ -96,7 +98,8 @@ class ClusterTablesGenerator:
 
         # Events are structures
         for e in self.cluster.events:
-            self.known_types.add("%s_%s" % (self.cluster.name, e.name))
+            if e.fields:
+                self.known_types.add("%s_%s" % (self.cluster.name, e.name))
 
         for e in self.cluster.enums:
             self.known_types.add("%s_%s" % (self.cluster.name, e.name))
@@ -141,11 +144,21 @@ class ClusterTablesGenerator:
     def GenerateTables(self) -> Generator[Table, None, None]:
         self.ComputeKnownTypes()
 
+        cluster_feature_map = None
+        for b in self.cluster.bitmaps:
+            # Older matter files use `ClusterNameFeature` as naming, newer code was
+            # updated to just `Feature`. For now support both.
+            if b.name in {'Feature', f'{self.cluster.name}Feature'} and b.base_type.lower() == 'bitmap32':
+                cluster_feature_map = b.name
+
         # Clusters have attributes. They are direct descendants for
         # attributes
         cluster_entries = []
-        cluster_entries.extend([self.FieldEntry(
-            a.definition, tag_type='AttributeTag') for a in self.cluster.attributes])
+        cluster_entries.extend([
+            self.FieldEntry(a.definition, tag_type='AttributeTag',
+                            type_override=(cluster_feature_map if a.definition.code == 0xFFFC else None))
+            for a in self.cluster.attributes
+        ])
 
         cluster_entries.extend([
             # events always reference an existing struct
@@ -155,7 +168,7 @@ class ClusterTablesGenerator:
                 reference="%s_%s" % (self.cluster.name, e.name),
                 real_type='%s::%s' % (self.cluster.name, e.name)
             )
-            for e in self.cluster.events
+            for e in self.cluster.events if e.fields
         ])
         cluster_entries.extend(
             [entry for entry in self.CommandEntries()]
@@ -173,10 +186,11 @@ class ClusterTablesGenerator:
             )
 
         for e in self.cluster.events:
-            yield Table(
-                full_name="%s_%s" % (self.cluster.name, e.name),
-                entries=[self.FieldEntry(field) for field in e.fields]
-            )
+            if e.fields:
+                yield Table(
+                    full_name="%s_%s" % (self.cluster.name, e.name),
+                    entries=[self.FieldEntry(field) for field in e.fields]
+                )
 
         # some items have lists, create an intermediate item for those
         for name in self.list_types:
@@ -185,7 +199,7 @@ class ClusterTablesGenerator:
                 entries=[
                     TableEntry(
                         code="AnonymousTag()",
-                        name="[]",
+                        name="Anonymous<>",
                         reference=name,
                         real_type="%s[]" % name,
                     )
@@ -200,7 +214,8 @@ class ClusterTablesGenerator:
                         code="ConstantValueTag(0x%X)" % entry.code,
                         name=entry.name,
                         reference=None,
-                        real_type="%s::%s::%s" % (self.cluster.name, e.name, entry.name)
+                        real_type="%s::%s::%s" % (
+                            self.cluster.name, e.name, entry.name)
                     )
                     for entry in e.entries
                 ]
@@ -214,7 +229,8 @@ class ClusterTablesGenerator:
                         code="ConstantValueTag(0x%X)" % entry.code,
                         name=entry.name,
                         reference=None,
-                        real_type="%s::%s::%s" % (self.cluster.name, e.name, entry.name)
+                        real_type="%s::%s::%s" % (
+                            self.cluster.name, e.name, entry.name)
                     )
                     for entry in e.entries
                 ]
@@ -245,7 +261,7 @@ def IndexInTable(name: Optional[str], table: List[Table]) -> str:
     for idx, t in enumerate(table):
         if t.full_name == name:
             # Index skipping hard-coded items
-            return idx + 2
+            return "%d" % (idx + 2)
 
     raise Exception("Name %r not found in table" % name)
 

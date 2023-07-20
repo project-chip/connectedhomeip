@@ -34,6 +34,10 @@
 #endif
 #endif // BRD4325A
 
+#ifdef BRD4325A // For SiWx917 Platform only
+#include "core_cm4.h"
+#endif
+
 // Technically FaultRecording is an octstr up to 1024 bytes.
 // We currently only report short strings. 100 char will more than enough for now.
 constexpr uint8_t kMaxFaultStringLen = 100;
@@ -50,6 +54,7 @@ namespace Silabs {
 
 void OnSoftwareFaultEventHandler(const char * faultRecordString)
 {
+#ifdef EMBER_AF_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
     EnabledEndpointsWithServerCluster enabledEndpoints(SoftwareDiagnostics::Id);
     VerifyOrReturn(enabledEndpoints.begin() != enabledEndpoints.end());
 
@@ -66,6 +71,7 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
     softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultRecordString), strlen(faultRecordString)));
 
     SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
+#endif // EMBER_AF_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
 }
 
 } // namespace Silabs

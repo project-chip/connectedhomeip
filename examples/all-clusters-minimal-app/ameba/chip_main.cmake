@@ -129,6 +129,7 @@ list(
     APPEND ${list_chip_main_sources}
 
     ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/bridged-actions-stub.cpp
+    ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/smco-stub.cpp
     ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/static-supported-modes-manager.cpp
 
     ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/chipinterface.cpp

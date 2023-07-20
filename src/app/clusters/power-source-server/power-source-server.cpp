@@ -55,6 +55,10 @@ CHIP_ERROR PowerSourceAttrAccess::Read(const ConcreteReadAttributePath & aPath, 
         // TODO: Needs implementation.
         err = aEncoder.EncodeEmptyList();
         break;
+    case EndpointList::Id:
+        // TODO: Needs implementation and a way to allow dynamic endpoints to register endpoints
+        err = aEncoder.EncodeEmptyList();
+        break;
     default:
         break;
     }

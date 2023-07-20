@@ -1,0 +1,31 @@
+Name: Matter
+
+Enumerators:
+     # The Swift importer seems to get very confused about
+     # MTRWiFiNetworkDiagnosticsWiFiVersionType enum value naming depending on
+     # which set of them is deprecated.  Give explicit Swift names to the
+     # older-deprecated bits, so the importer does the same thing it used to do
+     # with the bits that got deprecated more recently.
+    - Name: MTRWiFiNetworkDiagnosticsWiFiVersionType80211a
+      SwiftName: type80211a
+    - Name: MTRWiFiNetworkDiagnosticsWiFiVersionType80211b
+      SwiftName: type80211b
+    - Name: MTRWiFiNetworkDiagnosticsWiFiVersionType80211g
+      SwiftName: type80211g
+    - Name: MTRWiFiNetworkDiagnosticsWiFiVersionType80211n
+      SwiftName: type80211n
+    - Name: MTRWiFiNetworkDiagnosticsWiFiVersionType80211ac
+      SwiftName: type80211ac
+    - Name: MTRWiFiNetworkDiagnosticsWiFiVersionType80211ax
+      SwiftName: type80211ax
+
+    # Make the names for MTRWiFiNetworkDiagnosticsWiFiVersion all be
+    # lowercase instead of having uppercase A and lowercase ax.
+    - Name: MTRWiFiNetworkDiagnosticsWiFiVersionA
+      SwiftName: a
+    - Name: MTRWiFiNetworkDiagnosticsWiFiVersionB
+      SwiftName: b
+    - Name: MTRWiFiNetworkDiagnosticsWiFiVersionG
+      SwiftName: g
+    - Name: MTRWiFiNetworkDiagnosticsWiFiVersionN
+      SwiftName: n

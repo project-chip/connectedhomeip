@@ -30,5 +30,5 @@ void registerCommandsSessionManagement(Commands & commands, CredentialIssuerComm
         make_unique<EvictLocalCASESessionsCommand>(credsIssuerConfig),
     };
 
-    commands.Register(clusterName, clusterCommands, "Commands for managing CASE and PASE session state");
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for managing CASE and PASE session state.");
 }

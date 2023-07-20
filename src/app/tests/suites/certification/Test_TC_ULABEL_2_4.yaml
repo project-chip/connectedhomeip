@@ -34,7 +34,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH writes LabelList attribute of the DUT"
+    - label: "Step 1: TH writes LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "writeAttribute"
       attribute: "LabelList"
@@ -45,7 +45,7 @@ tests:
                   { Label: "Orientation", Value: "east" },
               ]
 
-    - label: "TH reads LabelList attribute of the DUT"
+    - label: "Step 2: TH reads LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "readAttribute"
       attribute: "LabelList"
@@ -56,14 +56,14 @@ tests:
                   { Label: "Orientation", Value: "east" },
               ]
 
-    - label: "TH writes LabelList attribute of the DUT"
+    - label: "Step 3: TH writes LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "writeAttribute"
       attribute: "LabelList"
       arguments:
           value: [{ Label: "", Value: "" }]
 
-    - label: "TH reads LabelList attribute of the DUT"
+    - label: "Step 4: TH reads LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "readAttribute"
       attribute: "LabelList"

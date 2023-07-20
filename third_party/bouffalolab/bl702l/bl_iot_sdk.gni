@@ -687,7 +687,8 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_utils",
     ]
     public_configs = [ ":${sdk_target_name}_config_BSP_Driver" ]
-    if (chip_enable_openthread) {
+    if (defined(invoker.chip_enable_openthread) &&
+        invoker.chip_enable_openthread) {
       public_deps += [ ":${sdk_target_name}_openthread_port" ]
     }
   }
