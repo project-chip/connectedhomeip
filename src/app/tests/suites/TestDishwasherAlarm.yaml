@@ -28,34 +28,34 @@ tests:
               - name: "nodeId"
                 value: nodeId
     #Init
-    #Support 00 1011  (11)
-    #Mask    00 1001  (9)
-    #State   00 1001  (9)
-    #Latch   00 1001  (9)
+    #Support 10 1111  (47) (0x2F)
+    #Mask    10 1111  (47) (0x2F)
+    #Latch   00 0011  (3)  (0x03)
+    #State   00 0111  (7)  (0x07)
     #FeatureMap 1
     - label: "Read Supported Attribute"
       command: "readAttribute"
       attribute: "Supported"
       response:
-          value: 11
+          value: 47
 
     - label: "Read Mask Attribute"
       command: "readAttribute"
       attribute: "Mask"
       response:
-          value: 9
+          value: 47
 
     - label: "Read Latch Attribute"
       command: "readAttribute"
       attribute: "Latch"
       response:
-          value: 9
+          value: 3
 
     - label: "Read State Attribute"
       command: "readAttribute"
       attribute: "State"
       response:
-          value: 9
+          value: 7
 
     - label: "Read feature map Attribute"
       command: "readAttribute"
@@ -66,20 +66,26 @@ tests:
               hasMasksSet: [0x1]
 
     #After Modify Enabled Alarm (Valid)
-    #Support 00 1011  (11)
-    #Mask    00 0011  (3)
-    #State   00 0001  (1)
-    #Latch   00 1001  (9)
+    #Support 10 1111  (47) (0x2F)
+    #Mask    10 1001  (41) (0x29)
+    #Latch   00 0011  (3)  (0x03)
+    #State   00 0011  (3)  (0x03), bit 1 is latched, so unable to inactive while Mask attribute changed.
     - label: "Modify enabled alarms Command"
       command: "ModifyEnabledAlarms"
       arguments:
           values:
               - name: "Mask"
-                value: 3
+                value: 41
 
     - label: "Read Mask Attribute"
       command: "readAttribute"
       attribute: "Mask"
+      response:
+          value: 41
+
+    - label: "Read Latch Attribute"
+      command: "readAttribute"
+      attribute: "Latch"
       response:
           value: 3
 
@@ -87,26 +93,19 @@ tests:
       command: "readAttribute"
       attribute: "State"
       response:
-          value: 1
+          value: 3
 
-    - label: "Read Latch Attribute"
-      command: "readAttribute"
-      attribute: "Latch"
-      response:
-          value: 9
-
-    #After Modify Enabled Alarm (Invalid)
-    #Support 00 1011  (11)
-    #Mask    00 0011  (3)
-    #State   00 0001  (1)
-    #Latch   00 1001  (9)
-
+    #After Modify Enabled Alarm (Invalid, set for unknown alarms)
+    #Support 10 1111  (47) (0x2F)
+    #Mask   110 1001  (105) (0x69)
+    #Latch   00 0011  (3)  (0x03)
+    #State   00 0011  (3)  (0x03)
     - label: "Modify enabled alarms Command"
       command: "ModifyEnabledAlarms"
       arguments:
           values:
               - name: "Mask"
-                value: 16
+                value: 105
       response:
           error: INVALID_COMMAND
 
@@ -114,6 +113,74 @@ tests:
       command: "readAttribute"
       attribute: "Mask"
       response:
+          value: 41
+
+    - label: "Read Latch Attribute"
+      command: "readAttribute"
+      attribute: "Latch"
+      response:
+          value: 3
+
+    - label: "Read State Attribute"
+      command: "readAttribute"
+      attribute: "State"
+      response:
+          value: 3
+
+    #After Modify Enabled Alarm (Invalid, set for alarms which are not supported)
+    #Support 10 1111  (47) (0x2F)
+    #Mask    11 1011  (59) (0x3B)
+    #Latch   00 0011  (3)  (0x03)
+    #State   00 0011  (3)  (0x03)
+    - label: "Modify enabled alarms Command"
+      command: "ModifyEnabledAlarms"
+      arguments:
+          values:
+              - name: "Mask"
+                value: 59
+      response:
+          error: INVALID_COMMAND
+
+    - label: "Read Mask Attribute"
+      command: "readAttribute"
+      attribute: "Mask"
+      response:
+          value: 41
+
+    - label: "Read Latch Attribute"
+      command: "readAttribute"
+      attribute: "Latch"
+      response:
+          value: 3
+
+    - label: "Read State Attribute"
+      command: "readAttribute"
+      attribute: "State"
+      response:
+          value: 3
+
+    #After Reset alarms bit 1
+    #Support 10 1111  (47) (0x2F)
+    #Mask    10 1001  (41) (0x29)
+    #Latch   00 0011  (3)  (0x03)
+    #State   00 0001  (1)  (0x01)
+    - label: "Reset Command"
+      command: "Reset"
+      arguments:
+          values:
+              - name: "Alarms"
+                value: 2
+
+    - label: "Read Mask Attribute"
+      command: "readAttribute"
+      attribute: "Mask"
+      response:
+          value: 41
+
+    - label: "Read Latch Attribute"
+      command: "readAttribute"
+      attribute: "Latch"
+      response:
           value: 3
 
     - label: "Read State Attribute"
@@ -122,38 +189,3 @@ tests:
       response:
           value: 1
 
-    - label: "Read Latch Attribute"
-      command: "readAttribute"
-      attribute: "Latch"
-      response:
-          value: 9
-
-    #After Reset alarms bit 0
-    #Support 00 1011  (11)
-    #Mask    00 0011  (3)
-    #State   00 0000  (0)
-    #Latch   00 1000  (8)
-    - label: "Reset Command"
-      command: "Reset"
-      arguments:
-          values:
-              - name: "Alarms"
-                value: 1
-
-    - label: "Read Mask Attribute"
-      command: "readAttribute"
-      attribute: "Mask"
-      response:
-          value: 3
-
-    - label: "Read State Attribute"
-      command: "readAttribute"
-      attribute: "State"
-      response:
-          value: 0
-
-    - label: "Read Latch Attribute"
-      command: "readAttribute"
-      attribute: "Latch"
-      response:
-          value: 8
