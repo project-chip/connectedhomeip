@@ -67,26 +67,52 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
+    friend void netif_status_callback(struct netif * netif);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 public:
-    static WiFiStationState mWiFiStationState;
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     bool _IsWiFiStationConnected(void);
-    void WifiStationStateChange(void);
-    void OnStationConnected(void);
+    WiFiStationState GetWiFiStationState(void);
     void ChangeWiFiStationState(WiFiStationState newState);
+    void OnWiFiStationStateChanged(void);
+    void OnWiFiStationConnected(void);
+    void OnWiFiStationDisconnected(void);
+#endif
+
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    void OnConnectivityChanged(struct netif * interface);
+    void OnIPv4AddressAvailable();
     void OnIPv6AddressAvailable();
 #endif
 
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    WiFiStationMode mWiFiStationMode;
+    WiFiStationState mWiFiStationState;
+
+    BitFlags<GenericConnectivityManagerImpl_WiFi::ConnectivityFlags> mConnectivityFlag;
+
     bool _IsWiFiStationEnabled(void);
-    // bool _IsWiFiStationProvisioned(void);
+    ConnectivityManager::WiFiStationMode _GetWiFiStationMode();
     CHIP_ERROR _SetWiFiStationMode(WiFiStationMode val);
-    void GetWifiState(void);
-    WiFiStationState GetWiFiStationState(void);
+    bool _IsWiFiStationProvisioned(void);
+    void _ClearWiFiStationProvision();
+    void _OnWiFiStationProvisionChange();
+    CHIP_ERROR ConnectProvisionedWiFiNetwork();
+#elif !CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    enum class ConnectivityFlags : uint16_t
+    {
+        kHaveIPv4InternetConnectivity = 0x0001,
+        kHaveIPv6InternetConnectivity = 0x0002,
+        kAwaitingConnectivity         = 0x0010,
+    };
+    BitFlags<ConnectivityFlags> mConnectivityFlag;
+#endif
+
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    ip4_addr_t m_ip4addr;
+    ip6_addr_t m_ip6addr[LWIP_IPV6_NUM_ADDRESSES];
 #endif
 
     void DriveStationState(void);
@@ -95,7 +121,6 @@ private:
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
     // ===== Members for internal use by the following friends.
-
     friend ConnectivityManager & ConnectivityMgr(void);
     friend ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 
@@ -111,6 +136,11 @@ inline ConnectivityManager::WiFiStationState ConnectivityManagerImpl::GetWiFiSta
 inline bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
 {
     return mWiFiStationState == kWiFiStationState_Connected;
+}
+
+inline ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode(void)
+{
+    return kWiFiStationMode_Enabled;
 }
 #endif
 

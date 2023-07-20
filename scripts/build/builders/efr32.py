@@ -26,6 +26,7 @@ class Efr32App(Enum):
     SWITCH = auto()
     WINDOW_COVERING = auto()
     THERMOSTAT = auto()
+    PUMP = auto()
     UNIT_TEST = auto()
 
     def ExampleName(self):
@@ -39,6 +40,8 @@ class Efr32App(Enum):
             return 'window-app'
         elif self == Efr32App.THERMOSTAT:
             return 'thermostat'
+        elif self == Efr32App.PUMP:
+            return 'pump-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -53,6 +56,8 @@ class Efr32App(Enum):
             return 'matter-silabs-window-example'
         elif self == Efr32App.THERMOSTAT:
             return 'matter-silabs-thermostat-example'
+        elif self == Efr32App.PUMP:
+            return 'matter-silabs-pump-example'
         elif self == Efr32App.UNIT_TEST:
             return 'matter-silabs-device_tests'
         else:
@@ -69,6 +74,8 @@ class Efr32App(Enum):
             return 'window_app.flashbundle.txt'
         elif self == Efr32App.THERMOSTAT:
             return 'thermostat_app.flashbundle.txt'
+        elif self == Efr32App.PUMP:
+            return 'pump_app.flashbundle.txt'
         elif self == Efr32App.UNIT_TEST:
             return 'efr32_device_tests.flashbundle.txt'
         else:

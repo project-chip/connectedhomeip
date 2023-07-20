@@ -44,7 +44,6 @@ ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeM
     mpCallback(apCallback), mOnConnectedCallback(HandleDeviceConnected, this),
     mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {
-    // Error if already initialized.
     mpExchangeMgr    = apExchangeMgr;
     mpCallback       = apCallback;
     mInteractionType = aInteractionType;
@@ -1094,6 +1093,7 @@ void ReadClient::HandleDeviceConnected(void * context, Messaging::ExchangeManage
 
     ChipLogProgress(DataManagement, "HandleDeviceConnected");
     _this->mReadPrepareParams.mSessionHolder.Grab(sessionHandle);
+    _this->mpExchangeMgr = &exchangeMgr;
 
     auto err = _this->SendSubscribeRequest(_this->mReadPrepareParams);
     if (err != CHIP_NO_ERROR)

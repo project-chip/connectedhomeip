@@ -120,7 +120,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
         chip_device_platform == "tizen" || chip_device_platform == "android" ||
-        chip_device_platform == "k32w0" || chip_device_platform == "webos") {
+        chip_device_platform == "k32w0" || chip_device_platform == "webos" ||
+        chip_device_platform == "bl602" || chip_device_platform == "bl702" ||
+        chip_device_platform == "bl702l") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 

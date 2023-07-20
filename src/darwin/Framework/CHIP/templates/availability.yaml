@@ -54,6 +54,13 @@
 #              Please examine codegen carefully when using "removed" to make
 #              sure all the things that should have been removed have been.
 #
+# * "swiftUnavailable": Can contain clusters, commands, attributes, etc as
+#                       described above for "introduced" and "deprecated".  This
+#                       can be used to mark APIs with NS_SWIFT_UNAVAILABLE,
+#                       typically when an API was renamed between two names that
+#                       map to the same Swift name and then both names were
+#                       deprecated.
+#
 # * "provisional": Can contain clusters, commands, attributes, etc as described
 #                  above for "introduced" and "deprecated".  Items can be
 #                  defined as provisional to prevent code generation for them.
@@ -7394,6 +7401,18 @@
           ModeSelect:
               Feature:
                   OnOff: DEPONOFF
+  swiftUnavailable:
+      bitmap values:
+          NetworkCommissioning:
+              WiFiSecurity:
+                  # The bitmap got renamed to WiFiSecurityBitmap, so now both
+                  # the Wpa* and WPA* names on WiFiSecurity are deprecated.
+                  # They get mapped to Swift with identical names, which leads
+                  # to the names being ambiguous.  Mark the "Wpa*" as
+                  # unavailable to Swift to work around this.
+                  - WpaPersonal
+                  - Wpa2Personal
+                  - Wpa3Personal
   provisional:
       clusters:
           ## Not ready at cutoff

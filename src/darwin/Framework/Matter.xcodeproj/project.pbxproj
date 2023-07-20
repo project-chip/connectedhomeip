@@ -152,6 +152,7 @@
 		514304202914CED9004DC7FE /* generic-callback-stubs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */; };
 		51431AF927D2973E008A7943 /* MTRIMDispatch.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51431AF827D2973E008A7943 /* MTRIMDispatch.mm */; };
 		51431AFB27D29CA4008A7943 /* ota-provider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 51431AFA27D29CA4008A7943 /* ota-provider.cpp */; };
+		5143851E2A65885500EDC8E6 /* MTRSwiftPairingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5143851D2A65885500EDC8E6 /* MTRSwiftPairingTests.swift */; };
 		515C1C6F284F9FFB00A48F0C /* MTRFramework.mm in Sources */ = {isa = PBXBuildFile; fileRef = 515C1C6D284F9FFB00A48F0C /* MTRFramework.mm */; };
 		515C1C70284F9FFB00A48F0C /* MTRFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = 515C1C6E284F9FFB00A48F0C /* MTRFramework.h */; };
 		51669AF02913204400F4AA36 /* MTRBackwardsCompatTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51669AEF2913204400F4AA36 /* MTRBackwardsCompatTests.m */; };
@@ -452,6 +453,8 @@
 		5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "generic-callback-stubs.cpp"; path = "util/generic-callback-stubs.cpp"; sourceTree = "<group>"; };
 		51431AF827D2973E008A7943 /* MTRIMDispatch.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRIMDispatch.mm; sourceTree = "<group>"; };
 		51431AFA27D29CA4008A7943 /* ota-provider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ota-provider.cpp"; path = "clusters/ota-provider/ota-provider.cpp"; sourceTree = "<group>"; };
+		5143851C2A65885400EDC8E6 /* MatterTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MatterTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		5143851D2A65885500EDC8E6 /* MTRSwiftPairingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTRSwiftPairingTests.swift; sourceTree = "<group>"; };
 		515C1C6D284F9FFB00A48F0C /* MTRFramework.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRFramework.mm; sourceTree = "<group>"; };
 		515C1C6E284F9FFB00A48F0C /* MTRFramework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRFramework.h; sourceTree = "<group>"; };
 		51669AEF2913204400F4AA36 /* MTRBackwardsCompatTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRBackwardsCompatTests.m; sourceTree = "<group>"; };
@@ -1120,7 +1123,9 @@
 				51A2F1312A00402A00F03298 /* MTRDataValueParserTests.m */,
 				51339B1E2A0DA64D00C798C1 /* MTRCertificateValidityTests.m */,
 				519498312A25581C00B3BABE /* MTRSetupPayloadSerializerTests.m */,
+				5143851D2A65885500EDC8E6 /* MTRSwiftPairingTests.swift */,
 				B202529D2459E34F00F97062 /* Info.plist */,
+				5143851C2A65885400EDC8E6 /* MatterTests-Bridging-Header.h */,
 			);
 			path = CHIPTests;
 			sourceTree = "<group>";
@@ -1346,6 +1351,7 @@
 					};
 					B20252952459E34F00F97062 = {
 						CreatedOnToolsVersion = 11.4.1;
+						LastSwiftMigration = 1430;
 					};
 				};
 			};
@@ -1532,6 +1538,7 @@
 				1EE0805E2A44875E008A03C2 /* MTRCommissionableBrowserTests.m in Sources */,
 				51339B1F2A0DA64D00C798C1 /* MTRCertificateValidityTests.m in Sources */,
 				5173A47929C0E82300F67F48 /* MTRFabricInfoTests.m in Sources */,
+				5143851E2A65885500EDC8E6 /* MTRSwiftPairingTests.swift in Sources */,
 				3D0C484B29DA4FA0006D811F /* MTRErrorTests.m in Sources */,
 				51742B4A29CB5FC1009974FE /* MTRTestResetCommissioneeHelper.m in Sources */,
 				5AE6D4E427A99041001F2493 /* MTRDeviceTests.m in Sources */,
@@ -1824,6 +1831,7 @@
 		BA09EB752474881D00605257 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../../src";
 				INFOPLIST_FILE = CHIPTests/Info.plist;
@@ -1834,6 +1842,9 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "CHIPTests/MatterTests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 			};
 			name = Debug;
@@ -1987,6 +1998,7 @@
 		BA09EB792474882200605257 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../../src";
@@ -1998,6 +2010,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "CHIPTests/MatterTests-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 			};
 			name = Release;

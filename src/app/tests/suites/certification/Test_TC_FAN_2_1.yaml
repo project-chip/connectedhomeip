@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads from the DUT the the FanMode attribute"
+    - label: "Step 2: TH reads from the DUT the the FanMode attribute"
       PICS: FAN.S.A0000
       command: "readAttribute"
       attribute: "FanMode"
@@ -41,7 +41,7 @@ tests:
               minValue: 0
               maxValue: 6
 
-    - label: "TH reads from the DUT the the FanModeSequence attribute"
+    - label: "Step 3: TH reads from the DUT the the FanModeSequence attribute"
       PICS: FAN.S.A0001
       command: "readAttribute"
       attribute: "FanModeSequence"
@@ -51,7 +51,7 @@ tests:
               minValue: 0
               maxValue: 5
 
-    - label: "TH reads from the DUT the the PercentSetting attribute"
+    - label: "Step 4: TH reads from the DUT the the PercentSetting attribute"
       PICS: FAN.S.A0002
       command: "readAttribute"
       attribute: "PercentSetting"
@@ -61,7 +61,7 @@ tests:
               minValue: 0
               maxValue: 100
 
-    - label: "TH reads from the DUT the the PercentCurrent attribute"
+    - label: "Step 5: TH reads from the DUT the the PercentCurrent attribute"
       PICS: FAN.S.A0003
       command: "readAttribute"
       attribute: "PercentCurrent"

@@ -29,8 +29,8 @@ using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
 #define APP_BUTTON_PRESS_JITTER 50
-#define APP_BUTTON_PRESS_SHORT 1000
-#define APP_BUTTON_PRESS_LONG 4000
+#define APP_BUTTON_PRESS_SHORT 1500
+#define APP_BUTTON_PRESS_LONG 5000
 
 #define APP_LIGHT_ENDPOINT_ID 1
 #define APP_REBOOT_RESET_COUNT 3
@@ -55,23 +55,9 @@ public:
     {
         APP_EVENT_NONE = 0x00000000,
 
-        APP_EVENT_BTN_FACTORY_RESET_CANCEL = 0x00000002,
-        APP_EVENT_BTN_FACTORY_RESET_IND    = 0x00000004,
-        APP_EVENT_BTN_FACTORY_RESET_PRESS  = 0x00000008,
-
-        APP_EVENT_BTN_ALL_MASK =
-            APP_EVENT_BTN_FACTORY_RESET_CANCEL | APP_EVENT_BTN_FACTORY_RESET_IND | APP_EVENT_BTN_FACTORY_RESET_PRESS,
-        APP_EVENT_TIMER     = 0x00000010,
-        APP_EVENT_BTN_SHORT = 0x00000020,
-
-        APP_EVENT_SYS_BLE_ADV      = 0x00000100,
-        APP_EVENT_SYS_BLE_CONN     = 0x00000200,
-        APP_EVENT_SYS_PROVISIONED  = 0x00000400,
-        APP_EVENT_SYS_LIGHT_TOGGLE = 0x00000800,
-        APP_EVENT_FACTORY_RESET    = 0x00001000,
-
-        APP_EVENT_SYS_ALL_MASK =
-            APP_EVENT_SYS_BLE_ADV | APP_EVENT_SYS_BLE_CONN | APP_EVENT_SYS_PROVISIONED | APP_EVENT_FACTORY_RESET,
+        APP_EVENT_TIMER         = 0x00000010,
+        APP_EVENT_BTN_SHORT     = 0x00000020,
+        APP_EVENT_FACTORY_RESET = 0x00000040,
 
         APP_EVENT_LIGHTING_ONOFF = 0x00010000,
         APP_EVENT_LIGHTING_LEVEL = 0x00020000,
@@ -83,8 +69,7 @@ public:
         APP_EVENT_IDENTIFY_STOP     = 0x04000000,
         APP_EVENT_IDENTIFY_MASK     = APP_EVENT_IDENTIFY_START | APP_EVENT_IDENTIFY_IDENTIFY | APP_EVENT_IDENTIFY_STOP,
 
-        APP_EVENT_ALL_MASK = APP_EVENT_LIGHTING_MASK | APP_EVENT_BTN_ALL_MASK | APP_EVENT_SYS_ALL_MASK | APP_EVENT_TIMER |
-            APP_EVENT_BTN_SHORT | APP_EVENT_IDENTIFY_MASK,
+        APP_EVENT_ALL_MASK = APP_EVENT_LIGHTING_MASK | APP_EVENT_TIMER | APP_EVENT_BTN_SHORT | APP_EVENT_IDENTIFY_MASK,
     };
 
     void SetEndpointId(EndpointId endpointId)
@@ -100,7 +85,6 @@ public:
     static void IdentifyStartHandler(Identify *);
     static void IdentifyStopHandler(Identify *);
     static void IdentifyHandleOp(app_event_t event);
-    bool mIsConnected;
 
 private:
     friend void StartAppTask(void);
@@ -119,7 +103,7 @@ private:
     static void TimerEventHandler(app_event_t event);
     static void TimerCallback(TimerHandle_t xTimer);
 
-#ifdef LED_BTN_RESET
+#ifdef BOOT_PIN_RESET
     static void ButtonInit(void);
     static bool ButtonPressed(void);
     static void ButtonEventHandler(void * arg);
@@ -137,7 +121,6 @@ private:
     TimerHandle_t sTimer;
     uint32_t mTimerIntvl;
     uint64_t mButtonPressedTime;
-    bool mIsFactoryResetIndicat;
 
     static StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
     static StaticTask_t appTaskStruct;

@@ -338,6 +338,7 @@ server cluster OnOff = 6 {
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
   bitmap OnOffControl : BITMAP8 {
@@ -2473,12 +2474,12 @@ endpoint 0 {
   }
 
   server cluster IcdManagement {
-    ram      attribute idleModeInterval default = 500;
-    ram      attribute activeModeInterval default = 300;
-    ram      attribute activeModeThreshold default = 300;
+    callback attribute idleModeInterval default = 500;
+    callback attribute activeModeInterval default = 300;
+    callback attribute activeModeThreshold default = 300;
     callback attribute registeredClients;
-    ram      attribute ICDCounter;
-    ram      attribute clientsSupportedPerFabric default = 1;
+    callback attribute ICDCounter;
+    callback attribute clientsSupportedPerFabric default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2527,7 +2528,7 @@ endpoint 1 {
     ram      attribute offWaitTime default = 0x0000;
     persist  attribute startUpOnOff default = 0xFF;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster LevelControl {

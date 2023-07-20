@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads from the DUT the MinMeasuredValue attribute."
+    - label: "Step 2: TH reads from the DUT the MinMeasuredValue attribute."
       PICS: TVOCCONC.S.A0001
       command: "readAttribute"
       attribute: "MinMeasuredValue"
@@ -41,7 +41,7 @@ tests:
               type: single
               minValue: 0
 
-    - label: "TH reads from the DUT the MaxMeasuredValue attribute."
+    - label: "Step 3: TH reads from the DUT the MaxMeasuredValue attribute."
       PICS: TVOCCONC.S.A0002
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
@@ -51,7 +51,7 @@ tests:
               type: single
               minValue: MinMeasuredValue
 
-    - label: "TH reads from the DUT the MeasuredValue attribute."
+    - label: "Step 4: TH reads from the DUT the MeasuredValue attribute."
       PICS: TVOCCONC.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
@@ -61,7 +61,7 @@ tests:
               minValue: MinMeasuredValue
               maxValue: MaxMeasuredValue
 
-    - label: "TH reads from the DUT the PeakMeasuredValue attribute."
+    - label: "Step 5: TH reads from the DUT the PeakMeasuredValue attribute."
       PICS: TVOCCONC.S.A0003
       command: "readAttribute"
       attribute: "PeakMeasuredValue"
@@ -71,7 +71,8 @@ tests:
               minValue: MinMeasuredValue
               maxValue: MaxMeasuredValue
 
-    - label: "TH reads from the DUT the PeakMeasuredValueWindow attribute."
+    - label:
+          "Step 6: TH reads from the DUT the PeakMeasuredValueWindow attribute."
       PICS: TVOCCONC.S.A0004
       command: "readAttribute"
       attribute: "PeakMeasuredValueWindow"
@@ -81,7 +82,7 @@ tests:
               minValue: 0
               maxValue: 604800
 
-    - label: "TH reads from the DUT the AverageMeasuredValue attribute."
+    - label: "Step 7: TH reads from the DUT the AverageMeasuredValue attribute."
       PICS: TVOCCONC.S.A0005
       command: "readAttribute"
       attribute: "AverageMeasuredValue"
@@ -91,7 +92,9 @@ tests:
               minValue: MinMeasuredValue
               maxValue: MaxMeasuredValue
 
-    - label: "TH reads from the DUT the AverageMeasuredValueWindow attribute."
+    - label:
+          "Step 8: TH reads from the DUT the AverageMeasuredValueWindow
+          attribute."
       PICS: TVOCCONC.S.A0006
       command: "readAttribute"
       attribute: "AverageMeasuredValueWindow"
@@ -101,7 +104,7 @@ tests:
               minValue: 0
               maxValue: 604800
 
-    - label: "TH reads from the DUT the MeasurementUnit attribute."
+    - label: "Step 9: TH reads from the DUT the MeasurementUnit attribute."
       PICS: TVOCCONC.S.A0008
       command: "readAttribute"
       attribute: "MeasurementUnit"
@@ -111,7 +114,7 @@ tests:
               minValue: 0
               maxValue: 7
 
-    - label: "TH reads from the DUT the MeasurementMedium attribute."
+    - label: "Step 10: TH reads from the DUT the MeasurementMedium attribute."
       PICS: TVOCCONC.S.A0009
       command: "readAttribute"
       attribute: "MeasurementMedium"
@@ -121,7 +124,7 @@ tests:
               minValue: 0
               maxValue: 2
 
-    - label: "TH reads from the DUT the LevelValue attribute."
+    - label: "Step 11: TH reads from the DUT the LevelValue attribute."
       PICS: TVOCCONC.S.A000a
       command: "readAttribute"
       attribute: "LevelValue"

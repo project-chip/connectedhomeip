@@ -24,7 +24,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -32,7 +32,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads NetworkInterfaces structure attribute from DUT."
+    - label: "Step 2: TH reads NetworkInterfaces structure attribute from DUT."
       PICS: DGGEN.S.A0000
       command: "readAttribute"
       attribute: "NetworkInterfaces"
@@ -40,7 +40,7 @@ tests:
           constraints:
               type: list
 
-    - label: "TH reads a RebootCount attribute value from DUT."
+    - label: "Step 3: TH reads a RebootCount attribute value from DUT."
       PICS: DGGEN.S.A0001
       command: "readAttribute"
       attribute: "RebootCount"
@@ -50,12 +50,12 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Reboot target device"
+    - label: "Step 3a: Reboot target device"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       command: "Reboot"
 
-    - label: "Reboot target device(DUT)"
+    - label: "Step 3b: Reboot target device(DUT)"
       verification: |
           Did the DUT successfully reboot?
       cluster: "LogCommands"
@@ -68,12 +68,12 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reboot target device"
+    - label: "Step 3c: Reboot target device"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       command: "Reboot"
 
-    - label: "Reboot target device(DUT)"
+    - label: "Step 3d: Reboot target device(DUT)"
       verification: |
           Did the DUT successfully reboot?
       cluster: "LogCommands"
@@ -95,8 +95,8 @@ tests:
                 value: nodeId
 
     - label:
-          "DUT reboots and TH reads a UpTime attribute value of DUT since some
-          arbitrary start time of DUT rebooting."
+          "Step 4: DUT reboots and TH reads a UpTime attribute value of DUT
+          since some arbitrary start time of DUT rebooting."
       PICS: DGGEN.S.A0002
       command: "readAttribute"
       attribute: "UpTime"
@@ -114,7 +114,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFE
 
-    - label: "Reboot target device"
+    - label: "Step 6a: Reboot target device"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       command: "Reboot"
@@ -140,7 +140,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads BootReason attribute value from DUT."
+    - label: "Step 6: TH reads BootReason attribute value from DUT."
       PICS: DGGEN.S.A0004
       command: "readAttribute"
       attribute: "BootReason"
@@ -150,7 +150,7 @@ tests:
               maxValue: 6
 
     #issue #13029
-    - label: "TH reads ActiveHardwareFaults attribute value from DUT."
+    - label: "Step 7: TH reads ActiveHardwareFaults attribute value from DUT."
       verification: |
           This is optional attribute implemented in RPI, may vary based on DUT implementation on TH(chip-tool) log
 
@@ -224,7 +224,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads ActiveRadioFaults attribute value from DUT."
+    - label: "Step 8: TH reads ActiveRadioFaults attribute value from DUT."
       verification: |
           This is optional attribute implemented in RPI, may vary based on DUT implementation on TH(chip-tool) log
 
@@ -268,7 +268,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads ActiveNetworkFaults attribute value from DUT."
+    - label: "Step 9: TH reads ActiveNetworkFaults attribute value from DUT."
       verification: |
           This is optional attribute implemented in RPI, may vary based on DUT implementation on TH(chip-tool) log
 
@@ -313,7 +313,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads TestEventTriggersEnabled attribute value"
+    - label: "Step 10: TH reads TestEventTriggersEnabled attribute value"
       verification: |
           ./chip-tool generaldiagnostics read   test-event-triggers-enabled  1 0
           On TH(chip-tool), Verify that TestEventTriggersEnabled attribute value should be data type bool on TH(chip-tool) log
