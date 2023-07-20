@@ -106,7 +106,8 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CountdownTime)
         logging.info("CountdownTime: %s" % (countdown_time))
         asserts.assert_true(countdown_time != 0 or countdown_time == NullValue, "invalid CountdownTime")
-        asserts.assert_equal(countdown_time, initial_countdown_time, "CountdownTime does not equal to the intial CountdownTime %s" % initial_countdown_time)
+        asserts.assert_equal(countdown_time, initial_countdown_time,
+                             "CountdownTime does not equal to the intial CountdownTime %s" % initial_countdown_time)
 
         self.print_step(9, "Send Pause command")
         ret = await self.send_pause_cmd()

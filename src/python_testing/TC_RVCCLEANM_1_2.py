@@ -92,7 +92,8 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
             for m in supported_modes:
                 for t in m.modeTags:
                     is_mfg = (0x8000 <= t.value and t.value <= 0xBFFF)
-                    asserts.assert_true(t.value in commonTags.keys() or t.value in cleanTags.keys() or is_mfg, "Found a SupportedModes entry with invalid mode tag value!")
+                    asserts.assert_true(t.value in commonTags.keys() or t.value in cleanTags.keys() or is_mfg,
+                                        "Found a SupportedModes entry with invalid mode tag value!")
 
         if self.check_pics("RVCCLEANM.S.A0001"):
             self.print_step(3, "Read CurrentMode attribute")

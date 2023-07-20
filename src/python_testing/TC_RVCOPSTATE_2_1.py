@@ -67,7 +67,8 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
             if phase_list == NullValue:
                 asserts.assert_true(current_phase == NullValue, "CurrentPhase should be null")
             else:
-                asserts.assert_true(0 <= current_phase and current_phase <= (phase_list_len - 1), "CurrentPhase must be between 0 and (phase-list-size - 1)")
+                asserts.assert_true(0 <= current_phase and current_phase <= (phase_list_len - 1),
+                                    "CurrentPhase must be between 0 and (phase-list-size - 1)")
 
         if self.check_pics("RVCOPSTATE.S.A0002"):
             self.print_step(4, "Read CountdownTime attribute")
@@ -100,7 +101,8 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
             for state_id in state_ids:
                 in_range = (0x8000 <= state_id and state_id <= 0xBFFF)
-                asserts.assert_true(id in definedStates.keys() or in_range, "Found a OperationalStateList entry with invalid ID value!")
+                asserts.assert_true(id in definedStates.keys() or in_range,
+                                    "Found a OperationalStateList entry with invalid ID value!")
                 if state_id == 0x03:
                     error_present_in_list = True
             asserts.assert_true(error_present_in_list, "The OperationalStateList does not have an ID entry of Error(0x03)")
@@ -135,7 +137,8 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                              0x47: 'MopCleaningPadMissing'}
 
             in_range = (0x8000 <= operational_error.errorStateID and operational_error.errorStateID <= 0xBFFF)
-            asserts.assert_true(operational_error.errorStateID in definedErrors.keys() or in_range, "OperationalError has an invalid ID value!")
+            asserts.assert_true(operational_error.errorStateID in definedErrors.keys()
+                                or in_range, "OperationalError has an invalid ID value!")
 
 
 if __name__ == "__main__":
