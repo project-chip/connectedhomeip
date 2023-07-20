@@ -37,7 +37,7 @@ tests:
       verification: |
           ./chip-tool descriptor read server-list 1 0
 
-          Verify the "descriptor" on the TH(Chip-tool) log
+          Via the TH (chip-tool), verify that the server list has value as 49.
 
           [1653474860.462391][29901:29906] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 1237231415
           [1653474860.462487][29901:29906] CHIP:TOO:   server list: 25 entries
@@ -73,7 +73,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read feature-map 1 0
 
-          Verify the "feature-map" on the TH(Chip-tool) log
+          Via the TH (chip-tool), verify that FeatureMap attribute value as 1 for WiFi NetworkInterface.
 
           [1653474932.055513][29920:29925] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFC DataVersion: 1600858167
           [1653474932.055578][29920:29925] CHIP:TOO:   FeatureMap: 1
@@ -101,7 +101,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read max-networks 1 0
 
-          Verify the "max-networks" on the TH(Chip-tool) log
+          Via the TH (chip-tool), Verify the MaxNetworks attribute that contains value in the range of 1 to 255.
 
           [1653476960.303444][30164:30169] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0000 DataVersion: 1600858167
           [1653476960.303531][30164:30169] CHIP:TOO:   MaxNetworks: 1

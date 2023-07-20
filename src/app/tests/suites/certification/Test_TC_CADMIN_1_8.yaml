@@ -64,24 +64,23 @@ tests:
       disabled: true
 
     - label:
-          "Step 3.a: A User Consent screen pops up asking for Users permission
-          to allow second commissioner to control TH_CE"
-      PICS: CADMIN.UserInterfaceDisplay
+          "Step 3a: A User Consent screen pops up asking for Users permission to
+          allow second commissioner to control TH_CE"
+      PICS: CADMIN.M.UserInterfaceDisplay
       verification: |
           Verify the User Consent pop up screen. Verify that the pop up closes after user gives permission
       disabled: true
 
     - label:
-          "Step 3.b: 11 digit Manual Code is displayed on the screen in textual
+          "Step 3b: 11 digit Manual Code is displayed on the screen in textual
           format for User to see"
-      PICS: CADMIN.UserInterfaceDisplay
+      PICS: CADMIN.M.UserInterfaceDisplay
       verification: |
           Verify that the displayed Manual Code is 11 digits long and doesn’t contain Vendor_ID or Product_ID.
       disabled: true
 
-    - label:
-          "Step 3.c: A voice prompt of the Manual Code format should be heard"
-      PICS: CADMIN.AudioInterface
+    - label: "Step 3c: A voice prompt of the Manual Code format should be heard"
+      PICS: CADMIN.M.AudioInterface
       verification: |
           Verify voice prompt saying the manual code. Verify the voice prompt repeats if user asks.
       disabled: true

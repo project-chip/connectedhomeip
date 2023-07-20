@@ -4945,10 +4945,10 @@ PICS:
     # server / manually
     #
     - label: "Does the Device support User Interface Display"
-      id: CADMIN.UserInterfaceDisplay
+      id: CADMIN.M.UserInterfaceDisplay
 
     - label: "Does the Device support Audio Interface"
-      id: CADMIN.AudioInterface
+      id: CADMIN.M.AudioInterface
 
     #
     # client / attributes
@@ -9127,6 +9127,12 @@ PICS:
     #
     #Commands:
     #
+    - label: "Does the device implement receiving the RegisterClient command?"
+      id: ICDM.S.C00.Rsp
+
+    - label: "Does the device implement receiving the UnregisterClient command?"
+      id: ICDM.S.C02.Rsp
+
     - label:
           "Does the device implement receiving the StayActiveRequest command?"
       id: ICDM.S.C03.Rsp
@@ -9191,3 +9197,124 @@ PICS:
 
     - label: "Does the device implement receiving the Resume command?"
       id: OPSTATE.S.C03
+    # Smoke CO Alarm Cluster Test Plan
+    - label: "Does the device implement the SMCO cluster as a server?"
+      id: SMCO.S
+
+    - label: "Does the device implement the SMCO cluster as a client?"
+      id: SMCO.C
+
+    #
+    # server / features
+    #
+    - label: "Does the device support this specific cluster feature?"
+      id: SMCO.S.F00
+
+    - label: "Does the device support this specific cluster feature?"
+      id: SMCO.S.F01
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the ExpressedState attribute?"
+      id: SMCO.S.A0000
+
+    - label: "Does the device implement the SmokeState attribute?"
+      id: SMCO.S.A0001
+
+    - label: "Does the device implement the COState attribute?"
+      id: SMCO.S.A0002
+
+    - label: "Does the device implement the BatteryAlert attribute?"
+      id: SMCO.S.A0003
+
+    - label: "Does the device implement the DeviceMuted attribute?"
+      id: SMCO.S.A0004
+
+    - label: "Does the device implement the TestInProgress attribute?"
+      id: SMCO.S.A0005
+
+    - label: "Does the device implement the HardwareFaultAlert attribute?"
+      id: SMCO.S.A0006
+
+    - label: "Does the device implement the EndOfServiceAlert attribute?"
+      id: SMCO.S.A0007
+
+    - label: "Does the device implement the InterconnectSmokeAlarm attribute?"
+      id: SMCO.S.A0008
+
+    - label: "Does the device implement the InterconnectCOAlarm attribute?"
+      id: SMCO.S.A0009
+
+    - label: "Does the device implement the ContaminationState attribute?"
+      id: SMCO.S.A000a
+
+    - label: "Does the device implement the SensitivityLevel attribute?"
+      id: SMCO.S.A000b
+
+    - label: "Does the device implement the ExpiryDate attribute?"
+      id: SMCO.S.A000c
+
+    #
+    # server / Events
+    #
+    - label: "Does the device implement the SmokeAlarm event?"
+      id: SMCO.S.E00
+
+    - label: "Does the device implement the COAlarm event?"
+      id: SMCO.S.E01
+
+    - label: "Does the device implement the LowBattery event?"
+      id: SMCO.S.E02
+
+    - label: "Does the device implement the HardwareFault event?"
+      id: SMCO.S.E03
+
+    - label: "Does the device implement the EndOfService event?"
+      id: SMCO.S.E04
+
+    - label: "Does the device implement the SelfTestComplete event?"
+      id: SMCO.S.E05
+
+    - label: "Does the device implement the AlarmMuted event?"
+      id: SMCO.S.E06
+
+    - label: "Does the device implement the MuteEnded event?"
+      id: SMCO.S.E07
+
+    - label: "Does the device implement the InterconnectSmokeAlarm event?"
+      id: SMCO.S.E08
+
+    - label: "Does the device implement the InterconnectCOAlarm event?"
+      id: SMCO.S.E09
+
+    - label: "Does the device implement the ContaminationState attribute?"
+      id: SMCO.S.A0010
+
+    - label: "Does the device implement the SensitivityLevel attribute?"
+      id: SMCO.S.A0011
+
+    - label: "Does the device implement the ExpiryDate attribute?"
+      id: SMCO.S.A0012
+
+    - label: "Does the device implement the AllClear event?"
+      id: SMCO.S.E0a
+
+    #
+    # server / manually
+    #
+    - label:
+          "Can the TestInProgress attribute be changed by physical control at
+          the device?"
+      id: SMCO.M.ManuallyControlledTest
+
+    - label:
+          "Can the DeviceMuted attribute be changed by physical control at the
+          device?"
+      id: SMCO.M.ManuallyControlledMute
+
+    #
+    # server / commandsReceived
+    #
+    - label: "Does the device implement receiving the SelfTestRequest command?"
+      id: SMCO.S.C00.Rsp

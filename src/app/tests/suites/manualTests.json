@@ -98,6 +98,11 @@
         "Test_TC_DLOG_3_1"
     ],
     "Descriptor": ["Test_TC_DESC_2_1"],
+    "FanControl": [
+        "Test_TC_FAN_3_3",
+        "Test_TC_FAN_3_5",
+        "Test_TC_FAN_3_6"
+    ],
     "GeneralCommissioning": ["Test_TC_CGEN_2_2"],
     "GeneralDiagnostics": [
         "Test_TC_DGGEN_2_2",
@@ -105,6 +110,7 @@
         "Test_TC_DGGEN_3_1"
     ],
     "Identify": ["Test_TC_I_3_2"],
+    "IcdManagement": ["Test_TC_ICDM_2_2"],
     "IlluminanceMeasurement": [],
     "InteractionDataModel": [
         "Test_TC_IDM_1_1",
@@ -176,10 +182,12 @@
     ],
     "ModeSelect": [
         "Test_TC_MOD_1_2",
+        "Test_TC_MOD_1_3",
         "Test_TC_MOD_2_1",
-        "Test_TC_MOD_2_3",
+        "Test_TC_MOD_2_2",
         "Test_TC_MOD_3_1",
         "Test_TC_MOD_3_2",
+        "Test_TC_MOD_3_3",
         "Test_TC_MOD_3_4"
     ],
     "OTASoftwareUpdate": [
@@ -253,12 +261,14 @@
     "RelativeHumidityMeasurement": ["Test_TC_RH_2_2"],
     "SmokeCOAlarm": [],
     "Switch": ["Test_TC_SWTCH_2_2", "Test_TC_SWTCH_3_2"],
+    "SmokeCOAlarm": ["Test_TC_SMCO_1_1", "Test_TC_SMCO_2_1" ],
     "TemperatureMeasurement": ["Test_TC_TMP_2_2"],
     "Thermostat": ["Test_TC_TSTAT_3_1", "Test_TC_TSTAT_3_2"],
     "ThermostatUserConfiguration": [],
     "ThreadNetworkDiagnostics": ["Test_TC_DGTHREAD_2_5"],
     "Actions": ["Test_TC_ACT_2_1", "Test_TC_ACT_2_2", "Test_TC_ACT_3_2"],
     "TimeFormatLocalization": ["Test_TC_LTIME_2_1", "Test_TC_LTIME_3_1"],
+    "TimeSynchronization": ["Test_TC_TIMESYNC_2_15"],
     "UnitLocalization": [],
     "Binding": ["Test_TC_BIND_2_1", "Test_TC_BIND_2_2", "Test_TC_BIND_2_3"],
     "Scenes": [
@@ -267,6 +277,8 @@
         "Test_TC_S_2_2",
         "Test_TC_S_2_3",
         "Test_TC_S_2_4",
+        "Test_TC_S_2_5",
+        "Test_TC_S_2_6",
         "Test_TC_S_3_1"
     ],
     "PumpConfigurationControl": [],
@@ -287,9 +299,11 @@
         "DeviceManagement",
         "DiagnosticsLogs",
         "Descriptor",
+        "FanControl",
         "EthernetNetworkDiagnostics",
         "GeneralCommissioning",
         "GeneralDiagnostics",
+        "IcdManagement",
         "Identify",
         "IlluminanceMeasurement",
         "InteractionDataModel",
@@ -315,12 +329,14 @@
         "RelativeHumidityMeasurement",
         "SmokeCOAlarm",
         "Switch",
+        "SmokeCOAlarm",
         "TemperatureMeasurement",
         "Thermostat",
         "ThermostatUserConfiguration",
         "ThreadNetworkDiagnostics",
         "Actions",
         "TimeFormatLocalization",
+        "TimeSynchronization",
         "UnitLocalization",
         "Binding",
         "Scenes",

@@ -458,7 +458,102 @@ tests:
       disabled: true
 
     - label:
-          "Step 3: For each of the endpoints for the bridged devices found in
+          "Step 3a: For each of the endpoints for the bridged devices found in
+          step 2b, read attribute PartsList of the Descriptor cluster."
+      PICS: MCORE.BRIDGE
+      verification: |
+          Read PartList of the Descriptor cluster for For each of the endpoints for the bridged devices:
+
+          ./chip-tool descriptor read parts-list 1 3
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 3.
+
+          [1657013905.333904][5805:5810] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 4168180
+          [1657013905.333984][5805:5810] CHIP:TOO:   parts list: 0 entries
+
+
+          ./chip-tool descriptor read parts-list 1 4
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 4.
+
+          [1657014011.276060][5822:5827] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2935336058
+          [1657014011.276141][5822:5827] CHIP:TOO:   parts list: 0 entries
+
+
+          ./chip-tool descriptor read parts-list 1 5
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 5.
+
+          [1657014034.298958][5829:5834] CHIP:TOO: Endpoint: 5 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3372622835
+          [1657014034.299041][5829:5834] CHIP:TOO:   parts list: 0 entries
+
+          ./chip-tool descriptor read parts-list 1 6
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 6.
+
+          [1657014056.893995][5847:5852] CHIP:TOO: Endpoint: 6 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1565587733
+          [1657014056.894072][5847:5852] CHIP:TOO:   parts list: 3 entries
+          [1657014056.894104][5847:5852] CHIP:TOO:     [1]: 7
+          [1657014056.894130][5847:5852] CHIP:TOO:     [2]: 8
+          [1657014056.894154][5847:5852] CHIP:TOO:     [3]: 9
+
+          ./chip-tool descriptor read parts-list 1 7
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 7.
+
+          [1657014071.347535][5854:5859] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1352552269
+          [1657014071.347611][5854:5859] CHIP:TOO:   parts list: 0 entries
+
+          ./chip-tool descriptor read parts-list 1 8
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 8.
+
+          [1663236558.589003][5550:5555] CHIP:TOO: Endpoint: 8 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 310844624
+          [1663236558.589059][5550:5555] CHIP:TOO:   PartsList: 0 entries
+
+
+          ./chip-tool descriptor read parts-list 1 9
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 9.
+
+          [1663236593.607523][5556:5561] CHIP:TOO: Endpoint: 9 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3304459819
+          [1663236593.607583][5556:5561] CHIP:TOO:   PartsList: 0 entries
+
+
+          ./chip-tool descriptor read parts-list 1 10
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 10.
+
+          [1663236642.682033][5565:5570] CHIP:TOO: Endpoint: 10 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2389378730
+          [1663236642.682091][5565:5570] CHIP:TOO:   PartsList: 0 entries
+
+
+          ./chip-tool descriptor read parts-list 1 11
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 11.
+
+          [1663236682.900934][5573:5578] CHIP:TOO: Endpoint: 11 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3007496001
+          [1663236682.900988][5573:5578] CHIP:TOO:   PartsList: 0 entries
+
+
+          ./chip-tool descriptor read parts-list 1 12
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 12.
+
+          [1663236715.610271][5579:5584] CHIP:TOO: Endpoint: 12 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2445783348
+          [1663236715.610328][5579:5584] CHIP:TOO:   PartsList: 0 entries
+
+
+          ./chip-tool descriptor read parts-list 1 13
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 13.
+
+          [1663236752.985450][5590:5595] CHIP:TOO: Endpoint: 13 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 4223376445
+          [1663236752.985512][5590:5595] CHIP:TOO:   PartsList: 0 entries
+      disabled: true
+
+    - label:
+          "Step 3b: For each of the endpoints for the bridged devices found in
           step 2b, perform the tests for Bridged Device Basic Information
           cluster"
       PICS: MCORE.BRIDGE

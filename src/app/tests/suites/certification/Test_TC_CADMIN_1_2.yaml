@@ -113,7 +113,7 @@ tests:
 
           On DUT_CR2 send the below command
 
-          ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta
+          ./chip-tool pairing code 2 34970112332 --commissioner-name beta
 
           Verify TH_CE logs for
           Commissioning completed successfully
@@ -428,33 +428,21 @@ tests:
 
           On TH_CR3 send the below command  
 
-          ./chip-tool pairing onnetwork 3  20202021  --commissioner-name gamma
+          ./chip-tool pairing code 3 34970112332  --commissioner-name gamma
 
-          verify you got the following message in the TH_CR3(all-clusters-app) log
+          verify you got the following message in the TH_CR3 log
 
 
 
 
           If the DUT has to provision to verify the logs,  Verify that either no _matterc._udp commissionable records exist matching the previously obtained discriminator, or that TH_CE refuses to allow a PASE with the provided passcode from the onboarding payload.
 
-          [1676356124.529686][997434:997434] CHIP:TS: Reverted Last Known Good Time to previous value
-          [1676356124.529707][997434:997434] CHIP:CTL: Shutting down the commissioner
-          [1676356124.529711][997434:997434] CHIP:CTL: Stopping commissioning discovery over DNS-SD
-          [1676356124.529728][997434:997434] CHIP:CTL: Shutting down the controller
-          [1676356124.529732][997434:997434] CHIP:CTL: Shutting down the System State, this will teardown the CHIP Stack
-          [1676356124.530546][997434:997434] CHIP:DMG: All ReadHandler-s are clean, clear GlobalDirtySet
-          [1676356124.530584][997434:997434] CHIP:BLE: BleConnectionDelegate::CancelConnection is not implemented.
-          [1676356124.530603][997434:997434] CHIP:FP: Shutting down FabricTable
-          [1676356124.530617][997434:997434] CHIP:TS: Pending Last Known Good Time: 2023-02-13T11:57:54
-          [1676356124.530729][997434:997434] CHIP:TS: Previous Last Known Good Time: 2023-02-13T11:57:54
-          [1676356124.530736][997434:997434] CHIP:TS: Reverted Last Known Good Time to previous value
-          [1676356124.530884][997434:997434] CHIP:DL: writing settings to file (/tmp/chip_counters.ini-G154Fy)
-          [1676356124.531158][997434:997434] CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
-          [1676356124.531183][997434:997434] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
-          [1676356124.531192][997434:997434] CHIP:DL: Inet Layer shutdown
-          [1676356124.531199][997434:997434] CHIP:DL: BLE shutdown
-          [1676356124.531204][997434:997434] CHIP:DL: System Layer shutdown
-          [1676356124.531299][997434:997434] CHIP:TOO: Run command failure: ../../commands/pairing/PairingCommand.cpp:196: CHIP Error 0x000000032:  Timeout
+          [1689719618872] [29136:5163326] [DIS] Browsing for: _matterc._udp,_S15
+          [1689719648874] [29136:5163326] [CTL] Discovery timed out
+          [1689719648874] [29136:5163326] [CTL] Stopping commissioning discovery over DNS-SD
+          [1689719648874] [29136:5163320] [CTL] Shutting down the commissioner
+          [1689719648874] [29136:5163320] [CTL] Stopping commissioning discovery over DNS-SD
+          [1689719648874] [29136:5163320] [CTL] Shutting down the controller
       disabled: true
 
     - label:
@@ -549,7 +537,7 @@ tests:
           On TH_CR1 send the below command  
 
 
-          ./chip-tool pairing onnetwork 1 20202021
+          ./chip-tool pairing code 1 34970112332 --commissioner-name alpha
           [1676358083.879096][997283:997283] CHIP:SVR: Failsafe timer expired
           [1676358083.879098][997283:997283] CHIP:IN: SecureSession[0x563d5294d7b0]: MarkForEviction Type:1 LSID:55630
           [1676358083.879100][997283:997283] CHIP:SC: SecureSession[0x563d5294d7b0]: Moving from state 'kActive' --> 'kPendingEviction'

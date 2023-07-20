@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    4.3.1. [TC-LTIME-3.1] Read and Write Time Format Localization Cluster
+    117.3.1. [TC-LTIME-3.1] Read and Write Time Format Localization Cluster
     Attributes [DUT as Server]
 
 PICS:
@@ -26,22 +26,25 @@ config:
     endpoint: 0
 
 tests:
-    - label: "TH reads HourFormat attribute from DUT"
+    - label: "Step 1: TH reads HourFormat attribute from DUT"
       PICS: LTIME.S.A0000
       verification: |
           ./chip-tool timeformatlocalization read hour-format 1 0
-          Verify that  HourFormat attribute value is of Enum8(0, 1)  datatype on TH(chip-tool) log:
+
+          Verify that HourFormat attribute value is of Enum8(0, 1) datatype on TH(chip-tool) log and below is the sample log provided for raspi platform, here "HourFormat" value is 0.
 
           [1651191944157] [13649:182326] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3316530441
           [1651191944158] [13649:182326] CHIP: [TOO]   HourFormat: 0
       disabled: true
 
-    - label: "If (LTIME.S.A0000.12HR) TH writes 0 to HourFormat attribute"
+    - label:
+          "Step 2: If (LTIME.S.A0000.12HR) TH writes 0 to HourFormat attribute"
       PICS: LTIME.S.A0000.12HR
       verification: |
           ./chip-tool timeformatlocalization write hour-format 0 1 0
 
-          Verify that DUT sends a success response  TH(chip-tool) log:
+          Verify that DUT sends a success response  TH(chip-tool) log and below is the sample log provided for raspi platform:
+
           [1651192743588] [14026:192208] CHIP: [DMG] WriteResponseMessage =
           [1651192743588] [14026:192208] CHIP: [DMG] {
           [1651192743588] [14026:192208] CHIP: [DMG]         AttributeStatusIBs =
@@ -72,17 +75,21 @@ tests:
       PICS: LTIME.S.A0000
       verification: |
           ./chip-tool timeformatlocalization read hour-format 1 0
-          Verify that  HourFormat attribute value changed as  0 on  TH(chip-tool) log:
+
+          Verify that  HourFormat attribute value is changed to 0 on TH(chip-tool) log and below is the sample log provided for raspi platform:
+
           [1651193120969] [14169:196901] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3316530443
           [1651193120969] [14169:196901] CHIP: [TOO]   HourFormat: 0
       disabled: true
 
-    - label: "If (LTIME.S.A0000.24HR) TH writes 1 to HourFormat attribute"
+    - label:
+          "Step 4: If (LTIME.S.A0000.24HR) TH writes 1 to HourFormat attribute"
       PICS: LTIME.S.A0000.24HR
       verification: |
           ./chip-tool timeformatlocalization write hour-format 1 1 0
 
-          Verify that DUT sends a success response on TH(chip-tool) log:
+          Verify that DUT sends a success response on TH(chip-tool) log and and below is the sample log provided for raspi platform:
+
           [1651193043035] [14140:195730] CHIP: [DMG] WriteResponseMessage =
           [1651193043035] [14140:195730] CHIP: [DMG] {
           [1651193043035] [14140:195730] CHIP: [DMG]         AttributeStatusIBs =
@@ -110,29 +117,35 @@ tests:
           [1651193043036] [14140:195730] CHIP: [DMG] WriteClient moving to [AwaitingDe]
       disabled: true
 
-    - label: "TH reads HourFormat attribute"
+    - label: "Step 5: TH reads HourFormat attribute"
       PICS: LTIME.S.A0000
       verification: |
           ./chip-tool timeformatlocalization read hour-format 1 0
-          Verify that  HourFormat attribute read request is successful and value changed as  1  on TH(chip-tool) log:
+
+          Verify that  HourFormat attribute read request is successful and value is changed to 1 on TH(chip-tool) log and below is the sample log provided for raspi platform:
+
           [1651193120969] [14169:196901] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3316530443
           [1651193120969] [14169:196901] CHIP: [TOO]   HourFormat: 1
       disabled: true
 
-    - label: "TH reads ActiveCalendarType attribute from DUT"
+    - label: "Step 6: TH reads ActiveCalendarType attribute from DUT"
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
-          Verify that  ActiveCalendarType attribute read request is successful and  value is in between 0 to 11 on  TH(chip-tool) log:
+
+          Verify that  ActiveCalendarType attribute read request is successful and value is in between 0 to 11 on  TH(chip-tool) log and below is the sample log provided for raspi platform:
+
           [1651193250602] [14215:198406] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3316530443
           [1651193250602] [14215:198406] CHIP: [TOO]   ActiveCalendarType: 0
       disabled: true
 
-    - label: "TH reads SupportedCalendarTypes attribute from DUT"
+    - label: "Step 7: TH reads SupportedCalendarTypes attribute from DUT"
       PICS: LTIME.S.A0002
       verification: |
           ./chip-tool timeformatlocalization read supported-calendar-types 1 0
-          Verify that  SupportedCalendarTypes attribute read request is successful and value is in between 0 to 11 on TH(chip-tool) log:
+
+          Verify that SupportedCalendarTypes attribute read request is successful and value is in between 0 to 11 on TH(chip-tool) log and below is the sample log provided for raspi platform:
+
           [1651194334793] [14653:210647] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0002 DataVersion: 3316530443
           [1651194334794] [14653:210647] CHIP: [TOO]   SupportedCalendarTypes: 12 entries
           [1651194334794] [14653:210647] CHIP: [TOO]     [1]: 0
@@ -150,13 +163,14 @@ tests:
       disabled: true
 
     - label:
-          "TH writes value in PIXIT.LTIME.SCT to ActiveCalendarType attribute,
-          followed by reading the ActiveCalendarType attribute value"
+          "Step 8: TH writes value in PIXIT.LTIME.SCT to ActiveCalendarType
+          attribute, followed by reading the ActiveCalendarType attribute value"
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 0 1 0
 
-          Verify that DUT sends a success response on TH(chip-tool) log:
+          Verify that DUT sends a success response on TH(chip-tool) log and below is the sample log provided for raspi platform:
+
           [1651194449245] [14699:212201] CHIP: [DMG] WriteResponseMessage =
           [1651194449245] [14699:212201] CHIP: [DMG] {
           [1651194449245] [14699:212201] CHIP: [DMG]         AttributeStatusIBs =
@@ -181,9 +195,14 @@ tests:
           [1651194449246] [14699:212201] CHIP: [DMG]
           [1651194449246] [14699:212201] CHIP: [DMG]         InteractionModelRevision = 1
           [1651194449246] [14699:212201] CHIP: [DMG] }
+      disabled: true
 
+    - label: "Step 9: Repeat step 8 for all the values in PIXIT.LTIME.SCT"
+      PICS: LTIME.S.A0001
+      verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
-          Verify that ActiveCalendarType attribute value changed as  0 on TH(chip-tool) log:
+
+          Verify that ActiveCalendarType attribute value is changed to 0 on TH(chip-tool) log and below is the sample log provided for raspi platform:
 
           [1658149303.936031][9227:9232] CHIP:DMG: }
           [1658149303.936185][9227:9232] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2364893025
@@ -191,17 +210,40 @@ tests:
           [1658149303.936385][9227:9232] CHIP:EM: Sending Standalone Ack for MessageCounter:70392442 on exchange 10288i
       disabled: true
 
-    - label: "Repeat step 8 for all the values in PIXIT.LTIME.SCT"
+    - label: "Step 10: TH writes 50 to ActiveCalendarType attribute"
       PICS: LTIME.S.A0001
       verification: |
           Repeat the test step 8 for below mentioned values 1, 2,3, 4, 5, 6,7, 8, 9,10 and 11 and verify that TH receives the write command and updates the respective value. Verify that TH reads ActiveCalendarType attribute value and it is the same as the value that was set before
       disabled: true
 
-    - label: "TH writes 50 to ActiveCalendarType attribute"
+    - label: "Step 11: TH writes 5 to HourFormat attribute"
+      PICS: LTIME.S.A0000
+      verification: |
+          ./chip-tool timeformatlocalization write active-calendar-type 2 1 0
+
+          Verify that write request is successful on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+                                 
+          [1685530839.323951][17790:17790] CHIP:DMG:                         StatusIB =
+          [1685530839.323956][17790:17790] CHIP:DMG:                         {
+          [1685530839.323961][17790:17790] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1685530839.323965][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          Verify  ActiveCalendarType attribute value is 2 on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+
+          [1685530893.728748][17790:17790] CHIP:DMG:                                         
+          [1685530893.728752][17790:17790] CHIP:DMG:                                 Data = 2, 
+          [1685530893.728755][17790:17790] CHIP:DMG:                         },
+      disabled: true
+
+    - label: "Step 10: TH writes 50 to ActiveCalendarType attribute"
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization write  active-calendar-type 50 1 0
-          Verify that DUT sends a CONSTRAINT_ERROR response On TH(chip-tool) log:
+
+          Verify that DUT sends a CONSTRAINT_ERROR response On TH(chip-tool) log and below is the sample log provided for raspi platform:
+
           [1658742658.653019][3572:3577] CHIP:DMG:         ],
           [1658742658.653047][3572:3577] CHIP:DMG:
           [1658742658.653071][3572:3577] CHIP:DMG:         InteractionModelRevision = 1
@@ -211,11 +253,12 @@ tests:
           [1658742658.653254][3572:3577] CHIP:EM: Sending Standalone Ack for MessageCounter:51762667 on exchange 55831i
       disabled: true
 
-    - label: "TH writes 5 to HourFormat attribute"
+    - label: "Step 11: TH writes 5 to HourFormat attribute"
       PICS: LTIME.S.A0000
       verification: |
           ./chip-tool timeformatlocalization write   hour-format  5 1 0
-          Verify that DUT sends a CONSTRAINT_ERROR response On TH(chip-tool)  log:
+
+          Verify that DUT sends a CONSTRAINT_ERROR response On TH(chip-tool)  log and below is the sample log provided for raspi platform:
 
           [1656934321.910991][6387:6392] CHIP:DMG: WriteResponseMessage =
           [1656934321.911025][6387:6392] CHIP:DMG: {
