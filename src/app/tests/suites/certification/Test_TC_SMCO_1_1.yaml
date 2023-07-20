@@ -39,23 +39,43 @@ tests:
           constraints:
               type: int16u
 
-    - label: "TH reads from the DUT the FeatureMap attribute(Smoke Alarm)"
-      PICS: SMOKECO.S.F00
+    - label: "TH reads from the DUT the FeatureMap attribute"
+      PICS: "!SMOKECO.S.F00 && !SMOKECO.S.F01"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
+          value: 0
           constraints:
               type: bitmap32
-              hasMasksSet: [0x1]
+
+    - label: "TH reads from the DUT the FeatureMap attribute(Smoke Alarm)"
+      PICS: SMOKECO.S.F00 && !SMOKECO.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
+          constraints:
+              type: bitmap32
 
     - label: "TH reads from the DUT the FeatureMap attribute(CO Alarm)"
-      PICS: SMOKECO.S.F01
+      PICS: SMOKECO.S.F01 && !SMOKECO.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
+          value: 2
           constraints:
               type: bitmap32
-              hasMasksSet: [0x2]
+
+    - label:
+          "TH reads from the DUT the FeatureMap attribute(Smoke Alarm & CO
+          Alarm)"
+      PICS: SMOKECO.S.F00 && SMOKECO.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 3
+          constraints:
+              type: bitmap32
 
     - label: "TH reads from the DUT the AttributeList attribute"
       command: "readAttribute"

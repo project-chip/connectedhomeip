@@ -430,10 +430,12 @@ tests:
       response:
           value: {}
 
-    - label: "TH reads TestInProgress attribute from DUT"
+    - label: "TH subscribes to TestInProgress attribute from DUT"
       PICS: SMOKECO.S.A0005
-      command: "readAttribute"
+      command: "subscribeAttribute"
       attribute: "TestInProgress"
+      minInterval: 3
+      maxInterval: 30
       response:
           value: 0
           constraints:
@@ -447,13 +449,6 @@ tests:
           value: 0
           constraints:
               type: enum8
-
-    - label: "TH subscribes to TestInProgress attribute from DUT"
-      PICS: SMOKECO.S.A0005
-      command: "subscribeAttribute"
-      attribute: "TestInProgress"
-      minInterval: 3
-      maxInterval: 30
 
     - label: "Start manually DUT self-test"
       cluster: "LogCommands"

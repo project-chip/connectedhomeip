@@ -158,6 +158,7 @@ tests:
       event: "InterconnectSmokeAlarm"
       EVENT_NUMBER: EVENT_NUMBER + 1
       response:
+          # TODO: Change to variable when #28096 is fixed
           value: { AlarmSeverityLevel: 1 }
 
     - label: "TH reads ExpressedState attribute from DUT"
@@ -270,6 +271,7 @@ tests:
       event: "InterconnectCOAlarm"
       EVENT_NUMBER: EVENT_NUMBER + 3
       response:
+          # TODO: Change to variable when #28096 is fixed
           value: { AlarmSeverityLevel: 1 }
 
     - label: "TH reads ExpressedState attribute from DUT"
@@ -756,6 +758,7 @@ tests:
                 value: TEST_EVENT_TRIGGER_DEVICE_MUTED
 
     - label: "TH waits 60 Seconds"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -966,6 +969,7 @@ tests:
                 value: TEST_EVENT_TRIGGER_DEVICE_MUTED
 
     - label: "TH waits 60 Seconds"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
