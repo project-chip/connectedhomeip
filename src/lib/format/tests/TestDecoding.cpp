@@ -274,7 +274,7 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "          endpoint_id: 0\n"
                    "          cluster_id: 49 == 'NetworkCommissioning'\n"
                    "          attribute_id: 65532 == 'featureMap'\n"
-                   "        NetworkCommissioning::featureMap: 4\n"
+                   "        NetworkCommissioning::featureMap: 4 == kEthernetNetworkInterface\n"
                    "  suppress_response: true\n"
                    "  interaction_model_revison: 1\n");
 
