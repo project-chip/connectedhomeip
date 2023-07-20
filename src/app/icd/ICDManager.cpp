@@ -35,9 +35,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 
-// TODO ICD this will change with PR #27272
-System::Clock::Milliseconds32 ICDManager::mActiveThreshold;
-
 void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable)
 {
     VerifyOrDie(storage != nullptr);
@@ -48,13 +45,6 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     uint32_t activeModeInterval = IcdManagementServer::GetInstance().GetActiveModeInterval();
     VerifyOrDie(kFastPollingInterval.count() < activeModeInterval);
 
-    uint16_t activeModeThreshold = 0;
-    if (Attributes::ActiveModeThreshold::Get(kRootEndpointId, &activeModeThreshold) != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        activeModeThreshold = kMinActiveModeThreshold;
-    }
-
-    ICDManager::SetActiveThresholdInterval(System::Clock::Milliseconds32(activeModeThreshold));
     UpdateIcdMode();
     UpdateOperationState(OperationalState::ActiveMode);
 }
