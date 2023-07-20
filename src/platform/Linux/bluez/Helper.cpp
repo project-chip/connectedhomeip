@@ -427,6 +427,7 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
 #endif // CHIP_ERROR_LOGGING
     BluezConnection * conn = nullptr;
     GVariantDict * options = nullptr;
+    GVariant * option_mtu  = nullptr;
     bool isSuccess         = false;
 
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
@@ -448,18 +449,12 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
         goto exit;
     }
 
-    options = g_variant_dict_new(aOptions);
-    if (g_variant_dict_contains(options, "mtu") == TRUE)
-    {
-        GVariant * v = g_variant_dict_lookup_value(options, "mtu", G_VARIANT_TYPE_UINT16);
-        conn->mMtu   = g_variant_get_uint16(v);
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "FAIL: no MTU in options in %s", __func__);
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed");
-        goto exit;
-    }
+    options    = g_variant_dict_new(aOptions);
+    option_mtu = g_variant_dict_lookup_value(options, "mtu", G_VARIANT_TYPE_UINT16);
+    VerifyOrExit(
+        option_mtu != nullptr, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed"));
+    conn->mMtu = g_variant_get_uint16(option_mtu);
 
     channel = g_io_channel_unix_new(fds[0]);
     g_io_channel_set_encoding(channel, nullptr, nullptr);
@@ -482,6 +477,10 @@ exit:
     if (options != nullptr)
     {
         g_variant_dict_unref(options);
+    }
+    if (option_mtu != nullptr)
+    {
+        g_variant_unref(option_mtu);
     }
     return isSuccess ? TRUE : FALSE;
 }
@@ -506,26 +505,29 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
 #endif // CHIP_ERROR_LOGGING
     BluezConnection * conn = nullptr;
     GVariantDict * options = nullptr;
+    GVariant * option_mtu  = nullptr;
     bool isSuccess         = false;
 
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
     VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
 
+    if (bluez_gatt_characteristic1_get_notifying(aChar))
+    {
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.NotPermitted", "Already notifying");
+        goto exit;
+    }
+
     conn = GetBluezConnectionViaDevice(endpoint);
     VerifyOrExit(conn != nullptr,
                  g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No Chipoble connection"));
 
-    options = g_variant_dict_new(aOptions);
-    if ((g_variant_dict_contains(options, "mtu") == TRUE))
-    {
-        GVariant * v = g_variant_dict_lookup_value(options, "mtu", G_VARIANT_TYPE_UINT16);
-        conn->mMtu   = g_variant_get_uint16(v);
-    }
+    options    = g_variant_dict_new(aOptions);
+    option_mtu = g_variant_dict_lookup_value(options, "mtu", G_VARIANT_TYPE_UINT16);
+    VerifyOrExit(
+        option_mtu != nullptr, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed"));
+    conn->mMtu = g_variant_get_uint16(option_mtu);
 
-    if (bluez_gatt_characteristic1_get_notifying(aChar))
-    {
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.NotPermitted", "Already notifying");
-    }
     if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
     {
 #if CHIP_ERROR_LOGGING
@@ -561,6 +563,10 @@ exit:
     if (options != nullptr)
     {
         g_variant_dict_unref(options);
+    }
+    if (option_mtu != nullptr)
+    {
+        g_variant_unref(option_mtu);
     }
     return isSuccess ? TRUE : FALSE;
 }
@@ -1078,7 +1084,7 @@ static BluezConnection * BluezCharacteristicGetBluezConnection(BluezGattCharacte
 {
     BluezConnection * retval = nullptr;
     GVariantDict * options   = nullptr;
-    GVariant * v;
+    GVariant * option_device = nullptr;
 
     VerifyOrExit(apEndpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
     VerifyOrExit(apEndpoint->mIsCentral, );
@@ -1129,17 +1135,22 @@ static BluezConnection * BluezCharacteristicGetBluezConnection(BluezGattCharacte
     }
     else
     {
-        options = g_variant_dict_new(aOptions);
-        v       = g_variant_dict_lookup_value(options, "device", G_VARIANT_TYPE_OBJECT_PATH);
-        VerifyOrExit(v != nullptr, ChipLogError(DeviceLayer, "FAIL: No device option in dictionary (%s)", __func__));
+        options       = g_variant_dict_new(aOptions);
+        option_device = g_variant_dict_lookup_value(options, "device", G_VARIANT_TYPE_OBJECT_PATH);
+        VerifyOrExit(option_device != nullptr, ChipLogError(DeviceLayer, "FAIL: No device in options in %s", __func__););
 
-        retval = static_cast<BluezConnection *>(g_hash_table_lookup(apEndpoint->mpConnMap, g_variant_get_string(v, nullptr)));
+        retval = static_cast<BluezConnection *>(
+            g_hash_table_lookup(apEndpoint->mpConnMap, g_variant_get_string(option_device, nullptr)));
     }
 
 exit:
     if (options != nullptr)
     {
         g_variant_dict_unref(options);
+    }
+    if (option_device != nullptr)
+    {
+        g_variant_unref(option_device);
     }
     return retval;
 }
