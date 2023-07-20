@@ -2,17 +2,14 @@
 #include <app/reporting/ReportScheduler.h>
 #include <system/SystemClock.h>
 
-using ReportScheduler        = chip::app::reporting::ReportScheduler;
-using ReadHandlerNode        = chip::app::reporting::ReportScheduler::ReadHandlerNode;
-using InteractionModelEngine = chip::app::InteractionModelEngine;
-using Timestamp              = chip::System::Clock::Timestamp;
-using Timeout                = chip::System::Clock::Timeout;
-
 namespace chip {
 
-class DefaultTimerDelegate : public ReportScheduler::TimerDelegate
+class DefaultTimerDelegate : public app::reporting::ReportScheduler::TimerDelegate
 {
 public:
+    using ReadHandlerNode        = app::reporting::ReportScheduler::ReadHandlerNode;
+    using InteractionModelEngine = app::InteractionModelEngine;
+    using Timeout                = System::Clock::Timeout;
     static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
     {
         ReadHandlerNode * node = static_cast<ReadHandlerNode *>(aAppState);
@@ -34,7 +31,7 @@ public:
             TimerCallbackInterface, context);
     }
 
-    Timestamp GetCurrentMonotonicTimestamp() override { return System::SystemClock().GetMonotonicTimestamp(); }
+    System::Clock::Timestamp GetCurrentMonotonicTimestamp() override { return System::SystemClock().GetMonotonicTimestamp(); }
 };
 
 class SynchronizedTimerDelegate : public DefaultTimerDelegate
@@ -42,7 +39,7 @@ class SynchronizedTimerDelegate : public DefaultTimerDelegate
 public:
     static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
     {
-        ReportScheduler * scheduler = static_cast<ReportScheduler *>(aAppState);
+        app::reporting::ReportScheduler * scheduler = static_cast<app::reporting::ReportScheduler *>(aAppState);
         scheduler->ReportTimerCallback();
     }
 };
