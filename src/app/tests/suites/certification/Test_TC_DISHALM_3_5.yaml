@@ -35,11 +35,15 @@ tests:
                 value: nodeId
 
     - label: "Operate device to set State attribute bit 4 (TempHigh) to 1"
-      PICS: DISHALM.M.ManuallyControlled
-      command: "writeAttribute"
-      attribute: "State"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
-          value: 16
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads from the DUT the State attribute"
       PICS: DISHALM.S.A0002
@@ -50,11 +54,15 @@ tests:
               hasMasksSet: [0x10]
 
     - label: "Operate device to set State attribute bit 4 (TempHigh) to 0"
-      PICS: DISHALM.M.ManuallyControlled
-      command: "writeAttribute"
-      attribute: "State"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
-          value: 0
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads from the DUT the State attribute"
       PICS: " !DISHALM.S.A0001 && DISHALM.S.A0002 "
@@ -88,19 +96,23 @@ tests:
 
     - label: "Set up subscription to Notify event"
       PICS: DISHALM.S.E00
-      command: "subcribeEvent"
+      command: "subscribeEvent"
       event: notify
       minInterval: 0
       maxInterval: 100
 
     - label: "Operate device to set State attribute bit 4 (TempHigh) to 1"
-      PICS: DISHALM.S.A0002 && DISHALM.S.E00
-      command: "writeAttribute"
-      attribute: "State"
-      arguments:
-          value: 16
-      response:
+      verification: |
           value: { Notify: TRUE }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads from the DUT the State attribute"
       PICS: DISHALM.S.A0002
@@ -111,16 +123,24 @@ tests:
               hasMasksSet: [0x10]
 
     - label: "Operate device to set State attribute bit 4 (TempHigh) to 0"
-      PICS: DISHALM.S.A0002 && DISHALM.S.C00.Rsp
-      command: "writeAttribute"
-      attribute: "State"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
-          value: 0
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "TH sends command Reset to DUT with bit 4 (TempHigh) of Alarms set to
           1"
       PICS: DISHALM.S.F00 && DISHALM.S.C00.Rsp
       command: "reset"
+      arguments:
+          value: 16
       response:
-          value: { Notify: FALSE }
+          values: 
+            - name: "Notification"
+              value: "{ Notify: FALSE }"
