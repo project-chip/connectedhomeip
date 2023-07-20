@@ -48,7 +48,7 @@ limitations under the License.
     <attribute side="server" code="0x0008" define="INTERCONNECT_SMOKE_ALARM" type="AlarmStateEnum" writable="false" optional="true">InterconnectSmokeAlarm</attribute>
     <attribute side="server" code="0x0009" define="INTERCONNECT_CO_ALARM" type="AlarmStateEnum" writable="false" optional="true">InterconnectCOAlarm</attribute>
     <attribute side="server" code="0x000A" define="CONTAMINATION_STATE" type="ContaminationStateEnum" writable="false" optional="true">ContaminationState</attribute>
-    <attribute side="server" code="0x000B" define="SENSITIVITY_LEVEL" type="SensitivityEnum" min="0" max="2" writable="true" optional="true">SensitivityLevel</attribute>
+    <attribute side="server" code="0x000B" define="SENSITIVITY_LEVEL" type="SensitivityEnum" min="0" max="2" writable="true" optional="true">SmokeSensitivityLevel</attribute>
     <attribute side="server" code="0x000C" define="EXPIRY_DATE" type="epoch_s" writable="false" optional="true">ExpiryDate</attribute>
 
     <!-- Commands -->
