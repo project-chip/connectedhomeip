@@ -1096,6 +1096,10 @@ namespace ActiveBatChargeFaults {
 static constexpr AttributeId Id = 0x0000001E;
 } // namespace ActiveBatChargeFaults
 
+namespace EndpointList {
+static constexpr AttributeId Id = 0x0000001F;
+} // namespace EndpointList
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

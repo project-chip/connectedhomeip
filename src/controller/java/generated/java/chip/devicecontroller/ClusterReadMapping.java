@@ -2621,6 +2621,17 @@ public class ClusterReadMapping {
           readPowerSourceActiveBatChargeFaultsCommandParams
         );
         result.put("readActiveBatChargeFaultsAttribute", readPowerSourceActiveBatChargeFaultsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readPowerSourceEndpointListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readPowerSourceEndpointListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.PowerSourceCluster) cluster).readEndpointListAttribute(
+              (ChipClusters.PowerSourceCluster.EndpointListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedPowerSourceClusterEndpointListAttributeCallback(),
+          readPowerSourceEndpointListCommandParams
+        );
+        result.put("readEndpointListAttribute", readPowerSourceEndpointListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readPowerSourceGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readPowerSourceGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
