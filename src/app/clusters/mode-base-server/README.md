@@ -3,9 +3,9 @@
 Mode Base is a pseudo cluster. It has no cluster ID. It exists only to be
 derived from by other clusters.
 
-# How to use a ModeBase derived cluster
+# How to use a Mode Base derived cluster
 
-To use a ModeBase derived cluster, you need to
+To use a Mode Base derived cluster, you need to
 
 -   Create a class that inherits the `ModeBase::Delegate` class. For simple
     examples that store all their data in memory, look at the
@@ -16,23 +16,23 @@ To use a ModeBase derived cluster, you need to
     documentation in `mode-base-server.h` for more information about these
     methods. Cluster-specific enums can be accessed from the cluster namespace.
 -   Optionally implement the `Init` function.
--   In your translation unit, instantiate your `ModeBase::Instance` inherited
-    class. See the constructor documentation in `mode-base-server.h`.
+-   In some translation unit (.c or .cpp file), instantiate your 
+    `ModeBase::Instance` inherited class. See the constructor documentation 
+    in `mode-base-server.h`.
 -   Call the `.Init()` function of your instance after the root
     `Server::Init()`.
 -   Alternatively, the last two steps can be done in the
     `emberAf<ClusterName>ClusterInitCallback` function.
 -   Add `#define EMBER_AF_PLUGIN_MODE_BASE` to your
     `chip_device_project_config_include` file. In the examples, this file is
-    `CHIPProjectAAConfig.h`.
+    `CHIPProjectAppConfig.h`.
 
-**Note** Zap accessor functions for these clusters will not return correct
-values. Use the instance's `Update...` and `Get...` functions to access the
-attributes.
+**Note** Zap accessor functions for these clusters do not exist. 
+Use the instance's `Update...` and `Get...` functions to access the attributes.
 
 # How to add new derived clusters
 
-Once a ModeBase derived cluster has been defined in the spec, add the
+Once a Mode Base derived cluster has been defined in the spec, add the
 implementation using the following steps
 
 1.  Translate the spec as an XML in `src/app/zap-templates/zcl/data-model/chip`.
