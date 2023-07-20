@@ -6486,7 +6486,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster RefrigeratorAndTemperatureControlledCabinetMode {
@@ -6499,7 +6499,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster RvcRunMode {
@@ -6512,7 +6512,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster RvcCleanMode {
@@ -6525,7 +6525,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster TemperatureControl {
@@ -6562,7 +6562,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster AirQuality {
