@@ -1243,12 +1243,19 @@ server cluster Channel = 1284 {
     LineupInfoTypeEnum lineupInfoType = 3;
   }
 
+  readonly attribute ChannelInfoStruct channelList[] = 0;
+  readonly attribute nullable LineupInfoStruct lineup = 1;
+  readonly attribute nullable ChannelInfoStruct currentChannel = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeChannelRequest {
+    CHAR_STRING match = 0;
+  }
 
   request struct ChangeChannelByNumberRequest {
     INT16U majorNumber = 0;
@@ -1259,6 +1266,12 @@ server cluster Channel = 1284 {
     INT16S count = 0;
   }
 
+  response struct ChangeChannelResponse = 1 {
+    ChannelStatusEnum status = 0;
+    optional CHAR_STRING data = 1;
+  }
+
+  command ChangeChannel(ChangeChannelRequest): ChangeChannelResponse = 0;
   command ChangeChannelByNumber(ChangeChannelByNumberRequest): DefaultSuccess = 2;
   command SkipChannel(SkipChannelRequest): DefaultSuccess = 3;
 }
@@ -1773,11 +1786,14 @@ endpoint 1 {
   }
 
   server cluster Channel {
+    callback attribute channelList;
+    callback attribute lineup;
+    callback attribute currentChannel;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
   }
 
