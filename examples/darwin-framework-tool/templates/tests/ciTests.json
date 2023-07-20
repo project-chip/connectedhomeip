@@ -108,6 +108,7 @@
         "Test_TC_TVOCCONC_2_1",
         "Disabled due to FanControl AirFlowDirection attribute not being enabled in Matter.framework for now:",
         "Test_TC_FAN_2_5",
+        "Test_TC_FAN_3_6",
         "Disabled due to DoorLock UnboltDoor command not being enabled in Matter.framework for now:",
         "Test_TC_DRLK_2_12",
         "DL_LockUnlock",
