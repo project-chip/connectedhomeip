@@ -69,8 +69,14 @@ public:
             MinIntervalElapsed = (1 << 0),
             MaxIntervalElapsed = (1 << 1),
         };
-        void SetTestFlags(TestFlags aFlag, bool aValue) { mFlags.Set(aFlag, aValue); }
-        bool GetTestFlags(TestFlags aFlag) const { return mFlags.Has(aFlag); }
+        void SetTestFlags(TestFlags aFlag, bool aValue)
+        {
+            mFlags.Set(aFlag, aValue);
+        }
+        bool GetTestFlags(TestFlags aFlag) const
+        {
+            return mFlags.Has(aFlag);
+        }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
         ReadHandlerNode(ReadHandler * aReadHandler, TimerDelegate * aTimerDelegate, ReportScheduler * aScheduler) :
@@ -83,7 +89,10 @@ public:
             mReadHandler = aReadHandler;
             SetIntervalTimeStamps(aReadHandler);
         }
-        ReadHandler * GetReadHandler() const { return mReadHandler; }
+        ReadHandler * GetReadHandler() const
+        {
+            return mReadHandler;
+        }
 
         /// @brief Check if the Node is reportable now, meaning its readhandler was made reportable by attribute dirtying and
         /// handler state, and minimal time interval since last report has elapsed, or the maximal time interval since last
@@ -102,7 +111,10 @@ public:
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
         }
 
-        bool IsEngineRunScheduled() const { return mEngineRunScheduled; }
+        bool IsEngineRunScheduled() const
+        {
+            return mEngineRunScheduled;
+        }
         void SetEngineRunScheduled(bool aEngineRunScheduled)
         {
             mEngineRunScheduled = aEngineRunScheduled;
@@ -140,9 +152,18 @@ public:
             mSyncTimestamp = aSyncTimestamp;
         }
 
-        System::Clock::Timestamp GetMinTimestamp() const { return mMinTimestamp; }
-        System::Clock::Timestamp GetMaxTimestamp() const { return mMaxTimestamp; }
-        System::Clock::Timestamp GetSyncTimestamp() const { return mSyncTimestamp; }
+        System::Clock::Timestamp GetMinTimestamp() const
+        {
+            return mMinTimestamp;
+        }
+        System::Clock::Timestamp GetMaxTimestamp() const
+        {
+            return mMaxTimestamp;
+        }
+        System::Clock::Timestamp GetSyncTimestamp() const
+        {
+            return mSyncTimestamp;
+        }
 
     private:
 #ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -167,14 +188,35 @@ public:
 
     virtual void ReportTimerCallback() = 0;
 
+    void OnActiveModeEntered()
+    {
+        for (auto & iter : mReadHandlerList)
+        {
+            if (iter.IsReportableNow())
+            {
+                OnBecameReportable(iter.GetReadHandler());
+                break;
+            }
+        }
+    }
+
     /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
     /// @param aReadHandler read handler to check
-    bool IsReportableNow(ReadHandler * aReadHandler) { return FindReadHandlerNode(aReadHandler)->IsReportableNow(); }
+    bool IsReportableNow(ReadHandler * aReadHandler)
+    {
+        return FindReadHandlerNode(aReadHandler)->IsReportableNow();
+    }
     /// @brief Check if a ReadHandler is reportable without considering the timing
-    bool IsReadHandlerReportable(ReadHandler * aReadHandler) const { return aReadHandler->IsReportable(); }
+    bool IsReadHandlerReportable(ReadHandler * aReadHandler) const
+    {
+        return aReadHandler->IsReportable();
+    }
 
     /// @brief Get the number of ReadHandlers registered in the scheduler's node pool
-    size_t GetNumReadHandlers() const { return mNodesPool.Allocated(); }
+    size_t GetNumReadHandlers() const
+    {
+        return mNodesPool.Allocated();
+    }
 
 #ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
     void RunNodeCallbackForHandler(const ReadHandler * aReadHandler)

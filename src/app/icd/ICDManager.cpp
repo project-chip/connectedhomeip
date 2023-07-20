@@ -152,6 +152,8 @@ void ICDManager::UpdateOperationState(OperationalState state)
             {
                 ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
             }
+
+            InteractionModelEngine::GetInstance()->GetReportScheduler()->OnActiveModeEntered();
         }
         else
         {
