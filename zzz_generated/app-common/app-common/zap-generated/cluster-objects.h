@@ -16018,7 +16018,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ContaminationState
-namespace SensitivityLevel {
+namespace SmokeSensitivityLevel {
 struct TypeInfo
 {
     using Type             = chip::app::Clusters::SmokeCoAlarm::SensitivityEnum;
@@ -16026,10 +16026,10 @@ struct TypeInfo
     using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::SensitivityEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SensitivityLevel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SmokeSensitivityLevel::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace SensitivityLevel
+} // namespace SmokeSensitivityLevel
 namespace ExpiryDate {
 struct TypeInfo
 {
@@ -16106,7 +16106,7 @@ struct TypeInfo
             static_cast<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>(0);
         Attributes::ContaminationState::TypeInfo::DecodableType contaminationState =
             static_cast<chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum>(0);
-        Attributes::SensitivityLevel::TypeInfo::DecodableType sensitivityLevel =
+        Attributes::SmokeSensitivityLevel::TypeInfo::DecodableType smokeSensitivityLevel =
             static_cast<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum>(0);
         Attributes::ExpiryDate::TypeInfo::DecodableType expiryDate = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;

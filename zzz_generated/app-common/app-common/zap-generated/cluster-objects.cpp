@@ -12622,8 +12622,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ContaminationState::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, contaminationState));
         break;
-    case Attributes::SensitivityLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, sensitivityLevel));
+    case Attributes::SmokeSensitivityLevel::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, smokeSensitivityLevel));
         break;
     case Attributes::ExpiryDate::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, expiryDate));

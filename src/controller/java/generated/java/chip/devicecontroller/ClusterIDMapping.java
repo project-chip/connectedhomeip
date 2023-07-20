@@ -7352,7 +7352,7 @@ public class ClusterIDMapping {
             InterconnectSmokeAlarm(8L),
             InterconnectCOAlarm(9L),
             ContaminationState(10L),
-            SensitivityLevel(11L),
+            SmokeSensitivityLevel(11L),
             ExpiryDate(12L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),

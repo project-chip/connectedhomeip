@@ -9002,7 +9002,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
 
 } // namespace ContaminationState
 
-namespace SensitivityLevel {
+namespace SmokeSensitivityLevel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum * value)
 {
@@ -9031,7 +9031,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
-} // namespace SensitivityLevel
+} // namespace SmokeSensitivityLevel
 
 namespace ExpiryDate {
 

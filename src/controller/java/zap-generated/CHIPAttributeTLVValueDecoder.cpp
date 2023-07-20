@@ -14632,8 +14632,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           static_cast<uint8_t>(cppValue), value);
             return value;
         }
-        case Attributes::SensitivityLevel::Id: {
-            using TypeInfo = Attributes::SensitivityLevel::TypeInfo;
+        case Attributes::SmokeSensitivityLevel::Id: {
+            using TypeInfo = Attributes::SmokeSensitivityLevel::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
