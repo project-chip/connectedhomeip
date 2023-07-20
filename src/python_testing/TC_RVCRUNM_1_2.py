@@ -18,7 +18,6 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.interaction_model import Status
 from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -26,7 +25,7 @@ from mobly import asserts
 
 # This test requires several additional command line arguments
 # run with
-# --int-arg PIXIT_ENDPOINT:<endpoint> 
+# --int-arg PIXIT_ENDPOINT:<endpoint>
 
 
 class TC_RVCRUNM_1_2(MatterBaseTest):
@@ -37,86 +36,86 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_RVCRUNM_1_2(self):
-            
 
-            asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
-                                "PIXIT_ENDPOINT must be included on the command line in "
-                                "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
 
-            self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
+        asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
+                            "PIXIT_ENDPOINT must be included on the command line in "
+                            "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
 
-            attributes = Clusters.RvcRunMode.Attributes
+        self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
 
-            self.print_step(1, "Commissioning, already done")
+        attributes = Clusters.RvcRunMode.Attributes
 
-            if self.check_pics("RVCRUNM.S.A0000"):
-                self.print_step(2, "Read SupportedModes attribute")
-                supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
+        self.print_step(1, "Commissioning, already done")
 
-                logging.info("SupportedModes: %s" % (supported_modes))
+        if self.check_pics("RVCRUNM.S.A0000"):
+            self.print_step(2, "Read SupportedModes attribute")
+            supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
-                asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
+            logging.info("SupportedModes: %s" % (supported_modes))
 
-                modes = []
-                for m in supported_modes:
-                    if m.mode in modes:
-                        asserts.fail("SupportedModes must have unique mode values!")
-                    else:
-                        modes.append(m.mode)
+            asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
 
-                labels = []
-                for m in supported_modes:
-                    if m.label in labels:
-                        asserts.fail("SupportedModes must have unique mode label values!")
-                    else:
-                        labels.append(m.label)
+            modes = []
+            for m in supported_modes:
+                if m.mode in modes:
+                    asserts.fail("SupportedModes must have unique mode values!")
+                else:
+                    modes.append(m.mode)
 
-                    #common mode tags
-                    commonTags = {0x0: 'Auto', 
-                                  0x1: 'Quick', 
-                                  0x2: 'Quiet',
-                                  0x3: 'LowNoise',
-                                  0x4: 'LowEnergy',
-                                  0x5: 'Vacation',
-                                  0x6: 'Min',
-                                  0x7: 'Max',
-                                  0x8: 'Night',
-                                  0x9: 'Day'}
-                    
-                    #RVC Run mode tags
-                    runTags = {0x4000: 'Idle',
-                               0x4001: 'Cleaning'}
+            labels = []
+            for m in supported_modes:
+                if m.label in labels:
+                    asserts.fail("SupportedModes must have unique mode label values!")
+                else:
+                    labels.append(m.label)
 
-                    #RVC Clean mode tags
-                    #cleanTags = {0x4000: 'DeepClean',
-                    #             0x4001: 'Vacuum',
-                    #             0x4002: 'Mop'}
+                # common mode tags
+                commonTags = {0x0: 'Auto',
+                              0x1: 'Quick',
+                              0x2: 'Quiet',
+                              0x3: 'LowNoise',
+                              0x4: 'LowEnergy',
+                              0x5: 'Vacation',
+                              0x6: 'Min',
+                              0x7: 'Max',
+                              0x8: 'Night',
+                              0x9: 'Day'}
 
-                for m in supported_modes:
-                    for t in m.modeTags:
-                        is_mfg = (0x8000 <= t.value and t.value <= 0xBFFF)
-                        asserts.assert_true(t.value in commonTags.keys() or t.value in runTags.keys() or is_mfg, "Found a SupportedModes entry with invalid mode tag value!")
+                # RVC Run mode tags
+                runTags = {0x4000: 'Idle',
+                           0x4001: 'Cleaning'}
 
-            if self.check_pics("RVCRUNM.S.A0001"):
-                self.print_step(3, "Read CurrentMode attribute")
-                current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+                # RVC Clean mode tags
+                # cleanTags = {0x4000: 'DeepClean',
+                #             0x4001: 'Vacuum',
+                #             0x4002: 'Mop'}
 
-                logging.info("CurrentMode: %s" % (current_mode))
-                asserts.assert_true(current_mode in modes, "CurrentMode is not a supported mode!")    
+            for m in supported_modes:
+                for t in m.modeTags:
+                    is_mfg = (0x8000 <= t.value and t.value <= 0xBFFF)
+                    asserts.assert_true(t.value in commonTags.keys() or t.value in runTags.keys() or is_mfg, "Found a SupportedModes entry with invalid mode tag value!")
 
-            if self.check_pics("RVCRUNM.S.A0003"):
-                self.print_step(4, "Read OnMode attribute")
-                on_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OnMode)
+        if self.check_pics("RVCRUNM.S.A0001"):
+            self.print_step(3, "Read CurrentMode attribute")
+            current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-                logging.info("OnMode: %s" % (on_mode))
-                asserts.assert_true(on_mode in modes or on_mode == NullValue, "OnMode is not a supported mode!")    
+            logging.info("CurrentMode: %s" % (current_mode))
+            asserts.assert_true(current_mode in modes, "CurrentMode is not a supported mode!")
 
-            if self.check_pics("RVCRUNM.S.A0002"):
-                self.print_step(5, "Read StartUpMode attribute")
-                startup_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.StartUpMode)
+        if self.check_pics("RVCRUNM.S.A0003"):
+            self.print_step(4, "Read OnMode attribute")
+            on_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OnMode)
 
-                logging.info("StartUpMode: %s" % (startup_mode))
-                asserts.assert_true(startup_mode in modes or startup_mode == NullValue, "StartUpMode is not a supported mode!")    
+            logging.info("OnMode: %s" % (on_mode))
+            asserts.assert_true(on_mode in modes or on_mode == NullValue, "OnMode is not a supported mode!")
+
+        if self.check_pics("RVCRUNM.S.A0002"):
+            self.print_step(5, "Read StartUpMode attribute")
+            startup_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.StartUpMode)
+
+            logging.info("StartUpMode: %s" % (startup_mode))
+            asserts.assert_true(startup_mode in modes or startup_mode == NullValue, "StartUpMode is not a supported mode!")
 
 if __name__ == "__main__":
     default_matter_test_main()

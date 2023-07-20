@@ -18,8 +18,6 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.interaction_model import InteractionModelError
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
@@ -41,8 +39,8 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         return ret
 
     @async_test_body
-    async def test_TC_RVCRUNM_2_1   (self):
-            
+    async def test_TC_RVCRUNM_2_1(self):
+
             asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
                                 "PIXIT_ENDPOINT must be included on the command line in "
                                 "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
@@ -83,28 +81,28 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
             old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
             logging.info("CurrentMode: %s" % (old_current_mode))
-                                
-            #pick a value that's not on the list of supported modes    
-            invalid_mode = max(modes) + 1        
+
+            # pick a value that's not on the list of supported modes
+            invalid_mode = max(modes) + 1
 
             from enum import Enum
 
             class CommonCodes(Enum):
-                SUCCESS          = 0x00
+                SUCCESS = 0x00
                 UNSUPPORTED_MODE = 0x01
-                GENERIC_FAILURE  = 0x02
+                GENERIC_FAILURE = 0x02
 
             class RvcRunCodes(Enum):
-                STUCK                    = 0x41
-                DUST_BIN_MISSING         = 0x42
-                DUST_BIN_FULL            = 0x43
-                WATER_TANK_EMPTY         = 0x44
-                WATER_TANK_MISSING       = 0x45
-                WATER_TANK_LID_OPEN_     = 0x46
+                STUCK = 0x41
+                DUST_BIN_MISSING = 0x42
+                DUST_BIN_FULL = 0x43
+                WATER_TANK_EMPTY = 0x44
+                WATER_TANK_MISSING = 0x45
+                WATER_TANK_LID_OPEN = 0x46
                 MOP_CLEANING_PAD_MISSING = 0x47
-                BATTERY_LOW              = 0x48
+                BATTERY_LOW = 0x48
 
-            #class RvcCleanCodes(Enum):
+            # class RvcCleanCodes(Enum):
             #    CLEANING_IN_PROGRESS = 0x40
 
             self.print_step(4, "Send ChangeToMode command with NewMode set to %d" % (old_current_mode))
@@ -128,8 +126,8 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
             is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st in [i.value for i in RvcRunCodes]) or is_mfg_code
             asserts.assert_true(is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.modefail))
             st_text_len = len(ret.statusText)
-            asserts.assert_true(st_text_len in range(1,65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
-            
+            asserts.assert_true(st_text_len in range(1, 65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
+
             self.print_step(8, "Read CurrentMode attribute")
             current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
@@ -149,7 +147,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
 
             ret = await self.send_change_to_mode_cmd(newMode=self.modeok)
             asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing to mode %d must succeed due to the current state of the device" % (self.modeok))
-            
+
             self.print_step(12, "Read CurrentMode attribute")
             current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
@@ -161,7 +159,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
 
             ret = await self.send_change_to_mode_cmd(newMode=invalid_mode)
             asserts.assert_true(ret.status == CommonCodes.UNSUPPORTED_MODE.value, "Attempt to change to invalid mode %d didn't fail as expected" % (invalid_mode))
-            
+
             self.print_step(14, "Read CurrentMode attribute")
             current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 

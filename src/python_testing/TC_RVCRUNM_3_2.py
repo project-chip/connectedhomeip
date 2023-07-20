@@ -18,9 +18,7 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.interaction_model import InteractionModelError
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 # This test requires several additional command line arguments
@@ -56,6 +54,13 @@ class TC_RVCRUNM_3_2(MatterBaseTest):
         asserts.assert_true(self.check_pics("RVCRUNM.S.C01.Tx"), "RVCRUNM.S.C01.Tx must be supported")
 
         attributes = Clusters.RvcRunMode.Attributes
+
+        from enum import Enum
+
+        class CommonCodes(Enum):
+            SUCCESS = 0x00
+            UNSUPPORTED_MODE = 0x01
+            GENERIC_FAILURE = 0x02
 
         self.print_step(1, "Commissioning, already done")
 

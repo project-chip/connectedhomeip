@@ -18,8 +18,6 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.interaction_model import InteractionModelError
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
@@ -41,133 +39,133 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         return ret
 
     @async_test_body
-    async def test_TC_RVCCLEANM_2_1   (self):
-            
-            asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
-                                "PIXIT_ENDPOINT must be included on the command line in "
-                                "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
-            asserts.assert_true('PIXIT_MODEOK' in self.matter_test_config.global_test_params,
-                                "PIXIT_MODEOK must be included on the command line in "
-                                "the --int-arg flag as PIXIT_MODEOK:<mode id>")
-            asserts.assert_true('PIXIT_MODEFAIL' in self.matter_test_config.global_test_params,
-                                "PIXIT_MODEFAIL must be included on the command line in "
-                                "the --int-arg flag as PIXIT_MODEFAIL:<mode id>")
+    async def test_TC_RVCCLEANM_2_1(self):
 
-            self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
-            self.modeok = self.matter_test_config.global_test_params['PIXIT_MODEOK']
-            self.modefail = self.matter_test_config.global_test_params['PIXIT_MODEFAIL']
+        asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
+                            "PIXIT_ENDPOINT must be included on the command line in "
+                            "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
+        asserts.assert_true('PIXIT_MODEOK' in self.matter_test_config.global_test_params,
+                            "PIXIT_MODEOK must be included on the command line in "
+                            "the --int-arg flag as PIXIT_MODEOK:<mode id>")
+        asserts.assert_true('PIXIT_MODEFAIL' in self.matter_test_config.global_test_params,
+                            "PIXIT_MODEFAIL must be included on the command line in "
+                            "the --int-arg flag as PIXIT_MODEFAIL:<mode id>")
 
-            asserts.assert_true(self.check_pics("RVCCLEANM.S.A0000"), "RVCCLEANM.S.A0000 must be supported")
-            asserts.assert_true(self.check_pics("RVCCLEANM.S.A0001"), "RVCCLEANM.S.A0001 must be supported")
-            asserts.assert_true(self.check_pics("RVCCLEANM.S.C00.Rsp"), "RVCCLEANM.S.C00.Rsp must be supported")
-            asserts.assert_true(self.check_pics("RVCCLEANM.S.C01.Tx"), "RVCCLEANM.S.C01.Tx must be supported")
+        self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
+        self.modeok = self.matter_test_config.global_test_params['PIXIT_MODEOK']
+        self.modefail = self.matter_test_config.global_test_params['PIXIT_MODEFAIL']
 
-            attributes = Clusters.RvcCleanMode.Attributes
+        asserts.assert_true(self.check_pics("RVCCLEANM.S.A0000"), "RVCCLEANM.S.A0000 must be supported")
+        asserts.assert_true(self.check_pics("RVCCLEANM.S.A0001"), "RVCCLEANM.S.A0001 must be supported")
+        asserts.assert_true(self.check_pics("RVCCLEANM.S.C00.Rsp"), "RVCCLEANM.S.C00.Rsp must be supported")
+        asserts.assert_true(self.check_pics("RVCCLEANM.S.C01.Tx"), "RVCCLEANM.S.C01.Tx must be supported")
 
-            self.print_step(1, "Commissioning, already done")
+        attributes = Clusters.RvcCleanMode.Attributes
 
-            modes = []
+        self.print_step(1, "Commissioning, already done")
 
-            self.print_step(2, "Read SupportedModes attribute")
-            supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
+        modes = []
 
-            logging.info("SupportedModes: %s" % (supported_modes))
+        self.print_step(2, "Read SupportedModes attribute")
+        supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
-            asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
+        logging.info("SupportedModes: %s" % (supported_modes))
 
-            for m in supported_modes:
-                modes.append(m.mode)
+        asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
 
-            self.print_step(3, "Read CurrentMode attribute")
+        for m in supported_modes:
+            modes.append(m.mode)
 
-            old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        self.print_step(3, "Read CurrentMode attribute")
 
-            logging.info("CurrentMode: %s" % (old_current_mode))
-                                
-            #pick a value that's not on the list of supported modes    
-            invalid_mode = max(modes) + 1        
+        old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-            from enum import Enum
+        logging.info("CurrentMode: %s" % (old_current_mode))
 
-            class CommonCodes(Enum):
-                SUCCESS          = 0x00
-                UNSUPPORTED_MODE = 0x01
-                GENERIC_FAILURE  = 0x02
+        # pick a value that's not on the list of supported modes
+        invalid_mode = max(modes) + 1
 
-            #class RvcRunCodes(Enum):
-            #    STUCK                    = 0x41
-            #    DUST_BIN_MISSING         = 0x42
-            #    DUST_BIN_FULL            = 0x43
-            #    WATER_TANK_EMPTY         = 0x44
-            #    WATER_TANK_MISSING       = 0x45
-            #    WATER_TANK_LID_OPEN_     = 0x46
-            #    MOP_CLEANING_PAD_MISSING = 0x47
-            #    BATTERY_LOW              = 0x48
+        from enum import Enum
 
-            class RvcCleanCodes(Enum):
-                CLEANING_IN_PROGRESS = 0x40
+        class CommonCodes(Enum):
+            SUCCESS = 0x00
+            UNSUPPORTED_MODE = 0x01
+            GENERIC_FAILURE = 0x02
 
-            self.print_step(4, "Send ChangeToMode command with NewMode set to %d" % (old_current_mode))
+        # class RvcRunCodes(Enum):
+        #    STUCK                    = 0x41
+        #    DUST_BIN_MISSING         = 0x42
+        #    DUST_BIN_FULL            = 0x43
+        #    WATER_TANK_EMPTY         = 0x44
+        #    WATER_TANK_MISSING       = 0x45
+        #    WATER_TANK_LID_OPEN_     = 0x46
+        #    MOP_CLEANING_PAD_MISSING = 0x47
+        #    BATTERY_LOW              = 0x48
 
-            ret = await self.send_change_to_mode_cmd(newMode=old_current_mode)
-            asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to the current mode should be a no-op")
+        class RvcCleanCodes(Enum):
+            CLEANING_IN_PROGRESS = 0x40
 
-            self.print_step(5, "Manually put the device in a state from which it will FAIL to transition to mode %d" % (self.modefail))
-            input("Press Enter when done.\n")
+        self.print_step(4, "Send ChangeToMode command with NewMode set to %d" % (old_current_mode))
 
-            self.print_step(6, "Read CurrentMode attribute")
-            old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        ret = await self.send_change_to_mode_cmd(newMode=old_current_mode)
+        asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to the current mode should be a no-op")
 
-            logging.info("CurrentMode: %s" % (old_current_mode))
+        self.print_step(5, "Manually put the device in a state from which it will FAIL to transition to mode %d" % (self.modefail))
+        input("Press Enter when done.\n")
 
-            self.print_step(7, "Send ChangeToMode command with NewMode set to %d" % (self.modefail))
+        self.print_step(6, "Read CurrentMode attribute")
+        old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-            ret = await self.send_change_to_mode_cmd(newMode=self.modefail)
-            st = ret.status
-            is_mfg_code = st in range(0x80, 0xC0)
-            is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st in [i.value for i in RvcCleanCodes]) or is_mfg_code
-            asserts.assert_true(is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.modefail))
-            st_text_len = len(ret.statusText)
-            asserts.assert_true(st_text_len in range(1,65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
-            
-            self.print_step(8, "Read CurrentMode attribute")
-            current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        logging.info("CurrentMode: %s" % (old_current_mode))
 
-            logging.info("CurrentMode: %s" % (current_mode))
+        self.print_step(7, "Send ChangeToMode command with NewMode set to %d" % (self.modefail))
 
-            asserts.assert_true(current_mode == old_current_mode, "CurrentMode changed after failed ChangeToMode command!")
+        ret = await self.send_change_to_mode_cmd(newMode=self.modefail)
+        st = ret.status
+        is_mfg_code = st in range(0x80, 0xC0)
+        is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st in [i.value for i in RvcCleanCodes]) or is_mfg_code
+        asserts.assert_true(is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.modefail))
+        st_text_len = len(ret.statusText)
+        asserts.assert_true(st_text_len in range(1,65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
 
-            self.print_step(9, "Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d" % (self.modeok))
-            input("Press Enter when done.\n")
+        self.print_step(8, "Read CurrentMode attribute")
+        current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-            self.print_step(10, "Read CurrentMode attribute")
-            old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        logging.info("CurrentMode: %s" % (current_mode))
 
-            logging.info("CurrentMode: %s" % (old_current_mode))
+        asserts.assert_true(current_mode == old_current_mode, "CurrentMode changed after failed ChangeToMode command!")
 
-            self.print_step(11, "Send ChangeToMode command with NewMode set to %d" % (self.modeok))
+        self.print_step(9, "Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d" % (self.modeok))
+        input("Press Enter when done.\n")
 
-            ret = await self.send_change_to_mode_cmd(newMode=self.modeok)
-            asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing to mode %d must succeed due to the current state of the device" % (self.modeok))
-            
-            self.print_step(12, "Read CurrentMode attribute")
-            current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        self.print_step(10, "Read CurrentMode attribute")
+        old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-            logging.info("CurrentMode: %s" % (current_mode))
+        logging.info("CurrentMode: %s" % (old_current_mode))
 
-            asserts.assert_true(current_mode == self.modeok, "CurrentMode doesn't match the argument of the successful ChangeToMode command!")
+        self.print_step(11, "Send ChangeToMode command with NewMode set to %d" % (self.modeok))
 
-            self.print_step(13, "Send ChangeToMode command with NewMode set to %d" % (invalid_mode))
+        ret = await self.send_change_to_mode_cmd(newMode=self.modeok)
+        asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing to mode %d must succeed due to the current state of the device" % (self.modeok))
 
-            ret = await self.send_change_to_mode_cmd(newMode=invalid_mode)
-            asserts.assert_true(ret.status == CommonCodes.UNSUPPORTED_MODE.value, "Attempt to change to invalid mode %d didn't fail as expected" % (invalid_mode))
-            
-            self.print_step(14, "Read CurrentMode attribute")
-            current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        self.print_step(12, "Read CurrentMode attribute")
+        current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-            logging.info("CurrentMode: %s" % (current_mode))
+        logging.info("CurrentMode: %s" % (current_mode))
 
-            asserts.assert_true(current_mode == self.modeok, "CurrentMode changed after failed ChangeToMode command!")
+        asserts.assert_true(current_mode == self.modeok, "CurrentMode doesn't match the argument of the successful ChangeToMode command!")
+
+        self.print_step(13, "Send ChangeToMode command with NewMode set to %d" % (invalid_mode))
+
+        ret = await self.send_change_to_mode_cmd(newMode=invalid_mode)
+        asserts.assert_true(ret.status == CommonCodes.UNSUPPORTED_MODE.value, "Attempt to change to invalid mode %d didn't fail as expected" % (invalid_mode))
+
+        self.print_step(14, "Read CurrentMode attribute")
+        current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+
+        logging.info("CurrentMode: %s" % (current_mode))
+
+        asserts.assert_true(current_mode == self.modeok, "CurrentMode changed after failed ChangeToMode command!")
 
 
 if __name__ == "__main__":
