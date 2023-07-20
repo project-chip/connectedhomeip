@@ -2751,7 +2751,7 @@ client cluster IcdManagement = 70 {
 
   request struct UnregisterClientRequest {
     node_id checkInNodeID = 0;
-    optional OCTET_STRING<16> key = 1;
+    optional OCTET_STRING<16> verificationKey = 1;
   }
 
   /** Register a client to the end device */

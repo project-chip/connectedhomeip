@@ -56,7 +56,7 @@ public:
                           uint64_t monitored_subject, chip::ByteSpan key, Optional<chip::ByteSpan> verification_key, bool is_admin);
 
     Status UnregisterClient(PersistentStorageDelegate & storage, FabricIndex fabric_index, chip::NodeId node_id,
-                            Optional<chip::ByteSpan> key, bool is_admin);
+                            Optional<chip::ByteSpan> verificationKey, bool is_admin);
 
     Status StayActiveRequest(FabricIndex fabric_index);
 
