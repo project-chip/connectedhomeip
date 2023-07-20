@@ -10,7 +10,7 @@
     {{> @partial-block}}
   {{/if}}
 {{/inline}}
-class MTR{{> @partial-block}}Bridge : public MTRCallbackBridge<{{>callbackType}}>
+class {{#if provisional}}MTR_PROVISIONALLY_AVAILABLE{{/if}} MTR{{> @partial-block}}Bridge : public MTRCallbackBridge<{{>callbackType}}>
 {
 public:
     MTR{{> @partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler)
@@ -39,7 +39,7 @@ public:
 };
 
 {{#unless partial-type}}
-class MTR{{> @partial-block}}SubscriptionBridge : public MTR{{> @partial-block}}Bridge
+class {{#if provisional}}MTR_PROVISIONALLY_AVAILABLE{{/if}} MTR{{> @partial-block}}SubscriptionBridge : public MTR{{> @partial-block}}Bridge
 {
 public:
     MTR{{> @partial-block}}SubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler)
