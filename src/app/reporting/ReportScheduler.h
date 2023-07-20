@@ -56,14 +56,12 @@ public:
     class ReadHandlerNode : public IntrusiveListNodeBase<>
     {
     public:
-        using TimerCompleteCallback = void (*)();
-
-        ReadHandlerNode(ReadHandler * aReadHandler, TimerDelegate * aTimerDelegate, TimerCompleteCallback aCallback) :
-            mTimerDelegate(aTimerDelegate), mCallback(aCallback)
+        ReadHandlerNode(ReadHandler * aReadHandler, TimerDelegate * aTimerDelegate, ReportScheduler * aScheduler) :
+            mTimerDelegate(aTimerDelegate), mScheduler(aScheduler)
         {
             VerifyOrDie(aReadHandler != nullptr);
             VerifyOrDie(aTimerDelegate != nullptr);
-            VerifyOrDie(aCallback != nullptr);
+            VerifyOrDie(aScheduler != nullptr);
 
             mReadHandler = aReadHandler;
             SetIntervalTimeStamps(aReadHandler);
@@ -78,29 +76,50 @@ public:
             // the scheduler in the ReadHandler
             Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
             return (mReadHandler->IsGeneratingReports() &&
-                    ((now >= mMinTimestamp && mReadHandler->IsDirty()) || now >= mMaxTimestamp));
+                    (now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || now >= mSyncTimestamp)));
         }
+
+        bool IsEngineRunScheduled() const { return mEngineRunScheduled; }
+        void SetEngineRunScheduled(bool aEnginRunScheduled) { mEngineRunScheduled = aEnginRunScheduled; }
 
         void SetIntervalTimeStamps(ReadHandler * aReadHandler)
         {
             uint16_t minInterval, maxInterval;
             aReadHandler->GetReportingIntervals(minInterval, maxInterval);
-            Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
-            mMinTimestamp = now + System::Clock::Seconds16(minInterval);
-            mMaxTimestamp = now + System::Clock::Seconds16(maxInterval);
+            Timestamp now  = mTimerDelegate->GetCurrentMonotonicTimestamp();
+            mMinTimestamp  = now + System::Clock::Seconds16(minInterval);
+            mMaxTimestamp  = now + System::Clock::Seconds16(maxInterval);
+            mSyncTimestamp = mMaxTimestamp;
         }
 
-        void RunCallback() { mCallback(); }
+        void RunCallback()
+        {
+            mScheduler->ReportTimerCallback();
+            SetEngineRunScheduled(true);
+        }
 
-        Timestamp GetMinTimestamp() const { return mMinTimestamp; }
-        Timestamp GetMaxTimestamp() const { return mMaxTimestamp; }
+        void SetSyncTimestamp(System::Clock::Timestamp aSyncTimestamp)
+        {
+            // Prevents the sync timestamp being set to a value lower than the min timestamp to prevent it to appear as reportable
+            // on the next timeout calculation and cause the scheduler to run the engine too early
+            VerifyOrReturn(aSyncTimestamp >= mMinTimestamp);
+            mSyncTimestamp = aSyncTimestamp;
+        }
+
+        System::Clock::Timestamp GetMinTimestamp() const { return mMinTimestamp; }
+        System::Clock::Timestamp GetMaxTimestamp() const { return mMaxTimestamp; }
+        System::Clock::Timestamp GetSyncTimestamp() const { return mSyncTimestamp; }
 
     private:
         TimerDelegate * mTimerDelegate;
-        TimerCompleteCallback mCallback;
         ReadHandler * mReadHandler;
+        ReportScheduler * mScheduler;
         Timestamp mMinTimestamp;
         Timestamp mMaxTimestamp;
+        Timestamp mSyncTimestamp; // Timestamp at which the read handler will be allowed to emit a report so it can be synced with
+                                  // other handlers that have an earlier max timestamp
+        bool mEngineRunScheduled = false; // Flag to indicate if the engine run is already scheduled so the scheduler can ignore
+                                          // it when calculating the next run time
     };
 
     ReportScheduler(TimerDelegate * aTimerDelegate) : mTimerDelegate(aTimerDelegate) {}
@@ -109,11 +128,14 @@ public:
      */
     virtual ~ReportScheduler() = default;
 
-    /// @brief Check if a ReadHandler is scheduled for reporting
-    virtual bool IsReportScheduled(ReadHandler * aReadHandler) = 0;
+    virtual void ReportTimerCallback() = 0;
+
     /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
     /// @param aReadHandler read handler to check
-    bool IsReportableNow(ReadHandler * aReadHandler) { return FindReadHandlerNode(aReadHandler)->IsReportableNow(); };
+    bool IsReportableNow(ReadHandler * aReadHandler)
+    {
+        return FindReadHandlerNode(aReadHandler)->IsReportableNow();
+    } // TODO: Change the IsReportableNow to IsReportable() for readHandlers
     /// @brief Check if a ReadHandler is reportable without considering the timing
     bool IsReadHandlerReportable(ReadHandler * aReadHandler) const
     {
