@@ -92,7 +92,8 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gRvcRunModeDelegate == nullptr && gRvcRunModeInstance == nullptr);
     gRvcRunModeDelegate = new RvcRunMode::RvcRunModeDelegate;
-    gRvcRunModeInstance = new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kOnOff));
+    gRvcRunModeInstance =
+        new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kOnOff));
     gRvcRunModeInstance->Init();
 }
 
@@ -160,6 +161,7 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gRvcCleanModeDelegate == nullptr && gRvcCleanModeInstance == nullptr);
     gRvcCleanModeDelegate = new RvcCleanMode::RvcCleanModeDelegate;
-    gRvcCleanModeInstance = new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id, chip::to_underlying(RvcCleanMode::Feature::kOnOff));
+    gRvcCleanModeInstance =
+        new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id, chip::to_underlying(RvcCleanMode::Feature::kOnOff));
     gRvcCleanModeInstance->Init();
 }
