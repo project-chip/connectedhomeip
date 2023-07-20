@@ -28,17 +28,34 @@ using namespace chip::app::Clusters::ResourceMonitoring;
 using chip::Protocols::InteractionModel::Status;
 
 constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
-                                                static_cast<uint32_t>(Feature::kWarning) };
+                                                static_cast<uint32_t>(Feature::kWarning) |
+                                                static_cast<uint32_t>(Feature::kReplacementProductList) };
 constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
-                                                     static_cast<uint32_t>(Feature::kWarning) };
+                                                     static_cast<uint32_t>(Feature::kWarning) |
+                                                     static_cast<uint32_t>(Feature::kReplacementProductList) };
 
-static HepaFilterMonitoringInstance * gHepafilterInstance                       = nullptr;
+static HepaFilterMonitoringInstance * gHepaFilterInstance                       = nullptr;
 static ActivatedCarbonFilterMonitoringInstance * gActivatedCarbonFilterInstance = nullptr;
+
+static ResourceMonitoring::Attributes::ReplacementProductStruct::Type sReplacementProductsList[] = {
+    { .productIdentifierType  = ProductIdentifierTypeEnum::kUpc,
+      .productIdentifierValue = CharSpan::fromCharString("111112222233") },
+    { .productIdentifierType = ProductIdentifierTypeEnum::kGtin8, .productIdentifierValue = CharSpan::fromCharString("gtin8xxx") },
+    { .productIdentifierType  = ProductIdentifierTypeEnum::kEan,
+      .productIdentifierValue = CharSpan::fromCharString("4444455555666") },
+    { .productIdentifierType  = ProductIdentifierTypeEnum::kGtin14,
+      .productIdentifierValue = CharSpan::fromCharString("gtin14xxxxxxxx") },
+    { .productIdentifierType  = ProductIdentifierTypeEnum::kOem,
+      .productIdentifierValue = CharSpan::fromCharString("oem20xxxxxxxxxxxxxxx") },
+};
+StaticReplacementProductListManager sReplacementProductListManager(&sReplacementProductsList[0],
+                                                                   ArraySize(sReplacementProductsList));
 
 //-- Activated Carbon Filter Monitoring Instance methods
 CHIP_ERROR ActivatedCarbonFilterMonitoringInstance::AppInit()
 {
     ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringDelegate::Init()");
+    SetReplacementProductListManagerInstance(&sReplacementProductListManager);
     return CHIP_NO_ERROR;
 }
 
@@ -58,6 +75,7 @@ Status ActivatedCarbonFilterMonitoringInstance::PostResetCondition()
 CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
 {
     ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::Init()");
+    SetReplacementProductListManagerInstance(&sReplacementProductListManager);
     return CHIP_NO_ERROR;
 }
 
@@ -82,8 +100,19 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
 }
 void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 {
-    VerifyOrDie(gActivatedCarbonFilterInstance == nullptr);
-    gHepafilterInstance = new HepaFilterMonitoringInstance(endpoint, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
+    gHepaFilterInstance = new HepaFilterMonitoringInstance(endpoint, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                                                            DegradationDirectionEnum::kDown, true);
-    gHepafilterInstance->Init();
+    gHepaFilterInstance->Init();
+}
+
+CHIP_ERROR StaticReplacementProductListManager::Next(Attributes::ReplacementProductStruct::Type & item)
+{
+    if (mIndex < mReplacementProductListSize)
+    {
+        item = mReplacementProductsList[mIndex];
+        mIndex++;
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
