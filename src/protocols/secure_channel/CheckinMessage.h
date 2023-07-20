@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file implements the utility class for the Matter Checkin protocol.
+ *      This file implements the Matter Checkin protocol.
  */
 
 #pragma once
@@ -66,12 +66,13 @@ public:
      * @param payloadSize (Optionnal) Total size of the generated payload
      * @return CHIP_ERROR
      */
-    static CHIP_ERROR GenerateCheckingMessagePayload(Crypto::Aes128KeyHandle & key, uint32_t counter, ByteSpan appData,
-                                                     uint8_t * output, uint16_t * payloadSize = nullptr);
+    static CHIP_ERROR GenerateCheckinMessagePayload(Crypto::Aes128KeyHandle & key, uint32_t counter, const ByteSpan & appData,
+                                                    MutableByteSpan & output, uint16_t * payloadSize = nullptr);
 
-    static CHIP_ERROR ParseCheckingMessagePayload(Crypto::Aes128KeyHandle & key, ByteSpan & payload, uint32_t & counter,
-                                                  uint8_t * appData);
+    static CHIP_ERROR ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & key, ByteSpan & payload, uint32_t & counter,
+                                                 MutableByteSpan & appData);
 
+private:
     static uint16_t GetAppDataSize(ByteSpan & payload);
 };
 

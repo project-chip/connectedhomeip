@@ -40,9 +40,11 @@ using TestSessionKeystoreImpl = Crypto::DefaultSessionKeystore;
 
 void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
 {
-    uint8_t outputBuffer[300]    = { 0 };
-    uint8_t oldOutputBuffer[300] = { 0 };
-    uint32_t counter             = 0;
+    uint8_t a[300] = { 0 };
+    uint8_t b[300] = { 0 };
+    MutableByteSpan outputBuffer{ a };
+    MutableByteSpan oldOutputBuffer{ b };
+    uint32_t counter = 0;
     ByteSpan userData;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestSessionKeystoreImpl keystore;
@@ -62,12 +64,12 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
         counter = 0;
         for (uint8_t j = 0; j < 5; j++)
         {
-            err = CheckinMessage::GenerateCheckingMessagePayload(keyHandle, counter, userData, outputBuffer);
+            err = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, userData, outputBuffer);
             NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
 
             // Verifiy that the output buffer changed
-            NL_TEST_ASSERT(inSuite, (memcmp(outputBuffer, oldOutputBuffer, 300) != 0));
-            memcpy(oldOutputBuffer, outputBuffer, 300);
+            NL_TEST_ASSERT(inSuite, (memcmp(outputBuffer.data(), oldOutputBuffer.data(), 300) != 0));
+            memcpy(oldOutputBuffer.data(), outputBuffer.data(), 300);
 
             // Increment by a random count. On the slim changes the increment is 0 add 1 to change output buffer
             counter += chip::Crypto::GetRandU32() + 1;
@@ -92,18 +94,19 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
         // Neitherless, considering the nature of the key it's the responsability of the
         // caller to make sure the key is indeed valid.
         Aes128KeyHandle emptyKeyHandle;
-        err = CheckinMessage::GenerateCheckingMessagePayload(emptyKeyHandle, counter, userData, outputBuffer);
+        err = CheckinMessage::GenerateCheckinMessagePayload(emptyKeyHandle, counter, userData, outputBuffer);
         NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
 
         ByteSpan emptyData;
-        err = CheckinMessage::GenerateCheckingMessagePayload(keyHandle, counter, emptyData, outputBuffer);
+        err = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, emptyData, outputBuffer);
         NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
 
-        err = CheckinMessage::GenerateCheckingMessagePayload(keyHandle, counter, emptyData, nullptr);
+        MutableByteSpan empty;
+        err = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, emptyData, empty);
         NL_TEST_ASSERT(inSuite, (CHIP_ERROR_INVALID_ARGUMENT == err));
 
         userData = chip::ByteSpan(gargantuaBuffer, sizeof(gargantuaBuffer));
-        err      = CheckinMessage::GenerateCheckingMessagePayload(keyHandle, counter, userData, nullptr);
+        err      = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, userData, outputBuffer);
         NL_TEST_ASSERT(inSuite, (CHIP_ERROR_INVALID_ARGUMENT == err));
 
         // Cleanup
@@ -113,10 +116,12 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
 
 void TestCheckin_Parse(nlTestSuite * inSuite, void * inContext)
 {
-    uint8_t outputBuffer[300] = { 0 };
-    uint8_t buffer[300]       = { 0 };
-    uint32_t counter          = 0, decryptedCounter;
-    uint16_t payloadSize      = 0;
+    uint8_t a[300] = { 0 };
+    uint8_t b[300] = { 0 };
+    MutableByteSpan outputBuffer{ a };
+    MutableByteSpan buffer{ b };
+    uint32_t counter     = 0, decryptedCounter;
+    uint16_t payloadSize = 0;
     ByteSpan userData;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -136,26 +141,29 @@ void TestCheckin_Parse(nlTestSuite * inSuite, void * inContext)
 
     //=================Encrypt=======================
 
-    err              = CheckinMessage::GenerateCheckingMessagePayload(keyHandle, counter, userData, outputBuffer, &payloadSize);
-    ByteSpan payload = chip::ByteSpan(outputBuffer, payloadSize);
+    err              = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, userData, outputBuffer, &payloadSize);
+    ByteSpan payload = chip::ByteSpan(outputBuffer.data(), payloadSize);
     NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
 
     //=================Decrypt=======================
 
-    err = CheckinMessage::ParseCheckingMessagePayload(keyHandle, payload, decryptedCounter, nullptr);
+    MutableByteSpan empty;
+    err = CheckinMessage::ParseCheckinMessagePayload(keyHandle, payload, decryptedCounter, empty);
     NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR != err));
 
     ByteSpan emptyPayload;
-    err = CheckinMessage::ParseCheckingMessagePayload(keyHandle, emptyPayload, decryptedCounter, buffer);
+    err = CheckinMessage::ParseCheckinMessagePayload(keyHandle, emptyPayload, decryptedCounter, buffer);
     NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR != err));
 }
 
 void TestCheckin_GenerateParse(nlTestSuite * inSuite, void * inContext)
 {
-    uint8_t outputBuffer[300]    = { 0 };
-    uint8_t oldOutputBuffer[300] = { 0 };
-    uint32_t counter             = 0;
-    uint16_t payloadSize         = 0;
+    uint8_t a[300] = { 0 };
+    uint8_t b[300] = { 0 };
+    MutableByteSpan outputBuffer{ a };
+    MutableByteSpan buffer{ b };
+    uint32_t counter     = 0xDEADBEEF;
+    uint16_t payloadSize = 0;
     ByteSpan userData;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -177,20 +185,22 @@ void TestCheckin_GenerateParse(nlTestSuite * inSuite, void * inContext)
 
         //=================Encrypt=======================
 
-        err = CheckinMessage::GenerateCheckingMessagePayload(keyHandle, counter, userData, outputBuffer, &payloadSize);
+        err = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, userData, outputBuffer, &payloadSize);
         NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
 
         //=================Decrypt=======================
         uint32_t decryptedCounter = 0;
-        uint8_t buffer[300]       = { 0 };
-        ByteSpan payload          = chip::ByteSpan(outputBuffer, payloadSize);
+        ByteSpan payload          = chip::ByteSpan(outputBuffer.data(), payloadSize);
 
-        err = CheckinMessage::ParseCheckingMessagePayload(keyHandle, payload, decryptedCounter, buffer);
-
+        err = CheckinMessage::ParseCheckinMessagePayload(keyHandle, payload, decryptedCounter, buffer);
         NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
 
-        NL_TEST_ASSERT(inSuite, (memcmp(data, buffer, sizeof(data)) == 0));
+        NL_TEST_ASSERT(inSuite, (memcmp(data, buffer.data(), sizeof(data)) == 0));
         NL_TEST_ASSERT(inSuite, (counter == decryptedCounter));
+
+        // reset buffers
+        memset(buffer.data(), 0, buffer.size());
+        memset(outputBuffer.data(), 0, outputBuffer.size());
 
         counter += chip::Crypto::GetRandU32() + 1;
         keystore.DestroyKey(keyHandle);
