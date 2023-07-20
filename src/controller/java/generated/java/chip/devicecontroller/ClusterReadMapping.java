@@ -7182,17 +7182,17 @@ public class ClusterReadMapping {
           readSmokeCoAlarmContaminationStateCommandParams
         );
         result.put("readContaminationStateAttribute", readSmokeCoAlarmContaminationStateAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readSmokeCoAlarmSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readSmokeCoAlarmSensitivityLevelAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readSmokeCoAlarmSmokeSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeCoAlarmSmokeSensitivityLevelAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.SmokeCoAlarmCluster) cluster).readSensitivityLevelAttribute(
+            ((ChipClusters.SmokeCoAlarmCluster) cluster).readSmokeSensitivityLevelAttribute(
               (ChipClusters.IntegerAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readSmokeCoAlarmSensitivityLevelCommandParams
+          readSmokeCoAlarmSmokeSensitivityLevelCommandParams
         );
-        result.put("readSensitivityLevelAttribute", readSmokeCoAlarmSensitivityLevelAttributeInteractionInfo);
+        result.put("readSmokeSensitivityLevelAttribute", readSmokeCoAlarmSmokeSensitivityLevelAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readSmokeCoAlarmExpiryDateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readSmokeCoAlarmExpiryDateAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

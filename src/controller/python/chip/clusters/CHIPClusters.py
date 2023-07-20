@@ -5091,7 +5091,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x0000000B: {
-                "attributeName": "SensitivityLevel",
+                "attributeName": "SmokeSensitivityLevel",
                 "attributeId": 0x0000000B,
                 "type": "int",
                 "reportable": True,

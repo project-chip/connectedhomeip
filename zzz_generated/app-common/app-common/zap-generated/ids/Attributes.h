@@ -2920,9 +2920,9 @@ namespace ContaminationState {
 static constexpr AttributeId Id = 0x0000000A;
 } // namespace ContaminationState
 
-namespace SensitivityLevel {
+namespace SmokeSensitivityLevel {
 static constexpr AttributeId Id = 0x0000000B;
-} // namespace SensitivityLevel
+} // namespace SmokeSensitivityLevel
 
 namespace ExpiryDate {
 static constexpr AttributeId Id = 0x0000000C;

@@ -8582,10 +8582,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ContaminationState", 1, value);
         }
-        case SmokeCoAlarm::Attributes::SensitivityLevel::Id: {
+        case SmokeCoAlarm::Attributes::SmokeSensitivityLevel::Id: {
             chip::app::Clusters::SmokeCoAlarm::SensitivityEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SensitivityLevel", 1, value);
+            return DataModelLogger::LogValue("SmokeSensitivityLevel", 1, value);
         }
         case SmokeCoAlarm::Attributes::ExpiryDate::Id: {
             uint32_t value;
