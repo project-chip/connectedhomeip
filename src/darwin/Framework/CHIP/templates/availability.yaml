@@ -4132,13 +4132,6 @@
                   - ValueA
                   - ValueB
                   - ValueC
-          FaultInjection:
-              FaultType:
-                  - Unspecified
-                  - SystemFault
-                  - InetFault
-                  - ChipFault
-                  - CertFault
       bitmaps:
           Groups:
               - GroupClusterFeature
@@ -4663,10 +4656,6 @@
           clusters:
               - PulseWidthModulation
               - TimeSynchronization
-              - ProxyConfiguration
-              - ProxyDiscovery
-              - ProxyValid
-              - FaultInjection
           attributes:
               PulseWidthModulation:
                   - GeneratedCommandList
@@ -4690,40 +4679,10 @@
                   - LocalTime
                   - TimeZoneDatabase
                   - NtpServerPort
-              ProxyConfiguration:
-                  - GeneratedCommandList
-                  - AcceptedCommandList
-                  - AttributeList
-                  - FeatureMap
-                  - ClusterRevision
-              ProxyDiscovery:
-                  - GeneratedCommandList
-                  - AcceptedCommandList
-                  - AttributeList
-                  - FeatureMap
-                  - ClusterRevision
-              ProxyValid:
-                  - GeneratedCommandList
-                  - AcceptedCommandList
-                  - AttributeList
-                  - FeatureMap
-                  - ClusterRevision
-              FaultInjection:
-                  - GeneratedCommandList
-                  - AcceptedCommandList
-                  - AttributeList
-                  - FeatureMap
-                  - ClusterRevision
           commands:
-              FaultInjection:
-                  - FailAtFault
-                  - FailRandomlyAtFault
               TimeSynchronization:
                   - SetUtcTime
       command payloads:
-          FaultInjection:
-              - FailAtFault
-              - FailRandomlyAtFault
           TimeSynchronization:
               - SetUtcTime
       global attributes:
@@ -4739,10 +4698,6 @@
       clusters:
           - PulseWidthModulation
           - TimeSynchronization
-          - ProxyConfiguration
-          - ProxyDiscovery
-          - ProxyValid
-          - FaultInjection
 
 - release: "First dot-release"
   versions:
@@ -7443,17 +7398,6 @@
           - TotalColiformBacteriaConcentrationMeasurement
           - TotalTrihalomethanesConcentrationMeasurement
           - TurbidityConcentrationMeasurement
-          ## Officially marked provisional: many replaceable monitoring clusters
-          - CeramicFilterMonitoring
-          - ElectrostaticFilterMonitoring
-          - UVFilterMonitoring
-          - IonizingFilterMonitoring
-          - ZeoliteFilterMonitoring
-          - OzoneFilterMonitoring
-          - WaterTankMonitoring
-          - FuelTankMonitoring
-          - InkCartridgeMonitoring
-          - TonerCartridgeMonitoring
           ## Not ready to be public API yet.
           - ICDManagement
           - LaundryWasherMode
@@ -7535,12 +7479,6 @@
               - EventList
           UserLabel:
               - EventList
-          ProxyConfiguration:
-              - EventList
-          ProxyDiscovery:
-              - EventList
-          ProxyValid:
-              - EventList
           BooleanState:
               - EventList
           ModeSelect:
@@ -7606,8 +7544,6 @@
           ElectricalMeasurement:
               - EventList
           UnitTesting:
-              - EventList
-          FaultInjection:
               - EventList
           BasicInformation:
               - EventList
@@ -7689,3 +7625,17 @@
 
 - release: "Future"
   versions: "future"
+  introduced:
+      bitmap values:
+          OnOff:
+              Feature:
+                  - DeadFront
+  removed:
+      clusters:
+          # Clusters that really should just not be exposed, even if they're in our XML.
+          - FaultInjection
+          # Clusters that are not going to end up shipping in their current form,
+          # so we should not be exposing the bits we expose now.
+          - ProxyConfiguration
+          - ProxyDiscovery
+          - ProxyValid
