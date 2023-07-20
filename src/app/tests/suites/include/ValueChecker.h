@@ -69,7 +69,7 @@ protected:
 
     // Allow a different expected type from the actual value type, because if T
     // is short the literal we are using is not short-typed.
-    template <typename T, typename U, typename std::enable_if_t<!std::is_enum<T>::value, int> = 0>
+    template <typename T, typename U, typename std::enable_if_t<!std::is_enum<T>::value && !std::is_enum<U>::value, int> = 0>
     bool CheckValue(const char * itemName, T current, U expected)
     {
         if (current != expected)
@@ -80,6 +80,12 @@ protected:
         }
 
         return true;
+    }
+
+    template <typename T, typename U, typename std::enable_if_t<!std::is_enum<T>::value && std::is_enum<U>::value, int> = 0>
+    bool CheckValue(const char * itemName, T current, U expected)
+    {
+        return CheckValue(itemName, current, chip::to_underlying(expected));
     }
 
     template <typename T, typename U, typename std::enable_if_t<std::is_enum<T>::value, int> = 0>
