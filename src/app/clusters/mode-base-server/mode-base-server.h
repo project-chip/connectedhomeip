@@ -75,9 +75,8 @@ private:
 public:
     /**
      * Initialise the ModeBase server instance.
-     * @return Returns an error if the cluster ID given is not af a valid ModeBase cluster, if the
-     * given endpoint and cluster ID have not been enabled in zap, if the CommandHandler or
-     * AttributeHandler registration fails or if the AppInit() returns an error.
+     * @return Returns an error if the given endpoint and cluster ID have not been enabled in zap, if the
+     * CommandHandler or AttributeHandler registration fails or if the Delegate::Init() returns an error.
      */
     CHIP_ERROR Init();
 
@@ -103,7 +102,7 @@ public:
      */
     Protocols::InteractionModel::Status UpdateCurrentMode(uint8_t aNewMode);
 
-    // Attribute getters
+    // Attribute getters.
     /**
      * @return The Start-Up mode.
      */
@@ -124,7 +123,7 @@ public:
      */
     EndpointId GetEndpointId() const { return mEndpointId; }
 
-    // Cluster constants
+    // Cluster constants, from the spec.
     static constexpr uint8_t kMaxModeLabelSize = 64;
     static constexpr uint8_t kMaxNumOfModeTags = 8;
 
@@ -143,7 +142,6 @@ public:
     /**
      * Creates a mode base cluster instance. The Init() function needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
-     * **Note** Once instantiated, the lifetime of this object must span the entire lifetime of the application.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aClusterId The ID of the ModeBase aliased cluster to be instantiated.
      * @param aFeature The bitmask value that identifies which features are supported by this instance.
