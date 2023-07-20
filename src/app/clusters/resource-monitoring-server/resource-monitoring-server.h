@@ -165,7 +165,7 @@ private:
     ChangeIndicationEnum mChangeIndication         = ChangeIndicationEnum::kOk;
     bool mInPlaceIndicator                         = true;
     DataModel::Nullable<uint32_t> mLastChangedTime;
-    ReplacementProductListManager * mReplacementProductListManager;
+    ReplacementProductListManager * mReplacementProductListManager = nullptr;
 
     uint32_t mFeatureMap;
 

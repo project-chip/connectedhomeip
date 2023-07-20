@@ -21,8 +21,8 @@
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/data-model/Nullable.h>
 #include <app/util/endpoint-config-api.h>
+#include <StaticReplacementProductListManager.h>
 #include <instances/ActivatedCarbonFilterMonitoring.h>
-#include <instances/StaticReplacementProductListManager.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/StatusCode.h>

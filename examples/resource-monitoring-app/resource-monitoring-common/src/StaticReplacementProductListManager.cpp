@@ -19,7 +19,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
-#include <instances/StaticReplacementProductListManager.h>
+#include <StaticReplacementProductListManager.h>
 #include <lib/core/CHIPError.h>
 
 using namespace chip::app::Clusters;

@@ -29,10 +29,8 @@ namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
 
-#define HEPA_FILTER_CLUSTER_ID 0x0071
-#define ACTIVATED_CARBON_FILTER_CLUSTER_ID 0x0072
-
-static constexpr std::array<ClusterId, 2> AliasedClusters = { HEPA_FILTER_CLUSTER_ID, ACTIVATED_CARBON_FILTER_CLUSTER_ID };
+static constexpr std::array<ClusterId, 2> AliasedClusters = { 
+    HepaFilterMonitoring::Id, ActivatedCarbonFilterMonitoring::Id };
 
 // Enum for ChangeIndicationEnum
 enum class ChangeIndicationEnum : uint8_t

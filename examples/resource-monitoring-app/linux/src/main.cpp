@@ -19,9 +19,9 @@
 #include <AppMain.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <bitset>
+#include <StaticReplacementProductListManager.h>
 #include <instances/ActivatedCarbonFilterMonitoring.h>
 #include <instances/HepaFilterMonitoring.h>
-#include <instances/StaticReplacementProductListManager.h>
 #include <stdint.h>
 
 using namespace chip;

@@ -247,18 +247,18 @@ CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
     CHIP_ERROR err;
     if (Instance::HasFeature(ResourceMonitoring::Feature::kReplacementProductList))
     {
-        ReplacementProductListManager * instance = Instance::GetReplacementProductListManagerInstance();
-        if (nullptr == instance)
+        ReplacementProductListManager * productListManagerInstance = Instance::GetReplacementProductListManagerInstance();
+        if (nullptr == productListManagerInstance)
         {
             aEncoder.EncodeEmptyList();
             return CHIP_NO_ERROR;
         }
 
-        instance->Reset();
+        productListManagerInstance->Reset();
 
         err = aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
             Attributes::ReplacementProductStruct::Type replacementProductStruct;
-            while (instance->Next(replacementProductStruct) == CHIP_NO_ERROR)
+            while (productListManagerInstance->Next(replacementProductStruct) == CHIP_NO_ERROR)
             {
                 ReturnErrorOnFailure(encoder.Encode(replacementProductStruct));
             }
