@@ -55,6 +55,7 @@
 #include <platform/PlatformManager.h>
 
 #include <platform/Tizen/ThreadStackManagerImpl.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -311,9 +312,26 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     if (val && !isEnabled)
     {
         threadErr = thread_network_attach(mThreadInstance);
+        DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
+            if (this->mpConnectCallback != nullptr && threadErr != THREAD_ERROR_NONE)
+            {
+                this->mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
+                this->mpConnectCallback = nullptr;
+            }
+        });
+
         VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: attach thread network"));
 
         threadErr = thread_start(mThreadInstance);
+        DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
+            if (this->mpConnectCallback != nullptr)
+            {
+                this->mpConnectCallback->OnResult(threadErr == THREAD_ERROR_NONE ? NetworkCommissioning::Status::kSuccess
+                                                                                 : NetworkCommissioning::Status::kUnknownError,
+                                                  CharSpan(), 0);
+                this->mpConnectCallback = nullptr;
+            }
+        });
         VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: start thread network"));
     }
     else if (!val && isEnabled)
