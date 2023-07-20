@@ -460,8 +460,8 @@ bool emberAfFanControlClusterStepCallback(app::CommandHandler * commandObj, cons
         EndpointId endpoint         = commandPath.mEndpointId;
         StepDirectionEnum direction = commandData.direction;
 
-        bool wrapValue      = commandData.wrap.HasValue() ? commandData.wrap.Value() : false;
-        bool lowestOffValue = commandData.lowestOff.HasValue() ? commandData.lowestOff.Value() : false;
+        bool wrapValue      = commandData.wrap.ValueOr(false);
+        bool lowestOffValue = commandData.lowestOff.ValueOr(false);
 
         Delegate * delegate = GetDelegate(endpoint);
         if (delegate)
@@ -471,6 +471,7 @@ bool emberAfFanControlClusterStepCallback(app::CommandHandler * commandObj, cons
         else
         {
             ChipLogProgress(Zcl, "FanControl has no delegate set for endpoint:%u", endpoint);
+            status = Status::Failure;
         }
     }
 
