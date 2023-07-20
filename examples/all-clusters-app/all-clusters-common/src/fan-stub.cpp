@@ -43,7 +43,7 @@ public:
     {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool off) override;
+    Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
 
 private:
     CHIP_ERROR ReadPercentCurrent(AttributeValueEncoder & aEncoder);

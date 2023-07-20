@@ -28,10 +28,6 @@ logger = logging.getLogger(__name__)
 
 class TC_FAN_3_3(MatterBaseTest):
 
-    ROCK_LEFT_RIGHT = 0x01
-    ROCK_UP_DOWN = 0x02
-    ROCK_ROUND = 0x04
-
     async def read_fc_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.FanControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -59,32 +55,32 @@ class TC_FAN_3_3(MatterBaseTest):
         self.print_step(2, "Read from the DUT the RockSupport attribute and store")
         rock_support = await self.read_rock_support(endpoint=endpoint)
 
-        if rock_support & self.ROCK_LEFT_RIGHT:
+        if rock_support & Clusters.FanControl.Bitmaps.RockBitmap.kRockLeftRight:
             self.print_step(3, "RockLeftRight is supported, so write 0x01 to RockSetting")
-            await self.write_rock_setting(endpoint=endpoint, rock_setting=self.ROCK_LEFT_RIGHT)
+            await self.write_rock_setting(endpoint=endpoint, rock_setting=Clusters.FanControl.Bitmaps.RockBitmap.kRockLeftRight)
             time.sleep(1)
 
             self.print_step(4, "Read from the DUT the RockSetting attribute")
             rock_setting = await self.read_rock_setting(endpoint=endpoint)
-            asserts.assert_equal(rock_setting, self.ROCK_LEFT_RIGHT, "RockSetting is not 0x01")
+            asserts.assert_equal(rock_setting, Clusters.FanControl.Bitmaps.RockBitmap.kRockLeftRight, "RockSetting is not 0x01")
 
-        if rock_support & self.ROCK_UP_DOWN:
+        if rock_support & Clusters.FanControl.Bitmaps.RockBitmap.kRockUpDown:
             self.print_step(5, "RockUpDown is supported, so write 0x02 to RockSetting")
-            await self.write_rock_setting(endpoint=endpoint, rock_setting=self.ROCK_UP_DOWN)
+            await self.write_rock_setting(endpoint=endpoint, rock_setting=Clusters.FanControl.Bitmaps.RockBitmap.kRockUpDown)
             time.sleep(1)
 
             self.print_step(6, "Read from the DUT the RockSetting attribute")
             rock_setting = await self.read_rock_setting(endpoint=endpoint)
-            asserts.assert_equal(rock_setting, self.ROCK_UP_DOWN, "RockSetting is not 0x02")
+            asserts.assert_equal(rock_setting, Clusters.FanControl.Bitmaps.RockBitmap.kRockUpDown, "RockSetting is not 0x02")
 
-        if rock_support & self.ROCK_ROUND:
+        if rock_support & Clusters.FanControl.Bitmaps.RockBitmap.kRockRound:
             self.print_step(7, "RockRound is supported, so write 0x04 to RockSetting")
-            await self.write_rock_setting(endpoint=endpoint, rock_setting=self.ROCK_ROUND)
+            await self.write_rock_setting(endpoint=endpoint, rock_setting=Clusters.FanControl.Bitmaps.RockBitmap.kRockRound)
             time.sleep(1)
 
             self.print_step(8, "Read from the DUT the RockSetting attribute")
             rock_setting = await self.read_rock_setting(endpoint=endpoint)
-            asserts.assert_equal(rock_setting, self.ROCK_ROUND, "RockSetting is not 0x04")
+            asserts.assert_equal(rock_setting, Clusters.FanControl.Bitmaps.RockBitmap.kRockRound, "RockSetting is not 0x04")
 
         self.print_step(9, "Write RockSetting to 0x00")
         await self.write_rock_setting(endpoint=endpoint, rock_setting=0x00)

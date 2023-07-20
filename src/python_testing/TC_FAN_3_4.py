@@ -28,9 +28,6 @@ logger = logging.getLogger(__name__)
 
 class TC_FAN_3_4(MatterBaseTest):
 
-    SLEEP_WIND = 0x01
-    NATURAL_WIND = 0x02
-
     async def read_fc_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.FanControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -58,23 +55,23 @@ class TC_FAN_3_4(MatterBaseTest):
         self.print_step(2, "Read from the DUT the WindSupport attribute and store")
         wind_support = await self.read_wind_support(endpoint=endpoint)
 
-        if wind_support & self.SLEEP_WIND:
+        if wind_support & Clusters.FanControl.Bitmaps.WindBitmap.kSleepWind:
             self.print_step(3, "SleepWind is supported, so write 0x01 to WindSetting")
-            await self.write_wind_setting(endpoint=endpoint, wind_setting=self.SLEEP_WIND)
+            await self.write_wind_setting(endpoint=endpoint, wind_setting=Clusters.FanControl.Bitmaps.WindBitmap.kSleepWind)
             time.sleep(1)
 
             self.print_step(4, "Read from the DUT the WindSetting attribute")
             wind_setting = await self.read_wind_setting(endpoint=endpoint)
-            asserts.assert_equal(wind_setting, self.SLEEP_WIND, "WindSetting is not 0x01")
+            asserts.assert_equal(wind_setting, Clusters.FanControl.Bitmaps.WindBitmap.kSleepWind, "WindSetting is not 0x01")
 
-        if wind_support & self.NATURAL_WIND:
+        if wind_support & Clusters.FanControl.Bitmaps.WindBitmap.kNaturalWind:
             self.print_step(5, "NaturalWind is supported, so write 0x02 to WindSetting")
-            await self.write_wind_setting(endpoint=endpoint, wind_setting=self.NATURAL_WIND)
+            await self.write_wind_setting(endpoint=endpoint, wind_setting=Clusters.FanControl.Bitmaps.WindBitmap.kNaturalWind)
             time.sleep(1)
 
             self.print_step(6, "Read from the DUT the WindSetting attribute")
             wind_setting = await self.read_wind_setting(endpoint=endpoint)
-            asserts.assert_equal(wind_setting, self.NATURAL_WIND, "WindSetting is not 0x02")
+            asserts.assert_equal(wind_setting, Clusters.FanControl.Bitmaps.WindBitmap.kNaturalWind, "WindSetting is not 0x02")
 
         self.print_step(9, "Write WindSetting to 0x00")
         await self.write_wind_setting(endpoint=endpoint, wind_setting=0x00)

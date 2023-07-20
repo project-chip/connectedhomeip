@@ -26,10 +26,7 @@ from mobly import asserts
 logger = logging.getLogger(__name__)
 
 
-class TC_FAN_3_4(MatterBaseTest):
-
-    SLEEP_WIND = 0x01
-    NATURAL_WIND = 0x02
+class TC_FAN_3_5(MatterBaseTest):
 
     async def read_fc_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.FanControl
@@ -189,17 +186,17 @@ class TC_FAN_3_4(MatterBaseTest):
                              "SpeedCurrent did not wrap to SpeedMax when wrap was true and lowestOff was false")
 
         # Part 9
-        self.print_step("9a", "TH writes to the DUT the SpeedSetting attribute with the value of 0")
+        self.print_step("9b", "TH writes to the DUT the SpeedSetting attribute with the value of 0")
         await self.write_speed_setting(endpoint=endpoint, speed_setting=0)
 
         time.sleep(1)
 
-        self.print_step("9b", "TH sends Step command to DUT with Direction set to Decrease, Wrap set to True and LowestOff set to True")
+        self.print_step("9c", "TH sends Step command to DUT with Direction set to Decrease, Wrap set to True and LowestOff set to True")
         await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kDecrease, wrap=True, lowestOff=True)
 
         time.sleep(1)
 
-        self.print_step("9c", "Read from the DUT the SpeedCurrent attribute and check its equal to SpeedMax")
+        self.print_step("9d", "Read from the DUT the SpeedCurrent attribute and check its equal to SpeedMax")
         speed_current = await self.read_speed_current(endpoint=endpoint)
         asserts.assert_equal(speed_current, speed_max,
                              "SpeedCurrent did not wrap to SpeedMax when wrap was true and lowestOff was true")
