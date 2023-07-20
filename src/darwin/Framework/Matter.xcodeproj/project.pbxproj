@@ -135,6 +135,7 @@
 		3DFCB32C29678C9500332B35 /* MTRConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DFCB32B29678C9500332B35 /* MTRConversion.h */; };
 		51029DF6293AA6100087AFB0 /* MTROperationalCertificateIssuer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51029DF5293AA6100087AFB0 /* MTROperationalCertificateIssuer.mm */; };
 		510470FB2A2F7DF60053EA7E /* MTRBackwardsCompatShims.mm in Sources */ = {isa = PBXBuildFile; fileRef = 510470FA2A2F7DF60053EA7E /* MTRBackwardsCompatShims.mm */; };
+		510A07492A685D3900A9241C /* Matter.apinotes in Headers */ = {isa = PBXBuildFile; fileRef = 510A07482A685D3900A9241C /* Matter.apinotes */; settings = {ATTRIBUTES = (Public, ); }; };
 		510CECA8297F72970064E0B3 /* MTROperationalCertificateIssuerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 510CECA6297F72470064E0B3 /* MTROperationalCertificateIssuerTests.m */; };
 		5117DD3829A931AE00FFA1AA /* MTROperationalBrowser.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5117DD3629A931AD00FFA1AA /* MTROperationalBrowser.mm */; };
 		5117DD3929A931AE00FFA1AA /* MTROperationalBrowser.h in Headers */ = {isa = PBXBuildFile; fileRef = 5117DD3729A931AE00FFA1AA /* MTROperationalBrowser.h */; };
@@ -436,6 +437,7 @@
 		3DFCB32B29678C9500332B35 /* MTRConversion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRConversion.h; sourceTree = "<group>"; };
 		51029DF5293AA6100087AFB0 /* MTROperationalCertificateIssuer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTROperationalCertificateIssuer.mm; sourceTree = "<group>"; };
 		510470FA2A2F7DF60053EA7E /* MTRBackwardsCompatShims.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRBackwardsCompatShims.mm; sourceTree = "<group>"; };
+		510A07482A685D3900A9241C /* Matter.apinotes */ = {isa = PBXFileReference; lastKnownFileType = text.apinotes; name = Matter.apinotes; path = CHIP/Matter.apinotes; sourceTree = "<group>"; };
 		510CECA6297F72470064E0B3 /* MTROperationalCertificateIssuerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTROperationalCertificateIssuerTests.m; sourceTree = "<group>"; };
 		5117DD3629A931AD00FFA1AA /* MTROperationalBrowser.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTROperationalBrowser.mm; sourceTree = "<group>"; };
 		5117DD3729A931AE00FFA1AA /* MTROperationalBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTROperationalBrowser.h; sourceTree = "<group>"; };
@@ -952,6 +954,7 @@
 		B20252832459E34F00F97062 = {
 			isa = PBXGroup;
 			children = (
+				510A07482A685D3900A9241C /* Matter.apinotes */,
 				BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */,
 				B202528F2459E34F00F97062 /* CHIP */,
 				B202529A2459E34F00F97062 /* CHIPTests */,
@@ -1190,6 +1193,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				510A07492A685D3900A9241C /* Matter.apinotes in Headers */,
 				51EF279F2A2A3EB100E33F75 /* MTRBackwardsCompatShims.h in Headers */,
 				5173A47729C0E2ED00F67F48 /* MTRFabricInfo.h in Headers */,
 				517BF3F0282B62B800A8B7DB /* MTRCertificates.h in Headers */,
