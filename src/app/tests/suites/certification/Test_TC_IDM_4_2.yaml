@@ -112,9 +112,6 @@ tests:
           [1686294932.420822][101362:101364] CHIP:DMG: }
           [1686294932.420834][101362:101364] CHIP:DMG: Subscription established with SubscriptionID = 0xcbbba269 MinInterval = 10s MaxInterval = 2400s Peer = 01:0000000000000001
           [1686294932.420847][101362:101364] CHIP:DMG: MoveToState ReadClient[0x7fc7ec00e400]: Moving to [Subscripti]
-
-
-           MaxInterval and MaxIntervalCeiling are different parameters. One is sent from the TH the other from DUT, verify MaxInterval <=  MaxIntervalCeiling
       disabled: true
 
     - label:
