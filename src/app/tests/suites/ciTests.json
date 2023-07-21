@@ -259,7 +259,8 @@
         "TestCommissioningWindow",
         "TestCommissionerNodeId",
         "TestTimeSynchronization",
-        "TestOperationalState"
+        "TestOperationalState",
+        "TestRVCOperationalState"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
