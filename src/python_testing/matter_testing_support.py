@@ -47,11 +47,11 @@ import chip.CertificateAuthority
 import chip.clusters as Clusters
 import chip.logging
 import chip.native
-from chip.tracing import TracingContext
 from chip.ChipStack import ChipStack
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.interaction_model import InteractionModelError, Status
 from chip.storage import PersistentStorage
+from chip.tracing import TracingContext
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner

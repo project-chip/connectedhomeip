@@ -14,6 +14,7 @@
 #    limitations under the License.
 #
 
+import ctypes
 from enum import Enum
 from typing import Optional
 
