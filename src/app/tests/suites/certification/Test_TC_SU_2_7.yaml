@@ -30,7 +30,7 @@ tests:
 
           Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
 
-          Please use Interactive mode to Verify the subscription of an event 
+          Please use Interactive mode to Verify the subscription of an event
 
           ./chip-tool interactive start
 
@@ -61,7 +61,7 @@ tests:
 
           Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
 
-          Please use Interactive mode to Verify the subscription of an event 
+          Please use Interactive mode to Verify the subscription of an event
           ./chip-tool interactive start
 
           Subscribe to StateTransition event using command
@@ -99,7 +99,7 @@ tests:
 
           Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
 
-          Please use Interactive mode to Verify the subscription of an event 
+          Please use Interactive mode to Verify the subscription of an event
           ./chip-tool interactive start
 
           Subscribe to StateTransition event using command
@@ -133,7 +133,7 @@ tests:
 
           Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
 
-          Please use Interactive mode to Verify the subscription of an event 
+          Please use Interactive mode to Verify the subscription of an event
           ./chip-tool interactive start
 
           Subscribe to StateTransition event using command
@@ -150,14 +150,14 @@ tests:
 
           Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
 
-          Please use Interactive mode to Verify the subscription of an event 
+          Please use Interactive mode to Verify the subscription of an event
           ./chip-tool interactive start
 
           Force an error during the download of the OTA image to the DUT. Wait for the Idle timeout which should be no less than 5 minutes.
 
           otasoftwareupdaterequestor subscribe-event download-error 5 10 321 0 --timeout 65535
 
-          Verify that the OTA-Subscribe(TH) receives a DownloadError event notification on BDX Idle timeout which should be no less than 5 minutes 
+          Verify that the OTA-Subscribe(TH) receives a DownloadError event notification on BDX Idle timeout which should be no less than 5 minutes
           Verify following fields:
            - SoftwareVersion - Set to the value of the SoftwareVersion being downloaded.
            - BytesDownloaded - Number of bytes that have been downloaded.
@@ -193,7 +193,7 @@ tests:
 
           Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
 
-          Please use Interactive mode to Verify the subscription of an event 
+          Please use Interactive mode to Verify the subscription of an event
           ./chip-tool interactive start
 
           Subscribe to StateTransition event using command

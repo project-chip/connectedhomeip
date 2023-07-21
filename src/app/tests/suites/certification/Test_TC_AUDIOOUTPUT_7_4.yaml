@@ -42,8 +42,8 @@ tests:
 
           [1658531363038] [21924:323905] CHIP: [DMG] InvokeRequestMessage =
           [1658531363038] [21924:323905] CHIP: [DMG] {
-          [1658531363038] [21924:323905] CHIP: [DMG]         suppressResponse = false, 
-          [1658531363038] [21924:323905] CHIP: [DMG]         timedRequest = false, 
+          [1658531363038] [21924:323905] CHIP: [DMG]         suppressResponse = false,
+          [1658531363038] [21924:323905] CHIP: [DMG]         timedRequest = false,
           [1658531363038] [21924:323905] CHIP: [DMG]         InvokeRequests =
           [1658531363038] [21924:323905] CHIP: [DMG]         [
           [1658531363038] [21924:323905] CHIP: [DMG]                 CommandDataIB =
@@ -54,16 +54,16 @@ tests:
           [1658531363038] [21924:323905] CHIP: [DMG]                                 ClusterId = 0x50b,
           [1658531363038] [21924:323905] CHIP: [DMG]                                 CommandId = 0x1,
           [1658531363038] [21924:323905] CHIP: [DMG]                         },
-          [1658531363038] [21924:323905] CHIP: [DMG]                         
-          [1658531363038] [21924:323905] CHIP: [DMG]                         CommandFields = 
+          [1658531363038] [21924:323905] CHIP: [DMG]
+          [1658531363038] [21924:323905] CHIP: [DMG]                         CommandFields =
           [1658531363038] [21924:323905] CHIP: [DMG]                         {
-          [1658531363038] [21924:323905] CHIP: [DMG]                                 0x0 = 1, 
-          [1658531363038] [21924:323905] CHIP: [DMG]                                 0x1 = "Kitchen Speakers", 
+          [1658531363038] [21924:323905] CHIP: [DMG]                                 0x0 = 1,
+          [1658531363038] [21924:323905] CHIP: [DMG]                                 0x1 = "Kitchen Speakers",
           [1658531363038] [21924:323905] CHIP: [DMG]                         },
           [1658531363038] [21924:323905] CHIP: [DMG]                 },
-          [1658531363038] [21924:323905] CHIP: [DMG]                 
+          [1658531363038] [21924:323905] CHIP: [DMG]
           [1658531363038] [21924:323905] CHIP: [DMG]         ],
-          [1658531363038] [21924:323905] CHIP: [DMG]         
+          [1658531363038] [21924:323905] CHIP: [DMG]
           [1658531363038] [21924:323905] CHIP: [DMG]         InteractionModelRevision = 1
           [1658531363038] [21924:323905] CHIP: [DMG] },
       disabled: true

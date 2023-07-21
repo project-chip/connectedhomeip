@@ -357,7 +357,7 @@ tests:
           node that is, [Node = Specific, Endpoint = Wildcard, Cluster =
           Wildcard, Event = Wildcard]."
       verification: |
-          any subscribe-event-by-id 0xFFFFFFFF 0xFFFFFFFF 100 1000 1 0xFFFF 
+          any subscribe-event-by-id 0xFFFFFFFF 0xFFFFFFFF 100 1000 1 0xFFFF
           On TH(chip-tool) verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
           [1657456221.167627][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657456221.167698][11635:11640] CHIP:DMG: {
@@ -855,7 +855,7 @@ tests:
           set to Wildcard path where reading an event in the path requires a
           privilege that is not granted for the cluster in the path."
       verification: |
-          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command 
+          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
 
           #1 accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
 
@@ -880,7 +880,7 @@ tests:
       verification: |
           accesscontrol subscribe-event access-control-entry-changed 5 10 1 0   --keepSubscriptions true
 
-          On TH(chip-tool), verify that the Report Data Message with EventReports for event numbers higher than the EventMin field and 
+          On TH(chip-tool), verify that the Report Data Message with EventReports for event numbers higher than the EventMin field and
            Verify that the subsequent ReportData actions as part of the subscription include the latest EventNo associated with each node generating new events
 
 
@@ -1041,7 +1041,7 @@ tests:
           "Step 17: With an active Event subscription from TH to DUT, trigger
           events on DUT multiple times."
       verification: |
-          accesscontrol subscribe-event access-control-entry-changed  20 500 1 0    --keepSubscriptions 1  
+          accesscontrol subscribe-event access-control-entry-changed  20 500 1 0    --keepSubscriptions 1
           On TH(chip-tool) verify that each event number
           [1658405014.975407][4236:4241] CHIP:DMG: }
           [1658405014.975582][4236:4241] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000

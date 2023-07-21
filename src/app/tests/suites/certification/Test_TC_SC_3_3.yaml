@@ -36,13 +36,13 @@ tests:
 
             # 1 Please use Interactive mode to Verify this test cases
             Here the command to enter interactive mode:--
-            ./chip-tool interactive start   --trace_decode 1                        
+            ./chip-tool interactive start   --trace_decode 1
 
-            #2. kill the app(all-clusters-app), by sending below mentioned command 
+            #2. kill the app(all-clusters-app), by sending below mentioned command
             sessionmanagement send-close-session 1 --evict-local-session true
 
-            #3. send a read request from chip-tool 
-            onoff read on-off 1 1  --trace_decode 1                      
+            #3. send a read request from chip-tool
+            onoff read on-off 1 1  --trace_decode 1
 
             In the response of above read request command, please verify the below test steps
       disabled: true
@@ -60,8 +60,8 @@ tests:
           resumptionID
           initiatorResumeMIC
           initiatorEphPubKey
-          initiatorSEDParams - optional flag 
-          And 
+          initiatorSEDParams - optional flag
+          And
           Verify that the message is properly formatted:
 
            I Flag is set to 1
@@ -92,18 +92,18 @@ tests:
           [1683973662.299573][21637:21637] CHIP:DMG:         NeedsAck = true
           [1683973662.299581][21637:21637] CHIP:DMG:     }
           [1683973662.299597][21637:21637] CHIP:DMG: }
-          [1683973662.299605][21637:21637] CHIP:DMG:  
+          [1683973662.299605][21637:21637] CHIP:DMG:
           [1683973662.299620][21637:21637] CHIP:DMG: Encrypted Payload (204 bytes) =
           [1683973662.299628][21637:21637] CHIP:DMG: {
           [1683973662.299637][21637:21637] CHIP:DMG:     data = 04000000a9e8f80940d13ab44ffa79d30530e580000015300120d3e371ae41aeeeefec3ec8088649815c1e8c3a9f698bbc637d22bdff9840c88e2502eda430032072c5aa1f0f616a767207274761c0643407696db926c39fcb1c76a0587889d0a83004410445a43b226ae57e1668e2ce881570b9faffb6467f7cecbefe329604ba7de1864d3ec9b31a749590c2e099450556eb27522de7d89648453a89c74b2c3dfa77a011300610783082d937b2fa2c82593b64d1fc5e183007109a50249022efc01396950e9416cc4beb18
           [1683973662.299651][21637:21637] CHIP:DMG:     buffer_ptr = 94717329512304
           [1683973662.299658][21637:21637] CHIP:DMG: }
-          [1683973662.299666][21637:21637] CHIP:DMG:  
+          [1683973662.299666][21637:21637] CHIP:DMG:
           [1683973662.299682][21637:21637] CHIP:DMG: Decrypted Payload (182 bytes) =
           [1683973662.299690][21637:21637] CHIP:DMG: {
           [1683973662.299697][21637:21637] CHIP:DMG:     data = 15300120d3e371ae41aeeeefec3ec8088649815c1e8c3a9f698bbc637d22bdff9840c88e2502eda430032072c5aa1f0f616a767207274761c0643407696db926c39fcb1c76a0587889d0a83004410445a43b226ae57e1668e2ce881570b9faffb6467f7cecbefe329604ba7de1864d3ec9b31a749590c2e099450556eb27522de7d89648453a89c74b2c3dfa77a011300610783082d937b2fa2c82593b64d1fc5e183007109a50249022efc01396950e9416cc4beb18
           [1683973662.299710][21637:21637] CHIP:DMG: }
-          [1683973662.299719][21637:21637] CHIP:DMG:  
+          [1683973662.299719][21637:21637] CHIP:DMG:
           [1683973662.299759][21637:21637] CHIP:DMG: Parameters =
           [1683973662.299766][21637:21637] CHIP:DMG: {
           [1683973662.299780][21637:21637] CHIP:DMG:     InitiatorRandom (32) = D3E371AE41AEEEEFEC3EC8088649815C1E8C3A9F698BBC637D22BDFF9840C88E
@@ -113,13 +113,13 @@ tests:
           [1683973662.299830][21637:21637] CHIP:DMG:     ResumptionID (16) = 783082D937B2FA2C82593B64D1FC5E18
           [1683973662.299842][21637:21637] CHIP:DMG:     InitiatorResumeMIC (16) = 9A50249022EFC01396950E9416CC4BEB
           [1683973662.299853][21637:21637] CHIP:DMG: }
-          [1683973662.299861][21637:21637] CHIP:DMG:  
-          [1683973662.299871][21637:21637] CHIP:DMG:  
+          [1683973662.299861][21637:21637] CHIP:DMG:
+          [1683973662.299871][21637:21637] CHIP:DMG:
           [1683973662.299890][21637:21637] CHIP:DMG: Additional Fields =
           [1683973662.299898][21637:21637] CHIP:DMG: {
           [1683973662.299907][21637:21637] CHIP:DMG:     peer_address = UDP:[fe80::e9f6:2c08:2794:357d%wlp0s20f3]:41363
           [1683973662.299915][21637:21637] CHIP:DMG: }
-          [1683973662.299922][21637:21637] CHIP:DMG:  
+          [1683973662.299922][21637:21637] CHIP:DMG:
           [1683973662.299943][21637:21637] CHIP:EM: >>> [E:32997r S:0 M:167307433] (U) Msg RX from 0:D379FA4FB43AD140 [0000] --- Type 0000:30 (SecureChannel:CASE_Sigma1)
       disabled: true
 
@@ -149,31 +149,31 @@ tests:
           [1683973662.301497][21648:21650] CHIP:DMG:         NeedsAck = true
           [1683973662.301502][21648:21650] CHIP:DMG:     }
           [1683973662.301513][21648:21650] CHIP:DMG: }
-          [1683973662.301521][21648:21650] CHIP:DMG:  
+          [1683973662.301521][21648:21650] CHIP:DMG:
           [1683973662.301531][21648:21650] CHIP:DMG: Encrypted Payload (70 bytes) =
           [1683973662.301537][21648:21650] CHIP:DMG: {
           [1683973662.301543][21648:21650] CHIP:DMG:     data = 01000000a697c20640d13ab44ffa79d30633e5800000a9e8f809153001108927f63ba4091ee14da61e238cccf5bc30021079fec088dac734a0be8c0ee0bf9145a72503b00218
           [1683973662.301551][21648:21650] CHIP:DMG:     buffer_ptr = 140651656201648
           [1683973662.301557][21648:21650] CHIP:DMG: }
-          [1683973662.301562][21648:21650] CHIP:DMG:  
+          [1683973662.301562][21648:21650] CHIP:DMG:
           [1683973662.301574][21648:21650] CHIP:DMG: Decrypted Payload (44 bytes) =
           [1683973662.301580][21648:21650] CHIP:DMG: {
           [1683973662.301586][21648:21650] CHIP:DMG:     data = 153001108927f63ba4091ee14da61e238cccf5bc30021079fec088dac734a0be8c0ee0bf9145a72503b00218
           [1683973662.301592][21648:21650] CHIP:DMG: }
-          [1683973662.301599][21648:21650] CHIP:DMG:  
+          [1683973662.301599][21648:21650] CHIP:DMG:
           [1683973662.301619][21648:21650] CHIP:DMG: Parameters =
           [1683973662.301624][21648:21650] CHIP:DMG: {
           [1683973662.301632][21648:21650] CHIP:DMG:     ResumptionID (16) = 8927F63BA4091EE14DA61E238CCCF5BC
           [1683973662.301640][21648:21650] CHIP:DMG:     Sigma2ResumeMIC (16) = 79FEC088DAC734A0BE8C0EE0BF9145A7
           [1683973662.301647][21648:21650] CHIP:DMG:     ResponderSessionId = 688
           [1683973662.301654][21648:21650] CHIP:DMG: }
-          [1683973662.301662][21648:21650] CHIP:DMG:  
-          [1683973662.301668][21648:21650] CHIP:DMG:  
+          [1683973662.301662][21648:21650] CHIP:DMG:
+          [1683973662.301668][21648:21650] CHIP:DMG:
           [1683973662.301680][21648:21650] CHIP:DMG: Additional Fields =
           [1683973662.301686][21648:21650] CHIP:DMG: {
           [1683973662.301693][21648:21650] CHIP:DMG:     peer_address = UDP:[fe80::e9f6:2c08:2794:357d%wlp0s20f3]:5540
           [1683973662.301699][21648:21650] CHIP:DMG: }
-          [1683973662.301705][21648:21650] CHIP:DMG:  
+          [1683973662.301705][21648:21650] CHIP:DMG:
           [1683973662.301717][21648:21650] CHIP:EM: >>> [E:32997i S:0 M:113416102 (Ack:167307433)] (U) Msg RX from 0:0000000000000000 [0000] --- Type 0000:33 (SecureChannel:CASE_Sigma2Resume)
           [1683973662.301729][21648:21650] CHIP:EM: Found matching exchange: 32997i, Delegate: 0x7fec0400dc28
           [1683973662.301745][21648:21650] CHIP:EM: Rxd Ack; Removing MessageCounter:167307433 from Retrans Table on exchange 32997i
@@ -193,20 +193,20 @@ tests:
           [1683973662.304419][21637:21637] CHIP:DMG: {
           [1683973662.304428][21637:21637] CHIP:DMG:     data = 0000000000000000
           [1683973662.304436][21637:21637] CHIP:DMG: }
-          [1683973662.304443][21637:21637] CHIP:DMG:  
+          [1683973662.304443][21637:21637] CHIP:DMG:
           [1683973662.304456][21637:21637] CHIP:DMG: Parameters =
           [1683973662.304465][21637:21637] CHIP:DMG: {
           [1683973662.304472][21637:21637] CHIP:DMG:     GeneralStatusCode = 0
           [1683973662.304479][21637:21637] CHIP:DMG:     ProtocolId = 0
           [1683973662.304486][21637:21637] CHIP:DMG:     ProtocolCode = 0
           [1683973662.304494][21637:21637] CHIP:DMG: }
-          [1683973662.304499][21637:21637] CHIP:DMG:  
-          [1683973662.304507][21637:21637] CHIP:DMG:  
+          [1683973662.304499][21637:21637] CHIP:DMG:
+          [1683973662.304507][21637:21637] CHIP:DMG:
           [1683973662.304522][21637:21637] CHIP:DMG: Additional Fields =
           [1683973662.304528][21637:21637] CHIP:DMG: {
           [1683973662.304533][21637:21637] CHIP:DMG:     peer_address = UDP:[fe80::e9f6:2c08:2794:357d%wlp0s20f3]:41363
           [1683973662.304538][21637:21637] CHIP:DMG: }
-          [1683973662.304541][21637:21637] CHIP:DMG:  
+          [1683973662.304541][21637:21637] CHIP:DMG:
           [1683973662.304552][21637:21637] CHIP:EM: >>> [E:32997r S:0 M:167307434 (Ack:113416102)] (U) Msg RX from 0:D379FA4FB43AD140 [0000] --- Type 0000:40 (SecureChannel:StatusReport)
           [1683973662.304563][21637:21637] CHIP:EM: Found matching exchange: 32997r, Delegate: 0x56251895ef18
           [1683973662.304580][21637:21637] CHIP:EM: Rxd Ack; Removing MessageCounter:113416102 from Retrans Table on exchange 32997r
@@ -226,20 +226,20 @@ tests:
           [1683973662.304419][21637:21637] CHIP:DMG: {
           [1683973662.304428][21637:21637] CHIP:DMG:     data = 0000000000000000
           [1683973662.304436][21637:21637] CHIP:DMG: }
-          [1683973662.304443][21637:21637] CHIP:DMG:  
+          [1683973662.304443][21637:21637] CHIP:DMG:
           [1683973662.304456][21637:21637] CHIP:DMG: Parameters =
           [1683973662.304465][21637:21637] CHIP:DMG: {
           [1683973662.304472][21637:21637] CHIP:DMG:     GeneralStatusCode = 0
           [1683973662.304479][21637:21637] CHIP:DMG:     ProtocolId = 0
           [1683973662.304486][21637:21637] CHIP:DMG:     ProtocolCode = 0
           [1683973662.304494][21637:21637] CHIP:DMG: }
-          [1683973662.304499][21637:21637] CHIP:DMG:  
-          [1683973662.304507][21637:21637] CHIP:DMG:  
+          [1683973662.304499][21637:21637] CHIP:DMG:
+          [1683973662.304507][21637:21637] CHIP:DMG:
           [1683973662.304522][21637:21637] CHIP:DMG: Additional Fields =
           [1683973662.304528][21637:21637] CHIP:DMG: {
           [1683973662.304533][21637:21637] CHIP:DMG:     peer_address = UDP:[fe80::e9f6:2c08:2794:357d%wlp0s20f3]:41363
           [1683973662.304538][21637:21637] CHIP:DMG: }
-          [1683973662.304541][21637:21637] CHIP:DMG:  
+          [1683973662.304541][21637:21637] CHIP:DMG:
           [1683973662.304552][21637:21637] CHIP:EM: >>> [E:32997r S:0 M:167307434 (Ack:113416102)] (U) Msg RX from 0:D379FA4FB43AD140 [0000] --- Type 0000:40 (SecureChannel:StatusReport)
           [1683973662.304563][21637:21637] CHIP:EM: Found matching exchange: 32997r, Delegate: 0x56251895ef18
           [1683973662.304580][21637:21637] CHIP:EM: Rxd Ack; Removing MessageCounter:113416102 from Retrans Table on exchange 32997r

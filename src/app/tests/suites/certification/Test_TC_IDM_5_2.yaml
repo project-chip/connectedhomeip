@@ -80,7 +80,7 @@ tests:
 
 
            By sending a ReadRequest that the Write action was performed correctly.
-          ./chip-tool levelcontrol read on-level 1 1 
+          ./chip-tool levelcontrol read on-level 1 1
           [1655799013.466144][7075:7080] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 737039642
           [1655799013.466237][7075:7080] CHIP:TOO:   on level: 1
           [1655799013.466336][7075:7080] CHIP:EM: Sending Standalone Ack for MessageCounter:202402347 on exchange 58038i

@@ -57,7 +57,7 @@ tests:
       verification: |
           1. Follow DUT vendor-specific steps to put DUT into commissioning mode
 
-          2. Verify DUT is advertising in commissioning mode. On DUT, 
+          2. Verify DUT is advertising in commissioning mode. On DUT,
 
           For devices already on the network:
             ./chip-tool discover commissionables
@@ -78,9 +78,9 @@ tests:
 
 
           For devices not on the network (i.e. BLE discovery):
-          1. Discover commissionables over BLE using a BLE discovery tool of choice. 
-          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop) 
-          OR 
+          1. Discover commissionables over BLE using a BLE discovery tool of choice.
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
+          OR
           HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
           Observe the DUT advertising in a commissionable state
       disabled: true

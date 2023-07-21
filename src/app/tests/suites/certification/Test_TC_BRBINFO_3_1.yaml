@@ -33,12 +33,12 @@ tests:
       PICS: BRBINFO.S.A0014
       verification: |
           ./chip-tool bridgeddevicebasicinformation read product-appearance 1 3
-           
-          Via the TH (chip-tool), verify that the ProductAppearance attribute value is in ProductAppearanceStruct Finish value is in range 0-5. 
+
+          Via the TH (chip-tool), verify that the ProductAppearance attribute value is in ProductAppearanceStruct Finish value is in range 0-5.
 
           Current sample apps do not have this implementation. However, if the vendor has implemented it, the below response will be displayed.
 
-           
+
            [1685008885.082338][143325:143327] CHIP:DMG: }
            [1685008885.082831][143325:143327] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0014 DataVersion: 106877633
            [1685008885.083153][143325:143327] CHIP:TOO: ProductAppearance: {
@@ -51,9 +51,9 @@ tests:
       PICS: BRBINFO.S.A0014
       verification: |
           ./chip-tool bridgeddevicebasicinformation read product-appearance 1 3
-           
+
           Via the TH (chip-tool), verify that the ProductAppearance attribute value is in ProductAppearanceStruct PrimaryColor is in range 0-20.
-           
+
           Current sample apps do not have this implementation. However, if the vendor has implemented it, the below response will be displayed.
 
            [1685008885.082338][143325:143327] CHIP:DMG: }
@@ -68,11 +68,11 @@ tests:
       PICS: BRBINFO.S.A0014
       verification: |
           Vendor specific test-step
-           
+
            Below is an example log (chip-tool) by assuming the PIXIT.BRBINFO.Finish is satin(2). So This should be verified by the vendor as per the PIXIT values provided.
-           
+
            ./chip-tool bridgeddevicebasicinformation read product-appearance 1 3
-           
+
            Via the TH (chip-tool), verify the TH reads ProductAppearance attribute from the DUT successfully.
 
            [1685008885.082338][143325:143327] CHIP:DMG: }
@@ -87,13 +87,13 @@ tests:
       PICS: BRBINFO.S.A0014
       verification: |
           Vendor specific test-step
-           
+
            Below is an example log (chip-tool) by assuming the PIXIT.BRBINFO.PrimaryColor is purple(5). So This should be verified by the vendor as per the PIXIT values provided.
-           
+
            ./chip-tool bridgeddevicebasicinformation read product-appearance 1 3
-           
+
            Via the TH (chip-tool), verify the TH reads ProductAppearance attribute from the DUT successfully.
-           
+
            [1685008885.082338][143325:143327] CHIP:DMG: }
            [1685008885.082831][143325:143327] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0014 DataVersion: 106877633
            [1685008885.083153][143325:143327] CHIP:TOO: ProductAppearance: {

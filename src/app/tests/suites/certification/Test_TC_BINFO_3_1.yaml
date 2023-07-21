@@ -29,8 +29,8 @@ tests:
       verification: |
           ./chip-tool basicinformation read product-appearance 1 0
 
-          On TH Verify that, TH reads ProductAppearance attribute from the DUT successfully and  the value is in ProductAppearanceStruct  Finish value is in range 0-5 
-           
+          On TH Verify that, TH reads ProductAppearance attribute from the DUT successfully and  the value is in ProductAppearanceStruct  Finish value is in range 0-5
+
 
           [1685008885.082338][143325:143327] CHIP:DMG: }
           [1685008885.082831][143325:143327] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0014 DataVersion: 106877633
@@ -45,7 +45,7 @@ tests:
       verification: |
           ./chip-tool basicinformation read product-appearance 1 0
 
-          On TH Verify that, TH reads ProductAppearance attribute from the DUT successfully and  the value is in ProductAppearanceStruct PrimaryColor is in range 0-20 
+          On TH Verify that, TH reads ProductAppearance attribute from the DUT successfully and  the value is in ProductAppearanceStruct PrimaryColor is in range 0-20
 
 
           [1685008885.082338][143325:143327] CHIP:DMG: }
@@ -65,7 +65,7 @@ tests:
 
           ./chip-tool basicinformation read product-appearance 1 0
 
-          On TH Verify that, TH reads ProductAppearance attribute from the DUT successfully 
+          On TH Verify that, TH reads ProductAppearance attribute from the DUT successfully
 
 
           [1685008885.082338][143325:143327] CHIP:DMG: }
@@ -85,7 +85,7 @@ tests:
 
           ./chip-tool basicinformation read product-appearance 1 0
 
-          On TH Verify that, TH reads ProductAppearance attribute from the DUT successfully 
+          On TH Verify that, TH reads ProductAppearance attribute from the DUT successfully
 
 
           [1685008885.082338][143325:143327] CHIP:DMG: }

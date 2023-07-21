@@ -26,7 +26,7 @@ config:
 tests:
     - label: "Note"
       verification: |
-          1.To run this test case build the OTA Provider app to be build in the nRF Environment setup . Follow this step to setup the nRF build environment using container. 
+          1.To run this test case build the OTA Provider app to be build in the nRF Environment setup . Follow this step to setup the nRF build environment using container.
           https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/nrfconnect#using-docker-container-for-setup
 
           Once the build  environmnet is ready , build teh OTA-Provider-App inside the container. Follow the below link to build the OTA-Provider app
@@ -34,13 +34,13 @@ tests:
 
           2. Build all-cluster-app in docker  or Flash the pre-built folder from the delivered image
 
-          To build maually and flash follow steps explained in: 
-          https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/nrfconnect#building 
+          To build maually and flash follow steps explained in:
+          https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/nrfconnect#building
 
           west build -b nrf52840dk_nrf52840 -- -DCONF_FILE=prj_dfu.conf -DCONFIG_CHIP_LIB_SHELL=y
 
 
-          3.Flash 
+          3.Flash
           west flash --erase
 
           4.OTA Image needs to build on the docker environment as like in the first step inside the all-clusters-app folder.  Refer the below link to build the OTA image with new version.

@@ -49,11 +49,11 @@ tests:
           BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 180 1 0 --timedInteractionTimeoutMs 1000 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 180 1 0 --timedInteractionTimeoutMs 1000
 
 
           Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
@@ -90,7 +90,7 @@ tests:
           PIXIT.CADMIN.CwDuration (that was given in step 2) + 10 seconds"
       PICS: CADMIN.C
       verification: |
-          On TH_CR2 send the below command  
+          On TH_CR2 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
@@ -111,11 +111,11 @@ tests:
           using BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool administratorcommissioning  open-basic-commissioning-window 500 1 0  --timedInteractionTimeoutMs 1000 
+          ./chip-tool administratorcommissioning  open-basic-commissioning-window 500 1 0  --timedInteractionTimeoutMs 1000
 
           Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
@@ -129,7 +129,7 @@ tests:
           window"
       PICS: CADMIN.C.C02.Tx
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
@@ -145,11 +145,11 @@ tests:
     - label: "Step 7: TH_CR2 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
-          On TH_CR2 send the below command  
+          On TH_CR2 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta 
+          ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta
 
           verify you got the following message in the TH_CR2(CHIP-TOOL) log
 
@@ -163,7 +163,7 @@ tests:
           window"
       PICS: CADMIN.C.C02.Tx
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
@@ -182,11 +182,11 @@ tests:
           Information Clusters NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool  basicinformation write node-label te5new 1 0 
+          ./chip-tool  basicinformation write node-label te5new 1 0
 
           Verify Write request on TH_CE(all-clusters-app) Log
 
@@ -195,8 +195,8 @@ tests:
           [1660894021.901484][2871:2871] CHIP:DMG: IM WH moving to [Initialized]
           [1660894021.901613][2871:2871] CHIP:DMG: WriteRequestMessage =
           [1660894021.901676][2871:2871] CHIP:DMG: {
-          [1660894021.901735][2871:2871] CHIP:DMG:         suppressResponse = false, 
-          [1660894021.901802][2871:2871] CHIP:DMG:         timedRequest = false, 
+          [1660894021.901735][2871:2871] CHIP:DMG:         suppressResponse = false,
+          [1660894021.901802][2871:2871] CHIP:DMG:         timedRequest = false,
           [1660894021.901864][2871:2871] CHIP:DMG:         AttributeDataIBs =
           [1660894021.901940][2871:2871] CHIP:DMG:         [
           [1660894021.902001][2871:2871] CHIP:DMG:                 AttributeDataIB =
@@ -207,11 +207,11 @@ tests:
           [1660894021.902394][2871:2871] CHIP:DMG:                                 Cluster = 0x28,
           [1660894021.902488][2871:2871] CHIP:DMG:                                 Attribute = 0x0000_0005,
           [1660894021.902574][2871:2871] CHIP:DMG:                         }
-          [1660894021.902827][2871:2871] CHIP:DMG:                                 
-          [1660894021.902912][2871:2871] CHIP:DMG:                         Data = "te5new" (6 chars), 
+          [1660894021.902827][2871:2871] CHIP:DMG:
+          [1660894021.902912][2871:2871] CHIP:DMG:                         Data = "te5new" (6 chars),
           [1660894021.902985][2871:2871] CHIP:DMG:                 },
 
-          ./chip-tool  basicinformation read node-label 1 0 
+          ./chip-tool  basicinformation read node-label 1 0
 
           Verify read request on TH_CE(all-clusters-app) Log
 
@@ -237,11 +237,11 @@ tests:
           using BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
           Verify the Commissioning window is opened in TH_CE(all-clusters-app) Log
 
@@ -253,20 +253,20 @@ tests:
     - label: "Step 11: TH_CR2 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
-          On TH_CR2 send the below command  
+          On TH_CR2 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
           ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta
 
-           Verify whether you got below message in the log of TH_CR2(CHIP-TOOL) 
+           Verify whether you got below message in the log of TH_CR2(CHIP-TOOL)
           Device commissioning completed with success
       disabled: true
 
     - label: "Step 12: TH_CR3 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
-          On TH_CR3 send the below command  
+          On TH_CR3 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 

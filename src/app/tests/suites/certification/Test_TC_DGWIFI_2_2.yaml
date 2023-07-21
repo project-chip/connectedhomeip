@@ -65,7 +65,7 @@ tests:
 
            CHIP:DMG: ReportDataMessage =
           [1651574380.297222][8941:8946] CHIP:DMG: {
-          [1651574380.297245][8941:8946] CHIP:DMG:         SuppressResponse = true, 
+          [1651574380.297245][8941:8946] CHIP:DMG:         SuppressResponse = true,
           [1651574380.297270][8941:8946] CHIP:DMG:         InteractionModelRevision = 1
           [1651574380.297293][8941:8946] CHIP:DMG: }
           [1651574380.297374][8941:8946] CHIP:EM: Sending Standalone Ack for MessageCounter:12534430 on exchange 15170i

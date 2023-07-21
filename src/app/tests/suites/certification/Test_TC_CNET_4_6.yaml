@@ -51,7 +51,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning add-or-update-thread-network-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
           ./chip-tool networkcommissioning add-or-update-thread-network hex:1011101122222229 51 0
 
@@ -70,7 +70,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
           ./chip-tool networkcommissioning remove-network hex:1011101122222229 51 0
 
@@ -89,7 +89,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
           ./chip-tool networkcommissioning connect-network hex:1011101122222229 51 0
 

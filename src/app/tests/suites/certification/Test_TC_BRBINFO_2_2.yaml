@@ -42,7 +42,7 @@ tests:
           factory new) TH receives the StartUp event from DUT"
       PICS: BRBINFO.S.E00
       verification: |
-          StartUp is an optional Event - 
+          StartUp is an optional Event -
           As its an optional event we cannot generate the event as of now , hence no example logs provided.
 
 
@@ -59,7 +59,7 @@ tests:
           To verify that  the  ReachableChanged follow the below procedure
 
           1. ./chip-tool interactive start
-          2. bridgeddevicebasicinformation subscribe reachable 1 60 1 4 
+          2. bridgeddevicebasicinformation subscribe reachable 1 60 1 4
           3. press 'u' on bridge-app to change reachable to false for endpoint 4 and see the reachable value has been changed compared with precondition
 
           [1659441181.388547][2392:2397] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_0039 Attribute 0x0000_0011 DataVersion: 2189020906

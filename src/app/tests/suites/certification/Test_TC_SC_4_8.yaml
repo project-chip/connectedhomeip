@@ -106,7 +106,7 @@ tests:
           "Step 3: Send RemoveFabric from DUT to TH1 and commission DUT to TH1
           again"
       verification: |
-          Send RemoveFabric command  from DUT to TH1 
+          Send RemoveFabric command  from DUT to TH1
 
           ./chip-tool operationalcredentials remove-fabric 1 1 0
           [1686293276.612334][64862:64862] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)

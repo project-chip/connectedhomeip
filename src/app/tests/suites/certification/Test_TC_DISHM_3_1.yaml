@@ -116,7 +116,7 @@ tests:
 
           On TH(chip-tool) log, verify DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
 
-          [1684931013.571019][20667:20669] CHIP:DMG: 
+          [1684931013.571019][20667:20669] CHIP:DMG:
           [1684931013.571021][20667:20669] CHIP:DMG: StatusIB =
           [1684931013.571024][20667:20669] CHIP:DMG: {
           [1684931013.571027][20667:20669] CHIP:DMG: status = 0x00 (SUCCESS),

@@ -38,7 +38,7 @@ tests:
 
           If the DUT knows the MajorNumber and MinorNumber in channel InputList then those can be sent as the argument. Else User needs to execute the following command to know the MajorNumber and MinorNumber to change the channel
 
-           ./chip-tool channel read channel-list 1 1 
+           ./chip-tool channel read channel-list 1 1
 
           By sending above command user can select the MajorNumber and MinorNumber instead of 9 1 which are listed in chanel list.
 
@@ -50,8 +50,8 @@ tests:
 
           [1661515240.201737][4433:4433] CHIP:DMG: InvokeRequestMessage =
           [1661515240.201782][4433:4433] CHIP:DMG: {
-          [1661515240.201816][4433:4433] CHIP:DMG:         suppressResponse = false, 
-          [1661515240.201855][4433:4433] CHIP:DMG:         timedRequest = false, 
+          [1661515240.201816][4433:4433] CHIP:DMG:         suppressResponse = false,
+          [1661515240.201855][4433:4433] CHIP:DMG:         timedRequest = false,
           [1661515240.201975][4433:4433] CHIP:DMG:         InvokeRequests =
           [1661515240.202024][4433:4433] CHIP:DMG:         [
           [1661515240.202060][4433:4433] CHIP:DMG:                 CommandDataIB =
@@ -62,16 +62,16 @@ tests:
           [1661515240.202294][4433:4433] CHIP:DMG:                                 ClusterId = 0x504,
           [1661515240.202338][4433:4433] CHIP:DMG:                                 CommandId = 0x2,
           [1661515240.202382][4433:4433] CHIP:DMG:                         },
-          [1661515240.202436][4433:4433] CHIP:DMG:                         
-          [1661515240.202477][4433:4433] CHIP:DMG:                         CommandFields = 
+          [1661515240.202436][4433:4433] CHIP:DMG:
+          [1661515240.202477][4433:4433] CHIP:DMG:                         CommandFields =
           [1661515240.202523][4433:4433] CHIP:DMG:                         {
-          [1661515240.202571][4433:4433] CHIP:DMG:                                 0x0 = 9, 
-          [1661515240.202619][4433:4433] CHIP:DMG:                                 0x1 = 1, 
+          [1661515240.202571][4433:4433] CHIP:DMG:                                 0x0 = 9,
+          [1661515240.202619][4433:4433] CHIP:DMG:                                 0x1 = 1,
           [1661515240.202671][4433:4433] CHIP:DMG:                         },
           [1661515240.202712][4433:4433] CHIP:DMG:                 },
-          [1661515240.202753][4433:4433] CHIP:DMG:                 
+          [1661515240.202753][4433:4433] CHIP:DMG:
           [1661515240.202786][4433:4433] CHIP:DMG:         ],
-          [1661515240.202827][4433:4433] CHIP:DMG:         
+          [1661515240.202827][4433:4433] CHIP:DMG:
           [1661515240.202860][4433:4433] CHIP:DMG:         InteractionModelRevision = 1
           [1661515240.202892][4433:4433] CHIP:DMG: },
           [1661515240.202975][4433:4433] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_0504 e=1 p=o

@@ -36,9 +36,9 @@ tests:
 
           Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
 
-          On the OTA Requestor log,  
+          On the OTA Requestor log,
           Verify DUT sends a QueryImageResponse with following fields:
-          Status - UpdateAvailable 
+          Status - UpdateAvailable
           DelayedActionTime if present should be of type uint32.
           ImageURI - contain a URI where the OTA Requestor SHOULD download a Software Image
           SoftwareVersion is the same as the new software image version.

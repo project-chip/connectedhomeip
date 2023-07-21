@@ -53,7 +53,7 @@ tests:
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 1, "groupKeySetID": 1, "fabricIndex": 1}]' 1 0
 
           [1688019387.509419][1710:1712] CHIP:DMG:                         }
-          [1688019387.509461][1710:1712] CHIP:DMG:                                 
+          [1688019387.509461][1710:1712] CHIP:DMG:
           [1688019387.509497][1710:1712] CHIP:DMG:                         StatusIB =
           [1688019387.509534][1710:1712] CHIP:DMG:                         {
           [1688019387.509572][1710:1712] CHIP:DMG:                                 status = 0x00 (SUCCESS),
@@ -66,7 +66,7 @@ tests:
           ./chip-tool groups remove-all-groups 1 1
 
           [1688019423.251477][1716:1718] CHIP:DMG: 				},
-          [1688019423.251524][1716:1718] CHIP:DMG: 				
+          [1688019423.251524][1716:1718] CHIP:DMG:
           [1688019423.251561][1716:1718] CHIP:DMG: 				StatusIB =
           [1688019423.251602][1716:1718] CHIP:DMG: 				{
           [1688019423.251643][1716:1718] CHIP:DMG: 					status = 0x00 (SUCCESS),
@@ -137,14 +137,14 @@ tests:
           [1688019515.542230][1731:1733] CHIP:DMG: 					Cluster = 0x5,
           [1688019515.542273][1731:1733] CHIP:DMG: 					Attribute = 0x0000_0007,
           [1688019515.542313][1731:1733] CHIP:DMG: 				}
-          [1688019515.542355][1731:1733] CHIP:DMG: 					
-          [1688019515.542396][1731:1733] CHIP:DMG: 				Data = 0, 
+          [1688019515.542355][1731:1733] CHIP:DMG:
+          [1688019515.542396][1731:1733] CHIP:DMG: 				Data = 0,
           [1688019515.542433][1731:1733] CHIP:DMG: 			},
-          [1688019515.542474][1731:1733] CHIP:DMG: 			
+          [1688019515.542474][1731:1733] CHIP:DMG:
           [1688019515.542507][1731:1733] CHIP:DMG: 		},
-          [1688019515.542546][1731:1733] CHIP:DMG: 		
+          [1688019515.542546][1731:1733] CHIP:DMG:
           [1688019515.542575][1731:1733] CHIP:DMG: 	],
-          [1688019515.542614][1731:1733] CHIP:DMG: 	
+          [1688019515.542614][1731:1733] CHIP:DMG:
           [1688019515.542644][1731:1733] CHIP:DMG: 	InteractionModelRevision = 1
           [1688019515.542673][1731:1733] CHIP:DMG: }
           [1688019515.542841][1731:1733] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 1550229741
@@ -277,7 +277,7 @@ tests:
           field set to 0x0001."
       PICS: S.S.C03.Rsp
       verification: |
-          ./chip-tool scenes remove-all-scenes 0x0001 1 1 
+          ./chip-tool scenes remove-all-scenes 0x0001 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0003
           CHIP:TOO:   RemoveAllScenesResponse: {
@@ -305,7 +305,7 @@ tests:
           ./chip-tool groupkeymanagement key-set-remove 1 1 0
 
           [1688019719.867880][1746:1748] CHIP:DMG: 				},
-          [1688019719.867923][1746:1748] CHIP:DMG: 				
+          [1688019719.867923][1746:1748] CHIP:DMG:
           [1688019719.867956][1746:1748] CHIP:DMG: 				StatusIB =
           [1688019719.867995][1746:1748] CHIP:DMG: 				{
           [1688019719.868033][1746:1748] CHIP:DMG: 					status = 0x00 (SUCCESS),

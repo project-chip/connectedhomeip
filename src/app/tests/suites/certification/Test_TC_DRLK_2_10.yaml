@@ -268,7 +268,7 @@ tests:
     - label: "Step 3e: TH reads the LockOperation event from DUT"
       PICS: DRLK.S.E02
       verification: |
-          Note : This step can be validated in STEP 3d chip-tool log 
+          Note : This step can be validated in STEP 3d chip-tool log
 
           Via the TH (chip-tool), verify that the:
           -LockOperationType value as 1(Unlock).

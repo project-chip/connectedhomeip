@@ -54,7 +54,7 @@ tests:
       verification: |
           ./chip-tool modeselect read start-up-mode 1 1
 
-          On TH(chip-tool) log, Verify DUT response is an integer. 
+          On TH(chip-tool) log, Verify DUT response is an integer.
           - Record this value for usage in step 2,  below is the sample log provided for the raspi platform:
 
           [1651099663211] [82177:7560652] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004 DataVersion: 2609052118
@@ -89,7 +89,7 @@ tests:
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          On TH(chip-tool) log, Verify DUT response contains a list of supported modes 
+          On TH(chip-tool) log, Verify DUT response contains a list of supported modes
           Save the Mode values for usage in step 2d,  below is the sample log provided for the raspi platform:
 
           [1685020074.437287][16950:16952] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 3898153349
@@ -164,7 +164,7 @@ tests:
       verification: |
           ./chip-tool modeselect read on-mode 1 1
 
-          On TH(chip-tool) log, Verify OnMode attribute value is an integer. 
+          On TH(chip-tool) log, Verify OnMode attribute value is an integer.
           Save the value and below is the sample log provided for the raspi platform:
 
           [1669190858.739158][4187:4189] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4107771634

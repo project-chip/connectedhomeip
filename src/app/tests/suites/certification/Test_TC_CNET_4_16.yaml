@@ -47,7 +47,7 @@ tests:
           [1650392597.976363][10152:10157] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1650392597.976539][10152:10157] CHIP:TOO:   ArmFailSafeResponse: {
           [1650392597.976665][10152:10157] CHIP:TOO:     errorCode: 0
-          [1650392597.976729][10152:10157] CHIP:TOO:     debugText: 
+          [1650392597.976729][10152:10157] CHIP:TOO:     debugText:
           [1650392597.976785][10152:10157] CHIP:TOO:    }
           [1650392597.976874][10152:10157] CHIP:DMG: ICR moving to [AwaitingDe]
           [1650392597.976987][10152:10157] CHIP:EM: Sending Standalone Ack for MessageCounter:10494017 on exchange 14665i
@@ -62,7 +62,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
           ./chip-tool networkcommissioning remove-network 2111111122222222 54 0
 
@@ -90,7 +90,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
           ./chip-tool networkcommissioning connect-network 47524C50726976617465 54 0
 

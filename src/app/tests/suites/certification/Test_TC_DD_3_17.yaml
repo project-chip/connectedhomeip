@@ -61,7 +61,7 @@ tests:
           Commissionee to the DUT in any format supported by DUT"
       verification: |
           Verify in TH (All-cluster-app):
-          ./chip-all-clusters-app 
+          ./chip-all-clusters-app
 
           [1657203632.334400][13827:13827] CHIP:DL: Device Configuration:
           [1657203632.334663][13827:13827] CHIP:DL:   Serial Number: (not set)
@@ -261,10 +261,10 @@ tests:
           a new manual code using all the same Onboarding Payload components and
           one Test VENDOR_ID from the list: 0xFFF1, 0xFFF2, 0xFFF3, 0xFFF4"
       verification: |
-          1. Use this as an example of how to generate a manual code with an invalid vendor IDs 
+          1. Use this as an example of how to generate a manual code with an invalid vendor IDs
           Verify in DUT (Chip-tool):
 
-           ./chip-tool payload generate-manualcode --discriminator 3840 --setup-pin-code 20202021 --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 1 
+           ./chip-tool payload generate-manualcode --discriminator 3840 --setup-pin-code 20202021 --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 1
           [1651189120686] [14218:398626] CHIP: [TOO] Manual Code: 749701123365521327694
       disabled: true
 
@@ -329,7 +329,7 @@ tests:
       verification: |
           Verify in DUT (Chip-tool):
             ./chip-tool pairing code 1 749701123365521000006
-           
+
           [1657239565895] [32193:16881922] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:55: CHIP Error 0x0000002F: Invalid argument
       disabled: true
 

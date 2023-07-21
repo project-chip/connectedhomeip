@@ -61,7 +61,7 @@ tests:
           "Step 1c: Read the NodeLabel attribute of the Bridged Device Basic
           Information cluster on the same endpoint as in 1a"
       verification: |
-          Read the NodeLabel attribute of the Bridged Device Basic Information cluster with EP 3, verify the name is changed 
+          Read the NodeLabel attribute of the Bridged Device Basic Information cluster with EP 3, verify the name is changed
 
           ./chip-tool bridgeddevicebasicinformation read node-label 1 3
 
@@ -85,7 +85,7 @@ tests:
           "Step 2b: Read the state (e.g. on/off, brightness) of that bridged
           device"
       verification: |
-          Read OnOff attribute of On/Off cluster 
+          Read OnOff attribute of On/Off cluster
 
           ./chip-tool onoff read on-off 1 3
 
@@ -108,7 +108,7 @@ tests:
 
           ./chip-tool onoff read on-off 1 3
 
-          Via the TH (chip-tool),  Verify the Onoff attribute state has changed. 
+          Via the TH (chip-tool),  Verify the Onoff attribute state has changed.
 
           [1657004454.213279][4792:4798] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3808303315
           [1657004454.213319][4792:4798] CHIP:TOO:   OnOff: TRUE

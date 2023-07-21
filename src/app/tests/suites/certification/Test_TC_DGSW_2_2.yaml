@@ -62,7 +62,7 @@ tests:
           -Name is in the type of string with max 8 chars.
           -FaultRecording is in the type of Octet string with max 1024 chars and Priority should be Info.
 
-          [1655375196.291424][35133:35138] CHIP:DMG:         SuppressResponse = true, 
+          [1655375196.291424][35133:35138] CHIP:DMG:         SuppressResponse = true,
           [1655375196.291478][35133:35138] CHIP:DMG:         InteractionModelRevision = 1
           [1655375196.291527][35133:35138] CHIP:DMG: }
           [1655375196.291829][35133:35138] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000

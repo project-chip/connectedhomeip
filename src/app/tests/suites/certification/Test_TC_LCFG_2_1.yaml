@@ -31,7 +31,7 @@ tests:
       verification: |
           ./chip-tool localizationconfiguration read supported-locales 1 0
 
-          On TH(chip-tool) log, Verify the SupportedLocales attribute values are not repeated, 
+          On TH(chip-tool) log, Verify the SupportedLocales attribute values are not repeated,
            - Maximum number of elements in the SupportedLocales list is 32 and maximum length is 35 bytes, below is the sample log provided for the raspi platform:
 
           [1661759583.481746][104665:104670] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_0001 DataVersion: 3207653748
@@ -81,8 +81,8 @@ tests:
       verification: |
           ./chip-tool localizationconfiguration read active-locale 1 0
 
-          Verify that  ActiveLocale Attribute value is a Language Tag as defined by BCP47, 
-            - Maximum length is 35 bytes and it should be present in SupportedLocales attribute 
+          Verify that  ActiveLocale Attribute value is a Language Tag as defined by BCP47,
+            - Maximum length is 35 bytes and it should be present in SupportedLocales attribute
             - If the value of ActiveLocale is not one among supportedLocales value, then default value is assigned by the Vendor on TH(chip-tool)log and below is the sample log provided for the raspi platform:
 
           [1661759849.744419][104758:104763] CHIP:DMG: }

@@ -406,7 +406,7 @@ tests:
           to path which requires a privilege that is not granted for the cluster
           in the path."
       verification: |
-          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command 
+          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except ACL cluster command if try to send any other command will get status as unsupported access
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]' 1 0
@@ -598,7 +598,7 @@ tests:
           On TH(chip-tool) verify that the DUT sends  Report Data Message with empty EventReports
           [1650622225.700153][3069:3074] CHIP:DMG: ReportDataMessage =
           [1650622225.700193][3069:3074] CHIP:DMG: {
-          [1650622225.700227][3069:3074] CHIP:DMG:         SuppressResponse = true, 
+          [1650622225.700227][3069:3074] CHIP:DMG:         SuppressResponse = true,
           [1650622225.700257][3069:3074] CHIP:DMG:         InteractionModelRevision = 1
           [1650622225.700285][3069:3074] CHIP:DMG: }
       disabled: true

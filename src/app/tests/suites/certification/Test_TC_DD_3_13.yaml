@@ -190,14 +190,14 @@ tests:
           documentation."
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope 
+          Out of Scope
           SoftAP commissioning not currently supported
       disabled: true
 
     - label: "Step 3b: Scan the QR code from the previous step using the DUT."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
-          Out of Scope 
+          Out of Scope
           SoftAP commissioning not currently supported
       disabled: true
 

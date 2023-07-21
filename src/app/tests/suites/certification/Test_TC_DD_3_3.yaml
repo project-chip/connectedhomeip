@@ -42,11 +42,11 @@ tests:
     - label:
           "Step 2: TH is instructed to advertise Commissioner Discovery service"
       verification: |
-          chip-tv-app is used as dut 
+          chip-tv-app is used as dut
 
-           ./chip-tv-app 
+           ./chip-tv-app
 
-          Verify in tv-app side 
+          Verify in tv-app side
           [1667820688.750031][13245:13245] CHIP:DL: Using wifi MAC for hostname
           [1667820688.750083][13245:13245] CHIP:DIS: Advertise operational node 43D06D09FCEEDF78-FFFFFFEFFFFFFFFF
           [1667820688.782144][13245:13245] CHIP:DIS: Responding with _matter._tcp.local
@@ -94,7 +94,7 @@ tests:
           [1653478433.098023][3785:3785] CHIP:DIS:         Device Type: 35
           [1653478433.098056][3785:3785] CHIP:DIS:         Instance Name: 02DEC0D7B8A76577
           [1653478433.098076][3785:3785] CHIP:DIS:         Commissioning Mode: 0
-          [1653478433.098103][3785:3785] CHIP:SVR: 2 commissioner(s) discovered. Select one (by number# above) to request commissioning from: 
+          [1653478433.098103][3785:3785] CHIP:SVR: 2 commissioner(s) discovered. Select one (by number# above) to request commissioning from:
           [1653478433.098124][3785:3785] CHIP:SVR: Example: cast request 0
       disabled: true
 
@@ -112,7 +112,7 @@ tests:
 
     - label: "Step 6: TH start the commissioning procedure with DUT"
       verification: |
-          Into the shell, enter "cast request 0" to send a user-directed-commissioning request to the DUT on tv-casting-app side 
+          Into the shell, enter "cast request 0" to send a user-directed-commissioning request to the DUT on tv-casting-app side
 
           > cast request 1
           [1653179218011] [47890:1899175] CHIP: [DL] request

@@ -40,7 +40,7 @@ tests:
       verification: |
           ./chip-tool laundrywashercontrols read feature-map 1 1
 
-          On TH(chip-tool), verify that DUT sends  FeatureMap attribute 
+          On TH(chip-tool), verify that DUT sends  FeatureMap attribute
           Below is the example value which is observed in the RPI platform the value may be differ based on the dut implementation.
       disabled: true
 

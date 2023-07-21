@@ -44,7 +44,7 @@ tests:
 
     - label: "Step 1: Factory Reset DUT"
       verification: |
-          Vendor specific action, for chip-tool run 
+          Vendor specific action, for chip-tool run
           rm -rf /tmp/chip*
       disabled: true
 
@@ -66,9 +66,9 @@ tests:
 
           ./chip-tool pairing onnetwork 2 20202021
 
-          On TH1(Chip-tool), Verify the success response 
+          On TH1(Chip-tool), Verify the success response
 
-          [1659104612.592373][62366:62371] CHIP:DMG:         SuppressResponse = true, 
+          [1659104612.592373][62366:62371] CHIP:DMG:         SuppressResponse = true,
           [1659104612.592399][62366:62371] CHIP:DMG:         InteractionModelRevision = 1
           [1659104612.592432][62366:62371] CHIP:DMG: }
           [1659104612.593187][62366:62371] CHIP:CTL: Successfully finished commissioning step 'ReadCommissioningInfo'
@@ -98,7 +98,7 @@ tests:
           [1657719041.075123][4541:4546] CHIP:DMG: ICR moving to [ResponseRe]
           [1657719041.075174][4541:4546] CHIP:DMG: InvokeResponseMessage =
           [1657719041.075200][4541:4546] CHIP:DMG: {
-          [1657719041.075224][4541:4546] CHIP:DMG:         suppressResponse = false, 
+          [1657719041.075224][4541:4546] CHIP:DMG:         suppressResponse = false,
           [1657719041.075255][4541:4546] CHIP:DMG:         InvokeResponseIBs =
           [1657719041.075287][4541:4546] CHIP:DMG:         [
           [1657719041.075311][4541:4546] CHIP:DMG:                 InvokeResponseIB =
@@ -111,18 +111,18 @@ tests:
           [1657719041.075542][4541:4546] CHIP:DMG:                                         ClusterId = 0x3f,
           [1657719041.075577][4541:4546] CHIP:DMG:                                         CommandId = 0x0,
           [1657719041.075609][4541:4546] CHIP:DMG:                                 },
-          [1657719041.075646][4541:4546] CHIP:DMG:                                 
+          [1657719041.075646][4541:4546] CHIP:DMG:
           [1657719041.075676][4541:4546] CHIP:DMG:                                 StatusIB =
           [1657719041.075709][4541:4546] CHIP:DMG:                                 {
           [1657719041.075743][4541:4546] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1657719041.075775][4541:4546] CHIP:DMG:                                 },
-          [1657719041.075809][4541:4546] CHIP:DMG:                                 
+          [1657719041.075809][4541:4546] CHIP:DMG:
           [1657719041.075840][4541:4546] CHIP:DMG:                         },
-          [1657719041.075874][4541:4546] CHIP:DMG:                         
+          [1657719041.075874][4541:4546] CHIP:DMG:
           [1657719041.075902][4541:4546] CHIP:DMG:                 },
-          [1657719041.075935][4541:4546] CHIP:DMG:                 
+          [1657719041.075935][4541:4546] CHIP:DMG:
           [1657719041.075959][4541:4546] CHIP:DMG:         ],
-          [1657719041.075988][4541:4546] CHIP:DMG:         
+          [1657719041.075988][4541:4546] CHIP:DMG:
           [1657719041.076012][4541:4546] CHIP:DMG:         InteractionModelRevision = 1
 
           Run this command for lighting app in chip-tool:
@@ -152,10 +152,10 @@ tests:
           [1657719130.464214][4557:4562] CHIP:DMG:                         {
           [1657719130.464256][4557:4562] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657719130.464298][4557:4562] CHIP:DMG:                         },
-          [1657719130.464342][4557:4562] CHIP:DMG:      
+          [1657719130.464342][4557:4562] CHIP:DMG:
 
           Run this command for lighting app in chip-tool:
-          ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]' 2 0       
+          ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]' 2 0
 
           On TH1(Chip-tool), Verify the success response for GroupKeySetID
 

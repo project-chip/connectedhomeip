@@ -46,8 +46,8 @@ tests:
           TH Commissioner should not discover the DUT here
 
           For devices not on the network (i.e. BLE discovery):
-          1. Discover commissionables over BLE using a BLE discovery tool of choice. 
-          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop) 
+          1. Discover commissionables over BLE using a BLE discovery tool of choice.
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
           OR
           HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
           TH Commissioner should not discover the DUT here
@@ -78,7 +78,7 @@ tests:
           Commissionee into commissioning mode"
       verification: |
           1. Follow vendor-specific steps from the pairing hint to put DUT into commissioning mode
-          2. Verify DUT is advertising in commissioning mode. On DUT, 
+          2. Verify DUT is advertising in commissioning mode. On DUT,
 
           For devices already on the network:
           ./chip-tool discover commissionables
@@ -98,8 +98,8 @@ tests:
           [1651192893436] [15304:442604] CHIP: [DIS]         Mrp Interval active: 300 ms
 
           For devices not on the network (i.e. BLE discovery):
-          1. Discover commissionables over BLE using a BLE discovery tool of choice. 
-          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop) 
+          1. Discover commissionables over BLE using a BLE discovery tool of choice.
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
           OR
           HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
           Observe the DUT advertising in a commissionable state

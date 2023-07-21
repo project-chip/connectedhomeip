@@ -38,8 +38,8 @@ tests:
           supported."
       PICS: MCORE.IDM.C.SubscribeRequest
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
-           
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           onoff subscribe on-off  10 80 1 1 --keepSubscriptions true
 
           On the TH(all-clusters-app) verify the subscription message received has the following fields. KeepSubscriptions which is of type bool
@@ -55,7 +55,7 @@ tests:
           [1686231339.679704][92910:92910] CHIP:IM: Received Subscribe request
           [1686231339.679714][92910:92910] CHIP:DMG: SubscribeRequestMessage =
           [1686231339.679717][92910:92910] CHIP:DMG: {
-          [1686231339.679720][92910:92910] CHIP:DMG:         KeepSubscriptions = true, 
+          [1686231339.679720][92910:92910] CHIP:DMG:         KeepSubscriptions = true,
           [1686231339.679723][92910:92910] CHIP:DMG:         MinIntervalFloorSeconds = 0xa,
           [1686231339.679726][92910:92910] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x50,
           [1686231339.679728][92910:92910] CHIP:DMG:         AttributePathIBs =
@@ -66,10 +66,10 @@ tests:
           [1686231339.679744][92910:92910] CHIP:DMG:                         Cluster = 0x6,
           [1686231339.679748][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1686231339.679751][92910:92910] CHIP:DMG:                 }
-          [1686231339.679755][92910:92910] CHIP:DMG:                         
+          [1686231339.679755][92910:92910] CHIP:DMG:
           [1686231339.679758][92910:92910] CHIP:DMG:         ],
-          [1686231339.679762][92910:92910] CHIP:DMG:                 
-          [1686231339.679765][92910:92910] CHIP:DMG:         isFabricFiltered = true, 
+          [1686231339.679762][92910:92910] CHIP:DMG:
+          [1686231339.679765][92910:92910] CHIP:DMG:         isFabricFiltered = true,
           [1686231339.679768][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
           [1686231339.679770][92910:92910] CHIP:DMG: },
           [1686231339.679782][92910:92910] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=v
@@ -109,7 +109,7 @@ tests:
           report data DUT sends the status response back to TH"
       PICS: MCORE.IDM.C.SubscribeRequest
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
 
           onoff  subscribe on-off   10 80  1 1 --keepSubscriptions true
@@ -120,7 +120,7 @@ tests:
           [1686231385.233033][92910:92910] CHIP:IM: Received Subscribe request
           [1686231385.233046][92910:92910] CHIP:DMG: SubscribeRequestMessage =
           [1686231385.233050][92910:92910] CHIP:DMG: {
-          [1686231385.233053][92910:92910] CHIP:DMG:         KeepSubscriptions = true, 
+          [1686231385.233053][92910:92910] CHIP:DMG:         KeepSubscriptions = true,
           [1686231385.233057][92910:92910] CHIP:DMG:         MinIntervalFloorSeconds = 0xa,
           [1686231385.233060][92910:92910] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x50,
           [1686231385.233063][92910:92910] CHIP:DMG:         AttributePathIBs =
@@ -131,10 +131,10 @@ tests:
           [1686231385.233080][92910:92910] CHIP:DMG:                         Cluster = 0x6,
           [1686231385.233084][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1686231385.233087][92910:92910] CHIP:DMG:                 }
-          [1686231385.233091][92910:92910] CHIP:DMG:                         
+          [1686231385.233091][92910:92910] CHIP:DMG:
           [1686231385.233093][92910:92910] CHIP:DMG:         ],
-          [1686231385.233097][92910:92910] CHIP:DMG:                 
-          [1686231385.233101][92910:92910] CHIP:DMG:         isFabricFiltered = true, 
+          [1686231385.233097][92910:92910] CHIP:DMG:
+          [1686231385.233101][92910:92910] CHIP:DMG:         isFabricFiltered = true,
           [1686231385.233104][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
           [1686231385.233106][92910:92910] CHIP:DMG: },
           [1686231385.233120][92910:92910] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=v
@@ -176,7 +176,7 @@ tests:
           multiple times (3 times)."
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_Bool
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           basicinformation subscribe local-config-disabled 10 100 1 0 --keepSubscriptions true
 
@@ -185,7 +185,7 @@ tests:
           [1686231800.052780][92910:92910] CHIP:IM: Received Subscribe request
           [1686231800.052808][92910:92910] CHIP:DMG: SubscribeRequestMessage =
           [1686231800.052817][92910:92910] CHIP:DMG: {
-          [1686231800.052826][92910:92910] CHIP:DMG:         KeepSubscriptions = true, 
+          [1686231800.052826][92910:92910] CHIP:DMG:         KeepSubscriptions = true,
           [1686231800.052836][92910:92910] CHIP:DMG:         MinIntervalFloorSeconds = 0xa,
           [1686231800.052846][92910:92910] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x64,
           [1686231800.052856][92910:92910] CHIP:DMG:         AttributePathIBs =
@@ -196,10 +196,10 @@ tests:
           [1686231800.052908][92910:92910] CHIP:DMG:                         Cluster = 0x28,
           [1686231800.052919][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0010,
           [1686231800.052929][92910:92910] CHIP:DMG:                 }
-          [1686231800.052940][92910:92910] CHIP:DMG:                         
+          [1686231800.052940][92910:92910] CHIP:DMG:
           [1686231800.052953][92910:92910] CHIP:DMG:         ],
-          [1686231800.052964][92910:92910] CHIP:DMG:                 
-          [1686231800.052971][92910:92910] CHIP:DMG:         isFabricFiltered = true, 
+          [1686231800.052964][92910:92910] CHIP:DMG:
+          [1686231800.052971][92910:92910] CHIP:DMG:         isFabricFiltered = true,
           [1686231800.052978][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
           [1686231800.052983][92910:92910] CHIP:DMG: },
           [1686231800.053009][92910:92910] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
@@ -242,8 +242,8 @@ tests:
           [1686232216.410155][92910:92910] CHIP:DMG: IM WH moving to [Initialized]
           [1686232216.410168][92910:92910] CHIP:DMG: WriteRequestMessage =
           [1686232216.410170][92910:92910] CHIP:DMG: {
-          [1686232216.410172][92910:92910] CHIP:DMG:         suppressResponse = false, 
-          [1686232216.410175][92910:92910] CHIP:DMG:         timedRequest = false, 
+          [1686232216.410172][92910:92910] CHIP:DMG:         suppressResponse = false,
+          [1686232216.410175][92910:92910] CHIP:DMG:         timedRequest = false,
           [1686232216.410177][92910:92910] CHIP:DMG:         AttributeDataIBs =
           [1686232216.410180][92910:92910] CHIP:DMG:         [
           [1686232216.410182][92910:92910] CHIP:DMG:                 AttributeDataIB =
@@ -254,13 +254,13 @@ tests:
           [1686232216.410195][92910:92910] CHIP:DMG:                                 Cluster = 0x28,
           [1686232216.410198][92910:92910] CHIP:DMG:                                 Attribute = 0x0000_0010,
           [1686232216.410200][92910:92910] CHIP:DMG:                         }
-          [1686232216.410203][92910:92910] CHIP:DMG:                                 
-          [1686232216.410206][92910:92910] CHIP:DMG:                         Data = false, 
+          [1686232216.410203][92910:92910] CHIP:DMG:
+          [1686232216.410206][92910:92910] CHIP:DMG:                         Data = false,
           [1686232216.410208][92910:92910] CHIP:DMG:                 },
-          [1686232216.410211][92910:92910] CHIP:DMG:                 
+          [1686232216.410211][92910:92910] CHIP:DMG:
           [1686232216.410213][92910:92910] CHIP:DMG:         ],
-          [1686232216.410217][92910:92910] CHIP:DMG:         
-          [1686232216.410219][92910:92910] CHIP:DMG:         moreChunkedMessages = false, 
+          [1686232216.410217][92910:92910] CHIP:DMG:
+          [1686232216.410219][92910:92910] CHIP:DMG:         moreChunkedMessages = false,
           [1686232216.410221][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
           [1686232216.410223][92910:92910] CHIP:DMG: },
           [1686232216.410241][92910:92910] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=m
@@ -301,7 +301,7 @@ tests:
           [1686232456.706240][92910:92910] CHIP:IM: Received Subscribe request
           [1686232456.706256][92910:92910] CHIP:DMG: SubscribeRequestMessage =
           [1686232456.706260][92910:92910] CHIP:DMG: {
-          [1686232456.706263][92910:92910] CHIP:DMG:         KeepSubscriptions = true, 
+          [1686232456.706263][92910:92910] CHIP:DMG:         KeepSubscriptions = true,
           [1686232456.706265][92910:92910] CHIP:DMG:         MinIntervalFloorSeconds = 0x1e,
           [1686232456.706270][92910:92910] CHIP:DMG:         MaxIntervalCeilingSeconds = 0xc8,
           [1686232456.706273][92910:92910] CHIP:DMG:         AttributePathIBs =
@@ -312,10 +312,10 @@ tests:
           [1686232456.706292][92910:92910] CHIP:DMG:                         Cluster = 0x28,
           [1686232456.706294][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0005,
           [1686232456.706296][92910:92910] CHIP:DMG:                 }
-          [1686232456.706299][92910:92910] CHIP:DMG:                         
+          [1686232456.706299][92910:92910] CHIP:DMG:
           [1686232456.706301][92910:92910] CHIP:DMG:         ],
-          [1686232456.706304][92910:92910] CHIP:DMG:                 
-          [1686232456.706307][92910:92910] CHIP:DMG:         isFabricFiltered = true, 
+          [1686232456.706304][92910:92910] CHIP:DMG:
+          [1686232456.706307][92910:92910] CHIP:DMG:         isFabricFiltered = true,
           [1686232456.706310][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
           [1686232456.706312][92910:92910] CHIP:DMG: },
           [1686232456.706335][92910:92910] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
@@ -348,8 +348,8 @@ tests:
           [1686232636.062771][92910:92910] CHIP:DMG: IM WH moving to [Initialized]
           [1686232636.062800][92910:92910] CHIP:DMG: WriteRequestMessage =
           [1686232636.062807][92910:92910] CHIP:DMG: {
-          [1686232636.062813][92910:92910] CHIP:DMG:         suppressResponse = false, 
-          [1686232636.062820][92910:92910] CHIP:DMG:         timedRequest = false, 
+          [1686232636.062813][92910:92910] CHIP:DMG:         suppressResponse = false,
+          [1686232636.062820][92910:92910] CHIP:DMG:         timedRequest = false,
           [1686232636.062827][92910:92910] CHIP:DMG:         AttributeDataIBs =
           [1686232636.062837][92910:92910] CHIP:DMG:         [
           [1686232636.062843][92910:92910] CHIP:DMG:                 AttributeDataIB =
@@ -360,13 +360,13 @@ tests:
           [1686232636.062882][92910:92910] CHIP:DMG:                                 Cluster = 0x28,
           [1686232636.062890][92910:92910] CHIP:DMG:                                 Attribute = 0x0000_0005,
           [1686232636.062896][92910:92910] CHIP:DMG:                         }
-          [1686232636.062905][92910:92910] CHIP:DMG:                                 
-          [1686232636.062915][92910:92910] CHIP:DMG:                         Data = "label" (5 chars), 
+          [1686232636.062905][92910:92910] CHIP:DMG:
+          [1686232636.062915][92910:92910] CHIP:DMG:                         Data = "label" (5 chars),
           [1686232636.062922][92910:92910] CHIP:DMG:                 },
-          [1686232636.062932][92910:92910] CHIP:DMG:                 
+          [1686232636.062932][92910:92910] CHIP:DMG:
           [1686232636.062938][92910:92910] CHIP:DMG:         ],
-          [1686232636.062947][92910:92910] CHIP:DMG:         
-          [1686232636.062954][92910:92910] CHIP:DMG:         moreChunkedMessages = false, 
+          [1686232636.062947][92910:92910] CHIP:DMG:
+          [1686232636.062954][92910:92910] CHIP:DMG:         moreChunkedMessages = false,
           [1686232636.062960][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
           [1686232636.062967][92910:92910] CHIP:DMG: },
           [1686232636.063008][92910:92910] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=m
@@ -398,7 +398,7 @@ tests:
           Modify the attribute multiple times (3 times)."
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_UnsignedInteger
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
 
 
@@ -408,7 +408,7 @@ tests:
           [1686232748.726333][92910:92910] CHIP:IM: Received Subscribe request
           [1686232748.726358][92910:92910] CHIP:DMG: SubscribeRequestMessage =
           [1686232748.726364][92910:92910] CHIP:DMG: {
-          [1686232748.726369][92910:92910] CHIP:DMG:         KeepSubscriptions = true, 
+          [1686232748.726369][92910:92910] CHIP:DMG:         KeepSubscriptions = true,
           [1686232748.726375][92910:92910] CHIP:DMG:         MinIntervalFloorSeconds = 0xa,
           [1686232748.726381][92910:92910] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x64,
           [1686232748.726386][92910:92910] CHIP:DMG:         AttributePathIBs =
@@ -419,10 +419,10 @@ tests:
           [1686232748.726413][92910:92910] CHIP:DMG:                         Cluster = 0x8,
           [1686232748.726422][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0010,
           [1686232748.726433][92910:92910] CHIP:DMG:                 }
-          [1686232748.726442][92910:92910] CHIP:DMG:                         
+          [1686232748.726442][92910:92910] CHIP:DMG:
           [1686232748.726448][92910:92910] CHIP:DMG:         ],
-          [1686232748.726459][92910:92910] CHIP:DMG:                 
-          [1686232748.726466][92910:92910] CHIP:DMG:         isFabricFiltered = true, 
+          [1686232748.726459][92910:92910] CHIP:DMG:
+          [1686232748.726466][92910:92910] CHIP:DMG:         isFabricFiltered = true,
           [1686232748.726473][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
           [1686232748.726481][92910:92910] CHIP:DMG: },
           [1686232748.726504][92910:92910] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0008 e=1 p=v
@@ -453,8 +453,8 @@ tests:
           [1686232799.909968][92910:92910] CHIP:DMG: IM WH moving to [Initialized]
           [1686232799.909995][92910:92910] CHIP:DMG: WriteRequestMessage =
           [1686232799.910002][92910:92910] CHIP:DMG: {
-          [1686232799.910009][92910:92910] CHIP:DMG:         suppressResponse = false, 
-          [1686232799.910015][92910:92910] CHIP:DMG:         timedRequest = false, 
+          [1686232799.910009][92910:92910] CHIP:DMG:         suppressResponse = false,
+          [1686232799.910015][92910:92910] CHIP:DMG:         timedRequest = false,
           [1686232799.910021][92910:92910] CHIP:DMG:         AttributeDataIBs =
           [1686232799.910035][92910:92910] CHIP:DMG:         [
           [1686232799.910042][92910:92910] CHIP:DMG:                 AttributeDataIB =
@@ -465,13 +465,13 @@ tests:
           [1686232799.910082][92910:92910] CHIP:DMG:                                 Cluster = 0x8,
           [1686232799.910090][92910:92910] CHIP:DMG:                                 Attribute = 0x0000_0010,
           [1686232799.910096][92910:92910] CHIP:DMG:                         }
-          [1686232799.910105][92910:92910] CHIP:DMG:                                 
-          [1686232799.910113][92910:92910] CHIP:DMG:                         Data = 1, 
+          [1686232799.910105][92910:92910] CHIP:DMG:
+          [1686232799.910113][92910:92910] CHIP:DMG:                         Data = 1,
           [1686232799.910120][92910:92910] CHIP:DMG:                 },
-          [1686232799.910130][92910:92910] CHIP:DMG:                 
+          [1686232799.910130][92910:92910] CHIP:DMG:
           [1686232799.910136][92910:92910] CHIP:DMG:         ],
-          [1686232799.910144][92910:92910] CHIP:DMG:         
-          [1686232799.910151][92910:92910] CHIP:DMG:         moreChunkedMessages = false, 
+          [1686232799.910144][92910:92910] CHIP:DMG:
+          [1686232799.910151][92910:92910] CHIP:DMG:         moreChunkedMessages = false,
           [1686232799.910158][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
           [1686232799.910164][92910:92910] CHIP:DMG: },
           [1686232799.910203][92910:92910] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0008 e=1 p=o
@@ -556,7 +556,7 @@ tests:
           node/reference device for multiple attributes(3 attributes)."
       PICS: MCORE.IDM.C.SubscribeRequest.MultipleAttributes
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           any subscribe-by-id '6,8,3' '0,1,0' 10 100 1 '1,1,1' --keepSubscriptions true
 
@@ -573,7 +573,7 @@ tests:
           [1686232907.168281][92910:92910] CHIP:IM: Received Subscribe request
           [1686232907.168308][92910:92910] CHIP:DMG: SubscribeRequestMessage =
           [1686232907.168315][92910:92910] CHIP:DMG: {
-          [1686232907.168322][92910:92910] CHIP:DMG:         KeepSubscriptions = true, 
+          [1686232907.168322][92910:92910] CHIP:DMG:         KeepSubscriptions = true,
           [1686232907.168329][92910:92910] CHIP:DMG:         MinIntervalFloorSeconds = 0xa,
           [1686232907.168337][92910:92910] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x64,
           [1686232907.168344][92910:92910] CHIP:DMG:         AttributePathIBs =
@@ -584,24 +584,24 @@ tests:
           [1686232907.168384][92910:92910] CHIP:DMG:                         Cluster = 0x6,
           [1686232907.168392][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1686232907.168398][92910:92910] CHIP:DMG:                 }
-          [1686232907.168407][92910:92910] CHIP:DMG:                         
+          [1686232907.168407][92910:92910] CHIP:DMG:
           [1686232907.168413][92910:92910] CHIP:DMG:                 AttributePathIB =
           [1686232907.168420][92910:92910] CHIP:DMG:                 {
           [1686232907.168427][92910:92910] CHIP:DMG:                         Endpoint = 0x1,
           [1686232907.168434][92910:92910] CHIP:DMG:                         Cluster = 0x8,
           [1686232907.168441][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1686232907.168448][92910:92910] CHIP:DMG:                 }
-          [1686232907.168456][92910:92910] CHIP:DMG:                         
+          [1686232907.168456][92910:92910] CHIP:DMG:
           [1686232907.168462][92910:92910] CHIP:DMG:                 AttributePathIB =
           [1686232907.168469][92910:92910] CHIP:DMG:                 {
           [1686232907.168476][92910:92910] CHIP:DMG:                         Endpoint = 0x1,
           [1686232907.168483][92910:92910] CHIP:DMG:                         Cluster = 0x3,
           [1686232907.168489][92910:92910] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1686232907.168496][92910:92910] CHIP:DMG:                 }
-          [1686232907.168504][92910:92910] CHIP:DMG:                         
+          [1686232907.168504][92910:92910] CHIP:DMG:
           [1686232907.168510][92910:92910] CHIP:DMG:         ],
-          [1686232907.168521][92910:92910] CHIP:DMG:                 
-          [1686232907.168528][92910:92910] CHIP:DMG:         isFabricFiltered = true, 
+          [1686232907.168521][92910:92910] CHIP:DMG:
+          [1686232907.168528][92910:92910] CHIP:DMG:         isFabricFiltered = true,
           [1686232907.168536][92910:92910] CHIP:DMG:         InteractionModelRevision = 1
           [1686232907.168542][92910:92910] CHIP:DMG: },
           [1686232907.168566][92910:92910] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=v

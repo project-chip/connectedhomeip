@@ -82,7 +82,7 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          Verify on TH(chip-tool), Current modes attribute value is an integer value. 
+          Verify on TH(chip-tool), Current modes attribute value is an integer value.
           - Save the mode values for usage in steps 3 and below is the sample log provided for the raspi platform
 
           [1649678800.298128][10854:10861] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
@@ -106,7 +106,7 @@ tests:
           [1685017925.030106][16218:16220] CHIP:DMG:                                         ClusterId = 0x50,
           [1685017925.030109][16218:16220] CHIP:DMG:                                         CommandId = 0x0,
           [1685017925.030112][16218:16220] CHIP:DMG:                                 },
-          [1685017925.030117][16218:16220] CHIP:DMG:                                 
+          [1685017925.030117][16218:16220] CHIP:DMG:
           [1685017925.030121][16218:16220] CHIP:DMG:                                 StatusIB =
           [1685017925.030126][16218:16220] CHIP:DMG:                                 {
           [1685017925.030129][16218:16220] CHIP:DMG:                                         status = 0x00 (SUCCESS),
@@ -122,8 +122,8 @@ tests:
           Verify on TH(chip-tool),  CurrentMode attribute value is an integer provided in step 3a, not the integer from step 2, below is the sample log provided for the raspi platform:
 
           [1685017991.905343][16336:16338] CHIP:DMG:         ],
-          [1685017991.905348][16336:16338] CHIP:DMG:         
-          [1685017991.905351][16336:16338] CHIP:DMG:         SuppressResponse = true, 
+          [1685017991.905348][16336:16338] CHIP:DMG:
+          [1685017991.905351][16336:16338] CHIP:DMG:         SuppressResponse = true,
           [1685017991.905353][16336:16338] CHIP:DMG:         InteractionModelRevision = 1
           [1685017991.905356][16336:16338] CHIP:DMG: }
           [1685017991.905393][16336:16338] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 3673378954
@@ -143,13 +143,13 @@ tests:
           [1685018023.768429][16341:16343] CHIP:DMG:                                 {
           [1685018023.768441][16341:16343] CHIP:DMG:                                         status = 0x85 (INVALID_COMMAND),
           [1685018023.768452][16341:16343] CHIP:DMG:                                 },
-          [1685018023.768464][16341:16343] CHIP:DMG:                                 
+          [1685018023.768464][16341:16343] CHIP:DMG:
           [1685018023.768474][16341:16343] CHIP:DMG:                         },
-          [1685018023.768490][16341:16343] CHIP:DMG:                         
+          [1685018023.768490][16341:16343] CHIP:DMG:
           [1685018023.768499][16341:16343] CHIP:DMG:                 },
-          [1685018023.768515][16341:16343] CHIP:DMG:                 
+          [1685018023.768515][16341:16343] CHIP:DMG:
           [1685018023.768523][16341:16343] CHIP:DMG:         ],
-          [1685018023.768540][16341:16343] CHIP:DMG:         
+          [1685018023.768540][16341:16343] CHIP:DMG:
           [1685018023.768549][16341:16343] CHIP:DMG:         InteractionModelRevision = 1
           [1685018023.768558][16341:16343] CHIP:DMG: },
       disabled: true

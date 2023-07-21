@@ -82,7 +82,7 @@ tests:
           "Step 2: DUT sends Subscribe Request Message to the TH. TH sends
           Report Data message to DUT."
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           basicinformation subscribe-event-by-id 0x000 20 400 1 0
           On TH (On the reference app), Verify DUT is responds with  status response  for the data sent in the above command

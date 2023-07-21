@@ -41,7 +41,7 @@ tests:
     - label: "Step 1: DUT_CR1 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
-          "1. Provision TH_CE using DUT_CR1 (Chip-tool as DUT controller)  
+          "1. Provision TH_CE using DUT_CR1 (Chip-tool as DUT controller)
           "
       disabled: true
 
@@ -56,7 +56,7 @@ tests:
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
           Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
@@ -84,7 +84,7 @@ tests:
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
           Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
@@ -115,7 +115,7 @@ tests:
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
           Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
@@ -154,12 +154,12 @@ tests:
           [1661483425.923951][6917:6917] CHIP:DMG:                                         Cluster = 0x3c,
           [1661483425.923981][6917:6917] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1661483425.924009][6917:6917] CHIP:DMG:                                 }
-          [1661483425.924040][6917:6917] CHIP:DMG:                                         
-          [1661483425.924070][6917:6917] CHIP:DMG:                                 Data = 2, 
+          [1661483425.924040][6917:6917] CHIP:DMG:
+          [1661483425.924070][6917:6917] CHIP:DMG:                                 Data = 2,
           [1661483425.924097][6917:6917] CHIP:DMG:                         },
-          [1661483425.924126][6917:6917] CHIP:DMG:                         
+          [1661483425.924126][6917:6917] CHIP:DMG:
           [1661483425.924169][6917:6917] CHIP:DMG:                 },
-          [1661483425.924197][6917:6917] CHIP:DMG:                 
+          [1661483425.924197][6917:6917] CHIP:DMG:
           [1661483425.924218][6917:6917] CHIP:DMG:         ],
           [1661483425.924244][6917:6917] CHIP:DMG:
       disabled: true
@@ -183,7 +183,7 @@ tests:
 
           CHIP:DMG: InvokeResponseMessage =
           [1650527622.373450][15824:15829] CHIP:DMG: {
-          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false, 
+          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false,
           [1650527622.373628][15824:15829] CHIP:DMG:         InvokeResponseIBs =
           [1650527622.373734][15824:15829] CHIP:DMG:         [
           [1650527622.373817][15824:15829] CHIP:DMG:                 InvokeResponseIB =
@@ -196,19 +196,19 @@ tests:
           [1650527622.374490][15824:15829] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650527622.374593][15824:15829] CHIP:DMG:                                         CommandId = 0x1,
           [1650527622.374682][15824:15829] CHIP:DMG:                                 },
-          [1650527622.374799][15824:15829] CHIP:DMG:                                 
+          [1650527622.374799][15824:15829] CHIP:DMG:
           [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
           [1650527622.374979][15824:15829] CHIP:DMG:                                 {
           [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
           [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x2,
           [1650527622.375320][15824:15829] CHIP:DMG:                                 },
-          [1650527622.375426][15824:15829] CHIP:DMG:                                 
+          [1650527622.375426][15824:15829] CHIP:DMG:
           [1650527622.375527][15824:15829] CHIP:DMG:                         },
-          [1650527622.375616][15824:15829] CHIP:DMG:                         
+          [1650527622.375616][15824:15829] CHIP:DMG:
           [1650527622.375704][15824:15829] CHIP:DMG:                 },
-          [1650527622.375786][15824:15829] CHIP:DMG:                 
+          [1650527622.375786][15824:15829] CHIP:DMG:
           [1650527622.375864][15824:15829] CHIP:DMG:         ],
-          [1650527622.375940][15824:15829] CHIP:DMG:         
+          [1650527622.375940][15824:15829] CHIP:DMG:
           [1650527622.376000][15824:15829] CHIP:DMG:         InteractionModelRevision = 1
           [1650527622.376058][15824:15829] CHIP:DMG: },
           [1650527622.376202][15824:15829] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1
@@ -269,15 +269,15 @@ tests:
           [1661482777.284430][6453:6453] CHIP:DMG:                                         Cluster = 0x3c,
           [1661482777.284479][6453:6453] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1661482777.284522][6453:6453] CHIP:DMG:                                 }
-          [1661482777.284567][6453:6453] CHIP:DMG:                                         
-          [1661482777.284612][6453:6453] CHIP:DMG:                                 Data = 1, 
+          [1661482777.284567][6453:6453] CHIP:DMG:
+          [1661482777.284612][6453:6453] CHIP:DMG:                                 Data = 1,
           [1661482777.284655][6453:6453] CHIP:DMG:                         },
-          [1661482777.284699][6453:6453] CHIP:DMG:                         
+          [1661482777.284699][6453:6453] CHIP:DMG:
           [1661482777.284733][6453:6453] CHIP:DMG:                 },
-          [1661482777.284773][6453:6453] CHIP:DMG:                 
+          [1661482777.284773][6453:6453] CHIP:DMG:
           [1661482777.284803][6453:6453] CHIP:DMG:         ],
-          [1661482777.284841][6453:6453] CHIP:DMG:         
-          [1661482777.284872][6453:6453] CHIP:DMG:         SuppressResponse = true, 
+          [1661482777.284841][6453:6453] CHIP:DMG:
+          [1661482777.284872][6453:6453] CHIP:DMG:         SuppressResponse = true,
           [1661482777.284905][6453:6453] CHIP:DMG:         InteractionModelRevision = 1
           [1661482777.284934][6453:6453] CHIP:DMG: }
           [1661482777.284962][6453:6453] CHIP:DMG:
@@ -302,7 +302,7 @@ tests:
 
           CHIP:DMG: InvokeResponseMessage =
           [1650527622.373450][15824:15829] CHIP:DMG: {
-          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false, 
+          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false,
           [1650527622.373628][15824:15829] CHIP:DMG:         InvokeResponseIBs =
           [1650527622.373734][15824:15829] CHIP:DMG:         [
           [1650527622.373817][15824:15829] CHIP:DMG:                 InvokeResponseIB =
@@ -315,19 +315,19 @@ tests:
           [1650527622.374490][15824:15829] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650527622.374593][15824:15829] CHIP:DMG:                                         CommandId = 0x1,
           [1650527622.374682][15824:15829] CHIP:DMG:                                 },
-          [1650527622.374799][15824:15829] CHIP:DMG:                                 
+          [1650527622.374799][15824:15829] CHIP:DMG:
           [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
           [1650527622.374979][15824:15829] CHIP:DMG:                                 {
           [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
           [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x2,
           [1650527622.375320][15824:15829] CHIP:DMG:                                 },
-          [1650527622.375426][15824:15829] CHIP:DMG:                                 
+          [1650527622.375426][15824:15829] CHIP:DMG:
           [1650527622.375527][15824:15829] CHIP:DMG:                         },
-          [1650527622.375616][15824:15829] CHIP:DMG:                         
+          [1650527622.375616][15824:15829] CHIP:DMG:
           [1650527622.375704][15824:15829] CHIP:DMG:                 },
-          [1650527622.375786][15824:15829] CHIP:DMG:                 
+          [1650527622.375786][15824:15829] CHIP:DMG:
           [1650527622.375864][15824:15829] CHIP:DMG:         ],
-          [1650527622.375940][15824:15829] CHIP:DMG:         
+          [1650527622.375940][15824:15829] CHIP:DMG:
           [1650527622.376000][15824:15829] CHIP:DMG:         InteractionModelRevision = 1
           [1650527622.376058][15824:15829] CHIP:DMG: },
           [1650527622.376202][15824:15829] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1
@@ -378,7 +378,7 @@ tests:
 
           CHIP:DMG: InvokeResponseMessage =
           [1650527622.373450][15824:15829] CHIP:DMG: {
-          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false, 
+          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false,
           [1650527622.373628][15824:15829] CHIP:DMG:         InvokeResponseIBs =
           [1650527622.373734][15824:15829] CHIP:DMG:         [
           [1650527622.373817][15824:15829] CHIP:DMG:                 InvokeResponseIB =
@@ -391,19 +391,19 @@ tests:
           [1650527622.374490][15824:15829] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650527622.374593][15824:15829] CHIP:DMG:                                         CommandId = 0x1,
           [1650527622.374682][15824:15829] CHIP:DMG:                                 },
-          [1650527622.374799][15824:15829] CHIP:DMG:                                 
+          [1650527622.374799][15824:15829] CHIP:DMG:
           [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
           [1650527622.374979][15824:15829] CHIP:DMG:                                 {
           [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
           [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x2,
           [1650527622.375320][15824:15829] CHIP:DMG:                                 },
-          [1650527622.375426][15824:15829] CHIP:DMG:                                 
+          [1650527622.375426][15824:15829] CHIP:DMG:
           [1650527622.375527][15824:15829] CHIP:DMG:                         },
-          [1650527622.375616][15824:15829] CHIP:DMG:                         
+          [1650527622.375616][15824:15829] CHIP:DMG:
           [1650527622.375704][15824:15829] CHIP:DMG:                 },
-          [1650527622.375786][15824:15829] CHIP:DMG:                 
+          [1650527622.375786][15824:15829] CHIP:DMG:
           [1650527622.375864][15824:15829] CHIP:DMG:         ],
-          [1650527622.375940][15824:15829] CHIP:DMG:         
+          [1650527622.375940][15824:15829] CHIP:DMG:
           [1650527622.376000][15824:15829] CHIP:DMG:         InteractionModelRevision = 1
           [1650527622.376058][15824:15829] CHIP:DMG: },
           [1650527622.376202][15824:15829] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1
@@ -444,15 +444,15 @@ tests:
           [1661482777.284430][6453:6453] CHIP:DMG:                                         Cluster = 0x3c,
           [1661482777.284479][6453:6453] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1661482777.284522][6453:6453] CHIP:DMG:                                 }
-          [1661482777.284567][6453:6453] CHIP:DMG:                                         
-          [1661482777.284612][6453:6453] CHIP:DMG:                                 Data = 0, 
+          [1661482777.284567][6453:6453] CHIP:DMG:
+          [1661482777.284612][6453:6453] CHIP:DMG:                                 Data = 0,
           [1661482777.284655][6453:6453] CHIP:DMG:                         },
-          [1661482777.284699][6453:6453] CHIP:DMG:                         
+          [1661482777.284699][6453:6453] CHIP:DMG:
           [1661482777.284733][6453:6453] CHIP:DMG:                 },
-          [1661482777.284773][6453:6453] CHIP:DMG:                 
+          [1661482777.284773][6453:6453] CHIP:DMG:
           [1661482777.284803][6453:6453] CHIP:DMG:         ],
-          [1661482777.284841][6453:6453] CHIP:DMG:         
-          [1661482777.284872][6453:6453] CHIP:DMG:         SuppressResponse = true, 
+          [1661482777.284841][6453:6453] CHIP:DMG:
+          [1661482777.284872][6453:6453] CHIP:DMG:         SuppressResponse = true,
           [1661482777.284905][6453:6453] CHIP:DMG:         InteractionModelRevision = 1
           [1661482777.284934][6453:6453] CHIP:DMG: }
           [1661482777.284962][6453:6453] CHIP:DMG:
@@ -486,12 +486,12 @@ tests:
           [1661484456.069524][6930:6930] CHIP:DMG:                                         Cluster = 0x3c,
           [1661484456.069629][6930:6930] CHIP:DMG:                                         Attribute = 0x0000_0001,
           [1661484456.069661][6930:6930] CHIP:DMG:                                 }
-          [1661484456.069695][6930:6930] CHIP:DMG:                                         
+          [1661484456.069695][6930:6930] CHIP:DMG:
           [1661484456.069729][6930:6930] CHIP:DMG:                                 Data = NULL
           [1661484456.069757][6930:6930] CHIP:DMG:                         },
-          [1661484456.069790][6930:6930] CHIP:DMG:                         
+          [1661484456.069790][6930:6930] CHIP:DMG:
           [1661484456.069815][6930:6930] CHIP:DMG:                 },
-          [1661484456.069844][6930:6930] CHIP:DMG:                 
+          [1661484456.069844][6930:6930] CHIP:DMG:
           [1661484456.069865][6930:6930] CHIP:DMG:         ],
           [1661484456.069892][6930:6930] CHIP:DMG:
       disabled: true
@@ -524,12 +524,12 @@ tests:
           [1661484515.722292][6930:6930] CHIP:DMG:                                         Cluster = 0x3c,
           [1661484515.722344][6930:6930] CHIP:DMG:                                         Attribute = 0x0000_0002,
           [1661484515.722394][6930:6930] CHIP:DMG:                                 }
-          [1661484515.722443][6930:6930] CHIP:DMG:                                         
+          [1661484515.722443][6930:6930] CHIP:DMG:
           [1661484515.722494][6930:6930] CHIP:DMG:                                 Data = NULL
           [1661484515.722542][6930:6930] CHIP:DMG:                         },
-          [1661484515.722589][6930:6930] CHIP:DMG:                         
+          [1661484515.722589][6930:6930] CHIP:DMG:
           [1661484515.722626][6930:6930] CHIP:DMG:                 },
-          [1661484515.722673][6930:6930] CHIP:DMG:                 
+          [1661484515.722673][6930:6930] CHIP:DMG:
           [1661484515.722705][6930:6930] CHIP:DMG:         ],
           [1661484515.722746][6930:6930] CHIP:DMG:
       disabled: true

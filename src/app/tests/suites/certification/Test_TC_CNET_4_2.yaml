@@ -83,7 +83,7 @@ tests:
 
           Via the TH (chip-tool), verify that FeatureMap attribute value as 2 for Thread NetworkInterface.
 
-          [1645772204.502545][3809:3814] CHIP:DMG:         SuppressResponse = true, 
+          [1645772204.502545][3809:3814] CHIP:DMG:         SuppressResponse = true,
           [1645772204.502608][3809:3814] CHIP:DMG:         InteractionModelRevision = 1
           [1645772204.502683][3809:3814] CHIP:DMG: }
           [1645772204.503195][3809:3814] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFCDataVersion: 92121563
@@ -98,7 +98,7 @@ tests:
 
           Via the TH (chip-tool), Verify the MaxNetworks attribute that contains value in the range of 1 to 255.
 
-          [1645772548.257320][3837:3842] CHIP:DMG:         SuppressResponse = true, 
+          [1645772548.257320][3837:3842] CHIP:DMG:         SuppressResponse = true,
           [1645772548.257381][3837:3842] CHIP:DMG:         InteractionModelRevision = 1
           [1645772548.257437][3837:3842] CHIP:DMG: }
           [1645772548.257735][3837:3842] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0000DataVersion: 92121563
@@ -122,7 +122,7 @@ tests:
           -the Networks attribute has NetworkID that should be type of octstr with a length range 1 to 32.
           -that the connected status is in the type of bool value as TRUE.
 
-          [1645772651.445097][3856:3861] CHIP:DMG:         SuppressResponse = true, 
+          [1645772651.445097][3856:3861] CHIP:DMG:         SuppressResponse = true,
           [1645772651.445149][3856:3861] CHIP:DMG:         InteractionModelRevision = 1
           [1645772651.445209][3856:3861] CHIP:DMG: }
           [1645772651.445754][3856:3861] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001DataVersion: 92121563
@@ -141,7 +141,7 @@ tests:
 
           Via the TH (chip-tool), Verify the ScanMaxTimeSeconds attribute that contains value in the range of 1 to 255 secs.
 
-          [1645772820.740795][3867:3872] CHIP:DMG:         SuppressResponse = true, 
+          [1645772820.740795][3867:3872] CHIP:DMG:         SuppressResponse = true,
           [1645772820.740855][3867:3872] CHIP:DMG:         InteractionModelRevision = 1
           [1645772820.740903][3867:3872] CHIP:DMG: }
           [1645772820.741209][3867:3872] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0002DataVersion: 92121563
@@ -156,7 +156,7 @@ tests:
 
           Via the TH (chip-tool), Verify the ConnectMaxTimeSeconds attribute that contains value in the range of 1 to 255 secs.
 
-          [1645772901.118880][3879:3884] CHIP:DMG:         SuppressResponse = true, 
+          [1645772901.118880][3879:3884] CHIP:DMG:         SuppressResponse = true,
           [1645772901.119008][3879:3884] CHIP:DMG:         InteractionModelRevision = 1
           [1645772901.119141][3879:3884] CHIP:DMG: }
           [1645772901.119684][3879:3884] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0003DataVersion: 92121563
@@ -171,7 +171,7 @@ tests:
 
           Via the TH (chip-tool), Verify the InterfaceEnabled attribute that contains bool value as True.
 
-          [1645772984.653996][3895:3900] CHIP:DMG:         SuppressResponse = true, 
+          [1645772984.653996][3895:3900] CHIP:DMG:         SuppressResponse = true,
           [1645772984.654043][3895:3900] CHIP:DMG:         InteractionModelRevision = 1
           [1645772984.654084][3895:3900] CHIP:DMG: }
           [1645772984.654310][3895:3900] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0004DataVersion: 92121563
@@ -186,7 +186,7 @@ tests:
 
           Via the TH (chip-tool), Verify the LastNetworkingStatus attribute that contains value as 0 that mentions success.
 
-          [1645773078.930516][3905:3910] CHIP:DMG:         SuppressResponse = true, 
+          [1645773078.930516][3905:3910] CHIP:DMG:         SuppressResponse = true,
           [1645773078.930579][3905:3910] CHIP:DMG:         InteractionModelRevision = 1
           [1645773078.930635][3905:3910] CHIP:DMG: }
           [1645773078.930943][3905:3910] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005DataVersion: 92121563
@@ -205,7 +205,7 @@ tests:
           -that the LastNetworkID attribute that contains NetworkID that should be type of octstr with a length range 1 to 32.
           -if the Networks attribute list is Empty, then LastNetworkID attribute value is null.
 
-          [1645773167.178501][3913:3918] CHIP:DMG:         SuppressResponse = true, 
+          [1645773167.178501][3913:3918] CHIP:DMG:         SuppressResponse = true,
           [1645773167.178561][3913:3918] CHIP:DMG:         InteractionModelRevision = 1
           [1645773167.178618][3913:3918] CHIP:DMG: }
           [1645773167.178919][3913:3918] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006DataVersion: 92121563
@@ -221,7 +221,7 @@ tests:
 
           Via the TH (chip-tool), Verify the LastConnectErrorValue attribute that contains value as null.
 
-          [1645773318.752774][3938:3943] CHIP:DMG:         SuppressResponse = true, 
+          [1645773318.752774][3938:3943] CHIP:DMG:         SuppressResponse = true,
           [1645773318.752861][3938:3943] CHIP:DMG:         InteractionModelRevision = 1
           [1645773318.753043][3938:3943] CHIP:DMG: }
           [1645773318.753543][3938:3943] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0007DataVersion: 92121563

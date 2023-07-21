@@ -78,7 +78,7 @@ tests:
           verify  that order attribute succeeds with no error.The order value is the same or greater than the order value of the previous iteration on TH(chip-tool) log:
           Below is the example log which is observed in the RPI platform the value may be differ based on the dut implementation.
 
-          [1686219840.688775][91298:91300] CHIP:DMG:         SuppressResponse = true, 
+          [1686219840.688775][91298:91300] CHIP:DMG:         SuppressResponse = true,
           [1686219840.688780][91298:91300] CHIP:DMG:         InteractionModelRevision = 1
           [1686219840.688785][91298:91300] CHIP:DMG: }
           [1686219840.688851][91298:91300] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_002F Attribute 0x0000_0001 DataVersion: 4007458595

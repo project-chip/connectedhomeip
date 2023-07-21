@@ -82,14 +82,14 @@ tests:
           [1683797474.814429][38909:38911] CHIP:DMG:                                 Cluster = 0x3f,
           [1683797474.814435][38909:38911] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683797474.814441][38909:38911] CHIP:DMG:                         }
-          [1683797474.814447][38909:38911] CHIP:DMG:                                 
+          [1683797474.814447][38909:38911] CHIP:DMG:
           [1683797474.814451][38909:38911] CHIP:DMG:                         StatusIB =
           [1683797474.814456][38909:38911] CHIP:DMG:                         {
           [1683797474.814466][38909:38911] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683797474.814471][38909:38911] CHIP:DMG:                         },
-          [1683797474.814476][38909:38911] CHIP:DMG:                         
+          [1683797474.814476][38909:38911] CHIP:DMG:
           [1683797474.814480][38909:38911] CHIP:DMG:                 },
-          [1683797474.814489][38909:38911] CHIP:DMG:                 
+          [1683797474.814489][38909:38911] CHIP:DMG:
           [1683797474.814493][38909:38911] CHIP:DMG:                 AttributeStatusIB =
           [1683797474.814498][38909:38911] CHIP:DMG:                 {
           [1683797474.814501][38909:38911] CHIP:DMG:                         AttributePathIB =
@@ -99,14 +99,14 @@ tests:
           [1683797474.814520][38909:38911] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683797474.814527][38909:38911] CHIP:DMG:                                 ListIndex = Null,
           [1683797474.814530][38909:38911] CHIP:DMG:                         }
-          [1683797474.814541][38909:38911] CHIP:DMG:                                 
+          [1683797474.814541][38909:38911] CHIP:DMG:
           [1683797474.814546][38909:38911] CHIP:DMG:                         StatusIB =
           [1683797474.814551][38909:38911] CHIP:DMG:                         {
           [1683797474.814555][38909:38911] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683797474.814560][38909:38911] CHIP:DMG:                         },
-          [1683797474.814564][38909:38911] CHIP:DMG:                         
+          [1683797474.814564][38909:38911] CHIP:DMG:
           [1683797474.814567][38909:38911] CHIP:DMG:                 },
-          [1683797474.814576][38909:38911] CHIP:DMG:                 
+          [1683797474.814576][38909:38911] CHIP:DMG:
           [1683797474.814579][38909:38911] CHIP:DMG:                 AttributeStatusIB =
           [1683797474.814583][38909:38911] CHIP:DMG:                 {
           [1683797474.814586][38909:38911] CHIP:DMG:                         AttributePathIB =
@@ -116,14 +116,14 @@ tests:
           [1683797474.814604][38909:38911] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683797474.814609][38909:38911] CHIP:DMG:                                 ListIndex = Null,
           [1683797474.814615][38909:38911] CHIP:DMG:                         }
-          [1683797474.814622][38909:38911] CHIP:DMG:                                 
+          [1683797474.814622][38909:38911] CHIP:DMG:
           [1683797474.814626][38909:38911] CHIP:DMG:                         StatusIB =
           [1683797474.814630][38909:38911] CHIP:DMG:                         {
           [1683797474.814634][38909:38911] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683797474.814639][38909:38911] CHIP:DMG:                         },
-          [1683797474.814644][38909:38911] CHIP:DMG:                         
+          [1683797474.814644][38909:38911] CHIP:DMG:
           [1683797474.814647][38909:38911] CHIP:DMG:                 },
-          [1683797474.814657][38909:38911] CHIP:DMG:                 
+          [1683797474.814657][38909:38911] CHIP:DMG:
           [1683797474.814660][38909:38911] CHIP:DMG:                 AttributeStatusIB =
           [1683797474.814665][38909:38911] CHIP:DMG:                 {
           [1683797474.814668][38909:38911] CHIP:DMG:                         AttributePathIB =
@@ -133,14 +133,14 @@ tests:
           [1683797474.814688][38909:38911] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683797474.814692][38909:38911] CHIP:DMG:                                 ListIndex = Null,
           [1683797474.814696][38909:38911] CHIP:DMG:                         }
-          [1683797474.814702][38909:38911] CHIP:DMG:                                 
+          [1683797474.814702][38909:38911] CHIP:DMG:
           [1683797474.814706][38909:38911] CHIP:DMG:                         StatusIB =
           [1683797474.814710][38909:38911] CHIP:DMG:                         {
           [1683797474.814715][38909:38911] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683797474.814720][38909:38911] CHIP:DMG:                         },
-          [1683797474.814724][38909:38911] CHIP:DMG:                         
+          [1683797474.814724][38909:38911] CHIP:DMG:
           [1683797474.814728][38909:38911] CHIP:DMG:                 },
-          [1683797474.814737][38909:38911] CHIP:DMG:                 
+          [1683797474.814737][38909:38911] CHIP:DMG:
           [1683797474.814741][38909:38911] CHIP:DMG:                 AttributeStatusIB =
           [1683797474.814745][38909:38911] CHIP:DMG:                 {
           [1683797474.814748][38909:38911] CHIP:DMG:                         AttributePathIB =
@@ -150,14 +150,14 @@ tests:
           [1683797474.814767][38909:38911] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683797474.814771][38909:38911] CHIP:DMG:                                 ListIndex = Null,
           [1683797474.814776][38909:38911] CHIP:DMG:                         }
-          [1683797474.814782][38909:38911] CHIP:DMG:                                 
+          [1683797474.814782][38909:38911] CHIP:DMG:
           [1683797474.814786][38909:38911] CHIP:DMG:                         StatusIB =
           [1683797474.814791][38909:38911] CHIP:DMG:                         {
           [1683797474.814795][38909:38911] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683797474.814799][38909:38911] CHIP:DMG:                         },
-          [1683797474.814803][38909:38911] CHIP:DMG:                         
+          [1683797474.814803][38909:38911] CHIP:DMG:
           [1683797474.814808][38909:38911] CHIP:DMG:                 },
-          [1683797474.814817][38909:38911] CHIP:DMG:                 
+          [1683797474.814817][38909:38911] CHIP:DMG:
           [1683797474.814821][38909:38911] CHIP:DMG:                 AttributeStatusIB =
           [1683797474.814825][38909:38911] CHIP:DMG:                 {
           [1683797474.814828][38909:38911] CHIP:DMG:                         AttributePathIB =
@@ -167,14 +167,14 @@ tests:
           [1683797474.814868][38909:38911] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683797474.814872][38909:38911] CHIP:DMG:                                 ListIndex = Null,
           [1683797474.814876][38909:38911] CHIP:DMG:                         }
-          [1683797474.814882][38909:38911] CHIP:DMG:                                 
+          [1683797474.814882][38909:38911] CHIP:DMG:
           [1683797474.814886][38909:38911] CHIP:DMG:                         StatusIB =
           [1683797474.814892][38909:38911] CHIP:DMG:                         {
           [1683797474.814896][38909:38911] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683797474.814901][38909:38911] CHIP:DMG:                         },
-          [1683797474.814906][38909:38911] CHIP:DMG:                         
+          [1683797474.814906][38909:38911] CHIP:DMG:
           [1683797474.814910][38909:38911] CHIP:DMG:                 },
-          [1683797474.814919][38909:38911] CHIP:DMG:                 
+          [1683797474.814919][38909:38911] CHIP:DMG:
           [1683797474.814922][38909:38911] CHIP:DMG:                 AttributeStatusIB =
           [1683797474.814927][38909:38911] CHIP:DMG:                 {
           [1683797474.814931][38909:38911] CHIP:DMG:                         AttributePathIB =
@@ -184,14 +184,14 @@ tests:
           [1683797474.814950][38909:38911] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683797474.814954][38909:38911] CHIP:DMG:                                 ListIndex = Null,
           [1683797474.814958][38909:38911] CHIP:DMG:                         }
-          [1683797474.814965][38909:38911] CHIP:DMG:                                 
+          [1683797474.814965][38909:38911] CHIP:DMG:
           [1683797474.814969][38909:38911] CHIP:DMG:                         StatusIB =
           [1683797474.814973][38909:38911] CHIP:DMG:                         {
           [1683797474.814978][38909:38911] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683797474.814982][38909:38911] CHIP:DMG:                         },
-          [1683797474.814987][38909:38911] CHIP:DMG:                         
+          [1683797474.814987][38909:38911] CHIP:DMG:
           [1683797474.814991][38909:38911] CHIP:DMG:                 },
-          [1683797474.815000][38909:38911] CHIP:DMG:                 
+          [1683797474.815000][38909:38911] CHIP:DMG:
           [1683797474.815003][38909:38911] CHIP:DMG:                 AttributeStatusIB =
           [1683797474.815007][38909:38911] CHIP:DMG:                 {
           [1683797474.815011][38909:38911] CHIP:DMG:                         AttributePathIB =
@@ -201,14 +201,14 @@ tests:
           [1683797474.815029][38909:38911] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683797474.815033][38909:38911] CHIP:DMG:                                 ListIndex = Null,
           [1683797474.815038][38909:38911] CHIP:DMG:                         }
-          [1683797474.815045][38909:38911] CHIP:DMG:                                 
+          [1683797474.815045][38909:38911] CHIP:DMG:
           [1683797474.815048][38909:38911] CHIP:DMG:                         StatusIB =
           [1683797474.815054][38909:38911] CHIP:DMG:                         {
           [1683797474.815058][38909:38911] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683797474.815062][38909:38911] CHIP:DMG:                         },
-          [1683797474.815067][38909:38911] CHIP:DMG:                         
+          [1683797474.815067][38909:38911] CHIP:DMG:
           [1683797474.815071][38909:38911] CHIP:DMG:                 },
-          [1683797474.815080][38909:38911] CHIP:DMG:                 
+          [1683797474.815080][38909:38911] CHIP:DMG:
           [1683797474.815084][38909:38911] CHIP:DMG:                 AttributeStatusIB =
           [1683797474.815088][38909:38911] CHIP:DMG:                 {
           [1683797474.815091][38909:38911] CHIP:DMG:                         AttributePathIB =
@@ -218,14 +218,14 @@ tests:
           [1683797474.815112][38909:38911] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683797474.815117][38909:38911] CHIP:DMG:                                 ListIndex = Null,
           [1683797474.815121][38909:38911] CHIP:DMG:                         }
-          [1683797474.815127][38909:38911] CHIP:DMG:                                 
+          [1683797474.815127][38909:38911] CHIP:DMG:
           [1683797474.815131][38909:38911] CHIP:DMG:                         StatusIB =
           [1683797474.815135][38909:38911] CHIP:DMG:                         {
           [1683797474.815139][38909:38911] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683797474.815143][38909:38911] CHIP:DMG:                         },
-          [1683797474.815148][38909:38911] CHIP:DMG:                         
+          [1683797474.815148][38909:38911] CHIP:DMG:
           [1683797474.815151][38909:38911] CHIP:DMG:                 },
-          [1683797474.815160][38909:38911] CHIP:DMG:                 
+          [1683797474.815160][38909:38911] CHIP:DMG:
           [1683797474.815164][38909:38911] CHIP:DMG:                 AttributeStatusIB =
           [1683797474.815168][38909:38911] CHIP:DMG:                 {
           [1683797474.815171][38909:38911] CHIP:DMG:                         AttributePathIB =
@@ -235,14 +235,14 @@ tests:
           [1683797474.815190][38909:38911] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683797474.815198][38909:38911] CHIP:DMG:                                 ListIndex = Null,
           [1683797474.815202][38909:38911] CHIP:DMG:                         }
-          [1683797474.815207][38909:38911] CHIP:DMG:                                 
+          [1683797474.815207][38909:38911] CHIP:DMG:
           [1683797474.815211][38909:38911] CHIP:DMG:                         StatusIB =
           [1683797474.815216][38909:38911] CHIP:DMG:                         {
           [1683797474.815220][38909:38911] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683797474.815224][38909:38911] CHIP:DMG:                         },
-          [1683797474.815230][38909:38911] CHIP:DMG:                         
+          [1683797474.815230][38909:38911] CHIP:DMG:
           [1683797474.815233][38909:38911] CHIP:DMG:                 },
-          [1683797474.815242][38909:38911] CHIP:DMG:                 
+          [1683797474.815242][38909:38911] CHIP:DMG:
           [1683797474.815245][38909:38911] CHIP:DMG:                 AttributeStatusIB =
           [1683797474.815249][38909:38911] CHIP:DMG:                 {
           [1683797474.815252][38909:38911] CHIP:DMG:                         AttributePathIB =
@@ -252,14 +252,14 @@ tests:
           [1683797474.815271][38909:38911] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683797474.815275][38909:38911] CHIP:DMG:                                 ListIndex = Null,
           [1683797474.815278][38909:38911] CHIP:DMG:                         }
-          [1683797474.815285][38909:38911] CHIP:DMG:                                 
+          [1683797474.815285][38909:38911] CHIP:DMG:
           [1683797474.815289][38909:38911] CHIP:DMG:                         StatusIB =
           [1683797474.815293][38909:38911] CHIP:DMG:                         {
           [1683797474.815297][38909:38911] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683797474.815300][38909:38911] CHIP:DMG:                         },
-          [1683797474.815305][38909:38911] CHIP:DMG:                         
+          [1683797474.815305][38909:38911] CHIP:DMG:
           [1683797474.815308][38909:38911] CHIP:DMG:                 },
-          [1683797474.815317][38909:38911] CHIP:DMG:                 
+          [1683797474.815317][38909:38911] CHIP:DMG:
           [1683797474.815321][38909:38911] CHIP:DMG:                 AttributeStatusIB =
           [1683797474.815325][38909:38911] CHIP:DMG:                 {
           [1683797474.815329][38909:38911] CHIP:DMG:                         AttributePathIB =
@@ -269,14 +269,14 @@ tests:
           [1683797474.815346][38909:38911] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683797474.815352][38909:38911] CHIP:DMG:                                 ListIndex = Null,
           [1683797474.815356][38909:38911] CHIP:DMG:                         }
-          [1683797474.815363][38909:38911] CHIP:DMG:                                 
+          [1683797474.815363][38909:38911] CHIP:DMG:
           [1683797474.815366][38909:38911] CHIP:DMG:                         StatusIB =
           [1683797474.815370][38909:38911] CHIP:DMG:                         {
           [1683797474.815375][38909:38911] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683797474.815379][38909:38911] CHIP:DMG:                         },
-          [1683797474.815383][38909:38911] CHIP:DMG:                         
+          [1683797474.815383][38909:38911] CHIP:DMG:
           [1683797474.815387][38909:38911] CHIP:DMG:                 },
-          [1683797474.815396][38909:38911] CHIP:DMG:                 
+          [1683797474.815396][38909:38911] CHIP:DMG:
           [1683797474.815400][38909:38911] CHIP:DMG:                 AttributeStatusIB =
           [1683797474.815404][38909:38911] CHIP:DMG:                 {
           [1683797474.815407][38909:38911] CHIP:DMG:                         AttributePathIB =
@@ -286,16 +286,16 @@ tests:
           [1683797474.815424][38909:38911] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683797474.815428][38909:38911] CHIP:DMG:                                 ListIndex = Null,
           [1683797474.815432][38909:38911] CHIP:DMG:                         }
-          [1683797474.815439][38909:38911] CHIP:DMG:                                 
+          [1683797474.815439][38909:38911] CHIP:DMG:
           [1683797474.815443][38909:38911] CHIP:DMG:                         StatusIB =
           [1683797474.815448][38909:38911] CHIP:DMG:                         {
           [1683797474.815452][38909:38911] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683797474.815455][38909:38911] CHIP:DMG:                         },
-          [1683797474.815460][38909:38911] CHIP:DMG:                         
+          [1683797474.815460][38909:38911] CHIP:DMG:
           [1683797474.815463][38909:38911] CHIP:DMG:                 },
-          [1683797474.815469][38909:38911] CHIP:DMG:                 
+          [1683797474.815469][38909:38911] CHIP:DMG:
           [1683797474.815473][38909:38911] CHIP:DMG:         ],
-          [1683797474.815508][38909:38911] CHIP:DMG:         
+          [1683797474.815508][38909:38911] CHIP:DMG:
           [1683797474.815512][38909:38911] CHIP:DMG:         InteractionModelRevision = 1
           [1683797474.815515][38909:38911] CHIP:DMG: }
       disabled: true
@@ -340,7 +340,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify the "GroupTable entries" with  following fields: 
+          Verify the "GroupTable entries" with  following fields:
           GroupId is 0x0001
           Endpoint is 0
           If G.S.F00(GN) is true then GroupName is Gp1, Otherwise empty on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
@@ -382,7 +382,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify the "GroupTable entries" with  following fields: 
+          Verify the "GroupTable entries" with  following fields:
           GroupId is 0x0002
           Endpoint is 0
           If G.S.F00(GN) is true then GroupName is Gp2, Otherwise empty  on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
@@ -538,7 +538,7 @@ tests:
           cluster from DUT on Ep0"
       PICS: GRPKEY.S.A0001
       verification: |
-          ./chip-tool groupkeymanagement read group-table 1 0  
+          ./chip-tool groupkeymanagement read group-table 1 0
 
           Verify the "GroupTable entries" are same as GroupId's added in step 5 on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
@@ -649,14 +649,14 @@ tests:
           [1683799348.785789][39651:39653] CHIP:DMG:                                 Cluster = 0x3f,
           [1683799348.785794][39651:39653] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683799348.785798][39651:39653] CHIP:DMG:                         }
-          [1683799348.785804][39651:39653] CHIP:DMG:                                 
+          [1683799348.785804][39651:39653] CHIP:DMG:
           [1683799348.785811][39651:39653] CHIP:DMG:                         StatusIB =
           [1683799348.785816][39651:39653] CHIP:DMG:                         {
           [1683799348.785821][39651:39653] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683799348.785825][39651:39653] CHIP:DMG:                         },
-          [1683799348.785831][39651:39653] CHIP:DMG:                         
+          [1683799348.785831][39651:39653] CHIP:DMG:
           [1683799348.785835][39651:39653] CHIP:DMG:                 },
-          [1683799348.785844][39651:39653] CHIP:DMG:                 
+          [1683799348.785844][39651:39653] CHIP:DMG:
           [1683799348.785848][39651:39653] CHIP:DMG:                 AttributeStatusIB =
           [1683799348.785852][39651:39653] CHIP:DMG:                 {
           [1683799348.785856][39651:39653] CHIP:DMG:                         AttributePathIB =
@@ -666,16 +666,16 @@ tests:
           [1683799348.785874][39651:39653] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683799348.785878][39651:39653] CHIP:DMG:                                 ListIndex = Null,
           [1683799348.785882][39651:39653] CHIP:DMG:                         }
-          [1683799348.785889][39651:39653] CHIP:DMG:                                 
+          [1683799348.785889][39651:39653] CHIP:DMG:
           [1683799348.785894][39651:39653] CHIP:DMG:                         StatusIB =
           [1683799348.785898][39651:39653] CHIP:DMG:                         {
           [1683799348.785904][39651:39653] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683799348.785909][39651:39653] CHIP:DMG:                         },
-          [1683799348.785914][39651:39653] CHIP:DMG:                         
+          [1683799348.785914][39651:39653] CHIP:DMG:
           [1683799348.785918][39651:39653] CHIP:DMG:                 },
-          [1683799348.785924][39651:39653] CHIP:DMG:                 
+          [1683799348.785924][39651:39653] CHIP:DMG:
           [1683799348.785927][39651:39653] CHIP:DMG:         ],
-          [1683799348.785936][39651:39653] CHIP:DMG:         
+          [1683799348.785936][39651:39653] CHIP:DMG:
           [1683799348.785940][39651:39653] CHIP:DMG:         InteractionModelRevision = 1
           [1683799348.785943][39651:39653] CHIP:DMG: }
       disabled: true
@@ -836,7 +836,7 @@ tests:
           ./chip-tool groups view-group 0x0001 1 0
 
           Verify the ViewGroupResponse with following fields :
-          Status is SUCCESS 
+          Status is SUCCESS
           GroupID is 0x0001 and same as the one which is sent in ViewGroup command
           If G.S.F00(GN) is true then GroupName is Gp1, Otherwise empty
           on  TH(Chip-tool)  Log , below is the sample log provided for the raspi platform:
@@ -997,7 +997,7 @@ tests:
           ./chip-tool groups remove-group 0x0000 1 0
 
           Verify the RemoveGroupResponse with  following fields:
-          Status is CONSTRAINT_ERROR 
+          Status is CONSTRAINT_ERROR
           GroupID is not in the inclusive range of 0x0001 to 0xffff on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
           [1653485045.328766][11473:11478] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0003

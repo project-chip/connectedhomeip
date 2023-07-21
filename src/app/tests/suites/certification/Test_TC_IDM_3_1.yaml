@@ -33,7 +33,7 @@ tests:
           "Step 1: DUT sends the WriteRequestMessage to the TH to modify one
           attribute data"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
 
            ./chip-tool levelcontrol write on-level 2 1 1
@@ -81,7 +81,7 @@ tests:
           attribute of data type bool."
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Bool
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool  basicinformation write local-config-disabled 1 1 0
 
@@ -164,7 +164,7 @@ tests:
           attribute of data type unsigned integer."
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_UnsignedInteger
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any write-by-id  0x0008 0x0010 1 1 1
 
@@ -254,7 +254,7 @@ tests:
           attribute of data type enum."
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Enum
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool any write-by-id 0x0204 0  1  1 1
 
@@ -337,7 +337,7 @@ tests:
           of attribute data, which is larger than 1 MTU(1280 bytes), that has to
           be sent in multiple messages."
       verification: |
-          DUT implementation required to verify write an attribute which is is larger than 1 MTU(1280 bytes) 
+          DUT implementation required to verify write an attribute which is is larger than 1 MTU(1280 bytes)
           Here is an example command to verify the write functionality. User must choose an attribute which has large list of attribute data.
            ./chip-tool  basicinformation write node-label node 1 0
 
@@ -349,7 +349,7 @@ tests:
           attribute on a given cluster and endpoint. Repeat the above steps 3
           times."
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any write-by-id 0x0204 0  1  1 1
 

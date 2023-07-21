@@ -43,7 +43,7 @@ tests:
       verification: |
           1. Launch all-clusters-app on the raspi , get the Manual Pairing code from the log
 
-          ./chip-all-clusters-app --wifi 
+          ./chip-all-clusters-app --wifi
 
           [13293:13293] CHIP:DL: Device Configuration:
           [1653306603.740569][13293:13293] CHIP:DL:   Serial Number: TEST_SN

@@ -35,7 +35,7 @@ tests:
     - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
-          "1. Provision the device using TH_CR1 - chip tool(use above instructions) , 
+          "1. Provision the device using TH_CR1 - chip tool(use above instructions) ,
           "
       disabled: true
 
@@ -46,13 +46,13 @@ tests:
       verification: |
           On TH_CR1 (chip tool), open commissioning window using BCM
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0  --timedInteractionTimeoutMs 1000 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0  --timedInteractionTimeoutMs 1000
 
           Verify success response On TH_CR1(chip-tool) Log
 
           CHIP:DMG: InvokeResponseMessage =
           [1649756654.928453][3385:3390] CHIP:DMG: {
-          [1649756654.928511][3385:3390] CHIP:DMG:         suppressResponse = false, 
+          [1649756654.928511][3385:3390] CHIP:DMG:         suppressResponse = false,
           [1649756654.928571][3385:3390] CHIP:DMG:         InvokeResponseIBs =
           [1649756654.928647][3385:3390] CHIP:DMG:         [
           [1649756654.928708][3385:3390] CHIP:DMG:                 InvokeResponseIB =
@@ -65,18 +65,18 @@ tests:
           [1649756654.929284][3385:3390] CHIP:DMG:                                         ClusterId = 0x3c,
           [1649756654.929376][3385:3390] CHIP:DMG:                                         CommandId = 0x1,
           [1649756654.929459][3385:3390] CHIP:DMG:                                 },
-          [1649756654.929551][3385:3390] CHIP:DMG:                                 
+          [1649756654.929551][3385:3390] CHIP:DMG:
           [1649756654.929632][3385:3390] CHIP:DMG:                                 StatusIB =
           [1649756654.929720][3385:3390] CHIP:DMG:                                 {
           [1649756654.929804][3385:3390] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1649756654.929878][3385:3390] CHIP:DMG:                                 },
-          [1649756654.929946][3385:3390] CHIP:DMG:                                 
+          [1649756654.929946][3385:3390] CHIP:DMG:
           [1649756654.930017][3385:3390] CHIP:DMG:                         },
-          [1649756654.930109][3385:3390] CHIP:DMG:                         
+          [1649756654.930109][3385:3390] CHIP:DMG:
           [1649756654.930176][3385:3390] CHIP:DMG:                 },
-          [1649756654.930256][3385:3390] CHIP:DMG:                 
+          [1649756654.930256][3385:3390] CHIP:DMG:
           [1649756654.930314][3385:3390] CHIP:DMG:         ],
-          [1649756654.930389][3385:3390] CHIP:DMG:         
+          [1649756654.930389][3385:3390] CHIP:DMG:
           [1649756654.930448][3385:3390] CHIP:DMG:         InteractionModelRevision = 1
           [1649756654.930555][3385:3390] CHIP:DMG: },
           [1649756654.930703][3385:3390] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
@@ -140,7 +140,7 @@ tests:
           CHIP:TOO:    }
           CHIP:DMG: ICR moving to [AwaitingDe]
 
-          Verify CommissionedFabrics=SupportedFabrics-1 on  TH_CR2(chip-tool) log 
+          Verify CommissionedFabrics=SupportedFabrics-1 on  TH_CR2(chip-tool) log
 
           ./chip-tool operationalcredentials read commissioned-fabrics 2 0 --commissioner-name beta
 

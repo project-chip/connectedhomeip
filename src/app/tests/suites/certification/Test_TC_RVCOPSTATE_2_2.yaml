@@ -42,7 +42,7 @@ tests:
       PICS: RVCOPSTATE.S.A0003
       verification: |
           ./chip-tool roboticvacuumoperationalstate read operationalstatelist 1 1
-           
+
            Via the TH (chip-tool), verify:
            - all entries include an ID (enum8) and a label (string)
            - all provided IDs are in the allowed range
@@ -53,7 +53,7 @@ tests:
       PICS: RVCOPSTATE.S.C02.Rsp && RVCOPSTATE.S.C04.Tx
       verification: |
           ./chip-tool roboticvacuumoperationalstate start 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
            - The ErrorStateID field is set to 0x00 (NoError)
@@ -63,7 +63,7 @@ tests:
       PICS: RVCOPSTATE.S.A0004
       verification: |
           ./chip-tool roboticvacuumoperationalstate read operationalstate 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the response has an operationalstateID field that is set to 0x01 (Running)
       disabled: true
@@ -72,7 +72,7 @@ tests:
       PICS: RVCOPSTATE.S.A0005
       verification: |
           ./chip-tool roboticvacuumoperationalstate read countdowntime 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the response is an instance of a uint32
       disabled: true
@@ -81,7 +81,7 @@ tests:
       PICS: RVCOPSTATE.S.A0002
       verification: |
           ./chip-tool roboticvacuumoperationalstate read countdowntime 1 1
-           
+
            Via the TH (chip-tool), verify:
            - that CountdownTime attribute contains either null our a uint32 value
            - if non-null, verify that the value is in the range 1 to 259200
@@ -92,10 +92,10 @@ tests:
       PICS: RVCOPSTATE.S.A0000
       verification: |
           ./chip-tool roboticvacuumoperationalstate read phaselist 1 1
-           
+
            Via the TH (chip-tool), verify:
-           - that PhaseList attribute value contains either null or a list of strings. 
-           
+           - that PhaseList attribute value contains either null or a list of strings.
+
            If not null, receord the number of entries in the list as 'phase-list-size'; execute step 7.
            If null, go to step 8.
       disabled: true
@@ -104,7 +104,7 @@ tests:
       PICS: RVCOPSTATE.S.A0001
       verification: |
           ./chip-tool roboticvacuumoperationalstate read currentphase 1 1
-           
+
            Via the TH (chip-tool), verify:
            - that the CurrentPhase attribute value contains contains a uint8 value
            - that the value is between 0 and 'phase-list-size - 1'.
@@ -122,7 +122,7 @@ tests:
       PICS: RVCOPSTATE.S.A0002
       verification: |
           ./chip-tool roboticvacuumoperationalstate read countdowntime 1 1
-           
+
            Via the TH (chip-tool), verify:
            - that CountdownTime attribute contains either null our a uint32 value
            - if non-null, verify that the value is in the range 1 to 259200
@@ -133,7 +133,7 @@ tests:
       PICS: RVCOPSTATE.S.C02.Rsp && RVCOPSTATE.S.C04.Tx
       verification: |
           ./chip-tool roboticvacuumoperationalstate start 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
            - The ErrorStateID field is set to 0x00 (NoError)
@@ -143,7 +143,7 @@ tests:
       PICS: RVCOPSTATE.S.C01.Rsp && RVCOPSTATE.S.C04.Tx
       verification: |
           ./chip-tool roboticvacuumoperationalstate stop 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
            - The ErrorStateID field is set to 0x00 (NoError)
@@ -153,7 +153,7 @@ tests:
       PICS: RVCOPSTATE.S.A0004
       verification: |
           ./chip-tool roboticvacuumoperationalstate read operationalstate 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the response has an operationalstateID field that is set to 0x00 (Stopped)
       disabled: true
@@ -162,7 +162,7 @@ tests:
       PICS: RVCOPSTATE.S.C01.Rsp && RVCOPSTATE.S.C04.Tx
       verification: |
           ./chip-tool roboticvacuumoperationalstate stop 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
            - The ErrorStateID field is set to 0x00 (NoError)
@@ -179,7 +179,7 @@ tests:
       PICS: RVCOPSTATE.S.C02.Rsp && RVCOPSTATE.S.C04.Tx
       verification: |
           ./chip-tool roboticvacuumoperationalstate start 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
            - The ErrorStateID field is set to 0x01 (UnableToStartOrResume)

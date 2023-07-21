@@ -101,7 +101,7 @@ tests:
           process using BLE"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-          Verify on the DUT (CHIP-TOOL): 
+          Verify on the DUT (CHIP-TOOL):
            ./chip-tool pairing code 1  MT:-24J0YXE00KA0648G00
 
           [1657232374820] [31379:16804218] CHIP: [CTL] Received CommissioningComplete response, errorCode=0
@@ -156,7 +156,7 @@ tests:
           process using IP Network"
       PICS: MCORE.DD.DISCOVERY_IP
       verification: |
-          Verify on the DUT (CHIP-TOOL): 
+          Verify on the DUT (CHIP-TOOL):
            ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
 
           [1651105530854] [95067:65607294] CHIP: [CTL] Received CommissioningComplete response
@@ -179,14 +179,14 @@ tests:
           current Matter spec. documentation."
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope 
+          Out of Scope
           SoftAP commissioning not currently supported
       disabled: true
 
     - label: "Step 3b: Scan the QR code from the previous step using the DUT."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
-          Out of Scope 
+          Out of Scope
           SoftAP commissioning not currently supported
           1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
       disabled: true

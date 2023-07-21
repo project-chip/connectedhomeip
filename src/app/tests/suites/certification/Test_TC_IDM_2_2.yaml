@@ -538,7 +538,7 @@ tests:
 
           On TH(chip-tool) verify that the DUT sends the status code UNSUPPORTED_ENDPOINT for above command
 
-          [1653631094.367299][9229:9234] CHIP:DMG:         SuppressResponse = true, 
+          [1653631094.367299][9229:9234] CHIP:DMG:         SuppressResponse = true,
           [1653631094.367315][9229:9234] CHIP:DMG:         InteractionModelRevision = 1
           [1653631094.367329][9229:9234] CHIP:DMG: }
           [1653631094.367438][9229:9234] CHIP:TOO: Response Failure: IM Error 0x0000057F: General error: 0x7f (UNSUPPORTED_ENDPOINT)
@@ -585,7 +585,7 @@ tests:
           attribute which is not readable. DUT responds with the report data
           action."
       verification: |
-          DUT implementation required to verify read an attribute which is not having a read access 
+          DUT implementation required to verify read an attribute which is not having a read access
           If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
@@ -949,12 +949,12 @@ tests:
           [1653634371.474832][9936:9941] CHIP:DMG:                                         Cluster = 0x3,
           [1653634371.474859][9936:9941] CHIP:DMG:                                         Attribute = 0x0000_0001,
           [1653634371.474917][9936:9941] CHIP:DMG:                                 }
-          [1653634371.474945][9936:9941] CHIP:DMG:                                         
-          [1653634371.474990][9936:9941] CHIP:DMG:                                         Data = 2, 
+          [1653634371.474945][9936:9941] CHIP:DMG:
+          [1653634371.474990][9936:9941] CHIP:DMG:                                         Data = 2,
           [1653634371.475012][9936:9941] CHIP:DMG:                         },
-          [1653634371.475040][9936:9941] CHIP:DMG:                         
+          [1653634371.475040][9936:9941] CHIP:DMG:
           [1653634371.475058][9936:9941] CHIP:DMG:                 },
-          [1653634371.475091][9936:9941] CHIP:DMG:                 
+          [1653634371.475091][9936:9941] CHIP:DMG:
           [1653634371.475106][9936:9941] CHIP:DMG:                 AttributeReportIB =
           [1653634371.475127][9936:9941] CHIP:DMG:                 {
           [1653634371.475139][9936:9941] CHIP:DMG:                         AttributeDataIB =
@@ -966,15 +966,15 @@ tests:
           [1653634371.475258][9936:9941] CHIP:DMG:                                         Cluster = 0x3,
           [1653634371.475279][9936:9941] CHIP:DMG:                                         Attribute = 0x0000_0001,
           [1653634371.475303][9936:9941] CHIP:DMG:                                 }
-          [1653634371.475329][9936:9941] CHIP:DMG:                                         
-          [1653634371.475353][9936:9941] CHIP:DMG:                                         Data = 2, 
+          [1653634371.475329][9936:9941] CHIP:DMG:
+          [1653634371.475353][9936:9941] CHIP:DMG:                                         Data = 2,
           [1653634371.475373][9936:9941] CHIP:DMG:                         },
-          [1653634371.475399][9936:9941] CHIP:DMG:                         
+          [1653634371.475399][9936:9941] CHIP:DMG:
           [1653634371.475416][9936:9941] CHIP:DMG:                 },
-          [1653634371.475441][9936:9941] CHIP:DMG:                 
+          [1653634371.475441][9936:9941] CHIP:DMG:
           [1653634371.475456][9936:9941] CHIP:DMG:         ],
-          [1653634371.475485][9936:9941] CHIP:DMG:         
-          [1653634371.475501][9936:9941] CHIP:DMG:         SuppressResponse = true, 
+          [1653634371.475485][9936:9941] CHIP:DMG:
+          [1653634371.475501][9936:9941] CHIP:DMG:         SuppressResponse = true,
           [1653634371.475517][9936:9941] CHIP:DMG:         InteractionModelRevision = 1
           [1653634371.475531][9936:9941] CHIP:DMG: }
           [1653634371.475692][9936:9941] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3620435660
@@ -1057,7 +1057,7 @@ tests:
           spec can be chunked +"
       PICS: MCORE.IDM.S.LargeData
       verification: |
-          DUT implementation required to verify read an attribute which is is larger than 1 MTU(1280 bytes) 
+          DUT implementation required to verify read an attribute which is is larger than 1 MTU(1280 bytes)
           If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
@@ -1112,7 +1112,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
-          To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command 
+          To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except ACL cluster command if try to send any other command will get status as unsupported access
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]' 1 0
@@ -1129,14 +1129,14 @@ tests:
           [1659419722.669953][1915:1920] CHIP:DMG:                                 Cluster = 0x1f,
           [1659419722.669993][1915:1920] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1659419722.670034][1915:1920] CHIP:DMG:                         }
-          [1659419722.670077][1915:1920] CHIP:DMG:                                 
+          [1659419722.670077][1915:1920] CHIP:DMG:
           [1659419722.670114][1915:1920] CHIP:DMG:                         StatusIB =
           [1659419722.670153][1915:1920] CHIP:DMG:                         {
           [1659419722.670191][1915:1920] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1659419722.670229][1915:1920] CHIP:DMG:                         },
-          [1659419722.670266][1915:1920] CHIP:DMG:                         
+          [1659419722.670266][1915:1920] CHIP:DMG:
           [1659419722.670300][1915:1920] CHIP:DMG:                 },
-          [1659419722.670343][1915:1920] CHIP:DMG:                 
+          [1659419722.670343][1915:1920] CHIP:DMG:
           [1659419722.670373][1915:1920] CHIP:DMG:                 AttributeStatusIB =
           [1659419722.670405][1915:1920] CHIP:DMG:                 {
           [1659419722.670436][1915:1920] CHIP:DMG:                         AttributePathIB =
@@ -1146,20 +1146,20 @@ tests:
           [1659419722.670590][1915:1920] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1659419722.670661][1915:1920] CHIP:DMG:                                 ListIndex = Null,
           [1659419722.670700][1915:1920] CHIP:DMG:                         }
-          [1659419722.670740][1915:1920] CHIP:DMG:                                 
+          [1659419722.670740][1915:1920] CHIP:DMG:
           [1659419722.670776][1915:1920] CHIP:DMG:                         StatusIB =
           [1659419722.670813][1915:1920] CHIP:DMG:                         {
           [1659419722.670851][1915:1920] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1659419722.670888][1915:1920] CHIP:DMG:                         },
-          [1659419722.670925][1915:1920] CHIP:DMG:                         
+          [1659419722.670925][1915:1920] CHIP:DMG:
           [1659419722.670958][1915:1920] CHIP:DMG:                 },
-          [1659419722.670994][1915:1920] CHIP:DMG:                 
+          [1659419722.670994][1915:1920] CHIP:DMG:
           [1659419722.671022][1915:1920] CHIP:DMG:         ],
-          [1659419722.671062][1915:1920] CHIP:DMG:         
+          [1659419722.671062][1915:1920] CHIP:DMG:
           [1659419722.671092][1915:1920] CHIP:DMG:         InteractionModelRevision = 1
           [1659419722.671120][1915:1920] CHIP:DMG: }
           [1659419722.671244][1915:1920] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1659419722.671314][1915:1920] CHIP:EM: Sending Standalone Ack for MessageCounter:153124628 on 
+          [1659419722.671314][1915:1920] CHIP:EM: Sending Standalone Ack for MessageCounter:153124628 on
 
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0
@@ -1224,7 +1224,7 @@ tests:
           "Step 35: TH sends a Read Request Message to read all events and
           attributes from the DUT."
       verification: |
-          In case of chip tool, here is an example command to use  
+          In case of chip tool, here is an example command to use
 
            ./chip-tool any read-all 0xFFFFFFFF,0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF,0xFFFF
 

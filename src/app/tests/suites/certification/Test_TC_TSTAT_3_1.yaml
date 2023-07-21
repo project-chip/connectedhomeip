@@ -347,7 +347,7 @@ tests:
 
 
 
-           ./chip-tool thermostat write  control-sequence-of-operation 1 1 1 
+           ./chip-tool thermostat write  control-sequence-of-operation 1 1 1
           Verify the WriteRequestMessage on TH(thermostat-app)
 
           [1666952355.926940][5547:5547] CHIP:EM: Handling via exchange: 19955r, Delegate: 0xaaaabacd6d38

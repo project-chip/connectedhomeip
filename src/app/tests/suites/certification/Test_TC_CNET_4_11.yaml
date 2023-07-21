@@ -132,7 +132,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your 1st network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1  0 --Breadcrumb 1
 
@@ -154,7 +154,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
           ./chip-tool networkcommissioning add-or-update-wi-fi-network Sbee_Moto Sunsuraj 1 0 --Breadcrumb 1 ( second network)
 
@@ -192,7 +192,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your second network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
           ./chip-tool networkcommissioning connect-network hex:536265655F4D6F746F 1 0 --Breadcrumb 2 (second network)
 
@@ -306,7 +306,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1  0 --Breadcrumb 1
 
           Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 0 (success).
@@ -330,7 +330,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning add-or-update-wi-fi-network-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
           ./chip-tool networkcommissioning add-or-update-wi-fi-network Sbee_Moto Sunsuraj 1 0 --Breadcrumb 1 ( second network)
 
           Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 0 (success).
@@ -350,8 +350,8 @@ tests:
       PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
-          Below is an example: 
-          ./chip-tool networkcommissioning connect-network hex:536265655F4D6F746F 1 0 --Breadcrumb 3 (second network)  
+          Below is an example:
+          ./chip-tool networkcommissioning connect-network hex:536265655F4D6F746F 1 0 --Breadcrumb 3 (second network)
 
           Via the TH (chip-tool), Verify the ConnectNetworkResponse that contains Networking Status value as 0 (success).
 

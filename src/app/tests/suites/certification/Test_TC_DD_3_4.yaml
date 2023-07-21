@@ -43,9 +43,9 @@ tests:
 
           chip-tv-app is used as TH
 
-           ./chip-tv-app 
+           ./chip-tv-app
 
-          Verify in tv-app side 
+          Verify in tv-app side
 
           CHIP:DL: Using wifi MAC for hostname
           CHIP:DIS: Advertise operational node DFC28FF9FE811EF2-FFFFFFEFFFFFFFFF
@@ -114,7 +114,7 @@ tests:
           [1660758661.645506][2867:2867] CHIP:DIS:         Device Type: 35
           [1660758661.645548][2867:2867] CHIP:DIS:         Instance Name: 38D0A5D1137B8FF4
           [1660758661.645589][2867:2867] CHIP:DIS:         Commissioning Mode: 0
-          [1660758661.645633][2867:2867] CHIP:SVR: 3 commissioner(s) discovered. Select one (by number# above) to request commissioning from: 
+          [1660758661.645633][2867:2867] CHIP:SVR: 3 commissioner(s) discovered. Select one (by number# above) to request commissioning from:
           [1660758661.645672][2867:2867] CHIP:SVR: Example: cast request 0
       disabled: true
 
@@ -135,7 +135,7 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
 
-          Into the shell, enter "cast request 0" to send a user-directed-commissioning request to the DUT on tv-casting-app side  
+          Into the shell, enter "cast request 0" to send a user-directed-commissioning request to the DUT on tv-casting-app side
           > cast request 1 [1653179218011] [47890:1899175] CHIP: [DL] request [1653179218011] [47890:1899175] CHIP: [SVR] ------- PrepareForCommissioning [1653179218011] [47890:1899175] CHIP: [SVR] Server initializing...
       disabled: true
 

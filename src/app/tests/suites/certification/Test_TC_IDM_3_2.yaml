@@ -47,16 +47,16 @@ tests:
           [1686227268.758261][93527:93529] CHIP:DMG:                                 Cluster = 0x8,
           [1686227268.758269][93527:93529] CHIP:DMG:                                 Attribute = 0x0000_0011,
           [1686227268.758276][93527:93529] CHIP:DMG:                         }
-          [1686227268.758287][93527:93529] CHIP:DMG:                                 
+          [1686227268.758287][93527:93529] CHIP:DMG:
           [1686227268.758294][93527:93529] CHIP:DMG:                         StatusIB =
           [1686227268.758307][93527:93529] CHIP:DMG:                         {
           [1686227268.758315][93527:93529] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1686227268.758322][93527:93529] CHIP:DMG:                         },
-          [1686227268.758332][93527:93529] CHIP:DMG:                         
+          [1686227268.758332][93527:93529] CHIP:DMG:
           [1686227268.758337][93527:93529] CHIP:DMG:                 },
-          [1686227268.758347][93527:93529] CHIP:DMG:                 
+          [1686227268.758347][93527:93529] CHIP:DMG:
           [1686227268.758353][93527:93529] CHIP:DMG:         ],
-          [1686227268.758363][93527:93529] CHIP:DMG:         
+          [1686227268.758363][93527:93529] CHIP:DMG:
           [1686227268.758369][93527:93529] CHIP:DMG:         InteractionModelRevision = 1
           [1686227268.758375][93527:93529] CHIP:DMG: }
           [1686227268.758410][93527:93529] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -108,16 +108,16 @@ tests:
           [1686227392.013900][93552:93554] CHIP:DMG:                                 Cluster = 0x28,
           [1686227392.013902][93552:93554] CHIP:DMG:                                 Attribute = 0x0000_0010,
           [1686227392.013904][93552:93554] CHIP:DMG:                         }
-          [1686227392.013908][93552:93554] CHIP:DMG:                                 
+          [1686227392.013908][93552:93554] CHIP:DMG:
           [1686227392.013910][93552:93554] CHIP:DMG:                         StatusIB =
           [1686227392.013913][93552:93554] CHIP:DMG:                         {
           [1686227392.013915][93552:93554] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1686227392.013918][93552:93554] CHIP:DMG:                         },
-          [1686227392.013920][93552:93554] CHIP:DMG:                         
+          [1686227392.013920][93552:93554] CHIP:DMG:
           [1686227392.013922][93552:93554] CHIP:DMG:                 },
-          [1686227392.013925][93552:93554] CHIP:DMG:                 
+          [1686227392.013925][93552:93554] CHIP:DMG:
           [1686227392.013927][93552:93554] CHIP:DMG:         ],
-          [1686227392.013930][93552:93554] CHIP:DMG:         
+          [1686227392.013930][93552:93554] CHIP:DMG:
           [1686227392.013932][93552:93554] CHIP:DMG:         InteractionModelRevision = 1
           [1686227392.013934][93552:93554] CHIP:DMG: }
           [1686227392.013946][93552:93554] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -162,16 +162,16 @@ tests:
           [1686227478.441665][93568:93570] CHIP:DMG:                                 Cluster = 0x28,
           [1686227478.441673][93568:93570] CHIP:DMG:                                 Attribute = 0x0000_0005,
           [1686227478.441679][93568:93570] CHIP:DMG:                         }
-          [1686227478.441689][93568:93570] CHIP:DMG:                                 
+          [1686227478.441689][93568:93570] CHIP:DMG:
           [1686227478.441696][93568:93570] CHIP:DMG:                         StatusIB =
           [1686227478.441704][93568:93570] CHIP:DMG:                         {
           [1686227478.441711][93568:93570] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1686227478.441718][93568:93570] CHIP:DMG:                         },
-          [1686227478.441726][93568:93570] CHIP:DMG:                         
+          [1686227478.441726][93568:93570] CHIP:DMG:
           [1686227478.441731][93568:93570] CHIP:DMG:                 },
-          [1686227478.441741][93568:93570] CHIP:DMG:                 
+          [1686227478.441741][93568:93570] CHIP:DMG:
           [1686227478.441746][93568:93570] CHIP:DMG:         ],
-          [1686227478.441756][93568:93570] CHIP:DMG:         
+          [1686227478.441756][93568:93570] CHIP:DMG:
           [1686227478.441762][93568:93570] CHIP:DMG:         InteractionModelRevision = 1
           [1686227478.441768][93568:93570] CHIP:DMG: }
           [1686227478.441802][93568:93570] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -213,16 +213,16 @@ tests:
           [1686227533.524557][93582:93584] CHIP:DMG:                                 Cluster = 0x8,
           [1686227533.524569][93582:93584] CHIP:DMG:                                 Attribute = 0x0000_0010,
           [1686227533.524578][93582:93584] CHIP:DMG:                         }
-          [1686227533.524594][93582:93584] CHIP:DMG:                                 
+          [1686227533.524594][93582:93584] CHIP:DMG:
           [1686227533.524602][93582:93584] CHIP:DMG:                         StatusIB =
           [1686227533.524613][93582:93584] CHIP:DMG:                         {
           [1686227533.524623][93582:93584] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1686227533.524631][93582:93584] CHIP:DMG:                         },
-          [1686227533.524642][93582:93584] CHIP:DMG:                         
+          [1686227533.524642][93582:93584] CHIP:DMG:
           [1686227533.524650][93582:93584] CHIP:DMG:                 },
-          [1686227533.524663][93582:93584] CHIP:DMG:                 
+          [1686227533.524663][93582:93584] CHIP:DMG:
           [1686227533.524671][93582:93584] CHIP:DMG:         ],
-          [1686227533.524687][93582:93584] CHIP:DMG:         
+          [1686227533.524687][93582:93584] CHIP:DMG:
           [1686227533.524696][93582:93584] CHIP:DMG:         InteractionModelRevision = 1
           [1686227533.524704][93582:93584] CHIP:DMG: }
           [1686227533.524757][93582:93584] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -235,7 +235,7 @@ tests:
 
           On TH(chip-tool), verify the attribute value that was modified in above step
 
-          [1686227548.116523][93586:93588] CHIP:DMG:         SuppressResponse = true, 
+          [1686227548.116523][93586:93588] CHIP:DMG:         SuppressResponse = true,
           [1686227548.116529][93586:93588] CHIP:DMG:         InteractionModelRevision = 1
           [1686227548.116535][93586:93588] CHIP:DMG: }
           [1686227548.116609][93586:93588] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0010 DataVersion: 2737039618
@@ -319,16 +319,16 @@ tests:
           [1686227640.711505][93605:93607] CHIP:DMG:                                 Cluster = 0x204,
           [1686227640.711509][93605:93607] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1686227640.711512][93605:93607] CHIP:DMG:                         }
-          [1686227640.711517][93605:93607] CHIP:DMG:                                 
+          [1686227640.711517][93605:93607] CHIP:DMG:
           [1686227640.711521][93605:93607] CHIP:DMG:                         StatusIB =
           [1686227640.711525][93605:93607] CHIP:DMG:                         {
           [1686227640.711528][93605:93607] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1686227640.711532][93605:93607] CHIP:DMG:                         },
-          [1686227640.711535][93605:93607] CHIP:DMG:                         
+          [1686227640.711535][93605:93607] CHIP:DMG:
           [1686227640.711538][93605:93607] CHIP:DMG:                 },
-          [1686227640.711542][93605:93607] CHIP:DMG:                 
+          [1686227640.711542][93605:93607] CHIP:DMG:
           [1686227640.711545][93605:93607] CHIP:DMG:         ],
-          [1686227640.711550][93605:93607] CHIP:DMG:         
+          [1686227640.711550][93605:93607] CHIP:DMG:
           [1686227640.711553][93605:93607] CHIP:DMG:         InteractionModelRevision = 1
           [1686227640.711556][93605:93607] CHIP:DMG: }
           [1686227640.711575][93605:93607] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -339,7 +339,7 @@ tests:
           ./chip-tool any read-by-id 0x0204 0 1 1
 
           On TH(chip-tool), verify the attribute value that was modified in above step
-          [1686227658.643633][93610:93612] CHIP:DMG:         SuppressResponse = true, 
+          [1686227658.643633][93610:93612] CHIP:DMG:         SuppressResponse = true,
           [1686227658.643643][93610:93612] CHIP:DMG:         InteractionModelRevision = 1
           [1686227658.643651][93610:93612] CHIP:DMG: }
           [1686227658.643729][93610:93612] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 1939013916
@@ -374,16 +374,16 @@ tests:
           [1686227690.827308][93615:93617] CHIP:DMG:                                 Cluster = 0x300,
           [1686227690.827335][93615:93617] CHIP:DMG:                                 Attribute = 0x0000_000F,
           [1686227690.827343][93615:93617] CHIP:DMG:                         }
-          [1686227690.827353][93615:93617] CHIP:DMG:                                 
+          [1686227690.827353][93615:93617] CHIP:DMG:
           [1686227690.827360][93615:93617] CHIP:DMG:                         StatusIB =
           [1686227690.827367][93615:93617] CHIP:DMG:                         {
           [1686227690.827374][93615:93617] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1686227690.827381][93615:93617] CHIP:DMG:                         },
-          [1686227690.827388][93615:93617] CHIP:DMG:                         
+          [1686227690.827388][93615:93617] CHIP:DMG:
           [1686227690.827394][93615:93617] CHIP:DMG:                 },
-          [1686227690.827404][93615:93617] CHIP:DMG:                 
+          [1686227690.827404][93615:93617] CHIP:DMG:
           [1686227690.827409][93615:93617] CHIP:DMG:         ],
-          [1686227690.827419][93615:93617] CHIP:DMG:         
+          [1686227690.827419][93615:93617] CHIP:DMG:
           [1686227690.827425][93615:93617] CHIP:DMG:         InteractionModelRevision = 1
           [1686227690.827430][93615:93617] CHIP:DMG: }
           [1686227690.827466][93615:93617] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -397,7 +397,7 @@ tests:
 
           On TH(chip-tool), verify the attribute value that was modified in above step
 
-          [1686227710.429709][93622:93624] CHIP:DMG:         SuppressResponse = true, 
+          [1686227710.429709][93622:93624] CHIP:DMG:         SuppressResponse = true,
           [1686227710.429715][93622:93624] CHIP:DMG:         InteractionModelRevision = 1
           [1686227710.429720][93622:93624] CHIP:DMG: }
           [1686227710.429791][93622:93624] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_000F DataVersion: 861636757
@@ -439,16 +439,16 @@ tests:
           [1686227733.922279][93629:93631] CHIP:DMG:                                 Cluster = 0x8,
           [1686227733.922287][93629:93631] CHIP:DMG:                                 Attribute = 0x0000_0011,
           [1686227733.922293][93629:93631] CHIP:DMG:                         }
-          [1686227733.922304][93629:93631] CHIP:DMG:                                 
+          [1686227733.922304][93629:93631] CHIP:DMG:
           [1686227733.922310][93629:93631] CHIP:DMG:                         StatusIB =
           [1686227733.922318][93629:93631] CHIP:DMG:                         {
           [1686227733.922325][93629:93631] CHIP:DMG:                                 status = 0x7f (UNSUPPORTED_ENDPOINT),
           [1686227733.922332][93629:93631] CHIP:DMG:                         },
-          [1686227733.922339][93629:93631] CHIP:DMG:                         
+          [1686227733.922339][93629:93631] CHIP:DMG:
           [1686227733.922345][93629:93631] CHIP:DMG:                 },
-          [1686227733.922354][93629:93631] CHIP:DMG:                 
+          [1686227733.922354][93629:93631] CHIP:DMG:
           [1686227733.922359][93629:93631] CHIP:DMG:         ],
-          [1686227733.922369][93629:93631] CHIP:DMG:         
+          [1686227733.922369][93629:93631] CHIP:DMG:
           [1686227733.922375][93629:93631] CHIP:DMG:         InteractionModelRevision = 1
           [1686227733.922381][93629:93631] CHIP:DMG: }
           [1686227733.922415][93629:93631] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -483,16 +483,16 @@ tests:
           [1686229393.094098][94065:94067] CHIP:DMG:                                 Cluster = 0x201,
           [1686229393.094101][94065:94067] CHIP:DMG:                                 Attribute = 0x0000_0014,
           [1686229393.094103][94065:94067] CHIP:DMG:                         }
-          [1686229393.094106][94065:94067] CHIP:DMG:                                 
+          [1686229393.094106][94065:94067] CHIP:DMG:
           [1686229393.094108][94065:94067] CHIP:DMG:                         StatusIB =
           [1686229393.094110][94065:94067] CHIP:DMG:                         {
           [1686229393.094112][94065:94067] CHIP:DMG:                                 status = 0xc3 (UNSUPPORTED_CLUSTER),
           [1686229393.094114][94065:94067] CHIP:DMG:                         },
-          [1686229393.094117][94065:94067] CHIP:DMG:                         
+          [1686229393.094117][94065:94067] CHIP:DMG:
           [1686229393.094118][94065:94067] CHIP:DMG:                 },
-          [1686229393.094121][94065:94067] CHIP:DMG:                 
+          [1686229393.094121][94065:94067] CHIP:DMG:
           [1686229393.094123][94065:94067] CHIP:DMG:         ],
-          [1686229393.094126][94065:94067] CHIP:DMG:         
+          [1686229393.094126][94065:94067] CHIP:DMG:
           [1686229393.094128][94065:94067] CHIP:DMG:         InteractionModelRevision = 1
           [1686229393.094129][94065:94067] CHIP:DMG: }
           [1686229393.094140][94065:94067] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -523,16 +523,16 @@ tests:
           [1686228971.778125][93969:93971] CHIP:DMG:                                 Cluster = 0x201,
           [1686228971.778133][93969:93971] CHIP:DMG:                                 Attribute = 0x0000_0014,
           [1686228971.778140][93969:93971] CHIP:DMG:                         }
-          [1686228971.778150][93969:93971] CHIP:DMG:                                 
+          [1686228971.778150][93969:93971] CHIP:DMG:
           [1686228971.778157][93969:93971] CHIP:DMG:                         StatusIB =
           [1686228971.778167][93969:93971] CHIP:DMG:                         {
           [1686228971.778175][93969:93971] CHIP:DMG:                                 status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1686228971.778182][93969:93971] CHIP:DMG:                         },
-          [1686228971.778193][93969:93971] CHIP:DMG:                         
+          [1686228971.778193][93969:93971] CHIP:DMG:
           [1686228971.778199][93969:93971] CHIP:DMG:                 },
-          [1686228971.778210][93969:93971] CHIP:DMG:                 
+          [1686228971.778210][93969:93971] CHIP:DMG:
           [1686228971.778216][93969:93971] CHIP:DMG:         ],
-          [1686228971.778227][93969:93971] CHIP:DMG:         
+          [1686228971.778227][93969:93971] CHIP:DMG:
           [1686228971.778233][93969:93971] CHIP:DMG:         InteractionModelRevision = 1
           [1686228971.778241][93969:93971] CHIP:DMG: }
           [1686228971.778277][93969:93971] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -565,16 +565,16 @@ tests:
           [1686228740.233884][93918:93920] CHIP:DMG:                                 Cluster = 0x28,
           [1686228740.233896][93918:93920] CHIP:DMG:                                 Attribute = 0x0000_0007,
           [1686228740.233905][93918:93920] CHIP:DMG:                         }
-          [1686228740.233921][93918:93920] CHIP:DMG:                                 
+          [1686228740.233921][93918:93920] CHIP:DMG:
           [1686228740.233931][93918:93920] CHIP:DMG:                         StatusIB =
           [1686228740.233943][93918:93920] CHIP:DMG:                         {
           [1686228740.233954][93918:93920] CHIP:DMG:                                 status = 0x88 (UNSUPPORTED_WRITE),
           [1686228740.233964][93918:93920] CHIP:DMG:                         },
-          [1686228740.233976][93918:93920] CHIP:DMG:                         
+          [1686228740.233976][93918:93920] CHIP:DMG:
           [1686228740.233984][93918:93920] CHIP:DMG:                 },
-          [1686228740.233999][93918:93920] CHIP:DMG:                 
+          [1686228740.233999][93918:93920] CHIP:DMG:
           [1686228740.234007][93918:93920] CHIP:DMG:         ],
-          [1686228740.234023][93918:93920] CHIP:DMG:         
+          [1686228740.234023][93918:93920] CHIP:DMG:
           [1686228740.234031][93918:93920] CHIP:DMG:         InteractionModelRevision = 1
           [1686228740.234039][93918:93920] CHIP:DMG: }
           [1686228740.234097][93918:93920] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -592,7 +592,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
-          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command 
+          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except identify cluster command if try to send any other command will get status as unsupported access.
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]' 1 0
@@ -612,14 +612,14 @@ tests:
           [1686228784.940536][93932:93934] CHIP:DMG:                                 Cluster = 0x1f,
           [1686228784.940543][93932:93934] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1686228784.940550][93932:93934] CHIP:DMG:                         }
-          [1686228784.940559][93932:93934] CHIP:DMG:                                 
+          [1686228784.940559][93932:93934] CHIP:DMG:
           [1686228784.940566][93932:93934] CHIP:DMG:                         StatusIB =
           [1686228784.940574][93932:93934] CHIP:DMG:                         {
           [1686228784.940581][93932:93934] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1686228784.940588][93932:93934] CHIP:DMG:                         },
-          [1686228784.940596][93932:93934] CHIP:DMG:                         
+          [1686228784.940596][93932:93934] CHIP:DMG:
           [1686228784.940602][93932:93934] CHIP:DMG:                 },
-          [1686228784.940617][93932:93934] CHIP:DMG:                 
+          [1686228784.940617][93932:93934] CHIP:DMG:
           [1686228784.940622][93932:93934] CHIP:DMG:                 AttributeStatusIB =
           [1686228784.940634][93932:93934] CHIP:DMG:                 {
           [1686228784.940640][93932:93934] CHIP:DMG:                         AttributePathIB =
@@ -629,16 +629,16 @@ tests:
           [1686228784.940671][93932:93934] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1686228784.940678][93932:93934] CHIP:DMG:                                 ListIndex = Null,
           [1686228784.940684][93932:93934] CHIP:DMG:                         }
-          [1686228784.940694][93932:93934] CHIP:DMG:                                 
+          [1686228784.940694][93932:93934] CHIP:DMG:
           [1686228784.940700][93932:93934] CHIP:DMG:                         StatusIB =
           [1686228784.940710][93932:93934] CHIP:DMG:                         {
           [1686228784.940716][93932:93934] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1686228784.940723][93932:93934] CHIP:DMG:                         },
-          [1686228784.940731][93932:93934] CHIP:DMG:                         
+          [1686228784.940731][93932:93934] CHIP:DMG:
           [1686228784.940737][93932:93934] CHIP:DMG:                 },
-          [1686228784.940745][93932:93934] CHIP:DMG:                 
+          [1686228784.940745][93932:93934] CHIP:DMG:
           [1686228784.940750][93932:93934] CHIP:DMG:         ],
-          [1686228784.940764][93932:93934] CHIP:DMG:         
+          [1686228784.940764][93932:93934] CHIP:DMG:
           [1686228784.940770][93932:93934] CHIP:DMG:         InteractionModelRevision = 1
           [1686228784.940776][93932:93934] CHIP:DMG: }
           [1686228784.940829][93932:93934] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -665,16 +665,16 @@ tests:
           [1686228802.123105][93936:93938] CHIP:DMG:                                 Cluster = 0x204,
           [1686228802.123112][93936:93938] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1686228802.123118][93936:93938] CHIP:DMG:                         }
-          [1686228802.123128][93936:93938] CHIP:DMG:                                 
+          [1686228802.123128][93936:93938] CHIP:DMG:
           [1686228802.123135][93936:93938] CHIP:DMG:                         StatusIB =
           [1686228802.123142][93936:93938] CHIP:DMG:                         {
           [1686228802.123149][93936:93938] CHIP:DMG:                                 status = 0x7e (UNSUPPORTED_ACCESS),
           [1686228802.123156][93936:93938] CHIP:DMG:                         },
-          [1686228802.123163][93936:93938] CHIP:DMG:                         
+          [1686228802.123163][93936:93938] CHIP:DMG:
           [1686228802.123169][93936:93938] CHIP:DMG:                 },
-          [1686228802.123178][93936:93938] CHIP:DMG:                 
+          [1686228802.123178][93936:93938] CHIP:DMG:
           [1686228802.123184][93936:93938] CHIP:DMG:         ],
-          [1686228802.123194][93936:93938] CHIP:DMG:         
+          [1686228802.123194][93936:93938] CHIP:DMG:
           [1686228802.123200][93936:93938] CHIP:DMG:         InteractionModelRevision = 1
           [1686228802.123206][93936:93938] CHIP:DMG: }
           [1686228802.123240][93936:93938] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -696,7 +696,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
            ./chip-tool levelcontrol write on-level 2 1 1
-           On TH(chip-tool), verify that DUT sends a Write Response message with a success 
+           On TH(chip-tool), verify that DUT sends a Write Response message with a success
           [1686229097.486513][93998:94000] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1686229097.486533][93998:94000] CHIP:DMG: WriteResponseMessage =
           [1686229097.486541][93998:94000] CHIP:DMG: {
@@ -710,16 +710,16 @@ tests:
           [1686229097.486602][93998:94000] CHIP:DMG:                                 Cluster = 0x8,
           [1686229097.486610][93998:94000] CHIP:DMG:                                 Attribute = 0x0000_0011,
           [1686229097.486617][93998:94000] CHIP:DMG:                         }
-          [1686229097.486627][93998:94000] CHIP:DMG:                                 
+          [1686229097.486627][93998:94000] CHIP:DMG:
           [1686229097.486633][93998:94000] CHIP:DMG:                         StatusIB =
           [1686229097.486641][93998:94000] CHIP:DMG:                         {
           [1686229097.486648][93998:94000] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1686229097.486655][93998:94000] CHIP:DMG:                         },
-          [1686229097.486663][93998:94000] CHIP:DMG:                         
+          [1686229097.486663][93998:94000] CHIP:DMG:
           [1686229097.486669][93998:94000] CHIP:DMG:                 },
-          [1686229097.486678][93998:94000] CHIP:DMG:                 
+          [1686229097.486678][93998:94000] CHIP:DMG:
           [1686229097.486683][93998:94000] CHIP:DMG:         ],
-          [1686229097.486693][93998:94000] CHIP:DMG:         
+          [1686229097.486693][93998:94000] CHIP:DMG:
           [1686229097.486700][93998:94000] CHIP:DMG:         InteractionModelRevision = 1
           [1686229097.486705][93998:94000] CHIP:DMG: }
           [1686229097.486740][93998:94000] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -755,16 +755,16 @@ tests:
           [1686229150.157993][94008:94010] CHIP:DMG:                                 Cluster = 0x8,
           [1686229150.158001][94008:94010] CHIP:DMG:                                 Attribute = 0x0000_0011,
           [1686229150.158007][94008:94010] CHIP:DMG:                         }
-          [1686229150.158018][94008:94010] CHIP:DMG:                                 
+          [1686229150.158018][94008:94010] CHIP:DMG:
           [1686229150.158024][94008:94010] CHIP:DMG:                         StatusIB =
           [1686229150.158032][94008:94010] CHIP:DMG:                         {
           [1686229150.158039][94008:94010] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1686229150.158046][94008:94010] CHIP:DMG:                         },
-          [1686229150.158053][94008:94010] CHIP:DMG:                         
+          [1686229150.158053][94008:94010] CHIP:DMG:
           [1686229150.158059][94008:94010] CHIP:DMG:                 },
-          [1686229150.158068][94008:94010] CHIP:DMG:                 
+          [1686229150.158068][94008:94010] CHIP:DMG:
           [1686229150.158073][94008:94010] CHIP:DMG:         ],
-          [1686229150.158083][94008:94010] CHIP:DMG:         
+          [1686229150.158083][94008:94010] CHIP:DMG:
           [1686229150.158089][94008:94010] CHIP:DMG:         InteractionModelRevision = 1
           [1686229150.158095][94008:94010] CHIP:DMG: }
           [1686229150.158130][94008:94010] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -802,16 +802,16 @@ tests:
           [1686229199.082692][94020:94022] CHIP:DMG:                                 Cluster = 0x8,
           [1686229199.082700][94020:94022] CHIP:DMG:                                 Attribute = 0x0000_0011,
           [1686229199.082706][94020:94022] CHIP:DMG:                         }
-          [1686229199.082716][94020:94022] CHIP:DMG:                                 
+          [1686229199.082716][94020:94022] CHIP:DMG:
           [1686229199.082722][94020:94022] CHIP:DMG:                         StatusIB =
           [1686229199.082730][94020:94022] CHIP:DMG:                         {
           [1686229199.082737][94020:94022] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1686229199.082744][94020:94022] CHIP:DMG:                         },
-          [1686229199.082751][94020:94022] CHIP:DMG:                         
+          [1686229199.082751][94020:94022] CHIP:DMG:
           [1686229199.082757][94020:94022] CHIP:DMG:                 },
-          [1686229199.082766][94020:94022] CHIP:DMG:                 
+          [1686229199.082766][94020:94022] CHIP:DMG:
           [1686229199.082772][94020:94022] CHIP:DMG:         ],
-          [1686229199.082782][94020:94022] CHIP:DMG:         
+          [1686229199.082782][94020:94022] CHIP:DMG:
           [1686229199.082788][94020:94022] CHIP:DMG:         InteractionModelRevision = 1
           [1686229199.082794][94020:94022] CHIP:DMG: }
           [1686229199.082829][94020:94022] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -835,7 +835,7 @@ tests:
           "Step 20: TH sends the WriteRequestMessage to the DUT to modify the
           value of one attribute on a given cluster and endpoint to null. +"
       verification: |
-          Out of Scope 
+          Out of Scope
           https://github.com/project-chip/connectedhomeip/issues/8043
       disabled: true
 
@@ -851,7 +851,7 @@ tests:
           "Step 22: TH sends the WriteRequestMessage to the DUT to delete an
           attribute value +"
       verification: |
-          Out of Scope 
+          Out of Scope
           https://github.com/project-chip/connectedhomeip/issues/8043
       disabled: true
 
@@ -877,8 +877,8 @@ tests:
           ./chip-tool levelcontrol read on-level 1 1
 
            On TH(chip-tool), Verify the attribute value which is received from DUT
-          [1686229541.147770][94111:94113] CHIP:DMG:         
-          [1686229541.147777][94111:94113] CHIP:DMG:         SuppressResponse = true, 
+          [1686229541.147770][94111:94113] CHIP:DMG:
+          [1686229541.147777][94111:94113] CHIP:DMG:         SuppressResponse = true,
           [1686229541.147784][94111:94113] CHIP:DMG:         InteractionModelRevision = 1
           [1686229541.147789][94111:94113] CHIP:DMG: }
           [1686229541.147862][94111:94113] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 2737039621
@@ -888,11 +888,11 @@ tests:
 
 
 
-           TH sends below mentioned WriteRequestMessage to the DUT to modify the value of one attribute with the DataVersion field set to the one received in the prior step. 
+           TH sends below mentioned WriteRequestMessage to the DUT to modify the value of one attribute with the DataVersion field set to the one received in the prior step.
 
-          ./chip-tool levelcontrol write on-level 3 1 1 --data-version 0xc4c9d7ae 
+          ./chip-tool levelcontrol write on-level 3 1 1 --data-version 0xc4c9d7ae
 
-           On TH(chip-tool), verify that DUT sends a Write Response message with a success 
+           On TH(chip-tool), verify that DUT sends a Write Response message with a success
           [1686229590.858793][94124:94126] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1686229590.858813][94124:94126] CHIP:DMG: WriteResponseMessage =
           [1686229590.858821][94124:94126] CHIP:DMG: {
@@ -906,16 +906,16 @@ tests:
           [1686229590.858886][94124:94126] CHIP:DMG:                                 Cluster = 0x8,
           [1686229590.858894][94124:94126] CHIP:DMG:                                 Attribute = 0x0000_0011,
           [1686229590.858901][94124:94126] CHIP:DMG:                         }
-          [1686229590.858911][94124:94126] CHIP:DMG:                                 
+          [1686229590.858911][94124:94126] CHIP:DMG:
           [1686229590.858918][94124:94126] CHIP:DMG:                         StatusIB =
           [1686229590.858926][94124:94126] CHIP:DMG:                         {
           [1686229590.858934][94124:94126] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1686229590.858941][94124:94126] CHIP:DMG:                         },
-          [1686229590.858948][94124:94126] CHIP:DMG:                         
+          [1686229590.858948][94124:94126] CHIP:DMG:
           [1686229590.858955][94124:94126] CHIP:DMG:                 },
-          [1686229590.858964][94124:94126] CHIP:DMG:                 
+          [1686229590.858964][94124:94126] CHIP:DMG:
           [1686229590.858970][94124:94126] CHIP:DMG:         ],
-          [1686229590.858981][94124:94126] CHIP:DMG:         
+          [1686229590.858981][94124:94126] CHIP:DMG:
           [1686229590.858988][94124:94126] CHIP:DMG:         InteractionModelRevision = 1
           [1686229590.858993][94124:94126] CHIP:DMG: }
           [1686229590.859027][94124:94126] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -962,7 +962,7 @@ tests:
 
 
           ./chip-tool levelcontrol write on-level 4 1 1
-           On TH(chip-tool), DUT send a Write Response message with status code as success 
+           On TH(chip-tool), DUT send a Write Response message with status code as success
           [1686229675.214378][94147:94149] CHIP:DMG: WriteResponseMessage =
           [1686229675.214386][94147:94149] CHIP:DMG: {
           [1686229675.214393][94147:94149] CHIP:DMG:         AttributeStatusIBs =
@@ -975,16 +975,16 @@ tests:
           [1686229675.214473][94147:94149] CHIP:DMG:                                 Cluster = 0x8,
           [1686229675.214484][94147:94149] CHIP:DMG:                                 Attribute = 0x0000_0011,
           [1686229675.214494][94147:94149] CHIP:DMG:                         }
-          [1686229675.214509][94147:94149] CHIP:DMG:                                 
+          [1686229675.214509][94147:94149] CHIP:DMG:
           [1686229675.214518][94147:94149] CHIP:DMG:                         StatusIB =
           [1686229675.214530][94147:94149] CHIP:DMG:                         {
           [1686229675.214540][94147:94149] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1686229675.214550][94147:94149] CHIP:DMG:                         },
-          [1686229675.214562][94147:94149] CHIP:DMG:                         
+          [1686229675.214562][94147:94149] CHIP:DMG:
           [1686229675.214570][94147:94149] CHIP:DMG:                 },
-          [1686229675.214585][94147:94149] CHIP:DMG:                 
+          [1686229675.214585][94147:94149] CHIP:DMG:
           [1686229675.214592][94147:94149] CHIP:DMG:         ],
-          [1686229675.214607][94147:94149] CHIP:DMG:         
+          [1686229675.214607][94147:94149] CHIP:DMG:
           [1686229675.214615][94147:94149] CHIP:DMG:         InteractionModelRevision = 1
           [1686229675.214623][94147:94149] CHIP:DMG: }
           [1686229675.214664][94147:94149] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -998,7 +998,7 @@ tests:
 
            ./chip-tool levelcontrol write on-level 4 1 1 --data-version 0xc4c9d7af
 
-           On TH(chip-tool), verify that  DUT responds as DATA_VERSION_MISMATCH for the second Write request. 
+           On TH(chip-tool), verify that  DUT responds as DATA_VERSION_MISMATCH for the second Write request.
 
           [1686229718.873144][94160:94162] CHIP:EM: Rxd Ack; Removing MessageCounter:265995501 from Retrans Table on exchange 34809i
           [1686229718.873148][94160:94162] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -1014,16 +1014,16 @@ tests:
           [1686229718.873179][94160:94162] CHIP:DMG:                                 Cluster = 0x8,
           [1686229718.873182][94160:94162] CHIP:DMG:                                 Attribute = 0x0000_0011,
           [1686229718.873184][94160:94162] CHIP:DMG:                         }
-          [1686229718.873187][94160:94162] CHIP:DMG:                                 
+          [1686229718.873187][94160:94162] CHIP:DMG:
           [1686229718.873189][94160:94162] CHIP:DMG:                         StatusIB =
           [1686229718.873192][94160:94162] CHIP:DMG:                         {
           [1686229718.873194][94160:94162] CHIP:DMG:                                 status = 0x92 (DATA_VERSION_MISMATCH),
           [1686229718.873196][94160:94162] CHIP:DMG:                         },
-          [1686229718.873199][94160:94162] CHIP:DMG:                         
+          [1686229718.873199][94160:94162] CHIP:DMG:
           [1686229718.873201][94160:94162] CHIP:DMG:                 },
-          [1686229718.873203][94160:94162] CHIP:DMG:                 
+          [1686229718.873203][94160:94162] CHIP:DMG:
           [1686229718.873205][94160:94162] CHIP:DMG:         ],
-          [1686229718.873208][94160:94162] CHIP:DMG:         
+          [1686229718.873208][94160:94162] CHIP:DMG:
           [1686229718.873210][94160:94162] CHIP:DMG:         InteractionModelRevision = 1
           [1686229718.873212][94160:94162] CHIP:DMG: }
           [1686229718.873223][94160:94162] CHIP:DMG: WriteClient moving to [AwaitingDe]

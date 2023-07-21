@@ -94,7 +94,7 @@ tests:
           [1653645452.044092][15281:15286] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002A Attribute 0x0000_0002 DataVersion: 1306504521
           [1653645452.044186][15281:15286] CHIP:TOO:   UpdateState: 1
 
-          Relaunch the OTA Provider App and initiate another query 
+          Relaunch the OTA Provider App and initiate another query
           ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
 
           Verify that the DUT starts a new transfer of software image when sending another QueryImage request i.e. Start Offset field in ReceiveInit message received on OTA Provider side is 0

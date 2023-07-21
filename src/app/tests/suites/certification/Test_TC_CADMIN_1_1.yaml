@@ -66,9 +66,9 @@ tests:
           "Step 3a: TH_CR1 sends command to TH_CE to read the list of Fabrics"
       PICS: OPCREDS.C.A0001
       verification: |
-          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command with their all-cluster-app and for the second and third commissioners.  
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command with their all-cluster-app and for the second and third commissioners.
 
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
           ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
 
@@ -86,10 +86,10 @@ tests:
           [1676355303.609141][997145:997145] CHIP:DMG:                         Cluster = 0x3e,
           [1676355303.609150][997145:997145] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1676355303.609158][997145:997145] CHIP:DMG:                 }
-          [1676355303.609168][997145:997145] CHIP:DMG:                         
+          [1676355303.609168][997145:997145] CHIP:DMG:
           [1676355303.609175][997145:997145] CHIP:DMG:         ],
-          [1676355303.609186][997145:997145] CHIP:DMG:                 
-          [1676355303.609196][997145:997145] CHIP:DMG:         isFabricFiltered = false, 
+          [1676355303.609186][997145:997145] CHIP:DMG:
+          [1676355303.609196][997145:997145] CHIP:DMG:         isFabricFiltered = false,
           [1676355303.609206][997145:997145] CHIP:DMG:         InteractionModelRevision = 1
           [1676355303.609214][997145:997145] CHIP:DMG: },
           [1676355303.609271][997145:997145] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -105,7 +105,7 @@ tests:
           [1676355303.610557][997160:997162] CHIP:TOO:       VendorID: 65521
           [1676355303.610563][997160:997162] CHIP:TOO:       FabricID: 1
           [1676355303.610569][997160:997162] CHIP:TOO:       NodeID: 1
-          [1676355303.610576][997160:997162] CHIP:TOO:       Label: 
+          [1676355303.610576][997160:997162] CHIP:TOO:       Label:
           [1676355303.610582][997160:997162] CHIP:TOO:       FabricIndex: 1
           [1676355303.610588][997160:997162] CHIP:TOO:      }
           [1676355303.610660][997160:997162] CHIP:EM: <<< [E:41653i S:27265 M:61334885 (Ack:214003320)] (S) Msg TX to 1:0000000000000001 [6193] --- Type 0000:10 (SecureChannel:StandaloneAck)
@@ -139,9 +139,9 @@ tests:
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          On the raspi , Verify if the TH_CE(All-cluster-app) is broadcasting 
+          On the raspi , Verify if the TH_CE(All-cluster-app) is broadcasting
 
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
            avahi-browse -rt _matter._tcp
 
@@ -166,11 +166,11 @@ tests:
           Information Clusters NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
-          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command with their all-cluster-app and for the second and third commissioners.  
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command with their all-cluster-app and for the second and third commissioners.
 
-          On DUT_CR2 send the below command  
+          On DUT_CR2 send the below command
 
-            
+
           ./chip-tool  basicinformation write node-label te5new 2 0 --commissioner-name beta
 
           Verify Write request on TH_CE(all-clusters-app) Log
@@ -180,8 +180,8 @@ tests:
           [1660894021.901484][2871:2871] CHIP:DMG: IM WH moving to [Initialized]
           [1660894021.901613][2871:2871] CHIP:DMG: WriteRequestMessage =
           [1660894021.901676][2871:2871] CHIP:DMG: {
-          [1660894021.901735][2871:2871] CHIP:DMG:         suppressResponse = false, 
-          [1660894021.901802][2871:2871] CHIP:DMG:         timedRequest = false, 
+          [1660894021.901735][2871:2871] CHIP:DMG:         suppressResponse = false,
+          [1660894021.901802][2871:2871] CHIP:DMG:         timedRequest = false,
           [1660894021.901864][2871:2871] CHIP:DMG:         AttributeDataIBs =
           [1660894021.901940][2871:2871] CHIP:DMG:         [
           [1660894021.902001][2871:2871] CHIP:DMG:                 AttributeDataIB =
@@ -192,8 +192,8 @@ tests:
           [1660894021.902394][2871:2871] CHIP:DMG:                                 Cluster = 0x28,
           [1660894021.902488][2871:2871] CHIP:DMG:                                 Attribute = 0x0000_0005,
           [1660894021.902574][2871:2871] CHIP:DMG:                         }
-          [1660894021.902827][2871:2871] CHIP:DMG:                                 
-          [1660894021.902912][2871:2871] CHIP:DMG:                         Data = "te5new" (6 chars), 
+          [1660894021.902827][2871:2871] CHIP:DMG:
+          [1660894021.902912][2871:2871] CHIP:DMG:                         Data = "te5new" (6 chars),
           [1660894021.902985][2871:2871] CHIP:DMG:                 },
 
           ./chip-tool  basicinformation read node-label 2 0 --commissioner-name beta
@@ -222,7 +222,7 @@ tests:
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          On DUT_CR2 send the below command  
+          On DUT_CR2 send the below command
 
           ./chip-tool operationalcredentials read fabrics 2 0  --fabric-filtered 0 --commissioner-name beta
 
@@ -237,10 +237,10 @@ tests:
           [1676355937.247238][997283:997283] CHIP:DMG:                         Cluster = 0x3e,
           [1676355937.247245][997283:997283] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1676355937.247251][997283:997283] CHIP:DMG:                 }
-          [1676355937.247259][997283:997283] CHIP:DMG:                         
+          [1676355937.247259][997283:997283] CHIP:DMG:
           [1676355937.247264][997283:997283] CHIP:DMG:         ],
-          [1676355937.247273][997283:997283] CHIP:DMG:                 
-          [1676355937.247279][997283:997283] CHIP:DMG:         isFabricFiltered = false, 
+          [1676355937.247273][997283:997283] CHIP:DMG:
+          [1676355937.247279][997283:997283] CHIP:DMG:         isFabricFiltered = false,
           [1676355937.247285][997283:997283] CHIP:DMG:         InteractionModelRevision = 1
           [1676355937.247291][997283:997283] CHIP:DMG: },
           [1676355937.247324][997283:997283] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -254,7 +254,7 @@ tests:
           [1676355937.249150][997381:997383] CHIP:TOO:       VendorID: 65521
           [1676355937.249152][997381:997383] CHIP:TOO:       FabricID: 1
           [1676355937.249154][997381:997383] CHIP:TOO:       NodeID: 1
-          [1676355937.249156][997381:997383] CHIP:TOO:       Label: 
+          [1676355937.249156][997381:997383] CHIP:TOO:       Label:
           [1676355937.249158][997381:997383] CHIP:TOO:       FabricIndex: 1
           [1676355937.249160][997381:997383] CHIP:TOO:      }
           [1676355937.249163][997381:997383] CHIP:TOO:     [2]: {
@@ -262,7 +262,7 @@ tests:
           [1676355937.249168][997381:997383] CHIP:TOO:       VendorID: 65521
           [1676355937.249170][997381:997383] CHIP:TOO:       FabricID: 2
           [1676355937.249172][997381:997383] CHIP:TOO:       NodeID: 2
-          [1676355937.249173][997381:997383] CHIP:TOO:       Label: 
+          [1676355937.249173][997381:997383] CHIP:TOO:       Label:
           [1676355937.249175][997381:997383] CHIP:TOO:       FabricIndex: 2
           [1676355937.249176][997381:997383] CHIP:TOO:      }
           [1676355937.249199][997381:997383] CHIP:EM: <<< [E:40732i S:56928 M:242798967 (Ack:118300610)] (S) Msg TX to 2:0000000000000002 [BE7C] --- Type 0000:10 (SecureChannel:StandaloneAck)
@@ -275,7 +275,7 @@ tests:
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
           ./chip-tool  basicinformation write node-label te8 1 0
 
@@ -287,8 +287,8 @@ tests:
           [1660894538.804737][2871:2871] CHIP:DMG: IM WH moving to [Initialized]
           [1660894538.804867][2871:2871] CHIP:DMG: WriteRequestMessage =
           [1660894538.804933][2871:2871] CHIP:DMG: {
-          [1660894538.804993][2871:2871] CHIP:DMG:         suppressResponse = false, 
-          [1660894538.805059][2871:2871] CHIP:DMG:         timedRequest = false, 
+          [1660894538.804993][2871:2871] CHIP:DMG:         suppressResponse = false,
+          [1660894538.805059][2871:2871] CHIP:DMG:         timedRequest = false,
           [1660894538.805120][2871:2871] CHIP:DMG:         AttributeDataIBs =
           [1660894538.805196][2871:2871] CHIP:DMG:         [
           [1660894538.805258][2871:2871] CHIP:DMG:                 AttributeDataIB =
@@ -299,8 +299,8 @@ tests:
           [1660894538.805661][2871:2871] CHIP:DMG:                                 Cluster = 0x28,
           [1660894538.805752][2871:2871] CHIP:DMG:                                 Attribute = 0x0000_0005,
           [1660894538.805840][2871:2871] CHIP:DMG:                         }
-          [1660894538.805922][2871:2871] CHIP:DMG:                                 
-          [1660894538.806010][2871:2871] CHIP:DMG:                         Data = "te8" (3 chars), 
+          [1660894538.805922][2871:2871] CHIP:DMG:
+          [1660894538.806010][2871:2871] CHIP:DMG:                         Data = "te8" (3 chars),
           [1660894538.806082][2871:2871] CHIP:DMG:                 },
 
           ./chip-tool  basicinformation read node-label 1 0
@@ -328,7 +328,7 @@ tests:
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          On DUT_CR2 send the below command  
+          On DUT_CR2 send the below command
 
           ./chip-tool  basicinformation read node-label 2 0 --commissioner-name beta
 
@@ -346,7 +346,7 @@ tests:
           [1660902253.379782][3045:3045] CHIP:DMG:                         Cluster = 0x28,
           [1660902253.379871][3045:3045] CHIP:DMG:                         Attribute = 0x0000_0005,
           [1660902253.379935][3045:3045] CHIP:DMG:                 }
-          [1660902253.380141][3045:3045] CHIP:DMG:                         
+          [1660902253.380141][3045:3045] CHIP:DMG:
           [1660902253.380208][3045:3045] CHIP:DMG:         ],
 
 
@@ -359,8 +359,8 @@ tests:
           [1660900144.090226][3045:3045] CHIP:DMG: IM WH moving to [Initialized]
           [1660900144.090347][3045:3045] CHIP:DMG: WriteRequestMessage =
           [1660900144.090411][3045:3045] CHIP:DMG: {
-          [1660900144.090470][3045:3045] CHIP:DMG:         suppressResponse = false, 
-          [1660900144.090537][3045:3045] CHIP:DMG:         timedRequest = false, 
+          [1660900144.090470][3045:3045] CHIP:DMG:         suppressResponse = false,
+          [1660900144.090537][3045:3045] CHIP:DMG:         timedRequest = false,
           [1660900144.090598][3045:3045] CHIP:DMG:         AttributeDataIBs =
           [1660900144.090677][3045:3045] CHIP:DMG:         [
           [1660900144.090739][3045:3045] CHIP:DMG:                 AttributeDataIB =
@@ -371,8 +371,8 @@ tests:
           [1660900144.091150][3045:3045] CHIP:DMG:                                 Cluster = 0x28,
           [1660900144.091247][3045:3045] CHIP:DMG:                                 Attribute = 0x0000_0005,
           [1660900144.091344][3045:3045] CHIP:DMG:                         }
-          [1660900144.091432][3045:3045] CHIP:DMG:                                 
-          [1660900144.091560][3045:3045] CHIP:DMG:                         Data = "te5new" (6 chars), 
+          [1660900144.091432][3045:3045] CHIP:DMG:
+          [1660900144.091560][3045:3045] CHIP:DMG:                         Data = "te5new" (6 chars),
           [1660900144.091655][3045:3045] CHIP:DMG:                 },
 
 
@@ -394,7 +394,7 @@ tests:
           [1660900360.861871][3045:3045] CHIP:DMG:                         Cluster = 0x28,
           [1660900360.861939][3045:3045] CHIP:DMG:                         Attribute = 0x0000_0005,
           [1660900360.862012][3045:3045] CHIP:DMG:                 }
-          [1660900360.862088][3045:3045] CHIP:DMG:                         
+          [1660900360.862088][3045:3045] CHIP:DMG:
           [1660900360.862158][3045:3045] CHIP:DMG:         ],
       disabled: true
 
@@ -411,10 +411,10 @@ tests:
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          On DUT_CR2 send the below command  
+          On DUT_CR2 send the below command
 
           ./chip-tool  pairing open-commissioning-window 2 1 400 2000 3841 --commissioner-name beta
-               
+
           Verify the Commissioning window is opened in TH_CE(all-clusters-app) Log
 
           [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
@@ -429,7 +429,7 @@ tests:
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          On DUT_CR2 send the below command  
+          On DUT_CR2 send the below command
 
           ./chip-tool administratorcommissioning revoke-commissioning 2 0 --timedInteractionTimeoutMs 1000 --commissioner-name beta
 
@@ -445,9 +445,9 @@ tests:
           process with TH_CE"
       PICS: CADMIN.C
       verification: |
-          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command with their all-cluster-app and for the second and third commissioners.  
-            
-          On TH_CR3 send the below command  
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command with their all-cluster-app and for the second and third commissioners.
+
+          On TH_CR3 send the below command
 
           ./chip-tool pairing code 3  34995354639  --commissioner-name gamma
 
@@ -473,7 +473,7 @@ tests:
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          On DUT_CR2 send the below command  
+          On DUT_CR2 send the below command
 
           ./chip-tool  basicinformation write node-label te5new 2 0 --commissioner-name beta
 
@@ -484,8 +484,8 @@ tests:
           [1660902144.913785][3045:3045] CHIP:DMG: IM WH moving to [Initialized]
           [1660902144.913912][3045:3045] CHIP:DMG: WriteRequestMessage =
           [1660902144.913977][3045:3045] CHIP:DMG: {
-          [1660902144.914038][3045:3045] CHIP:DMG:         suppressResponse = false, 
-          [1660902144.914106][3045:3045] CHIP:DMG:         timedRequest = false, 
+          [1660902144.914038][3045:3045] CHIP:DMG:         suppressResponse = false,
+          [1660902144.914106][3045:3045] CHIP:DMG:         timedRequest = false,
           [1660902144.914168][3045:3045] CHIP:DMG:         AttributeDataIBs =
           [1660902144.914244][3045:3045] CHIP:DMG:         [
           [1660902144.914305][3045:3045] CHIP:DMG:                 AttributeDataIB =
@@ -496,10 +496,10 @@ tests:
           [1660902144.914691][3045:3045] CHIP:DMG:                                 Cluster = 0x28,
           [1660902144.914940][3045:3045] CHIP:DMG:                                 Attribute = 0x0000_0005,
           [1660902144.915025][3045:3045] CHIP:DMG:                         }
-          [1660902144.915109][3045:3045] CHIP:DMG:                                 
-          [1660902144.915208][3045:3045] CHIP:DMG:                         Data = "te5new" (6 chars), 
+          [1660902144.915109][3045:3045] CHIP:DMG:
+          [1660902144.915208][3045:3045] CHIP:DMG:                         Data = "te5new" (6 chars),
           [1660902144.915292][3045:3045] CHIP:DMG:                 },
-          [1660902144.915374][3045:3045] CHIP:DMG:                 
+          [1660902144.915374][3045:3045] CHIP:DMG:
 
           ./chip-tool  basicinformation read node-label 2 0 --commissioner-name beta
 
@@ -517,7 +517,7 @@ tests:
           [1660902253.379782][3045:3045] CHIP:DMG:                         Cluster = 0x28,
           [1660902253.379871][3045:3045] CHIP:DMG:                         Attribute = 0x0000_0005,
           [1660902253.379935][3045:3045] CHIP:DMG:                 }
-          [1660902253.380141][3045:3045] CHIP:DMG:                         
+          [1660902253.380141][3045:3045] CHIP:DMG:
           [1660902253.380208][3045:3045] CHIP:DMG:         ],
       disabled: true
 
@@ -528,7 +528,7 @@ tests:
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          On DUT_CR2 send the below command  
+          On DUT_CR2 send the below command
 
           ./chip-tool pairing open-commissioning-window 2 1 180 1000 3840 --commissioner-name beta
 
@@ -553,7 +553,7 @@ tests:
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          On DUT_CR2 send the below command  
+          On DUT_CR2 send the below command
 
           ./chip-tool pairing open-commissioning-window 2 1 300 1000 3840 --commissioner-name beta
 
@@ -571,7 +571,7 @@ tests:
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
            (considering 34995354639 as the manual code generated by DUT)
           ./chip-tool pairing code 1 34995354639

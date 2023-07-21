@@ -243,7 +243,7 @@ tests:
           2"
       PICS: CNET.S.C00.Rsp && CNET.S.C01.Tx
       verification: |
-          Below is an example: 
+          Below is an example:
           ./chip-tool networkcommissioning scan-networks 1 0 --Ssid hex:47524C50726976617465 --Breadcrumb 2
 
           Via the TH (chip-tool), verify the ScanNetworks response with first network SSID.

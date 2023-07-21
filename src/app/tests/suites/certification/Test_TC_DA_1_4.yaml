@@ -53,7 +53,7 @@ tests:
 
     - label: "Step 2: DUT generates 32-byte AttestationNonce"
       verification: |
-          During provision, DUT sends AttestationRequest Command with AttestationNonce 
+          During provision, DUT sends AttestationRequest Command with AttestationNonce
 
 
           [1662449060.839956][31006:31006] CHIP:DMG:         }
@@ -92,20 +92,20 @@ tests:
           [1662449060.840930][31013:31018] CHIP:DMG:     Attestation Nonce (32) = 0DCBD6B7CE5AC2B7972D5350E2709C659E2222862BE8F204FE1E3D709FD959AD
           [1662449060.840932][31013:31018] CHIP:DMG:     Timestamp = 0
           [1662449060.840934][31013:31018] CHIP:DMG: }
-          [1662449060.840935][31013:31018] CHIP:DMG:  
-          [1662449060.840938][31013:31018] CHIP:DMG:  
+          [1662449060.840935][31013:31018] CHIP:DMG:
+          [1662449060.840938][31013:31018] CHIP:DMG:
           [1662449060.840943][31013:31018] CHIP:DMG: Additional Fields =
           [1662449060.840945][31013:31018] CHIP:DMG: {
           [1662449060.840948][31013:31018] CHIP:DMG:     peer_address = UDP:[fe80::b7b8:ff3e:9ace:3e12%wlp0s20f3]:5540
           [1662449060.840950][31013:31018] CHIP:DMG: }
-          [1662449060.840951][31013:31018] CHIP:DMG:  
+          [1662449060.840951][31013:31018] CHIP:DMG:
           [1662449060.840955][31013:31018] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:160787812 on exchange 51916i
           [1662449060.840959][31013:31018] CHIP:EM: Found matching exchange: 51916i, Delegate: 0x7fd35c0219d8
           [1662449060.840962][31013:31018] CHIP:EM: CHIP MessageCounter:39600912 not in RetransTable on exchange 51916i
           [1662449060.840969][31013:31018] CHIP:DMG: ICR moving to [ResponseRe]
           [1662449060.840974][31013:31018] CHIP:DMG: InvokeResponseMessage =
           [1662449060.840976][31013:31018] CHIP:DMG: {
-          [1662449060.840979][31013:31018] CHIP:DMG:         suppressResponse = false, 
+          [1662449060.840979][31013:31018] CHIP:DMG:         suppressResponse = false,
           [1662449060.840981][31013:31018] CHIP:DMG:         InvokeResponseIBs =
           [1662449060.840984][31013:31018] CHIP:DMG:         [
           [1662449060.840986][31013:31018] CHIP:DMG:                 InvokeResponseIB =
@@ -118,22 +118,22 @@ tests:
           [1662449060.841004][31013:31018] CHIP:DMG:                                         ClusterId = 0x3e,
           [1662449060.841006][31013:31018] CHIP:DMG:                                         CommandId = 0x1,
           [1662449060.841008][31013:31018] CHIP:DMG:                                 },
-          [1662449060.841011][31013:31018] CHIP:DMG:                                 
-          [1662449060.841013][31013:31018] CHIP:DMG:                                 CommandFields = 
+          [1662449060.841011][31013:31018] CHIP:DMG:
+          [1662449060.841013][31013:31018] CHIP:DMG:                                 CommandFields =
           [1662449060.841016][31013:31018] CHIP:DMG:                                 {
           [1662449060.841018][31013:31018] CHIP:DMG:                                         0x0 = [
           [1662449060.841037][31013:31018] CHIP:DMG:                                                         0x15, 0x31, 0x1, 0x1d, 0x2, 0x30, 0x82, 0x2, 0x19, 0x6, 0x9, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0xd, 0x1, 0x7, 0x2, 0xa0, 0x82, 0x2, 0xa, 0x30, 0x82, 0x2, 0x6, 0x2, 0x1, 0x3, 0x31, 0xd, 0x30, 0xb, 0x6, 0x9, 0x60, 0x86, 0x48, 0x1, 0x65, 0x3, 0x4, 0x2, 0x1, 0x30, 0x82, 0x1, 0x71, 0x6, 0x9, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0xd, 0x1, 0x7, 0x1, 0xa0, 0x82, 0x1, 0x62, 0x4, 0x82, 0x1, 0x5e, 0x15, 0x24, 0x0, 0x1, 0x25, 0x1, 0xf1, 0xff, 0x36, 0x2, 0x5, 0x0, 0x80, 0x5, 0x1, 0x80, 0x5, 0x2, 0x80, 0x5, 0x3, 0x80, 0x5, 0x4, 0x80, 0x5, 0x5, 0x80, 0x5, 0x6, 0x80, 0x5, 0x7, 0x80, 0x5, 0x8, 0x80, 0x5, 0x9, 0x80, 0x5, 0xa, 0x80, 0x5, 0xb, 0x80, 0x5, 0xc, 0x80, 0x5, 0xd, 0x80, 0x5, 0xe, 0x80, 0x5, 0xf, 0x80, 0x5, 0x10, 0x80, 0x5, 0x11, 0x80, 0x5, 0x12, 0x80, 0x5, 0x13, 0x80, 0x5, 0x14, 0x80, 0x5, 0x15, 0x80, 0x5, 0x16, 0x80, 0x5, 0x17, 0x80, 0x5, 0x18, 0x80, 0x5, 0x19, 0x80, 0x5, 0x1a, 0x80, 0x5, 0x1b, 0x80, 0x5, 0x1c, 0x80, 0x5, 0x1d, 0x80, 0x5, 0x1e, 0x80, 0x5, 0x1f, 0x80, 0x5, 0x20, 0x80, 0x5, 0x21, 0x80, 0x5, 0x22, 0x80, 0x5, 0x23, 0x80, 0x5, 0x24, 0x80, 0x5, 0x25, 0x80, 0x5, 0x26, 0x80, 0x5, 0x27, 0x80, 0x5, 0x28, 0x80, 0x5, 0x29, 0x80, 0x5, 0x2a, 0x80, 0x5, 0x2b, 0x80, 0x5, 0x2c, 0x80, 0x5, 0x2d, 0x80, 0x5, 0x2e, 0x80, 0x5, 0x2f, 0x80, 0x5, 0x30, 0x80, 0x5, 0x31, 0x80, 0x5, 0x32, 0x80, 0x5, 0x33, 0x80, 0x5, 0x34, 0x80, 0x5, 0x35, 0x80, 0x5, 0x36, 0x80, 0x5, 0x37, 0x80, 0x5, 0x38, 0x80, 0x5, 0x39, 0x80, 0x5, 0x3a, 0x80, 0x5, 0x3b, 0x80, 0x5, 0x3c, 0x80, 0x5, 0x3d, 0x80, 0x5, 0x3e, 0x80, 0x5, 0x3f, 0x80, 0x5, 0x40, 0x80, 0x5, 0x41, 0x80, 0x5, 0x42, 0x80, 0x5, 0x43, 0x80, 0x5, 0x44, 0x80, 0x5, 0x45, 0x80, 0x5, 0x46, 0x80, 0x5, 0x47, 0x80, 0x5, 0x48, 0x80, 0x5, 0x49, 0x80, 0x5, 0x4a, 0x80, 0x5, 0
           [1662449060.841046][31013:31018] CHIP:DMG:                                         ] (585 bytes)
           [1662449060.841048][31013:31018] CHIP:DMG:                                         0x1 = [
-          [1662449060.841053][31013:31018] CHIP:DMG:                                                         0x97, 0x2, 0x34, 0x3f, 0x85, 0xad, 0xe8, 0xd0, 0x4, 0x0, 0xfa, 0x8b, 0x3e, 0x91, 0xed, 0x34, 0x77, 0x3, 0x55, 0x89, 0xd5, 0xe, 0xe0, 0x9d, 0x32, 0x5d, 0x9f, 0x30, 0x20, 0x12, 0xf0, 0x25, 0x63, 0x62, 0xc7, 0x47, 0x7e, 0xd1, 0x9f, 0x89, 0x30, 0x84, 0x49, 0x7c, 0xbd, 0xc, 0xab, 0x38, 0xfe, 0xb5, 0x31, 0x24, 0x8e, 0x28, 0xc7, 0x7e, 0x1, 0xab, 0x34, 0x18, 0xe5, 0x78, 0x9c, 0x97, 
+          [1662449060.841053][31013:31018] CHIP:DMG:                                                         0x97, 0x2, 0x34, 0x3f, 0x85, 0xad, 0xe8, 0xd0, 0x4, 0x0, 0xfa, 0x8b, 0x3e, 0x91, 0xed, 0x34, 0x77, 0x3, 0x55, 0x89, 0xd5, 0xe, 0xe0, 0x9d, 0x32, 0x5d, 0x9f, 0x30, 0x20, 0x12, 0xf0, 0x25, 0x63, 0x62, 0xc7, 0x47, 0x7e, 0xd1, 0x9f, 0x89, 0x30, 0x84, 0x49, 0x7c, 0xbd, 0xc, 0xab, 0x38, 0xfe, 0xb5, 0x31, 0x24, 0x8e, 0x28, 0xc7, 0x7e, 0x1, 0xab, 0x34, 0x18, 0xe5, 0x78, 0x9c, 0x97,
           [1662449060.841058][31013:31018] CHIP:DMG:                                         ] (64 bytes)
           [1662449060.841060][31013:31018] CHIP:DMG:                                 },
           [1662449060.841062][31013:31018] CHIP:DMG:                         },
-          [1662449060.841065][31013:31018] CHIP:DMG:                         
+          [1662449060.841065][31013:31018] CHIP:DMG:
           [1662449060.841067][31013:31018] CHIP:DMG:                 },
-          [1662449060.841070][31013:31018] CHIP:DMG:                 
+          [1662449060.841070][31013:31018] CHIP:DMG:
           [1662449060.841072][31013:31018] CHIP:DMG:         ],
-          [1662449060.841076][31013:31018] CHIP:DMG:         
+          [1662449060.841076][31013:31018] CHIP:DMG:
           [1662449060.841078][31013:31018] CHIP:DMG:         InteractionModelRevision = 1
           [1662449060.841080][31013:31018] CHIP:DMG: },
           [1662449060.841088][31013:31018] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
@@ -185,7 +185,7 @@ tests:
           1. For error scenario 1 i.e. Commissionee’s PAA is not in the Commissioner’s trusted set.
 
           execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
-          ./chip-all-clusters-app --trace_decode 1 
+          ./chip-all-clusters-app --trace_decode 1
 
           Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
            ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1 --paa-trust-store-path  ~/connectedhomeip/credentials/development/attestation
@@ -242,14 +242,14 @@ tests:
           Commissionee provides DAC with validity period that is not in range of PAA/PAI
            Use the folder  - connectedhomeip/credentials/development/commissioner_dut/struct_dac_valid_in_past & use the sample json test_case_vector.json
 
-          Commission TH to DUT by using --dac_provider parameter  
+          Commission TH to DUT by using --dac_provider parameter
 
 
           execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
            ./chip-all-clusters-app  --trace_decode 1 --dac_provider ~/connectedhomeip/credentials/development/commissioner_dut/struct_dac_valid_in_past/test_case_vector.json
 
           Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
-           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1 
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
 
 
           If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
@@ -288,7 +288,7 @@ tests:
           ./chip-all-clusters-app  --trace_decode 1 --dac_provider ~/connectedhomeip/credentials/development/commissioner_dut/struct_cd_dac_origin_vid_missing_pid_present/test_case_vector.json
 
           Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
-           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1 
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
 
           If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
           [1662459904.540345][32873:32878] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
@@ -324,7 +324,7 @@ tests:
            ./chip-all-clusters-app  --trace_decode 1 --dac_provider ~/connectedhomeip/credentials/development/commissioner_dut/struct_cd_vid_mismatch/test_case_vector.json
 
           Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
-           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1 
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
           If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
           [1684495876.434738][176910:176912] CHIP:DMG: },
           [1684495876.434750][176910:176912] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
@@ -344,7 +344,7 @@ tests:
           [1684495876.441912][176910:176912] CHIP:DMG: ICR moving to [AddedComma]
           [1684495876.441967][176910:176912] CHIP:EM: <<< [E:25914i M:173255705] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:08 (IM:InvokeCommandRequest)
           [1684495876.441973][176910:176912] CHIP:IN: (S) Sending msg 173255705 on secure session with LSID: 21068
-          [1684495876.442029][176910:176912] CHIP:DMG: >> to UDP:[fe80::529f:9f59:cfec:7130%wlp0s20f3]:5540 | 173255705 | [Interaction Model  (1) / InvokeCommandRequest 
+          [1684495876.442029][176910:176912] CHIP:DMG: >> to UDP:[fe80::529f:9f59:cfec:7130%wlp0s20f3]:5540 | 173255705 | [Interaction Model  (1) / InvokeCommandRequest
 
 
 
@@ -362,7 +362,7 @@ tests:
            ./chip-all-clusters-app  --trace_decode 1 --dac_provider ~/connectedhomeip/credentials/development/commissioner_dut/struct_cd_vid_mismatch/test_case_vector.json
 
           Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
-           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1 
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
           If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
           [1684495930.801406][176931:176933] CHIP:CTL: Received Attestation Information from the device
           [1684495930.801409][176931:176933] CHIP:CTL: Successfully finished commissioning step 'SendAttestationRequest'
@@ -393,13 +393,13 @@ tests:
           connectedhomeip/credentials/development/commissioner_dut/struct_cd_pid_array_count01_mismatch
           & use the sample json test_case_vector.json
 
-          Commission TH to DUT by using --dac_provider parameter 
+          Commission TH to DUT by using --dac_provider parameter
 
           execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app  --trace_decode 1 --dac_provider ~/connectedhomeip/credentials/development/commissioner_dut/struct_cd_pid_array_count10_mismatch/test_case_vector.json
 
           Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
-           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1 
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
           If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
           [1684496002.435208][176959:176961] CHIP:CTL: Performing next commissioning step 'AttestationVerification'
           [1684496002.435210][176959:176961] CHIP:CTL: Verifying attestation

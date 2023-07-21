@@ -38,7 +38,7 @@ tests:
     - label: "Step 2: TH reads TestEventTriggersEnabled attribute value"
       verification: |
           ./chip-tool generaldiagnostics read test-event-triggers-enabled 1 0
-          Verify that the TestEventTriggersEnabled value is of bool type. If this value is set to True, then proceed with step 3, otherwise skip step 3 On TH(chip-tool) 
+          Verify that the TestEventTriggersEnabled value is of bool type. If this value is set to True, then proceed with step 3, otherwise skip step 3 On TH(chip-tool)
           [1668678839.754134][146642:146644] CHIP:DMG: }
           [1668678839.754234][146642:146644] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0008 DataVersion: 3696371826
           [1668678839.754256][146642:146644] CHIP:TOO:   TestEventTriggersEnabled: FALSE
@@ -50,7 +50,7 @@ tests:
           to PIXIT.DGGEN.ENABLEKEY and EventTrigger field set to 0."
       PICS: DGGEN.S.C00.Rsp
       verification: |
-          Based on Spec, EnableKey value is to be provided by  manufacturer 
+          Based on Spec, EnableKey value is to be provided by  manufacturer
           below mentioned the example command to verify
            ./chip-tool generaldiagnostics  test-event-trigger  <EnableKey>  0 1 0
       disabled: true
@@ -62,7 +62,7 @@ tests:
       verification: |
           ./chip-tool generaldiagnostics  test-event-trigger hex:0000000000000000  0 1 0
 
-          Verify that DUT responds with CONSTRAINT_ERROR On TH(chip-tool) 
+          Verify that DUT responds with CONSTRAINT_ERROR On TH(chip-tool)
 
           [1659426470.994413][4451:4456] CHIP:DMG:         InteractionModelRevision = 1
           [1659426470.994442][4451:4456] CHIP:DMG: },

@@ -102,7 +102,7 @@ tests:
     - label: "Step 2e: compare result of step 2d to what was read in step 2b"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          compare result of step 2d to what was read in step 2b, Verify name field in relevant EndpointListStruct has been updated and no other changes in EndpointLists attribute 
+          compare result of step 2d to what was read in step 2b, Verify name field in relevant EndpointListStruct has been updated and no other changes in EndpointLists attribute
 
           Step 2d log:
           Via the TH (chip-tool), verify the EndpointLists attribute that contains EndpointListStructs.
@@ -340,7 +340,7 @@ tests:
       verification: |
           Compare step 3d and 3b and verify the name field has been changed
 
-          Step 3d 
+          Step 3d
           Via the TH (chip-tool), verify the ActionList attribute that contains ActionListStructs.
 
           [1658480004.064867][26153:26158] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220

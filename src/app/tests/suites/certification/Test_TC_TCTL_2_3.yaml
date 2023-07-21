@@ -39,7 +39,7 @@ tests:
           ./chip-tool temperaturecontrol read selected-temperature-level 1 1
           On TH(chip-tool), Verify that the DUT response contains a uint8 with value between 0 and 31 inclusive.
 
-          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true, 
+          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
           [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
           [1689770673.417851][9280:9282] CHIP:DMG: }
           [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0004 DataVersion: 2844459846
@@ -57,7 +57,7 @@ tests:
       verification: |
           ./chip-tool temperaturecontrol read supported-temperature-levels 1 1
           On TH(chip-tool), Verify that the DUT response contains a list of up to 32 strings with each string length not exceeding 16 characters.
-          [1689770716.974439][9291:9293] CHIP:DMG:         SuppressResponse = true, 
+          [1689770716.974439][9291:9293] CHIP:DMG:         SuppressResponse = true,
           [1689770716.974446][9291:9293] CHIP:DMG:         InteractionModelRevision = 1
           [1689770716.974451][9291:9293] CHIP:DMG: }
           [1689770716.974558][9291:9293] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0005 DataVersion: 2844459846

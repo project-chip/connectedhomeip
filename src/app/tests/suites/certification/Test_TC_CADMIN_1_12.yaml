@@ -49,7 +49,7 @@ tests:
           ECM and TH_CR3 Commissions with TH_CE"
       PICS: CADMIN.C.C00.Tx
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
@@ -65,7 +65,7 @@ tests:
 
 
 
-          On TH_CR3 send the below command  
+          On TH_CR3 send the below command
 
           ./chip-tool pairing code 3 35484132896  --commissioner-name gamma
 
@@ -79,7 +79,7 @@ tests:
           ECM and TH_CR2 Commissions with TH_CE"
       PICS: CADMIN.C.C00.Tx
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
@@ -95,7 +95,7 @@ tests:
 
 
 
-          On TH_CR2 send the below command 
+          On TH_CR2 send the below command
 
           ./chip-tool pairing code 2 35484132896  --commissioner-name beta
 
@@ -109,7 +109,7 @@ tests:
           ECM"
       PICS: CADMIN.C.C00.Tx
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
@@ -129,7 +129,7 @@ tests:
           attribute"
       PICS: CADMIN.C.A0000
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
@@ -152,15 +152,15 @@ tests:
           [1661482777.284430][6453:6453] CHIP:DMG:                                         Cluster = 0x3c,
           [1661482777.284479][6453:6453] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1661482777.284522][6453:6453] CHIP:DMG:                                 }
-          [1661482777.284567][6453:6453] CHIP:DMG:                                         
-          [1661482777.284612][6453:6453] CHIP:DMG:                                 Data = 1, 
+          [1661482777.284567][6453:6453] CHIP:DMG:
+          [1661482777.284612][6453:6453] CHIP:DMG:                                 Data = 1,
           [1661482777.284655][6453:6453] CHIP:DMG:                         },
-          [1661482777.284699][6453:6453] CHIP:DMG:                         
+          [1661482777.284699][6453:6453] CHIP:DMG:
           [1661482777.284733][6453:6453] CHIP:DMG:                 },
-          [1661482777.284773][6453:6453] CHIP:DMG:                 
+          [1661482777.284773][6453:6453] CHIP:DMG:
           [1661482777.284803][6453:6453] CHIP:DMG:         ],
-          [1661482777.284841][6453:6453] CHIP:DMG:         
-          [1661482777.284872][6453:6453] CHIP:DMG:         SuppressResponse = true, 
+          [1661482777.284841][6453:6453] CHIP:DMG:
+          [1661482777.284872][6453:6453] CHIP:DMG:         SuppressResponse = true,
           [1661482777.284905][6453:6453] CHIP:DMG:         InteractionModelRevision = 1
           [1661482777.284934][6453:6453] CHIP:DMG: }
           [1661482777.284962][6453:6453] CHIP:DMG:
@@ -173,7 +173,7 @@ tests:
           PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.C.C00.Tx
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
@@ -184,13 +184,13 @@ tests:
 
 
           [1650527622.374682][15824:15829] CHIP:DMG:                                 },
-          [1650527622.374799][15824:15829] CHIP:DMG:                                 
+          [1650527622.374799][15824:15829] CHIP:DMG:
           [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
           [1650527622.374979][15824:15829] CHIP:DMG:                                 {
           [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
           [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x2,
           [1650527622.375320][15824:15829] CHIP:DMG:                                 },
-          [1650527622.375426][15824:15829] CHIP:DMG:                                 
+          [1650527622.375426][15824:15829] CHIP:DMG:
           [1650527622.375527][15824:15829] CHIP:DMG:                         },
       disabled: true
 
@@ -207,12 +207,12 @@ tests:
           using BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
           Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
@@ -228,7 +228,7 @@ tests:
           attribute"
       PICS: CADMIN.C.A0000
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
@@ -251,12 +251,12 @@ tests:
           [1661483425.923951][6917:6917] CHIP:DMG:                                         Cluster = 0x3c,
           [1661483425.923981][6917:6917] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1661483425.924009][6917:6917] CHIP:DMG:                                 }
-          [1661483425.924040][6917:6917] CHIP:DMG:                                         
-          [1661483425.924070][6917:6917] CHIP:DMG:                                 Data = 2, 
+          [1661483425.924040][6917:6917] CHIP:DMG:
+          [1661483425.924070][6917:6917] CHIP:DMG:                                 Data = 2,
           [1661483425.924097][6917:6917] CHIP:DMG:                         },
-          [1661483425.924126][6917:6917] CHIP:DMG:                         
+          [1661483425.924126][6917:6917] CHIP:DMG:
           [1661483425.924169][6917:6917] CHIP:DMG:                 },
-          [1661483425.924197][6917:6917] CHIP:DMG:                 
+          [1661483425.924197][6917:6917] CHIP:DMG:
           [1661483425.924218][6917:6917] CHIP:DMG:         ],
           [1661483425.924244][6917:6917] CHIP:DMG:
       disabled: true
@@ -268,7 +268,7 @@ tests:
           PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On TH_CR3 send the below command  
+          On TH_CR3 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
@@ -298,11 +298,11 @@ tests:
           using BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
           Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
@@ -319,7 +319,7 @@ tests:
           PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On TH_CR2 send the below command  
+          On TH_CR2 send the below command
 
            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
@@ -329,13 +329,13 @@ tests:
 
           ,
           [1650527622.374682][15824:15829] CHIP:DMG:                                 },
-          [1650527622.374799][15824:15829] CHIP:DMG:                                 
+          [1650527622.374799][15824:15829] CHIP:DMG:
           [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
           [1650527622.374979][15824:15829] CHIP:DMG:                                 {
           [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
           [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x2,
           [1650527622.375320][15824:15829] CHIP:DMG:                                 },
-          [1650527622.375426][15824:15829] CHIP:DMG:                                 
+          [1650527622.375426][15824:15829] CHIP:DMG:
           [1650527622.375527][15824:15829] CHIP:DMG:                         },
       disabled: true
 
@@ -344,7 +344,7 @@ tests:
           attribute"
       PICS: CADMIN.C.A0000
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
@@ -366,12 +366,12 @@ tests:
           [1661483425.923951][6917:6917] CHIP:DMG:                                         Cluster = 0x3c,
           [1661483425.923981][6917:6917] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1661483425.924009][6917:6917] CHIP:DMG:                                 }
-          [1661483425.924040][6917:6917] CHIP:DMG:                                         
-          [1661483425.924070][6917:6917] CHIP:DMG:                                 Data = 2, 
+          [1661483425.924040][6917:6917] CHIP:DMG:
+          [1661483425.924070][6917:6917] CHIP:DMG:                                 Data = 2,
           [1661483425.924097][6917:6917] CHIP:DMG:                         },
-          [1661483425.924126][6917:6917] CHIP:DMG:                         
+          [1661483425.924126][6917:6917] CHIP:DMG:
           [1661483425.924169][6917:6917] CHIP:DMG:                 },
-          [1661483425.924197][6917:6917] CHIP:DMG:                 
+          [1661483425.924197][6917:6917] CHIP:DMG:
           [1661483425.924218][6917:6917] CHIP:DMG:         ],
           [1661483425.924244][6917:6917] CHIP:DMG:
       disabled: true
@@ -381,14 +381,14 @@ tests:
           attribute"
       PICS: CADMIN.C.A0001
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
           ./chip-tool administratorcommissioning read admin-fabric-index  1 0
 
           Verify TH_CE successfully reads AdminFabricIndex
-           
+
           [1661483686.785602][6930:6930] CHIP:DMG: ReportDataMessage =
           [1661483686.785626][6930:6930] CHIP:DMG: {
           [1661483686.785644][6930:6930] CHIP:DMG:         AttributeReportIBs =
@@ -404,12 +404,12 @@ tests:
           [1661483686.785922][6930:6930] CHIP:DMG:                                         Cluster = 0x3c,
           [1661483686.785956][6930:6930] CHIP:DMG:                                         Attribute = 0x0000_0001,
           [1661483686.785982][6930:6930] CHIP:DMG:                                 }
-          [1661483686.786015][6930:6930] CHIP:DMG:                                         
-          [1661483686.786044][6930:6930] CHIP:DMG:                                 Data = 1, 
+          [1661483686.786015][6930:6930] CHIP:DMG:
+          [1661483686.786044][6930:6930] CHIP:DMG:                                 Data = 1,
           [1661483686.786074][6930:6930] CHIP:DMG:                         },
-          [1661483686.786100][6930:6930] CHIP:DMG:                         
+          [1661483686.786100][6930:6930] CHIP:DMG:
           [1661483686.786121][6930:6930] CHIP:DMG:                 },
-          [1661483686.786147][6930:6930] CHIP:DMG:                 
+          [1661483686.786147][6930:6930] CHIP:DMG:
           [1661483686.786167][6930:6930] CHIP:DMG:         ],
       disabled: true
 
@@ -418,7 +418,7 @@ tests:
           attribute"
       PICS: CADMIN.C.A0002
       verification: |
-          On DUT_CR1 send the below command  
+          On DUT_CR1 send the below command
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
@@ -441,12 +441,12 @@ tests:
           [1661483751.978075][6930:6930] CHIP:DMG:                                         Cluster = 0x3c,
           [1661483751.978120][6930:6930] CHIP:DMG:                                         Attribute = 0x0000_0002,
           [1661483751.978165][6930:6930] CHIP:DMG:                                 }
-          [1661483751.978210][6930:6930] CHIP:DMG:                                         
-          [1661483751.978259][6930:6930] CHIP:DMG:                                 Data = 65521, 
+          [1661483751.978210][6930:6930] CHIP:DMG:
+          [1661483751.978259][6930:6930] CHIP:DMG:                                 Data = 65521,
           [1661483751.978299][6930:6930] CHIP:DMG:                         },
-          [1661483751.978344][6930:6930] CHIP:DMG:                         
+          [1661483751.978344][6930:6930] CHIP:DMG:
           [1661483751.978379][6930:6930] CHIP:DMG:                 },
-          [1661483751.978420][6930:6930] CHIP:DMG:                 
+          [1661483751.978420][6930:6930] CHIP:DMG:
           [1661483751.978450][6930:6930] CHIP:DMG:         ],
           [1661483751.978488][6930:6930] CHIP:DMG:
       disabled: true

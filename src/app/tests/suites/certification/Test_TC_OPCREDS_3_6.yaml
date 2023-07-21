@@ -31,7 +31,7 @@ tests:
 
           On TH side:
           ./chip-tool pairing code 1 34970112332 --trace_decode 1
-          Verify the TH1 commissioning is success 
+          Verify the TH1 commissioning is success
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success"
       disabled: true
 

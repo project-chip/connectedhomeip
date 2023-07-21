@@ -39,7 +39,7 @@ tests:
           that endpoint"
       PICS: MCORE.BRIDGE
       verification: |
-          Read parts-list and device-list with endpoint 0, and for each of the endpoint listed for endpoint 0 read device-list and parts-list and verify the below log in TH  
+          Read parts-list and device-list with endpoint 0, and for each of the endpoint listed for endpoint 0 read device-list and parts-list and verify the below log in TH
 
           ./chip-tool descriptor read parts-list 1 0
 
@@ -887,7 +887,7 @@ tests:
       verification: |
           Verify step 6 and 7 of TC-BR-1 for bridged device added in step 2 of TC-BR-2
 
-          For actuator, 
+          For actuator,
           "From Step 5 output of TC-BR-1 , choose one of the device type and identfy the device from the device Library
           For Ex: on-off cluster has been taken as example to run further steps" follow below steps
 
@@ -913,7 +913,7 @@ tests:
           Via the TH (chip-tool), Verify actual state of the bridged device changes accordingly.
 
           [1657522278.539407][16698:16703] CHIP:DMG: {
-          [1657522278.539447][16698:16703] CHIP:DMG:         suppressResponse = false, 
+          [1657522278.539447][16698:16703] CHIP:DMG:         suppressResponse = false,
           [1657522278.539495][16698:16703] CHIP:DMG:         InvokeResponseIBs =
           [1657522278.539545][16698:16703] CHIP:DMG:         [
           [1657522278.539585][16698:16703] CHIP:DMG:                 InvokeResponseIB =
@@ -926,18 +926,18 @@ tests:
           [1657522278.539977][16698:16703] CHIP:DMG:                                         ClusterId = 0x6,
           [1657522278.540039][16698:16703] CHIP:DMG:                                         CommandId = 0x2,
           [1657522278.540097][16698:16703] CHIP:DMG:                                 },
-          [1657522278.540162][16698:16703] CHIP:DMG:                                 
+          [1657522278.540162][16698:16703] CHIP:DMG:
           [1657522278.540214][16698:16703] CHIP:DMG:                                 StatusIB =
           [1657522278.540276][16698:16703] CHIP:DMG:                                 {
           [1657522278.540332][16698:16703] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1657522278.540386][16698:16703] CHIP:DMG:                                 },
-          [1657522278.540446][16698:16703] CHIP:DMG:                                 
+          [1657522278.540446][16698:16703] CHIP:DMG:
           [1657522278.540499][16698:16703] CHIP:DMG:                         },
-          [1657522278.540560][16698:16703] CHIP:DMG:                         
+          [1657522278.540560][16698:16703] CHIP:DMG:
           [1657522278.540605][16698:16703] CHIP:DMG:                 },
-          [1657522278.540658][16698:16703] CHIP:DMG:                 
+          [1657522278.540658][16698:16703] CHIP:DMG:
           [1657522278.540696][16698:16703] CHIP:DMG:         ],
-          [1657522278.540744][16698:16703] CHIP:DMG:         
+          [1657522278.540744][16698:16703] CHIP:DMG:
           [1657522278.540783][16698:16703] CHIP:DMG:         InteractionModelRevision = 1
           [1657522278.540825][16698:16703] CHIP:DMG: },
           [1657522278.540916][16698:16703] CHIP:DMG: Received Command Response Status for Endpoint=3 Cluster=0x0000_0006 Command=0x0000_0002 Status=0x0
@@ -951,8 +951,8 @@ tests:
           [1657004565.254635][4804:4809] CHIP:TOO:   OnOff: TRUE
 
 
-          For sensor 
-          "From Step 5 output , choose one of the sensor device type and identfy the device from the device librray. 
+          For sensor
+          "From Step 5 output , choose one of the sensor device type and identfy the device from the device librray.
           For Ex:  temperature sensor, being added to bridge-app as example to run further steps "follow below steps:
 
           1) Choose a sensor device (e.g. temperature sensor, being added to bridge-app)
@@ -1019,7 +1019,7 @@ tests:
           [1657005165.790727][4885:4890] CHIP:TOO:     [12]: 14
 
 
-          ./chip-tool descriptor read device-type-list 1 0 
+          ./chip-tool descriptor read device-type-list 1 0
 
           Via the TH (chip-tool), Verify that DeviceTypeList has not changed compared to step 1a
 
@@ -1224,7 +1224,7 @@ tests:
           [1666339056.791653][54121:54126] CHIP:TOO:      }
 
 
-          ./chip-tool descriptor read device-type-list 1 5 
+          ./chip-tool descriptor read device-type-list 1 5
 
           Via the TH (chip-tool), Verify the DeviceTypeList attribute entries with endpoint 5.
 

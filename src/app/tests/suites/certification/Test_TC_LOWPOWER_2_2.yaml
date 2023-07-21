@@ -37,7 +37,7 @@ tests:
           ./chip-tv-casting-app lowpower sleep 1 1
 
 
-          On TH (tv-app), Verify the sleep command is successfully received 
+          On TH (tv-app), Verify the sleep command is successfully received
           [1658530100234] [21469:308294] CHIP: [DMG] InvokeRequestMessage =
           [1658530100234] [21469:308294] CHIP: [DMG] {
           [1658530100234] [21469:308294] CHIP: [DMG]         suppressResponse = false,

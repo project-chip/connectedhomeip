@@ -28,7 +28,7 @@ tests:
           field set to 0x0000."
       PICS: S.S.C03.Rsp
       verification: |
-          ./chip-tool scenes remove-all-scenes 0x0000 1 1 
+          ./chip-tool scenes remove-all-scenes 0x0000 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0003
           CHIP:TOO:   RemoveAllScenesResponse: {
@@ -102,7 +102,7 @@ tests:
           set to 0x0014 (20s) and no extension field sets."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0000 0x1 0x0014 scene1 [] 1 1 
+          ./chip-tool scenes add-scene 0x0000 0x1 0x0014 scene1 [] 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
@@ -119,7 +119,7 @@ tests:
           MinIntervalFloor) for RemainingCapacity becomes 0."
       PICS: S.S.C00.Rsp && S.S.A0007
       verification: |
-          ./chip-tool scenes add-scene 0x0000 0x2 0x0014 scene2 [] 1 1 
+          ./chip-tool scenes add-scene 0x0000 0x2 0x0014 scene2 [] 1 1
 
           Repeat till RemainingCapacity is 0
       disabled: true
@@ -131,7 +131,7 @@ tests:
           field sets."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0000 0x10 0x0014 scene101 [] 1 1 
+          ./chip-tool scenes add-scene 0x0000 0x10 0x0014 scene101 [] 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
@@ -171,7 +171,7 @@ tests:
     - label: "Step 5b: Repeat Step 4b with TH2"
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0000 0x11 0x0014 scene201 [] 2 1 --commissioner-name beta 
+          ./chip-tool scenes add-scene 0x0000 0x11 0x0014 scene201 [] 2 1 --commissioner-name beta
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {

@@ -32,7 +32,7 @@ tests:
 
           Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
 
-          On OTA Requestor logs,  
+          On OTA Requestor logs,
           Verify that the DUT is able to query the server where the software update image is located. DUT should obtain the User Consent from the user. DUT should respond with the QueryImageResponse to the OTA-R/TH
 
           [1673337981.104652][28428:28428] CHIP:SWU: QueryImageResponse:

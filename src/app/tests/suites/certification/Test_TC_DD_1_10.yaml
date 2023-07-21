@@ -61,7 +61,7 @@ tests:
           "Step 1: Power up the TH Device and put the TH Device in commissioning
           mode"
       verification: |
-          1. Launch TH that has NFC tag 
+          1. Launch TH that has NFC tag
            ./chip-all-clusters-app
           ...
           [1646286638.375844][11651:11651] CHIP:DL: Device Configuration:

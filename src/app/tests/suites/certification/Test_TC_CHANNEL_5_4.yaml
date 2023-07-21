@@ -36,7 +36,7 @@ tests:
 
           If the DUT knows the Match(Channel name)  in channel InputList then those can be sent as the argument. Else User needs to execute the following command to know theMatch(Channel name)  to change the channel
 
-           ./chip-tool channel read channel-list 1 1 
+           ./chip-tool channel read channel-list 1 1
 
           By sending above command user can select the Match(Channel name)  instead of ABC which are listed in chanel list.
 
@@ -44,8 +44,8 @@ tests:
           On TH (tv-app), Verify the  change channel command is received successfully.
           [1665567814.599622][111029:111029] CHIP:DMG: InvokeRequestMessage =
           [1665567814.599625][111029:111029] CHIP:DMG: {
-          [1665567814.599628][111029:111029] CHIP:DMG:         suppressResponse = false, 
-          [1665567814.599631][111029:111029] CHIP:DMG:         timedRequest = false, 
+          [1665567814.599628][111029:111029] CHIP:DMG:         suppressResponse = false,
+          [1665567814.599631][111029:111029] CHIP:DMG:         timedRequest = false,
           [1665567814.599640][111029:111029] CHIP:DMG:         InvokeRequests =
           [1665567814.599646][111029:111029] CHIP:DMG:         [
           [1665567814.599649][111029:111029] CHIP:DMG:                 CommandDataIB =
@@ -56,15 +56,15 @@ tests:
           [1665567814.599668][111029:111029] CHIP:DMG:                                 ClusterId = 0x504,
           [1665567814.599671][111029:111029] CHIP:DMG:                                 CommandId = 0x0,
           [1665567814.599675][111029:111029] CHIP:DMG:                         },
-          [1665567814.599679][111029:111029] CHIP:DMG:                         
-          [1665567814.599682][111029:111029] CHIP:DMG:                         CommandFields = 
+          [1665567814.599679][111029:111029] CHIP:DMG:
+          [1665567814.599682][111029:111029] CHIP:DMG:                         CommandFields =
           [1665567814.599686][111029:111029] CHIP:DMG:                         {
-          [1665567814.599691][111029:111029] CHIP:DMG:                                 0x0 = "ABC" (3 chars), 
+          [1665567814.599691][111029:111029] CHIP:DMG:                                 0x0 = "ABC" (3 chars),
           [1665567814.599694][111029:111029] CHIP:DMG:                         },
           [1665567814.599697][111029:111029] CHIP:DMG:                 },
-          [1665567814.599702][111029:111029] CHIP:DMG:                 
+          [1665567814.599702][111029:111029] CHIP:DMG:
           [1665567814.599705][111029:111029] CHIP:DMG:         ],
-          [1665567814.599710][111029:111029] CHIP:DMG:         
+          [1665567814.599710][111029:111029] CHIP:DMG:
           [1665567814.599714][111029:111029] CHIP:DMG:         InteractionModelRevision = 1
           [1665567814.599716][111029:111029] CHIP:DMG: },
           [1665567814.599733][111029:111029] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_0504 e=1 p=o

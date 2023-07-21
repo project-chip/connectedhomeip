@@ -51,7 +51,7 @@ tests:
       verification: |
           onoff  subscribe start-up-on-off  30 100 1 1 --keepSubscriptions true
 
-          on TH(chip-tool), verify that DUT is responds right attribute value for above command 
+          on TH(chip-tool), verify that DUT is responds right attribute value for above command
 
           [1657451357.177831][11635:11640] CHIP:DMG: {
           [1657451357.177894][11635:11640] CHIP:DMG:      SubscriptionId = 0xf3aa49ef,
@@ -125,7 +125,7 @@ tests:
       verification: |
           onoff  subscribe on-off 10 200  1 1 --keepSubscriptions true
 
-           on TH(chip-tool)  verify that DUT is responds right attribute value for above command 
+           on TH(chip-tool)  verify that DUT is responds right attribute value for above command
 
           [1657451491.078934][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657451491.079004][11635:11640] CHIP:DMG: {
@@ -876,7 +876,7 @@ tests:
           on the DUT."
       verification: |
           onoff subscribe on-time 10 100 1 1   --keepSubscriptions true
-          After sending above command verify that the subscription is activated between DUT and TH 
+          After sending above command verify that the subscription is activated between DUT and TH
           1657454443.310644][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657454443.310712][11635:11640] CHIP:DMG: {
           [1657454443.310773][11635:11640] CHIP:DMG:      SubscriptionId = 0xae2db075,
@@ -961,7 +961,7 @@ tests:
 
 
           onoff write on-time 1 1 1
-           on TH(chip-tool) Verify that  subscription is terminated after the MaxInterval of the first subscription is reached. 
+           on TH(chip-tool) Verify that  subscription is terminated after the MaxInterval of the first subscription is reached.
           [1657455187.367198][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657455187.367281][11635:11640] CHIP:DMG: {
           [1657455187.367324][11635:11640] CHIP:DMG:      SubscriptionId = 0x50a6822b,
@@ -1055,7 +1055,7 @@ tests:
       verification: |
           onoff subscribe-by-id 0x4001 200 700  1 0xFFFF --keepSubscriptions true
 
-           on TH(chip-tool), verify that DUT is responds right attribute value for  command and then send write command to change the attribute value, 
+           on TH(chip-tool), verify that DUT is responds right attribute value for  command and then send write command to change the attribute value,
           [1658322253.825601][4866:4871] CHIP:DMG: ReportDataMessage =
           [1658322253.825662][4866:4871] CHIP:DMG: {
           [1658322253.825714][4866:4871] CHIP:DMG:        SubscriptionId = 0x42baa1,

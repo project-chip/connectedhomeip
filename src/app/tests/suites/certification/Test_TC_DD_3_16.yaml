@@ -225,52 +225,52 @@ tests:
           Verify on the DUT (Chip-tool):
           No applicable TH logs
 
-          (00000000) 
-            ./chip-tool pairing code 1 34915200008 
+          (00000000)
+            ./chip-tool pairing code 1 34915200008
           Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
-          (11111111) 
-            ./chip-tool pairing code 1 35191106788 
+          (11111111)
+            ./chip-tool pairing code 1 35191106788
           Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
-          (22222222) 
-            ./chip-tool pairing code 1 35467013565 
+          (22222222)
+            ./chip-tool pairing code 1 35467013565
           Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
-          (33333333) 
-            ./chip-tool pairing code 1 35742920344 
+          (33333333)
+            ./chip-tool pairing code 1 35742920344
           Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
-          (44444444) 
-            ./chip-tool pairing code 1 36018827124 
+          (44444444)
+            ./chip-tool pairing code 1 36018827124
           Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
-          (55555555) 
-            ./chip-tool pairing code 1 36294733900 
+          (55555555)
+            ./chip-tool pairing code 1 36294733900
           Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
-          (66666666) 
-            ./chip-tool pairing code 1 34932240691 
+          (66666666)
+            ./chip-tool pairing code 1 34932240691
           Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
-          (77777777) 
-            ./chip-tool pairing code 1 35208147474 
+          (77777777)
+            ./chip-tool pairing code 1 35208147474
           Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
-          (88888888) 
-            ./chip-tool pairing code 1 35484054250 
+          (88888888)
+            ./chip-tool pairing code 1 35484054250
           Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
-          (99999999) 
-            ./chip-tool pairing code 1 35759961037 
+          (99999999)
+            ./chip-tool pairing code 1 35759961037
           Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
-          (12345678) 
-            ./chip-tool pairing code 1 35767807533 
+          (12345678)
+            ./chip-tool pairing code 1 35767807533
           Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
-          (87654321) 
-            ./chip-tool pairing code 1 36545753496 
+          (87654321)
+            ./chip-tool pairing code 1 36545753496
           Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
       disabled: true
 

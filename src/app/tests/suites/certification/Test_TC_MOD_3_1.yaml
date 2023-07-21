@@ -48,7 +48,7 @@ tests:
       verification: |
           ./chip-tool modeselect read on-mode 1 1
 
-          On TH(chip-tool), Verify that OnMode attribute value is an integer. 
+          On TH(chip-tool), Verify that OnMode attribute value is an integer.
           Save this value for usage in step 2b and below is the sample log provided for the raspi platform:
 
           [1649678983.679893][10871:10876] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065073
@@ -60,7 +60,7 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          On TH(chip-tool), Verify that CurrentMode attribute is an integer. 
+          On TH(chip-tool), Verify that CurrentMode attribute is an integer.
           Save the value for usage in step 2b and below is the sample log provided for the raspi platform:
 
           NOTE: If on_mode_dut is equal to old_current_mode_dut proceed to step 4. Else proceed to step 6.
@@ -82,7 +82,7 @@ tests:
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          On TH(chip-tool) log, Verify DUT response contains a list of supported modes. 
+          On TH(chip-tool) log, Verify DUT response contains a list of supported modes.
           Save the Mode values for usage in step 2d,  below is the sample log provided for the raspi platform:
 
           [1654595268.854568][14400:14405] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
@@ -128,7 +128,7 @@ tests:
 
           On TH(chip-tool) log, Verify that DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
 
-          [1684931013.571019][20667:20669] CHIP:DMG:                                 
+          [1684931013.571019][20667:20669] CHIP:DMG:
           [1684931013.571021][20667:20669] CHIP:DMG:                                 StatusIB =
           [1684931013.571024][20667:20669] CHIP:DMG:                                 {
           [1684931013.571027][20667:20669] CHIP:DMG:                                         status = 0x00 (SUCCESS),

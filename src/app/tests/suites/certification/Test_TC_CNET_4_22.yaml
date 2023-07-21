@@ -48,7 +48,7 @@ tests:
           -the ExtendedPanId value is type of uint64.
           -the NetworkName value is type of string with a size of 1 to 16 bytes.
           -the Channel is type of uint16 with range 0 to 65535.
-          -the version value is type of uint8(0 to 255). 
+          -the version value is type of uint8(0 to 255).
           -the ExtendedAddress is a hwaddr with a size of 8 bytes
           -the RSSI is of type int8 with a range of -120 to 0.
           -the LQI is type of uint8(0 to 255).
@@ -99,7 +99,7 @@ tests:
           -the ExtendedPanId value is type of uint64.
           -the NetworkName value is type of string with a size of 1 to 16 bytes.
           -the Channel is type of uint16 with range 0 to 65535.
-          -the version value is type of uint8(0 to 255). 
+          -the version value is type of uint8(0 to 255).
           -the ExtendedAddress is a hwaddr with a size of 8 bytes
           -the RSSI is of type int8 with a range of -120 to 0.
           -the LQI is type of uint8(0 to 255).
@@ -161,7 +161,7 @@ tests:
           -the ExtendedPanId value is type of uint64.
           -the NetworkName value is type of string with a size of 1 to 16 bytes.
           -the Channel is type of uint16 with range 0 to 65535.
-          -the version value is type of uint8(0 to 255). 
+          -the version value is type of uint8(0 to 255).
           -the ExtendedAddress is a hwaddr with a size of 8 bytes
           -the RSSI is of type int8 with a range of -120 to 0.
           -the LQI is type of uint8(0 to 255).

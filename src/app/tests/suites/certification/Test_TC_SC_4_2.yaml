@@ -37,7 +37,7 @@ tests:
 
           Run the  unknown key/value pair on second TH Terminal with the same discriminator as the one in the first teminal:
 
-          avahi-publish-service --subtype=_S3._sub._matterc._udp --subtype=_L840._sub._matterc._udp DD200C20D25AE5F7 --subtype=_CM._sub._matterc._udp _matterc._udp 11111 D=3840 CM=1  INVALID_TEST=40 SII=5000 SAI=300 PH=36 PI= VP=65521+3276 T=1 
+          avahi-publish-service --subtype=_S3._sub._matterc._udp --subtype=_L840._sub._matterc._udp DD200C20D25AE5F7 --subtype=_CM._sub._matterc._udp _matterc._udp 11111 D=3840 CM=1  INVALID_TEST=40 SII=5000 SAI=300 PH=36 PI= VP=65521+3276 T=1
           TH(all-clusters-app) must advertise with new data added
           Established under name 'DD200C20D25AE5F7'
       disabled: true

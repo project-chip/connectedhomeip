@@ -34,10 +34,10 @@ tests:
     - label: "Step 2: TH reads from the DUT the PhaseList attribute"
       PICS: OPSTATE.S.A0000
       verification: |
-          ./chip-tool operationalstate read phase-list 1 1 
+          ./chip-tool operationalstate read phase-list 1 1
 
            Via the TH (chip-tool), verify:
-           - that PhaseList attribute value contains either null or a list of strings. 
+           - that PhaseList attribute value contains either null or a list of strings.
            - that the list has no more than 32 entries. on TH(chip-tool)
 
           [1689673042.242432][16559:16561] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0000 DataVersion: 2102885775
@@ -50,9 +50,9 @@ tests:
     - label: "Step 3: TH reads from the DUT the CurrentPhase attribute"
       PICS: OPSTATE.S.A0001
       verification: |
-          ./chip-tool operationalstate read current-phase 1  1 
+          ./chip-tool operationalstate read current-phase 1  1
 
-           
+
            Via the TH (chip-tool), verify:
            - if the value from Step 1 was null, verify that this is also null.
            - otherwise, verify that the CurrentPhase attribute value contains contains an integer between 0 and the size of the list from step 1 minus 1.
@@ -68,7 +68,7 @@ tests:
       PICS: OPSTATE.S.A0002
       verification: |
           ./chip-tool operationalstate read countdown-time 1 1
-           
+
            Via the TH (chip-tool), verify:
            - that CountdownTime attribute contains either null our a uint32 value
            - if non-null, verify that the value is in the range 0 to 259200
@@ -86,7 +86,7 @@ tests:
       PICS: OPSTATE.S.A0003
       verification: |
           ./chip-tool operationalstate read operational-state-list 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the provided list contains the Error state (an entry with an ID of 0x03).
            - all entries include an ID (enum8) and a label (string)
@@ -137,7 +137,7 @@ tests:
       PICS: OPSTATE.S.A0005
       verification: |
           ./chip-tool operationalstate read operationalerror 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the response includes an ID (enum8), a label (string), and additional details (string)
            - if the label is null, verify the additional details is also null

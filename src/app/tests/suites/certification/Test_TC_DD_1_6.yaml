@@ -44,7 +44,7 @@ tests:
           - Alphanumeric capacity
           - Total available payload, excluding prefix (bits)
           - Available payload for TLV data (bits)
-          2. Vendor specific field test case that should be manually verified using the requirements in the Expected Outcome. 
+          2. Vendor specific field test case that should be manually verified using the requirements in the Expected Outcome.
 
           Note: chip-tool is not used to verify this test step
       disabled: true

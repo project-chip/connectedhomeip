@@ -38,7 +38,7 @@ tests:
 
           [1657022305.316864][7266:7271] CHIP:DMG: InvokeResponseMessage =
           [1657022305.316900][7266:7271] CHIP:DMG: {
-          [1657022305.316935][7266:7271] CHIP:DMG:         suppressResponse = false, 
+          [1657022305.316935][7266:7271] CHIP:DMG:         suppressResponse = false,
           [1657022305.316972][7266:7271] CHIP:DMG:         InvokeResponseIBs =
           [1657022305.317018][7266:7271] CHIP:DMG:         [
           [1657022305.317055][7266:7271] CHIP:DMG:                 InvokeResponseIB =
@@ -51,18 +51,18 @@ tests:
           [1657022305.317397][7266:7271] CHIP:DMG:                                         ClusterId = 0x34,
           [1657022305.317447][7266:7271] CHIP:DMG:                                         CommandId = 0x0,
           [1657022305.317496][7266:7271] CHIP:DMG:                                 },
-          [1657022305.317551][7266:7271] CHIP:DMG:                                 
+          [1657022305.317551][7266:7271] CHIP:DMG:
           [1657022305.317596][7266:7271] CHIP:DMG:                                 StatusIB =
           [1657022305.317645][7266:7271] CHIP:DMG:                                 {
           [1657022305.317694][7266:7271] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1657022305.317743][7266:7271] CHIP:DMG:                                 },
-          [1657022305.317797][7266:7271] CHIP:DMG:                                 
+          [1657022305.317797][7266:7271] CHIP:DMG:
           [1657022305.317928][7266:7271] CHIP:DMG:                         },
-          [1657022305.317980][7266:7271] CHIP:DMG:                         
+          [1657022305.317980][7266:7271] CHIP:DMG:
           [1657022305.318021][7266:7271] CHIP:DMG:                 },
-          [1657022305.318067][7266:7271] CHIP:DMG:                 
+          [1657022305.318067][7266:7271] CHIP:DMG:
           [1657022305.318103][7266:7271] CHIP:DMG:         ],
-          [1657022305.318146][7266:7271] CHIP:DMG:         
+          [1657022305.318146][7266:7271] CHIP:DMG:
           [1657022305.318182][7266:7271] CHIP:DMG:         InteractionModelRevision = 1
           [1657022305.318217][7266:7271] CHIP:DMG: },
           [1657022305.318300][7266:7271] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0034 Command=0x0000_0000 Status=0x0
@@ -75,7 +75,7 @@ tests:
       verification: |
           ./chip-tool softwarediagnostics read thread-metrics 1 0
 
-          Via the TH (chip-tool), verify: 
+          Via the TH (chip-tool), verify:
           -that ThreadMetrics attribute contains entries with ThreadMetrics Struct.
           -that the entries are matched with StackFreeMinimum and StackFreeCurrent values of ThreadMetrics.
 

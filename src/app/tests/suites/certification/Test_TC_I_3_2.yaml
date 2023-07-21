@@ -35,7 +35,7 @@ tests:
           that is supported by the DUT."
       PICS: I.C.C00.Tx
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
 
           ./chip-tool identify identify 60 1 1
@@ -44,8 +44,8 @@ tests:
 
           [1689773867.665951][49374:49374] CHIP:DMG: InvokeRequestMessage =
           [1689773867.665963][49374:49374] CHIP:DMG: {
-          [1689773867.665974][49374:49374] CHIP:DMG:         suppressResponse = false, 
-          [1689773867.665986][49374:49374] CHIP:DMG:         timedRequest = false, 
+          [1689773867.665974][49374:49374] CHIP:DMG:         suppressResponse = false,
+          [1689773867.665986][49374:49374] CHIP:DMG:         timedRequest = false,
           [1689773867.665995][49374:49374] CHIP:DMG:         InvokeRequests =
           [1689773867.666015][49374:49374] CHIP:DMG:         [
           [1689773867.666025][49374:49374] CHIP:DMG:                 CommandDataIB =
@@ -56,15 +56,15 @@ tests:
           [1689773867.666083][49374:49374] CHIP:DMG:                         ClusterId = 0x3,
           [1689773867.666097][49374:49374] CHIP:DMG:                         CommandId = 0x0,
           [1689773867.666107][49374:49374] CHIP:DMG:                         },
-          [1689773867.666122][49374:49374] CHIP:DMG:                         
-          [1689773867.666133][49374:49374] CHIP:DMG:                         CommandFields = 
+          [1689773867.666122][49374:49374] CHIP:DMG:
+          [1689773867.666133][49374:49374] CHIP:DMG:                         CommandFields =
           [1689773867.666145][49374:49374] CHIP:DMG:                         {
-          [1689773867.666210][49374:49374] CHIP:DMG:                         0x0 = 60, 
+          [1689773867.666210][49374:49374] CHIP:DMG:                         0x0 = 60,
           [1689773867.666223][49374:49374] CHIP:DMG:                         },
           [1689773867.666232][49374:49374] CHIP:DMG:                 },
-          [1689773867.666249][49374:49374] CHIP:DMG:                 
+          [1689773867.666249][49374:49374] CHIP:DMG:
           [1689773867.666257][49374:49374] CHIP:DMG:         ],
-          [1689773867.666275][49374:49374] CHIP:DMG:         
+          [1689773867.666275][49374:49374] CHIP:DMG:
           [1689773867.666285][49374:49374] CHIP:DMG:         InteractionModelRevision = 1
           [1689773867.666294][49374:49374] CHIP:DMG: },
       disabled: true
@@ -82,7 +82,7 @@ tests:
           IdentifyTime argument set to 0x0000 (Stop)."
       PICS: I.C.C00.Tx
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool identify identify 0 1 1
 
@@ -90,8 +90,8 @@ tests:
 
           [1689773832.333792][49374:49374] CHIP:DMG: InvokeRequestMessage =
           [1689773832.333804][49374:49374] CHIP:DMG: {
-          [1689773832.333812][49374:49374] CHIP:DMG:         suppressResponse = false, 
-          [1689773832.333825][49374:49374] CHIP:DMG:         timedRequest = false, 
+          [1689773832.333812][49374:49374] CHIP:DMG:         suppressResponse = false,
+          [1689773832.333825][49374:49374] CHIP:DMG:         timedRequest = false,
           [1689773832.333835][49374:49374] CHIP:DMG:         InvokeRequests =
           [1689773832.333861][49374:49374] CHIP:DMG:         [
           [1689773832.333875][49374:49374] CHIP:DMG:                 CommandDataIB =
@@ -102,15 +102,15 @@ tests:
           [1689773832.333956][49374:49374] CHIP:DMG:                                 ClusterId = 0x3,
           [1689773832.333974][49374:49374] CHIP:DMG:                                 CommandId = 0x0,
           [1689773832.333987][49374:49374] CHIP:DMG:                         },
-          [1689773832.334008][49374:49374] CHIP:DMG:                         
-          [1689773832.334021][49374:49374] CHIP:DMG:                         CommandFields = 
+          [1689773832.334008][49374:49374] CHIP:DMG:
+          [1689773832.334021][49374:49374] CHIP:DMG:                         CommandFields =
           [1689773832.334038][49374:49374] CHIP:DMG:                         {
-          [1689773832.334060][49374:49374] CHIP:DMG:                                 0x0 = 0, 
+          [1689773832.334060][49374:49374] CHIP:DMG:                                 0x0 = 0,
           [1689773832.334077][49374:49374] CHIP:DMG:                         },
           [1689773832.334090][49374:49374] CHIP:DMG:                 },
-          [1689773832.334114][49374:49374] CHIP:DMG:                 
+          [1689773832.334114][49374:49374] CHIP:DMG:
           [1689773832.334125][49374:49374] CHIP:DMG:         ],
-          [1689773832.334151][49374:49374] CHIP:DMG:         
+          [1689773832.334151][49374:49374] CHIP:DMG:
           [1689773832.334163][49374:49374] CHIP:DMG:         InteractionModelRevision = 1
           [1689773832.334176][49374:49374] CHIP:DMG: },
       disabled: true
@@ -120,7 +120,7 @@ tests:
           any supported EffectIdentifier argument and EffectVariant set to 0."
       PICS: I.C.C40.Tx
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool identify trigger-effect 0 0 1 1
 
@@ -128,8 +128,8 @@ tests:
 
           [1689773765.746962][49374:49374] CHIP:DMG: InvokeRequestMessage =
           [1689773765.746977][49374:49374] CHIP:DMG: {
-          [1689773765.746985][49374:49374] CHIP:DMG:         suppressResponse = false, 
-          [1689773765.747006][49374:49374] CHIP:DMG:         timedRequest = false, 
+          [1689773765.746985][49374:49374] CHIP:DMG:         suppressResponse = false,
+          [1689773765.747006][49374:49374] CHIP:DMG:         timedRequest = false,
           [1689773765.747016][49374:49374] CHIP:DMG:         InvokeRequests =
           [1689773765.747035][49374:49374] CHIP:DMG:         [
           [1689773765.747045][49374:49374] CHIP:DMG:                 CommandDataIB =
@@ -140,16 +140,16 @@ tests:
           [1689773765.747107][49374:49374] CHIP:DMG:                                 ClusterId = 0x3,
           [1689773765.747119][49374:49374] CHIP:DMG:                                 CommandId = 0x40,
           [1689773765.747130][49374:49374] CHIP:DMG:                         },
-          [1689773765.747144][49374:49374] CHIP:DMG:                         
-          [1689773765.747155][49374:49374] CHIP:DMG:                         CommandFields = 
+          [1689773765.747144][49374:49374] CHIP:DMG:
+          [1689773765.747155][49374:49374] CHIP:DMG:                         CommandFields =
           [1689773765.747167][49374:49374] CHIP:DMG:                         {
-          [1689773765.747181][49374:49374] CHIP:DMG:                                 0x0 = 0, 
-          [1689773765.747194][49374:49374] CHIP:DMG:                                 0x1 = 0, 
+          [1689773765.747181][49374:49374] CHIP:DMG:                                 0x0 = 0,
+          [1689773765.747194][49374:49374] CHIP:DMG:                                 0x1 = 0,
           [1689773765.747205][49374:49374] CHIP:DMG:                         },
           [1689773765.747215][49374:49374] CHIP:DMG:                 },
-          [1689773765.747234][49374:49374] CHIP:DMG:                 
+          [1689773765.747234][49374:49374] CHIP:DMG:
           [1689773765.747243][49374:49374] CHIP:DMG:         ],
-          [1689773765.747261][49374:49374] CHIP:DMG:         
+          [1689773765.747261][49374:49374] CHIP:DMG:
           [1689773765.747271][49374:49374] CHIP:DMG:         InteractionModelRevision = 1
           [1689773765.747284][49374:49374] CHIP:DMG: },
       disabled: true

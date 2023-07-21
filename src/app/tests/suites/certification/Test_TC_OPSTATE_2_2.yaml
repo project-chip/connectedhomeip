@@ -42,7 +42,7 @@ tests:
       PICS: OPSTATE.S.A0003
       verification: |
           ./chip-tool operationalstate read operational-state-list 1 1
-           
+
            Via the TH (chip-tool), verify:
            - all entries include an ID (enum8) and a label (string)
            - all provided IDs are in the allowed range
@@ -71,7 +71,7 @@ tests:
       PICS: OPSTATE.S.C02.Rsp && OPSTATE.S.C04.Tx
       verification: |
           ./chip-tool operationalstate start 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
            - The ErrorStateID field is set to 0x00 (NoError)
@@ -93,7 +93,7 @@ tests:
       PICS: OPSTATE.S.A0004
       verification: |
           ./chip-tool operationalstate read operational-state 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the response has an OperationalStateID field that is set to 0x01 (Running)
 
@@ -147,10 +147,10 @@ tests:
       PICS: OPSTATE.S.A0000
       verification: |
           ./chip-tool operationalstate read phase-list 1 1
-           
+
            Via the TH (chip-tool), verify:
-           - that PhaseList attribute value contains either null or a list of strings. 
-           
+           - that PhaseList attribute value contains either null or a list of strings.
+
            If not null, receord the number of entries in the list as 'phase-list-size'; execute step 7.
            If null, go to step 8.
 
@@ -212,12 +212,12 @@ tests:
       PICS: OPSTATE.S.C02.Rsp && OPSTATE.S.C04.Tx
       verification: |
           ./chip-tool operationalstate start 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
            - The ErrorStateID field is set to 0x00 (NoError)
 
-          [1689674637.555734][17326:17328] CHIP:DMG: 	
+          [1689674637.555734][17326:17328] CHIP:DMG:
           [1689674637.555742][17326:17328] CHIP:DMG: 	InteractionModelRevision = 1
           [1689674637.555751][17326:17328] CHIP:DMG: },
           [1689674637.555784][17326:17328] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0060 Command=0x0000_0004
@@ -237,7 +237,7 @@ tests:
       PICS: OPSTATE.S.C01.Rsp && OPSTATE.S.C04.Tx
       verification: |
           ./chip-tool operationalstate stop 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
            - The ErrorStateID field is set to 0x00 (NoError)
@@ -261,7 +261,7 @@ tests:
       PICS: OPSTATE.S.A0004
       verification: |
           ./chip-tool operationalstate read operational-state 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the response has an OperationalStateID field that is set to 0x00 (Stopped)
 
@@ -279,7 +279,7 @@ tests:
       PICS: OPSTATE.S.C01.Rsp && OPSTATE.S.C04.Tx
       verification: |
           ./chip-tool operationalstate stop 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
            - The ErrorStateID field is set to 0x00 (NoError)
@@ -307,7 +307,7 @@ tests:
       PICS: OPSTATE.S.C02.Rsp && OPSTATE.S.C04.Tx
       verification: |
           ./chip-tool operationalstate start 1 1
-           
+
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
            - The ErrorStateID field is set to 0x01 (UnableToStartOrResume)

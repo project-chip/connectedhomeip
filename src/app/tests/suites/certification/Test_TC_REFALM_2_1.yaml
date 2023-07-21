@@ -65,7 +65,7 @@ tests:
           ./chip-tool refrigeratoralarm read supported 1 1
           On TH(chip-tool), Verify that the DUT response contains a 32-bit value with bit 0 set to 1.
 
-          [1689677642.708638][18413:18415] CHIP:DMG:         SuppressResponse = true, 
+          [1689677642.708638][18413:18415] CHIP:DMG:         SuppressResponse = true,
           [1689677642.708645][18413:18415] CHIP:DMG:         InteractionModelRevision = 1
           [1689677642.708651][18413:18415] CHIP:DMG: }
           [1689677642.708726][18413:18415] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0057 Attribute 0x0000_0003 DataVersion: 1517282962

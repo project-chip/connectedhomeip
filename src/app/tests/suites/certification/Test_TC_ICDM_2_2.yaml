@@ -155,7 +155,7 @@ tests:
           On TH(chip-tool) verify that DUT responds with status as  SUCCESS(0x00).
           [1689764286.310839][26236:26241] CHIP:DMG: InvokeResponseMessage =
           [1689764286.310843][26236:26241] CHIP:DMG: {
-          [1689764286.310848][26236:26241] CHIP:DMG:         suppressResponse = false, 
+          [1689764286.310848][26236:26241] CHIP:DMG:         suppressResponse = false,
           [1689764286.310852][26236:26241] CHIP:DMG:         InvokeResponseIBs =
           [1689764286.310859][26236:26241] CHIP:DMG:         [
           [1689764286.310863][26236:26241] CHIP:DMG:                 InvokeResponseIB =
@@ -168,18 +168,18 @@ tests:
           [1689764286.310901][26236:26241] CHIP:DMG:                                         ClusterId = 0x46,
           [1689764286.310906][26236:26241] CHIP:DMG:                                         CommandId = 0x2,
           [1689764286.310911][26236:26241] CHIP:DMG:                                 },
-          [1689764286.310919][26236:26241] CHIP:DMG:                                 
+          [1689764286.310919][26236:26241] CHIP:DMG:
           [1689764286.310922][26236:26241] CHIP:DMG:                                 StatusIB =
           [1689764286.310928][26236:26241] CHIP:DMG:                                 {
           [1689764286.310932][26236:26241] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1689764286.310936][26236:26241] CHIP:DMG:                                 },
-          [1689764286.310941][26236:26241] CHIP:DMG:                                 
+          [1689764286.310941][26236:26241] CHIP:DMG:
           [1689764286.310945][26236:26241] CHIP:DMG:                         },
-          [1689764286.310951][26236:26241] CHIP:DMG:                         
+          [1689764286.310951][26236:26241] CHIP:DMG:
           [1689764286.310955][26236:26241] CHIP:DMG:                 },
-          [1689764286.310962][26236:26241] CHIP:DMG:                 
+          [1689764286.310962][26236:26241] CHIP:DMG:
           [1689764286.310966][26236:26241] CHIP:DMG:         ],
-          [1689764286.310972][26236:26241] CHIP:DMG:         
+          [1689764286.310972][26236:26241] CHIP:DMG:
           [1689764286.310976][26236:26241] CHIP:DMG:         InteractionModelRevision = 1
           [1689764286.310980][26236:26241] CHIP:DMG: },
           [1689764286.311002][26236:26241] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0002 Status=0x0
@@ -200,7 +200,7 @@ tests:
           [1689764308.632783][26647:26650] CHIP:DMG: ICR moving to [ResponseRe]
           [1689764308.632806][26647:26650] CHIP:DMG: InvokeResponseMessage =
           [1689764308.632816][26647:26650] CHIP:DMG: {
-          [1689764308.632826][26647:26650] CHIP:DMG:         suppressResponse = false, 
+          [1689764308.632826][26647:26650] CHIP:DMG:         suppressResponse = false,
           [1689764308.632842][26647:26650] CHIP:DMG:         InvokeResponseIBs =
           [1689764308.632864][26647:26650] CHIP:DMG:         [
           [1689764308.632878][26647:26650] CHIP:DMG:                 InvokeResponseIB =
@@ -213,18 +213,18 @@ tests:
           [1689764308.633056][26647:26650] CHIP:DMG:                                         ClusterId = 0x46,
           [1689764308.633080][26647:26650] CHIP:DMG:                                         CommandId = 0x2,
           [1689764308.633103][26647:26650] CHIP:DMG:                                 },
-          [1689764308.633129][26647:26650] CHIP:DMG:                                 
+          [1689764308.633129][26647:26650] CHIP:DMG:
           [1689764308.633151][26647:26650] CHIP:DMG:                                 StatusIB =
           [1689764308.633176][26647:26650] CHIP:DMG:                                 {
           [1689764308.633201][26647:26650] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1689764308.633228][26647:26650] CHIP:DMG:                                 },
-          [1689764308.633252][26647:26650] CHIP:DMG:                                 
+          [1689764308.633252][26647:26650] CHIP:DMG:
           [1689764308.633273][26647:26650] CHIP:DMG:                         },
-          [1689764308.633295][26647:26650] CHIP:DMG:                         
+          [1689764308.633295][26647:26650] CHIP:DMG:
           [1689764308.633311][26647:26650] CHIP:DMG:                 },
-          [1689764308.633331][26647:26650] CHIP:DMG:                 
+          [1689764308.633331][26647:26650] CHIP:DMG:
           [1689764308.633345][26647:26650] CHIP:DMG:         ],
-          [1689764308.633363][26647:26650] CHIP:DMG:         
+          [1689764308.633363][26647:26650] CHIP:DMG:
           [1689764308.633383][26647:26650] CHIP:DMG:         InteractionModelRevision = 1
           [1689764308.633413][26647:26650] CHIP:DMG: },
           [1689764308.633514][26647:26650] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0002 Status=0x0
@@ -254,9 +254,9 @@ tests:
           On TH(chip-tool) verify that DUT responds with status as  NOT_FOUND(0x8b)
 
           [1689764335.957449][27077:27079] CHIP:DMG:                 },
-          [1689764335.957456][27077:27079] CHIP:DMG:                 
+          [1689764335.957456][27077:27079] CHIP:DMG:
           [1689764335.957460][27077:27079] CHIP:DMG:         ],
-          [1689764335.957468][27077:27079] CHIP:DMG:         
+          [1689764335.957468][27077:27079] CHIP:DMG:
           [1689764335.957472][27077:27079] CHIP:DMG:         InteractionModelRevision = 1
           [1689764335.957476][27077:27079] CHIP:DMG: },
           [1689764335.957497][27077:27079] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0002 Status=0x8b

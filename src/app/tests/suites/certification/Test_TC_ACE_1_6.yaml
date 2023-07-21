@@ -272,7 +272,7 @@ tests:
           [1685009398.600944][39795:39797] CHIP:TOO: ViewGroupResponse: {
           [1685009398.600949][39795:39797] CHIP:TOO: status: 139
           [1685009398.600952][39795:39797] CHIP:TOO: groupID: 261
-          [1685009398.600955][39795:39797] CHIP:TOO: groupName: 
+          [1685009398.600955][39795:39797] CHIP:TOO: groupName:
           [1685009398.600957][39795:39797] CHIP:TOO: }
           [1685009398.600964][39795:39797] CHIP:DMG: ICR moving to [AwaitingDe]
       cluster: "LogCommands"

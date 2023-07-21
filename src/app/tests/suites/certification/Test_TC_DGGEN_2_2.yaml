@@ -59,7 +59,7 @@ tests:
 
           Verify that HardwareFaultChange Event SHALL indicate a change in the set of hardware faults currently
           detected by the Node. The current and previous field SHALL represent the set of faults as per Section 11.11.6.1,
-          “HardwareFault enum”, On TH(chip-tool) 
+          “HardwareFault enum”, On TH(chip-tool)
 
           [1684144494.712474][50333:50335] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0000
           [1684144494.712481][50333:50335] CHIP:TOO:   Event number: 4
@@ -133,7 +133,7 @@ tests:
            ./chip-tool generaldiagnostics read-event network-fault-change 1 0
 
           Verify that NetworkFaultChange Event SHALL indicate a change in the set of network faults currently
-          TH receives NetworkFaultChange event with current and previous data specified by NetworkFault ENUM table 11.11.2.3 according to two failure causes, On TH(chip-tool) 
+          TH receives NetworkFaultChange event with current and previous data specified by NetworkFault ENUM table 11.11.2.3 according to two failure causes, On TH(chip-tool)
 
           [1684144729.918248][50378:50380] CHIP:DMG: }
           [1684144729.918277][50378:50380] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0002
@@ -164,7 +164,7 @@ tests:
 
           ./chip-tool generaldiagnostics read-event boot-reason 1 0
 
-          Read the event data of BootReason specified by Table 103 BootReason ENUM table On TH(chip-tool) 
+          Read the event data of BootReason specified by Table 103 BootReason ENUM table On TH(chip-tool)
 
           [1684144762.620015][50386:50388] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0003
           [1684144762.620021][50386:50388] CHIP:TOO:   Event number: 0

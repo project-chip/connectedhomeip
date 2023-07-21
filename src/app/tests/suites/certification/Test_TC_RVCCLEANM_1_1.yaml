@@ -44,7 +44,7 @@ tests:
       verification: |
           ./chip-tool rvcleanm read feature-map  1 1
           On the reference app we see featureMap value 1, This value changes depending on DUT implementing the features
-          Verify  FeatureMap attribute On the TH(Chip-tool) Log 
+          Verify  FeatureMap attribute On the TH(Chip-tool) Log
 
           [1649052001.646939][8355:8360] CHIP:TOO:   FeatureMap: 1
       disabled: true
@@ -53,9 +53,9 @@ tests:
       verification: |
           ./chip-tool rvcleanm read attribute-list 1 1
 
-          Verify " AttributeList "should include the mandatory attributes (values 0, 2, 3) and  
+          Verify " AttributeList "should include the mandatory attributes (values 0, 2, 3) and
           global attributes  (value 65533, 65532, 65531, 65530, 65529 and 65528)
-          list may include optional attribute(value 0x0004), if RVCCLEANM.S.A0004(StartUpMode) supports, 
+          list may include optional attribute(value 0x0004), if RVCCLEANM.S.A0004(StartUpMode) supports,
           list contains feature dependent attribute (values 0x0005),if RVCCLEANM.S.F00(DEPONOFF) is true  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
 
           [1676288620.483812][4014:4016] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_FFFB DataVersion: 2649295313
@@ -83,7 +83,7 @@ tests:
       verification: |
           ./chip-tool rvcleanm read accepted-command-list 1 1
 
-          Verify the "AcceptedCommandList" contains feature dependent commands 
+          Verify the "AcceptedCommandList" contains feature dependent commands
 
           [1650274602.826352][8965:8970] CHIP:TOO:   AcceptedCommandList: 1 entries
           [1650274602.826442][8965:8970] CHIP:TOO:     [1]: 0
