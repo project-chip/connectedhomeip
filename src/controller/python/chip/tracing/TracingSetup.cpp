@@ -19,11 +19,11 @@
 #include <controller/python/chip/native/PyChipError.h>
 
 #include <tracing/json/json_tracing.h>
-#include <tracing/registry.h>
 #include <tracing/perfetto/event_storage.h>
 #include <tracing/perfetto/file_output.h>
 #include <tracing/perfetto/perfetto_tracing.h>
 #include <tracing/perfetto/simple_initialize.h>
+#include <tracing/registry.h>
 
 namespace {
 
@@ -50,7 +50,6 @@ extern "C" PyChipError pychip_tracing_start_json_file(const char * file_name)
     chip::Tracing::Register(mJsonBackend);
     return ToPyChipError(CHIP_NO_ERROR);
 }
-
 
 extern "C" void pychip_tracing_start_perfetto_system()
 {

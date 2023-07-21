@@ -16,9 +16,10 @@
 
 from enum import Enum
 from typing import Optional
-from chip.native import PyChipError
 
 import chip.native
+from chip.native import PyChipError
+
 
 def _GetTracingLibraryHandle() -> ctypes.CDLL:
     """ Get the native library handle with tracing methods initialized.
@@ -105,12 +106,11 @@ class TracingContext:
         elif destination == 'json:log':
             self.Start(TraceType.JSON)
         elif destination.startswith("json:")
-            self.Start(TraceType.JSON, destination[5:])
+        self.Start(TraceType.JSON, destination[5:])
         elif destination.startswith("perfetto:")
-            self.Start(TraceType.PERFETTO, destination[9:])
+        self.Start(TraceType.PERFETTO, destination[9:])
         else:
             raise ValueError("Invalid trace-to destination: %r", destination)
-
 
     def __init__(self):
         pass
