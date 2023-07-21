@@ -28,7 +28,6 @@ class DefaultTimerDelegate : public reporting::ReportScheduler::TimerDelegate
 {
 public:
     using TimerContext    = reporting::TimerContext;
-    using ReadHandlerNode = reporting::ReportScheduler::ReadHandlerNode;
     using Timeout         = System::Clock::Timeout;
     static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
     {
