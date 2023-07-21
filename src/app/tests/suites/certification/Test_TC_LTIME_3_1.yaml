@@ -195,11 +195,7 @@ tests:
           [1651194449246] [14699:212201] CHIP: [DMG]
           [1651194449246] [14699:212201] CHIP: [DMG]         InteractionModelRevision = 1
           [1651194449246] [14699:212201] CHIP: [DMG] }
-      disabled: true
 
-    - label: "Step 9: Repeat step 8 for all the values in PIXIT.LTIME.SCT"
-      PICS: LTIME.S.A0001
-      verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
 
           Verify that ActiveCalendarType attribute value is changed to 0 on TH(chip-tool) log and below is the sample log provided for raspi platform:
@@ -210,19 +206,16 @@ tests:
           [1658149303.936385][9227:9232] CHIP:EM: Sending Standalone Ack for MessageCounter:70392442 on exchange 10288i
       disabled: true
 
-    - label: "Step 10: TH writes 50 to ActiveCalendarType attribute"
+    - label: "Step 9: Repeat step 8 for all the values in PIXIT.LTIME.SCT"
       PICS: LTIME.S.A0001
       verification: |
           Repeat the test step 8 for below mentioned values 1, 2,3, 4, 5, 6,7, 8, 9,10 and 11 and verify that TH receives the write command and updates the respective value. Verify that TH reads ActiveCalendarType attribute value and it is the same as the value that was set before
-      disabled: true
 
-    - label: "Step 11: TH writes 5 to HourFormat attribute"
-      PICS: LTIME.S.A0000
-      verification: |
+
           ./chip-tool timeformatlocalization write active-calendar-type 2 1 0
 
           Verify that write request is successful on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
-                                 
+                                
           [1685530839.323951][17790:17790] CHIP:DMG:                         StatusIB =
           [1685530839.323956][17790:17790] CHIP:DMG:                         {
           [1685530839.323961][17790:17790] CHIP:DMG:                                 status = 0x00 (SUCCESS),
@@ -235,6 +228,165 @@ tests:
           [1685530893.728748][17790:17790] CHIP:DMG:                                         
           [1685530893.728752][17790:17790] CHIP:DMG:                                 Data = 2, 
           [1685530893.728755][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization write active-calendar-type 3 1 0
+
+          Verify that write request is successful on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+
+          [1685530930.699453][17790:17790] CHIP:DMG:                                 
+          [1685530930.699457][17790:17790] CHIP:DMG:                         StatusIB =
+          [1685530930.699462][17790:17790] CHIP:DMG:                         {
+          [1685530930.699467][17790:17790] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1685530930.699472][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          Verify  ActiveCalendarType attribute value is 3 on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+
+          [1685530966.990434][17790:17790] CHIP:DMG:                                 }
+          [1685530966.990439][17790:17790] CHIP:DMG:                                         
+          [1685530966.990444][17790:17790] CHIP:DMG:                                 Data = 3, 
+          [1685530966.990448][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization write active-calendar-type 4 1 0
+
+          Verify that write request is successful on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+                                      
+          [1685531105.731791][17790:17790] CHIP:DMG:                         StatusIB =
+          [1685531105.731794][17790:17790] CHIP:DMG:                         {
+          [1685531105.731797][17790:17790] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1685531105.731800][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          Verify  ActiveCalendarType attribute value is 4 on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+
+          [1685531136.531053][17790:17790] CHIP:DMG:                                 }
+          [1685531136.531059][17790:17790] CHIP:DMG:                                         
+          [1685531136.531064][17790:17790] CHIP:DMG:                                 Data = 4, 
+          [1685531136.531069][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization write active-calendar-type 5 1 0
+
+          Verify that write request is successful on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+                      
+          [1685531255.834498][17790:17790] CHIP:DMG:                         StatusIB =
+          [1685531255.834501][17790:17790] CHIP:DMG:                         {
+          [1685531255.834504][17790:17790] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1685531255.834507][17790:17790] CHIP:DMG:                         },
+          [1685531255.834510][17790:17790] CHIP:DMG:                         
+
+          ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          Verify  ActiveCalendarType attribute value is 5 on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+
+          [1685531310.536085][17790:17790] CHIP:DMG:                                         
+          [1685531310.536091][17790:17790] CHIP:DMG:                                 Data = 5, 
+          [1685531310.536095][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization write active-calendar-type 6 1 0
+
+          Verify that write request is successful on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+                                      
+          [1685531399.287320][17790:17790] CHIP:DMG:                         StatusIB =
+          [1685531399.287323][17790:17790] CHIP:DMG:                         {
+          [1685531399.287326][17790:17790] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1685531399.287329][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          Verify  ActiveCalendarType attribute value is 6 on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+
+          [1685531511.587292][17790:17790] CHIP:DMG:                                         
+          [1685531511.587298][17790:17790] CHIP:DMG:                                 Data = 6, 
+          [1685531511.587302][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization write active-calendar-type 7 1 0
+
+          Verify that write request is successful on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+
+          [1685531629.563773][17790:17790] CHIP:DMG:                         {
+          [1685531629.563776][17790:17790] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1685531629.563779][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          Verify  ActiveCalendarType attribute value is 7 on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+
+          [1685531645.726844][17790:17790] CHIP:DMG:                                 }
+          [1685531645.726847][17790:17790] CHIP:DMG:                                         
+          [1685531645.726851][17790:17790] CHIP:DMG:                                 Data = 7, 
+          [1685531645.726854][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization write active-calendar-type 8 1 0
+
+          Verify that write request is successful on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+                                        
+          [1685531675.078136][17790:17790] CHIP:DMG:                         StatusIB =
+          [1685531675.078140][17790:17790] CHIP:DMG:                         {
+          [1685531675.078144][17790:17790] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1685531675.078147][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          Verify  ActiveCalendarType attribute value is 8 on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+
+          [1685531710.831092][17790:17790] CHIP:DMG:                                 }
+          [1685531710.831096][17790:17790] CHIP:DMG:                                         
+          [1685531710.831099][17790:17790] CHIP:DMG:                                 Data = 8, 
+          [1685531710.831103][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization write active-calendar-type 9 1 0
+
+          Verify that write request is successful on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+
+          [1685531741.848621][17790:17790] CHIP:DMG:                         {
+          [1685531741.848624][17790:17790] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1685531741.848626][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          Verify  ActiveCalendarType attribute value is 9 on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+
+          [1685531774.495981][17790:17790] CHIP:DMG:                                 }
+          [1685531774.495985][17790:17790] CHIP:DMG:                                         
+          [1685531774.495989][17790:17790] CHIP:DMG:                                 Data = 9, 
+          [1685531774.495992][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization write active-calendar-type 10 1 0
+
+          Verify that write request is successful on  the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+                              
+          [1685531804.062762][17790:17790] CHIP:DMG:                         StatusIB =
+          [1685531804.062767][17790:17790] CHIP:DMG:                         {
+          [1685531804.062770][17790:17790] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1685531804.062773][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          Verify  ActiveCalendarType attribute value is 10 on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+
+          [1685531853.080080][17790:17790] CHIP:DMG:                                 }
+          [1685531853.080085][17790:17790] CHIP:DMG:                                         
+          [1685531853.080089][17790:17790] CHIP:DMG:                                 Data = 10, 
+          [1685531853.080092][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization write active-calendar-type 11 1 0
+
+          Verify that write request is successful on  the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+                                          
+          [1685531890.505936][17790:17790] CHIP:DMG:                         StatusIB =
+          [1685531890.505940][17790:17790] CHIP:DMG:                         {
+          [1685531890.505943][17790:17790] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1685531890.505946][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          Verify  ActiveCalendarType attribute value is 11 on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+
+          [1685531928.300701][17790:17790] CHIP:DMG:                                         
+          [1685531928.300705][17790:17790] CHIP:DMG:                                 Data = 11, 
+          [1685531928.300709][17790:17790] CHIP:DMG:                         },
       disabled: true
 
     - label: "Step 10: TH writes 50 to ActiveCalendarType attribute"
@@ -245,7 +397,7 @@ tests:
           Verify that DUT sends a CONSTRAINT_ERROR response On TH(chip-tool) log and below is the sample log provided for raspi platform:
 
           [1658742658.653019][3572:3577] CHIP:DMG:         ],
-          [1658742658.653047][3572:3577] CHIP:DMG:
+          [1658742658.653047][3572:3577] CHIP:DMG:         
           [1658742658.653071][3572:3577] CHIP:DMG:         InteractionModelRevision = 1
           [1658742658.653098][3572:3577] CHIP:DMG: }
           [1658742658.653166][3572:3577] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -256,7 +408,7 @@ tests:
     - label: "Step 11: TH writes 5 to HourFormat attribute"
       PICS: LTIME.S.A0000
       verification: |
-          ./chip-tool timeformatlocalization write   hour-format  5 1 0
+          ./chip-tool timeformatlocalization write hour-format  5 1 0
 
           Verify that DUT sends a CONSTRAINT_ERROR response On TH(chip-tool)  log and below is the sample log provided for raspi platform:
 

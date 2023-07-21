@@ -106,7 +106,7 @@ tests:
           [1676355303.610660][997160:997162] CHIP:EM: <<< [E:41653i S:27265 M:61334885 (Ack:214003320)] (S) Msg TX to 1:0000000000000001 [6193] --- Type 0000:10 (SecureChannel:StandaloneAck)
       disabled: true
 
-    - label: "Step 4.a: DUT_CR2 starts a commissioning process with TH_CE"
+    - label: "Step 4a: DUT_CR2 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
@@ -120,7 +120,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 4.b: Verify TH_CE is now discoverable over DNS-SD with two SRV
+          "Step 4b: Verify TH_CE is now discoverable over DNS-SD with two SRV
           Records"
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
@@ -150,7 +150,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 4.c: DUT_CR2 sends command to TH_CE to write and read the Basic
+          "Step 4c: DUT_CR2 sends command to TH_CE to write and read the Basic
           Information Clusters NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
@@ -254,7 +254,7 @@ tests:
 
     - label:
           "Step 6: TH_CR1 sends command to TH_CE to write and read the Basic
-          Information Clusters NodeLabel mandatory attribute"
+          Information Cluster’s NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
@@ -298,7 +298,7 @@ tests:
 
     - label:
           "Step 7: DUT_CR2 sends command to TH_CE to read, write and then read
-          the Basic Information Clusters NodeLabel mandatory attribute"
+          the Basic Information Cluster’s NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
           On DUT_CR2 read, write attribute and then read attribute to and from TH_CE
@@ -447,7 +447,7 @@ tests:
 
     - label:
           "Step 12: DUT_CR2 sends command to TH_CE to write and read the Basic
-          Information Clusters NodeLabel mandatory attribute"
+          Information Cluster’s NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers

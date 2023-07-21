@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 234.2.2. [TC-ICDM-2.2] Primary functionality with DUT as Server
+name: 214.2.2. [TC-ICDM-2.2] Primary functionality with DUT as Server
 
 PICS:
     - ICDM.S

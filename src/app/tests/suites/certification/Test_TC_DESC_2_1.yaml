@@ -243,8 +243,13 @@ tests:
           [1672919326.178777][33468:33470] CHIP:TOO:     [2]: 2
       disabled: true
 
+    - label: "Step 5: TH reads from the DUT the 'TagList' attribute."
+      verification: |
+          Chip-tool has to implement the Taglist attribute
+      disabled: true
+
     - label:
-          "Step 5: The cluster tests applicable to each Device Type should be
+          "Step 6: The cluster tests applicable to each Device Type should be
           executed to make sure all mandatory (and applicable optional)
           attributes/commands are implemented."
       verification: |

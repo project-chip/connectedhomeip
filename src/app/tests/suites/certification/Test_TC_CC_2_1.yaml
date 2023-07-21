@@ -279,7 +279,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read  primary1x 1 1
 
-          Verify  that Primary1X value is an uint16 [Min:0 Max:0xfeff]  if NumberOfPrimaries is 1 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify that "Primary1X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary1X" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0011 DataVersion: 540305990
           [1651483665.109697][3245:3250] CHIP:TOO:    Primary1X: 0
@@ -301,7 +301,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read  primary1y 1 1
 
-          Verify  that Primary1Y value is an uint16 [Min:0 Max:0xfeff]  if NumberOfPrimaries is 1 or more On TH(chip-tool)  Logs:
+
+          On TH(chip-tool)  Logs, Verify  that "Primary1Y" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary1Y" value is 0.      
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0012 DataVersion: 540305990
           [1651483698.733322][3253:3259] CHIP:TOO:    Primary1Y: 0
@@ -323,7 +324,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary1intensity 1 1
 
-          Verify  that Primary1Intensity value is an uint8   if NumberOfPrimaries is 1 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify that "Primary1Intensity" attribute value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary1Intensity" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0013 DataVersion: 540305990
           [1651483742.297459][3263:3268] CHIP:TOO:   Primary1Intensity: 0
@@ -345,7 +346,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary2x 1 1
 
-          Verify  that Primary2X value is an uint16 [Min:0 Max:0xfeff]  if NumberOfPrimaries is 2 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify that "Primary2X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary2X" value is 0.  
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0015 DataVersion: 540305990
           [1651483777.233498][3270:3275] CHIP:TOO:   Primary2X: 0
@@ -367,7 +368,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary2y 1 1
 
-          Verify  that Primary2Y value is an uint16 [Min:0 Max:0xfeff]  if NumberOfPrimaries is 2 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary2Y" value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary2Y" value is 0.  
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0016 DataVersion: 540305990
           [1651483805.650796][3279:3284] CHIP:TOO:  Primary2Y: 0
@@ -389,7 +390,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary2intensity 1 1
 
-          Verify  that Primary2Intensity value is an uint8  if NumberOfPrimaries is 2 or more  On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary2Intensity" attribute value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary2Intensity" value is 0.  
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0017 DataVersion: 540305990
           [1651483834.596380][3285:3290] CHIP:TOO:  Primary2Intensity: 0
@@ -411,7 +412,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary3x 1 1
 
-          Verify  that Primary3X value is an uint16 [Min:0 Max:0xfeff]  if NumberOfPrimaries is 3 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary3X" value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary3X" value is 0.  
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0019 DataVersion: 540305990
           [1651483937.072323][3298:3303] CHIP:TOO:   Primary3X: 0
@@ -433,7 +434,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary3y 1 1
 
-          Verify  that Primary3Y value is an uint16 [Min:0 Max:0xfeff]  if NumberOfPrimaries is 3 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary3Y" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary3Y" value is 0.  
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_001A DataVersion: 540305990
           [1651483967.386334][3305:3310] CHIP:TOO:   Primary3Y: 0
@@ -455,7 +456,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary3intensity 1 1
 
-          Verify  that Primary3Intensity value is an uint8  if NumberOfPrimaries is 3 or more  On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary3Intensity" attribute value is an uint8  and below is the sample log provided for the raspi platform, In RPI "Primary3Intensity" value is 0.  
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_001B DataVersion: 540305990
           [1651484113.812178][3316:3321] CHIP:TOO:   Primary3Intensity: 0
@@ -478,7 +479,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary4x 1 1
 
-          Verify  that Primary4X value is an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is 4 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary4X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary4X" value is 0.  
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0020 DataVersion: 540305990
           [1651484143.778301][3324:3329] CHIP:TOO:   Primary4X: 0
@@ -500,7 +501,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary4y 1 1
 
-          Verify  that Primary4Y value is an uint16 [Min:0 Max:0xfeff] On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary4Y" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary4Y" value is 0.   
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0021 DataVersion: 540305990
           [1651484171.921901][3334:3339] CHIP:TOO:   Primary4Y: 0
@@ -522,7 +523,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary4intensity 1 1
 
-          Verify  that Primary4Intensity value is an uint8  On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify that "Primary4Intensity" attribute value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary4Intensity" value is 0.   
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0022 DataVersion: 540305990
           [1651484198.443415][3341:3346] CHIP:TOO:   Primary4Intensity: 0
@@ -544,7 +545,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary5x 1 1
 
-          Verify  that Primary5X value is an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is 5 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify that "Primary5X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary5X" value is 0.   
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0024 DataVersion: 540305990
           [1651484241.467661][3350:3355] CHIP:TOO:   Primary5X: 0
@@ -566,7 +567,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary5y 1 1
 
-          Verify  that Primary5Y value is an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is 5 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify that "Primary5Y" attribute value is an uint16 and below is the sample log provided for the raspi platform, In RPI "Primary5Y" value is 0.   
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0025 DataVersion: 540305990
           [1651484286.709863][3358:3363] CHIP:TOO:  Primary5Y: 0
@@ -588,7 +589,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary5intensity 1 1
 
-          Verify  that Primary5Intensity value is an uint8 if NumberOfPrimaries is 5 or more  On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify that "Primary5Intensity" attribute value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary5Intensity" value is 0.   
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0026 DataVersion: 540305990
           [1651484304.715731][3365:3370] CHIP:TOO:  Primary5Intensity: 0
@@ -610,7 +611,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary6x 1 1
 
-          Verify  that Primary6X value is an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is 6 On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary6X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary6X" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0028 DataVersion: 540305990
           [1651484349.601181][3372:3377] CHIP:TOO:  Primary6X: 0
@@ -632,7 +633,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary6y 1 1
 
-          Verify  that Primary6Y value is an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is 6 On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary6Y" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary6Y" value is 0.   
 
           [1663318323.234522][132277:132282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0029 DataVersion: 3053940635
           [1663318323.234951][132277:132282] CHIP:TOO:   Primary6Y: 0
@@ -654,7 +655,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary6intensity 1 1
 
-          Verify  that Primary6Intensity value is an uint8 if NumberOfPrimaries is 6 On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary6Intensity" value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary6Intensity" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_002A DataVersion: 540305990
           [1651484392.490974][3378:3383] CHIP:TOO:  Primary6Intensity: 0
