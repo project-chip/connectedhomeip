@@ -625,8 +625,50 @@ tests:
           flag is set to True for a particular event path in the EventPathIB in
           the SubscribeRequestMessage."
       verification: |
-          Test-plan need to be modified based on Spec update
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/2507
+          basicinformation subscribe-event start-up  3 10 1 0 --is-urgent true   --keepSubscriptions true
+
+          On TH(chiptool), Verify TH receives Report Data Message for all subscribed events, including any queued events leading up to (and including) the urgent event, after the minimum interval time.
+
+          [1689936447.980311][50375:50377] CHIP:EM: Rxd Ack; Removing MessageCounter:21689776 from Retrans Table on exchange 23683i
+          [1689936447.980350][50375:50377] CHIP:DMG: ReportDataMessage =
+          [1689936447.980360][50375:50377] CHIP:DMG: {
+          [1689936447.980368][50375:50377] CHIP:DMG:         SubscriptionId = 0xb2266b9e,
+          [1689936447.980377][50375:50377] CHIP:DMG:         EventReportIBs =
+          [1689936447.980392][50375:50377] CHIP:DMG:         [
+          [1689936447.980399][50375:50377] CHIP:DMG:                 EventReportIB =
+          [1689936447.980415][50375:50377] CHIP:DMG:                 {
+          [1689936447.980424][50375:50377] CHIP:DMG:                         EventDataIB =
+          [1689936447.980450][50375:50377] CHIP:DMG:                         {
+          [1689936447.980459][50375:50377] CHIP:DMG:                                 EventPath =
+          [1689936447.980470][50375:50377] CHIP:DMG:                                 {
+          [1689936447.980482][50375:50377] CHIP:DMG:                                         Endpoint = 0x0,
+          [1689936447.980493][50375:50377] CHIP:DMG:                                         Cluster = 0x28,
+          [1689936447.980505][50375:50377] CHIP:DMG:                                         Event = 0x0,
+          [1689936447.980514][50375:50377] CHIP:DMG:                                 },
+          [1689936447.980526][50375:50377] CHIP:DMG:                                 
+          [1689936447.980536][50375:50377] CHIP:DMG:                                 EventNumber = 0x3,
+          [1689936447.980546][50375:50377] CHIP:DMG:                                 PriorityLevel = 0x2,
+          [1689936447.980556][50375:50377] CHIP:DMG:                                 EpochTimestamp = 0x18977193a21,
+          [1689936447.980567][50375:50377] CHIP:DMG:                                 EventData = 
+          [1689936447.980578][50375:50377] CHIP:DMG:                                 {
+          [1689936447.980590][50375:50377] CHIP:DMG:                                         0x0 = 1, 
+          [1689936447.980600][50375:50377] CHIP:DMG:                                 },
+          [1689936447.980609][50375:50377] CHIP:DMG:                         },
+          [1689936447.980623][50375:50377] CHIP:DMG:                         
+          [1689936447.980631][50375:50377] CHIP:DMG:                 },
+          [1689936447.980656][50375:50377] CHIP:DMG:                 
+          [1689936447.980662][50375:50377] CHIP:DMG:         ],
+          [1689936447.980676][50375:50377] CHIP:DMG:         
+          [1689936447.980684][50375:50377] CHIP:DMG:         InteractionModelRevision = 1
+          [1689936447.980690][50375:50377] CHIP:DMG: }
+          [1689936447.980761][50375:50377] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1689936447.980768][50375:50377] CHIP:TOO:   Event number: 3
+          [1689936447.980772][50375:50377] CHIP:TOO:   Priority: Critical
+          [1689936447.980775][50375:50377] CHIP:TOO:   Timestamp: 1689920289313
+          [1689936447.980789][50375:50377] CHIP:TOO:   StartUp: {
+          [1689936447.980797][50375:50377] CHIP:TOO:     SoftwareVersion: 1
+          [1689936447.980804][50375:50377] CHIP:TOO:    }
+          [1689936447.980835][50375:50377] CHIP:DMG: MoveToState ReadClient[0x7f380c010c70]: Moving to [AwaitingSu]
       disabled: true
 
     - label:
