@@ -66,7 +66,7 @@ public:
      * @brief Reset the value of latched alarms in the State attribute.
      * When the State attribute changes a Notify event is generated.
      * @param[in] endpoint The endpoint corresponding to the Dishwasher Alarm cluster.
-     * @param[in] alarms Each bit set to a 1 in this parameters corresponds to a bit in the
+     * @param[in] alarms Each bit set to a 1 in this parameter corresponds to a bit in the
      * State attribute will SHALL be reset to false.
      */
     EmberAfStatus ResetLatchedAlarms(EndpointId endpoint, const BitMask<AlarmMap> alarms);
