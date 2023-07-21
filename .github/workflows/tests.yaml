@@ -525,6 +525,13 @@ jobs:
                   path: /cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
+            - name: Uploading traces on failure
+              uses: actions/upload-artifact@v3
+              if: ${{ failure() && !env.ACT }}
+              with:
+                  name: trace-data-python-repl
+                  path: out/trace_data/
+                  retention-days: 5
             - name: Uploading diagnostic logs
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
