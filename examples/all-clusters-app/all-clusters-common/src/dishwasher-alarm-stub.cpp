@@ -31,7 +31,7 @@ class DishwasherAlarmDelegate : public Delegate
 public:
     /**
      *   @brief
-     *   A notification that the Mask attribute has changed.  When this happens, some previously suppressed
+     *   A notification that the Mask attribute will be checked.  When this happens, some previously suppressed
      *   alarms may need to be enabled, and previously enabled alarms may need to be suppressed.
      *   @param[in] mask The new value of the Mask attribute.
      *   @return The cluster will do this update if ModifyEnabledAlarmsCallback() returns true.
@@ -41,10 +41,10 @@ public:
 
     /**
      *   @brief
-     *   A notification that resets active and latched alarms (if possible)
+     *   A notification that resets active alarms (if possible)
      *   @param[in] alarms The value of reset alarms
-     *   @return The cluster will do this update if ResetAlarmsCallback() returns true.
-     *   The cluster will not do this update if ResetAlarmsCallback() returns false.
+     *   @return The cluster will reset active alarms if ResetAlarmsCallback() returns true.
+     *   The cluster will not reset active alarms if ResetAlarmsCallback() returns false.
      */
     bool ResetAlarmsCallback(const BitMask<AlarmMap> alarms) override;
 
