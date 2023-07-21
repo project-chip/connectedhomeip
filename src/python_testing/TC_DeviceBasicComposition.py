@@ -423,7 +423,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id,
                                                  attribute_id=Clusters.Descriptor.Attributes.PartsList.id)
                 self.record_error(self.get_test_name(), location=location,
-                                  problem=f'Missing descriptor cluster PartsList or DeviceTypeList', spec_location="PartsList Attribute")
+                                  problem='Missing descriptor cluster PartsList or DeviceTypeList', spec_location="PartsList Attribute")
                 success = False
             device_types[endpoint_id] = [i.deviceType for i in endpoint[Clusters.Descriptor]
                                          [Clusters.Descriptor.Attributes.DeviceTypeList]]
