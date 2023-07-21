@@ -9565,19 +9565,21 @@ PICS:
     - label: "Does the device implement the OnMode attribute?"
       id: RVCCLEANM.S.A0003
 
-    #
-    # server / Commands received
-    #
+    #Commands received
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: RVCCLEANM.S.C00.Rsp
+
     - label: "Does the device implement receiving the ChangeToMode command?"
       id: RVCCLEANM.S.Afff9
 
-    #
-    # server / Commands generated
-    #
+    #Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: RVCCLEANM.S.C01.Tx
+
     - label:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: RVCCLEANM.S.Afff8
-
     #
     #Temperature Controlled Cabinet Mode Cluster
     #
@@ -9738,9 +9740,16 @@ PICS:
 
     #Commands received
     - label: "Does the device implement receiving the ChangeToMode command?"
+      id: RVCRUNM.S.C00.Rsp
+
+    - label: "Does the device implement receiving the ChangeToMode command?"
       id: RVCRUNM.S.Afff9
 
     #Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: RVCRUNM.S.C01.Tx
+
     - label:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: RVCRUNM.S.Afff8
