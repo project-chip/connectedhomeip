@@ -43,7 +43,7 @@ declare_args() {
   c_standard = "gnu11"
 
   # C++ standard level (value for -std flag).
-  if (current_os == "android") {
+  if (current_os == "linux" || current_os == "mac" || current_os == "android") {
     cpp_standard = "gnu++17"
   } else {
     cpp_standard = "gnu++14"

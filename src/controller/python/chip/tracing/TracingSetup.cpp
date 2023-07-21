@@ -18,15 +18,12 @@
 
 #include <controller/python/chip/native/PyChipError.h>
 
-#include "tracing/enabled_features.h"
-
 #include <tracing/json/json_tracing.h>
 #include <tracing/registry.h>
 #include <tracing/perfetto/event_storage.h>
 #include <tracing/perfetto/file_output.h>
 #include <tracing/perfetto/perfetto_tracing.h>
 #include <tracing/perfetto/simple_initialize.h>
-#endif
 
 namespace {
 
