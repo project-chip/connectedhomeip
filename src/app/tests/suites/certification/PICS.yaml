@@ -9550,6 +9550,10 @@ PICS:
           the same endpoint?"
       id: RVCCLEANM.S.F00
 
+    - label:
+          "Does the device read the global attribute: EventList from the DUT"
+      id: RVCCLEANM.S.Afffa
+
     #
     # server / attributes
     #
@@ -9565,14 +9569,18 @@ PICS:
     - label: "Does the device implement the OnMode attribute?"
       id: RVCCLEANM.S.A0003
 
-    #Commands received
+    #
+    # server / Commands received
+    #
     - label: "Does the device implement receiving the ChangeToMode command?"
       id: RVCCLEANM.S.C00.Rsp
 
     - label: "Does the device implement receiving the ChangeToMode command?"
       id: RVCCLEANM.S.Afff9
 
-    #Commands generated
+    #
+    # server / Commands generated
+    #
     - label:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: RVCCLEANM.S.C01.Tx
@@ -9580,6 +9588,7 @@ PICS:
     - label:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: RVCCLEANM.S.Afff8
+
     #
     #Temperature Controlled Cabinet Mode Cluster
     #
@@ -9724,6 +9733,10 @@ PICS:
           "Does the device support depending on an On/Off cluster implemented on
           the same endpoint?"
       id: RVCRUNM.S.F00
+
+    - label:
+          "Does the device read the global attribute: EventList from the DUT"
+      id: RVCRUNM.S.Afffa
 
     #Attributes
     - label: "Does the device implement the SupportedModes attribute?"
