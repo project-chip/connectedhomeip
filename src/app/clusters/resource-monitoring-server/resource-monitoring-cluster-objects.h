@@ -141,37 +141,39 @@ struct TypeInfo
 };
 } // namespace LastChangedTime
 
-namespace ReplacementProductStruct {
+namespace GenericReplacementProductStruct {
 enum class Fields : uint8_t
 {
     kProductIdentifierType  = 0,
     kProductIdentifierValue = 1,
 };
 
-struct Type
+class GenericType : protected app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type 
 {
-public:
-    ProductIdentifierTypeEnum productIdentifierType = static_cast<ProductIdentifierTypeEnum>(0);
-    chip::CharSpan productIdentifierValue;
+    private:
+        ResourceMonitoring::ProductIdentifierTypeEnum productIdentifierType;
+        chip::CharSpan productIdentifierValue;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    public:
+        GenericType() {}
+        GenericType(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType, chip::CharSpan aProductIdentifierValue)
+        {
+            productIdentifierType = aProductIdentifierType;
+            productIdentifierValue = aProductIdentifierValue;
+        }
+        virtual ~GenericType() = default;
+        static constexpr bool kIsFabricScoped = false;
+        CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
-
-using DecodableType = Type;
-
-} // namespace ReplacementProductStruct
+} // namespace GenericReplacementProductStruct
 
 namespace ReplacementProductList {
 static constexpr AttributeId Id = 0x00000005;
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const ReplacementProductStruct::Type>;
-    using DecodableType    = chip::app::DataModel::DecodableList<ReplacementProductStruct::Type>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<ReplacementProductStruct::Type> &;
+    using Type             = chip::app::DataModel::List<const GenericReplacementProductStruct::GenericType>;
+    using DecodableType    = chip::app::DataModel::DecodableList<GenericReplacementProductStruct::GenericType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<GenericReplacementProductStruct::GenericType> &;
 
     static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }

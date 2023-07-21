@@ -39,10 +39,7 @@ public:
 
     void Reset() { mIndex = 0; }
 
-    // Returns total size of Replacement Products List.
-    virtual uint8_t Size() = 0;
-
-    virtual CHIP_ERROR Next(Attributes::ReplacementProductStruct::Type & item) = 0;
+    virtual CHIP_ERROR Next(Attributes::GenericReplacementProductStruct::GenericType & item) = 0;
 
 protected:
     uint8_t mIndex;

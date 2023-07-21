@@ -197,6 +197,12 @@ Status Instance::OnResetCondition()
         }
     }
 
+    ReplacementProductListManager * productListManagerInstance = Instance::GetReplacementProductListManagerInstance();
+    if (nullptr != productListManagerInstance)
+    {
+        productListManagerInstance->Reset();
+    }
+
     // call application specific post reset logic
     status = PostResetCondition();
     return status;
@@ -245,7 +251,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err;
-    if (Instance::HasFeature(ResourceMonitoring::Feature::kReplacementProductList))
+    if (HasFeature(ResourceMonitoring::Feature::kReplacementProductList))
     {
         ReplacementProductListManager * productListManagerInstance = Instance::GetReplacementProductListManagerInstance();
         if (nullptr == productListManagerInstance)
@@ -257,12 +263,14 @@ CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
         productListManagerInstance->Reset();
 
         err = aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-            Attributes::ReplacementProductStruct::Type replacementProductStruct;
-            while (productListManagerInstance->Next(replacementProductStruct) == CHIP_NO_ERROR)
+            Attributes::GenericReplacementProductStruct::GenericType replacementProductStruct;
+            CHIP_ERROR iteratorError;
+            while (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED != iteratorError)
             {
                 ReturnErrorOnFailure(encoder.Encode(replacementProductStruct));
+                iteratorError = productListManagerInstance->Next(replacementProductStruct);
             }
-            return CHIP_NO_ERROR;
+            return (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED != iteratorError) ? iteratorError : CHIP_NO_ERROR;
         });
     }
     return CHIP_NO_ERROR;

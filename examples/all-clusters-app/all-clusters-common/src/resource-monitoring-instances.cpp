@@ -25,6 +25,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
+using namespace ResourceMonitoring::Attributes::GenericReplacementProductStruct;
 using chip::Protocols::InteractionModel::Status;
 
 constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
@@ -37,16 +38,12 @@ constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Featu
 static HepaFilterMonitoringInstance * gHepaFilterInstance                       = nullptr;
 static ActivatedCarbonFilterMonitoringInstance * gActivatedCarbonFilterInstance = nullptr;
 
-static ResourceMonitoring::Attributes::ReplacementProductStruct::Type sReplacementProductsList[] = {
-    { .productIdentifierType  = ProductIdentifierTypeEnum::kUpc,
-      .productIdentifierValue = CharSpan::fromCharString("111112222233") },
-    { .productIdentifierType = ProductIdentifierTypeEnum::kGtin8, .productIdentifierValue = CharSpan::fromCharString("gtin8xxx") },
-    { .productIdentifierType  = ProductIdentifierTypeEnum::kEan,
-      .productIdentifierValue = CharSpan::fromCharString("4444455555666") },
-    { .productIdentifierType  = ProductIdentifierTypeEnum::kGtin14,
-      .productIdentifierValue = CharSpan::fromCharString("gtin14xxxxxxxx") },
-    { .productIdentifierType  = ProductIdentifierTypeEnum::kOem,
-      .productIdentifierValue = CharSpan::fromCharString("oem20xxxxxxxxxxxxxxx") },
+static GenericType sReplacementProductsList[] = {
+    GenericType(ProductIdentifierTypeEnum::kUpc, CharSpan::fromCharString("111112222233")),
+    GenericType(ProductIdentifierTypeEnum::kGtin8, CharSpan::fromCharString("gtin8xxx")),
+    GenericType(ProductIdentifierTypeEnum::kEan, CharSpan::fromCharString("4444455555666")),
+    GenericType(ProductIdentifierTypeEnum::kGtin14, CharSpan::fromCharString("gtin14xxxxxxxx")),
+    GenericType(ProductIdentifierTypeEnum::kOem, CharSpan::fromCharString("oem20xxxxxxxxxxxxxxx")),
 };
 StaticReplacementProductListManager sReplacementProductListManager(&sReplacementProductsList[0],
                                                                    ArraySize(sReplacementProductsList));
@@ -105,7 +102,7 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
     gHepaFilterInstance->Init();
 }
 
-CHIP_ERROR StaticReplacementProductListManager::Next(Attributes::ReplacementProductStruct::Type & item)
+CHIP_ERROR StaticReplacementProductListManager::Next(Attributes::GenericReplacementProductStruct::GenericType & item)
 {
     if (mIndex < mReplacementProductListSize)
     {

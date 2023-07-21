@@ -31,19 +31,15 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
+using namespace ResourceMonitoring::Attributes::GenericReplacementProductStruct;
 using chip::Protocols::InteractionModel::Status;
 
-static ResourceMonitoring::Attributes::ReplacementProductStruct::Type sHepaFilterReplacementProductsList[] = {
-    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kUpc,
-      .productIdentifierValue = CharSpan::fromCharString("111112222233") },
-    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8,
-      .productIdentifierValue = CharSpan::fromCharString("gtin8xhe") },
-    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kEan,
-      .productIdentifierValue = CharSpan::fromCharString("4444455555666") },
-    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14,
-      .productIdentifierValue = CharSpan::fromCharString("gtin14xhepaxxx") },
-    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kOem,
-      .productIdentifierValue = CharSpan::fromCharString("oem20xhepaxxxxxxxxxx") },
+static GenericType sHepaFilterReplacementProductsList[] = {
+    GenericType(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc, CharSpan::fromCharString("111112222233")),
+    GenericType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8, CharSpan::fromCharString("gtin8xhe")),
+    GenericType(ResourceMonitoring::ProductIdentifierTypeEnum::kEan, CharSpan::fromCharString("4444455555666")),
+    GenericType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14, CharSpan::fromCharString("gtin14xhepaxxx")),
+    GenericType(ResourceMonitoring::ProductIdentifierTypeEnum::kOem, CharSpan::fromCharString("oem20xhepaxxxxxxxxxx")),
 };
 StaticReplacementProductListManager sHepaFilterReplacementProductListManager(&sHepaFilterReplacementProductsList[0],
                                                                              ArraySize(sHepaFilterReplacementProductsList));

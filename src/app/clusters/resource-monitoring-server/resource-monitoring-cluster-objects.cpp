@@ -45,9 +45,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Commands
 
 namespace Attributes {
-namespace ReplacementProductStruct {
+namespace GenericReplacementProductStruct {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+CHIP_ERROR GenericType::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
@@ -57,7 +57,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     return CHIP_NO_ERROR;
 }
 
-} // namespace ReplacementProductStruct
+} // namespace GenericReplacementProductStruct
 } // namespace Attributes
 
 } // namespace ResourceMonitoring

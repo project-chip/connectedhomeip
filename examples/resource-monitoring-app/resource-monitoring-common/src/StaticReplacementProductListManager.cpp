@@ -25,7 +25,7 @@
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
 
-CHIP_ERROR StaticReplacementProductListManager::Next(Attributes::ReplacementProductStruct::Type & item)
+CHIP_ERROR StaticReplacementProductListManager::Next(Attributes::GenericReplacementProductStruct::GenericType & item)
 {
     if (mIndex < mReplacementProductListSize)
     {
