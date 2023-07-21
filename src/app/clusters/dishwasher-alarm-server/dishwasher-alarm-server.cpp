@@ -216,7 +216,7 @@ EmberAfStatus DishwasherAlarmServer::SetLatchValue(EndpointId endpoint, const Bi
     return status;
 }
 
-EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const BitMask<AlarmMap> newState)
+EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const BitMask<AlarmMap> newState, bool ignoreLatchState = false)
 {
     BitMask<AlarmMap> supported;
     BitMask<AlarmMap> finalNewState;
@@ -245,7 +245,7 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const Bi
     }
 
     BitMask<AlarmMap> latch;
-    if (GetLatchValue(endpoint, &latch) == EMBER_ZCL_STATUS_SUCCESS)
+    if (!ignoreLatchState && (GetLatchValue(endpoint, &latch) == EMBER_ZCL_STATUS_SUCCESS))
     {
         BitMask<AlarmMap> finalState = SetStateByLatch(latch, currentState, finalNewState);
         finalNewState.Set(finalState);
@@ -277,36 +277,15 @@ EmberAfStatus DishwasherAlarmServer::ResetStateValue(EndpointId endpoint, const 
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    BitMask<AlarmMap> currentState;
-    if (GetStateValue(endpoint, &currentState) != EMBER_ZCL_STATUS_SUCCESS)
+    BitMask<AlarmMap> state;
+    if (GetStateValue(endpoint, &state) != EMBER_ZCL_STATUS_SUCCESS)
     {
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    BitMask<AlarmMap> newState;
-    newState.Set(currentState).Clear(alarms);
-
-    if (Attributes::State::Set(endpoint, newState) != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: writing  state");
-        return EMBER_ZCL_STATUS_FAILURE;
-    }
-    // Generate Notify event.
-    BitMask<AlarmMap> becameActive;
-    BitMask<AlarmMap> becameInactive;
-    becameInactive.Set(currentState);
-    becameInactive = becameInactive & alarms;
-
-    BitMask<AlarmMap> mask;
-    if (GetMaskValue(endpoint, &mask) != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        return EMBER_ZCL_STATUS_FAILURE;
-    }
-    SendNotifyEvent(endpoint, becameActive, becameInactive, newState, mask);
-
-    return EMBER_ZCL_STATUS_SUCCESS;
+    state.Clear(alarms);
+    return SetStateValue(endpoint, state, true);
 }
-
 
 bool DishwasherAlarmServer::HasResetFeature(EndpointId endpoint)
 {
