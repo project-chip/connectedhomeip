@@ -15,7 +15,7 @@
 #
 
 import ctypes
-from enum import Enum
+from enum import Enum, auto
 from typing import Optional
 
 import chip.native
@@ -117,7 +117,7 @@ class TracingContext:
         pass
 
     def __enter__(self):
-        pass
+        return self
 
     def __exit__(self, type, value, traceback):
         StopTracing()

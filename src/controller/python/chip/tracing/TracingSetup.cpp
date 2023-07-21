@@ -17,6 +17,7 @@
  */
 
 #include <controller/python/chip/native/PyChipError.h>
+#include <platform/PlatformManager.h>
 
 #include <tracing/json/json_tracing.h>
 #include <tracing/perfetto/event_storage.h>
@@ -27,6 +28,16 @@
 
 namespace {
 
+using chip::DeviceLayer::PlatformMgr;
+
+class ScopedStackLock
+{
+public:
+    ScopedStackLock() { PlatformMgr().LockChipStack(); }
+
+    ~ScopedStackLock() { PlatformMgr().UnlockChipStack(); }
+};
+
 ::chip::Tracing::Json::JsonBackend mJsonBackend;
 
 chip::Tracing::Perfetto::FileTraceOutput mPerfettoFileOutput;
@@ -35,13 +46,17 @@ chip::Tracing::Perfetto::PerfettoBackend mPerfettoBackend;
 } // namespace
 
 extern "C" void pychip_tracing_start_json_log(const char * file_name)
-{
-    mJsonBackend.CloseFile(); // just in case, ensure no file output
-    chip::Tracing::Register(mJsonBackend);
+
+    ScopedStackLock lock;
+
+mJsonBackend.CloseFile(); // just in case, ensure no file output
+chip::Tracing::Register(mJsonBackend);
 }
 
 extern "C" PyChipError pychip_tracing_start_json_file(const char * file_name)
 {
+    ScopedStackLock lock;
+
     CHIP_ERROR err = mJsonBackend.OpenFile(file_name);
     if (err != CHIP_NO_ERROR)
     {
@@ -53,6 +68,8 @@ extern "C" PyChipError pychip_tracing_start_json_file(const char * file_name)
 
 extern "C" void pychip_tracing_start_perfetto_system()
 {
+    ScopedStackLock lock;
+
     chip::Tracing::Perfetto::Initialize(perfetto::kSystemBackend);
     chip::Tracing::Perfetto::RegisterEventTrackingStorage();
     chip::Tracing::Register(mPerfettoBackend);
@@ -60,6 +77,8 @@ extern "C" void pychip_tracing_start_perfetto_system()
 
 extern "C" PyChipError pychip_tracing_start_perfetto_file(const char * file_name)
 {
+    ScopedStackLock lock;
+
     chip::Tracing::Perfetto::Initialize(perfetto::kInProcessBackend);
     chip::Tracing::Perfetto::RegisterEventTrackingStorage();
 
@@ -75,6 +94,8 @@ extern "C" PyChipError pychip_tracing_start_perfetto_file(const char * file_name
 
 extern "C" void pychip_tracing_stop()
 {
+    ScopedStackLock lock;
+
     chip::Tracing::Perfetto::FlushEventTrackingStorage();
     mPerfettoFileOutput.Close();
     chip::Tracing::Unregister(mPerfettoBackend);
