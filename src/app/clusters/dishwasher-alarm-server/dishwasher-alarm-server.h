@@ -65,7 +65,7 @@ public:
      * @param[in] alarms Each bit set in this field corresponds to State that SHALL be reset to false.
      * Even if the corresponding bit in the Latch attribute is true.
      */
-    EmberAfStatus ResetStateValue(EndpointId endpoint, const BitMask<AlarmMap> alarms);
+    EmberAfStatus ResetAlarms(EndpointId endpoint, const BitMask<AlarmMap> alarms);
 
     // check whether the Alarm featureMap has enabled Reset feature.
     bool HasResetFeature(EndpointId endpoint);
