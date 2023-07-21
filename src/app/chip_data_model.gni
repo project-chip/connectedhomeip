@@ -274,11 +274,6 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/resource-monitoring-cluster-objects.cpp",
           "${_app_root}/clusters/${cluster}/resource-monitoring-cluster-objects.h",
         ]
-      } else if (cluster == "laundry-washer-controls-server") {
-        sources += [
-          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
-          "${_app_root}/clusters/${cluster}/LaundryWasherDataProvider.cpp",
-        ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
