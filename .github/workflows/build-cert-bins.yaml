@@ -1,8 +1,8 @@
-name: Build & Deploy
+name: Build Certification Image
 on:
     workflow_call:
 jobs:
-    build:
+    build-cert-bin:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@master
