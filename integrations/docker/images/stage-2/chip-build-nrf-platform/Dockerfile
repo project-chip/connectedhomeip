@@ -1,4 +1,4 @@
-ARG VERSION=latest
+ARG VERSION=1
 
 # ==================================================
 # Temporary image for SDK and dependencies download
