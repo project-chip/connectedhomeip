@@ -22,6 +22,7 @@
 #include <system/SystemClock.h>
 
 namespace chip {
+namespace app {
 
 class DefaultTimerDelegate : public app::reporting::ReportScheduler::TimerDelegate
 {
@@ -31,8 +32,9 @@ public:
     using Timeout                = System::Clock::Timeout;
     static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
     {
-        ReadHandlerNode * node = static_cast<ReadHandlerNode *>(aAppState);
-        node->RunCallback();
+        app::reporting::ReportScheduler::TimerCallback * callback =
+            static_cast<app::reporting::ReportScheduler::TimerCallback *>(aAppState);
+        (*callback)();
     }
     CHIP_ERROR StartTimer(void * context, Timeout aTimeout) override
     {
@@ -53,14 +55,5 @@ public:
     System::Clock::Timestamp GetCurrentMonotonicTimestamp() override { return System::SystemClock().GetMonotonicTimestamp(); }
 };
 
-class SynchronizedTimerDelegate : public DefaultTimerDelegate
-{
-public:
-    static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
-    {
-        app::reporting::ReportScheduler * scheduler = static_cast<app::reporting::ReportScheduler *>(aAppState);
-        scheduler->ReportTimerCallback();
-    }
-};
-
+} // namespace app
 } // namespace chip

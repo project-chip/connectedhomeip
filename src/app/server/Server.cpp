@@ -556,9 +556,14 @@ KvsPersistentStorageDelegate CommonCaseDeviceServerInitParams::sKvsPersistenStor
 PersistentStorageOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
 Credentials::PersistentStorageOpCertStore CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
 Credentials::GroupDataProviderImpl CommonCaseDeviceServerInitParams::sGroupDataProvider;
-chip::DefaultTimerDelegate CommonCaseDeviceServerInitParams::sTimerDelegate;
+chip::app::DefaultTimerDelegate CommonCaseDeviceServerInitParams::sTimerDelegate;
+#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+app::reporting::SynchronizedReportSchedulerImpl
+    CommonCaseDeviceServerInitParams::sReportScheduler(&CommonCaseDeviceServerInitParams::sTimerDelegate);
+#else
 app::reporting::ReportSchedulerImpl
     CommonCaseDeviceServerInitParams::sReportScheduler(&CommonCaseDeviceServerInitParams::sTimerDelegate);
+#endif
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
 SimpleSessionResumptionStorage CommonCaseDeviceServerInitParams::sSessionResumptionStorage;
 #endif

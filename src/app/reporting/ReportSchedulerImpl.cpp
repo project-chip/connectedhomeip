@@ -96,13 +96,13 @@ void ReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aReadHandler)
 CHIP_ERROR ReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode * node)
 {
     // Cancel Report if it is currently scheduled
-    mTimerDelegate->CancelTimer(node);
+    mTimerDelegate->CancelTimer(static_cast<void *>(node->GetCallbackPtr()));
     if (timeout == Milliseconds32(0))
     {
-        ReportTimerCallback();
+        node->Callback();
         return CHIP_NO_ERROR;
     }
-    ReturnErrorOnFailure(mTimerDelegate->StartTimer(node, timeout));
+    ReturnErrorOnFailure(mTimerDelegate->StartTimer(static_cast<void *>(node->GetCallbackPtr()), timeout));
 
     return CHIP_NO_ERROR;
 }
@@ -111,7 +111,7 @@ void ReportSchedulerImpl::CancelReport(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
     VerifyOrReturn(nullptr != node);
-    mTimerDelegate->CancelTimer(node);
+    mTimerDelegate->CancelTimer(static_cast<void *>(node->GetCallbackPtr()));
 }
 
 void ReportSchedulerImpl::UnregisterAllHandlers()
@@ -127,7 +127,7 @@ bool ReportSchedulerImpl::IsReportScheduled(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
     VerifyOrReturnValue(nullptr != node, false);
-    return mTimerDelegate->IsTimerActive(node);
+    return mTimerDelegate->IsTimerActive(static_cast<void *>(node->GetCallbackPtr()));
 }
 
 CHIP_ERROR ReportSchedulerImpl::CalculateNextReportTimeout(Timeout & timeout, ReadHandlerNode * aNode)

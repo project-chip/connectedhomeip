@@ -48,13 +48,13 @@ void SynchronizedReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aRead
 CHIP_ERROR SynchronizedReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode * node)
 {
     // Cancel Report if it is currently scheduled
-    mTimerDelegate->CancelTimer(this);
+    mTimerDelegate->CancelTimer(static_cast<void *>(&mTimerCallback));
     if (timeout == Milliseconds32(0))
     {
         ReportTimerCallback();
         return CHIP_NO_ERROR;
     }
-    ReturnErrorOnFailure(mTimerDelegate->StartTimer(this, timeout));
+    ReturnErrorOnFailure(mTimerDelegate->StartTimer(static_cast<void *>(&mTimerCallback), timeout));
     mTestNextReportTimestamp = mTimerDelegate->GetCurrentMonotonicTimestamp() + timeout;
 
     return CHIP_NO_ERROR;
@@ -63,14 +63,13 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::ScheduleReport(Timeout timeout, Read
 void SynchronizedReportSchedulerImpl::CancelReport()
 {
     // We don't need to take action on the handler, since the timer is common here
-    mTimerDelegate->CancelTimer(this);
+    mTimerDelegate->CancelTimer(static_cast<void *>(&mTimerCallback));
 }
 
-/// @brief Checks if the timer is active for the given ReadHandler. Since all read handlers are scheduled on the same timer, we
-/// check if the node is in the list and if the timer is active for the ReportScheduler
+/// @brief Checks if the timer is active for the ReportScheduler
 bool SynchronizedReportSchedulerImpl::IsReportScheduled()
 {
-    return mTimerDelegate->IsTimerActive(this);
+    return mTimerDelegate->IsTimerActive(static_cast<void *>(&mTimerCallback));
 }
 
 /// @brief Find the smallest maximum interval possible and set it as the common maximum
@@ -181,7 +180,7 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::CalculateNextReportTimeout(Timeout &
 /// the engine already verifies that read handlers are reportable before sending a report
 void SynchronizedReportSchedulerImpl::ReportTimerCallback()
 {
-    ReportSchedulerImpl::ReportTimerCallback();
+    InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
     ChipLogProgress(DataManagement, "Engine run at time: %" PRIu64 " for Handlers:", now.count());

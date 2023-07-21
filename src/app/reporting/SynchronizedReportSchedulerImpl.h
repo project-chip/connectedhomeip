@@ -35,7 +35,10 @@ class SynchronizedReportSchedulerImpl : public ReportSchedulerImpl
 public:
     void OnReadHandlerDestroyed(ReadHandler * aReadHandler) override;
 
-    SynchronizedReportSchedulerImpl(TimerDelegate * aTimerDelegate) : ReportSchedulerImpl(aTimerDelegate) {}
+    SynchronizedReportSchedulerImpl(TimerDelegate * aTimerDelegate) : ReportSchedulerImpl(aTimerDelegate)
+    {
+        mTimerCallback = [this]() { this->ReportTimerCallback(); };
+    }
     ~SynchronizedReportSchedulerImpl() {}
 
     bool IsReportScheduled();
@@ -47,6 +50,7 @@ protected:
     void CancelReport();
 
 private:
+    ReportScheduler::TimerCallback mTimerCallback;
     friend class chip::app::reporting::TestReportScheduler;
 
     CHIP_ERROR FindNextMinInterval();

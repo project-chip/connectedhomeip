@@ -138,8 +138,8 @@ public:
         // Normaly we would call the callback here, thus scheduling an engine run, but we don't need it for this test as we simulate
         // all the callbacks related to report emissions. The actual callback should look like this:
         //
-        ReadHandlerNode * node = static_cast<ReadHandlerNode *>(aAppState);
-        node->RunCallback();
+        ReportScheduler::TimerCallback * callback = static_cast<ReportScheduler::TimerCallback *>(aAppState);
+        (*callback)();
         ChipLogProgress(DataManagement, "Simluating engine run for Handler: %p", aAppState);
     }
     virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) override
@@ -184,8 +184,8 @@ class TestTimerSynchronizedDelegate : public ReportScheduler::TimerDelegate
 public:
     static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
     {
-        SynchronizedReportSchedulerImpl * scheduler = static_cast<SynchronizedReportSchedulerImpl *>(aAppState);
-        scheduler->ReportTimerCallback();
+        ReportScheduler::TimerCallback * callback = static_cast<ReportScheduler::TimerCallback *>(aAppState);
+        (*callback)();
     }
     virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) override
     {

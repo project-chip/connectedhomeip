@@ -35,6 +35,9 @@ using Timestamp = System::Clock::Timestamp;
 class ReportScheduler : public ReadHandler::Observer
 {
 public:
+    // TODO : Verify if replacing std::function with pw::Function, thus adding a dependency on Pigweed, is acceptable
+    using TimerCallback = std::function<void()>;
+
     /// @brief This class acts as an interface between the report scheduler and the system timer to reduce dependencies on the
     /// system layer.
     class TimerDelegate
@@ -75,6 +78,7 @@ public:
             VerifyOrDie(aScheduler != nullptr);
 
             mReadHandler = aReadHandler;
+            mCallback    = [this]() { Callback(); };
             SetIntervalTimeStamps(aReadHandler);
         }
         ReadHandler * GetReadHandler() const { return mReadHandler; }
@@ -120,7 +124,9 @@ public:
             mSyncTimestamp = mMaxTimestamp;
         }
 
-        void RunCallback()
+        TimerCallback * GetCallbackPtr() { return &mCallback; }
+
+        void Callback()
         {
             mScheduler->ReportTimerCallback();
             SetEngineRunScheduled(true);
@@ -141,7 +147,8 @@ public:
     private:
 #ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
         BitFlags<TestFlags> mFlags;
-#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#endif                           // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        TimerCallback mCallback; // Timer callback
         TimerDelegate * mTimerDelegate;
         ReadHandler * mReadHandler;
         ReportScheduler * mScheduler;
@@ -174,7 +181,7 @@ public:
     void RunNodeCallbackForHandler(const ReadHandler * aReadHandler)
     {
         ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
-        node->RunCallback();
+        node->Callback();
     }
     void SetFlagsForHandler(const ReadHandler * aReadHandler, ReadHandlerNode::TestFlags aFlag, bool aValue)
     {

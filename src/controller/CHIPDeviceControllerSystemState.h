@@ -82,9 +82,10 @@ struct DeviceControllerSystemStateParams
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
-    Credentials::GroupDataProvider * groupDataProvider      = nullptr;
-    chip::app::reporting::ReportScheduler * reportScheduler = nullptr;
-    Crypto::SessionKeystore * sessionKeystore               = nullptr;
+    Credentials::GroupDataProvider * groupDataProvider                   = nullptr;
+    chip::app::reporting::ReportScheduler::TimerDelegate * timerDelegate = nullptr;
+    chip::app::reporting::ReportScheduler * reportScheduler              = nullptr;
+    Crypto::SessionKeystore * sessionKeystore                            = nullptr;
 
     // Params that will be deallocated via Platform::Delete in
     // DeviceControllerSystemState::Shutdown.

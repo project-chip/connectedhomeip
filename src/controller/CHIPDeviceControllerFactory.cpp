@@ -25,6 +25,8 @@
 #include <controller/CHIPDeviceControllerFactory.h>
 
 #include <app/OperationalSessionSetup.h>
+#include <app/TimerDelegates.h>
+#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/util/DataModelHandler.h>
 #include <lib/support/ErrorStr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -170,7 +172,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.exchangeMgr               = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager     = chip::Platform::New<secure_channel::MessageCounterManager>();
     stateParams.groupDataProvider         = params.groupDataProvider;
-    stateParams.reportScheduler           = params.reportScheduler;
+    stateParams.timerDelegate             = chip::Platform::New<chip::app::DefaultTimerDelegate>();
+    stateParams.reportScheduler           = chip::Platform::New<app::reporting::ReportSchedulerImpl>(stateParams.timerDelegate);
     stateParams.sessionKeystore           = params.sessionKeystore;
 
     // if no fabricTable was provided, create one and track it in stateParams for cleanup

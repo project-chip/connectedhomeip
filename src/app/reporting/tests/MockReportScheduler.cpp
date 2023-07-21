@@ -27,11 +27,9 @@ namespace reporting {
 /// @brief Static instance of the default report scheduler and synchronized report scheduler meant for injection into IM engine in
 /// tests
 
-static chip::DefaultTimerDelegate sTimerDelegate;
+static chip::app::DefaultTimerDelegate sTimerDelegate;
 static ReportSchedulerImpl sTestDefaultReportScheduler(&sTimerDelegate);
-
-static chip::SynchronizedTimerDelegate sSynchronizedTimerDelegate;
-static SynchronizedReportSchedulerImpl sTestReportScheduler(&sSynchronizedTimerDelegate);
+static SynchronizedReportSchedulerImpl sTestReportScheduler(&sTimerDelegate);
 
 ReportSchedulerImpl * GetDefaultReportScheduler()
 {
