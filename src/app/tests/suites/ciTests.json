@@ -176,6 +176,15 @@
     "PowerSourceConfiguration": ["Test_TC_PSCFG_1_1", "Test_TC_PSCFG_2_1"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_1_1", "Test_TC_RH_2_1"],
     "SecureChannel": [],
+    "SmokeCOAlarm": [
+        "Test_TC_SMCO_1_1",
+        "Test_TC_SMCO_2_1",
+        "Test_TC_SMCO_2_2",
+        "Test_TC_SMCO_2_3",
+        "Test_TC_SMCO_2_4",
+        "Test_TC_SMCO_2_5",
+        "Test_TC_SMCO_2_6"
+    ],
     "Switch": ["Test_TC_SWTCH_1_1", "Test_TC_SWTCH_2_1"],
     "TemperatureMeasurement": ["Test_TC_TMP_1_1", "Test_TC_TMP_2_1"],
     "Thermostat": ["Test_TC_TSTAT_1_1", "Test_TC_TSTAT_2_1"],
@@ -359,6 +368,7 @@
         "PowerSourceConfiguration",
         "RelativeHumidityMeasurement",
         "SecureChannel",
+        "SmokeCOAlarm",
         "Switch",
         "TemperatureMeasurement",
         "Thermostat",
