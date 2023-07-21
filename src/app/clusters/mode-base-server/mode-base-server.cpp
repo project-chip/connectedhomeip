@@ -156,7 +156,6 @@ CHIP_ERROR Instance::Init()
     RegisterInstance(this);
     ReturnErrorOnFailure(mDelegate->Init());
 
-
     // If the StartUpMode is set, the CurrentMode attribute SHALL be set to the StartUpMode value, when the server is powered up.
     if (!mStartUpMode.IsNull())
     {
