@@ -417,7 +417,7 @@ public:
      *                                      the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(double & v);
+    CHIP_ERROR Get(double & v) const;
 
     /**
      * Get the value of the current element as a single-precision floating point number.
@@ -429,7 +429,7 @@ public:
      *                                      the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(float & v);
+    CHIP_ERROR Get(float & v) const;
 
     /**
      * Get the value of the current element as a ByteSpan

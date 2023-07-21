@@ -256,7 +256,7 @@ float BitCastToFloat(const uint64_t elemLenOrVal)
 // between float and double wherever possible, because these conversions are
 // relatively expensive on platforms that use soft-float instruction sets.
 
-CHIP_ERROR TLVReader::Get(float & v)
+CHIP_ERROR TLVReader::Get(float & v) const
 {
     switch (ElementType())
     {
@@ -270,7 +270,7 @@ CHIP_ERROR TLVReader::Get(float & v)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::Get(double & v)
+CHIP_ERROR TLVReader::Get(double & v) const
 {
     switch (ElementType())
     {
