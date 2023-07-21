@@ -27,10 +27,9 @@ namespace app {
 class DefaultTimerDelegate : public reporting::ReportScheduler::TimerDelegate
 {
 public:
-    using TimerContext           = reporting::TimerContext;
-    using ReadHandlerNode        = reporting::ReportScheduler::ReadHandlerNode;
-    using InteractionModelEngine = InteractionModelEngine;
-    using Timeout                = System::Clock::Timeout;
+    using TimerContext    = reporting::TimerContext;
+    using ReadHandlerNode = reporting::ReportScheduler::ReadHandlerNode;
+    using Timeout         = System::Clock::Timeout;
     static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
     {
         TimerContext * context = static_cast<TimerContext *>(aAppState);
