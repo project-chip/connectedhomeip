@@ -573,7 +573,8 @@ CHIP_ERROR TLVReader::Next()
 
     VerifyOrReturnError(elemType != TLVElementType::EndOfContainer, CHIP_END_OF_TLV);
 
-    if (TLVTypeIsString(ElementType()) && (GetLength() != 0)) {
+    if (TLVTypeIsString(ElementType()) && (GetLength() != 0))
+    {
         // Ensure that GetDataPtr calls can be called immediately after next
         // so that `Get(ByteSpan&)` does not need to advance buffers and just
         // works
