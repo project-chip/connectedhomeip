@@ -105,6 +105,45 @@ public Integer revision;
   }
 }
 
+public static class DescriptorClusterSemanticTagStruct {
+public @Nullable Integer mfgCode;
+public Integer namespaceID;
+public Integer tag;
+public @Nullable Optional<String> label;
+
+  public DescriptorClusterSemanticTagStruct(
+    @Nullable Integer mfgCode
+      , Integer namespaceID
+      , Integer tag
+      , @Nullable Optional<String> label
+  ) {
+    this.mfgCode = mfgCode;
+    this.namespaceID = namespaceID;
+    this.tag = tag;
+    this.label = label;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DescriptorClusterSemanticTagStruct {\n");
+    output.append("\tmfgCode: ");
+    output.append(mfgCode);
+        output.append("\n");
+    output.append("\tnamespaceID: ");
+    output.append(namespaceID);
+        output.append("\n");
+    output.append("\ttag: ");
+    output.append(tag);
+        output.append("\n");
+    output.append("\tlabel: ");
+    output.append(label);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
 public static class BindingClusterTargetStruct {
 public Optional<Long> node;
 public Optional<Integer> group;
