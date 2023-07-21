@@ -29,7 +29,9 @@ def _GetTracingLibraryHandle() -> ctypes.CDLL:
       native methods.
       """
 
-    handle = chip.native.GetLibraryHandle()
+    # Getting a handle without requiring init, as tracing methods
+    # do not require chip stack startup
+    handle = chip.native.GetLibraryHandle(chip.native.HandleFlags(0))
 
     # Uses one of the type decorators as an indicator for everything being
     # initialized.
