@@ -295,7 +295,7 @@ bool DishwasherAlarmServer::HasResetFeature(EndpointId endpoint)
         return false;
     }
 
-    if (featureMap == 1)
+    if (featureMap & 1)
     {
         return true;
     }
