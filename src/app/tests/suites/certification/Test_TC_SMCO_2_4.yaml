@@ -94,8 +94,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Warning Battery Alert Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning Battery Alert Test Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -139,8 +139,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Critical Battery Alert Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Critical Battery Alert Test Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -184,8 +184,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Battery Alert Test Event Clear"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Battery Alert Test Event Clear"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -240,8 +240,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Hardware Fault Alert Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Hardware Fault Alert Test Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -285,8 +285,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Hardware Fault Alert Test Event
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Hardware Fault Alert Test Event
           Clear"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
@@ -342,8 +342,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for End of Service Alert Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for End of Service Alert Test Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -387,8 +387,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for End of Service Alert Test Event
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for End of Service Alert Test Event
           Clear"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"

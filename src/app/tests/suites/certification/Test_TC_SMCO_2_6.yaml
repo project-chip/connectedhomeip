@@ -57,21 +57,9 @@ config:
     TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM_CLEAR:
         type: int64u
         defaultValue: "0xffffffff000000a4"
-    HIEST_PRI_ALARM_1:
+    HIEST_PRI_ALARM:
         type: int8u
         defaultValue: 1
-    HIEST_PRI_ALARM_2:
-        type: int8u
-        defaultValue: 2
-    HIEST_PRI_ALARM_3:
-        type: int8u
-        defaultValue: 7
-    HIEST_PRI_ALARM_4:
-        type: int8u
-        defaultValue: 7
-    HIEST_PRI_ALARM_5:
-        type: int8u
-        defaultValue: 3
 
 tests:
     - label: "Commission DUT to TH"
@@ -97,6 +85,10 @@ tests:
       attribute: "BatteryAlert"
       minInterval: 3
       maxInterval: 30
+      response:
+          value: 0
+          constraints:
+              type: enum8
 
     - label: "TH subscribes to InterconnectSmokeAlarm attribute from DUT"
       PICS: SMOKECO.S.A0008
@@ -105,6 +97,10 @@ tests:
       minInterval: 3
       maxInterval: 30
       keepSubscriptions: true
+      response:
+          value: 0
+          constraints:
+              type: enum8
 
     - label: "TH subscribes to InterconnectCOAlarm attribute from DUT"
       PICS: SMOKECO.S.A0009
@@ -113,6 +109,10 @@ tests:
       minInterval: 3
       maxInterval: 30
       keepSubscriptions: true
+      response:
+          value: 0
+          constraints:
+              type: enum8
 
     - label: "TH subscribes to COState attribute from DUT"
       PICS: SMOKECO.S.A0002
@@ -121,6 +121,10 @@ tests:
       minInterval: 3
       maxInterval: 30
       keepSubscriptions: true
+      response:
+          value: 0
+          constraints:
+              type: enum8
 
     - label: "TH subscribes to SmokeState attribute from DUT"
       PICS: SMOKECO.S.A0001
@@ -129,6 +133,10 @@ tests:
       minInterval: 3
       maxInterval: 30
       keepSubscriptions: true
+      response:
+          value: 0
+          constraints:
+              type: enum8
 
     - label:
           "TH reads TestEventTriggersEnabled attribute from General Diagnostics
@@ -144,8 +152,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Warning Battery Alert Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning Battery Alert Test Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -172,8 +180,9 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test
+          Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -201,8 +210,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -230,8 +239,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Warning CO Alarm Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning CO Alarm Test Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -258,8 +267,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Warning Smoke Alarm Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning Smoke Alarm Test Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -288,15 +297,15 @@ tests:
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
-          value: HIEST_PRI_ALARM_1
+          value: HIEST_PRI_ALARM
           constraints:
               type: enum8
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Smoke Alarm Test Event Clear"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Smoke Alarm Test Event Clear"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -325,15 +334,15 @@ tests:
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
-          value: HIEST_PRI_ALARM_2
+          value: HIEST_PRI_ALARM
           constraints:
               type: enum8
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for CO Alarm Test Event clear"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for CO Alarm Test Event clear"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -362,15 +371,15 @@ tests:
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
-          value: HIEST_PRI_ALARM_3
+          value: HIEST_PRI_ALARM
           constraints:
               type: enum8
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event
           Clear"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
@@ -400,16 +409,16 @@ tests:
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
-          value: HIEST_PRI_ALARM_4
+          value: HIEST_PRI_ALARM
           constraints:
               type: enum8
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test Event
-          Clear"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test
+          Event Clear"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -438,15 +447,15 @@ tests:
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
-          value: HIEST_PRI_ALARM_5
+          value: HIEST_PRI_ALARM
           constraints:
               type: enum8
 
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Battery Alert Test Event Clear"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Battery Alert Test Event Clear"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0

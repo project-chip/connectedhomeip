@@ -126,8 +126,9 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test
+          Event"
       PICS: SMOKECO.S.A0008 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -147,6 +148,7 @@ tests:
       attribute: "InterconnectSmokeAlarm"
       timeout: 300
       response:
+          saveAs: interconnectSmokeAlarmSeverityLevel
           constraints:
               type: enum8
               minValue: 1
@@ -158,8 +160,7 @@ tests:
       event: "InterconnectSmokeAlarm"
       EVENT_NUMBER: EVENT_NUMBER + 1
       response:
-          # TODO: Change to variable when #28096 is fixed
-          value: { AlarmSeverityLevel: 1 }
+          value: { AlarmSeverityLevel: interconnectSmokeAlarmSeverityLevel }
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0008 && SMOKECO.S.A0000
@@ -173,9 +174,9 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test Event
-          Clear"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test
+          Event Clear"
       PICS: SMOKECO.S.A0008 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -239,8 +240,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event"
       PICS: SMOKECO.S.A0009 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -260,6 +261,7 @@ tests:
       attribute: "InterconnectCOAlarm"
       timeout: 300
       response:
+          saveAs: interconnectCOAlarmSeverityLevel
           constraints:
               type: enum8
               minValue: 1
@@ -271,8 +273,7 @@ tests:
       event: "InterconnectCOAlarm"
       EVENT_NUMBER: EVENT_NUMBER + 3
       response:
-          # TODO: Change to variable when #28096 is fixed
-          value: { AlarmSeverityLevel: 1 }
+          value: { AlarmSeverityLevel: interconnectCOAlarmSeverityLevel }
 
     - label: "TH reads ExpressedState attribute from DUT"
       PICS: SMOKECO.S.A0009 && SMOKECO.S.A0000
@@ -286,8 +287,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event
           Clear"
       PICS: SMOKECO.S.A0009 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
@@ -343,8 +344,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Contamination State (High) Test
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Contamination State (High) Test
           Event"
       PICS: SMOKECO.S.A000a && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
@@ -373,8 +374,9 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Contamination State Test Event Clear"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Contamination State Test Event
+          Clear"
       PICS: SMOKECO.S.A000a && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -401,8 +403,9 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Contamination State (Low) Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Contamination State (Low) Test
+          Event"
       PICS: SMOKECO.S.A000a && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -429,8 +432,9 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Contamination State Test Event Clear"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Contamination State Test Event
+          Clear"
       PICS: SMOKECO.S.A000a && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -468,9 +472,9 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Smoke Sensitivity Level (High) Test
-          Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Smoke Sensitivity Level (High)
+          Test Event"
       PICS: SMOKECO.S.A000b && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -497,9 +501,9 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Smoke Sensitivity Level Test Event
-          Clear"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Smoke Sensitivity Level Test
+          Event Clear"
       PICS: SMOKECO.S.A000b && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -526,9 +530,9 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Smoke Sensitivity Level (Low) Test
-          Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Smoke Sensitivity Level (Low)
+          Test Event"
       PICS: SMOKECO.S.A000b && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -555,9 +559,9 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Smoke Sensitivity Level Test Event
-          Clear"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Smoke Sensitivity Level Test
+          Event Clear"
       PICS: SMOKECO.S.A000b && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -616,8 +620,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Warning Smoke Alarm Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning Smoke Alarm Test Event"
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -644,8 +648,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -680,8 +684,9 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event Clear"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event
+          Clear"
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -716,8 +721,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Critical Smoke Alarm Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Critical Smoke Alarm Test Event"
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -744,8 +749,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -758,7 +763,7 @@ tests:
                 value: TEST_EVENT_TRIGGER_DEVICE_MUTED
 
     - label: "TH waits 60 Seconds"
-      PICS: PICS_SDK_CI_ONLY
+      PICS: "!PICS_SDK_CI_ONLY"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -778,8 +783,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Smoke Alarm Test Event Clear"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Smoke Alarm Test Event Clear"
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F00 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -827,8 +832,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Warning CO Alarm Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning CO Alarm Test Event"
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -855,8 +860,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -891,8 +896,9 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event Clear"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event
+          Clear"
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -927,8 +933,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Critical CO Alarm Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Critical CO Alarm Test Event"
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -955,8 +961,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Manual Device Mute Test Event"
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -969,7 +975,7 @@ tests:
                 value: TEST_EVENT_TRIGGER_DEVICE_MUTED
 
     - label: "TH waits 60 Seconds"
-      PICS: PICS_SDK_CI_ONLY
+      PICS: "!PICS_SDK_CI_ONLY"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -989,8 +995,8 @@ tests:
     - label:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMCO.TEST_EVENT_TRIGGER for CO Alarm Test Event Clear"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for CO Alarm Test Event Clear"
       PICS: SMOKECO.S.A0004 && SMOKECO.S.F01 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0

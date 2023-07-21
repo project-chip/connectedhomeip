@@ -5904,10 +5904,10 @@ PICS:
       id: S.C.AM-READ
 
     # Smoke CO Alarm Cluster Test Plan
-    - label: "Does the device implement the SMCO cluster as a server?"
+    - label: "Does the device implement the SMOKECO cluster as a server?"
       id: SMOKECO.S
 
-    - label: "Does the device implement the SMCO cluster as a client?"
+    - label: "Does the device implement the SMOKECO cluster as a client?"
       id: SMOKECO.C
 
     #
