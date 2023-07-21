@@ -31,7 +31,10 @@ jobs:
         name: ESP32
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        # This CI is disabled because it is running out of DRAM in pull request: https://github.com/project-chip/connectedhomeip/pull/28104
+        # An issue was opened at https://github.com/project-chip/connectedhomeip/issues/28174
+        # TODO : Enable this once we have a way to run without out of DRAM failure
+        if: github.actor != 'restyled-io[bot]' && false
 
         container:
             image: ghcr.io/project-chip/chip-build-esp32:1
