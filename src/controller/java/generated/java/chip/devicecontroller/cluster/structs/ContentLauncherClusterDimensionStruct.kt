@@ -30,22 +30,22 @@ class ContentLauncherClusterDimensionStruct (
     val width: Double,
     val height: Double,
     val metric: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ContentLauncherClusterDimensionStruct {\n")
-    builder.append("\twidth : $width\n")
-    builder.append("\theight : $height\n")
-    builder.append("\tmetric : $metric\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ContentLauncherClusterDimensionStruct {\n")
+    append("\twidth : $width\n")
+    append("\theight : $height\n")
+    append("\tmetric : $metric\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_WIDTH), width)
-    tlvWriter.put(ContextSpecificTag(TAG_HEIGHT), height)
-    tlvWriter.put(ContextSpecificTag(TAG_METRIC), metric)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_WIDTH), width)
+      put(ContextSpecificTag(TAG_HEIGHT), height)
+      put(ContextSpecificTag(TAG_METRIC), metric)
+      endStructure()
+    }
   }
 
   companion object {
@@ -55,9 +55,9 @@ class ContentLauncherClusterDimensionStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ContentLauncherClusterDimensionStruct {
       tlvReader.enterStructure(tag)
-      val width: Double = tlvReader.getDouble(ContextSpecificTag(TAG_WIDTH))
-      val height: Double = tlvReader.getDouble(ContextSpecificTag(TAG_HEIGHT))
-      val metric: Int = tlvReader.getInt(ContextSpecificTag(TAG_METRIC))
+      val width = tlvReader.getDouble(ContextSpecificTag(TAG_WIDTH))
+      val height = tlvReader.getDouble(ContextSpecificTag(TAG_HEIGHT))
+      val metric = tlvReader.getInt(ContextSpecificTag(TAG_METRIC))
       
       tlvReader.exitContainer()
 

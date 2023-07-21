@@ -28,18 +28,18 @@ import java.util.Optional
 
 class DoorLockClusterDoorStateChangeEvent (
     val doorState: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("DoorLockClusterDoorStateChangeEvent {\n")
-    builder.append("\tdoorState : $doorState\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("DoorLockClusterDoorStateChangeEvent {\n")
+    append("\tdoorState : $doorState\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_DOOR_STATE), doorState)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_DOOR_STATE), doorState)
+      endStructure()
+    }
   }
 
   companion object {
@@ -47,7 +47,7 @@ class DoorLockClusterDoorStateChangeEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : DoorLockClusterDoorStateChangeEvent {
       tlvReader.enterStructure(tag)
-      val doorState: Int = tlvReader.getInt(ContextSpecificTag(TAG_DOOR_STATE))
+      val doorState = tlvReader.getInt(ContextSpecificTag(TAG_DOOR_STATE))
       
       tlvReader.exitContainer()
 

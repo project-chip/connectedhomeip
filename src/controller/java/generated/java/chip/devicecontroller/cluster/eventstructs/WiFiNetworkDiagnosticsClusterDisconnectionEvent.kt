@@ -28,18 +28,18 @@ import java.util.Optional
 
 class WiFiNetworkDiagnosticsClusterDisconnectionEvent (
     val reasonCode: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("WiFiNetworkDiagnosticsClusterDisconnectionEvent {\n")
-    builder.append("\treasonCode : $reasonCode\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("WiFiNetworkDiagnosticsClusterDisconnectionEvent {\n")
+    append("\treasonCode : $reasonCode\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_REASON_CODE), reasonCode)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_REASON_CODE), reasonCode)
+      endStructure()
+    }
   }
 
   companion object {
@@ -47,7 +47,7 @@ class WiFiNetworkDiagnosticsClusterDisconnectionEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : WiFiNetworkDiagnosticsClusterDisconnectionEvent {
       tlvReader.enterStructure(tag)
-      val reasonCode: Int = tlvReader.getInt(ContextSpecificTag(TAG_REASON_CODE))
+      val reasonCode = tlvReader.getInt(ContextSpecificTag(TAG_REASON_CODE))
       
       tlvReader.exitContainer()
 

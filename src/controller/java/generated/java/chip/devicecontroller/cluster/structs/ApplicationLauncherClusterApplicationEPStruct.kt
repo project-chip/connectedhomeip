@@ -29,23 +29,23 @@ import java.util.Optional
 class ApplicationLauncherClusterApplicationEPStruct (
     val application: ApplicationLauncherClusterApplicationStruct,
     val endpoint: Optional<Int>) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ApplicationLauncherClusterApplicationEPStruct {\n")
-    builder.append("\tapplication : $application\n")
-    builder.append("\tendpoint : $endpoint\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ApplicationLauncherClusterApplicationEPStruct {\n")
+    append("\tapplication : $application\n")
+    append("\tendpoint : $endpoint\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    application.toTlv(ContextSpecificTag(TAG_APPLICATION), tlvWriter)
-    if (endpoint.isPresent) {
+    tlvWriter.apply {
+      startStructure(tag)
+      application.toTlv(ContextSpecificTag(TAG_APPLICATION), this)
+      if (endpoint.isPresent) {
       val optendpoint = endpoint.get()
-      tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT), optendpoint)
+      put(ContextSpecificTag(TAG_ENDPOINT), optendpoint)
     }
-    tlvWriter.endStructure()
+      endStructure()
+    }
   }
 
   companion object {
@@ -54,10 +54,10 @@ class ApplicationLauncherClusterApplicationEPStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ApplicationLauncherClusterApplicationEPStruct {
       tlvReader.enterStructure(tag)
-      val application: ApplicationLauncherClusterApplicationStruct = ApplicationLauncherClusterApplicationStruct.fromTlv(ContextSpecificTag(TAG_APPLICATION), tlvReader)
-      val endpoint: Optional<Int> = try {
+      val application = ApplicationLauncherClusterApplicationStruct.fromTlv(ContextSpecificTag(TAG_APPLICATION), tlvReader)
+      val endpoint = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
       Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
       

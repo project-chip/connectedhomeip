@@ -29,23 +29,23 @@ import java.util.Optional
 class RvcOperationalStateClusterOperationalStateStruct (
     val operationalStateID: Int,
     val operationalStateLabel: Optional<String>) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("RvcOperationalStateClusterOperationalStateStruct {\n")
-    builder.append("\toperationalStateID : $operationalStateID\n")
-    builder.append("\toperationalStateLabel : $operationalStateLabel\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("RvcOperationalStateClusterOperationalStateStruct {\n")
+    append("\toperationalStateID : $operationalStateID\n")
+    append("\toperationalStateLabel : $operationalStateLabel\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_OPERATIONAL_STATE_I_D), operationalStateID)
-    if (operationalStateLabel.isPresent) {
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_OPERATIONAL_STATE_I_D), operationalStateID)
+      if (operationalStateLabel.isPresent) {
       val optoperationalStateLabel = operationalStateLabel.get()
-      tlvWriter.put(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL), optoperationalStateLabel)
+      put(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL), optoperationalStateLabel)
     }
-    tlvWriter.endStructure()
+      endStructure()
+    }
   }
 
   companion object {
@@ -54,10 +54,10 @@ class RvcOperationalStateClusterOperationalStateStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : RvcOperationalStateClusterOperationalStateStruct {
       tlvReader.enterStructure(tag)
-      val operationalStateID: Int = tlvReader.getInt(ContextSpecificTag(TAG_OPERATIONAL_STATE_I_D))
-      val operationalStateLabel: Optional<String> = try {
+      val operationalStateID = tlvReader.getInt(ContextSpecificTag(TAG_OPERATIONAL_STATE_I_D))
+      val operationalStateLabel = if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL))) {
       Optional.of(tlvReader.getString(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
       

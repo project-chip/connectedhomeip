@@ -28,18 +28,18 @@ import java.util.Optional
 
 class BooleanStateClusterStateChangeEvent (
     val stateValue: Boolean) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("BooleanStateClusterStateChangeEvent {\n")
-    builder.append("\tstateValue : $stateValue\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("BooleanStateClusterStateChangeEvent {\n")
+    append("\tstateValue : $stateValue\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_STATE_VALUE), stateValue)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_STATE_VALUE), stateValue)
+      endStructure()
+    }
   }
 
   companion object {
@@ -47,7 +47,7 @@ class BooleanStateClusterStateChangeEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : BooleanStateClusterStateChangeEvent {
       tlvReader.enterStructure(tag)
-      val stateValue: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_STATE_VALUE))
+      val stateValue = tlvReader.getBoolean(ContextSpecificTag(TAG_STATE_VALUE))
       
       tlvReader.exitContainer()
 

@@ -28,18 +28,18 @@ import java.util.Optional
 
 class SwitchClusterShortReleaseEvent (
     val previousPosition: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("SwitchClusterShortReleaseEvent {\n")
-    builder.append("\tpreviousPosition : $previousPosition\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("SwitchClusterShortReleaseEvent {\n")
+    append("\tpreviousPosition : $previousPosition\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_PREVIOUS_POSITION), previousPosition)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_PREVIOUS_POSITION), previousPosition)
+      endStructure()
+    }
   }
 
   companion object {
@@ -47,7 +47,7 @@ class SwitchClusterShortReleaseEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : SwitchClusterShortReleaseEvent {
       tlvReader.enterStructure(tag)
-      val previousPosition: Int = tlvReader.getInt(ContextSpecificTag(TAG_PREVIOUS_POSITION))
+      val previousPosition = tlvReader.getInt(ContextSpecificTag(TAG_PREVIOUS_POSITION))
       
       tlvReader.exitContainer()
 

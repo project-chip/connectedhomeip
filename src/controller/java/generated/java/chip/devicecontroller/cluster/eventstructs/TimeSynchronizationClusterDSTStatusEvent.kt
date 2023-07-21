@@ -28,18 +28,18 @@ import java.util.Optional
 
 class TimeSynchronizationClusterDSTStatusEvent (
     val DSTOffsetActive: Boolean) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("TimeSynchronizationClusterDSTStatusEvent {\n")
-    builder.append("\tDSTOffsetActive : $DSTOffsetActive\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("TimeSynchronizationClusterDSTStatusEvent {\n")
+    append("\tDSTOffsetActive : $DSTOffsetActive\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_D_S_T_OFFSET_ACTIVE), DSTOffsetActive)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_D_S_T_OFFSET_ACTIVE), DSTOffsetActive)
+      endStructure()
+    }
   }
 
   companion object {
@@ -47,7 +47,7 @@ class TimeSynchronizationClusterDSTStatusEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : TimeSynchronizationClusterDSTStatusEvent {
       tlvReader.enterStructure(tag)
-      val DSTOffsetActive: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_D_S_T_OFFSET_ACTIVE))
+      val DSTOffsetActive = tlvReader.getBoolean(ContextSpecificTag(TAG_D_S_T_OFFSET_ACTIVE))
       
       tlvReader.exitContainer()
 

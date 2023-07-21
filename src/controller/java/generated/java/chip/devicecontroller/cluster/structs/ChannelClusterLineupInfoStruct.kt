@@ -31,30 +31,30 @@ class ChannelClusterLineupInfoStruct (
     val lineupName: Optional<String>,
     val postalCode: Optional<String>,
     val lineupInfoType: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ChannelClusterLineupInfoStruct {\n")
-    builder.append("\toperatorName : $operatorName\n")
-    builder.append("\tlineupName : $lineupName\n")
-    builder.append("\tpostalCode : $postalCode\n")
-    builder.append("\tlineupInfoType : $lineupInfoType\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ChannelClusterLineupInfoStruct {\n")
+    append("\toperatorName : $operatorName\n")
+    append("\tlineupName : $lineupName\n")
+    append("\tpostalCode : $postalCode\n")
+    append("\tlineupInfoType : $lineupInfoType\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_OPERATOR_NAME), operatorName)
-    if (lineupName.isPresent) {
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_OPERATOR_NAME), operatorName)
+      if (lineupName.isPresent) {
       val optlineupName = lineupName.get()
-      tlvWriter.put(ContextSpecificTag(TAG_LINEUP_NAME), optlineupName)
+      put(ContextSpecificTag(TAG_LINEUP_NAME), optlineupName)
     }
-    if (postalCode.isPresent) {
+      if (postalCode.isPresent) {
       val optpostalCode = postalCode.get()
-      tlvWriter.put(ContextSpecificTag(TAG_POSTAL_CODE), optpostalCode)
+      put(ContextSpecificTag(TAG_POSTAL_CODE), optpostalCode)
     }
-    tlvWriter.put(ContextSpecificTag(TAG_LINEUP_INFO_TYPE), lineupInfoType)
-    tlvWriter.endStructure()
+      put(ContextSpecificTag(TAG_LINEUP_INFO_TYPE), lineupInfoType)
+      endStructure()
+    }
   }
 
   companion object {
@@ -65,18 +65,18 @@ class ChannelClusterLineupInfoStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ChannelClusterLineupInfoStruct {
       tlvReader.enterStructure(tag)
-      val operatorName: String = tlvReader.getString(ContextSpecificTag(TAG_OPERATOR_NAME))
-      val lineupName: Optional<String> = try {
+      val operatorName = tlvReader.getString(ContextSpecificTag(TAG_OPERATOR_NAME))
+      val lineupName = if (tlvReader.isNextTag(ContextSpecificTag(TAG_LINEUP_NAME))) {
       Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LINEUP_NAME)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
-      val postalCode: Optional<String> = try {
+      val postalCode = if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSTAL_CODE))) {
       Optional.of(tlvReader.getString(ContextSpecificTag(TAG_POSTAL_CODE)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
-      val lineupInfoType: Int = tlvReader.getInt(ContextSpecificTag(TAG_LINEUP_INFO_TYPE))
+      val lineupInfoType = tlvReader.getInt(ContextSpecificTag(TAG_LINEUP_INFO_TYPE))
       
       tlvReader.exitContainer()
 

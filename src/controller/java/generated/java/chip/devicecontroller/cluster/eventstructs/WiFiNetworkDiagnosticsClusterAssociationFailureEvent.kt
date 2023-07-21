@@ -29,20 +29,20 @@ import java.util.Optional
 class WiFiNetworkDiagnosticsClusterAssociationFailureEvent (
     val associationFailure: Int,
     val status: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("WiFiNetworkDiagnosticsClusterAssociationFailureEvent {\n")
-    builder.append("\tassociationFailure : $associationFailure\n")
-    builder.append("\tstatus : $status\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("WiFiNetworkDiagnosticsClusterAssociationFailureEvent {\n")
+    append("\tassociationFailure : $associationFailure\n")
+    append("\tstatus : $status\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_ASSOCIATION_FAILURE), associationFailure)
-    tlvWriter.put(ContextSpecificTag(TAG_STATUS), status)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_ASSOCIATION_FAILURE), associationFailure)
+      put(ContextSpecificTag(TAG_STATUS), status)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class WiFiNetworkDiagnosticsClusterAssociationFailureEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
       tlvReader.enterStructure(tag)
-      val associationFailure: Int = tlvReader.getInt(ContextSpecificTag(TAG_ASSOCIATION_FAILURE))
-      val status: Int = tlvReader.getInt(ContextSpecificTag(TAG_STATUS))
+      val associationFailure = tlvReader.getInt(ContextSpecificTag(TAG_ASSOCIATION_FAILURE))
+      val status = tlvReader.getInt(ContextSpecificTag(TAG_STATUS))
       
       tlvReader.exitContainer()
 

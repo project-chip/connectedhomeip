@@ -29,20 +29,20 @@ import java.util.Optional
 class TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct (
     val nodeID: Long,
     val endpoint: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct {\n")
-    builder.append("\tnodeID : $nodeID\n")
-    builder.append("\tendpoint : $endpoint\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct {\n")
+    append("\tnodeID : $nodeID\n")
+    append("\tendpoint : $endpoint\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_NODE_I_D), nodeID)
-    tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT), endpoint)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_NODE_I_D), nodeID)
+      put(ContextSpecificTag(TAG_ENDPOINT), endpoint)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct {
       tlvReader.enterStructure(tag)
-      val nodeID: Long = tlvReader.getLong(ContextSpecificTag(TAG_NODE_I_D))
-      val endpoint: Int = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
+      val nodeID = tlvReader.getLong(ContextSpecificTag(TAG_NODE_I_D))
+      val endpoint = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
       
       tlvReader.exitContainer()
 

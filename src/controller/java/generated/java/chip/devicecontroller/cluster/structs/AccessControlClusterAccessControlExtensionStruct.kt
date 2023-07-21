@@ -29,20 +29,20 @@ import java.util.Optional
 class AccessControlClusterAccessControlExtensionStruct (
     val data: ByteArray,
     val fabricIndex: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("AccessControlClusterAccessControlExtensionStruct {\n")
-    builder.append("\tdata : $data\n")
-    builder.append("\tfabricIndex : $fabricIndex\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("AccessControlClusterAccessControlExtensionStruct {\n")
+    append("\tdata : $data\n")
+    append("\tfabricIndex : $fabricIndex\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_DATA), data)
-    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_DATA), data)
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class AccessControlClusterAccessControlExtensionStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : AccessControlClusterAccessControlExtensionStruct {
       tlvReader.enterStructure(tag)
-      val data: ByteArray = tlvReader.getByteArray(ContextSpecificTag(TAG_DATA))
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val data = tlvReader.getByteArray(ContextSpecificTag(TAG_DATA))
+      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
       tlvReader.exitContainer()
 

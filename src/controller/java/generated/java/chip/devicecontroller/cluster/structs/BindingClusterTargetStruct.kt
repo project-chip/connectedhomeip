@@ -32,38 +32,38 @@ class BindingClusterTargetStruct (
     val endpoint: Optional<Int>,
     val cluster: Optional<Long>,
     val fabricIndex: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("BindingClusterTargetStruct {\n")
-    builder.append("\tnode : $node\n")
-    builder.append("\tgroup : $group\n")
-    builder.append("\tendpoint : $endpoint\n")
-    builder.append("\tcluster : $cluster\n")
-    builder.append("\tfabricIndex : $fabricIndex\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("BindingClusterTargetStruct {\n")
+    append("\tnode : $node\n")
+    append("\tgroup : $group\n")
+    append("\tendpoint : $endpoint\n")
+    append("\tcluster : $cluster\n")
+    append("\tfabricIndex : $fabricIndex\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    if (node.isPresent) {
+    tlvWriter.apply {
+      startStructure(tag)
+      if (node.isPresent) {
       val optnode = node.get()
-      tlvWriter.put(ContextSpecificTag(TAG_NODE), optnode)
+      put(ContextSpecificTag(TAG_NODE), optnode)
     }
-    if (group.isPresent) {
+      if (group.isPresent) {
       val optgroup = group.get()
-      tlvWriter.put(ContextSpecificTag(TAG_GROUP), optgroup)
+      put(ContextSpecificTag(TAG_GROUP), optgroup)
     }
-    if (endpoint.isPresent) {
+      if (endpoint.isPresent) {
       val optendpoint = endpoint.get()
-      tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT), optendpoint)
+      put(ContextSpecificTag(TAG_ENDPOINT), optendpoint)
     }
-    if (cluster.isPresent) {
+      if (cluster.isPresent) {
       val optcluster = cluster.get()
-      tlvWriter.put(ContextSpecificTag(TAG_CLUSTER), optcluster)
+      put(ContextSpecificTag(TAG_CLUSTER), optcluster)
     }
-    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
-    tlvWriter.endStructure()
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
+      endStructure()
+    }
   }
 
   companion object {
@@ -75,27 +75,27 @@ class BindingClusterTargetStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : BindingClusterTargetStruct {
       tlvReader.enterStructure(tag)
-      val node: Optional<Long> = try {
+      val node = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NODE))) {
       Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_NODE)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
-      val group: Optional<Int> = try {
+      val group = if (tlvReader.isNextTag(ContextSpecificTag(TAG_GROUP))) {
       Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_GROUP)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
-      val endpoint: Optional<Int> = try {
+      val endpoint = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
       Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
-      val cluster: Optional<Long> = try {
+      val cluster = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLUSTER))) {
       Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_CLUSTER)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
       tlvReader.exitContainer()
 

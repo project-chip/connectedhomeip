@@ -29,23 +29,23 @@ import java.util.Optional
 class RvcRunModeClusterModeTagStruct (
     val mfgCode: Optional<Int>,
     val value: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("RvcRunModeClusterModeTagStruct {\n")
-    builder.append("\tmfgCode : $mfgCode\n")
-    builder.append("\tvalue : $value\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("RvcRunModeClusterModeTagStruct {\n")
+    append("\tmfgCode : $mfgCode\n")
+    append("\tvalue : $value\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    if (mfgCode.isPresent) {
+    tlvWriter.apply {
+      startStructure(tag)
+      if (mfgCode.isPresent) {
       val optmfgCode = mfgCode.get()
-      tlvWriter.put(ContextSpecificTag(TAG_MFG_CODE), optmfgCode)
+      put(ContextSpecificTag(TAG_MFG_CODE), optmfgCode)
     }
-    tlvWriter.put(ContextSpecificTag(TAG_VALUE), value)
-    tlvWriter.endStructure()
+      put(ContextSpecificTag(TAG_VALUE), value)
+      endStructure()
+    }
   }
 
   companion object {
@@ -54,12 +54,12 @@ class RvcRunModeClusterModeTagStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : RvcRunModeClusterModeTagStruct {
       tlvReader.enterStructure(tag)
-      val mfgCode: Optional<Int> = try {
+      val mfgCode = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MFG_CODE))) {
       Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_MFG_CODE)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
-      val value: Int = tlvReader.getInt(ContextSpecificTag(TAG_VALUE))
+      val value = tlvReader.getInt(ContextSpecificTag(TAG_VALUE))
       
       tlvReader.exitContainer()
 

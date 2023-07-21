@@ -32,44 +32,42 @@ class AccessControlClusterAccessControlEntryStruct (
     val subjects: List<Long>?,
     val targets: List<AccessControlClusterAccessControlTargetStruct>?,
     val fabricIndex: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("AccessControlClusterAccessControlEntryStruct {\n")
-    builder.append("\tprivilege : $privilege\n")
-    builder.append("\tauthMode : $authMode\n")
-    builder.append("\tsubjects : $subjects\n")
-    builder.append("\ttargets : $targets\n")
-    builder.append("\tfabricIndex : $fabricIndex\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("AccessControlClusterAccessControlEntryStruct {\n")
+    append("\tprivilege : $privilege\n")
+    append("\tauthMode : $authMode\n")
+    append("\tsubjects : $subjects\n")
+    append("\ttargets : $targets\n")
+    append("\tfabricIndex : $fabricIndex\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_PRIVILEGE), privilege)
-    tlvWriter.put(ContextSpecificTag(TAG_AUTH_MODE), authMode)
-    if (subjects == null) { tlvWriter.putNull(ContextSpecificTag(TAG_SUBJECTS)) }
-    else {
-      tlvWriter.startList(ContextSpecificTag(TAG_SUBJECTS))
-      val itersubjects = subjects.iterator()
-      while(itersubjects.hasNext()) {
-        val next = itersubjects.next()
-        tlvWriter.put(AnonymousTag, next)
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_PRIVILEGE), privilege)
+      put(ContextSpecificTag(TAG_AUTH_MODE), authMode)
+      if (subjects != null) {
+      startList(ContextSpecificTag(TAG_SUBJECTS))
+      for (item in subjects.iterator()) {
+        put(AnonymousTag, item)
       }
-      tlvWriter.endList()
+      endList()
+    } else {
+      putNull(ContextSpecificTag(TAG_SUBJECTS))
     }
-    if (targets == null) { tlvWriter.putNull(ContextSpecificTag(TAG_TARGETS)) }
-    else {
-      tlvWriter.startList(ContextSpecificTag(TAG_TARGETS))
-      val itertargets = targets.iterator()
-      while(itertargets.hasNext()) {
-        val next = itertargets.next()
-        next.toTlv(AnonymousTag, tlvWriter)
+      if (targets != null) {
+      startList(ContextSpecificTag(TAG_TARGETS))
+      for (item in targets.iterator()) {
+        item.toTlv(AnonymousTag, this)
       }
-      tlvWriter.endList()
+      endList()
+    } else {
+      putNull(ContextSpecificTag(TAG_TARGETS))
     }
-    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
-    tlvWriter.endStructure()
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
+      endStructure()
+    }
   }
 
   companion object {
@@ -81,41 +79,33 @@ class AccessControlClusterAccessControlEntryStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : AccessControlClusterAccessControlEntryStruct {
       tlvReader.enterStructure(tag)
-      val privilege: Int = tlvReader.getInt(ContextSpecificTag(TAG_PRIVILEGE))
-      val authMode: Int = tlvReader.getInt(ContextSpecificTag(TAG_AUTH_MODE))
-      val subjects: List<Long>? = try {
-      mutableListOf<Long>().apply {
+      val privilege = tlvReader.getInt(ContextSpecificTag(TAG_PRIVILEGE))
+      val authMode = tlvReader.getInt(ContextSpecificTag(TAG_AUTH_MODE))
+      val subjects = if (tlvReader.isNull()) {
+      buildList<Long> {
       tlvReader.enterList(ContextSpecificTag(TAG_SUBJECTS))
-      while(true) {
-        try {
-          this.add(tlvReader.getLong(AnonymousTag))
-        } catch (e: TlvParsingException) {
-          break
-        }
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getLong(AnonymousTag))
       }
       tlvReader.exitContainer()
     }
-    } catch (e: TlvParsingException) {
+    } else {
       tlvReader.getNull(ContextSpecificTag(TAG_SUBJECTS))
       null
     }
-      val targets: List<AccessControlClusterAccessControlTargetStruct>? = try {
-      mutableListOf<AccessControlClusterAccessControlTargetStruct>().apply {
+      val targets = if (tlvReader.isNull()) {
+      buildList<AccessControlClusterAccessControlTargetStruct> {
       tlvReader.enterList(ContextSpecificTag(TAG_TARGETS))
-      while(true) {
-        try {
-          this.add(AccessControlClusterAccessControlTargetStruct.fromTlv(AnonymousTag, tlvReader))
-        } catch (e: TlvParsingException) {
-          break
-        }
+      while(!tlvReader.isEndOfContainer()) {
+        add(AccessControlClusterAccessControlTargetStruct.fromTlv(AnonymousTag, tlvReader))
       }
       tlvReader.exitContainer()
     }
-    } catch (e: TlvParsingException) {
+    } else {
       tlvReader.getNull(ContextSpecificTag(TAG_TARGETS))
       null
     }
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
       tlvReader.exitContainer()
 

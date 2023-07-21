@@ -28,18 +28,18 @@ import java.util.Optional
 
 class GeneralDiagnosticsClusterBootReasonEvent (
     val bootReason: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("GeneralDiagnosticsClusterBootReasonEvent {\n")
-    builder.append("\tbootReason : $bootReason\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("GeneralDiagnosticsClusterBootReasonEvent {\n")
+    append("\tbootReason : $bootReason\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_BOOT_REASON), bootReason)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_BOOT_REASON), bootReason)
+      endStructure()
+    }
   }
 
   companion object {
@@ -47,7 +47,7 @@ class GeneralDiagnosticsClusterBootReasonEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : GeneralDiagnosticsClusterBootReasonEvent {
       tlvReader.enterStructure(tag)
-      val bootReason: Int = tlvReader.getInt(ContextSpecificTag(TAG_BOOT_REASON))
+      val bootReason = tlvReader.getInt(ContextSpecificTag(TAG_BOOT_REASON))
       
       tlvReader.exitContainer()
 

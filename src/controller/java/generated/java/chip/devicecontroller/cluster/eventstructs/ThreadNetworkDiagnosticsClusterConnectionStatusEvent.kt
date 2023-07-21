@@ -28,18 +28,18 @@ import java.util.Optional
 
 class ThreadNetworkDiagnosticsClusterConnectionStatusEvent (
     val connectionStatus: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ThreadNetworkDiagnosticsClusterConnectionStatusEvent {\n")
-    builder.append("\tconnectionStatus : $connectionStatus\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ThreadNetworkDiagnosticsClusterConnectionStatusEvent {\n")
+    append("\tconnectionStatus : $connectionStatus\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_CONNECTION_STATUS), connectionStatus)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_CONNECTION_STATUS), connectionStatus)
+      endStructure()
+    }
   }
 
   companion object {
@@ -47,7 +47,7 @@ class ThreadNetworkDiagnosticsClusterConnectionStatusEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ThreadNetworkDiagnosticsClusterConnectionStatusEvent {
       tlvReader.enterStructure(tag)
-      val connectionStatus: Int = tlvReader.getInt(ContextSpecificTag(TAG_CONNECTION_STATUS))
+      val connectionStatus = tlvReader.getInt(ContextSpecificTag(TAG_CONNECTION_STATUS))
       
       tlvReader.exitContainer()
 

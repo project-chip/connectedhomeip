@@ -30,22 +30,22 @@ class TimeSynchronizationClusterTrustedTimeSourceStruct (
     val fabricIndex: Int,
     val nodeID: Long,
     val endpoint: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("TimeSynchronizationClusterTrustedTimeSourceStruct {\n")
-    builder.append("\tfabricIndex : $fabricIndex\n")
-    builder.append("\tnodeID : $nodeID\n")
-    builder.append("\tendpoint : $endpoint\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("TimeSynchronizationClusterTrustedTimeSourceStruct {\n")
+    append("\tfabricIndex : $fabricIndex\n")
+    append("\tnodeID : $nodeID\n")
+    append("\tendpoint : $endpoint\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
-    tlvWriter.put(ContextSpecificTag(TAG_NODE_I_D), nodeID)
-    tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT), endpoint)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
+      put(ContextSpecificTag(TAG_NODE_I_D), nodeID)
+      put(ContextSpecificTag(TAG_ENDPOINT), endpoint)
+      endStructure()
+    }
   }
 
   companion object {
@@ -55,9 +55,9 @@ class TimeSynchronizationClusterTrustedTimeSourceStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : TimeSynchronizationClusterTrustedTimeSourceStruct {
       tlvReader.enterStructure(tag)
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      val nodeID: Long = tlvReader.getLong(ContextSpecificTag(TAG_NODE_I_D))
-      val endpoint: Int = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
+      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val nodeID = tlvReader.getLong(ContextSpecificTag(TAG_NODE_I_D))
+      val endpoint = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
       
       tlvReader.exitContainer()
 

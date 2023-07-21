@@ -33,28 +33,28 @@ class ActionsClusterActionStruct (
     val endpointListID: Int,
     val supportedCommands: Int,
     val state: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ActionsClusterActionStruct {\n")
-    builder.append("\tactionID : $actionID\n")
-    builder.append("\tname : $name\n")
-    builder.append("\ttype : $type\n")
-    builder.append("\tendpointListID : $endpointListID\n")
-    builder.append("\tsupportedCommands : $supportedCommands\n")
-    builder.append("\tstate : $state\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ActionsClusterActionStruct {\n")
+    append("\tactionID : $actionID\n")
+    append("\tname : $name\n")
+    append("\ttype : $type\n")
+    append("\tendpointListID : $endpointListID\n")
+    append("\tsupportedCommands : $supportedCommands\n")
+    append("\tstate : $state\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_ACTION_I_D), actionID)
-    tlvWriter.put(ContextSpecificTag(TAG_NAME), name)
-    tlvWriter.put(ContextSpecificTag(TAG_TYPE), type)
-    tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D), endpointListID)
-    tlvWriter.put(ContextSpecificTag(TAG_SUPPORTED_COMMANDS), supportedCommands)
-    tlvWriter.put(ContextSpecificTag(TAG_STATE), state)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_ACTION_I_D), actionID)
+      put(ContextSpecificTag(TAG_NAME), name)
+      put(ContextSpecificTag(TAG_TYPE), type)
+      put(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D), endpointListID)
+      put(ContextSpecificTag(TAG_SUPPORTED_COMMANDS), supportedCommands)
+      put(ContextSpecificTag(TAG_STATE), state)
+      endStructure()
+    }
   }
 
   companion object {
@@ -67,12 +67,12 @@ class ActionsClusterActionStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ActionsClusterActionStruct {
       tlvReader.enterStructure(tag)
-      val actionID: Int = tlvReader.getInt(ContextSpecificTag(TAG_ACTION_I_D))
-      val name: String = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-      val type: Int = tlvReader.getInt(ContextSpecificTag(TAG_TYPE))
-      val endpointListID: Int = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D))
-      val supportedCommands: Int = tlvReader.getInt(ContextSpecificTag(TAG_SUPPORTED_COMMANDS))
-      val state: Int = tlvReader.getInt(ContextSpecificTag(TAG_STATE))
+      val actionID = tlvReader.getInt(ContextSpecificTag(TAG_ACTION_I_D))
+      val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
+      val type = tlvReader.getInt(ContextSpecificTag(TAG_TYPE))
+      val endpointListID = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D))
+      val supportedCommands = tlvReader.getInt(ContextSpecificTag(TAG_SUPPORTED_COMMANDS))
+      val state = tlvReader.getInt(ContextSpecificTag(TAG_STATE))
       
       tlvReader.exitContainer()
 

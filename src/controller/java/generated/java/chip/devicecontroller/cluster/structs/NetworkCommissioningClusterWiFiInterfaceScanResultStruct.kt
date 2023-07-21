@@ -33,28 +33,28 @@ class NetworkCommissioningClusterWiFiInterfaceScanResultStruct (
     val channel: Int,
     val wiFiBand: Int,
     val rssi: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("NetworkCommissioningClusterWiFiInterfaceScanResultStruct {\n")
-    builder.append("\tsecurity : $security\n")
-    builder.append("\tssid : $ssid\n")
-    builder.append("\tbssid : $bssid\n")
-    builder.append("\tchannel : $channel\n")
-    builder.append("\twiFiBand : $wiFiBand\n")
-    builder.append("\trssi : $rssi\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("NetworkCommissioningClusterWiFiInterfaceScanResultStruct {\n")
+    append("\tsecurity : $security\n")
+    append("\tssid : $ssid\n")
+    append("\tbssid : $bssid\n")
+    append("\tchannel : $channel\n")
+    append("\twiFiBand : $wiFiBand\n")
+    append("\trssi : $rssi\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_SECURITY), security)
-    tlvWriter.put(ContextSpecificTag(TAG_SSID), ssid)
-    tlvWriter.put(ContextSpecificTag(TAG_BSSID), bssid)
-    tlvWriter.put(ContextSpecificTag(TAG_CHANNEL), channel)
-    tlvWriter.put(ContextSpecificTag(TAG_WI_FI_BAND), wiFiBand)
-    tlvWriter.put(ContextSpecificTag(TAG_RSSI), rssi)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_SECURITY), security)
+      put(ContextSpecificTag(TAG_SSID), ssid)
+      put(ContextSpecificTag(TAG_BSSID), bssid)
+      put(ContextSpecificTag(TAG_CHANNEL), channel)
+      put(ContextSpecificTag(TAG_WI_FI_BAND), wiFiBand)
+      put(ContextSpecificTag(TAG_RSSI), rssi)
+      endStructure()
+    }
   }
 
   companion object {
@@ -67,12 +67,12 @@ class NetworkCommissioningClusterWiFiInterfaceScanResultStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : NetworkCommissioningClusterWiFiInterfaceScanResultStruct {
       tlvReader.enterStructure(tag)
-      val security: Int = tlvReader.getInt(ContextSpecificTag(TAG_SECURITY))
-      val ssid: ByteArray = tlvReader.getByteArray(ContextSpecificTag(TAG_SSID))
-      val bssid: ByteArray = tlvReader.getByteArray(ContextSpecificTag(TAG_BSSID))
-      val channel: Int = tlvReader.getInt(ContextSpecificTag(TAG_CHANNEL))
-      val wiFiBand: Int = tlvReader.getInt(ContextSpecificTag(TAG_WI_FI_BAND))
-      val rssi: Int = tlvReader.getInt(ContextSpecificTag(TAG_RSSI))
+      val security = tlvReader.getInt(ContextSpecificTag(TAG_SECURITY))
+      val ssid = tlvReader.getByteArray(ContextSpecificTag(TAG_SSID))
+      val bssid = tlvReader.getByteArray(ContextSpecificTag(TAG_BSSID))
+      val channel = tlvReader.getInt(ContextSpecificTag(TAG_CHANNEL))
+      val wiFiBand = tlvReader.getInt(ContextSpecificTag(TAG_WI_FI_BAND))
+      val rssi = tlvReader.getInt(ContextSpecificTag(TAG_RSSI))
       
       tlvReader.exitContainer()
 

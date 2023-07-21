@@ -28,24 +28,22 @@ import java.util.Optional
 
 class UnitTestingClusterDoubleNestedStructList (
     val a: List<UnitTestingClusterNestedStructList>) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("UnitTestingClusterDoubleNestedStructList {\n")
-    builder.append("\ta : $a\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("UnitTestingClusterDoubleNestedStructList {\n")
+    append("\ta : $a\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.startList(ContextSpecificTag(TAG_A))
-      val itera = a.iterator()
-      while(itera.hasNext()) {
-        val next = itera.next()
-        next.toTlv(AnonymousTag, tlvWriter)
+    tlvWriter.apply {
+      startStructure(tag)
+      startList(ContextSpecificTag(TAG_A))
+      for (item in a.iterator()) {
+        item.toTlv(AnonymousTag, this)
       }
-      tlvWriter.endList()
-    tlvWriter.endStructure()
+      endList()
+      endStructure()
+    }
   }
 
   companion object {
@@ -53,14 +51,10 @@ class UnitTestingClusterDoubleNestedStructList (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : UnitTestingClusterDoubleNestedStructList {
       tlvReader.enterStructure(tag)
-      val a: List<UnitTestingClusterNestedStructList> = mutableListOf<UnitTestingClusterNestedStructList>().apply {
+      val a = buildList<UnitTestingClusterNestedStructList> {
       tlvReader.enterList(ContextSpecificTag(TAG_A))
-      while(true) {
-        try {
-          this.add(UnitTestingClusterNestedStructList.fromTlv(AnonymousTag, tlvReader))
-        } catch (e: TlvParsingException) {
-          break
-        }
+      while(!tlvReader.isEndOfContainer()) {
+        add(UnitTestingClusterNestedStructList.fromTlv(AnonymousTag, tlvReader))
       }
       tlvReader.exitContainer()
     }

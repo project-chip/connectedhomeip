@@ -30,25 +30,25 @@ class TimeSynchronizationClusterTimeZoneStruct (
     val offset: Long,
     val validAt: Long,
     val name: Optional<String>) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("TimeSynchronizationClusterTimeZoneStruct {\n")
-    builder.append("\toffset : $offset\n")
-    builder.append("\tvalidAt : $validAt\n")
-    builder.append("\tname : $name\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("TimeSynchronizationClusterTimeZoneStruct {\n")
+    append("\toffset : $offset\n")
+    append("\tvalidAt : $validAt\n")
+    append("\tname : $name\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_OFFSET), offset)
-    tlvWriter.put(ContextSpecificTag(TAG_VALID_AT), validAt)
-    if (name.isPresent) {
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_OFFSET), offset)
+      put(ContextSpecificTag(TAG_VALID_AT), validAt)
+      if (name.isPresent) {
       val optname = name.get()
-      tlvWriter.put(ContextSpecificTag(TAG_NAME), optname)
+      put(ContextSpecificTag(TAG_NAME), optname)
     }
-    tlvWriter.endStructure()
+      endStructure()
+    }
   }
 
   companion object {
@@ -58,11 +58,11 @@ class TimeSynchronizationClusterTimeZoneStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : TimeSynchronizationClusterTimeZoneStruct {
       tlvReader.enterStructure(tag)
-      val offset: Long = tlvReader.getLong(ContextSpecificTag(TAG_OFFSET))
-      val validAt: Long = tlvReader.getLong(ContextSpecificTag(TAG_VALID_AT))
-      val name: Optional<String> = try {
+      val offset = tlvReader.getLong(ContextSpecificTag(TAG_OFFSET))
+      val validAt = tlvReader.getLong(ContextSpecificTag(TAG_VALID_AT))
+      val name = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
       Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
       

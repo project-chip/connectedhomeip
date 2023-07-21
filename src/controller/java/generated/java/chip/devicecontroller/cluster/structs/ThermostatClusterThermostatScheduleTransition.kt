@@ -30,28 +30,30 @@ class ThermostatClusterThermostatScheduleTransition (
     val transitionTime: Int,
     val heatSetpoint: Int?,
     val coolSetpoint: Int?) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ThermostatClusterThermostatScheduleTransition {\n")
-    builder.append("\ttransitionTime : $transitionTime\n")
-    builder.append("\theatSetpoint : $heatSetpoint\n")
-    builder.append("\tcoolSetpoint : $coolSetpoint\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ThermostatClusterThermostatScheduleTransition {\n")
+    append("\ttransitionTime : $transitionTime\n")
+    append("\theatSetpoint : $heatSetpoint\n")
+    append("\tcoolSetpoint : $coolSetpoint\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_TRANSITION_TIME), transitionTime)
-    if (heatSetpoint == null) { tlvWriter.putNull(ContextSpecificTag(TAG_HEAT_SETPOINT)) }
-    else {
-      tlvWriter.put(ContextSpecificTag(TAG_HEAT_SETPOINT), heatSetpoint)
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_TRANSITION_TIME), transitionTime)
+      if (heatSetpoint != null) {
+      put(ContextSpecificTag(TAG_HEAT_SETPOINT), heatSetpoint)
+    } else {
+      putNull(ContextSpecificTag(TAG_HEAT_SETPOINT))
     }
-    if (coolSetpoint == null) { tlvWriter.putNull(ContextSpecificTag(TAG_COOL_SETPOINT)) }
-    else {
-      tlvWriter.put(ContextSpecificTag(TAG_COOL_SETPOINT), coolSetpoint)
+      if (coolSetpoint != null) {
+      put(ContextSpecificTag(TAG_COOL_SETPOINT), coolSetpoint)
+    } else {
+      putNull(ContextSpecificTag(TAG_COOL_SETPOINT))
     }
-    tlvWriter.endStructure()
+      endStructure()
+    }
   }
 
   companion object {
@@ -61,16 +63,16 @@ class ThermostatClusterThermostatScheduleTransition (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ThermostatClusterThermostatScheduleTransition {
       tlvReader.enterStructure(tag)
-      val transitionTime: Int = tlvReader.getInt(ContextSpecificTag(TAG_TRANSITION_TIME))
-      val heatSetpoint: Int? = try {
+      val transitionTime = tlvReader.getInt(ContextSpecificTag(TAG_TRANSITION_TIME))
+      val heatSetpoint = if (tlvReader.isNull()) {
       tlvReader.getInt(ContextSpecificTag(TAG_HEAT_SETPOINT))
-    } catch (e: TlvParsingException) {
+    } else {
       tlvReader.getNull(ContextSpecificTag(TAG_HEAT_SETPOINT))
       null
     }
-      val coolSetpoint: Int? = try {
+      val coolSetpoint = if (tlvReader.isNull()) {
       tlvReader.getInt(ContextSpecificTag(TAG_COOL_SETPOINT))
-    } catch (e: TlvParsingException) {
+    } else {
       tlvReader.getNull(ContextSpecificTag(TAG_COOL_SETPOINT))
       null
     }

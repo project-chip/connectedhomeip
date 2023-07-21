@@ -31,30 +31,32 @@ class OtaSoftwareUpdateRequestorClusterDownloadErrorEvent (
     val bytesDownloaded: Long,
     val progressPercent: Int?,
     val platformCode: Long?) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("OtaSoftwareUpdateRequestorClusterDownloadErrorEvent {\n")
-    builder.append("\tsoftwareVersion : $softwareVersion\n")
-    builder.append("\tbytesDownloaded : $bytesDownloaded\n")
-    builder.append("\tprogressPercent : $progressPercent\n")
-    builder.append("\tplatformCode : $platformCode\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("OtaSoftwareUpdateRequestorClusterDownloadErrorEvent {\n")
+    append("\tsoftwareVersion : $softwareVersion\n")
+    append("\tbytesDownloaded : $bytesDownloaded\n")
+    append("\tprogressPercent : $progressPercent\n")
+    append("\tplatformCode : $platformCode\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_SOFTWARE_VERSION), softwareVersion)
-    tlvWriter.put(ContextSpecificTag(TAG_BYTES_DOWNLOADED), bytesDownloaded)
-    if (progressPercent == null) { tlvWriter.putNull(ContextSpecificTag(TAG_PROGRESS_PERCENT)) }
-    else {
-      tlvWriter.put(ContextSpecificTag(TAG_PROGRESS_PERCENT), progressPercent)
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_SOFTWARE_VERSION), softwareVersion)
+      put(ContextSpecificTag(TAG_BYTES_DOWNLOADED), bytesDownloaded)
+      if (progressPercent != null) {
+      put(ContextSpecificTag(TAG_PROGRESS_PERCENT), progressPercent)
+    } else {
+      putNull(ContextSpecificTag(TAG_PROGRESS_PERCENT))
     }
-    if (platformCode == null) { tlvWriter.putNull(ContextSpecificTag(TAG_PLATFORM_CODE)) }
-    else {
-      tlvWriter.put(ContextSpecificTag(TAG_PLATFORM_CODE), platformCode)
+      if (platformCode != null) {
+      put(ContextSpecificTag(TAG_PLATFORM_CODE), platformCode)
+    } else {
+      putNull(ContextSpecificTag(TAG_PLATFORM_CODE))
     }
-    tlvWriter.endStructure()
+      endStructure()
+    }
   }
 
   companion object {
@@ -65,17 +67,17 @@ class OtaSoftwareUpdateRequestorClusterDownloadErrorEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : OtaSoftwareUpdateRequestorClusterDownloadErrorEvent {
       tlvReader.enterStructure(tag)
-      val softwareVersion: Long = tlvReader.getLong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
-      val bytesDownloaded: Long = tlvReader.getLong(ContextSpecificTag(TAG_BYTES_DOWNLOADED))
-      val progressPercent: Int? = try {
+      val softwareVersion = tlvReader.getLong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
+      val bytesDownloaded = tlvReader.getLong(ContextSpecificTag(TAG_BYTES_DOWNLOADED))
+      val progressPercent = if (!tlvReader.isNull()) {
       tlvReader.getInt(ContextSpecificTag(TAG_PROGRESS_PERCENT))
-    } catch (e: TlvParsingException) {
+    } else {
       tlvReader.getNull(ContextSpecificTag(TAG_PROGRESS_PERCENT))
       null
     }
-      val platformCode: Long? = try {
+      val platformCode = if (!tlvReader.isNull()) {
       tlvReader.getLong(ContextSpecificTag(TAG_PLATFORM_CODE))
-    } catch (e: TlvParsingException) {
+    } else {
       tlvReader.getNull(ContextSpecificTag(TAG_PLATFORM_CODE))
       null
     }

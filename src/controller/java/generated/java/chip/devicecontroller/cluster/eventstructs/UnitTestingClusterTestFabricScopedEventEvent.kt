@@ -28,18 +28,18 @@ import java.util.Optional
 
 class UnitTestingClusterTestFabricScopedEventEvent (
     val fabricIndex: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("UnitTestingClusterTestFabricScopedEventEvent {\n")
-    builder.append("\tfabricIndex : $fabricIndex\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("UnitTestingClusterTestFabricScopedEventEvent {\n")
+    append("\tfabricIndex : $fabricIndex\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
+      endStructure()
+    }
   }
 
   companion object {
@@ -47,7 +47,7 @@ class UnitTestingClusterTestFabricScopedEventEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : UnitTestingClusterTestFabricScopedEventEvent {
       tlvReader.enterStructure(tag)
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
       tlvReader.exitContainer()
 

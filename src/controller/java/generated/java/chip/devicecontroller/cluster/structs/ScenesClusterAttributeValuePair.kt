@@ -29,20 +29,20 @@ import java.util.Optional
 class ScenesClusterAttributeValuePair (
     val attributeID: Long,
     val attributeValue: Long) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ScenesClusterAttributeValuePair {\n")
-    builder.append("\tattributeID : $attributeID\n")
-    builder.append("\tattributeValue : $attributeValue\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ScenesClusterAttributeValuePair {\n")
+    append("\tattributeID : $attributeID\n")
+    append("\tattributeValue : $attributeValue\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_ATTRIBUTE_I_D), attributeID)
-    tlvWriter.put(ContextSpecificTag(TAG_ATTRIBUTE_VALUE), attributeValue)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_ATTRIBUTE_I_D), attributeID)
+      put(ContextSpecificTag(TAG_ATTRIBUTE_VALUE), attributeValue)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class ScenesClusterAttributeValuePair (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ScenesClusterAttributeValuePair {
       tlvReader.enterStructure(tag)
-      val attributeID: Long = tlvReader.getLong(ContextSpecificTag(TAG_ATTRIBUTE_I_D))
-      val attributeValue: Long = tlvReader.getLong(ContextSpecificTag(TAG_ATTRIBUTE_VALUE))
+      val attributeID = tlvReader.getLong(ContextSpecificTag(TAG_ATTRIBUTE_I_D))
+      val attributeValue = tlvReader.getLong(ContextSpecificTag(TAG_ATTRIBUTE_VALUE))
       
       tlvReader.exitContainer()
 

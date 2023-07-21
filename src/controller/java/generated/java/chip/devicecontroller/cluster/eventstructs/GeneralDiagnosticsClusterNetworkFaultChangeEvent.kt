@@ -29,32 +29,28 @@ import java.util.Optional
 class GeneralDiagnosticsClusterNetworkFaultChangeEvent (
     val current: List<Int>,
     val previous: List<Int>) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("GeneralDiagnosticsClusterNetworkFaultChangeEvent {\n")
-    builder.append("\tcurrent : $current\n")
-    builder.append("\tprevious : $previous\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("GeneralDiagnosticsClusterNetworkFaultChangeEvent {\n")
+    append("\tcurrent : $current\n")
+    append("\tprevious : $previous\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.startList(ContextSpecificTag(TAG_CURRENT))
-      val itercurrent = current.iterator()
-      while(itercurrent.hasNext()) {
-        val next = itercurrent.next()
-        tlvWriter.put(AnonymousTag, next)
+    tlvWriter.apply {
+      startStructure(tag)
+      startList(ContextSpecificTag(TAG_CURRENT))
+      for (item in current.iterator()) {
+        put(AnonymousTag, item)
       }
-      tlvWriter.endList()
-    tlvWriter.startList(ContextSpecificTag(TAG_PREVIOUS))
-      val iterprevious = previous.iterator()
-      while(iterprevious.hasNext()) {
-        val next = iterprevious.next()
-        tlvWriter.put(AnonymousTag, next)
+      endList()
+      startList(ContextSpecificTag(TAG_PREVIOUS))
+      for (item in previous.iterator()) {
+        put(AnonymousTag, item)
       }
-      tlvWriter.endList()
-    tlvWriter.endStructure()
+      endList()
+      endStructure()
+    }
   }
 
   companion object {
@@ -63,25 +59,17 @@ class GeneralDiagnosticsClusterNetworkFaultChangeEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : GeneralDiagnosticsClusterNetworkFaultChangeEvent {
       tlvReader.enterStructure(tag)
-      val current: List<Int> = mutableListOf<Int>().apply {
+      val current = buildList <Int> {
       tlvReader.enterList(ContextSpecificTag(TAG_CURRENT))
-      while(true) {
-        try {
-          this.add(tlvReader.getInt(AnonymousTag))
-        } catch (e: TlvParsingException) {
-          break
-        }
+      while(!tlvReader.isEndOfContainer()) {
+        this.add(tlvReader.getInt(AnonymousTag))
       }
       tlvReader.exitContainer()
     }
-      val previous: List<Int> = mutableListOf<Int>().apply {
+      val previous = buildList <Int> {
       tlvReader.enterList(ContextSpecificTag(TAG_PREVIOUS))
-      while(true) {
-        try {
-          this.add(tlvReader.getInt(AnonymousTag))
-        } catch (e: TlvParsingException) {
-          break
-        }
+      while(!tlvReader.isEndOfContainer()) {
+        this.add(tlvReader.getInt(AnonymousTag))
       }
       tlvReader.exitContainer()
     }

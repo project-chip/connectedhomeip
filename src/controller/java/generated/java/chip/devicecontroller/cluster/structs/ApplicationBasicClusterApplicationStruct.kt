@@ -29,20 +29,20 @@ import java.util.Optional
 class ApplicationBasicClusterApplicationStruct (
     val catalogVendorID: Int,
     val applicationID: String) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ApplicationBasicClusterApplicationStruct {\n")
-    builder.append("\tcatalogVendorID : $catalogVendorID\n")
-    builder.append("\tapplicationID : $applicationID\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ApplicationBasicClusterApplicationStruct {\n")
+    append("\tcatalogVendorID : $catalogVendorID\n")
+    append("\tapplicationID : $applicationID\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_CATALOG_VENDOR_I_D), catalogVendorID)
-    tlvWriter.put(ContextSpecificTag(TAG_APPLICATION_I_D), applicationID)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_CATALOG_VENDOR_I_D), catalogVendorID)
+      put(ContextSpecificTag(TAG_APPLICATION_I_D), applicationID)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class ApplicationBasicClusterApplicationStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ApplicationBasicClusterApplicationStruct {
       tlvReader.enterStructure(tag)
-      val catalogVendorID: Int = tlvReader.getInt(ContextSpecificTag(TAG_CATALOG_VENDOR_I_D))
-      val applicationID: String = tlvReader.getString(ContextSpecificTag(TAG_APPLICATION_I_D))
+      val catalogVendorID = tlvReader.getInt(ContextSpecificTag(TAG_CATALOG_VENDOR_I_D))
+      val applicationID = tlvReader.getString(ContextSpecificTag(TAG_APPLICATION_I_D))
       
       tlvReader.exitContainer()
 

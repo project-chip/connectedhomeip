@@ -30,22 +30,22 @@ class UnitTestingClusterNestedStruct (
     val a: Int,
     val b: Boolean,
     val c: UnitTestingClusterSimpleStruct) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("UnitTestingClusterNestedStruct {\n")
-    builder.append("\ta : $a\n")
-    builder.append("\tb : $b\n")
-    builder.append("\tc : $c\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("UnitTestingClusterNestedStruct {\n")
+    append("\ta : $a\n")
+    append("\tb : $b\n")
+    append("\tc : $c\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_A), a)
-    tlvWriter.put(ContextSpecificTag(TAG_B), b)
-    c.toTlv(ContextSpecificTag(TAG_C), tlvWriter)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_A), a)
+      put(ContextSpecificTag(TAG_B), b)
+      c.toTlv(ContextSpecificTag(TAG_C), this)
+      endStructure()
+    }
   }
 
   companion object {
@@ -55,9 +55,9 @@ class UnitTestingClusterNestedStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : UnitTestingClusterNestedStruct {
       tlvReader.enterStructure(tag)
-      val a: Int = tlvReader.getInt(ContextSpecificTag(TAG_A))
-      val b: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
-      val c: UnitTestingClusterSimpleStruct = UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_C), tlvReader)
+      val a = tlvReader.getInt(ContextSpecificTag(TAG_A))
+      val b = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
+      val c = UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_C), tlvReader)
       
       tlvReader.exitContainer()
 

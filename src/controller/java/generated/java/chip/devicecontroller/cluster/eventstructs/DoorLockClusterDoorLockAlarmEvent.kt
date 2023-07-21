@@ -28,18 +28,18 @@ import java.util.Optional
 
 class DoorLockClusterDoorLockAlarmEvent (
     val alarmCode: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("DoorLockClusterDoorLockAlarmEvent {\n")
-    builder.append("\talarmCode : $alarmCode\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("DoorLockClusterDoorLockAlarmEvent {\n")
+    append("\talarmCode : $alarmCode\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_ALARM_CODE), alarmCode)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_ALARM_CODE), alarmCode)
+      endStructure()
+    }
   }
 
   companion object {
@@ -47,7 +47,7 @@ class DoorLockClusterDoorLockAlarmEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : DoorLockClusterDoorLockAlarmEvent {
       tlvReader.enterStructure(tag)
-      val alarmCode: Int = tlvReader.getInt(ContextSpecificTag(TAG_ALARM_CODE))
+      val alarmCode = tlvReader.getInt(ContextSpecificTag(TAG_ALARM_CODE))
       
       tlvReader.exitContainer()
 

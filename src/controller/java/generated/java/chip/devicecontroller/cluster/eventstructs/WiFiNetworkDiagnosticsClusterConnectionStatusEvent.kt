@@ -28,18 +28,18 @@ import java.util.Optional
 
 class WiFiNetworkDiagnosticsClusterConnectionStatusEvent (
     val connectionStatus: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("WiFiNetworkDiagnosticsClusterConnectionStatusEvent {\n")
-    builder.append("\tconnectionStatus : $connectionStatus\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("WiFiNetworkDiagnosticsClusterConnectionStatusEvent {\n")
+    append("\tconnectionStatus : $connectionStatus\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_CONNECTION_STATUS), connectionStatus)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_CONNECTION_STATUS), connectionStatus)
+      endStructure()
+    }
   }
 
   companion object {
@@ -47,7 +47,7 @@ class WiFiNetworkDiagnosticsClusterConnectionStatusEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : WiFiNetworkDiagnosticsClusterConnectionStatusEvent {
       tlvReader.enterStructure(tag)
-      val connectionStatus: Int = tlvReader.getInt(ContextSpecificTag(TAG_CONNECTION_STATUS))
+      val connectionStatus = tlvReader.getInt(ContextSpecificTag(TAG_CONNECTION_STATUS))
       
       tlvReader.exitContainer()
 

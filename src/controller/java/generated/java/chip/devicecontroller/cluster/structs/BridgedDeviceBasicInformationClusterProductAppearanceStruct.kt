@@ -29,23 +29,24 @@ import java.util.Optional
 class BridgedDeviceBasicInformationClusterProductAppearanceStruct (
     val finish: Int,
     val primaryColor: Int?) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("BridgedDeviceBasicInformationClusterProductAppearanceStruct {\n")
-    builder.append("\tfinish : $finish\n")
-    builder.append("\tprimaryColor : $primaryColor\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("BridgedDeviceBasicInformationClusterProductAppearanceStruct {\n")
+    append("\tfinish : $finish\n")
+    append("\tprimaryColor : $primaryColor\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_FINISH), finish)
-    if (primaryColor == null) { tlvWriter.putNull(ContextSpecificTag(TAG_PRIMARY_COLOR)) }
-    else {
-      tlvWriter.put(ContextSpecificTag(TAG_PRIMARY_COLOR), primaryColor)
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_FINISH), finish)
+      if (primaryColor != null) {
+      put(ContextSpecificTag(TAG_PRIMARY_COLOR), primaryColor)
+    } else {
+      putNull(ContextSpecificTag(TAG_PRIMARY_COLOR))
     }
-    tlvWriter.endStructure()
+      endStructure()
+    }
   }
 
   companion object {
@@ -54,10 +55,10 @@ class BridgedDeviceBasicInformationClusterProductAppearanceStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : BridgedDeviceBasicInformationClusterProductAppearanceStruct {
       tlvReader.enterStructure(tag)
-      val finish: Int = tlvReader.getInt(ContextSpecificTag(TAG_FINISH))
-      val primaryColor: Int? = try {
+      val finish = tlvReader.getInt(ContextSpecificTag(TAG_FINISH))
+      val primaryColor = if (tlvReader.isNull()) {
       tlvReader.getInt(ContextSpecificTag(TAG_PRIMARY_COLOR))
-    } catch (e: TlvParsingException) {
+    } else {
       tlvReader.getNull(ContextSpecificTag(TAG_PRIMARY_COLOR))
       null
     }

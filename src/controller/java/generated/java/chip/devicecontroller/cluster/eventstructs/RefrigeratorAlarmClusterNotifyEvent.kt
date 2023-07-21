@@ -31,24 +31,24 @@ class RefrigeratorAlarmClusterNotifyEvent (
     val inactive: Long,
     val state: Long,
     val mask: Long) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("RefrigeratorAlarmClusterNotifyEvent {\n")
-    builder.append("\tactive : $active\n")
-    builder.append("\tinactive : $inactive\n")
-    builder.append("\tstate : $state\n")
-    builder.append("\tmask : $mask\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("RefrigeratorAlarmClusterNotifyEvent {\n")
+    append("\tactive : $active\n")
+    append("\tinactive : $inactive\n")
+    append("\tstate : $state\n")
+    append("\tmask : $mask\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_ACTIVE), active)
-    tlvWriter.put(ContextSpecificTag(TAG_INACTIVE), inactive)
-    tlvWriter.put(ContextSpecificTag(TAG_STATE), state)
-    tlvWriter.put(ContextSpecificTag(TAG_MASK), mask)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_ACTIVE), active)
+      put(ContextSpecificTag(TAG_INACTIVE), inactive)
+      put(ContextSpecificTag(TAG_STATE), state)
+      put(ContextSpecificTag(TAG_MASK), mask)
+      endStructure()
+    }
   }
 
   companion object {
@@ -59,10 +59,10 @@ class RefrigeratorAlarmClusterNotifyEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : RefrigeratorAlarmClusterNotifyEvent {
       tlvReader.enterStructure(tag)
-      val active: Long = tlvReader.getLong(ContextSpecificTag(TAG_ACTIVE))
-      val inactive: Long = tlvReader.getLong(ContextSpecificTag(TAG_INACTIVE))
-      val state: Long = tlvReader.getLong(ContextSpecificTag(TAG_STATE))
-      val mask: Long = tlvReader.getLong(ContextSpecificTag(TAG_MASK))
+      val active = tlvReader.getLong(ContextSpecificTag(TAG_ACTIVE))
+      val inactive = tlvReader.getLong(ContextSpecificTag(TAG_INACTIVE))
+      val state = tlvReader.getLong(ContextSpecificTag(TAG_STATE))
+      val mask = tlvReader.getLong(ContextSpecificTag(TAG_MASK))
       
       tlvReader.exitContainer()
 

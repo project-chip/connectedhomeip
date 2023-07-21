@@ -29,20 +29,20 @@ import java.util.Optional
 class ContentLauncherClusterAdditionalInfoStruct (
     val name: String,
     val value: String) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ContentLauncherClusterAdditionalInfoStruct {\n")
-    builder.append("\tname : $name\n")
-    builder.append("\tvalue : $value\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ContentLauncherClusterAdditionalInfoStruct {\n")
+    append("\tname : $name\n")
+    append("\tvalue : $value\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_NAME), name)
-    tlvWriter.put(ContextSpecificTag(TAG_VALUE), value)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_NAME), name)
+      put(ContextSpecificTag(TAG_VALUE), value)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class ContentLauncherClusterAdditionalInfoStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ContentLauncherClusterAdditionalInfoStruct {
       tlvReader.enterStructure(tag)
-      val name: String = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-      val value: String = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
+      val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
+      val value = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
       
       tlvReader.exitContainer()
 

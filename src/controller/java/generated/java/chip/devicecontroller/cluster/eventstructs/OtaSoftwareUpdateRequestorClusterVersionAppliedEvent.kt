@@ -29,20 +29,20 @@ import java.util.Optional
 class OtaSoftwareUpdateRequestorClusterVersionAppliedEvent (
     val softwareVersion: Long,
     val productID: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("OtaSoftwareUpdateRequestorClusterVersionAppliedEvent {\n")
-    builder.append("\tsoftwareVersion : $softwareVersion\n")
-    builder.append("\tproductID : $productID\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("OtaSoftwareUpdateRequestorClusterVersionAppliedEvent {\n")
+    append("\tsoftwareVersion : $softwareVersion\n")
+    append("\tproductID : $productID\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_SOFTWARE_VERSION), softwareVersion)
-    tlvWriter.put(ContextSpecificTag(TAG_PRODUCT_I_D), productID)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_SOFTWARE_VERSION), softwareVersion)
+      put(ContextSpecificTag(TAG_PRODUCT_I_D), productID)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class OtaSoftwareUpdateRequestorClusterVersionAppliedEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : OtaSoftwareUpdateRequestorClusterVersionAppliedEvent {
       tlvReader.enterStructure(tag)
-      val softwareVersion: Long = tlvReader.getLong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
-      val productID: Int = tlvReader.getInt(ContextSpecificTag(TAG_PRODUCT_I_D))
+      val softwareVersion = tlvReader.getLong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
+      val productID = tlvReader.getInt(ContextSpecificTag(TAG_PRODUCT_I_D))
       
       tlvReader.exitContainer()
 

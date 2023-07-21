@@ -29,20 +29,20 @@ import java.util.Optional
 class ActivatedCarbonFilterMonitoringClusterReplacementProductStruct (
     val productIdentifierType: Int,
     val productIdentifierValue: String) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ActivatedCarbonFilterMonitoringClusterReplacementProductStruct {\n")
-    builder.append("\tproductIdentifierType : $productIdentifierType\n")
-    builder.append("\tproductIdentifierValue : $productIdentifierValue\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ActivatedCarbonFilterMonitoringClusterReplacementProductStruct {\n")
+    append("\tproductIdentifierType : $productIdentifierType\n")
+    append("\tproductIdentifierValue : $productIdentifierValue\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE), productIdentifierType)
-    tlvWriter.put(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE), productIdentifierValue)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE), productIdentifierType)
+      put(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE), productIdentifierValue)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class ActivatedCarbonFilterMonitoringClusterReplacementProductStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ActivatedCarbonFilterMonitoringClusterReplacementProductStruct {
       tlvReader.enterStructure(tag)
-      val productIdentifierType: Int = tlvReader.getInt(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE))
-      val productIdentifierValue: String = tlvReader.getString(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE))
+      val productIdentifierType = tlvReader.getInt(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE))
+      val productIdentifierValue = tlvReader.getString(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE))
       
       tlvReader.exitContainer()
 

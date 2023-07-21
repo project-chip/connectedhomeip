@@ -30,28 +30,26 @@ class DishwasherModeClusterModeOptionStruct (
     val label: String,
     val mode: Int,
     val modeTags: List<DishwasherModeClusterModeTagStruct>) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("DishwasherModeClusterModeOptionStruct {\n")
-    builder.append("\tlabel : $label\n")
-    builder.append("\tmode : $mode\n")
-    builder.append("\tmodeTags : $modeTags\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("DishwasherModeClusterModeOptionStruct {\n")
+    append("\tlabel : $label\n")
+    append("\tmode : $mode\n")
+    append("\tmodeTags : $modeTags\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_LABEL), label)
-    tlvWriter.put(ContextSpecificTag(TAG_MODE), mode)
-    tlvWriter.startList(ContextSpecificTag(TAG_MODE_TAGS))
-      val itermodeTags = modeTags.iterator()
-      while(itermodeTags.hasNext()) {
-        val next = itermodeTags.next()
-        next.toTlv(AnonymousTag, tlvWriter)
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_LABEL), label)
+      put(ContextSpecificTag(TAG_MODE), mode)
+      startList(ContextSpecificTag(TAG_MODE_TAGS))
+      for (item in modeTags.iterator()) {
+        item.toTlv(AnonymousTag, this)
       }
-      tlvWriter.endList()
-    tlvWriter.endStructure()
+      endList()
+      endStructure()
+    }
   }
 
   companion object {
@@ -61,16 +59,12 @@ class DishwasherModeClusterModeOptionStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : DishwasherModeClusterModeOptionStruct {
       tlvReader.enterStructure(tag)
-      val label: String = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
-      val mode: Int = tlvReader.getInt(ContextSpecificTag(TAG_MODE))
-      val modeTags: List<DishwasherModeClusterModeTagStruct> = mutableListOf<DishwasherModeClusterModeTagStruct>().apply {
+      val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
+      val mode = tlvReader.getInt(ContextSpecificTag(TAG_MODE))
+      val modeTags = buildList<DishwasherModeClusterModeTagStruct> {
       tlvReader.enterList(ContextSpecificTag(TAG_MODE_TAGS))
-      while(true) {
-        try {
-          this.add(DishwasherModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
-        } catch (e: TlvParsingException) {
-          break
-        }
+      while(!tlvReader.isEndOfContainer()) {
+        add(DishwasherModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
       }
       tlvReader.exitContainer()
     }

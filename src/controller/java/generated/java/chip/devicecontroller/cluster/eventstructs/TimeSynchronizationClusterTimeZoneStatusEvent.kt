@@ -29,23 +29,23 @@ import java.util.Optional
 class TimeSynchronizationClusterTimeZoneStatusEvent (
     val offset: Long,
     val name: Optional<String>) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("TimeSynchronizationClusterTimeZoneStatusEvent {\n")
-    builder.append("\toffset : $offset\n")
-    builder.append("\tname : $name\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("TimeSynchronizationClusterTimeZoneStatusEvent {\n")
+    append("\toffset : $offset\n")
+    append("\tname : $name\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_OFFSET), offset)
-    if (name.isPresent) {
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_OFFSET), offset)
+      if (name.isPresent) {
       val optname = name.get()
-      tlvWriter.put(ContextSpecificTag(TAG_NAME), optname)
+      put(ContextSpecificTag(TAG_NAME), optname)
     }
-    tlvWriter.endStructure()
+      endStructure()
+    }
   }
 
   companion object {
@@ -54,10 +54,10 @@ class TimeSynchronizationClusterTimeZoneStatusEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : TimeSynchronizationClusterTimeZoneStatusEvent {
       tlvReader.enterStructure(tag)
-      val offset: Long = tlvReader.getLong(ContextSpecificTag(TAG_OFFSET))
-      val name: Optional<String> = try {
+      val offset = tlvReader.getLong(ContextSpecificTag(TAG_OFFSET))
+      val name = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
       Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
       

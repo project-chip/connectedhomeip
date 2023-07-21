@@ -30,22 +30,22 @@ class OtaSoftwareUpdateRequestorClusterProviderLocation (
     val providerNodeID: Long,
     val endpoint: Int,
     val fabricIndex: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("OtaSoftwareUpdateRequestorClusterProviderLocation {\n")
-    builder.append("\tproviderNodeID : $providerNodeID\n")
-    builder.append("\tendpoint : $endpoint\n")
-    builder.append("\tfabricIndex : $fabricIndex\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("OtaSoftwareUpdateRequestorClusterProviderLocation {\n")
+    append("\tproviderNodeID : $providerNodeID\n")
+    append("\tendpoint : $endpoint\n")
+    append("\tfabricIndex : $fabricIndex\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_PROVIDER_NODE_I_D), providerNodeID)
-    tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT), endpoint)
-    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_PROVIDER_NODE_I_D), providerNodeID)
+      put(ContextSpecificTag(TAG_ENDPOINT), endpoint)
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
+      endStructure()
+    }
   }
 
   companion object {
@@ -55,9 +55,9 @@ class OtaSoftwareUpdateRequestorClusterProviderLocation (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : OtaSoftwareUpdateRequestorClusterProviderLocation {
       tlvReader.enterStructure(tag)
-      val providerNodeID: Long = tlvReader.getLong(ContextSpecificTag(TAG_PROVIDER_NODE_I_D))
-      val endpoint: Int = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val providerNodeID = tlvReader.getLong(ContextSpecificTag(TAG_PROVIDER_NODE_I_D))
+      val endpoint = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
+      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
       tlvReader.exitContainer()
 

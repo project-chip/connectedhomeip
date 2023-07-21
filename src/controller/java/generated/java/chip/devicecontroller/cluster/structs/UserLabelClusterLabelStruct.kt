@@ -29,20 +29,20 @@ import java.util.Optional
 class UserLabelClusterLabelStruct (
     val label: String,
     val value: String) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("UserLabelClusterLabelStruct {\n")
-    builder.append("\tlabel : $label\n")
-    builder.append("\tvalue : $value\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("UserLabelClusterLabelStruct {\n")
+    append("\tlabel : $label\n")
+    append("\tvalue : $value\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_LABEL), label)
-    tlvWriter.put(ContextSpecificTag(TAG_VALUE), value)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_LABEL), label)
+      put(ContextSpecificTag(TAG_VALUE), value)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class UserLabelClusterLabelStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : UserLabelClusterLabelStruct {
       tlvReader.enterStructure(tag)
-      val label: String = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
-      val value: String = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
+      val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
+      val value = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
       
       tlvReader.exitContainer()
 

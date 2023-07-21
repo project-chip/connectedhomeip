@@ -28,18 +28,18 @@ import java.util.Optional
 
 class BridgedDeviceBasicInformationClusterReachableChangedEvent (
     val reachableNewValue: Boolean) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("BridgedDeviceBasicInformationClusterReachableChangedEvent {\n")
-    builder.append("\treachableNewValue : $reachableNewValue\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("BridgedDeviceBasicInformationClusterReachableChangedEvent {\n")
+    append("\treachableNewValue : $reachableNewValue\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_REACHABLE_NEW_VALUE), reachableNewValue)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_REACHABLE_NEW_VALUE), reachableNewValue)
+      endStructure()
+    }
   }
 
   companion object {
@@ -47,7 +47,7 @@ class BridgedDeviceBasicInformationClusterReachableChangedEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : BridgedDeviceBasicInformationClusterReachableChangedEvent {
       tlvReader.enterStructure(tag)
-      val reachableNewValue: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_REACHABLE_NEW_VALUE))
+      val reachableNewValue = tlvReader.getBoolean(ContextSpecificTag(TAG_REACHABLE_NEW_VALUE))
       
       tlvReader.exitContainer()
 

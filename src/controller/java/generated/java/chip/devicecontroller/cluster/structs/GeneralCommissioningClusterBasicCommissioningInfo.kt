@@ -29,20 +29,20 @@ import java.util.Optional
 class GeneralCommissioningClusterBasicCommissioningInfo (
     val failSafeExpiryLengthSeconds: Int,
     val maxCumulativeFailsafeSeconds: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("GeneralCommissioningClusterBasicCommissioningInfo {\n")
-    builder.append("\tfailSafeExpiryLengthSeconds : $failSafeExpiryLengthSeconds\n")
-    builder.append("\tmaxCumulativeFailsafeSeconds : $maxCumulativeFailsafeSeconds\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("GeneralCommissioningClusterBasicCommissioningInfo {\n")
+    append("\tfailSafeExpiryLengthSeconds : $failSafeExpiryLengthSeconds\n")
+    append("\tmaxCumulativeFailsafeSeconds : $maxCumulativeFailsafeSeconds\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS), failSafeExpiryLengthSeconds)
-    tlvWriter.put(ContextSpecificTag(TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS), maxCumulativeFailsafeSeconds)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS), failSafeExpiryLengthSeconds)
+      put(ContextSpecificTag(TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS), maxCumulativeFailsafeSeconds)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class GeneralCommissioningClusterBasicCommissioningInfo (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : GeneralCommissioningClusterBasicCommissioningInfo {
       tlvReader.enterStructure(tag)
-      val failSafeExpiryLengthSeconds: Int = tlvReader.getInt(ContextSpecificTag(TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS))
-      val maxCumulativeFailsafeSeconds: Int = tlvReader.getInt(ContextSpecificTag(TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS))
+      val failSafeExpiryLengthSeconds = tlvReader.getInt(ContextSpecificTag(TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS))
+      val maxCumulativeFailsafeSeconds = tlvReader.getInt(ContextSpecificTag(TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS))
       
       tlvReader.exitContainer()
 

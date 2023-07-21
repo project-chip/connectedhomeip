@@ -29,20 +29,20 @@ import java.util.Optional
 class BasicInformationClusterCapabilityMinimaStruct (
     val caseSessionsPerFabric: Int,
     val subscriptionsPerFabric: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("BasicInformationClusterCapabilityMinimaStruct {\n")
-    builder.append("\tcaseSessionsPerFabric : $caseSessionsPerFabric\n")
-    builder.append("\tsubscriptionsPerFabric : $subscriptionsPerFabric\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("BasicInformationClusterCapabilityMinimaStruct {\n")
+    append("\tcaseSessionsPerFabric : $caseSessionsPerFabric\n")
+    append("\tsubscriptionsPerFabric : $subscriptionsPerFabric\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_CASE_SESSIONS_PER_FABRIC), caseSessionsPerFabric)
-    tlvWriter.put(ContextSpecificTag(TAG_SUBSCRIPTIONS_PER_FABRIC), subscriptionsPerFabric)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_CASE_SESSIONS_PER_FABRIC), caseSessionsPerFabric)
+      put(ContextSpecificTag(TAG_SUBSCRIPTIONS_PER_FABRIC), subscriptionsPerFabric)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class BasicInformationClusterCapabilityMinimaStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : BasicInformationClusterCapabilityMinimaStruct {
       tlvReader.enterStructure(tag)
-      val caseSessionsPerFabric: Int = tlvReader.getInt(ContextSpecificTag(TAG_CASE_SESSIONS_PER_FABRIC))
-      val subscriptionsPerFabric: Int = tlvReader.getInt(ContextSpecificTag(TAG_SUBSCRIPTIONS_PER_FABRIC))
+      val caseSessionsPerFabric = tlvReader.getInt(ContextSpecificTag(TAG_CASE_SESSIONS_PER_FABRIC))
+      val subscriptionsPerFabric = tlvReader.getInt(ContextSpecificTag(TAG_SUBSCRIPTIONS_PER_FABRIC))
       
       tlvReader.exitContainer()
 

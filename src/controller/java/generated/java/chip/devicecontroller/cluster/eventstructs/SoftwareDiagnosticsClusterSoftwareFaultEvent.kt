@@ -30,28 +30,28 @@ class SoftwareDiagnosticsClusterSoftwareFaultEvent (
     val id: Long,
     val name: Optional<String>,
     val faultRecording: Optional<ByteArray>) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("SoftwareDiagnosticsClusterSoftwareFaultEvent {\n")
-    builder.append("\tid : $id\n")
-    builder.append("\tname : $name\n")
-    builder.append("\tfaultRecording : $faultRecording\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("SoftwareDiagnosticsClusterSoftwareFaultEvent {\n")
+    append("\tid : $id\n")
+    append("\tname : $name\n")
+    append("\tfaultRecording : $faultRecording\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_ID), id)
-    if (name.isPresent) {
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_ID), id)
+      if (name.isPresent) {
       val optname = name.get()
-      tlvWriter.put(ContextSpecificTag(TAG_NAME), optname)
+      put(ContextSpecificTag(TAG_NAME), optname)
     }
-    if (faultRecording.isPresent) {
+      if (faultRecording.isPresent) {
       val optfaultRecording = faultRecording.get()
-      tlvWriter.put(ContextSpecificTag(TAG_FAULT_RECORDING), optfaultRecording)
+      put(ContextSpecificTag(TAG_FAULT_RECORDING), optfaultRecording)
     }
-    tlvWriter.endStructure()
+      endStructure()
+    }
   }
 
   companion object {
@@ -61,15 +61,15 @@ class SoftwareDiagnosticsClusterSoftwareFaultEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : SoftwareDiagnosticsClusterSoftwareFaultEvent {
       tlvReader.enterStructure(tag)
-      val id: Long = tlvReader.getLong(ContextSpecificTag(TAG_ID))
-      val name: Optional<String> = try {
+      val id = tlvReader.getLong(ContextSpecificTag(TAG_ID))
+      val name = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
       Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
-      val faultRecording: Optional<ByteArray> = try {
+      val faultRecording = if (tlvReader.isNextTag(ContextSpecificTag(TAG_FAULT_RECORDING))) {
       Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_FAULT_RECORDING)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
       

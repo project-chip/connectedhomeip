@@ -30,22 +30,22 @@ class ActionsClusterStateChangedEvent (
     val actionID: Int,
     val invokeID: Long,
     val newState: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ActionsClusterStateChangedEvent {\n")
-    builder.append("\tactionID : $actionID\n")
-    builder.append("\tinvokeID : $invokeID\n")
-    builder.append("\tnewState : $newState\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ActionsClusterStateChangedEvent {\n")
+    append("\tactionID : $actionID\n")
+    append("\tinvokeID : $invokeID\n")
+    append("\tnewState : $newState\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_ACTION_I_D), actionID)
-    tlvWriter.put(ContextSpecificTag(TAG_INVOKE_I_D), invokeID)
-    tlvWriter.put(ContextSpecificTag(TAG_NEW_STATE), newState)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_ACTION_I_D), actionID)
+      put(ContextSpecificTag(TAG_INVOKE_I_D), invokeID)
+      put(ContextSpecificTag(TAG_NEW_STATE), newState)
+      endStructure()
+    }
   }
 
   companion object {
@@ -55,9 +55,9 @@ class ActionsClusterStateChangedEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ActionsClusterStateChangedEvent {
       tlvReader.enterStructure(tag)
-      val actionID: Int = tlvReader.getInt(ContextSpecificTag(TAG_ACTION_I_D))
-      val invokeID: Long = tlvReader.getLong(ContextSpecificTag(TAG_INVOKE_I_D))
-      val newState: Int = tlvReader.getInt(ContextSpecificTag(TAG_NEW_STATE))
+      val actionID = tlvReader.getInt(ContextSpecificTag(TAG_ACTION_I_D))
+      val invokeID = tlvReader.getLong(ContextSpecificTag(TAG_INVOKE_I_D))
+      val newState = tlvReader.getInt(ContextSpecificTag(TAG_NEW_STATE))
       
       tlvReader.exitContainer()
 

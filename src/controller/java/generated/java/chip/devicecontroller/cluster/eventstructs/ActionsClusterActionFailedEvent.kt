@@ -31,24 +31,24 @@ class ActionsClusterActionFailedEvent (
     val invokeID: Long,
     val newState: Int,
     val error: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ActionsClusterActionFailedEvent {\n")
-    builder.append("\tactionID : $actionID\n")
-    builder.append("\tinvokeID : $invokeID\n")
-    builder.append("\tnewState : $newState\n")
-    builder.append("\terror : $error\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ActionsClusterActionFailedEvent {\n")
+    append("\tactionID : $actionID\n")
+    append("\tinvokeID : $invokeID\n")
+    append("\tnewState : $newState\n")
+    append("\terror : $error\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_ACTION_I_D), actionID)
-    tlvWriter.put(ContextSpecificTag(TAG_INVOKE_I_D), invokeID)
-    tlvWriter.put(ContextSpecificTag(TAG_NEW_STATE), newState)
-    tlvWriter.put(ContextSpecificTag(TAG_ERROR), error)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_ACTION_I_D), actionID)
+      put(ContextSpecificTag(TAG_INVOKE_I_D), invokeID)
+      put(ContextSpecificTag(TAG_NEW_STATE), newState)
+      put(ContextSpecificTag(TAG_ERROR), error)
+      endStructure()
+    }
   }
 
   companion object {
@@ -59,10 +59,10 @@ class ActionsClusterActionFailedEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ActionsClusterActionFailedEvent {
       tlvReader.enterStructure(tag)
-      val actionID: Int = tlvReader.getInt(ContextSpecificTag(TAG_ACTION_I_D))
-      val invokeID: Long = tlvReader.getLong(ContextSpecificTag(TAG_INVOKE_I_D))
-      val newState: Int = tlvReader.getInt(ContextSpecificTag(TAG_NEW_STATE))
-      val error: Int = tlvReader.getInt(ContextSpecificTag(TAG_ERROR))
+      val actionID = tlvReader.getInt(ContextSpecificTag(TAG_ACTION_I_D))
+      val invokeID = tlvReader.getLong(ContextSpecificTag(TAG_INVOKE_I_D))
+      val newState = tlvReader.getInt(ContextSpecificTag(TAG_NEW_STATE))
+      val error = tlvReader.getInt(ContextSpecificTag(TAG_ERROR))
       
       tlvReader.exitContainer()
 

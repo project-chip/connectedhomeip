@@ -29,20 +29,20 @@ import java.util.Optional
 class NetworkCommissioningClusterNetworkInfoStruct (
     val networkID: ByteArray,
     val connected: Boolean) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("NetworkCommissioningClusterNetworkInfoStruct {\n")
-    builder.append("\tnetworkID : $networkID\n")
-    builder.append("\tconnected : $connected\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("NetworkCommissioningClusterNetworkInfoStruct {\n")
+    append("\tnetworkID : $networkID\n")
+    append("\tconnected : $connected\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_I_D), networkID)
-    tlvWriter.put(ContextSpecificTag(TAG_CONNECTED), connected)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_NETWORK_I_D), networkID)
+      put(ContextSpecificTag(TAG_CONNECTED), connected)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class NetworkCommissioningClusterNetworkInfoStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : NetworkCommissioningClusterNetworkInfoStruct {
       tlvReader.enterStructure(tag)
-      val networkID: ByteArray = tlvReader.getByteArray(ContextSpecificTag(TAG_NETWORK_I_D))
-      val connected: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_CONNECTED))
+      val networkID = tlvReader.getByteArray(ContextSpecificTag(TAG_NETWORK_I_D))
+      val connected = tlvReader.getBoolean(ContextSpecificTag(TAG_CONNECTED))
       
       tlvReader.exitContainer()
 

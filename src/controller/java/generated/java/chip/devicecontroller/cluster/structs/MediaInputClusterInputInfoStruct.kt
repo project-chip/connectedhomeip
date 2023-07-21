@@ -31,24 +31,24 @@ class MediaInputClusterInputInfoStruct (
     val inputType: Int,
     val name: String,
     val description: String) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("MediaInputClusterInputInfoStruct {\n")
-    builder.append("\tindex : $index\n")
-    builder.append("\tinputType : $inputType\n")
-    builder.append("\tname : $name\n")
-    builder.append("\tdescription : $description\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("MediaInputClusterInputInfoStruct {\n")
+    append("\tindex : $index\n")
+    append("\tinputType : $inputType\n")
+    append("\tname : $name\n")
+    append("\tdescription : $description\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_INDEX), index)
-    tlvWriter.put(ContextSpecificTag(TAG_INPUT_TYPE), inputType)
-    tlvWriter.put(ContextSpecificTag(TAG_NAME), name)
-    tlvWriter.put(ContextSpecificTag(TAG_DESCRIPTION), description)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_INDEX), index)
+      put(ContextSpecificTag(TAG_INPUT_TYPE), inputType)
+      put(ContextSpecificTag(TAG_NAME), name)
+      put(ContextSpecificTag(TAG_DESCRIPTION), description)
+      endStructure()
+    }
   }
 
   companion object {
@@ -59,10 +59,10 @@ class MediaInputClusterInputInfoStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : MediaInputClusterInputInfoStruct {
       tlvReader.enterStructure(tag)
-      val index: Int = tlvReader.getInt(ContextSpecificTag(TAG_INDEX))
-      val inputType: Int = tlvReader.getInt(ContextSpecificTag(TAG_INPUT_TYPE))
-      val name: String = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-      val description: String = tlvReader.getString(ContextSpecificTag(TAG_DESCRIPTION))
+      val index = tlvReader.getInt(ContextSpecificTag(TAG_INDEX))
+      val inputType = tlvReader.getInt(ContextSpecificTag(TAG_INPUT_TYPE))
+      val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
+      val description = tlvReader.getString(ContextSpecificTag(TAG_DESCRIPTION))
       
       tlvReader.exitContainer()
 

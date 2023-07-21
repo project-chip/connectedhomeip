@@ -33,40 +33,36 @@ class UnitTestingClusterTestEventEvent (
     val arg4: chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct,
     val arg5: List<chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct>,
     val arg6: List<Int>) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("UnitTestingClusterTestEventEvent {\n")
-    builder.append("\targ1 : $arg1\n")
-    builder.append("\targ2 : $arg2\n")
-    builder.append("\targ3 : $arg3\n")
-    builder.append("\targ4 : $arg4\n")
-    builder.append("\targ5 : $arg5\n")
-    builder.append("\targ6 : $arg6\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("UnitTestingClusterTestEventEvent {\n")
+    append("\targ1 : $arg1\n")
+    append("\targ2 : $arg2\n")
+    append("\targ3 : $arg3\n")
+    append("\targ4 : $arg4\n")
+    append("\targ5 : $arg5\n")
+    append("\targ6 : $arg6\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_ARG1), arg1)
-    tlvWriter.put(ContextSpecificTag(TAG_ARG2), arg2)
-    tlvWriter.put(ContextSpecificTag(TAG_ARG3), arg3)
-    arg4.toTlv(ContextSpecificTag(TAG_ARG4), tlvWriter)
-    tlvWriter.startList(ContextSpecificTag(TAG_ARG5))
-      val iterarg5 = arg5.iterator()
-      while(iterarg5.hasNext()) {
-        val next = iterarg5.next()
-        next.toTlv(AnonymousTag, tlvWriter)
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_ARG1), arg1)
+      put(ContextSpecificTag(TAG_ARG2), arg2)
+      put(ContextSpecificTag(TAG_ARG3), arg3)
+      arg4.toTlv(ContextSpecificTag(TAG_ARG4), this)
+      startList(ContextSpecificTag(TAG_ARG5))
+      for (item in arg5.iterator()) {
+        item.toTlv(AnonymousTag, this)
       }
-      tlvWriter.endList()
-    tlvWriter.startList(ContextSpecificTag(TAG_ARG6))
-      val iterarg6 = arg6.iterator()
-      while(iterarg6.hasNext()) {
-        val next = iterarg6.next()
-        tlvWriter.put(AnonymousTag, next)
+      endList()
+      startList(ContextSpecificTag(TAG_ARG6))
+      for (item in arg6.iterator()) {
+        put(AnonymousTag, item)
       }
-      tlvWriter.endList()
-    tlvWriter.endStructure()
+      endList()
+      endStructure()
+    }
   }
 
   companion object {
@@ -79,29 +75,21 @@ class UnitTestingClusterTestEventEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : UnitTestingClusterTestEventEvent {
       tlvReader.enterStructure(tag)
-      val arg1: Int = tlvReader.getInt(ContextSpecificTag(TAG_ARG1))
-      val arg2: Int = tlvReader.getInt(ContextSpecificTag(TAG_ARG2))
-      val arg3: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_ARG3))
-      val arg4: chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct = chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_ARG4), tlvReader)
-      val arg5: List<chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct> = mutableListOf<chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct>().apply {
+      val arg1 = tlvReader.getInt(ContextSpecificTag(TAG_ARG1))
+      val arg2 = tlvReader.getInt(ContextSpecificTag(TAG_ARG2))
+      val arg3 = tlvReader.getBoolean(ContextSpecificTag(TAG_ARG3))
+      val arg4 = chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_ARG4), tlvReader)
+      val arg5 = buildList <chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct> {
       tlvReader.enterList(ContextSpecificTag(TAG_ARG5))
-      while(true) {
-        try {
-          this.add(chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader))
-        } catch (e: TlvParsingException) {
-          break
-        }
+      while(!tlvReader.isEndOfContainer()) {
+        this.add(chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader))
       }
       tlvReader.exitContainer()
     }
-      val arg6: List<Int> = mutableListOf<Int>().apply {
+      val arg6 = buildList <Int> {
       tlvReader.enterList(ContextSpecificTag(TAG_ARG6))
-      while(true) {
-        try {
-          this.add(tlvReader.getInt(AnonymousTag))
-        } catch (e: TlvParsingException) {
-          break
-        }
+      while(!tlvReader.isEndOfContainer()) {
+        this.add(tlvReader.getInt(AnonymousTag))
       }
       tlvReader.exitContainer()
     }

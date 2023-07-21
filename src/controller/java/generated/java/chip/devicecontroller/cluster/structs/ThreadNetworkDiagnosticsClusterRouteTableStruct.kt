@@ -37,36 +37,36 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct (
     val age: Int,
     val allocated: Boolean,
     val linkEstablished: Boolean) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ThreadNetworkDiagnosticsClusterRouteTableStruct {\n")
-    builder.append("\textAddress : $extAddress\n")
-    builder.append("\trloc16 : $rloc16\n")
-    builder.append("\trouterId : $routerId\n")
-    builder.append("\tnextHop : $nextHop\n")
-    builder.append("\tpathCost : $pathCost\n")
-    builder.append("\tLQIIn : $LQIIn\n")
-    builder.append("\tLQIOut : $LQIOut\n")
-    builder.append("\tage : $age\n")
-    builder.append("\tallocated : $allocated\n")
-    builder.append("\tlinkEstablished : $linkEstablished\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ThreadNetworkDiagnosticsClusterRouteTableStruct {\n")
+    append("\textAddress : $extAddress\n")
+    append("\trloc16 : $rloc16\n")
+    append("\trouterId : $routerId\n")
+    append("\tnextHop : $nextHop\n")
+    append("\tpathCost : $pathCost\n")
+    append("\tLQIIn : $LQIIn\n")
+    append("\tLQIOut : $LQIOut\n")
+    append("\tage : $age\n")
+    append("\tallocated : $allocated\n")
+    append("\tlinkEstablished : $linkEstablished\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_EXT_ADDRESS), extAddress)
-    tlvWriter.put(ContextSpecificTag(TAG_RLOC16), rloc16)
-    tlvWriter.put(ContextSpecificTag(TAG_ROUTER_ID), routerId)
-    tlvWriter.put(ContextSpecificTag(TAG_NEXT_HOP), nextHop)
-    tlvWriter.put(ContextSpecificTag(TAG_PATH_COST), pathCost)
-    tlvWriter.put(ContextSpecificTag(TAG_L_Q_I_IN), LQIIn)
-    tlvWriter.put(ContextSpecificTag(TAG_L_Q_I_OUT), LQIOut)
-    tlvWriter.put(ContextSpecificTag(TAG_AGE), age)
-    tlvWriter.put(ContextSpecificTag(TAG_ALLOCATED), allocated)
-    tlvWriter.put(ContextSpecificTag(TAG_LINK_ESTABLISHED), linkEstablished)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_EXT_ADDRESS), extAddress)
+      put(ContextSpecificTag(TAG_RLOC16), rloc16)
+      put(ContextSpecificTag(TAG_ROUTER_ID), routerId)
+      put(ContextSpecificTag(TAG_NEXT_HOP), nextHop)
+      put(ContextSpecificTag(TAG_PATH_COST), pathCost)
+      put(ContextSpecificTag(TAG_L_Q_I_IN), LQIIn)
+      put(ContextSpecificTag(TAG_L_Q_I_OUT), LQIOut)
+      put(ContextSpecificTag(TAG_AGE), age)
+      put(ContextSpecificTag(TAG_ALLOCATED), allocated)
+      put(ContextSpecificTag(TAG_LINK_ESTABLISHED), linkEstablished)
+      endStructure()
+    }
   }
 
   companion object {
@@ -83,16 +83,16 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ThreadNetworkDiagnosticsClusterRouteTableStruct {
       tlvReader.enterStructure(tag)
-      val extAddress: Long = tlvReader.getLong(ContextSpecificTag(TAG_EXT_ADDRESS))
-      val rloc16: Int = tlvReader.getInt(ContextSpecificTag(TAG_RLOC16))
-      val routerId: Int = tlvReader.getInt(ContextSpecificTag(TAG_ROUTER_ID))
-      val nextHop: Int = tlvReader.getInt(ContextSpecificTag(TAG_NEXT_HOP))
-      val pathCost: Int = tlvReader.getInt(ContextSpecificTag(TAG_PATH_COST))
-      val LQIIn: Int = tlvReader.getInt(ContextSpecificTag(TAG_L_Q_I_IN))
-      val LQIOut: Int = tlvReader.getInt(ContextSpecificTag(TAG_L_Q_I_OUT))
-      val age: Int = tlvReader.getInt(ContextSpecificTag(TAG_AGE))
-      val allocated: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_ALLOCATED))
-      val linkEstablished: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_LINK_ESTABLISHED))
+      val extAddress = tlvReader.getLong(ContextSpecificTag(TAG_EXT_ADDRESS))
+      val rloc16 = tlvReader.getInt(ContextSpecificTag(TAG_RLOC16))
+      val routerId = tlvReader.getInt(ContextSpecificTag(TAG_ROUTER_ID))
+      val nextHop = tlvReader.getInt(ContextSpecificTag(TAG_NEXT_HOP))
+      val pathCost = tlvReader.getInt(ContextSpecificTag(TAG_PATH_COST))
+      val LQIIn = tlvReader.getInt(ContextSpecificTag(TAG_L_Q_I_IN))
+      val LQIOut = tlvReader.getInt(ContextSpecificTag(TAG_L_Q_I_OUT))
+      val age = tlvReader.getInt(ContextSpecificTag(TAG_AGE))
+      val allocated = tlvReader.getBoolean(ContextSpecificTag(TAG_ALLOCATED))
+      val linkEstablished = tlvReader.getBoolean(ContextSpecificTag(TAG_LINK_ESTABLISHED))
       
       tlvReader.exitContainer()
 

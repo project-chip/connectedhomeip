@@ -29,20 +29,20 @@ import java.util.Optional
 class ModeSelectClusterSemanticTagStruct (
     val mfgCode: Int,
     val value: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ModeSelectClusterSemanticTagStruct {\n")
-    builder.append("\tmfgCode : $mfgCode\n")
-    builder.append("\tvalue : $value\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ModeSelectClusterSemanticTagStruct {\n")
+    append("\tmfgCode : $mfgCode\n")
+    append("\tvalue : $value\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_MFG_CODE), mfgCode)
-    tlvWriter.put(ContextSpecificTag(TAG_VALUE), value)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_MFG_CODE), mfgCode)
+      put(ContextSpecificTag(TAG_VALUE), value)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class ModeSelectClusterSemanticTagStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ModeSelectClusterSemanticTagStruct {
       tlvReader.enterStructure(tag)
-      val mfgCode: Int = tlvReader.getInt(ContextSpecificTag(TAG_MFG_CODE))
-      val value: Int = tlvReader.getInt(ContextSpecificTag(TAG_VALUE))
+      val mfgCode = tlvReader.getInt(ContextSpecificTag(TAG_MFG_CODE))
+      val value = tlvReader.getInt(ContextSpecificTag(TAG_VALUE))
       
       tlvReader.exitContainer()
 

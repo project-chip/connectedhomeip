@@ -30,28 +30,28 @@ class OperationalStateClusterErrorStateStruct (
     val errorStateID: Int,
     val errorStateLabel: Optional<String>,
     val errorStateDetails: Optional<String>) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("OperationalStateClusterErrorStateStruct {\n")
-    builder.append("\terrorStateID : $errorStateID\n")
-    builder.append("\terrorStateLabel : $errorStateLabel\n")
-    builder.append("\terrorStateDetails : $errorStateDetails\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("OperationalStateClusterErrorStateStruct {\n")
+    append("\terrorStateID : $errorStateID\n")
+    append("\terrorStateLabel : $errorStateLabel\n")
+    append("\terrorStateDetails : $errorStateDetails\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_ERROR_STATE_I_D), errorStateID)
-    if (errorStateLabel.isPresent) {
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_ERROR_STATE_I_D), errorStateID)
+      if (errorStateLabel.isPresent) {
       val opterrorStateLabel = errorStateLabel.get()
-      tlvWriter.put(ContextSpecificTag(TAG_ERROR_STATE_LABEL), opterrorStateLabel)
+      put(ContextSpecificTag(TAG_ERROR_STATE_LABEL), opterrorStateLabel)
     }
-    if (errorStateDetails.isPresent) {
+      if (errorStateDetails.isPresent) {
       val opterrorStateDetails = errorStateDetails.get()
-      tlvWriter.put(ContextSpecificTag(TAG_ERROR_STATE_DETAILS), opterrorStateDetails)
+      put(ContextSpecificTag(TAG_ERROR_STATE_DETAILS), opterrorStateDetails)
     }
-    tlvWriter.endStructure()
+      endStructure()
+    }
   }
 
   companion object {
@@ -61,15 +61,15 @@ class OperationalStateClusterErrorStateStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : OperationalStateClusterErrorStateStruct {
       tlvReader.enterStructure(tag)
-      val errorStateID: Int = tlvReader.getInt(ContextSpecificTag(TAG_ERROR_STATE_I_D))
-      val errorStateLabel: Optional<String> = try {
+      val errorStateID = tlvReader.getInt(ContextSpecificTag(TAG_ERROR_STATE_I_D))
+      val errorStateLabel = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_STATE_LABEL))) {
       Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ERROR_STATE_LABEL)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
-      val errorStateDetails: Optional<String> = try {
+      val errorStateDetails = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_STATE_DETAILS))) {
       Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ERROR_STATE_DETAILS)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
       

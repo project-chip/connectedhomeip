@@ -35,32 +35,32 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct (
     val extendedAddress: ByteArray,
     val rssi: Int,
     val lqi: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("NetworkCommissioningClusterThreadInterfaceScanResultStruct {\n")
-    builder.append("\tpanId : $panId\n")
-    builder.append("\textendedPanId : $extendedPanId\n")
-    builder.append("\tnetworkName : $networkName\n")
-    builder.append("\tchannel : $channel\n")
-    builder.append("\tversion : $version\n")
-    builder.append("\textendedAddress : $extendedAddress\n")
-    builder.append("\trssi : $rssi\n")
-    builder.append("\tlqi : $lqi\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("NetworkCommissioningClusterThreadInterfaceScanResultStruct {\n")
+    append("\tpanId : $panId\n")
+    append("\textendedPanId : $extendedPanId\n")
+    append("\tnetworkName : $networkName\n")
+    append("\tchannel : $channel\n")
+    append("\tversion : $version\n")
+    append("\textendedAddress : $extendedAddress\n")
+    append("\trssi : $rssi\n")
+    append("\tlqi : $lqi\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_PAN_ID), panId)
-    tlvWriter.put(ContextSpecificTag(TAG_EXTENDED_PAN_ID), extendedPanId)
-    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_NAME), networkName)
-    tlvWriter.put(ContextSpecificTag(TAG_CHANNEL), channel)
-    tlvWriter.put(ContextSpecificTag(TAG_VERSION), version)
-    tlvWriter.put(ContextSpecificTag(TAG_EXTENDED_ADDRESS), extendedAddress)
-    tlvWriter.put(ContextSpecificTag(TAG_RSSI), rssi)
-    tlvWriter.put(ContextSpecificTag(TAG_LQI), lqi)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_PAN_ID), panId)
+      put(ContextSpecificTag(TAG_EXTENDED_PAN_ID), extendedPanId)
+      put(ContextSpecificTag(TAG_NETWORK_NAME), networkName)
+      put(ContextSpecificTag(TAG_CHANNEL), channel)
+      put(ContextSpecificTag(TAG_VERSION), version)
+      put(ContextSpecificTag(TAG_EXTENDED_ADDRESS), extendedAddress)
+      put(ContextSpecificTag(TAG_RSSI), rssi)
+      put(ContextSpecificTag(TAG_LQI), lqi)
+      endStructure()
+    }
   }
 
   companion object {
@@ -75,14 +75,14 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : NetworkCommissioningClusterThreadInterfaceScanResultStruct {
       tlvReader.enterStructure(tag)
-      val panId: Int = tlvReader.getInt(ContextSpecificTag(TAG_PAN_ID))
-      val extendedPanId: Long = tlvReader.getLong(ContextSpecificTag(TAG_EXTENDED_PAN_ID))
-      val networkName: String = tlvReader.getString(ContextSpecificTag(TAG_NETWORK_NAME))
-      val channel: Int = tlvReader.getInt(ContextSpecificTag(TAG_CHANNEL))
-      val version: Int = tlvReader.getInt(ContextSpecificTag(TAG_VERSION))
-      val extendedAddress: ByteArray = tlvReader.getByteArray(ContextSpecificTag(TAG_EXTENDED_ADDRESS))
-      val rssi: Int = tlvReader.getInt(ContextSpecificTag(TAG_RSSI))
-      val lqi: Int = tlvReader.getInt(ContextSpecificTag(TAG_LQI))
+      val panId = tlvReader.getInt(ContextSpecificTag(TAG_PAN_ID))
+      val extendedPanId = tlvReader.getLong(ContextSpecificTag(TAG_EXTENDED_PAN_ID))
+      val networkName = tlvReader.getString(ContextSpecificTag(TAG_NETWORK_NAME))
+      val channel = tlvReader.getInt(ContextSpecificTag(TAG_CHANNEL))
+      val version = tlvReader.getInt(ContextSpecificTag(TAG_VERSION))
+      val extendedAddress = tlvReader.getByteArray(ContextSpecificTag(TAG_EXTENDED_ADDRESS))
+      val rssi = tlvReader.getInt(ContextSpecificTag(TAG_RSSI))
+      val lqi = tlvReader.getInt(ContextSpecificTag(TAG_LQI))
       
       tlvReader.exitContainer()
 

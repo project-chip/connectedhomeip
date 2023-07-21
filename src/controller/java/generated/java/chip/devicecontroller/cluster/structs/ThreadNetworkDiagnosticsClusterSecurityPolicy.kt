@@ -29,20 +29,20 @@ import java.util.Optional
 class ThreadNetworkDiagnosticsClusterSecurityPolicy (
     val rotationTime: Int,
     val flags: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ThreadNetworkDiagnosticsClusterSecurityPolicy {\n")
-    builder.append("\trotationTime : $rotationTime\n")
-    builder.append("\tflags : $flags\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ThreadNetworkDiagnosticsClusterSecurityPolicy {\n")
+    append("\trotationTime : $rotationTime\n")
+    append("\tflags : $flags\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_ROTATION_TIME), rotationTime)
-    tlvWriter.put(ContextSpecificTag(TAG_FLAGS), flags)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_ROTATION_TIME), rotationTime)
+      put(ContextSpecificTag(TAG_FLAGS), flags)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class ThreadNetworkDiagnosticsClusterSecurityPolicy (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ThreadNetworkDiagnosticsClusterSecurityPolicy {
       tlvReader.enterStructure(tag)
-      val rotationTime: Int = tlvReader.getInt(ContextSpecificTag(TAG_ROTATION_TIME))
-      val flags: Int = tlvReader.getInt(ContextSpecificTag(TAG_FLAGS))
+      val rotationTime = tlvReader.getInt(ContextSpecificTag(TAG_ROTATION_TIME))
+      val flags = tlvReader.getInt(ContextSpecificTag(TAG_FLAGS))
       
       tlvReader.exitContainer()
 

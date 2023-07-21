@@ -33,28 +33,28 @@ class OperationalCredentialsClusterFabricDescriptorStruct (
     val nodeID: Long,
     val label: String,
     val fabricIndex: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("OperationalCredentialsClusterFabricDescriptorStruct {\n")
-    builder.append("\trootPublicKey : $rootPublicKey\n")
-    builder.append("\tvendorID : $vendorID\n")
-    builder.append("\tfabricID : $fabricID\n")
-    builder.append("\tnodeID : $nodeID\n")
-    builder.append("\tlabel : $label\n")
-    builder.append("\tfabricIndex : $fabricIndex\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("OperationalCredentialsClusterFabricDescriptorStruct {\n")
+    append("\trootPublicKey : $rootPublicKey\n")
+    append("\tvendorID : $vendorID\n")
+    append("\tfabricID : $fabricID\n")
+    append("\tnodeID : $nodeID\n")
+    append("\tlabel : $label\n")
+    append("\tfabricIndex : $fabricIndex\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_ROOT_PUBLIC_KEY), rootPublicKey)
-    tlvWriter.put(ContextSpecificTag(TAG_VENDOR_I_D), vendorID)
-    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_I_D), fabricID)
-    tlvWriter.put(ContextSpecificTag(TAG_NODE_I_D), nodeID)
-    tlvWriter.put(ContextSpecificTag(TAG_LABEL), label)
-    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_ROOT_PUBLIC_KEY), rootPublicKey)
+      put(ContextSpecificTag(TAG_VENDOR_I_D), vendorID)
+      put(ContextSpecificTag(TAG_FABRIC_I_D), fabricID)
+      put(ContextSpecificTag(TAG_NODE_I_D), nodeID)
+      put(ContextSpecificTag(TAG_LABEL), label)
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
+      endStructure()
+    }
   }
 
   companion object {
@@ -67,12 +67,12 @@ class OperationalCredentialsClusterFabricDescriptorStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : OperationalCredentialsClusterFabricDescriptorStruct {
       tlvReader.enterStructure(tag)
-      val rootPublicKey: ByteArray = tlvReader.getByteArray(ContextSpecificTag(TAG_ROOT_PUBLIC_KEY))
-      val vendorID: Int = tlvReader.getInt(ContextSpecificTag(TAG_VENDOR_I_D))
-      val fabricID: Long = tlvReader.getLong(ContextSpecificTag(TAG_FABRIC_I_D))
-      val nodeID: Long = tlvReader.getLong(ContextSpecificTag(TAG_NODE_I_D))
-      val label: String = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val rootPublicKey = tlvReader.getByteArray(ContextSpecificTag(TAG_ROOT_PUBLIC_KEY))
+      val vendorID = tlvReader.getInt(ContextSpecificTag(TAG_VENDOR_I_D))
+      val fabricID = tlvReader.getLong(ContextSpecificTag(TAG_FABRIC_I_D))
+      val nodeID = tlvReader.getLong(ContextSpecificTag(TAG_NODE_I_D))
+      val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
+      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
       tlvReader.exitContainer()
 

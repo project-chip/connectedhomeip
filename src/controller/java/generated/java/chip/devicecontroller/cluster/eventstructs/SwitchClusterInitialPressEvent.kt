@@ -28,18 +28,18 @@ import java.util.Optional
 
 class SwitchClusterInitialPressEvent (
     val newPosition: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("SwitchClusterInitialPressEvent {\n")
-    builder.append("\tnewPosition : $newPosition\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("SwitchClusterInitialPressEvent {\n")
+    append("\tnewPosition : $newPosition\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_NEW_POSITION), newPosition)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_NEW_POSITION), newPosition)
+      endStructure()
+    }
   }
 
   companion object {
@@ -47,7 +47,7 @@ class SwitchClusterInitialPressEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : SwitchClusterInitialPressEvent {
       tlvReader.enterStructure(tag)
-      val newPosition: Int = tlvReader.getInt(ContextSpecificTag(TAG_NEW_POSITION))
+      val newPosition = tlvReader.getInt(ContextSpecificTag(TAG_NEW_POSITION))
       
       tlvReader.exitContainer()
 

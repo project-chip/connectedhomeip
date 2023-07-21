@@ -29,23 +29,24 @@ import java.util.Optional
 class MediaPlaybackClusterPlaybackPositionStruct (
     val updatedAt: Long,
     val position: Long?) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("MediaPlaybackClusterPlaybackPositionStruct {\n")
-    builder.append("\tupdatedAt : $updatedAt\n")
-    builder.append("\tposition : $position\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("MediaPlaybackClusterPlaybackPositionStruct {\n")
+    append("\tupdatedAt : $updatedAt\n")
+    append("\tposition : $position\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_UPDATED_AT), updatedAt)
-    if (position == null) { tlvWriter.putNull(ContextSpecificTag(TAG_POSITION)) }
-    else {
-      tlvWriter.put(ContextSpecificTag(TAG_POSITION), position)
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_UPDATED_AT), updatedAt)
+      if (position != null) {
+      put(ContextSpecificTag(TAG_POSITION), position)
+    } else {
+      putNull(ContextSpecificTag(TAG_POSITION))
     }
-    tlvWriter.endStructure()
+      endStructure()
+    }
   }
 
   companion object {
@@ -54,10 +55,10 @@ class MediaPlaybackClusterPlaybackPositionStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : MediaPlaybackClusterPlaybackPositionStruct {
       tlvReader.enterStructure(tag)
-      val updatedAt: Long = tlvReader.getLong(ContextSpecificTag(TAG_UPDATED_AT))
-      val position: Long? = try {
+      val updatedAt = tlvReader.getLong(ContextSpecificTag(TAG_UPDATED_AT))
+      val position = if (tlvReader.isNull()) {
       tlvReader.getLong(ContextSpecificTag(TAG_POSITION))
-    } catch (e: TlvParsingException) {
+    } else {
       tlvReader.getNull(ContextSpecificTag(TAG_POSITION))
       null
     }

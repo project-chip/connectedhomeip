@@ -30,28 +30,26 @@ class ModeSelectClusterModeOptionStruct (
     val label: String,
     val mode: Int,
     val semanticTags: List<ModeSelectClusterSemanticTagStruct>) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ModeSelectClusterModeOptionStruct {\n")
-    builder.append("\tlabel : $label\n")
-    builder.append("\tmode : $mode\n")
-    builder.append("\tsemanticTags : $semanticTags\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ModeSelectClusterModeOptionStruct {\n")
+    append("\tlabel : $label\n")
+    append("\tmode : $mode\n")
+    append("\tsemanticTags : $semanticTags\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_LABEL), label)
-    tlvWriter.put(ContextSpecificTag(TAG_MODE), mode)
-    tlvWriter.startList(ContextSpecificTag(TAG_SEMANTIC_TAGS))
-      val itersemanticTags = semanticTags.iterator()
-      while(itersemanticTags.hasNext()) {
-        val next = itersemanticTags.next()
-        next.toTlv(AnonymousTag, tlvWriter)
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_LABEL), label)
+      put(ContextSpecificTag(TAG_MODE), mode)
+      startList(ContextSpecificTag(TAG_SEMANTIC_TAGS))
+      for (item in semanticTags.iterator()) {
+        item.toTlv(AnonymousTag, this)
       }
-      tlvWriter.endList()
-    tlvWriter.endStructure()
+      endList()
+      endStructure()
+    }
   }
 
   companion object {
@@ -61,16 +59,12 @@ class ModeSelectClusterModeOptionStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ModeSelectClusterModeOptionStruct {
       tlvReader.enterStructure(tag)
-      val label: String = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
-      val mode: Int = tlvReader.getInt(ContextSpecificTag(TAG_MODE))
-      val semanticTags: List<ModeSelectClusterSemanticTagStruct> = mutableListOf<ModeSelectClusterSemanticTagStruct>().apply {
+      val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
+      val mode = tlvReader.getInt(ContextSpecificTag(TAG_MODE))
+      val semanticTags = buildList<ModeSelectClusterSemanticTagStruct> {
       tlvReader.enterList(ContextSpecificTag(TAG_SEMANTIC_TAGS))
-      while(true) {
-        try {
-          this.add(ModeSelectClusterSemanticTagStruct.fromTlv(AnonymousTag, tlvReader))
-        } catch (e: TlvParsingException) {
-          break
-        }
+      while(!tlvReader.isEndOfContainer()) {
+        add(ModeSelectClusterSemanticTagStruct.fromTlv(AnonymousTag, tlvReader))
       }
       tlvReader.exitContainer()
     }

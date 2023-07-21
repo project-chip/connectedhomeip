@@ -30,22 +30,22 @@ class AudioOutputClusterOutputInfoStruct (
     val index: Int,
     val outputType: Int,
     val name: String) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("AudioOutputClusterOutputInfoStruct {\n")
-    builder.append("\tindex : $index\n")
-    builder.append("\toutputType : $outputType\n")
-    builder.append("\tname : $name\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("AudioOutputClusterOutputInfoStruct {\n")
+    append("\tindex : $index\n")
+    append("\toutputType : $outputType\n")
+    append("\tname : $name\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_INDEX), index)
-    tlvWriter.put(ContextSpecificTag(TAG_OUTPUT_TYPE), outputType)
-    tlvWriter.put(ContextSpecificTag(TAG_NAME), name)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_INDEX), index)
+      put(ContextSpecificTag(TAG_OUTPUT_TYPE), outputType)
+      put(ContextSpecificTag(TAG_NAME), name)
+      endStructure()
+    }
   }
 
   companion object {
@@ -55,9 +55,9 @@ class AudioOutputClusterOutputInfoStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : AudioOutputClusterOutputInfoStruct {
       tlvReader.enterStructure(tag)
-      val index: Int = tlvReader.getInt(ContextSpecificTag(TAG_INDEX))
-      val outputType: Int = tlvReader.getInt(ContextSpecificTag(TAG_OUTPUT_TYPE))
-      val name: String = tlvReader.getString(ContextSpecificTag(TAG_NAME))
+      val index = tlvReader.getInt(ContextSpecificTag(TAG_INDEX))
+      val outputType = tlvReader.getInt(ContextSpecificTag(TAG_OUTPUT_TYPE))
+      val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       
       tlvReader.exitContainer()
 

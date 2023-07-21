@@ -30,25 +30,26 @@ class TimeSynchronizationClusterDSTOffsetStruct (
     val offset: Long,
     val validStarting: Long,
     val validUntil: Long?) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("TimeSynchronizationClusterDSTOffsetStruct {\n")
-    builder.append("\toffset : $offset\n")
-    builder.append("\tvalidStarting : $validStarting\n")
-    builder.append("\tvalidUntil : $validUntil\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("TimeSynchronizationClusterDSTOffsetStruct {\n")
+    append("\toffset : $offset\n")
+    append("\tvalidStarting : $validStarting\n")
+    append("\tvalidUntil : $validUntil\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_OFFSET), offset)
-    tlvWriter.put(ContextSpecificTag(TAG_VALID_STARTING), validStarting)
-    if (validUntil == null) { tlvWriter.putNull(ContextSpecificTag(TAG_VALID_UNTIL)) }
-    else {
-      tlvWriter.put(ContextSpecificTag(TAG_VALID_UNTIL), validUntil)
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_OFFSET), offset)
+      put(ContextSpecificTag(TAG_VALID_STARTING), validStarting)
+      if (validUntil != null) {
+      put(ContextSpecificTag(TAG_VALID_UNTIL), validUntil)
+    } else {
+      putNull(ContextSpecificTag(TAG_VALID_UNTIL))
     }
-    tlvWriter.endStructure()
+      endStructure()
+    }
   }
 
   companion object {
@@ -58,11 +59,11 @@ class TimeSynchronizationClusterDSTOffsetStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : TimeSynchronizationClusterDSTOffsetStruct {
       tlvReader.enterStructure(tag)
-      val offset: Long = tlvReader.getLong(ContextSpecificTag(TAG_OFFSET))
-      val validStarting: Long = tlvReader.getLong(ContextSpecificTag(TAG_VALID_STARTING))
-      val validUntil: Long? = try {
+      val offset = tlvReader.getLong(ContextSpecificTag(TAG_OFFSET))
+      val validStarting = tlvReader.getLong(ContextSpecificTag(TAG_VALID_STARTING))
+      val validUntil = if (tlvReader.isNull()) {
       tlvReader.getLong(ContextSpecificTag(TAG_VALID_UNTIL))
-    } catch (e: TlvParsingException) {
+    } else {
       tlvReader.getNull(ContextSpecificTag(TAG_VALID_UNTIL))
       null
     }

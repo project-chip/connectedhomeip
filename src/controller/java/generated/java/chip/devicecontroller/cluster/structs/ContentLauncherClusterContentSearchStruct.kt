@@ -28,24 +28,22 @@ import java.util.Optional
 
 class ContentLauncherClusterContentSearchStruct (
     val parameterList: List<ContentLauncherClusterParameterStruct>) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ContentLauncherClusterContentSearchStruct {\n")
-    builder.append("\tparameterList : $parameterList\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ContentLauncherClusterContentSearchStruct {\n")
+    append("\tparameterList : $parameterList\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.startList(ContextSpecificTag(TAG_PARAMETER_LIST))
-      val iterparameterList = parameterList.iterator()
-      while(iterparameterList.hasNext()) {
-        val next = iterparameterList.next()
-        next.toTlv(AnonymousTag, tlvWriter)
+    tlvWriter.apply {
+      startStructure(tag)
+      startList(ContextSpecificTag(TAG_PARAMETER_LIST))
+      for (item in parameterList.iterator()) {
+        item.toTlv(AnonymousTag, this)
       }
-      tlvWriter.endList()
-    tlvWriter.endStructure()
+      endList()
+      endStructure()
+    }
   }
 
   companion object {
@@ -53,14 +51,10 @@ class ContentLauncherClusterContentSearchStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ContentLauncherClusterContentSearchStruct {
       tlvReader.enterStructure(tag)
-      val parameterList: List<ContentLauncherClusterParameterStruct> = mutableListOf<ContentLauncherClusterParameterStruct>().apply {
+      val parameterList = buildList<ContentLauncherClusterParameterStruct> {
       tlvReader.enterList(ContextSpecificTag(TAG_PARAMETER_LIST))
-      while(true) {
-        try {
-          this.add(ContentLauncherClusterParameterStruct.fromTlv(AnonymousTag, tlvReader))
-        } catch (e: TlvParsingException) {
-          break
-        }
+      while(!tlvReader.isEndOfContainer()) {
+        add(ContentLauncherClusterParameterStruct.fromTlv(AnonymousTag, tlvReader))
       }
       tlvReader.exitContainer()
     }

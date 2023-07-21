@@ -29,26 +29,24 @@ import java.util.Optional
 class ScenesClusterExtensionFieldSet (
     val clusterID: Long,
     val attributeValueList: List<ScenesClusterAttributeValuePair>) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ScenesClusterExtensionFieldSet {\n")
-    builder.append("\tclusterID : $clusterID\n")
-    builder.append("\tattributeValueList : $attributeValueList\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ScenesClusterExtensionFieldSet {\n")
+    append("\tclusterID : $clusterID\n")
+    append("\tattributeValueList : $attributeValueList\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_CLUSTER_I_D), clusterID)
-    tlvWriter.startList(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
-      val iterattributeValueList = attributeValueList.iterator()
-      while(iterattributeValueList.hasNext()) {
-        val next = iterattributeValueList.next()
-        next.toTlv(AnonymousTag, tlvWriter)
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_CLUSTER_I_D), clusterID)
+      startList(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
+      for (item in attributeValueList.iterator()) {
+        item.toTlv(AnonymousTag, this)
       }
-      tlvWriter.endList()
-    tlvWriter.endStructure()
+      endList()
+      endStructure()
+    }
   }
 
   companion object {
@@ -57,15 +55,11 @@ class ScenesClusterExtensionFieldSet (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ScenesClusterExtensionFieldSet {
       tlvReader.enterStructure(tag)
-      val clusterID: Long = tlvReader.getLong(ContextSpecificTag(TAG_CLUSTER_I_D))
-      val attributeValueList: List<ScenesClusterAttributeValuePair> = mutableListOf<ScenesClusterAttributeValuePair>().apply {
+      val clusterID = tlvReader.getLong(ContextSpecificTag(TAG_CLUSTER_I_D))
+      val attributeValueList = buildList<ScenesClusterAttributeValuePair> {
       tlvReader.enterList(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
-      while(true) {
-        try {
-          this.add(ScenesClusterAttributeValuePair.fromTlv(AnonymousTag, tlvReader))
-        } catch (e: TlvParsingException) {
-          break
-        }
+      while(!tlvReader.isEndOfContainer()) {
+        add(ScenesClusterAttributeValuePair.fromTlv(AnonymousTag, tlvReader))
       }
       tlvReader.exitContainer()
     }

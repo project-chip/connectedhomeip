@@ -34,54 +34,46 @@ class UnitTestingClusterNestedStructList (
     val e: List<Long>,
     val f: List<ByteArray>,
     val g: List<Int>) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("UnitTestingClusterNestedStructList {\n")
-    builder.append("\ta : $a\n")
-    builder.append("\tb : $b\n")
-    builder.append("\tc : $c\n")
-    builder.append("\td : $d\n")
-    builder.append("\te : $e\n")
-    builder.append("\tf : $f\n")
-    builder.append("\tg : $g\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("UnitTestingClusterNestedStructList {\n")
+    append("\ta : $a\n")
+    append("\tb : $b\n")
+    append("\tc : $c\n")
+    append("\td : $d\n")
+    append("\te : $e\n")
+    append("\tf : $f\n")
+    append("\tg : $g\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_A), a)
-    tlvWriter.put(ContextSpecificTag(TAG_B), b)
-    c.toTlv(ContextSpecificTag(TAG_C), tlvWriter)
-    tlvWriter.startList(ContextSpecificTag(TAG_D))
-      val iterd = d.iterator()
-      while(iterd.hasNext()) {
-        val next = iterd.next()
-        next.toTlv(AnonymousTag, tlvWriter)
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_A), a)
+      put(ContextSpecificTag(TAG_B), b)
+      c.toTlv(ContextSpecificTag(TAG_C), this)
+      startList(ContextSpecificTag(TAG_D))
+      for (item in d.iterator()) {
+        item.toTlv(AnonymousTag, this)
       }
-      tlvWriter.endList()
-    tlvWriter.startList(ContextSpecificTag(TAG_E))
-      val itere = e.iterator()
-      while(itere.hasNext()) {
-        val next = itere.next()
-        tlvWriter.put(AnonymousTag, next)
+      endList()
+      startList(ContextSpecificTag(TAG_E))
+      for (item in e.iterator()) {
+        put(AnonymousTag, item)
       }
-      tlvWriter.endList()
-    tlvWriter.startList(ContextSpecificTag(TAG_F))
-      val iterf = f.iterator()
-      while(iterf.hasNext()) {
-        val next = iterf.next()
-        tlvWriter.put(AnonymousTag, next)
+      endList()
+      startList(ContextSpecificTag(TAG_F))
+      for (item in f.iterator()) {
+        put(AnonymousTag, item)
       }
-      tlvWriter.endList()
-    tlvWriter.startList(ContextSpecificTag(TAG_G))
-      val iterg = g.iterator()
-      while(iterg.hasNext()) {
-        val next = iterg.next()
-        tlvWriter.put(AnonymousTag, next)
+      endList()
+      startList(ContextSpecificTag(TAG_G))
+      for (item in g.iterator()) {
+        put(AnonymousTag, item)
       }
-      tlvWriter.endList()
-    tlvWriter.endStructure()
+      endList()
+      endStructure()
+    }
   }
 
   companion object {
@@ -95,50 +87,34 @@ class UnitTestingClusterNestedStructList (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : UnitTestingClusterNestedStructList {
       tlvReader.enterStructure(tag)
-      val a: Int = tlvReader.getInt(ContextSpecificTag(TAG_A))
-      val b: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
-      val c: UnitTestingClusterSimpleStruct = UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_C), tlvReader)
-      val d: List<UnitTestingClusterSimpleStruct> = mutableListOf<UnitTestingClusterSimpleStruct>().apply {
+      val a = tlvReader.getInt(ContextSpecificTag(TAG_A))
+      val b = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
+      val c = UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_C), tlvReader)
+      val d = buildList<UnitTestingClusterSimpleStruct> {
       tlvReader.enterList(ContextSpecificTag(TAG_D))
-      while(true) {
-        try {
-          this.add(UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader))
-        } catch (e: TlvParsingException) {
-          break
-        }
+      while(!tlvReader.isEndOfContainer()) {
+        add(UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader))
       }
       tlvReader.exitContainer()
     }
-      val e: List<Long> = mutableListOf<Long>().apply {
+      val e = buildList<Long> {
       tlvReader.enterList(ContextSpecificTag(TAG_E))
-      while(true) {
-        try {
-          this.add(tlvReader.getLong(AnonymousTag))
-        } catch (e: TlvParsingException) {
-          break
-        }
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getLong(AnonymousTag))
       }
       tlvReader.exitContainer()
     }
-      val f: List<ByteArray> = mutableListOf<ByteArray>().apply {
+      val f = buildList<ByteArray> {
       tlvReader.enterList(ContextSpecificTag(TAG_F))
-      while(true) {
-        try {
-          this.add(tlvReader.getByteArray(AnonymousTag))
-        } catch (e: TlvParsingException) {
-          break
-        }
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getByteArray(AnonymousTag))
       }
       tlvReader.exitContainer()
     }
-      val g: List<Int> = mutableListOf<Int>().apply {
+      val g = buildList<Int> {
       tlvReader.enterList(ContextSpecificTag(TAG_G))
-      while(true) {
-        try {
-          this.add(tlvReader.getInt(AnonymousTag))
-        } catch (e: TlvParsingException) {
-          break
-        }
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getInt(AnonymousTag))
       }
       tlvReader.exitContainer()
     }

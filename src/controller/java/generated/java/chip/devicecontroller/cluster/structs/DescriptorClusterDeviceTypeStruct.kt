@@ -29,20 +29,20 @@ import java.util.Optional
 class DescriptorClusterDeviceTypeStruct (
     val deviceType: Long,
     val revision: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("DescriptorClusterDeviceTypeStruct {\n")
-    builder.append("\tdeviceType : $deviceType\n")
-    builder.append("\trevision : $revision\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("DescriptorClusterDeviceTypeStruct {\n")
+    append("\tdeviceType : $deviceType\n")
+    append("\trevision : $revision\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_DEVICE_TYPE), deviceType)
-    tlvWriter.put(ContextSpecificTag(TAG_REVISION), revision)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_DEVICE_TYPE), deviceType)
+      put(ContextSpecificTag(TAG_REVISION), revision)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class DescriptorClusterDeviceTypeStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : DescriptorClusterDeviceTypeStruct {
       tlvReader.enterStructure(tag)
-      val deviceType: Long = tlvReader.getLong(ContextSpecificTag(TAG_DEVICE_TYPE))
-      val revision: Int = tlvReader.getInt(ContextSpecificTag(TAG_REVISION))
+      val deviceType = tlvReader.getLong(ContextSpecificTag(TAG_DEVICE_TYPE))
+      val revision = tlvReader.getInt(ContextSpecificTag(TAG_REVISION))
       
       tlvReader.exitContainer()
 

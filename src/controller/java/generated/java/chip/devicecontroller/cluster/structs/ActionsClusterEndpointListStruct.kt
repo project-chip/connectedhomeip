@@ -31,30 +31,28 @@ class ActionsClusterEndpointListStruct (
     val name: String,
     val type: Int,
     val endpoints: List<Int>) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ActionsClusterEndpointListStruct {\n")
-    builder.append("\tendpointListID : $endpointListID\n")
-    builder.append("\tname : $name\n")
-    builder.append("\ttype : $type\n")
-    builder.append("\tendpoints : $endpoints\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ActionsClusterEndpointListStruct {\n")
+    append("\tendpointListID : $endpointListID\n")
+    append("\tname : $name\n")
+    append("\ttype : $type\n")
+    append("\tendpoints : $endpoints\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D), endpointListID)
-    tlvWriter.put(ContextSpecificTag(TAG_NAME), name)
-    tlvWriter.put(ContextSpecificTag(TAG_TYPE), type)
-    tlvWriter.startList(ContextSpecificTag(TAG_ENDPOINTS))
-      val iterendpoints = endpoints.iterator()
-      while(iterendpoints.hasNext()) {
-        val next = iterendpoints.next()
-        tlvWriter.put(AnonymousTag, next)
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D), endpointListID)
+      put(ContextSpecificTag(TAG_NAME), name)
+      put(ContextSpecificTag(TAG_TYPE), type)
+      startList(ContextSpecificTag(TAG_ENDPOINTS))
+      for (item in endpoints.iterator()) {
+        put(AnonymousTag, item)
       }
-      tlvWriter.endList()
-    tlvWriter.endStructure()
+      endList()
+      endStructure()
+    }
   }
 
   companion object {
@@ -65,17 +63,13 @@ class ActionsClusterEndpointListStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ActionsClusterEndpointListStruct {
       tlvReader.enterStructure(tag)
-      val endpointListID: Int = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D))
-      val name: String = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-      val type: Int = tlvReader.getInt(ContextSpecificTag(TAG_TYPE))
-      val endpoints: List<Int> = mutableListOf<Int>().apply {
+      val endpointListID = tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D))
+      val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
+      val type = tlvReader.getInt(ContextSpecificTag(TAG_TYPE))
+      val endpoints = buildList<Int> {
       tlvReader.enterList(ContextSpecificTag(TAG_ENDPOINTS))
-      while(true) {
-        try {
-          this.add(tlvReader.getInt(AnonymousTag))
-        } catch (e: TlvParsingException) {
-          break
-        }
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getInt(AnonymousTag))
       }
       tlvReader.exitContainer()
     }

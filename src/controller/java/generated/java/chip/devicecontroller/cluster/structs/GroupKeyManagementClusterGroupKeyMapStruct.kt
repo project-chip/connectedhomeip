@@ -30,22 +30,22 @@ class GroupKeyManagementClusterGroupKeyMapStruct (
     val groupId: Int,
     val groupKeySetID: Int,
     val fabricIndex: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("GroupKeyManagementClusterGroupKeyMapStruct {\n")
-    builder.append("\tgroupId : $groupId\n")
-    builder.append("\tgroupKeySetID : $groupKeySetID\n")
-    builder.append("\tfabricIndex : $fabricIndex\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("GroupKeyManagementClusterGroupKeyMapStruct {\n")
+    append("\tgroupId : $groupId\n")
+    append("\tgroupKeySetID : $groupKeySetID\n")
+    append("\tfabricIndex : $fabricIndex\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID), groupId)
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D), groupKeySetID)
-    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_GROUP_ID), groupId)
+      put(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D), groupKeySetID)
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
+      endStructure()
+    }
   }
 
   companion object {
@@ -55,9 +55,9 @@ class GroupKeyManagementClusterGroupKeyMapStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : GroupKeyManagementClusterGroupKeyMapStruct {
       tlvReader.enterStructure(tag)
-      val groupId: Int = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_ID))
-      val groupKeySetID: Int = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D))
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val groupId = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_ID))
+      val groupKeySetID = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D))
+      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
       tlvReader.exitContainer()
 

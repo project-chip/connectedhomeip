@@ -29,20 +29,20 @@ import java.util.Optional
 class SwitchClusterMultiPressCompleteEvent (
     val previousPosition: Int,
     val totalNumberOfPressesCounted: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("SwitchClusterMultiPressCompleteEvent {\n")
-    builder.append("\tpreviousPosition : $previousPosition\n")
-    builder.append("\ttotalNumberOfPressesCounted : $totalNumberOfPressesCounted\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("SwitchClusterMultiPressCompleteEvent {\n")
+    append("\tpreviousPosition : $previousPosition\n")
+    append("\ttotalNumberOfPressesCounted : $totalNumberOfPressesCounted\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_PREVIOUS_POSITION), previousPosition)
-    tlvWriter.put(ContextSpecificTag(TAG_TOTAL_NUMBER_OF_PRESSES_COUNTED), totalNumberOfPressesCounted)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_PREVIOUS_POSITION), previousPosition)
+      put(ContextSpecificTag(TAG_TOTAL_NUMBER_OF_PRESSES_COUNTED), totalNumberOfPressesCounted)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class SwitchClusterMultiPressCompleteEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : SwitchClusterMultiPressCompleteEvent {
       tlvReader.enterStructure(tag)
-      val previousPosition: Int = tlvReader.getInt(ContextSpecificTag(TAG_PREVIOUS_POSITION))
-      val totalNumberOfPressesCounted: Int = tlvReader.getInt(ContextSpecificTag(TAG_TOTAL_NUMBER_OF_PRESSES_COUNTED))
+      val previousPosition = tlvReader.getInt(ContextSpecificTag(TAG_PREVIOUS_POSITION))
+      val totalNumberOfPressesCounted = tlvReader.getInt(ContextSpecificTag(TAG_TOTAL_NUMBER_OF_PRESSES_COUNTED))
       
       tlvReader.exitContainer()
 

@@ -29,20 +29,20 @@ import java.util.Optional
 class TargetNavigatorClusterTargetInfoStruct (
     val identifier: Int,
     val name: String) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("TargetNavigatorClusterTargetInfoStruct {\n")
-    builder.append("\tidentifier : $identifier\n")
-    builder.append("\tname : $name\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("TargetNavigatorClusterTargetInfoStruct {\n")
+    append("\tidentifier : $identifier\n")
+    append("\tname : $name\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_IDENTIFIER), identifier)
-    tlvWriter.put(ContextSpecificTag(TAG_NAME), name)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_IDENTIFIER), identifier)
+      put(ContextSpecificTag(TAG_NAME), name)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class TargetNavigatorClusterTargetInfoStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : TargetNavigatorClusterTargetInfoStruct {
       tlvReader.enterStructure(tag)
-      val identifier: Int = tlvReader.getInt(ContextSpecificTag(TAG_IDENTIFIER))
-      val name: String = tlvReader.getString(ContextSpecificTag(TAG_NAME))
+      val identifier = tlvReader.getInt(ContextSpecificTag(TAG_IDENTIFIER))
+      val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       
       tlvReader.exitContainer()
 

@@ -28,18 +28,18 @@ import java.util.Optional
 
 class SmokeCoAlarmClusterCOAlarmEvent (
     val alarmSeverityLevel: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("SmokeCoAlarmClusterCOAlarmEvent {\n")
-    builder.append("\talarmSeverityLevel : $alarmSeverityLevel\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("SmokeCoAlarmClusterCOAlarmEvent {\n")
+    append("\talarmSeverityLevel : $alarmSeverityLevel\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_ALARM_SEVERITY_LEVEL), alarmSeverityLevel)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_ALARM_SEVERITY_LEVEL), alarmSeverityLevel)
+      endStructure()
+    }
   }
 
   companion object {
@@ -47,7 +47,7 @@ class SmokeCoAlarmClusterCOAlarmEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : SmokeCoAlarmClusterCOAlarmEvent {
       tlvReader.enterStructure(tag)
-      val alarmSeverityLevel: Int = tlvReader.getInt(ContextSpecificTag(TAG_ALARM_SEVERITY_LEVEL))
+      val alarmSeverityLevel = tlvReader.getInt(ContextSpecificTag(TAG_ALARM_SEVERITY_LEVEL))
       
       tlvReader.exitContainer()
 

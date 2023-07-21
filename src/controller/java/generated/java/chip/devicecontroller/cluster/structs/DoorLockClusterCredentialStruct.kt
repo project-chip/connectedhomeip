@@ -29,20 +29,20 @@ import java.util.Optional
 class DoorLockClusterCredentialStruct (
     val credentialType: Int,
     val credentialIndex: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("DoorLockClusterCredentialStruct {\n")
-    builder.append("\tcredentialType : $credentialType\n")
-    builder.append("\tcredentialIndex : $credentialIndex\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("DoorLockClusterCredentialStruct {\n")
+    append("\tcredentialType : $credentialType\n")
+    append("\tcredentialIndex : $credentialIndex\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_CREDENTIAL_TYPE), credentialType)
-    tlvWriter.put(ContextSpecificTag(TAG_CREDENTIAL_INDEX), credentialIndex)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_CREDENTIAL_TYPE), credentialType)
+      put(ContextSpecificTag(TAG_CREDENTIAL_INDEX), credentialIndex)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class DoorLockClusterCredentialStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : DoorLockClusterCredentialStruct {
       tlvReader.enterStructure(tag)
-      val credentialType: Int = tlvReader.getInt(ContextSpecificTag(TAG_CREDENTIAL_TYPE))
-      val credentialIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_CREDENTIAL_INDEX))
+      val credentialType = tlvReader.getInt(ContextSpecificTag(TAG_CREDENTIAL_TYPE))
+      val credentialIndex = tlvReader.getInt(ContextSpecificTag(TAG_CREDENTIAL_INDEX))
       
       tlvReader.exitContainer()
 

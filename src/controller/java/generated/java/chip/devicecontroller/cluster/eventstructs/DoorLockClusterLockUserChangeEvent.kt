@@ -34,42 +34,46 @@ class DoorLockClusterLockUserChangeEvent (
     val fabricIndex: Int?,
     val sourceNode: Long?,
     val dataIndex: Int?) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("DoorLockClusterLockUserChangeEvent {\n")
-    builder.append("\tlockDataType : $lockDataType\n")
-    builder.append("\tdataOperationType : $dataOperationType\n")
-    builder.append("\toperationSource : $operationSource\n")
-    builder.append("\tuserIndex : $userIndex\n")
-    builder.append("\tfabricIndex : $fabricIndex\n")
-    builder.append("\tsourceNode : $sourceNode\n")
-    builder.append("\tdataIndex : $dataIndex\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("DoorLockClusterLockUserChangeEvent {\n")
+    append("\tlockDataType : $lockDataType\n")
+    append("\tdataOperationType : $dataOperationType\n")
+    append("\toperationSource : $operationSource\n")
+    append("\tuserIndex : $userIndex\n")
+    append("\tfabricIndex : $fabricIndex\n")
+    append("\tsourceNode : $sourceNode\n")
+    append("\tdataIndex : $dataIndex\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_LOCK_DATA_TYPE), lockDataType)
-    tlvWriter.put(ContextSpecificTag(TAG_DATA_OPERATION_TYPE), dataOperationType)
-    tlvWriter.put(ContextSpecificTag(TAG_OPERATION_SOURCE), operationSource)
-    if (userIndex == null) { tlvWriter.putNull(ContextSpecificTag(TAG_USER_INDEX)) }
-    else {
-      tlvWriter.put(ContextSpecificTag(TAG_USER_INDEX), userIndex)
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_LOCK_DATA_TYPE), lockDataType)
+      put(ContextSpecificTag(TAG_DATA_OPERATION_TYPE), dataOperationType)
+      put(ContextSpecificTag(TAG_OPERATION_SOURCE), operationSource)
+      if (userIndex != null) {
+      put(ContextSpecificTag(TAG_USER_INDEX), userIndex)
+    } else {
+      putNull(ContextSpecificTag(TAG_USER_INDEX))
     }
-    if (fabricIndex == null) { tlvWriter.putNull(ContextSpecificTag(TAG_FABRIC_INDEX)) }
-    else {
-      tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
+      if (fabricIndex != null) {
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
+    } else {
+      putNull(ContextSpecificTag(TAG_FABRIC_INDEX))
     }
-    if (sourceNode == null) { tlvWriter.putNull(ContextSpecificTag(TAG_SOURCE_NODE)) }
-    else {
-      tlvWriter.put(ContextSpecificTag(TAG_SOURCE_NODE), sourceNode)
+      if (sourceNode != null) {
+      put(ContextSpecificTag(TAG_SOURCE_NODE), sourceNode)
+    } else {
+      putNull(ContextSpecificTag(TAG_SOURCE_NODE))
     }
-    if (dataIndex == null) { tlvWriter.putNull(ContextSpecificTag(TAG_DATA_INDEX)) }
-    else {
-      tlvWriter.put(ContextSpecificTag(TAG_DATA_INDEX), dataIndex)
+      if (dataIndex != null) {
+      put(ContextSpecificTag(TAG_DATA_INDEX), dataIndex)
+    } else {
+      putNull(ContextSpecificTag(TAG_DATA_INDEX))
     }
-    tlvWriter.endStructure()
+      endStructure()
+    }
   }
 
   companion object {
@@ -83,30 +87,30 @@ class DoorLockClusterLockUserChangeEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : DoorLockClusterLockUserChangeEvent {
       tlvReader.enterStructure(tag)
-      val lockDataType: Int = tlvReader.getInt(ContextSpecificTag(TAG_LOCK_DATA_TYPE))
-      val dataOperationType: Int = tlvReader.getInt(ContextSpecificTag(TAG_DATA_OPERATION_TYPE))
-      val operationSource: Int = tlvReader.getInt(ContextSpecificTag(TAG_OPERATION_SOURCE))
-      val userIndex: Int? = try {
+      val lockDataType = tlvReader.getInt(ContextSpecificTag(TAG_LOCK_DATA_TYPE))
+      val dataOperationType = tlvReader.getInt(ContextSpecificTag(TAG_DATA_OPERATION_TYPE))
+      val operationSource = tlvReader.getInt(ContextSpecificTag(TAG_OPERATION_SOURCE))
+      val userIndex = if (!tlvReader.isNull()) {
       tlvReader.getInt(ContextSpecificTag(TAG_USER_INDEX))
-    } catch (e: TlvParsingException) {
+    } else {
       tlvReader.getNull(ContextSpecificTag(TAG_USER_INDEX))
       null
     }
-      val fabricIndex: Int? = try {
+      val fabricIndex = if (!tlvReader.isNull()) {
       tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-    } catch (e: TlvParsingException) {
+    } else {
       tlvReader.getNull(ContextSpecificTag(TAG_FABRIC_INDEX))
       null
     }
-      val sourceNode: Long? = try {
+      val sourceNode = if (!tlvReader.isNull()) {
       tlvReader.getLong(ContextSpecificTag(TAG_SOURCE_NODE))
-    } catch (e: TlvParsingException) {
+    } else {
       tlvReader.getNull(ContextSpecificTag(TAG_SOURCE_NODE))
       null
     }
-      val dataIndex: Int? = try {
+      val dataIndex = if (!tlvReader.isNull()) {
       tlvReader.getInt(ContextSpecificTag(TAG_DATA_INDEX))
-    } catch (e: TlvParsingException) {
+    } else {
       tlvReader.getNull(ContextSpecificTag(TAG_DATA_INDEX))
       null
     }

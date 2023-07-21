@@ -30,25 +30,26 @@ class OperationalCredentialsClusterNOCStruct (
     val noc: ByteArray,
     val icac: ByteArray?,
     val fabricIndex: Int) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("OperationalCredentialsClusterNOCStruct {\n")
-    builder.append("\tnoc : $noc\n")
-    builder.append("\ticac : $icac\n")
-    builder.append("\tfabricIndex : $fabricIndex\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("OperationalCredentialsClusterNOCStruct {\n")
+    append("\tnoc : $noc\n")
+    append("\ticac : $icac\n")
+    append("\tfabricIndex : $fabricIndex\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_NOC), noc)
-    if (icac == null) { tlvWriter.putNull(ContextSpecificTag(TAG_ICAC)) }
-    else {
-      tlvWriter.put(ContextSpecificTag(TAG_ICAC), icac)
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_NOC), noc)
+      if (icac != null) {
+      put(ContextSpecificTag(TAG_ICAC), icac)
+    } else {
+      putNull(ContextSpecificTag(TAG_ICAC))
     }
-    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
-    tlvWriter.endStructure()
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
+      endStructure()
+    }
   }
 
   companion object {
@@ -58,14 +59,14 @@ class OperationalCredentialsClusterNOCStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : OperationalCredentialsClusterNOCStruct {
       tlvReader.enterStructure(tag)
-      val noc: ByteArray = tlvReader.getByteArray(ContextSpecificTag(TAG_NOC))
-      val icac: ByteArray? = try {
+      val noc = tlvReader.getByteArray(ContextSpecificTag(TAG_NOC))
+      val icac = if (tlvReader.isNull()) {
       tlvReader.getByteArray(ContextSpecificTag(TAG_ICAC))
-    } catch (e: TlvParsingException) {
+    } else {
       tlvReader.getNull(ContextSpecificTag(TAG_ICAC))
       null
     }
-      val fabricIndex: Int = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
       tlvReader.exitContainer()
 

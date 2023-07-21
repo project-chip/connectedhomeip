@@ -31,27 +31,28 @@ class OtaSoftwareUpdateRequestorClusterStateTransitionEvent (
     val newState: Int,
     val reason: Int,
     val targetSoftwareVersion: Long?) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("OtaSoftwareUpdateRequestorClusterStateTransitionEvent {\n")
-    builder.append("\tpreviousState : $previousState\n")
-    builder.append("\tnewState : $newState\n")
-    builder.append("\treason : $reason\n")
-    builder.append("\ttargetSoftwareVersion : $targetSoftwareVersion\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("OtaSoftwareUpdateRequestorClusterStateTransitionEvent {\n")
+    append("\tpreviousState : $previousState\n")
+    append("\tnewState : $newState\n")
+    append("\treason : $reason\n")
+    append("\ttargetSoftwareVersion : $targetSoftwareVersion\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_PREVIOUS_STATE), previousState)
-    tlvWriter.put(ContextSpecificTag(TAG_NEW_STATE), newState)
-    tlvWriter.put(ContextSpecificTag(TAG_REASON), reason)
-    if (targetSoftwareVersion == null) { tlvWriter.putNull(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION)) }
-    else {
-      tlvWriter.put(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION), targetSoftwareVersion)
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_PREVIOUS_STATE), previousState)
+      put(ContextSpecificTag(TAG_NEW_STATE), newState)
+      put(ContextSpecificTag(TAG_REASON), reason)
+      if (targetSoftwareVersion != null) {
+      put(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION), targetSoftwareVersion)
+    } else {
+      putNull(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
     }
-    tlvWriter.endStructure()
+      endStructure()
+    }
   }
 
   companion object {
@@ -62,12 +63,12 @@ class OtaSoftwareUpdateRequestorClusterStateTransitionEvent (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : OtaSoftwareUpdateRequestorClusterStateTransitionEvent {
       tlvReader.enterStructure(tag)
-      val previousState: Int = tlvReader.getInt(ContextSpecificTag(TAG_PREVIOUS_STATE))
-      val newState: Int = tlvReader.getInt(ContextSpecificTag(TAG_NEW_STATE))
-      val reason: Int = tlvReader.getInt(ContextSpecificTag(TAG_REASON))
-      val targetSoftwareVersion: Long? = try {
+      val previousState = tlvReader.getInt(ContextSpecificTag(TAG_PREVIOUS_STATE))
+      val newState = tlvReader.getInt(ContextSpecificTag(TAG_NEW_STATE))
+      val reason = tlvReader.getInt(ContextSpecificTag(TAG_REASON))
+      val targetSoftwareVersion = if (!tlvReader.isNull()) {
       tlvReader.getLong(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
-    } catch (e: TlvParsingException) {
+    } else {
       tlvReader.getNull(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
       null
     }

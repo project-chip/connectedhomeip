@@ -29,20 +29,20 @@ import java.util.Optional
 class UnitTestingClusterTestListStructOctet (
     val member1: Long,
     val member2: ByteArray) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("UnitTestingClusterTestListStructOctet {\n")
-    builder.append("\tmember1 : $member1\n")
-    builder.append("\tmember2 : $member2\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("UnitTestingClusterTestListStructOctet {\n")
+    append("\tmember1 : $member1\n")
+    append("\tmember2 : $member2\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_MEMBER1), member1)
-    tlvWriter.put(ContextSpecificTag(TAG_MEMBER2), member2)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_MEMBER1), member1)
+      put(ContextSpecificTag(TAG_MEMBER2), member2)
+      endStructure()
+    }
   }
 
   companion object {
@@ -51,8 +51,8 @@ class UnitTestingClusterTestListStructOctet (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : UnitTestingClusterTestListStructOctet {
       tlvReader.enterStructure(tag)
-      val member1: Long = tlvReader.getLong(ContextSpecificTag(TAG_MEMBER1))
-      val member2: ByteArray = tlvReader.getByteArray(ContextSpecificTag(TAG_MEMBER2))
+      val member1 = tlvReader.getLong(ContextSpecificTag(TAG_MEMBER1))
+      val member2 = tlvReader.getByteArray(ContextSpecificTag(TAG_MEMBER2))
       
       tlvReader.exitContainer()
 

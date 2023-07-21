@@ -30,31 +30,31 @@ class ContentLauncherClusterStyleInformationStruct (
     val imageURL: Optional<String>,
     val color: Optional<String>,
     val size: Optional<ContentLauncherClusterDimensionStruct>) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("ContentLauncherClusterStyleInformationStruct {\n")
-    builder.append("\timageURL : $imageURL\n")
-    builder.append("\tcolor : $color\n")
-    builder.append("\tsize : $size\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("ContentLauncherClusterStyleInformationStruct {\n")
+    append("\timageURL : $imageURL\n")
+    append("\tcolor : $color\n")
+    append("\tsize : $size\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    if (imageURL.isPresent) {
+    tlvWriter.apply {
+      startStructure(tag)
+      if (imageURL.isPresent) {
       val optimageURL = imageURL.get()
-      tlvWriter.put(ContextSpecificTag(TAG_IMAGE_U_R_L), optimageURL)
+      put(ContextSpecificTag(TAG_IMAGE_U_R_L), optimageURL)
     }
-    if (color.isPresent) {
+      if (color.isPresent) {
       val optcolor = color.get()
-      tlvWriter.put(ContextSpecificTag(TAG_COLOR), optcolor)
+      put(ContextSpecificTag(TAG_COLOR), optcolor)
     }
-    if (size.isPresent) {
+      if (size.isPresent) {
       val optsize = size.get()
-      optsize.toTlv(ContextSpecificTag(TAG_SIZE), tlvWriter)
+      optsize.toTlv(ContextSpecificTag(TAG_SIZE), this)
     }
-    tlvWriter.endStructure()
+      endStructure()
+    }
   }
 
   companion object {
@@ -64,19 +64,19 @@ class ContentLauncherClusterStyleInformationStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ContentLauncherClusterStyleInformationStruct {
       tlvReader.enterStructure(tag)
-      val imageURL: Optional<String> = try {
+      val imageURL = if (tlvReader.isNextTag(ContextSpecificTag(TAG_IMAGE_U_R_L))) {
       Optional.of(tlvReader.getString(ContextSpecificTag(TAG_IMAGE_U_R_L)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
-      val color: Optional<String> = try {
+      val color = if (tlvReader.isNextTag(ContextSpecificTag(TAG_COLOR))) {
       Optional.of(tlvReader.getString(ContextSpecificTag(TAG_COLOR)))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
-      val size: Optional<ContentLauncherClusterDimensionStruct> = try {
+      val size = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SIZE))) {
       Optional.of(ContentLauncherClusterDimensionStruct.fromTlv(ContextSpecificTag(TAG_SIZE), tlvReader))
-    } catch (e: TlvParsingException) {
+    } else {
       Optional.empty()
     }
       

@@ -35,32 +35,32 @@ class UnitTestingClusterSimpleStruct (
     val f: Int,
     val g: Float,
     val h: Double) {
-  override fun toString() : String {
-    val builder: StringBuilder = StringBuilder()
-    builder.append("UnitTestingClusterSimpleStruct {\n")
-    builder.append("\ta : $a\n")
-    builder.append("\tb : $b\n")
-    builder.append("\tc : $c\n")
-    builder.append("\td : $d\n")
-    builder.append("\te : $e\n")
-    builder.append("\tf : $f\n")
-    builder.append("\tg : $g\n")
-    builder.append("\th : $h\n")
-    builder.append("}\n")
-    return builder.toString()
+  override fun toString(): String  = buildString {
+    append("UnitTestingClusterSimpleStruct {\n")
+    append("\ta : $a\n")
+    append("\tb : $b\n")
+    append("\tc : $c\n")
+    append("\td : $d\n")
+    append("\te : $e\n")
+    append("\tf : $f\n")
+    append("\tg : $g\n")
+    append("\th : $h\n")
+    append("}\n")
   }
 
   fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
-    tlvWriter.startStructure(tag)
-    tlvWriter.put(ContextSpecificTag(TAG_A), a)
-    tlvWriter.put(ContextSpecificTag(TAG_B), b)
-    tlvWriter.put(ContextSpecificTag(TAG_C), c)
-    tlvWriter.put(ContextSpecificTag(TAG_D), d)
-    tlvWriter.put(ContextSpecificTag(TAG_E), e)
-    tlvWriter.put(ContextSpecificTag(TAG_F), f)
-    tlvWriter.put(ContextSpecificTag(TAG_G), g)
-    tlvWriter.put(ContextSpecificTag(TAG_H), h)
-    tlvWriter.endStructure()
+    tlvWriter.apply {
+      startStructure(tag)
+      put(ContextSpecificTag(TAG_A), a)
+      put(ContextSpecificTag(TAG_B), b)
+      put(ContextSpecificTag(TAG_C), c)
+      put(ContextSpecificTag(TAG_D), d)
+      put(ContextSpecificTag(TAG_E), e)
+      put(ContextSpecificTag(TAG_F), f)
+      put(ContextSpecificTag(TAG_G), g)
+      put(ContextSpecificTag(TAG_H), h)
+      endStructure()
+    }
   }
 
   companion object {
@@ -75,14 +75,14 @@ class UnitTestingClusterSimpleStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : UnitTestingClusterSimpleStruct {
       tlvReader.enterStructure(tag)
-      val a: Int = tlvReader.getInt(ContextSpecificTag(TAG_A))
-      val b: Boolean = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
-      val c: Int = tlvReader.getInt(ContextSpecificTag(TAG_C))
-      val d: ByteArray = tlvReader.getByteArray(ContextSpecificTag(TAG_D))
-      val e: String = tlvReader.getString(ContextSpecificTag(TAG_E))
-      val f: Int = tlvReader.getInt(ContextSpecificTag(TAG_F))
-      val g: Float = tlvReader.getFloat(ContextSpecificTag(TAG_G))
-      val h: Double = tlvReader.getDouble(ContextSpecificTag(TAG_H))
+      val a = tlvReader.getInt(ContextSpecificTag(TAG_A))
+      val b = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
+      val c = tlvReader.getInt(ContextSpecificTag(TAG_C))
+      val d = tlvReader.getByteArray(ContextSpecificTag(TAG_D))
+      val e = tlvReader.getString(ContextSpecificTag(TAG_E))
+      val f = tlvReader.getInt(ContextSpecificTag(TAG_F))
+      val g = tlvReader.getFloat(ContextSpecificTag(TAG_G))
+      val h = tlvReader.getDouble(ContextSpecificTag(TAG_H))
       
       tlvReader.exitContainer()
 
