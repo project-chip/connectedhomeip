@@ -739,7 +739,9 @@ tests:
           [1689681605.068297][52705:52705] CHIP:DMG:         InteractionModelRevision = 1
       disabled: true
 
-    - label: "Step 10: Verify that the public Key extracted NOCValue of the AddNOC matches the Node Operational Public Key extracted from CSRResponse"
+    - label:
+          "Step 10: Verify that the public Key extracted NOCValue of the AddNOC
+          matches the Node Operational Public Key extracted from CSRResponse"
       verifiaction: |
           Not verifiable (out of scope)
       disabled: true
