@@ -106,7 +106,9 @@ void * __wrap_realloc(void * ptr, size_t new_size)
     if (new_size)
     {
         /* MML will only realloc a new pointer if the size is greater than old pointer size.*/
+        vTaskSuspendAll();
         new_ptr = MEM_BufferRealloc(ptr, new_size);
+        xTaskResumeAll();
 
         if (!new_ptr)
         {
