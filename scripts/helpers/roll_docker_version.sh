@@ -56,7 +56,7 @@ echo "Rolling VSCode container"
 sed -r -i "s|matter-dev-environment:local --version [0-9,a-z,A-Z,-]*|matter-dev-environment:local --version $NEXT_VERSION|" .devcontainer/devcontainer.json
 
 echo "Rolling docker images"
-find . -iname readme.md -not -path "./third_party/*" | xargs sed -r -i "s|ARG VERSION=[0-9,a-z,A-Z,-]*|ARG VERSION=$NEXT_VERSION|"
+find . -iname Dockerfile -not -path "./third_party/*" | xargs sed -r -i "s|ARG VERSION=[0-9,a-z,A-Z,-]*|ARG VERSION=$NEXT_VERSION|"
 
 echo "Rolling main docker version"
 echo "$NEXT_VERSION : $ROLL_REASON" >./integrations/docker/images/base/chip-build/version
