@@ -53,7 +53,8 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 1a: DUT is put in Commissioning Mode using Open Basic
+    - label:
+          "Step 1a: DUT is put in Commissioning Mode using Open Basic
           Commissioning Window command "
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
@@ -194,7 +195,8 @@ tests:
               - name: "value"
                 value: vendorId
 
-    - label: "Step 2f: If (MCORE.SC.DEVTYPE_SUBTYPE) present, subtype _T<ddd> is
+    - label:
+          "Step 2f: If (MCORE.SC.DEVTYPE_SUBTYPE) present, subtype _T<ddd> is
           present, <ddd> represents device type from Data Model and must be
           represented as a variable length decimal number in ASCII without
           leading zeros"
@@ -206,7 +208,8 @@ tests:
               - name: "value"
                 value: deviceType
 
-    - label: "Step 2g: Check Commissioning Mode (_CM) subtype _CM must be present"
+    - label:
+          "Step 2g: Check Commissioning Mode (_CM) subtype _CM must be present"
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByCommissioningMode"
 
@@ -320,7 +323,8 @@ tests:
                 constraints:
                     maxLength: 32
 
-    - label: "Step 2q: If (MCORE.SC.RI_KEY ) present, key RI must include the
+    - label:
+          "Step 2q: If (MCORE.SC.RI_KEY ) present, key RI must include the
           Rotating Device Identifier encoded as a uppercase string with a
           maximum length of 100 chars"
       PICS: MCORE.SC.RI_KEY
@@ -332,7 +336,8 @@ tests:
                 constraints:
                     maxValue: 100
 
-    - label: "Step 2r: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
+    - label:
+          "Step 2r: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
           variable-length decimal number in ASCII text, omitting any leading
           zeros. If present value must be different of 0"
       PICS: MCORE.SC.PH_KEY
@@ -344,7 +349,8 @@ tests:
                 constraints:
                     notValue: 0
 
-    - label: "Step 2s: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
+    - label:
+          "Step 2s: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
           valid UTF-8 string with a maximum length of 128 bytes"
       PICS: MCORE.SC.PI_KEY
       cluster: "DiscoveryCommands"
@@ -355,7 +361,8 @@ tests:
                 constraints:
                     maxLength: 128
 
-    - label: "Step 2t: DUT must publish AAAA records for each IPv6 address upon
+    - label:
+          "Step 2t: DUT must publish AAAA records for each IPv6 address upon
           which they are willing to accept Matter messages."
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -473,7 +480,8 @@ tests:
                 value: "y"
 
     #validate the service type and the service domain not implemented in CI
-    - label: "Step 4c: Check Hostname. If (MCORE.COM.WIFI) OR (MCORE.COM.ETH)
+    - label:
+          "Step 4c: Check Hostname. If (MCORE.COM.WIFI) OR (MCORE.COM.ETH)
           target hostname is derived from the 48bit or 64bit MAC address
           expressed as a twelve or sixteen capital letter hex string"
       PICS: "(MCORE.COM.WIFI || MCORE.COM.ETH) && !MCORE.COM.THR"
@@ -488,7 +496,8 @@ tests:
                     isUpperCase: true
                     isHexString: true
 
-    - label: "Step 4c: Check Hostname. If (MCORE.COM.THR) target hostname is
+    - label:
+          "Step 4c: Check Hostname. If (MCORE.COM.THR) target hostname is
           derived from the 48bit or 64bit MAC address expressed as a twelve or
           sixteen capital letter hex string"
       PICS: "(!MCORE.COM.WIFI && !MCORE.COM.ETH) && MCORE.COM.THR"
@@ -531,7 +540,8 @@ tests:
               - name: "value"
                 value: vendorId
 
-    - label: "Step 4g: If (MCORE.SC.DEVTYPE_SUBTYPE) present, subtype _T<ddd> is
+    - label:
+          "Step 4g: If (MCORE.SC.DEVTYPE_SUBTYPE) present, subtype _T<ddd> is
           present, <ddd> represents device type from Data Model and must be
           represented as a variable length decimal number in ASCII without
           leading zeros"
@@ -626,7 +636,8 @@ tests:
                 constraints:
                     maxValue: 65535
 
-    - label: "Step 4o: TXT key for commissioning mode (CM) key CM=1 must be present"
+    - label:
+          "Step 4o: TXT key for commissioning mode (CM) key CM=1 must be present"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -658,7 +669,8 @@ tests:
                 constraints:
                     maxLength: 32
 
-    - label: "Step 4r: If (MCORE.SC.RI_KEY) present, key RI must include the
+    - label:
+          "Step 4r: If (MCORE.SC.RI_KEY) present, key RI must include the
           Rotating Device Identifier encoded as a uppercase string with a
           maximum length of 100 chars"
       PICS: MCORE.SC.RI_KEY
@@ -670,7 +682,8 @@ tests:
                 constraints:
                     maxValue: 100
 
-    - label: "Step 4s: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
+    - label:
+          "Step 4s: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
           variable-length decimal number in ASCII text, omitting any leading
           zeros. If present value must be different of 0"
       PICS: MCORE.SC.PH_KEY
@@ -682,7 +695,8 @@ tests:
                 constraints:
                     notValue: 0
 
-    - label: "Step 4t: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
+    - label:
+          "Step 4t: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
           valid UTF-8 string with a maximum length of 128 bytes"
       PICS: MCORE.SC.PI_KEY
       cluster: "DiscoveryCommands"
@@ -693,7 +707,8 @@ tests:
                 constraints:
                     maxLength: 128
 
-    - label: "Step 4u: DUT must publish AAAA records for each IPv6 address upon
+    - label:
+          "Step 4u: DUT must publish AAAA records for each IPv6 address upon
           which they are willing to accept Matter messages."
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -791,7 +806,8 @@ tests:
               - name: "ms"
                 value: waitAfterCommissioning
 
-    - label: "Step 7a: DNS-SD instance name must be 64-bit randomly selected ID
+    - label:
+          "Step 7a: DNS-SD instance name must be 64-bit randomly selected ID
           expressed as a sixteen-char hex string with capital letters"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -823,7 +839,8 @@ tests:
                     isUpperCase: true
                     isHexString: true
 
-    - label: "Step 7b: Check Hostname. If (MCORE.COM.THR) target hostname is
+    - label:
+          "Step 7b: Check Hostname. If (MCORE.COM.THR) target hostname is
           derived from the 48bit or 64bit MAC extended address expressed as a
           twelve or sixteen capital letter hex string."
       # On macOS the hostname is the device name and because of it this test is disabled for now.
@@ -867,7 +884,8 @@ tests:
               - name: "value"
                 value: vendorId
 
-    - label: "Step 7f: If (MCORE.SC.DEVTYPE_SUBTYPE) present, subtype _T<ddd> is
+    - label:
+          "Step 7f: If (MCORE.SC.DEVTYPE_SUBTYPE) present, subtype _T<ddd> is
           present, <ddd> represents device type from Data Model and must be
           represented as a variable length decimal number in ASCII without
           leading zeros"
@@ -906,7 +924,8 @@ tests:
               - name: "productId"
                 value: productId
 
-    - label: "Step 7j: Optional TXT key for MRP Retry Interval Idle. if
+    - label:
+          "Step 7j: Optional TXT key for MRP Retry Interval Idle. if
           (MCORE.SC.SII_OP_DISCOVERY_KEY) present, SII key must be an unsigned
           integer with units of milliseconds and shall be encoded as a variable
           length decimal number in ASCII, omitting leading zeros. Shall not
@@ -920,7 +939,8 @@ tests:
                 constraints:
                     maxValue: 3600000
 
-    - label: "Step 7k: Optional TXT key for MRP Retry Interval Active. if
+    - label:
+          "Step 7k: Optional TXT key for MRP Retry Interval Active. if
           (MCORE.SC.SAI_OP_DISCOVERY_KEY) present, SAI key must be an unsigned
           integer with units of milliseconds and shall be encoded as a variable
           length decimal number in ASCII, omitting leading zeros. Shall not
@@ -934,11 +954,12 @@ tests:
                 constraints:
                     maxValue: 3600000
 
-    - label: "Step 7l: Optional TXT key for MRP Retry Active Mode Threshold.
-          If (MCORE.SC.SAT_OP_DISCOVERY_KEY) present, SAT key must be
-          an unsigned integer with units of milliseconds and shall be encoded as
-          a variable length decimal number in ASCII, omitting leading zeros.
-          Shall not exceed 65535."
+    - label:
+          "Step 7l: Optional TXT key for MRP Retry Active Mode Threshold. If
+          (MCORE.SC.SAT_OP_DISCOVERY_KEY) present, SAT key must be an unsigned
+          integer with units of milliseconds and shall be encoded as a variable
+          length decimal number in ASCII, omitting leading zeros. Shall not
+          exceed 65535."
       PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -980,7 +1001,8 @@ tests:
                 constraints:
                     maxLength: 32
 
-    - label: "Step 7p: If (MCORE.SC.RI_KEY) present, key RI must include the
+    - label:
+          "Step 7p: If (MCORE.SC.RI_KEY) present, key RI must include the
           Rotating Device Identifier encoded as a uppercase string with a
           maximum length of 100 chars"
       PICS: MCORE.SC.RI_KEY
@@ -992,7 +1014,8 @@ tests:
                 constraints:
                     maxValue: 100
 
-    - label: "Step 7q: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
+    - label:
+          "Step 7q: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
           variable-length decimal number in ASCII text, omitting any leading
           zeros. If present value must be different of 0"
       PICS: MCORE.SC.PH_KEY
@@ -1004,7 +1027,8 @@ tests:
                 constraints:
                     notValue: 0
 
-    - label: "Step 7r: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
+    - label:
+          "Step 7r: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
           valid UTF-8 string with a maximum length of 128 bytes"
       PICS: MCORE.SC.PI_KEY
       cluster: "DiscoveryCommands"
@@ -1015,7 +1039,8 @@ tests:
                 constraints:
                     maxLength: 128
 
-    - label: "Step 7s: DUT must publish AAAA records for each IPv6 address upon
+    - label:
+          "Step 7s: DUT must publish AAAA records for each IPv6 address upon
           which they are willing to accept Matter messages"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -1092,11 +1117,13 @@ tests:
 
     #validate the service type and the service domain
 
-    - label: "Step 10c: Check Hostname. If (MCORE.COM.WIFI) OR (MCORE.COM.ETH)
+    - label:
+          "Step 10c: Check Hostname. If (MCORE.COM.WIFI) OR (MCORE.COM.ETH)
           target hostname is derived from the 48bit or 64bit MAC address
           expressed as a twelve or sixteen capital letter hex string"
       # On macOS the hostname is the device name and because of it this test is disabled for now.
-      PICS: "(MCORE.COM.WIFI || MCORE.COM.ETH) && !MCORE.COM.THR &&
+      PICS:
+          "(MCORE.COM.WIFI || MCORE.COM.ETH) && !MCORE.COM.THR &&
           MCORE.SC.EXTENDED_DISCOVERY"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -1109,11 +1136,13 @@ tests:
                     isUpperCase: true
                     isHexString: true
 
-    - label: "Step 10c: Check Hostname. If (MCORE.COM.THR) target hostname is
+    - label:
+          "Step 10c: Check Hostname. If (MCORE.COM.THR) target hostname is
           derived from the 48bit or 64bit MAC extended address expressed as a
           twelve or sixteen capital letter hex string."
       # On macOS the hostname is the device name and because of it this test is disabled for now.
-      PICS: "(!MCORE.COM.WIFI && !MCORE.COM.ETH) && MCORE.COM.THR &&
+      PICS:
+          "(!MCORE.COM.WIFI && !MCORE.COM.ETH) && MCORE.COM.THR &&
           MCORE.SC.EXTENDED_DISCOVERY"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -1255,7 +1284,8 @@ tests:
                 constraints:
                     maxValue: 65535
 
-    - label: "Step 10o: TXT key for commissioning mode (CM), CM=0 may be present"
+    - label:
+          "Step 10o: TXT key for commissioning mode (CM), CM=0 may be present"
       PICS: MCORE.SC.EXTENDED_DISCOVERY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -1264,7 +1294,8 @@ tests:
               - name: "commissioningMode"
                 value: 0
 
-    - label: "Step 10p: If (MCORE.SC.DT_KEY) present, DT key must contain the
+    - label:
+          "Step 10p: If (MCORE.SC.DT_KEY) present, DT key must contain the
           device type identifier from Data Model Device Types and must be
           encoded as a variable length decimal ASCII number without leading
           zeros"
@@ -1276,7 +1307,8 @@ tests:
               - name: "deviceType"
                 value: deviceType
 
-    - label: "Step 10q: If (MCORE.SC.DN_KEY) present, DN key must be a UTF-8
+    - label:
+          "Step 10q: If (MCORE.SC.DN_KEY) present, DN key must be a UTF-8
           encoded string with a maximum length of 32B"
       PICS: MCORE.SC.DN_KEY && MCORE.SC.EXTENDED_DISCOVERY
       cluster: "DiscoveryCommands"
@@ -1287,7 +1319,8 @@ tests:
                 constraints:
                     maxLength: 32
 
-    - label: "Step 10r: If (MCORE.SC.RI_KEY) present, key RI must include the
+    - label:
+          "Step 10r: If (MCORE.SC.RI_KEY) present, key RI must include the
           Rotating Device Identifier encoded as a uppercase string with a
           maximum length of 100 chars"
       PICS: MCORE.SC.RI_KEY && MCORE.SC.EXTENDED_DISCOVERY

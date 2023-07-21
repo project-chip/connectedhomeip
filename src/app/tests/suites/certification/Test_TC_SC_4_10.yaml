@@ -13,7 +13,9 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 15.4.10. [TC-SC-4.10] Operational Discovery - SIT ICD Node [{DUT_Commissionee}]
+name:
+    15.4.10. [TC-SC-4.10] Operational Discovery - SIT ICD Node
+    [{DUT_Commissionee}]
 
 PICS:
     - MCORE.ROLE.COMMISSIONEE
