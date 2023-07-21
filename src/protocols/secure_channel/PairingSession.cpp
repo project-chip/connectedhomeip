@@ -151,7 +151,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
         ReturnErrorOnFailure(tlvReader.Get(tlvElementValue));
         mRemoteMRPConfig.mActiveThresholdTime = System::Clock::Milliseconds16(tlvElementValue);
     }
-    // Future proofing - Don't error out out if there is other tags
+    // Future proofing - Don't error out if there are other tags
 
     return tlvReader.ExitContainer(containerType);
 }
