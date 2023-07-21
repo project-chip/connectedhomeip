@@ -32,12 +32,15 @@ struct PowerSourceClusterInfo
 {
     PowerSourceClusterInfo() : mClusterEndpoint(kInvalidEndpointId) {}
     explicit PowerSourceClusterInfo(EndpointId powerClusterEndpointId) : mClusterEndpoint(powerClusterEndpointId) {}
-    void Shutdown() { mBuf.Release(); }
+    void Shutdown() {
+      mEndpointList = Span<EndpointId>();
+      mBuf.Free();
+    }
     CHIP_ERROR SetEndpointList(Span<EndpointId> endpointList)
     {
+        Shutdown();
         if (endpointList.size() == 0)
         {
-            mBuf.Release();
             mEndpointList = Span<EndpointId>();
             return CHIP_NO_ERROR;
         }

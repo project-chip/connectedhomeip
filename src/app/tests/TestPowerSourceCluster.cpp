@@ -265,6 +265,7 @@ void TestPowerSourceCluster::TestEndpointList(nlTestSuite * apSuite, void * apCo
         std::vector<EndpointId> vec = ReadEndpointsThroughAttributeReader(apSuite, ep);
         NL_TEST_ASSERT(apSuite, vec.size() == 0);
     }
+    powerSourceServer.Shutdown();
 }
 
 } // namespace app
@@ -300,7 +301,6 @@ int TestPowerSourceClusterContext_Setup(void * inContext)
  */
 int TestPowerSourceClusterContext_Teardown(void * inContext)
 {
-    chip::app::Clusters::PowerSourceServer::Instance().Shutdown();
     chip::Platform::MemoryShutdown();
     return SUCCESS;
 }
