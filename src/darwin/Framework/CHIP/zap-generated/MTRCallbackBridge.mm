@@ -2132,6 +2132,65 @@ void MTRDescriptorPartsListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
+void MTRDescriptorTagListListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType> & value)
+{
+    NSArray * _Nonnull objCValue;
+    { // Scope for our temporary variables
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = value.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            MTRDescriptorClusterSemanticTagStruct * newElement_0;
+            newElement_0 = [MTRDescriptorClusterSemanticTagStruct new];
+            if (entry_0.mfgCode.IsNull()) {
+                newElement_0.mfgCode = nil;
+            } else {
+                newElement_0.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.mfgCode.Value())];
+            }
+            newElement_0.namespaceID = [NSNumber numberWithUnsignedChar:entry_0.namespaceID];
+            newElement_0.tag = [NSNumber numberWithUnsignedChar:entry_0.tag];
+            if (entry_0.label.HasValue()) {
+                if (entry_0.label.Value().IsNull()) {
+                    newElement_0.label = nil;
+                } else {
+                    newElement_0.label = AsString(entry_0.label.Value().Value());
+                    if (newElement_0.label == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        OnFailureFn(context, err);
+                        return;
+                    }
+                }
+            } else {
+                newElement_0.label = nil;
+            }
+            [array_0 addObject:newElement_0];
+        }
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, err);
+            return;
+        }
+        objCValue = array_0;
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDescriptorTagListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
 void MTRDescriptorGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
