@@ -40,7 +40,8 @@ static constexpr size_t kDishwasherAlarmDelegateTableSize =
 
 static_assert(kDishwasherAlarmDelegateTableSize <= kEmberInvalidEndpointIndex, "Dishwasher Alarm Delegate table size error");
 
-static BitMask<AlarmMap> SetStateByLatch(const BitMask<AlarmMap> latch, const BitMask<AlarmMap> currentState, const BitMask<AlarmMap> newState);
+static BitMask<AlarmMap> SetStateByLatch(const BitMask<AlarmMap> latch, const BitMask<AlarmMap> currentState,
+                                         const BitMask<AlarmMap> newState);
 
 namespace chip {
 namespace app {
@@ -130,7 +131,8 @@ EmberAfStatus DishwasherAlarmServer::GetSupportedValue(EndpointId endpoint, BitM
 
 EmberAfStatus DishwasherAlarmServer::SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    ;
     if ((status = Attributes::Supported::Set(endpoint, supported)) != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: writing supported, err:0x%x", status);
@@ -140,7 +142,7 @@ EmberAfStatus DishwasherAlarmServer::SetSupportedValue(EndpointId endpoint, cons
     BitMask<AlarmMap> latch;
     if (GetLatchValue(endpoint, &latch) == EMBER_ZCL_STATUS_SUCCESS && !supported.HasAll(latch))
     {
-        latch = latch & supported;
+        latch  = latch & supported;
         status = SetLatchValue(endpoint, latch);
     }
 
@@ -408,19 +410,20 @@ bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(app::CommandHandle
  * @param[in] newState The State attribute which want to set.
  * @return The State attribute which want to set.
  */
-static BitMask<AlarmMap> SetStateByLatch(const BitMask<AlarmMap> latch, const BitMask<AlarmMap> currentState, const BitMask<AlarmMap> newState)
+static BitMask<AlarmMap> SetStateByLatch(const BitMask<AlarmMap> latch, const BitMask<AlarmMap> currentState,
+                                         const BitMask<AlarmMap> newState)
 {
-    uint32_t rawLatch = latch.Raw();
+    uint32_t rawLatch             = latch.Raw();
     uint32_t rawCurrentStateLatch = currentState.Raw();
-    uint32_t rawNewState = newState.Raw();
-    uint32_t newStateBit = 0;
-    uint32_t finalState = 0;
+    uint32_t rawNewState          = newState.Raw();
+    uint32_t newStateBit          = 0;
+    uint32_t finalState           = 0;
     BitMask<AlarmMap> state;
     for (size_t i = 0; i < sizeof(rawLatch) * 8; ++i)
     {
         if (rawLatch & 0x1)
         {
-            newStateBit = (rawCurrentStateLatch & 0x01)|(rawNewState & 0x01);
+            newStateBit = (rawCurrentStateLatch & 0x01) | (rawNewState & 0x01);
         }
         else
         {
@@ -428,7 +431,7 @@ static BitMask<AlarmMap> SetStateByLatch(const BitMask<AlarmMap> latch, const Bi
         }
         finalState |= (newStateBit << i);
         rawLatch >>= 1;
-        rawCurrentStateLatch  >>= 1;
+        rawCurrentStateLatch >>= 1;
         rawNewState >>= 1;
     }
     return state.SetRaw(finalState);
