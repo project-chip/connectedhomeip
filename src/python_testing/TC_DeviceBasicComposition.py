@@ -168,7 +168,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         dev_ctrl = self.default_controller
         self.problems = []
 
-        do_test_over_pase = self.user_params.get("use_pase_only", False)
+        do_test_over_pase = self.user_params.get("use_pase_only", True)
         dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
 
         if do_test_over_pase:
