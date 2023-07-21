@@ -32,9 +32,15 @@ declare_args() {
   # When config_enable_yaml_tests is false, the Matter SDK options are not available.
   if (!config_enable_yaml_tests) {
     chip_inet_config_enable_ipv4 = true
-    chip_config_network_layer_ble = true
-    is_clang = false
+    if (!defined(chip_config_network_layer_ble)) {
+      chip_config_network_layer_ble = true
+    }
+    if (!defined(is_clang)) {
+      is_clang = false
+    }
   }
+
+  enable_provisional_features = config_enable_yaml_tests
 }
 
 sdk = "macosx"
@@ -101,9 +107,15 @@ action("build-darwin-framework") {
   }
 
   if (config_enable_yaml_tests) {
-    args += [ "--enable_encoding_sentinel_enum_values" ]
+    args += [ "--enable-encoding-sentinel-enum-values" ]
   } else {
-    args += [ "--no-enable_encoding_sentinel_enum_values" ]
+    args += [ "--no-enable-encoding-sentinel-enum-values" ]
+  }
+
+  if (enable_provisional_features) {
+    args += [ "--enable-provisional-framework-features" ]
+  } else {
+    args += [ "--no-enable-provisional-framework-features" ]
   }
 
   output_name = "Matter.framework"
@@ -229,6 +241,8 @@ executable("darwin-framework-tool") {
       # pics is needed by tests
       "${chip_root}/src/app/tests/suites/pics",
     ]
+
+    defines = []
   } else {
     include_dirs = [
       "${chip_root}/config/standalone/",
@@ -258,6 +272,10 @@ executable("darwin-framework-tool") {
     if (sdk == "macosx") {
       libs = [ "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/lib/libCHIP.a" ]
     }
+  }
+
+  if (enable_provisional_features) {
+    defines += [ "MTR_ENABLE_PROVISIONAL=1" ]
   }
 
   public_configs = [ ":config" ]

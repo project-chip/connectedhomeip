@@ -29,7 +29,7 @@ namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
 
-static constexpr std::array<ClusterId, 2> AliasedClusters = { 0x0071, 0x0072 };
+static constexpr std::array<ClusterId, 2> AliasedClusters = { HepaFilterMonitoring::Id, ActivatedCarbonFilterMonitoring::Id };
 
 // Enum for ChangeIndicationEnum
 enum class ChangeIndicationEnum : uint8_t
@@ -59,9 +59,19 @@ enum class DegradationDirectionEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kCondition = 0x1,
-    kWarning   = 0x2,
-    // TODO(#27577): add server support for REP feature (ReplacementProductList)
+    kCondition              = 0x1,
+    kWarning                = 0x2,
+    kReplacementProductList = 0x3
+};
+
+// Enum for ProductIdentifierTypeEnum
+enum class ProductIdentifierTypeEnum : uint8_t
+{
+    kUpc    = 0x00,
+    kGtin8  = 0x01,
+    kEan    = 0x02,
+    kGtin14 = 0x03,
+    kOem    = 0x04
 };
 
 namespace Attributes {
@@ -130,6 +140,43 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastChangedTime
+
+namespace ReplacementProductStruct {
+enum class Fields : uint8_t
+{
+    kProductIdentifierType  = 0,
+    kProductIdentifierValue = 1,
+};
+
+struct Type
+{
+public:
+    ProductIdentifierTypeEnum productIdentifierType = static_cast<ProductIdentifierTypeEnum>(0);
+    chip::CharSpan productIdentifierValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ReplacementProductStruct
+
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000005;
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const ReplacementProductStruct::Type>;
+    using DecodableType    = chip::app::DataModel::DecodableList<ReplacementProductStruct::Type>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<ReplacementProductStruct::Type> &;
+
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReplacementProductList
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
