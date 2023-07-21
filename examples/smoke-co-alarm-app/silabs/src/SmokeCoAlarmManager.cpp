@@ -319,15 +319,15 @@ void SmokeCoAlarmManager::TriggerEventHandler(AppEvent * aEvent)
         break;
 
     case kTriggeredEvent_SensitivityLevelHigh:
-        SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, SensitivityEnum::kHigh);
+        SmokeCoAlarmServer::Instance().SetSmokeSensitivityLevel(1, SensitivityEnum::kHigh);
         break;
 
     case kTriggeredEvent_SensitivityLevelLow:
-        SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, SensitivityEnum::kLow);
+        SmokeCoAlarmServer::Instance().SetSmokeSensitivityLevel(1, SensitivityEnum::kLow);
         break;
 
     case kTriggeredEvent_SensitivityLevelClear:
-        SmokeCoAlarmServer::Instance().SetSensitivityLevel(1, SensitivityEnum::kStandard);
+        SmokeCoAlarmServer::Instance().SetSmokeSensitivityLevel(1, SensitivityEnum::kStandard);
         break;
     }
 
