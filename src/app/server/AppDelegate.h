@@ -28,6 +28,9 @@ class AppDelegate
 {
 public:
     virtual ~AppDelegate() {}
+    /**
+     * This is called on start of session establishment process 
+     */
     virtual void OnCommissioningSessionEstablishmentStarted() {}
     virtual void OnCommissioningSessionStarted() {}
     virtual void OnCommissioningSessionStopped(CHIP_ERROR err) {}
