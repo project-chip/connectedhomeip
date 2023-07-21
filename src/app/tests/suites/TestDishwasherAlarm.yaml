@@ -188,4 +188,3 @@ tests:
       attribute: "State"
       response:
           value: 1
-
