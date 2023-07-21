@@ -37,7 +37,7 @@ def _GetTracingLibraryHandle() -> ctypes.CDLL:
         setter.Set('pychip_tracing_start_json_log', None, [])
         setter.Set('pychip_tracing_start_json_file', PyChipError, [ctypes.c_char_p])
 
-        setter.Set('pychip_tracing_start_perfetto_system', PyChipError, [])
+        setter.Set('pychip_tracing_start_perfetto_system', None, [])
         setter.Set('pychip_tracing_start_perfetto_file', PyChipError, [ctypes.c_char_p])
 
         setter.Set('pychip_tracing_stop', None, [])
@@ -66,7 +66,7 @@ def StartTracingTo(trace_type: TraceType, file_name: Optional[str] = None):
             handle.pychip_tracing_start_json_file(file_name.encode('utf-8')).raise_on_error()
     elif trace_type == TraceType.PERFETTO:
         if file_name is None:
-            handle.pychip_tracing_start_perfetto_system().raise_on_error()
+            handle.pychip_tracing_start_perfetto_system()
         else:
             handle.pychip_tracing_start_perfetto_file(file_name.encode('utf-8')).raise_on_error()
     else:

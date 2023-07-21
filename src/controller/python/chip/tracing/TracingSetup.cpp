@@ -22,22 +22,18 @@
 
 #include <tracing/json/json_tracing.h>
 #include <tracing/registry.h>
-
-#if ENABLE_PERFETTO_TRACING
-#include <tracing/perfetto/event_storage.h>     // nogncheck
-#include <tracing/perfetto/file_output.h>       // nogncheck
-#include <tracing/perfetto/perfetto_tracing.h>  // nogncheck
-#include <tracing/perfetto/simple_initialize.h> // nogncheck
+#include <tracing/perfetto/event_storage.h>
+#include <tracing/perfetto/file_output.h>
+#include <tracing/perfetto/perfetto_tracing.h>
+#include <tracing/perfetto/simple_initialize.h>
 #endif
 
 namespace {
 
 ::chip::Tracing::Json::JsonBackend mJsonBackend;
 
-#if ENABLE_PERFETTO_TRACING
 chip::Tracing::Perfetto::FileTraceOutput mPerfettoFileOutput;
 chip::Tracing::Perfetto::PerfettoBackend mPerfettoBackend;
-#endif
 
 } // namespace
 
@@ -58,15 +54,12 @@ extern "C" PyChipError pychip_tracing_start_json_file(const char * file_name)
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-#if ENABLE_PERFETTO_TRACING
 
-extern "C" PyChipError pychip_tracing_start_perfetto_system()
+extern "C" void pychip_tracing_start_perfetto_system()
 {
     chip::Tracing::Perfetto::Initialize(perfetto::kSystemBackend);
     chip::Tracing::Perfetto::RegisterEventTrackingStorage();
     chip::Tracing::Register(mPerfettoBackend);
-
-    return ToPyChipError(CHIP_NO_ERROR);
 }
 
 extern "C" PyChipError pychip_tracing_start_perfetto_file(const char * file_name)
@@ -84,28 +77,10 @@ extern "C" PyChipError pychip_tracing_start_perfetto_file(const char * file_name
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-#else  // ENABLE_PERFETTO_TRACING
-
-extern "C" PyChipError pychip_tracing_start_perfetto_system()
-{
-    return ToPyChipError(CHIP_ERROR_NOT_IMPLEMENTED);
-}
-
-extern "C" PyChipError pychip_tracing_start_perfetto_file(const char * file_name)
-{
-    return ToPyChipError(CHIP_ERROR_NOT_IMPLEMENTED);
-}
-
-#endif // ENABLE_PERFETTO_TRACING
-
 extern "C" void pychip_tracing_stop()
 {
-#if ENABLE_PERFETTO_TRACING
     chip::Tracing::Perfetto::FlushEventTrackingStorage();
     mPerfettoFileOutput.Close();
     chip::Tracing::Unregister(mPerfettoBackend);
-
-#endif
-
     chip::Tracing::Unregister(mJsonBackend);
 }
