@@ -136,6 +136,13 @@ EmberAfStatus DishwasherAlarmServer::SetSupportedValue(EndpointId endpoint, cons
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: writing supported, err:0x%x", status);
         return status;
     }
+    // Whenever there is change in Supported attribute, Latch should change accordingly(if possible).
+    BitMask<AlarmMap> latch;
+    if (GetLatchValue(endpoint, &latch) == EMBER_ZCL_STATUS_SUCCESS && !supported.HasAll(latch))
+    {
+        latch = latch & supported;
+        status = SetLatchValue(endpoint, latch);
+    }
 
     // Whenever there is change in Supported attribute, Mask, State should change accordingly.
     BitMask<AlarmMap> mask;
@@ -148,14 +155,6 @@ EmberAfStatus DishwasherAlarmServer::SetSupportedValue(EndpointId endpoint, cons
     {
         mask   = supported & mask;
         status = SetMaskValue(endpoint, mask);
-    }
-
-    // Whenever there is change in Supported attribute, Latch shoud change accordingly(if possible).
-    BitMask<AlarmMap> latch;
-    if (GetLatchValue(endpoint, &latch) == EMBER_ZCL_STATUS_SUCCESS && !supported.HasAll(latch))
-    {
-        latch = latch & supported;
-        status = SetLatchValue(endpoint, latch);
     }
     return status;
 }
@@ -317,7 +316,7 @@ bool DishwasherAlarmServer::HasResetFeature(EndpointId endpoint)
         return false;
     }
 
-    if (featureMap != 0)
+    if (featureMap == 1)
     {
         return true;
     }
@@ -336,7 +335,7 @@ void DishwasherAlarmServer::SendNotifyEvent(EndpointId endpointId, BitMask<Alarm
     }
 }
 
-static Status modifyEnabledHandler(const app::ConcreteCommandPath & commandPath, const BitMask<AlarmMap> mask)
+static Status ModifyEnabledHandler(const app::ConcreteCommandPath & commandPath, const BitMask<AlarmMap> mask)
 {
     EndpointId endpoint = commandPath.mEndpointId;
     BitMask<AlarmMap> supported;
@@ -412,7 +411,7 @@ bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(app::CommandHandle
                                                               const Commands::ModifyEnabledAlarms::DecodableType & commandData)
 {
     auto & mask   = commandData.mask;
-    Status status = modifyEnabledHandler(commandPath, mask);
+    Status status = ModifyEnabledHandler(commandPath, mask);
     commandObj->AddStatus(commandPath, status);
 
     return true;
@@ -455,4 +454,3 @@ static BitMask<AlarmMap> SetStateByLatch(const BitMask<AlarmMap> latch, const Bi
     }
     return state.SetRaw(finalState);
 }
-
