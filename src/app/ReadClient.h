@@ -249,6 +249,16 @@ public:
          * @param[in] apReadClient the ReadClient for the subscription.
          */
         virtual void OnUnsolicitedMessageFromPublisher(ReadClient * apReadClient) {}
+
+        /**
+         * OnCASESessionEstablished will be called for a subscription ReadClient when
+         * it finishes setting up a CASE session, as part of either automatic
+         * re-subscription or doing an initial subscribe based on ScopedNodeId.
+         *
+         * The callee is allowed to modify the ReadPrepareParams (e.g. to change
+         * things like min/max intervals based on the session parameters).
+         */
+        virtual void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) {}
     };
 
     enum class InteractionType : uint8_t

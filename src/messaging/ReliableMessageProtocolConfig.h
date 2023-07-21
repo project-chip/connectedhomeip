@@ -66,7 +66,7 @@ namespace chip {
  *  timeout when it sends a message to the present node and the present node is
  *  perceived by the peer as idle.
  *
- *  This value is announced to the peer using SII (Sleepy Idle Interval) key
+ *  This value is announced to the peer using SII (Session Idle Interval) key
  *  in the advertised DNS Service Discovery TXT records. Additionally, it is
  *  exchanged in the initial phase of the PASE/CASE session establishment.
  *
@@ -167,14 +167,18 @@ namespace chip {
 #endif
 #endif // CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
 
+constexpr System::Clock::Milliseconds32 kDefaultActiveTime = System::Clock::Milliseconds16(4000);
+
 /**
  *  @brief
  *    The ReliableMessageProtocol configuration.
  */
 struct ReliableMessageProtocolConfig
 {
-    ReliableMessageProtocolConfig(System::Clock::Milliseconds32 idleInterval, System::Clock::Milliseconds32 activeInterval) :
-        mIdleRetransTimeout(idleInterval), mActiveRetransTimeout(activeInterval)
+    ReliableMessageProtocolConfig(System::Clock::Milliseconds32 idleInterval, System::Clock::Milliseconds32 activeInterval,
+                                  System::Clock::Milliseconds16 activeThreshold = kDefaultActiveTime) :
+        mIdleRetransTimeout(idleInterval),
+        mActiveRetransTimeout(activeInterval), mActiveThresholdTime(activeThreshold)
     {}
 
     // Configurable timeout in msec for retransmission of the first sent message.
@@ -183,9 +187,13 @@ struct ReliableMessageProtocolConfig
     // Configurable timeout in msec for retransmission of all subsequent messages.
     System::Clock::Milliseconds32 mActiveRetransTimeout;
 
+    // Configurable amount of time the node SHOULD stay active after network activity.
+    System::Clock::Milliseconds16 mActiveThresholdTime;
+
     bool operator==(const ReliableMessageProtocolConfig & that) const
     {
-        return mIdleRetransTimeout == that.mIdleRetransTimeout && mActiveRetransTimeout == that.mActiveRetransTimeout;
+        return mIdleRetransTimeout == that.mIdleRetransTimeout && mActiveRetransTimeout == that.mActiveRetransTimeout &&
+            mActiveThresholdTime == that.mActiveThresholdTime;
     }
 };
 
@@ -226,7 +234,8 @@ System::Clock::Timestamp GetRetransmissionTimeout(System::Clock::Timestamp activ
  * time defines). This is reserved for tests that need the ability to set these at runtime to make certain test scenarios possible.
  *
  */
-void OverrideLocalMRPConfig(System::Clock::Timeout idleRetransTimeout, System::Clock::Timeout activeRetransTimeout);
+void OverrideLocalMRPConfig(System::Clock::Timeout idleRetransTimeout, System::Clock::Timeout activeRetransTimeout,
+                            System::Clock::Timeout activeThresholdTime = kDefaultActiveTime);
 
 /**
  * @brief

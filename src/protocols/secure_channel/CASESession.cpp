@@ -640,8 +640,9 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
 CHIP_ERROR CASESession::SendSigma1()
 {
     MATTER_TRACE_SCOPE("SendSigma1", "CASESession");
-    const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
-    size_t data_len            = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, // initiatorRandom
+    const size_t mrpParamsSize =
+        mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t)) : 0;
+    size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, // initiatorRandom
                                                   sizeof(uint16_t),            // initiatorSessionId,
                                                   kSHA256_Hash_Length,         // destinationId
                                                   kP256_PublicKey_Length,      // InitiatorEphPubKey,
@@ -915,7 +916,8 @@ exit:
 CHIP_ERROR CASESession::SendSigma2Resume()
 {
     MATTER_TRACE_SCOPE("SendSigma2Resume", "CASESession");
-    const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
+    const size_t mrpParamsSize =
+        mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t)) : 0;
     size_t max_sigma2_resume_data_len = TLV::EstimateStructOverhead(
         SessionResumptionStorage::kResumptionIdSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, sizeof(uint16_t), mrpParamsSize);
 
@@ -1065,8 +1067,9 @@ CHIP_ERROR CASESession::SendSigma2()
                                          msg_R2_Encrypted.Get() + msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
     // Construct Sigma2 Msg
-    const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
-    size_t data_len            = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, sizeof(uint16_t), kP256_PublicKey_Length,
+    const size_t mrpParamsSize =
+        mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t)) : 0;
+    size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, sizeof(uint16_t), kP256_PublicKey_Length,
                                                   msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, mrpParamsSize);
 
     System::PacketBufferHandle msg_R2 = System::PacketBufferHandle::New(data_len);
@@ -2227,7 +2230,7 @@ System::Clock::Timeout CASESession::ComputeSigma1ResponseTimeout(const ReliableM
     return GetRetransmissionTimeout(remoteMrpConfig.mActiveRetransTimeout, remoteMrpConfig.mIdleRetransTimeout,
                                     // Assume peer is idle, since that's what we
                                     // will assume for our initial message.
-                                    System::Clock::kZero, Transport::kMinActiveTime) +
+                                    System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime) +
         kExpectedSigma1ProcessingTime;
 }
 
@@ -2235,7 +2238,7 @@ System::Clock::Timeout CASESession::ComputeSigma2ResponseTimeout(const ReliableM
 {
     return GetRetransmissionTimeout(remoteMrpConfig.mActiveRetransTimeout, remoteMrpConfig.mIdleRetransTimeout,
                                     // Assume peer is idle, as a worst-case assumption.
-                                    System::Clock::kZero, Transport::kMinActiveTime) +
+                                    System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime) +
         kExpectedHighProcessingTime;
 }
 
