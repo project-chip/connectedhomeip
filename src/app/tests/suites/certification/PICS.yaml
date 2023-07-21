@@ -9550,8 +9550,7 @@ PICS:
           the same endpoint?"
       id: RVCCLEANM.S.F00
 
-    - label:
-          "Does the device read the global attribute: EventList from the DUT"
+    - label: "Does the device read the global attribute: EventList from the DUT"
       id: RVCCLEANM.S.Afffa
 
     #
@@ -9734,8 +9733,7 @@ PICS:
           the same endpoint?"
       id: RVCRUNM.S.F00
 
-    - label:
-          "Does the device read the global attribute: EventList from the DUT"
+    - label: "Does the device read the global attribute: EventList from the DUT"
       id: RVCRUNM.S.Afffa
 
     #Attributes
