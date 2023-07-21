@@ -390,6 +390,100 @@ class TC_DeviceBasicComposition(MatterBaseTest):
     def test_topology_is_valid(self):
         asserts.skip("TODO: Make a test that verifies each endpoint only lists direct descendants, except Root Node and Aggregator endpoints that list all their descendants")
 
+    def test_TC_PS_3_1(self):
+        BRIDGED_NODE_DEVICE_TYPE_ID = 0x13
+        success = True
+        self.print_step(1, "Wildcard read of device - already done")
+
+        self.print_step(2, "Verify that all endpoints listed in the EndpointList are valid")
+        attribute_id = Clusters.PowerSource.Attributes.EndpointList.attribute_id
+        cluster_id = Clusters.PowerSource.id
+        attribute_string = self.cluster_mapper.get_attribute_string(cluster_id, attribute_id)
+        for endpoint_id, endpoint in self.endpoints.items():
+            if Clusters.PowerSource not in endpoint:
+                continue
+            if Clusters.PowerSource.Attributes.EndpointList not in endpoint[Clusters.PowerSource]:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+                self.record_error(self.get_test_name(), location=location,
+                                  problem=f'Did not find {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}', spec_location="EndpointList Attribute")
+                success = False
+                continue
+
+            endpoint_list = endpoint[Clusters.PowerSource][Clusters.PowerSource.Attributes.EndpointList]
+            non_existent = set(endpoint_list) - set(self.endpoints.keys())
+            if non_existent:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+                self.record_error(self.get_test_name(), location=location,
+                                  problem=f'{attribute_string} lists a non-existent endpoint', spec_location="EndpointList Attribute")
+                success = False
+
+        self.print_step(3, "Verify that all Bridged Node endpoint lists are correct")
+        device_types = {}
+        parts_list = {}
+        for endpoint_id, endpoint in self.endpoints.items():
+            if Clusters.PowerSource not in endpoint or Clusters.PowerSource.Attributes.EndpointList not in endpoint[Clusters.PowerSource]:
+                continue
+
+            def GetPartValidityProblem(endpoint):
+                if Clusters.Descriptor not in endpoint:
+                    return "Missing cluster descriptor"
+                if Clusters.Descriptor.Attributes.PartsList not in endpoint[Clusters.Descriptor]:
+                    return "Missing PartList in descriptor cluster"
+                if Clusters.Descriptor.Attributes.DeviceTypeList not in endpoint[Clusters.Descriptor]:
+                    return "Missing DeviceTypeList in descriptor cluster"
+                return None
+
+            problem = GetPartValidityProblem(endpoint)
+            if problem:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id,
+                                                 attribute_id=Clusters.Descriptor.Attributes.PartsList.id)
+                self.record_error(self.get_test_name(), location=location,
+                                  problem=problem, spec_location="PartsList Attribute")
+                success = False
+                continue
+
+            device_types[endpoint_id] = [i.deviceType for i in endpoint[Clusters.Descriptor]
+                                         [Clusters.Descriptor.Attributes.DeviceTypeList]]
+            parts_list[endpoint_id] = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+
+        bridged_nodes = [id for (id, dev_type) in device_types.items() if BRIDGED_NODE_DEVICE_TYPE_ID in dev_type]
+
+        for endpoint_id in bridged_nodes:
+            if Clusters.PowerSource not in self.endpoints[endpoint_id]:
+                continue
+            # using a list because we do want to preserve duplicates and error on those.
+            desired_endpoint_list = parts_list[endpoint_id].copy()
+            desired_endpoint_list.append(endpoint_id)
+            desired_endpoint_list.sort()
+            ep_list = self.endpoints[endpoint_id][Clusters.PowerSource][Clusters.PowerSource.Attributes.EndpointList]
+            ep_list.sort()
+            if ep_list != desired_endpoint_list:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+                self.record_error(self.get_test_name(), location=location,
+                                  problem=f'Power source EndpointList on bridged node endpoint {endpoint_id} is not as expected. Desired: {desired_endpoint_list} Actual: {ep_list}', spec_location="EndpointList Attribute")
+                success = False
+
+        self.print_step(4, "Verify that all Bridged Node children endpoint lists are correct")
+        children = []
+        # note, this doesn't handle the full tree structure, single layer only
+        for endpoint_id in bridged_nodes:
+            children = children + parts_list[endpoint_id]
+
+        for endpoint_id in children:
+            if Clusters.PowerSource not in self.endpoints[endpoint_id]:
+                continue
+            desired_endpoint_list = [endpoint_id]
+            ep_list = self.endpoints[endpoint_id][Clusters.PowerSource][Clusters.PowerSource.Attributes.EndpointList]
+            ep_list.sort()
+            if ep_list != desired_endpoint_list:
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+                self.record_error(self.get_test_name(), location=location,
+                                  problem=f'Power source EndpointList on bridged child endpoint {endpoint_id} is not as expected. Desired: {desired_endpoint_list} Actual: {ep_list}', spec_location="EndpointList Attribute")
+                success = False
+
+        if not success:
+            self.fail_current_test("power source EndpointList attribute is incorrect")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
