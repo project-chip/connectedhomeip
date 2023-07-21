@@ -22,6 +22,7 @@ import logging
 import pathlib
 import sys
 from dataclasses import dataclass
+from itertools import islice
 from pprint import pprint
 from typing import Any, Callable, Optional
 
@@ -167,7 +168,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         dev_ctrl = self.default_controller
         self.problems = []
 
-        do_test_over_pase = self.user_params.get("use_pase_only", True)
+        do_test_over_pase = self.user_params.get("use_pase_only", False)
         dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
 
         if do_test_over_pase:
@@ -447,6 +448,45 @@ class TC_DeviceBasicComposition(MatterBaseTest):
 
     def test_topology_is_valid(self):
         asserts.skip("TODO: Make a test that verifies each endpoint only lists direct descendants, except Root Node and Aggregator endpoints that list all their descendants")
+
+    def test_dup_feature_flag(self):
+        device_types = {}
+        dups = {}
+        for endpoint_id, endpoint in self.endpoints.items():
+            device_types[endpoint_id] = [i.deviceType for i in endpoint[Clusters.Descriptor]
+                                         [Clusters.Descriptor.Attributes.DeviceTypeList]]
+            dups[endpoint_id] = False
+
+        for i, (endpoint_id1, device_types1) in enumerate(device_types.items()):
+            for endpoint_id2, device_types2 in islice(device_types.items(), i+1, None):
+                have_dup = list(set(device_types1).intersection(device_types2))
+                if have_dup:
+                    dups[endpoint_id1] = True
+                    dups[endpoint_id2] = True
+
+        success = True
+        for endpoint_id, endpoint in self.endpoints.items():
+            if not dups[endpoint_id]:
+                continue
+            # All dup endpoints require the taglist feature flag and attribute in the descriptor cluster
+            feature_flag = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.FeatureMap]
+            # This should come from the python objects, but I'm not seeing it right now.
+            if not feature_flag & 0x01:
+                location = AttributePathLocation(endpoint_id, Clusters.Descriptor.id,
+                                                 Clusters.Descriptor.Attributes.FeatureMap.attribute_id)
+                self.record_error(self.get_test_name(), location=location,
+                                  problem=f'{endpoint_id} has duplicate device types with another endpoint, but taglist feature flag is not set on the descriptor cluster', spec_location="Base device type")
+                success = False
+            # TODO: add check for the attribute, once that lands in the SDK
+            # if Clusters.Descriptor.Attributes.TagList not in endpoint[Clusters.Descriptor]:
+            #    location = AttributePathLocation(endpoint_id, Clusters.Descriptor.id,
+            #                                     Clusters.Descriptor.Attributes.TagList.attribute_id)
+            #    self.record_error(self.get_test_name(), location=location,
+            #                      problem=f'{endpoint_id} has duplicate device types with another endpoint, but taglist attribute is not present in the descriptor cluster', spec_location="Base device type")
+            #    success = False
+
+        if not success:
+            self.fail_current_test("At least one descriptor cluster is missing the tag list attribute or feature flag")
 
 
 if __name__ == "__main__":
