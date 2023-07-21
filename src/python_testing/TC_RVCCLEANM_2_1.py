@@ -64,8 +64,6 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
 
         self.print_step(1, "Commissioning, already done")
 
-        modes = []
-
         self.print_step(2, "Read SupportedModes attribute")
         supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
