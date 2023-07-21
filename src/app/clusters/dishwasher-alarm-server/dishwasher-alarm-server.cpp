@@ -135,7 +135,7 @@ EmberAfStatus DishwasherAlarmServer::SetSupportedValue(EndpointId endpoint, cons
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: writing supported, err:0x%x", status);
         return status;
     }
-    // Whenever there is change in Supported attribute, Latch should change accordingly(if possible).
+    // Whenever there is change in Supported attribute, Latch should change accordingly (if possible).
     BitMask<AlarmMap> latch;
     if (GetLatchValue(endpoint, &latch) == EMBER_ZCL_STATUS_SUCCESS && !supported.HasAll(latch))
     {
