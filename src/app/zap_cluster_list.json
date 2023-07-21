@@ -167,7 +167,7 @@
         "IDENTIFY_CLUSTER": ["identify-server"],
         "ILLUMINANCE_MEASUREMENT_CLUSTER": [],
         "KEYPAD_INPUT_CLUSTER": ["keypad-input-server"],
-        "LAUNDRY_WASHER_MODE_CLUSTER": ["mode-select-server"],
+        "LAUNDRY_WASHER_MODE_CLUSTER": ["mode-base-server"],
         "LEVEL_CONTROL_CLUSTER": ["level-control"],
         "LOCALIZATION_CONFIGURATION_CLUSTER": [
             "localization-configuration-server"
@@ -208,11 +208,11 @@
         "RADON_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "REFRIGERATOR_ALARM_CLUSTER": ["refrigerator-alarm-server"],
         "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER": [
-            "mode-select-server"
+            "mode-base-server"
         ],
         "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
-        "RVC_CLEAN_MODE_CLUSTER": ["mode-select-server"],
-        "RVC_RUN_MODE_CLUSTER": ["mode-select-server"],
+        "RVC_CLEAN_MODE_CLUSTER": ["mode-base-server"],
+        "RVC_RUN_MODE_CLUSTER": ["mode-base-server"],
         "SCENES_CLUSTER": ["scenes-server"],
         "SMOKE_CO_ALARM_CLUSTER": ["smoke-co-alarm-server"],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": ["software-diagnostics-server"],

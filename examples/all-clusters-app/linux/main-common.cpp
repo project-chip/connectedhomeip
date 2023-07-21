@@ -19,11 +19,16 @@
 #include "main-common.h"
 #include "AllClustersCommandDelegate.h"
 #include "WindowCoveringManager.h"
+#include "dishwasher-mode.h"
 #include "include/tv-callbacks.h"
+#include "laundry-washer-mode.h"
+#include "rvc-modes.h"
+#include "tcc-mode.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/att-storage.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <lib/support/CHIPMem.h>

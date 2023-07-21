@@ -24,6 +24,11 @@ CommandHandlerInterfaceOnlyClusters:
     # This uses asUpperCamelCase versions of the cluster name.
     - NetworkCommissioning
     - Scenes
+    - RvcRunMode
+    - RvcCleanMode
+    - DishwasherMode
+    - LaundryWasherMode
+    - RefrigeratorAndTemperatureControlledCabinetMode
     - OperationalState
     - ActivatedCarbonFilterMonitoring
     - HepaFilterMonitoring

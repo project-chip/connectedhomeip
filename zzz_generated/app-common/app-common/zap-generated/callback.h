@@ -8742,42 +8742,11 @@ bool emberAfModeSelectClusterChangeToModeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ModeSelect::Commands::ChangeToMode::DecodableType & commandData);
 /**
- * @brief Laundry Washer Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfLaundryWasherModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::LaundryWasherMode::Commands::ChangeToMode::DecodableType & commandData);
-/**
- * @brief Refrigerator And Temperature Controlled Cabinet Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToMode::DecodableType &
-        commandData);
-/**
- * @brief RVC Run Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfRvcRunModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RvcRunMode::Commands::ChangeToMode::DecodableType & commandData);
-/**
- * @brief RVC Clean Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfRvcCleanModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RvcCleanMode::Commands::ChangeToMode::DecodableType & commandData);
-/**
  * @brief Temperature Control Cluster SetTemperature Command callback (from client)
  */
 bool emberAfTemperatureControlClusterSetTemperatureCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TemperatureControl::Commands::SetTemperature::DecodableType & commandData);
-/**
- * @brief Dishwasher Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfDishwasherModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DishwasherMode::Commands::ChangeToMode::DecodableType & commandData);
 /**
  * @brief Smoke CO Alarm Cluster SelfTestRequest Command callback (from client)
  */
