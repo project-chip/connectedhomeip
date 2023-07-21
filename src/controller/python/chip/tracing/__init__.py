@@ -82,14 +82,17 @@ def StopTracing():
     _GetTracingLibraryHandle().pychip_tracing_stop()
 
 
-class Tracing:
+class TracingContext:
     """Allows scoped enter/exit for tracing, like:
 
-    with Tracing() as tracing:
-       tracing.StartTracingTo(TraceType.JSON)
+    with TracingContext() as tracing:
+       tracing.Start(TraceType.JSON)
        # ...
 
     """
+
+    def Start(self, trace_type: TraceType, file_name: Optional[str] = None):
+        StartTracingTo(trace_type, file_name)
 
     def __init__(self):
         pass
