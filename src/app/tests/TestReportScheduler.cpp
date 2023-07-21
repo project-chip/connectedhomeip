@@ -138,16 +138,16 @@ public:
         // Normaly we would call the callback here, thus scheduling an engine run, but we don't need it for this test as we simulate
         // all the callbacks related to report emissions. The actual callback should look like this:
         //
-        ReportScheduler::TimerCallback * callback = static_cast<ReportScheduler::TimerCallback *>(aAppState);
-        (*callback)();
+        TimerContext * context = static_cast<TimerContext *>(aAppState);
+        context->TimerFired();
         ChipLogProgress(DataManagement, "Simluating engine run for Handler: %p", aAppState);
     }
-    virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) override
+    virtual CHIP_ERROR StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
     {
         return insertPair(static_cast<ReadHandlerNode *>(context), aTimeout + mMockSystemTimestamp);
     }
-    virtual void CancelTimer(void * context) override { removePair(static_cast<ReadHandlerNode *>(context)); }
-    virtual bool IsTimerActive(void * context) override
+    virtual void CancelTimer(TimerContext * context) override { removePair(static_cast<ReadHandlerNode *>(context)); }
+    virtual bool IsTimerActive(TimerContext * context) override
     {
         size_t position;
         NodeTimeoutPair * pair = FindPair(static_cast<ReadHandlerNode *>(context), position);
@@ -184,30 +184,29 @@ class TestTimerSynchronizedDelegate : public ReportScheduler::TimerDelegate
 public:
     static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
     {
-        ReportScheduler::TimerCallback * callback = static_cast<ReportScheduler::TimerCallback *>(aAppState);
-        (*callback)();
+        TimerContext * context = static_cast<TimerContext *>(aAppState);
+        context->TimerFired();
     }
-    virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) override
+    virtual CHIP_ERROR StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
     {
-        SynchronizedReportSchedulerImpl * scheduler = static_cast<SynchronizedReportSchedulerImpl *>(context);
-        if (nullptr == scheduler)
+        if (nullptr == context)
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
-        mSyncScheduler = scheduler;
-        mTimerTimeout  = mMockSystemTimestamp + aTimeout;
+        mTimerContext = context;
+        mTimerTimeout = mMockSystemTimestamp + aTimeout;
         return CHIP_NO_ERROR;
     }
-    virtual void CancelTimer(void * context) override
+    virtual void CancelTimer(TimerContext * context) override
     {
-        VerifyOrReturn(nullptr != mSyncScheduler);
-        mSyncScheduler = nullptr;
-        mTimerTimeout  = System::Clock::Milliseconds64(0x7FFFFFFFFFFFFFFF);
+        VerifyOrReturn(nullptr != mTimerContext);
+        mTimerContext = nullptr;
+        mTimerTimeout = System::Clock::Milliseconds64(0x7FFFFFFFFFFFFFFF);
     }
-    virtual bool IsTimerActive(void * context) override
+    virtual bool IsTimerActive(TimerContext * context) override
     {
-        return (nullptr != mSyncScheduler) && (mTimerTimeout > mMockSystemTimestamp);
+        return (nullptr != mTimerContext) && (mTimerTimeout > mMockSystemTimestamp);
     }
 
     virtual System::Clock::Timestamp GetCurrentMonotonicTimestamp() override { return mMockSystemTimestamp; }
@@ -223,7 +222,7 @@ public:
             mMockSystemTimestamp++;
             if (mMockSystemTimestamp == mTimerTimeout)
             {
-                TimerCallbackInterface(nullptr, mSyncScheduler);
+                TimerCallbackInterface(nullptr, mTimerContext);
             }
         }
 
@@ -231,14 +230,14 @@ public:
         {
             if (mMockSystemTimestamp == mTimerTimeout)
             {
-                TimerCallbackInterface(nullptr, mSyncScheduler);
+                TimerCallbackInterface(nullptr, mTimerContext);
             }
         }
     }
 
-    SynchronizedReportSchedulerImpl * mSyncScheduler = nullptr;
-    System::Clock::Timeout mTimerTimeout             = System::Clock::Milliseconds64(0x7FFFFFFFFFFFFFFF);
-    System::Clock::Timestamp mMockSystemTimestamp    = System::Clock::Milliseconds64(0);
+    TimerContext * mTimerContext                  = nullptr;
+    System::Clock::Timeout mTimerTimeout          = System::Clock::Milliseconds64(0x7FFFFFFFFFFFFFFF);
+    System::Clock::Timestamp mMockSystemTimestamp = System::Clock::Milliseconds64(0);
 };
 
 TestTimerDelegate sTestTimerDelegate;

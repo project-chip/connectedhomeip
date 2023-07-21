@@ -32,12 +32,16 @@ class TestReportScheduler;
 
 using Timestamp = System::Clock::Timestamp;
 
+class TimerContext
+{
+public:
+    virtual ~TimerContext() {}
+    virtual void TimerFired() = 0;
+};
+
 class ReportScheduler : public ReadHandler::Observer
 {
 public:
-    // TODO : Verify if replacing std::function with pw::Function, thus adding a dependency on Pigweed, is acceptable
-    using TimerCallback = std::function<void()>;
-
     /// @brief This class acts as an interface between the report scheduler and the system timer to reduce dependencies on the
     /// system layer.
     class TimerDelegate
@@ -48,15 +52,15 @@ public:
         /// CancelTimer) before starting a new one for that context.
         /// @param context context to pass to the timer callback.
         /// @param aTimeout time in miliseconds before the timer expires
-        virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) = 0;
+        virtual CHIP_ERROR StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) = 0;
         /// @brief Cancel a timer for a given context
         /// @param context used to identify the timer to cancel
-        virtual void CancelTimer(void * context)         = 0;
-        virtual bool IsTimerActive(void * context)       = 0;
-        virtual Timestamp GetCurrentMonotonicTimestamp() = 0;
+        virtual void CancelTimer(TimerContext * context)   = 0;
+        virtual bool IsTimerActive(TimerContext * context) = 0;
+        virtual Timestamp GetCurrentMonotonicTimestamp()   = 0;
     };
 
-    class ReadHandlerNode : public IntrusiveListNodeBase<>
+    class ReadHandlerNode : public IntrusiveListNodeBase<>, public TimerContext
     {
     public:
 #ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -78,7 +82,6 @@ public:
             VerifyOrDie(aScheduler != nullptr);
 
             mReadHandler = aReadHandler;
-            mCallback    = [this]() { Callback(); };
             SetIntervalTimeStamps(aReadHandler);
         }
         ReadHandler * GetReadHandler() const { return mReadHandler; }
@@ -124,9 +127,7 @@ public:
             mSyncTimestamp = mMaxTimestamp;
         }
 
-        TimerCallback * GetCallbackPtr() { return &mCallback; }
-
-        void Callback()
+        void TimerFired() override
         {
             mScheduler->ReportTimerCallback();
             SetEngineRunScheduled(true);
@@ -147,8 +148,7 @@ public:
     private:
 #ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
         BitFlags<TestFlags> mFlags;
-#endif                           // CONFIG_BUILD_FOR_HOST_UNIT_TEST
-        TimerCallback mCallback; // Timer callback
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
         TimerDelegate * mTimerDelegate;
         ReadHandler * mReadHandler;
         ReportScheduler * mScheduler;
@@ -181,7 +181,7 @@ public:
     void RunNodeCallbackForHandler(const ReadHandler * aReadHandler)
     {
         ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
-        node->Callback();
+        node->TimerFired();
     }
     void SetFlagsForHandler(const ReadHandler * aReadHandler, ReadHandlerNode::TestFlags aFlag, bool aValue)
     {

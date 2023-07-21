@@ -48,13 +48,13 @@ void SynchronizedReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aRead
 CHIP_ERROR SynchronizedReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode * node)
 {
     // Cancel Report if it is currently scheduled
-    mTimerDelegate->CancelTimer(static_cast<void *>(&mTimerCallback));
+    mTimerDelegate->CancelTimer(this);
     if (timeout == Milliseconds32(0))
     {
         ReportTimerCallback();
         return CHIP_NO_ERROR;
     }
-    ReturnErrorOnFailure(mTimerDelegate->StartTimer(static_cast<void *>(&mTimerCallback), timeout));
+    ReturnErrorOnFailure(mTimerDelegate->StartTimer(this, timeout));
     mTestNextReportTimestamp = mTimerDelegate->GetCurrentMonotonicTimestamp() + timeout;
 
     return CHIP_NO_ERROR;
@@ -63,13 +63,13 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::ScheduleReport(Timeout timeout, Read
 void SynchronizedReportSchedulerImpl::CancelReport()
 {
     // We don't need to take action on the handler, since the timer is common here
-    mTimerDelegate->CancelTimer(static_cast<void *>(&mTimerCallback));
+    mTimerDelegate->CancelTimer(this);
 }
 
 /// @brief Checks if the timer is active for the ReportScheduler
 bool SynchronizedReportSchedulerImpl::IsReportScheduled()
 {
-    return mTimerDelegate->IsTimerActive(static_cast<void *>(&mTimerCallback));
+    return mTimerDelegate->IsTimerActive(this);
 }
 
 /// @brief Find the smallest maximum interval possible and set it as the common maximum
@@ -178,7 +178,7 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::CalculateNextReportTimeout(Timeout &
 
 /// @brief Callback called when the report timer expires to schedule an engine run regardless of the state of the ReadHandlers, as
 /// the engine already verifies that read handlers are reportable before sending a report
-void SynchronizedReportSchedulerImpl::ReportTimerCallback()
+void SynchronizedReportSchedulerImpl::TimerFired()
 {
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 

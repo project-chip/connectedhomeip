@@ -24,29 +24,29 @@
 namespace chip {
 namespace app {
 
-class DefaultTimerDelegate : public app::reporting::ReportScheduler::TimerDelegate
+class DefaultTimerDelegate : public reporting::ReportScheduler::TimerDelegate
 {
 public:
-    using ReadHandlerNode        = app::reporting::ReportScheduler::ReadHandlerNode;
-    using InteractionModelEngine = app::InteractionModelEngine;
+    using TimerContext           = reporting::TimerContext;
+    using ReadHandlerNode        = reporting::ReportScheduler::ReadHandlerNode;
+    using InteractionModelEngine = InteractionModelEngine;
     using Timeout                = System::Clock::Timeout;
     static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
     {
-        app::reporting::ReportScheduler::TimerCallback * callback =
-            static_cast<app::reporting::ReportScheduler::TimerCallback *>(aAppState);
-        (*callback)();
+        TimerContext * context = static_cast<TimerContext *>(aAppState);
+        context->TimerFired();
     }
-    CHIP_ERROR StartTimer(void * context, Timeout aTimeout) override
+    CHIP_ERROR StartTimer(TimerContext * context, Timeout aTimeout) override
     {
         return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
             aTimeout, TimerCallbackInterface, context);
     }
-    void CancelTimer(void * context) override
+    void CancelTimer(TimerContext * context) override
     {
         InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
             TimerCallbackInterface, context);
     }
-    bool IsTimerActive(void * context) override
+    bool IsTimerActive(TimerContext * context) override
     {
         return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->IsTimerActive(
             TimerCallbackInterface, context);
