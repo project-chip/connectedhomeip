@@ -249,6 +249,25 @@ SynchronizedReportSchedulerImpl syncScheduler(&sTestTimerSynchronizedDelegate);
 class TestReportScheduler
 {
 public:
+    static ReadHandler * GetReadHandlerFromPool(ReportScheduler * scheduler, uint32_t target)
+    {
+        uint32_t i        = 0;
+        ReadHandler * ret = nullptr;
+
+        scheduler->mNodesPool.ForEachActiveObject([target, &i, &ret](ReadHandlerNode * node) {
+            if (i == target)
+            {
+                ret = node->GetReadHandler();
+                return Loop::Break;
+            }
+
+            i++;
+            return Loop::Continue;
+        });
+
+        return ret;
+    }
+
     static void TestReadHandlerList(nlTestSuite * aSuite, void * aContext)
     {
         TestContext & ctx = *static_cast<TestContext *>(aContext);
@@ -276,26 +295,26 @@ public:
         NL_TEST_ASSERT(aSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
 
         // Test unregister first ReadHandler
-        ReadHandler * firstReadHandler = sScheduler.mReadHandlerList.begin()->GetReadHandler();
+        uint32_t target                = 0;
+        ReadHandler * firstReadHandler = GetReadHandlerFromPool(&sScheduler, target);
+
+        NL_TEST_ASSERT(aSuite, nullptr != firstReadHandler);
         sScheduler.OnReadHandlerDestroyed(firstReadHandler);
         NL_TEST_ASSERT(aSuite, sScheduler.GetNumReadHandlers() == kNumMaxReadHandlers - 1);
         NL_TEST_ASSERT(aSuite, nullptr == sScheduler.FindReadHandlerNode(firstReadHandler));
 
         // Test unregister middle ReadHandler
-        auto iter = sScheduler.mReadHandlerList.begin();
-        for (size_t i = 0; i < static_cast<size_t>(kNumMaxReadHandlers / 2); i++)
-        {
-            iter++;
-        }
-        ReadHandler * middleReadHandler = iter->GetReadHandler();
+        target                          = static_cast<uint32_t>(sScheduler.GetNumReadHandlers() / 2);
+        ReadHandler * middleReadHandler = GetReadHandlerFromPool(&sScheduler, target);
+
+        NL_TEST_ASSERT(aSuite, nullptr != middleReadHandler);
         sScheduler.OnReadHandlerDestroyed(middleReadHandler);
         NL_TEST_ASSERT(aSuite, sScheduler.GetNumReadHandlers() == kNumMaxReadHandlers - 2);
         NL_TEST_ASSERT(aSuite, nullptr == sScheduler.FindReadHandlerNode(middleReadHandler));
 
         // Test unregister last ReadHandler
-        iter = sScheduler.mReadHandlerList.end();
-        iter--;
-        ReadHandler * lastReadHandler = iter->GetReadHandler();
+        target                        = static_cast<uint32_t>(sScheduler.GetNumReadHandlers() - 1);
+        ReadHandler * lastReadHandler = GetReadHandlerFromPool(&sScheduler, target);
         sScheduler.OnReadHandlerDestroyed(lastReadHandler);
         NL_TEST_ASSERT(aSuite, sScheduler.GetNumReadHandlers() == kNumMaxReadHandlers - 3);
         NL_TEST_ASSERT(aSuite, nullptr == sScheduler.FindReadHandlerNode(lastReadHandler));

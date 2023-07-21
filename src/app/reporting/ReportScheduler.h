@@ -214,17 +214,19 @@ protected:
     /// @return Node Address if node was found, nullptr otherwise
     ReadHandlerNode * FindReadHandlerNode(const ReadHandler * aReadHandler)
     {
-        for (auto & iter : mReadHandlerList)
-        {
-            if (iter.GetReadHandler() == aReadHandler)
+        ReadHandlerNode * foundNode = nullptr;
+        mNodesPool.ForEachActiveObject([&foundNode, aReadHandler](ReadHandlerNode * node) {
+            if (node->GetReadHandler() == aReadHandler)
             {
-                return &iter;
+                foundNode = node;
+                return Loop::Break;
             }
-        }
-        return nullptr;
+
+            return Loop::Continue;
+        });
+        return foundNode;
     }
 
-    IntrusiveList<ReadHandlerNode> mReadHandlerList;
     ObjectPool<ReadHandlerNode, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> mNodesPool;
     TimerDelegate * mTimerDelegate;
 };
