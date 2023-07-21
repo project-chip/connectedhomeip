@@ -564,7 +564,21 @@ void CommissioningWindowManager::ExpireFailSafeIfArmed()
 void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnum aNewStatus)
 {
     CommissioningWindowStatusEnum oldClusterStatus = CommissioningWindowStatusForCluster();
-    mWindowStatus                                  = aNewStatus;
+    if (mWindowStatus != aNewStatus)
+    {
+        mWindowStatus = aNewStatus;
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        DeviceLayer::ChipDeviceEvent event;
+        event.Type                           = DeviceLayer::DeviceEventType::kCommissioningWindowStatusChanged;
+        event.CommissioningWindowStatus.open = (mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen);
+        CHIP_ERROR err                       = DeviceLayer::PlatformMgr().PostEvent(&event);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to post kCommissioningWindowStatusChanged event %" CHIP_ERROR_FORMAT, err.Format());
+        }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+    }
+
     if (CommissioningWindowStatusForCluster() != oldClusterStatus)
     {
         // The Administrator Commissioning cluster is always on the root endpoint.

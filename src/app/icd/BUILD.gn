@@ -25,13 +25,25 @@ source_set("manager-srcs") {
     "ICDManager.h",
   ]
 
-  public_deps = [ "${chip_root}/src/lib/core" ]
+  deps = [ ":cluster-srcs" ]
+  public_deps = [ "${chip_root}/src/credentials:credentials" ]
 }
 
-# ICD Server Configuration
-# All configurations necessary to the ICD Server featureset need to in this configuration
-config("server-config") {
-  defines = [ "CHIP_CONFIG_ENABLE_ICD_SERVER" ]
+# ICD management cluster source-set is broken out of the main source-set to enable unit tests
+# All sources and configurations used by the ICD management cluster need to go in this source-set
+source_set("cluster-srcs") {
+  sources = [
+    "IcdManagementServer.cpp",
+    "IcdManagementServer.h",
+    "IcdMonitoringTable.cpp",
+    "IcdMonitoringTable.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/platform:platform",
+    "${chip_root}/src/protocols:im_status",
+  ]
 }
 
 # servers-srcs source-set contains all the sources and configurations necessary to build the ICD Server functionality
@@ -44,10 +56,5 @@ source_set("server-srcs") {
     "ICDEventManager.h",
   ]
 
-  public_deps = [
-    ":manager-srcs",
-    "${chip_root}/src/platform:platform",
-  ]
-
-  public_configs = [ ":server-config" ]
+  public_deps = [ ":manager-srcs" ]
 }

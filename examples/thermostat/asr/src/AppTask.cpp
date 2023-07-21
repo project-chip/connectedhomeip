@@ -21,7 +21,6 @@
 #include "AppConfig.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
-#include "LEDWidget.h"
 #include "init_Matter.h"
 #include "qrcodegen.h"
 
@@ -66,7 +65,6 @@ void NetWorkCommissioningInstInit()
 
 AppTask AppTask::sAppTask;
 static DeviceCallbacks EchoCallbacks;
-LEDWidget lightLED;
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -101,7 +99,11 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
 
     // Print setup info
+#if CONFIG_NETWORK_LAYER_BLE
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+#else
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
+#endif /* CONFIG_NETWORK_LAYER_BLE */
 
     CHIP_ERROR err;
     err = SensorMgr().Init();

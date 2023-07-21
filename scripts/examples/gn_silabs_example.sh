@@ -83,8 +83,8 @@ if [ "$#" == "0" ]; then
             Thresholds: 30 <= kvs_max_entries <= 255
         show_qr_code
             Enables QR code on LCD for devices with an LCD
-        enable_sleepy_device
-            Enable Sleepy end device. (Default false)
+        chip_enable_icd_server
+            Configure has a Intermitently connected device. (Default false)
             Must also set chip_openthread_ftd=false
         use_rs9116
             Build wifi example with extension board rs9116. (Default false)
@@ -98,6 +98,12 @@ if [ "$#" == "0" ]; then
             Periodic query timeout variable for OTA in seconds
         rs91x_wpa3_transition
             Support for WPA3 transition mode on RS91x
+        slc_gen_path
+            Allow users to define a path where slc generates board files. (requires --slc_generate or --slc_reuse_files)
+            (default: /third_party/silabs/slc_gen/<board>/)
+        sl_pre_gen_path
+            Allow users to define a path to pre-generated board files
+            (default: /third_party/silabs/matter_support/matter/<family>/<board>/)
         sl_matter_version
             Use provided software version at build time
         sl_matter_version_str
@@ -176,7 +182,7 @@ else
                 shift
                 ;;
             --sed)
-                optArgs+="enable_sleepy_device=true chip_openthread_ftd=false "
+                optArgs+="chip_enable_icd_server=true chip_openthread_ftd=false "
                 shift
                 ;;
             --low-power)
@@ -281,7 +287,6 @@ else
     fi
 
     if [ "$USE_SLC" == true ]; then
-        PYTHON_PATH="/usr/bin/python3"
         if [ "$GN_PATH_PROVIDED" == false ]; then
             GN_PATH=./.environment/cipd/packages/pigweed/gn
         fi
@@ -289,9 +294,9 @@ else
         # Activation needs to be after SLC generation which is done in gn gen.
         # Zap generation requires activation and is done in the build phase
         source "$CHIP_ROOT/scripts/activate.sh"
-        PYTHON_PATH=$VIRTUAL_ENV"/bin/python3"
     fi
 
+    PYTHON_PATH="$(which python3)"
     BUILD_DIR=$OUTDIR/$SILABS_BOARD
     echo BUILD_DIR="$BUILD_DIR"
 

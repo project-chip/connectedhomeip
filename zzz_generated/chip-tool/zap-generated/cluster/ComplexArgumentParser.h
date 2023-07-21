@@ -66,6 +66,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Descriptor::Str
 
 static void Finalize(chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Binding::Structs::TargetStruct::Type & request,
                         Json::Value & value);
 
@@ -253,6 +258,18 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Str
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
                         Json::Value & value);

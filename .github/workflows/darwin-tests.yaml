@@ -60,7 +60,7 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: darwin
-                bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}
 
             - name: Run macOS Darwin Framework Tool Build Debug
               working-directory: src/darwin/Framework
@@ -126,7 +126,7 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-core-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: crash-core-darwin-${{ matrix.build_variant }}
                   path: /cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -134,13 +134,19 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-log-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: crash-log-darwin-${{ matrix.build_variant }}
                   path: ~/Library/Logs/DiagnosticReports/
+            - name: Uploading framework build log
+              uses: actions/upload-artifact@v3
+              if: ${{ failure() && !env.ACT }}
+              with:
+                  name: framework-build-log-darwin-${{ matrix.build_variant }}
+                  path: out/darwin-x64-darwin-framework-tool-${{ matrix.build_variant }}/darwin_framework_build.log
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-objdir-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: crash-objdir-darwin-${{ matrix.build_variant }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5

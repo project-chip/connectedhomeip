@@ -356,6 +356,7 @@ client cluster OnOff = 6 {
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
   bitmap OnOffControl : BITMAP8 {
@@ -570,10 +571,18 @@ client cluster Descriptor = 29 {
     int16u revision = 1;
   }
 
+  struct SemanticTagStruct {
+    nullable vendor_id mfgCode = 0;
+    enum8 namespaceID = 1;
+    enum8 tag = 2;
+    optional nullable char_string label = 3;
+  }
+
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;
   readonly attribute ENDPOINT_NO partsList[] = 3;
+  readonly attribute optional SemanticTagStruct tagList[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1426,6 +1435,7 @@ client cluster PowerSource = 47 {
   readonly attribute optional boolean batFunctionalWhileCharging = 28;
   readonly attribute optional nullable int32u batChargingCurrent = 29;
   readonly attribute optional BatChargeFaultEnum activeBatChargeFaults[] = 30;
+  readonly attribute endpoint_no endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2749,7 +2759,7 @@ client cluster IcdManagement = 70 {
 
   request struct UnregisterClientRequest {
     node_id checkInNodeID = 0;
-    optional OCTET_STRING<16> key = 1;
+    optional OCTET_STRING<16> verificationKey = 1;
   }
 
   /** Register a client to the end device */
@@ -3176,8 +3186,8 @@ client cluster SmokeCoAlarm = 92 {
   }
 
   enum EndOfServiceEnum : ENUM8 {
-    kExpired = 0;
-    kNormal = 1;
+    kNormal = 0;
+    kExpired = 1;
   }
 
   enum ExpressedStateEnum : ENUM8 {
@@ -3208,13 +3218,16 @@ client cluster SmokeCoAlarm = 92 {
     kCOAlarm = 0x2;
   }
 
-  info event SmokeAlarm = 0 {
+  critical event SmokeAlarm = 0 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
-  info event COAlarm = 1 {
+  critical event COAlarm = 1 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
   info event LowBattery = 2 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
   info event HardwareFault = 3 {
@@ -3232,10 +3245,12 @@ client cluster SmokeCoAlarm = 92 {
   info event MuteEnded = 7 {
   }
 
-  info event InterconnectSmokeAlarm = 8 {
+  critical event InterconnectSmokeAlarm = 8 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
-  info event InterconnectCOAlarm = 9 {
+  critical event InterconnectCOAlarm = 9 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
   info event AllClear = 10 {
@@ -3252,7 +3267,7 @@ client cluster SmokeCoAlarm = 92 {
   readonly attribute optional AlarmStateEnum interconnectSmokeAlarm = 8;
   readonly attribute optional AlarmStateEnum interconnectCOAlarm = 9;
   readonly attribute optional ContaminationStateEnum contaminationState = 10;
-  attribute optional SensitivityEnum sensitivityLevel = 11;
+  attribute optional SensitivityEnum smokeSensitivityLevel = 11;
   readonly attribute optional epoch_s expiryDate = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -3349,7 +3364,7 @@ client cluster OperationalState = 96 {
   readonly attribute nullable int8u currentPhase = 1;
   readonly attribute optional nullable elapsed_s countdownTime = 2;
   readonly attribute OperationalStateStruct operationalStateList[] = 3;
-  readonly attribute OperationalStateStruct operationalState = 4;
+  readonly attribute OperationalStateEnum operationalState = 4;
   readonly attribute ErrorStateStruct operationalError = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -3416,7 +3431,7 @@ client cluster RvcOperationalState = 97 {
   readonly attribute nullable int8u currentPhase = 1;
   readonly attribute optional nullable elapsed_s countdownTime = 2;
   readonly attribute OperationalStateStruct operationalStateList[] = 3;
-  readonly attribute OperationalStateStruct operationalState = 4;
+  readonly attribute enum8 operationalState = 4;
   readonly attribute ErrorStateStruct operationalError = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -3452,15 +3467,31 @@ client cluster HepaFilterMonitoring = 113 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+    kReplacementProductList = 0x3;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3485,345 +3516,31 @@ client cluster ActivatedCarbonFilterMonitoring = 114 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+    kReplacementProductList = 0x3;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  /** Reset the condition of the replaceable to the non degraded state */
-  command ResetCondition(): DefaultSuccess = 0;
-}
-
-/** Attributes and commands for monitoring ceramic filters in a device */
-client cluster CeramicFilterMonitoring = 115 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute optional boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  /** Reset the condition of the replaceable to the non degraded state */
-  command ResetCondition(): DefaultSuccess = 0;
-}
-
-/** Attributes and commands for monitoring electrostatic filters in a device */
-client cluster ElectrostaticFilterMonitoring = 116 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute optional percent condition = 0;
-  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute optional boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  /** Reset the condition of the replaceable to the non degraded state */
-  command ResetCondition(): DefaultSuccess = 0;
-}
-
-/** Attributes and commands for monitoring UV filters in a device */
-client cluster UvFilterMonitoring = 117 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute optional percent condition = 0;
-  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute optional boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  /** Reset the condition of the replaceable to the non degraded state */
-  command ResetCondition(): DefaultSuccess = 0;
-}
-
-/** Attributes and commands for monitoring ionizing filters in a device */
-client cluster IonizingFilterMonitoring = 118 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute optional percent condition = 0;
-  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute optional boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  /** Reset the condition of the replaceable to the non degraded state */
-  command ResetCondition(): DefaultSuccess = 0;
-}
-
-/** Attributes and commands for monitoring zeolite filters in a device */
-client cluster ZeoliteFilterMonitoring = 119 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute optional percent condition = 0;
-  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute optional boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  /** Reset the condition of the replaceable to the non degraded state */
-  command ResetCondition(): DefaultSuccess = 0;
-}
-
-/** Attributes and commands for monitoring ozone filters in a device */
-client cluster OzoneFilterMonitoring = 120 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute optional percent condition = 0;
-  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute optional boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  /** Reset the condition of the replaceable to the non degraded state */
-  command ResetCondition(): DefaultSuccess = 0;
-}
-
-/** Attributes and commands for monitoring water tanks in a device */
-client cluster WaterTankMonitoring = 121 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute optional percent condition = 0;
-  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute optional boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  /** Reset the condition of the replaceable to the non degraded state */
-  command ResetCondition(): DefaultSuccess = 0;
-}
-
-/** Attributes and commands for monitoring fuel tanks in a device */
-client cluster FuelTankMonitoring = 122 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute optional percent condition = 0;
-  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute optional boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  /** Reset the condition of the replaceable to the non degraded state */
-  command ResetCondition(): DefaultSuccess = 0;
-}
-
-/** Attributes and commands for monitoring ink cartridges in a device */
-client cluster InkCartridgeMonitoring = 123 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute optional percent condition = 0;
-  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute optional boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  /** Reset the condition of the replaceable to the non degraded state */
-  command ResetCondition(): DefaultSuccess = 0;
-}
-
-/** Attributes and commands for monitoring toner cartridges in a device */
-client cluster TonerCartridgeMonitoring = 124 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute optional percent condition = 0;
-  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -5484,8 +5201,8 @@ client cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -5539,283 +5256,8 @@ client cluster CarbonDioxideConcentrationMeasurement = 1037 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting ethylene concentration measurements */
-client cluster EthyleneConcentrationMeasurement = 1038 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting ethylene oxide concentration measurements */
-client cluster EthyleneOxideConcentrationMeasurement = 1039 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting hydrogen concentration measurements */
-client cluster HydrogenConcentrationMeasurement = 1040 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting hydrogen sulfide concentration measurements */
-client cluster HydrogenSulfideConcentrationMeasurement = 1041 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting nitric oxide concentration measurements */
-client cluster NitricOxideConcentrationMeasurement = 1042 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -5869,63 +5311,8 @@ client cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting oxygen concentration measurements */
-client cluster OxygenConcentrationMeasurement = 1044 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -5979,1108 +5366,8 @@ client cluster OzoneConcentrationMeasurement = 1045 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting sulfur dioxide concentration measurements */
-client cluster SulfurDioxideConcentrationMeasurement = 1046 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting dissolved oxygen concentration measurements */
-client cluster DissolvedOxygenConcentrationMeasurement = 1047 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting bromate concentration measurements */
-client cluster BromateConcentrationMeasurement = 1048 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting chloramines concentration measurements */
-client cluster ChloraminesConcentrationMeasurement = 1049 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting chlorine concentration measurements */
-client cluster ChlorineConcentrationMeasurement = 1050 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting fecal coliform and e. coli concentration measurements */
-client cluster FecalColiformEColiConcentrationMeasurement = 1051 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting fluoride concentration measurements */
-client cluster FluorideConcentrationMeasurement = 1052 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting haloacetic acids concentration measurements */
-client cluster HaloaceticAcidsConcentrationMeasurement = 1053 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting total trihalomethanes concentration measurements */
-client cluster TotalTrihalomethanesConcentrationMeasurement = 1054 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting total coliform bacteria concentration measurements */
-client cluster TotalColiformBacteriaConcentrationMeasurement = 1055 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting turbidity concentration measurements */
-client cluster TurbidityConcentrationMeasurement = 1056 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting copper concentration measurements */
-client cluster CopperConcentrationMeasurement = 1057 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting lead concentration measurements */
-client cluster LeadConcentrationMeasurement = 1058 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting manganese concentration measurements */
-client cluster ManganeseConcentrationMeasurement = 1059 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting sulfate concentration measurements */
-client cluster SulfateConcentrationMeasurement = 1060 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting bromodichloromethane concentration measurements */
-client cluster BromodichloromethaneConcentrationMeasurement = 1061 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting bromoform concentration measurements */
-client cluster BromoformConcentrationMeasurement = 1062 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting chlorodibromomethane concentration measurements */
-client cluster ChlorodibromomethaneConcentrationMeasurement = 1063 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting chloroform concentration measurements */
-client cluster ChloroformConcentrationMeasurement = 1064 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
-    kSoil = 2;
-  }
-
-  enum MeasurementUnitEnum : ENUM8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kNumericMeasurement = 0x1;
-    kLevelIndication = 0x2;
-    kMediumLevel = 0x4;
-    kCriticalLevel = 0x8;
-    kPeakMeasurement = 0x10;
-    kAverageMeasurement = 0x20;
-  }
-
-  readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
-  readonly attribute optional nullable single peakMeasuredValue = 3;
-  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
-  readonly attribute optional nullable single averageMeasuredValue = 5;
-  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
-  readonly attribute optional LevelValueEnum levelValue = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes for reporting sodium concentration measurements */
-client cluster SodiumConcentrationMeasurement = 1065 {
-  enum LevelValueEnum : ENUM8 {
-    kUnknown = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kCritical = 4;
-  }
-
-  enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -7134,8 +5421,8 @@ client cluster Pm25ConcentrationMeasurement = 1066 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -7189,8 +5476,8 @@ client cluster FormaldehydeConcentrationMeasurement = 1067 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -7244,8 +5531,8 @@ client cluster Pm1ConcentrationMeasurement = 1068 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -7299,8 +5586,8 @@ client cluster Pm10ConcentrationMeasurement = 1069 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -7354,8 +5641,8 @@ client cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -7409,8 +5696,8 @@ client cluster RadonConcentrationMeasurement = 1071 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 

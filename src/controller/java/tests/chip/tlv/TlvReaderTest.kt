@@ -20,10 +20,10 @@ package chip.tlv
 
 import com.google.common.truth.Truth.assertThat
 import java.math.BigInteger
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.junit.Assert.assertThrows
 
 // Extracted from a Newman device during a pairing flow. Represents a fabric
 // ID and keys for the fabric 7885a14c693bf1cb.
@@ -188,8 +188,7 @@ class TlvReaderTest {
       assertThat(tag).isInstanceOf(CommonProfileTag::class.java)
       assertThat((tag as CommonProfileTag).size).isEqualTo(2)
       assertThat(value).isInstanceOf(ByteStringValue::class.java)
-      assertThat((value as ByteStringValue).value)
-        .isEqualTo("byte_string_utf8".toByteArray())
+      assertThat((value as ByteStringValue).value).isEqualTo("byte_string_utf8".toByteArray())
     }
   }
 

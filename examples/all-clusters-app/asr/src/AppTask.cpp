@@ -40,6 +40,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+#include <static-supported-temperature-levels.h>
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -47,7 +48,6 @@ using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::System;
 
-LEDWidget sStatusLED;
 LEDWidget sLightLED;
 
 namespace {
@@ -61,6 +61,7 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain /* Endpoint Id */,
                                       &(NetworkCommissioning::ASRWiFiDriver::GetInstance()));
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -119,7 +120,13 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
 
     // Print setup info
+#if CONFIG_NETWORK_LAYER_BLE
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+#else
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
+#endif /* CONFIG_NETWORK_LAYER_BLE */
+
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 
     return CHIP_NO_ERROR;
 }
@@ -131,8 +138,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     ButtonHandler::Init();
 
-    sLightLED.Init(LIGHT1_LED); // embedded board light
-    sStatusLED.Init(LIGHT2_LED);
+    sLightLED.Init(LIGHT_LED);
 
     lega_rtos_start_timer(&sAppTimer);
 
@@ -186,7 +192,6 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
         if (lightState)
         {
             sLightLED.Set(1);
-            sLightLED.SetBrightness(100);
         }
         else
         {
@@ -213,9 +218,9 @@ void AppTask::AppTimerCallback(void * params)
     sAppTask.PostEvent(&timer_event);
 }
 
-void AppTask::PostButtonEvent(uint8_t btnIdx, uint8_t btnAction)
+void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
 {
-    ASR_LOG("%s %s\n", btnIdx == SWITCH1_BUTTON ? "btn1" : "btn2", btnAction == APP_BUTTON_PRESSED ? "Pressed" : "Released");
+    ASR_LOG("%s %s\n", btnIdx == SWITCH1_BUTTON ? "btn1" : "btn2", btnAction == BUTTON_PRESSED ? "Pressed" : "Released");
 
     if (btnIdx != SWITCH1_BUTTON && btnIdx != SWITCH2_BUTTON)
     {
@@ -227,7 +232,7 @@ void AppTask::PostButtonEvent(uint8_t btnIdx, uint8_t btnAction)
     button_event.ButtonEvent.ButtonIdx = btnIdx;
     button_event.ButtonEvent.Action    = btnAction;
 
-    if (btnAction == APP_BUTTON_RELEASED)
+    if (btnAction == BUTTON_RELEASED)
     {
         button_event.Handler = AppEventHandler;
         sAppTask.PostEvent(&button_event);

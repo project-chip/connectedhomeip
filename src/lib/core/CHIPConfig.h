@@ -668,28 +668,6 @@
 #endif // CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
 
 /**
- * @def CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
- *
- * @brief Defines the size of the pool used for tracking the state of
- * secure sessions. This controls the maximum number of concurrent
- * established secure sessions across all supported transports.
- *
- * This is sized by default to cover the sum of the following:
- *  - At least 3 CASE sessions / fabric (Spec Ref: 4.13.2.8)
- *  - 1 reserved slot for CASEServer as a responder.
- *  - 1 reserved slot for PASE.
- *
- *  NOTE: On heap-based platforms, there is no pre-allocation of the pool.
- *  Due to the use of an LRU-scheme to manage sessions, the actual active
- *  size of the pool will grow up to the value of this define,
- *  after which, it will remain at or around this size indefinitely.
- *
- */
-#ifndef CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
-#define CHIP_CONFIG_SECURE_SESSION_POOL_SIZE (CHIP_CONFIG_MAX_FABRICS * 3 + 2)
-#endif // CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
-
-/**
  * @def CHIP_CONFIG_SECURE_SESSION_REFCOUNT_LOGGING
  *
  * @brief This enables logging of changes to the underlying reference count of
@@ -711,6 +689,28 @@
 #ifndef CHIP_CONFIG_MAX_FABRICS
 #define CHIP_CONFIG_MAX_FABRICS 16
 #endif // CHIP_CONFIG_MAX_FABRICS
+
+/**
+ * @def CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
+ *
+ * @brief Defines the size of the pool used for tracking the state of
+ * secure sessions. This controls the maximum number of concurrent
+ * established secure sessions across all supported transports.
+ *
+ * This is sized by default to cover the sum of the following:
+ *  - At least 3 CASE sessions / fabric (Spec Ref: 4.13.2.8)
+ *  - 1 reserved slot for CASEServer as a responder.
+ *  - 1 reserved slot for PASE.
+ *
+ *  NOTE: On heap-based platforms, there is no pre-allocation of the pool.
+ *  Due to the use of an LRU-scheme to manage sessions, the actual active
+ *  size of the pool will grow up to the value of this define,
+ *  after which, it will remain at or around this size indefinitely.
+ *
+ */
+#ifndef CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
+#define CHIP_CONFIG_SECURE_SESSION_POOL_SIZE (CHIP_CONFIG_MAX_FABRICS * 3 + 2)
+#endif // CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
 
 /**
  *  @def CHIP_CONFIG_MAX_GROUP_DATA_PEERS
@@ -1421,6 +1421,32 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE
+ *
+ * Defines the size of the time zone list
+ */
+#ifndef CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE
+#define CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE 2
+#endif
+
+#if (CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE < 1 || CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE > 2)
+#error "Please ensure CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE meets minimum and maximum requirements."
+#endif
+
+/**
+ * @def CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE
+ *
+ * Defines the size of the DSTOffset list
+ */
+#ifndef CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE
+#define CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE 2
+#endif
+
+#if (CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE < 1)
+#error "Please ensure CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE meets minimum requirements."
+#endif
+
+/**
  * @def CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
  *
  * @brief Controls whether core data model code will try to include app-specific generated headers.
@@ -1432,6 +1458,42 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
 #define CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES 0
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL
+ *
+ * @brief Default value for the ICD Management cluster IdleModeInterval attribute, in milliseconds
+ */
+#ifndef CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL
+#define CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL 500
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL
+ *
+ * @brief Default value for the ICD Management cluster ActiveModeInterval attribute, in milliseconds
+ */
+#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL 300
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD
+ *
+ * @brief Default value for the ICD Management cluster ActiveModeThreshold attribute, in milliseconds
+ */
+#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD 300
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
+ *
+ * @brief Default value for the ICD Management cluster ClientsSupportedPerFabric attribute, in milliseconds
+ */
+#ifndef CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
+#define CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC 2
 #endif
 
 /**

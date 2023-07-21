@@ -21,7 +21,6 @@
 #include "AppConfig.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
-#include "LEDWidget.h"
 #include "qrcodegen.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
@@ -38,8 +37,6 @@
 namespace {
 TaskHandle_t sAppTaskHandle;
 } // namespace
-
-LEDWidget lightLED;
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -97,7 +94,11 @@ void AppTask::AppTaskMain(void * pvParameter)
     ConfigurationMgr().LogDeviceConfig();
 
     // Print setup info
+#if CONFIG_NETWORK_LAYER_BLE
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+#else
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
+#endif /* CONFIG_NETWORK_LAYER_BLE */
 
     /* Delete task */
     vTaskDelete(NULL);

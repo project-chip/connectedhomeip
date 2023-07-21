@@ -45,6 +45,15 @@ def run_command(command):
 
     with open(args.log_path, "wb") as f:
         f.write(command_log)
+
+    if returncode != 0:
+        # command_log is binary, so decoding as utf-8 might technically fail.  We don't want
+        # to throw on that.
+        try:
+            print("Failure log: {}".format(command_log.decode()))
+        except Exception:
+            pass
+
     return returncode
 
 
@@ -86,6 +95,9 @@ def build_darwin_framework(args):
     }
     for option in options:
         command += ["{}={}".format(option, "YES" if options[option] else "NO")]
+
+    if args.enable_provisional_framework_features:
+        command += ['GCC_PREPROCESSOR_DEFINITIONS=${inherited} MTR_ENABLE_PROVISIONAL=1']
 
     # For now disable unguarded-availability-new warnings because we
     # internally use APIs that we are annotating as only available on
@@ -162,7 +174,8 @@ if __name__ == "__main__":
     parser.add_argument('--asan', action=argparse.BooleanOptionalAction)
     parser.add_argument('--ble', action=argparse.BooleanOptionalAction)
     parser.add_argument('--clang', action=argparse.BooleanOptionalAction)
-    parser.add_argument('--enable_encoding_sentinel_enum_values', action=argparse.BooleanOptionalAction)
+    parser.add_argument('--enable-encoding-sentinel-enum-values', action=argparse.BooleanOptionalAction)
+    parser.add_argument('--enable-provisional-framework-features', action=argparse.BooleanOptionalAction)
 
     args = parser.parse_args()
     build_darwin_framework(args)

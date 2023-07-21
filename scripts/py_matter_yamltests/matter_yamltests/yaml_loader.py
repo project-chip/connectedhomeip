@@ -15,8 +15,8 @@
 
 from typing import Tuple, Union
 
-from .errors import (TestStepError, TestStepGroupResponseError, TestStepInvalidTypeError, TestStepKeyError,
-                     TestStepNodeIdAndGroupIdError, TestStepResponseVariableError, TestStepValueAndValuesError,
+from .errors import (TestStepError, TestStepGroupEndPointError, TestStepGroupResponseError, TestStepInvalidTypeError,
+                     TestStepKeyError, TestStepNodeIdAndGroupIdError, TestStepResponseVariableError, TestStepValueAndValuesError,
                      TestStepVerificationStandaloneError, TestStepWaitResponseError)
 from .fixes import add_yaml_support_for_scientific_notation_without_dot
 
@@ -105,6 +105,7 @@ class YamlLoader:
             'response': (dict, list, str),  # Can be a variable
             'minInterval': int,
             'maxInterval': int,
+            'timeout': int,
             'timedInteractionTimeoutMs': int,
             'dataVersion': (list, int, str),  # Can be a variable
             'busyWaitMs': int,
@@ -114,6 +115,7 @@ class YamlLoader:
         self.__check(content, schema)
         self.__rule_node_id_and_group_id_are_mutually_exclusive(content)
         self.__rule_group_step_should_not_expect_a_response(content)
+        self.__rule_group_step_should_not_target_an_endpoint(content)
         self.__rule_step_with_verification_should_be_disabled_or_interactive(
             content)
         self.__rule_wait_should_not_expect_a_response(content)
@@ -232,9 +234,11 @@ class YamlLoader:
 
     def __rule_group_step_should_not_expect_a_response(self, content):
         if 'groupId' in content and 'response' in content:
-            response = content.get('response')
-            if 'value' in response or 'values' in response:
-                raise TestStepGroupResponseError(content)
+            raise TestStepGroupResponseError(content)
+
+    def __rule_group_step_should_not_target_an_endpoint(self, content):
+        if 'groupId' in content and 'endpoint' in content:
+            raise TestStepGroupEndPointError(content)
 
     def __rule_step_with_verification_should_be_disabled_or_interactive(self, content):
         if 'verification' in content:

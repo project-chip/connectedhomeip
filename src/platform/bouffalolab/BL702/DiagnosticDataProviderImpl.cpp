@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
-#include <platform/DiagnosticDataProvider.h>
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 extern "C" {
 #include <bl_sys.h>
 }
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -50,35 +50,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
         bootReason = BootReasonType::kUnspecified;
     }
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
-{
-    NetworkInterface * ifp = new NetworkInterface();
-
-    const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
-    ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
-    ifp->isOperational             = true;
-    ifp->offPremiseServicesReachableIPv4.SetNull();
-    ifp->offPremiseServicesReachableIPv6.SetNull();
-    ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
-    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
-    ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
-    ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
-
-    *netifpp = ifp;
-
-    return CHIP_NO_ERROR;
-}
-
-void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * netifp)
-{
-    while (netifp)
-    {
-        NetworkInterface * del = netifp;
-        netifp                 = netifp->Next;
-        delete del;
-    }
 }
 
 } // namespace DeviceLayer

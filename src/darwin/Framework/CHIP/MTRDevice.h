@@ -17,6 +17,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Matter/MTRBaseDevice.h>
+#import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -198,7 +199,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 - (void)openCommissioningWindowWithDiscriminator:(NSNumber *)discriminator
                                         duration:(NSNumber *)duration
                                            queue:(dispatch_queue_t)queue
-                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion MTR_NEWLY_AVAILABLE;
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion
+    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 @end
 

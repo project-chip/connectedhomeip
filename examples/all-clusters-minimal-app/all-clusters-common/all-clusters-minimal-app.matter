@@ -287,6 +287,7 @@ server cluster OnOff = 6 {
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
   bitmap OnOffControl : BITMAP8 {
@@ -408,6 +409,13 @@ server cluster Descriptor = 29 {
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
+  }
+
+  struct SemanticTagStruct {
+    nullable vendor_id mfgCode = 0;
+    enum8 namespaceID = 1;
+    enum8 tag = 2;
+    optional nullable char_string label = 3;
   }
 
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
@@ -900,17 +908,6 @@ server cluster UnitLocalization = 45 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** This cluster is used to describe the configuration and capabilities of a Device's power system. */
-server cluster PowerSourceConfiguration = 46 {
-  readonly attribute INT8U sources[] = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 server cluster PowerSource = 47 {
   enum BatApprovedChemistryEnum : ENUM16 {
@@ -1131,6 +1128,7 @@ server cluster PowerSource = 47 {
   readonly attribute PowerSourceStatusEnum status = 0;
   readonly attribute int8u order = 1;
   readonly attribute char_string<60> description = 2;
+  readonly attribute endpoint_no endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2078,6 +2076,31 @@ server cluster ModeSelect = 80 {
   }
 
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+}
+
+/** Attributes and commands for configuring the temperature control, and reporting temperature. */
+server cluster TemperatureControl = 86 {
+  bitmap Feature : BITMAP32 {
+    kTemperatureNumber = 0x1;
+    kTemperatureLevel = 0x2;
+    kTemperatureStep = 0x4;
+  }
+
+  readonly attribute int8u selectedTemperatureLevel = 4;
+  readonly attribute char_string supportedTemperatureLevels[] = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetTemperatureRequest {
+    optional temperature targetTemperature = 0;
+    optional INT8U targetTemperatureLevel = 1;
+  }
+
+  command SetTemperature(SetTemperatureRequest): DefaultSuccess = 0;
 }
 
 /** An interface to a generic way to secure a door */
@@ -4025,18 +4048,13 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster PowerSourceConfiguration {
-    callback attribute sources;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster PowerSource {
     ram      attribute status default = 0;
     ram      attribute order default = 3;
     ram      attribute description default = "B1";
+    callback attribute endpointList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster GeneralCommissioning {
@@ -4209,7 +4227,7 @@ endpoint 1 {
   server cluster OnOff {
     persist  attribute onOff default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster LevelControl {
@@ -4246,8 +4264,9 @@ endpoint 1 {
     ram      attribute status default = 0;
     ram      attribute order default = 2;
     ram      attribute description default = "B2";
+    callback attribute endpointList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster Switch {
@@ -4284,6 +4303,17 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TemperatureControl {
+    ram      attribute selectedTemperatureLevel default = 0;
+    callback attribute supportedTemperatureLevels;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4594,7 +4624,7 @@ endpoint 2 {
   server cluster OnOff {
     ram      attribute onOff default = 0x00;
     ram      attribute featureMap default = 0x0000;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster Descriptor {
@@ -4610,8 +4640,9 @@ endpoint 2 {
     ram      attribute status default = 0;
     ram      attribute order default = 1;
     ram      attribute description default = "B3";
+    callback attribute endpointList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster OccupancySensing {
@@ -4624,6 +4655,15 @@ endpoint 2 {
 }
 endpoint 65534 {
   device type anonymousEndpointType = 61442, version 1;
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    ram      attribute featureMap default = 0;
+    callback attribute clusterRevision default = 1;
+  }
 
   server cluster NetworkCommissioning {
     callback attribute maxNetworks;

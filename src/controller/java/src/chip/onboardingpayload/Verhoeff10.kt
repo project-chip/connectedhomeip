@@ -17,22 +17,118 @@
 
 package chip.onboardingpayload
 
-/**
- * Implements Verhoeff's check-digit algorithm for base-10 strings.
- */
+/** Implements Verhoeff's check-digit algorithm for base-10 strings. */
 class Verhoeff10 {
   companion object {
     const val Base = 10
     const val PolygonSize = 5
 
-    val sMultiplyTable = intArrayOf(
-      0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 0, 6, 7, 8, 9, 5, 2, 3, 4, 0, 1, 7, 8, 9, 5, 6, 3, 4, 0, 1,
-      2, 8, 9, 5, 6, 7, 4, 0, 1, 2, 3, 9, 5, 6, 7, 8, 5, 9, 8, 7, 6, 0, 4, 3, 2, 1, 6, 5, 9, 8, 7, 1, 0, 4,
-      3, 2, 7, 6, 5, 9, 8, 2, 1, 0, 4, 3, 8, 7, 6, 5, 9, 3, 2, 1, 0, 4, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-    )
+    val sMultiplyTable =
+      intArrayOf(
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        1,
+        2,
+        3,
+        4,
+        0,
+        6,
+        7,
+        8,
+        9,
+        5,
+        2,
+        3,
+        4,
+        0,
+        1,
+        7,
+        8,
+        9,
+        5,
+        6,
+        3,
+        4,
+        0,
+        1,
+        2,
+        8,
+        9,
+        5,
+        6,
+        7,
+        4,
+        0,
+        1,
+        2,
+        3,
+        9,
+        5,
+        6,
+        7,
+        8,
+        5,
+        9,
+        8,
+        7,
+        6,
+        0,
+        4,
+        3,
+        2,
+        1,
+        6,
+        5,
+        9,
+        8,
+        7,
+        1,
+        0,
+        4,
+        3,
+        2,
+        7,
+        6,
+        5,
+        9,
+        8,
+        2,
+        1,
+        0,
+        4,
+        3,
+        8,
+        7,
+        6,
+        5,
+        9,
+        3,
+        2,
+        1,
+        0,
+        4,
+        9,
+        8,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1,
+        0
+      )
 
     // Permutation table for the algorithm.
-    val sPermTable = byteArrayOf(1, 5, 7, 6, 2, 8, 3, 0, 9, 4)    
+    val sPermTable = byteArrayOf(1, 5, 7, 6, 2, 8, 3, 0, 9, 4)
 
     // Compute a check character for a given string.
     fun computeCheckChar(str: String): Char {
@@ -66,8 +162,7 @@ class Verhoeff10 {
     }
 
     fun validateCheckChar(str: String, strLen: Int): Boolean {
-      if (strLen == 0)
-        return false
+      if (strLen == 0) return false
       return validateCheckChar(str[strLen - 1], str, strLen - 1)
     }
 

@@ -19,14 +19,6 @@
 
 #pragma once
 
-#ifdef CFG_PLF_RV32
-#include "asr_gpio.h"
-#include "asr_pinmux.h"
-#define duet_gpio_dev_t asr_gpio_dev_t
-#else
-#include "duet_gpio.h"
-#include "duet_pinmux.h"
-#endif
 // ---- Lock Example App Config ----
 
 #define APP_TASK_NAME "APP"
@@ -34,20 +26,6 @@
 #define APP_TASK_STACK_SIZE (1024 * 4)
 
 #define MATTER_DEVICE_NAME "ASR-Temperature"
-
-#define APP_LOCK_BUTTON_IDX 0
-#define APP_FUNCTION_BUTTON_IDX 1
-
-#define APP_LOCK_BUTTON GPIO10_INDEX
-#define APP_FUNCTION_BUTTON GPIO11_INDEX
-
-#define APP_BUTTON_DEBOUNCE_PERIOD_MS 50
-
-#define APP_BUTTON_PRESSED 0
-#define APP_BUTTON_RELEASED 1
-
-#define SYSTEM_STATE_LED GPIO12_INDEX
-#define LOCK_STATE_LED GPIO13_INDEX
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.

@@ -132,23 +132,12 @@ void MatterTimePluginServerInitCallback() {}
 void MatterAclPluginServerInitCallback() {}
 void MatterPollControlPluginServerInitCallback() {}
 void MatterUnitLocalizationPluginServerInitCallback() {}
-void MatterTimeSynchronizationPluginServerInitCallback() {}
 void MatterProxyValidPluginServerInitCallback() {}
 void MatterProxyDiscoveryPluginServerInitCallback() {}
 void MatterProxyConfigurationPluginServerInitCallback() {}
 void MatterFanControlPluginServerInitCallback() {}
 void MatterActivatedCarbonFilterMonitoringPluginServerInitCallback() {}
-void MatterCeramicFilterMonitoringPluginServerInitCallback() {}
-void MatterElectrostaticFilterMonitoringPluginServerInitCallback() {}
-void MatterFuelTankMonitoringPluginServerInitCallback() {}
 void MatterHepaFilterMonitoringPluginServerInitCallback() {}
-void MatterInkCartridgeMonitoringPluginServerInitCallback() {}
-void MatterIonizingFilterMonitoringPluginServerInitCallback() {}
-void MatterOzoneFilterMonitoringPluginServerInitCallback() {}
-void MatterTonerCartridgeMonitoringPluginServerInitCallback() {}
-void MatterUvFilterMonitoringPluginServerInitCallback() {}
-void MatterWaterTankMonitoringPluginServerInitCallback() {}
-void MatterZeoliteFilterMonitoringPluginServerInitCallback() {}
 void MatterAirQualityPluginServerInitCallback() {}
 void MatterCarbonMonoxideConcentrationMeasurementPluginServerInitCallback() {}
 void MatterCarbonDioxideConcentrationMeasurementPluginServerInitCallback() {}
@@ -160,6 +149,7 @@ void MatterPm1ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterPm25ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterRadonConcentrationMeasurementPluginServerInitCallback() {}
 void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInitCallback() {}
+void MatterOperationalStatePluginServerInitCallback() {}
 // ****************************************
 // Print out information about each cluster
 // ****************************************

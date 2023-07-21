@@ -2578,6 +2578,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
+            jobject value_alarmSeverityLevel;
+            std::string value_alarmSeverityLevelClassName     = "java/lang/Integer";
+            std::string value_alarmSeverityLevelCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                value_alarmSeverityLevelClassName.c_str(), value_alarmSeverityLevelCtorSignature.c_str(),
+                static_cast<uint8_t>(cppValue.alarmSeverityLevel), value_alarmSeverityLevel);
+
             jclass smokeAlarmStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterSmokeAlarmEvent", smokeAlarmStructClass);
@@ -2586,14 +2593,14 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterSmokeAlarmEvent");
                 return nullptr;
             }
-            jmethodID smokeAlarmStructCtor = env->GetMethodID(smokeAlarmStructClass, "<init>", "()V");
+            jmethodID smokeAlarmStructCtor = env->GetMethodID(smokeAlarmStructClass, "<init>", "(Ljava/lang/Integer;)V");
             if (smokeAlarmStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterSmokeAlarmEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(smokeAlarmStructClass, smokeAlarmStructCtor);
+            jobject value = env->NewObject(smokeAlarmStructClass, smokeAlarmStructCtor, value_alarmSeverityLevel);
 
             return value;
         }
@@ -2604,6 +2611,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
+            jobject value_alarmSeverityLevel;
+            std::string value_alarmSeverityLevelClassName     = "java/lang/Integer";
+            std::string value_alarmSeverityLevelCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                value_alarmSeverityLevelClassName.c_str(), value_alarmSeverityLevelCtorSignature.c_str(),
+                static_cast<uint8_t>(cppValue.alarmSeverityLevel), value_alarmSeverityLevel);
+
             jclass COAlarmStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterCOAlarmEvent", COAlarmStructClass);
@@ -2612,14 +2626,14 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterCOAlarmEvent");
                 return nullptr;
             }
-            jmethodID COAlarmStructCtor = env->GetMethodID(COAlarmStructClass, "<init>", "()V");
+            jmethodID COAlarmStructCtor = env->GetMethodID(COAlarmStructClass, "<init>", "(Ljava/lang/Integer;)V");
             if (COAlarmStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterCOAlarmEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(COAlarmStructClass, COAlarmStructCtor);
+            jobject value = env->NewObject(COAlarmStructClass, COAlarmStructCtor, value_alarmSeverityLevel);
 
             return value;
         }
@@ -2630,6 +2644,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
+            jobject value_alarmSeverityLevel;
+            std::string value_alarmSeverityLevelClassName     = "java/lang/Integer";
+            std::string value_alarmSeverityLevelCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                value_alarmSeverityLevelClassName.c_str(), value_alarmSeverityLevelCtorSignature.c_str(),
+                static_cast<uint8_t>(cppValue.alarmSeverityLevel), value_alarmSeverityLevel);
+
             jclass lowBatteryStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterLowBatteryEvent", lowBatteryStructClass);
@@ -2638,14 +2659,14 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterLowBatteryEvent");
                 return nullptr;
             }
-            jmethodID lowBatteryStructCtor = env->GetMethodID(lowBatteryStructClass, "<init>", "()V");
+            jmethodID lowBatteryStructCtor = env->GetMethodID(lowBatteryStructClass, "<init>", "(Ljava/lang/Integer;)V");
             if (lowBatteryStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterLowBatteryEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(lowBatteryStructClass, lowBatteryStructCtor);
+            jobject value = env->NewObject(lowBatteryStructClass, lowBatteryStructCtor, value_alarmSeverityLevel);
 
             return value;
         }
@@ -2787,6 +2808,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
+            jobject value_alarmSeverityLevel;
+            std::string value_alarmSeverityLevelClassName     = "java/lang/Integer";
+            std::string value_alarmSeverityLevelCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                value_alarmSeverityLevelClassName.c_str(), value_alarmSeverityLevelCtorSignature.c_str(),
+                static_cast<uint8_t>(cppValue.alarmSeverityLevel), value_alarmSeverityLevel);
+
             jclass interconnectSmokeAlarmStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterInterconnectSmokeAlarmEvent",
@@ -2796,14 +2824,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterInterconnectSmokeAlarmEvent");
                 return nullptr;
             }
-            jmethodID interconnectSmokeAlarmStructCtor = env->GetMethodID(interconnectSmokeAlarmStructClass, "<init>", "()V");
+            jmethodID interconnectSmokeAlarmStructCtor =
+                env->GetMethodID(interconnectSmokeAlarmStructClass, "<init>", "(Ljava/lang/Integer;)V");
             if (interconnectSmokeAlarmStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterInterconnectSmokeAlarmEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(interconnectSmokeAlarmStructClass, interconnectSmokeAlarmStructCtor);
+            jobject value =
+                env->NewObject(interconnectSmokeAlarmStructClass, interconnectSmokeAlarmStructCtor, value_alarmSeverityLevel);
 
             return value;
         }
@@ -2814,6 +2844,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
+            jobject value_alarmSeverityLevel;
+            std::string value_alarmSeverityLevelClassName     = "java/lang/Integer";
+            std::string value_alarmSeverityLevelCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                value_alarmSeverityLevelClassName.c_str(), value_alarmSeverityLevelCtorSignature.c_str(),
+                static_cast<uint8_t>(cppValue.alarmSeverityLevel), value_alarmSeverityLevel);
+
             jclass interconnectCOAlarmStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterInterconnectCOAlarmEvent",
@@ -2823,14 +2860,15 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterInterconnectCOAlarmEvent");
                 return nullptr;
             }
-            jmethodID interconnectCOAlarmStructCtor = env->GetMethodID(interconnectCOAlarmStructClass, "<init>", "()V");
+            jmethodID interconnectCOAlarmStructCtor =
+                env->GetMethodID(interconnectCOAlarmStructClass, "<init>", "(Ljava/lang/Integer;)V");
             if (interconnectCOAlarmStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterInterconnectCOAlarmEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(interconnectCOAlarmStructClass, interconnectCOAlarmStructCtor);
+            jobject value = env->NewObject(interconnectCOAlarmStructClass, interconnectCOAlarmStructCtor, value_alarmSeverityLevel);
 
             return value;
         }
@@ -3294,106 +3332,6 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
     }
     case app::Clusters::ActivatedCarbonFilterMonitoring::Id: {
         using namespace app::Clusters::ActivatedCarbonFilterMonitoring;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::CeramicFilterMonitoring::Id: {
-        using namespace app::Clusters::CeramicFilterMonitoring;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::ElectrostaticFilterMonitoring::Id: {
-        using namespace app::Clusters::ElectrostaticFilterMonitoring;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::UvFilterMonitoring::Id: {
-        using namespace app::Clusters::UvFilterMonitoring;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::IonizingFilterMonitoring::Id: {
-        using namespace app::Clusters::IonizingFilterMonitoring;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::ZeoliteFilterMonitoring::Id: {
-        using namespace app::Clusters::ZeoliteFilterMonitoring;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::OzoneFilterMonitoring::Id: {
-        using namespace app::Clusters::OzoneFilterMonitoring;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::WaterTankMonitoring::Id: {
-        using namespace app::Clusters::WaterTankMonitoring;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::FuelTankMonitoring::Id: {
-        using namespace app::Clusters::FuelTankMonitoring;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::InkCartridgeMonitoring::Id: {
-        using namespace app::Clusters::InkCartridgeMonitoring;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::TonerCartridgeMonitoring::Id: {
-        using namespace app::Clusters::TonerCartridgeMonitoring;
         switch (aPath.mEventId)
         {
         default:
@@ -4527,56 +4465,6 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::EthyleneConcentrationMeasurement::Id: {
-        using namespace app::Clusters::EthyleneConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::EthyleneOxideConcentrationMeasurement::Id: {
-        using namespace app::Clusters::EthyleneOxideConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::HydrogenConcentrationMeasurement::Id: {
-        using namespace app::Clusters::HydrogenConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::HydrogenSulfideConcentrationMeasurement::Id: {
-        using namespace app::Clusters::HydrogenSulfideConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::NitricOxideConcentrationMeasurement::Id: {
-        using namespace app::Clusters::NitricOxideConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
     case app::Clusters::NitrogenDioxideConcentrationMeasurement::Id: {
         using namespace app::Clusters::NitrogenDioxideConcentrationMeasurement;
         switch (aPath.mEventId)
@@ -4587,218 +4475,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::OxygenConcentrationMeasurement::Id: {
-        using namespace app::Clusters::OxygenConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
     case app::Clusters::OzoneConcentrationMeasurement::Id: {
         using namespace app::Clusters::OzoneConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::SulfurDioxideConcentrationMeasurement::Id: {
-        using namespace app::Clusters::SulfurDioxideConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::DissolvedOxygenConcentrationMeasurement::Id: {
-        using namespace app::Clusters::DissolvedOxygenConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::BromateConcentrationMeasurement::Id: {
-        using namespace app::Clusters::BromateConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::ChloraminesConcentrationMeasurement::Id: {
-        using namespace app::Clusters::ChloraminesConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::ChlorineConcentrationMeasurement::Id: {
-        using namespace app::Clusters::ChlorineConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::FecalColiformEColiConcentrationMeasurement::Id: {
-        using namespace app::Clusters::FecalColiformEColiConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::FluorideConcentrationMeasurement::Id: {
-        using namespace app::Clusters::FluorideConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::HaloaceticAcidsConcentrationMeasurement::Id: {
-        using namespace app::Clusters::HaloaceticAcidsConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::TotalTrihalomethanesConcentrationMeasurement::Id: {
-        using namespace app::Clusters::TotalTrihalomethanesConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::TotalColiformBacteriaConcentrationMeasurement::Id: {
-        using namespace app::Clusters::TotalColiformBacteriaConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::TurbidityConcentrationMeasurement::Id: {
-        using namespace app::Clusters::TurbidityConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::CopperConcentrationMeasurement::Id: {
-        using namespace app::Clusters::CopperConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::LeadConcentrationMeasurement::Id: {
-        using namespace app::Clusters::LeadConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::ManganeseConcentrationMeasurement::Id: {
-        using namespace app::Clusters::ManganeseConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::SulfateConcentrationMeasurement::Id: {
-        using namespace app::Clusters::SulfateConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::BromodichloromethaneConcentrationMeasurement::Id: {
-        using namespace app::Clusters::BromodichloromethaneConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::BromoformConcentrationMeasurement::Id: {
-        using namespace app::Clusters::BromoformConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::ChlorodibromomethaneConcentrationMeasurement::Id: {
-        using namespace app::Clusters::ChlorodibromomethaneConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::ChloroformConcentrationMeasurement::Id: {
-        using namespace app::Clusters::ChloroformConcentrationMeasurement;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::SodiumConcentrationMeasurement::Id: {
-        using namespace app::Clusters::SodiumConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:

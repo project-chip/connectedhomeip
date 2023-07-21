@@ -31,21 +31,22 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH writes 0 to the Options attribute"
+    - label: "Step 0a: TH writes 0 to the Options attribute"
       PICS: CC.S.F01 && CC.S.A000f
       command: "writeAttribute"
       attribute: "Options"
       arguments:
           value: 0
 
-    - label: "TH sends On command to DUT"
+    - label: "Step 0b: TH sends On command to DUT"
       PICS: OO.S.C01.Rsp
       cluster: "On/Off"
       command: "On"
 
     - label:
-          "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=6000,
-          Direction=0x00 (shortest distance) and TransitionTime=0 (immediately)."
+          "Step 2a: TH sends EnhancedMoveToHue command to DUT with
+          EnhancedHue=6000, Direction=0x00 (shortest distance) and
+          TransitionTime=0 (immediately)."
       PICS: CC.S.F01 && CC.S.C40.Rsp
       command: "EnhancedMoveToHue"
       arguments:
@@ -71,8 +72,8 @@ tests:
                 value: 100
 
     - label:
-          "TH sends EnhancedStepHue command to DUT with StepMode=0x01 (up),
-          StepSize=6000 and TransitionTime=300 (30s)."
+          "Step 2b: TH sends EnhancedStepHue command to DUT with StepMode=0x01
+          (up), StepSize=6000 and TransitionTime=300 (30s)."
       PICS: CC.S.F01 && CC.S.C42.Rsp
       command: "EnhancedStepHue"
       arguments:
@@ -97,7 +98,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads EnhancedCurrentHue attribute from DUT"
+    - label: "Step 2c: TH reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
       attribute: "EnhancedCurrentHue"
@@ -115,7 +116,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads EnhancedCurrentHue attribute from DUT"
+    - label: "Step 2d: TH reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
       attribute: "EnhancedCurrentHue"
@@ -133,7 +134,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads EnhancedCurrentHue attribute from DUT"
+    - label: "Step 2e: TH reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
       attribute: "EnhancedCurrentHue"
@@ -151,7 +152,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "TH reads EnhancedCurrentHue attribute from DUT"
+    - label: "Step 2f: TH reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
       attribute: "EnhancedCurrentHue"
@@ -161,8 +162,9 @@ tests:
               maxValue: 13800
 
     - label:
-          "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=12000,
-          Direction=0x00 (shortest distance) and TransitionTime=0 (immediately)."
+          "Step 5a: TH sends EnhancedMoveToHue command to DUT with
+          EnhancedHue=12000, Direction=0x00 (shortest distance) and
+          TransitionTime=0 (immediately)."
       PICS: CC.S.F01 && CC.S.C40.Rsp
       command: "EnhancedMoveToHue"
       arguments:
@@ -188,8 +190,8 @@ tests:
                 value: 100
 
     - label:
-          "TH sends EnhancedStepHue command to DUT with StepMode=0x03 (down),
-          StepSize=6000 and TransitionTime=300 (30s)"
+          "Step 5b: TH sends EnhancedStepHue command to DUT with StepMode=0x03
+          (down), StepSize=6000 and TransitionTime=300 (30s)"
       PICS: CC.S.F01 && CC.S.C42.Rsp
       command: "EnhancedStepHue"
       arguments:
@@ -214,7 +216,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads EnhancedCurrentHue attribute from DUT"
+    - label: "Step 5c: TH reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
       attribute: "EnhancedCurrentHue"
@@ -232,7 +234,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads EnhancedCurrentHue attribute from DUT"
+    - label: "Step 2d: TH reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
       attribute: "EnhancedCurrentHue"
@@ -250,7 +252,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads EnhancedCurrentHue attribute from DUT"
+    - label: "Step 2e: TH reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
       attribute: "EnhancedCurrentHue"
@@ -268,7 +270,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "TH reads EnhancedCurrentHue attribute from DUT"
+    - label: "Step 2f: TH reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
       attribute: "EnhancedCurrentHue"
@@ -277,7 +279,7 @@ tests:
               minValue: 5100
               maxValue: 6900
 
-    - label: "TH reads ColorMode attribute from DUT"
+    - label: "Step 6a: TH reads ColorMode attribute from DUT"
       PICS: CC.S.F01 && CC.S.A0008
       command: "readAttribute"
       attribute: "ColorMode"
@@ -287,7 +289,7 @@ tests:
               minValue: 0
               maxValue: 2
 
-    - label: "TH reads EnhancedColorMode attribute from DUT"
+    - label: "Step 6b: TH reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.F01 && CC.S.A4001
       command: "readAttribute"
       attribute: "EnhancedColorMode"
