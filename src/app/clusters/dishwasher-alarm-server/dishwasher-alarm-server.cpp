@@ -40,9 +40,6 @@ static constexpr size_t kDishwasherAlarmDelegateTableSize =
 
 static_assert(kDishwasherAlarmDelegateTableSize <= kEmberInvalidEndpointIndex, "Dishwasher Alarm Delegate table size error");
 
-static BitMask<AlarmMap> SetStateByLatch(const BitMask<AlarmMap> latch, const BitMask<AlarmMap> currentState,
-                                         const BitMask<AlarmMap> newState);
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -188,7 +185,7 @@ EmberAfStatus DishwasherAlarmServer::SetMaskValue(EndpointId endpoint, const Bit
     if (!mask.HasAll(state))
     {
         state  = mask & state;
-        status = SetStateValue(endpoint, state);
+        status = SetStateValue(endpoint, state, true);
     }
     return status;
 }
@@ -226,14 +223,14 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const Bi
 
     if (GetSupportedValue(endpoint, &supported) || !supported.HasAll(finalNewState))
     {
-        ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: State is not supported");
+        ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: Alarm is not supported");
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
     BitMask<AlarmMap> mask;
     if (GetMaskValue(endpoint, &mask) || !mask.HasAll(finalNewState))
     {
-        ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: State is not supported");
+        ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: Alarm is suppressed");
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
@@ -249,8 +246,9 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const Bi
     BitMask<AlarmMap> latch;
     if (!ignoreLatchState && (GetLatchValue(endpoint, &latch) == EMBER_ZCL_STATUS_SUCCESS))
     {
-        BitMask<AlarmMap> finalState = SetStateByLatch(latch, currentState, finalNewState);
-        finalNewState.Set(finalState);
+        // only reset bits which can be reset based on latch value
+        BitMask<AlarmMap> finalState(latch & currentState, finalNewState);
+        finalNewState = finalState;
     }
 
     status = Attributes::State::Set(endpoint, finalNewState);
@@ -275,7 +273,7 @@ EmberAfStatus DishwasherAlarmServer::ResetStateValue(EndpointId endpoint, const 
     BitMask<AlarmMap> supported;
     if (GetSupportedValue(endpoint, &supported) || !supported.HasAll(alarms))
     {
-        ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: State is not supported");
+        ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: Alarm is not supported");
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
@@ -396,43 +394,4 @@ bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(app::CommandHandle
     commandObj->AddStatus(commandPath, status);
 
     return true;
-}
-
-/**
- * If the Dishwasher Alarm Cluster has Latch attribute, should call this function to handle the
- * State attribute.
- * If each bit set in the Latch attribute is true, the corresponding bit set in the
- * State attribute can change from false to true, but unable to change from true to false;
- * If each bit set in the Latch attribute is flase, the corresponding bit set in the
- * State attribute can change to true or false.
- * @param[in] latch The current latch attribute.
- * @param[in] currentState The current State attribute.
- * @param[in] newState The State attribute which want to set.
- * @return The State attribute which want to set.
- */
-static BitMask<AlarmMap> SetStateByLatch(const BitMask<AlarmMap> latch, const BitMask<AlarmMap> currentState,
-                                         const BitMask<AlarmMap> newState)
-{
-    uint32_t rawLatch             = latch.Raw();
-    uint32_t rawCurrentStateLatch = currentState.Raw();
-    uint32_t rawNewState          = newState.Raw();
-    uint32_t newStateBit          = 0;
-    uint32_t finalState           = 0;
-    BitMask<AlarmMap> state;
-    for (size_t i = 0; i < sizeof(rawLatch) * 8; ++i)
-    {
-        if (rawLatch & 0x1)
-        {
-            newStateBit = (rawCurrentStateLatch & 0x01) | (rawNewState & 0x01);
-        }
-        else
-        {
-            newStateBit = (rawNewState & 0x01);
-        }
-        finalState |= (newStateBit << i);
-        rawLatch >>= 1;
-        rawCurrentStateLatch >>= 1;
-        rawNewState >>= 1;
-    }
-    return state.SetRaw(finalState);
 }
