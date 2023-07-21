@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Door Lock"
     endpoint: 1
-    timeout: 100
+    timeout: 25
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -33,14 +33,6 @@ tests:
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 10000
 
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
-
     - label: "Verify that lock state attribute value is set to Unlocked"
       command: "readAttribute"
       attribute: "LockState"
@@ -50,14 +42,6 @@ tests:
     - label: "Try to lock the door without a PIN"
       command: "LockDoor"
       timedInteractionTimeoutMs: 10000
-
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
 
     - label: "Verify that lock state attribute value is set to Locked"
       command: "readAttribute"
@@ -69,14 +53,6 @@ tests:
       command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
 
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
-
     - label: "Verify that lock state attribute value is set to Unlocked"
       command: "readAttribute"
       attribute: "LockState"
@@ -86,14 +62,6 @@ tests:
     - label: "Try to lock the door without a PIN"
       command: "LockDoor"
       timedInteractionTimeoutMs: 10000
-
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
 
     - label: "Verify that lock state attribute value is set to Locked"
       command: "readAttribute"
@@ -180,14 +148,6 @@ tests:
           values:
               - name: "PINCode"
                 value: "123456"
-
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
 
     - label: "Read the LockOperation event list"
       command: "readEvent"
@@ -307,14 +267,6 @@ tests:
               - name: "PINCode"
                 value: "123456"
 
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
-
     - label: "Verify that lock state attribute value is set to Locked"
       command: "readAttribute"
       attribute: "LockState"
@@ -379,14 +331,6 @@ tests:
               - name: "PINCode"
                 value: "123456"
 
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
-
     - label: "Verify that lock state attribute value is set to Unlocked"
       command: "readAttribute"
       attribute: "LockState"
@@ -400,14 +344,6 @@ tests:
           values:
               - name: "PINCode"
                 value: "123456"
-
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
 
     - label: "Verify that lock state attribute value is set to Locked"
       command: "readAttribute"
@@ -443,14 +379,6 @@ tests:
               - name: "PINCode"
                 value: "123456"
 
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
-
     - label: "Verify that lock state attribute value is set to Unlocked"
       command: "readAttribute"
       attribute: "LockState"
@@ -464,14 +392,6 @@ tests:
           values:
               - name: "PINCode"
                 value: "123456"
-
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
 
     - label: "Verify that lock state attribute value is set to Locked"
       command: "readAttribute"
@@ -553,14 +473,6 @@ tests:
               - name: "PINCode"
                 value: "123456"
 
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
-
     - label: "Verify that lock state attribute value is set to Unlocked"
       command: "readAttribute"
       attribute: "LockState"
@@ -574,14 +486,6 @@ tests:
           values:
               - name: "PINCode"
                 value: "123456"
-
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
 
     - label: "Create a disabled user and credential"
       command: "SetCredential"
@@ -633,14 +537,6 @@ tests:
               - name: "PINCode"
                 value: "123456"
 
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
-
     - label: "Verify that lock state attribute value is set to Unlocked"
       command: "readAttribute"
       attribute: "LockState"
@@ -670,14 +566,6 @@ tests:
           values:
               - name: "PINCode"
                 value: "123456"
-
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
 
     - label: "Verify that lock state attribute value is set to Locked"
       command: "readAttribute"

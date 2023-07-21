@@ -37,7 +37,7 @@ struct LockActionData
     bool moving = false;
 };
 
-LockActionData currentAction;
+static LockActionData gCurrentAction;
 
 bool LockEndpoint::Lock(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
                         const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
@@ -427,21 +427,21 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
             ChipLogProgress(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", lockStateToString(lockState),
                             mEndpointId);
 
-            if (currentAction.moving == true)
+            if (gCurrentAction.moving == true)
             {
                 return false;
             }
 
-            currentAction.moving     = true;
-            currentAction.endpointId = mEndpointId;
-            currentAction.lockState  = lockState;
-            currentAction.opSource   = opSource;
-            currentAction.userIndex  = NullNullable;
-            currentAction.fabricIdx  = fabricIdx;
-            currentAction.nodeId     = nodeId;
+            gCurrentAction.moving     = true;
+            gCurrentAction.endpointId = mEndpointId;
+            gCurrentAction.lockState  = lockState;
+            gCurrentAction.opSource   = opSource;
+            gCurrentAction.userIndex  = NullNullable;
+            gCurrentAction.fabricIdx  = fabricIdx;
+            gCurrentAction.nodeId     = nodeId;
 
             // simulate 3s lock movement duration
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(3), OnLockActionCompleteCallback, nullptr);
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
 
             return true;
         }
@@ -506,54 +506,54 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
         "Lock App: specified PIN code was found in the database, setting door lock state to \"%s\" [endpointId=%d,userIndex=%u]",
         lockStateToString(lockState), mEndpointId, userIndex);
 
-    if (currentAction.moving == true)
+    if (gCurrentAction.moving == true)
     {
         return false;
     }
 
-    currentAction.moving          = true;
-    currentAction.endpointId      = mEndpointId;
-    currentAction.lockState       = lockState;
-    currentAction.opSource        = opSource;
-    currentAction.userIndex       = MakeNullable(static_cast<uint16_t>(userIndex + 1));
-    currentAction.credentialIndex = static_cast<uint16_t>(credentialIndex);
-    currentAction.fabricIdx       = fabricIdx;
-    currentAction.nodeId          = nodeId;
+    gCurrentAction.moving          = true;
+    gCurrentAction.endpointId      = mEndpointId;
+    gCurrentAction.lockState       = lockState;
+    gCurrentAction.opSource        = opSource;
+    gCurrentAction.userIndex       = MakeNullable(static_cast<uint16_t>(userIndex + 1));
+    gCurrentAction.credentialIndex = static_cast<uint16_t>(credentialIndex);
+    gCurrentAction.fabricIdx       = fabricIdx;
+    gCurrentAction.nodeId          = nodeId;
 
     // simulate 3s lock movement duration
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(3), OnLockActionCompleteCallback, nullptr);
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
 
     return true;
 }
 
 void LockEndpoint::OnLockActionCompleteCallback(chip::System::Layer *, void * callbackContext)
 {
-    if (currentAction.userIndex == NullNullable)
+    if (gCurrentAction.userIndex == NullNullable)
     {
-        DoorLockServer::Instance().SetLockState(currentAction.endpointId, currentAction.lockState, currentAction.opSource,
-                                                NullNullable, NullNullable, currentAction.fabricIdx, currentAction.nodeId);
+        DoorLockServer::Instance().SetLockState(gCurrentAction.endpointId, gCurrentAction.lockState, gCurrentAction.opSource,
+                                                NullNullable, NullNullable, gCurrentAction.fabricIdx, gCurrentAction.nodeId);
     }
     else
     {
-        LockOpCredentials userCredential[] = { { CredentialTypeEnum::kPin, currentAction.credentialIndex } };
+        LockOpCredentials userCredential[] = { { CredentialTypeEnum::kPin, gCurrentAction.credentialIndex } };
         auto userCredentials               = MakeNullable<List<const LockOpCredentials>>(userCredential);
 
-        DoorLockServer::Instance().SetLockState(currentAction.endpointId, currentAction.lockState, currentAction.opSource,
-                                                currentAction.userIndex, userCredentials, currentAction.fabricIdx,
-                                                currentAction.nodeId);
+        DoorLockServer::Instance().SetLockState(gCurrentAction.endpointId, gCurrentAction.lockState, gCurrentAction.opSource,
+                                                gCurrentAction.userIndex, userCredentials, gCurrentAction.fabricIdx,
+                                                gCurrentAction.nodeId);
     }
 
     // move back to Unlocked after Unlatch
-    if (currentAction.lockState == DlLockState::kUnlatched)
+    if (gCurrentAction.lockState == DlLockState::kUnlatched)
     {
-        currentAction.lockState = DlLockState::kUnlocked;
+        gCurrentAction.lockState = DlLockState::kUnlocked;
 
         // simulate 1s lock movement duration
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), OnLockActionCompleteCallback, nullptr);
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
     }
     else
     {
-        currentAction.moving = false;
+        gCurrentAction.moving = false;
     }
 }
 

@@ -159,14 +159,6 @@ tests:
       command: "LockDoor"
       timedInteractionTimeoutMs: 1000
 
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
-
     - label: "Step 4: TH sends Lock Door Command to the DUT with valid PINCode"
       PICS: DRLK.S.C00.Rsp
       command: "LockDoor"
@@ -175,14 +167,6 @@ tests:
           values:
               - name: "PINCode"
                 value: "123456"
-
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
 
     - label:
           "Step 5a: TH writes the RequirePINforRemoteOperation attribute value
@@ -221,14 +205,6 @@ tests:
           values:
               - name: "PINCode"
                 value: "123456"
-
-    - label: "Wait for lock action to complete"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
 
     - label:
           "Step 8: TH sends Lock Door Command to the DUT without valid PINCode"
