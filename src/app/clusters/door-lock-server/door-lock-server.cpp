@@ -128,21 +128,13 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
         opType = LockOperationTypeEnum::kUnlatch;
     }
 
-    if (OperationSourceEnum::kRemote == opSource)
+    if (OperationSourceEnum::kRemote == opSource && (fabricIdx.IsNull() || nodeId.IsNull()))
     {
-        if (fabricIdx.IsNull() || nodeId.IsNull())
-        {
-            ChipLogError(Zcl, "Received SetLockState for remote operation without fabricIdx or nodeId");
-        }
+        ChipLogError(Zcl, "Received SetLockState for remote operation without fabricIdx or nodeId");
+    }
 
-        SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kUnspecified, userIndex, fabricIdx, nodeId,
-                               credentials, success);
-    }
-    else
-    {
-        SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kUnspecified, userIndex, NullNullable,
-                               NullNullable, credentials, success);
-    }
+    SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kUnspecified, userIndex, fabricIdx, nodeId,
+                           credentials, success);
 
     // Reset wrong entry attempts (in case there were any incorrect credentials presented before) if lock/unlock was a success
     // and a valid credential was presented.
