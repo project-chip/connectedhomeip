@@ -100,7 +100,7 @@ struct ServerInitParams
     ServerInitParams() = default;
 
     // Not copyable
-    ServerInitParams(const ServerInitParams &)             = delete;
+    ServerInitParams(const ServerInitParams &) = delete;
     ServerInitParams & operator=(const ServerInitParams &) = delete;
 
     // Application delegate to handle some commissioning lifecycle events
@@ -180,7 +180,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     CommonCaseDeviceServerInitParams() = default;
 
     // Not copyable
-    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &)             = delete;
+    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &) = delete;
     CommonCaseDeviceServerInitParams & operator=(const CommonCaseDeviceServerInitParams &) = delete;
 
     /**
