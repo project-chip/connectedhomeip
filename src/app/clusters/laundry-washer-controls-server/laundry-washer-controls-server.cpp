@@ -19,6 +19,8 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 
+#include "laundry-washer-controls-delegate.h"
+#include "laundry-washer-controls-server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -29,12 +31,9 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include "laundry-washer-controls-delegate.h"
-#include "laundry-washer-controls-server.h"
 #include <app/server/Server.h>
 #include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
-
 
 using namespace chip;
 using namespace chip::app;
@@ -59,7 +58,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     return (endpoint > kLaundryWasherControlsDelegateTableSize ? nullptr : gDelegateTable[endpoint]);
 }
 
-}
+} // namespace
 
 LaundryWasherControlsServer LaundryWasherControlsServer::sInstance;
 
@@ -141,21 +140,21 @@ CHIP_ERROR LaundryWasherControlsServer::Read(const ConcreteReadAttributePath & a
 CHIP_ERROR LaundryWasherControlsServer::ReadSpinSpeeds(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     aEncoder.EncodeEmptyList();
-    Delegate *delegate = GetDelegate(aPath.mEndpointId);
+    Delegate * delegate = GetDelegate(aPath.mEndpointId);
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
 
     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-            for (uint8_t i = 0 ; true ; i++)
+        for (uint8_t i = 0; true; i++)
+        {
+            CharSpan spinSpeed;
+            auto err = delegate->GetSpinSpeedAtIndex(i, spinSpeed);
+            if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
             {
-                CharSpan spinSpeed;
-                auto err = delegate->GetSpinSpeedAtIndex(i, spinSpeed);
-                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(encoder.Encode(spinSpeed));
+                return CHIP_NO_ERROR;
             }
+            ReturnErrorOnFailure(err);
+            ReturnErrorOnFailure(encoder.Encode(spinSpeed));
+        }
     });
 }
 
@@ -163,21 +162,21 @@ CHIP_ERROR LaundryWasherControlsServer::ReadSupportedRinses(const ConcreteReadAt
                                                             AttributeValueEncoder & aEncoder)
 {
     aEncoder.EncodeEmptyList();
-    Delegate *delegate = GetDelegate(aPath.mEndpointId);
+    Delegate * delegate = GetDelegate(aPath.mEndpointId);
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
 
     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-            for (uint8_t i = 0 ; true ; i++)
+        for (uint8_t i = 0; true; i++)
+        {
+            NumberOfRinsesEnum supportedRinse;
+            auto err = delegate->GetSupportedRinseAtIndex(i, supportedRinse);
+            if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
             {
-                NumberOfRinsesEnum supportedRinse;
-                auto err = delegate->GetSupportedRinseAtIndex(i, supportedRinse);
-                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(encoder.Encode(supportedRinse));
+                return CHIP_NO_ERROR;
             }
+            ReturnErrorOnFailure(err);
+            ReturnErrorOnFailure(encoder.Encode(supportedRinse));
+        }
     });
 }
 

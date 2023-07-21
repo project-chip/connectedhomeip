@@ -17,10 +17,10 @@
 
 #pragma once
 
+#include "laundry-washer-controls-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/util/af.h>
-#include "laundry-washer-controls-delegate.h"
 
 namespace chip {
 namespace app {
@@ -52,7 +52,7 @@ public:
      * @param void
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-//    CHIP_ERROR Init();
+    //    CHIP_ERROR Init();
 
     /**
      * @brief Set the attribute newSpinSpeedCurrent

@@ -31,7 +31,7 @@ namespace LaundryWasherControls {
 class Delegate
 {
 public:
-    Delegate() = default;
+    Delegate()          = default;
     virtual ~Delegate() = default;
 
     /**
@@ -46,8 +46,7 @@ public:
      * @param index The index of the supported rinses with 0 representing the first one.
      * @param supportedRinse  The supported rinse is filled.
      */
-    virtual CHIP_ERROR GetSupportedRinseAtIndex(size_t index,  NumberOfRinsesEnum & supportedRinse) = 0;
-
+    virtual CHIP_ERROR GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse) = 0;
 };
 
 } // namespace LaundryWasherControls
