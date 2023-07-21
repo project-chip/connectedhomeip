@@ -772,6 +772,7 @@ LWM.S.F00=1
 
 #Command
 LWM.S.C00.Rsp=1
+LWM.S.C01.Tx=1
 
 # Time Format Localization Cluster
 LTIME.S=1
