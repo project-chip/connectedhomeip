@@ -251,16 +251,47 @@ class TC_DeviceBasicComposition(MatterBaseTest):
             asserts.fail(msg)
 
     # ======= START OF ACTUAL TESTS =======
-    def test_endpoint_zero_present(self):
-        logging.info("Validating that the Root Node endpoint is present (EP0)")
+    def test_TC_SM_1_1(self):
+        self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
+        self.print_step(2, "Verify that endpoint 0 exists")
         if 0 not in self.endpoints:
             self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
                               problem="Did not find Endpoint 0.", spec_location="Endpoint Composition")
             self.fail_current_test()
 
-    def test_descriptor_present_on_each_endpoint(self):
-        logging.info("Validating each endpoint has a descriptor cluster")
+        self.print_step(3, "Verify that endpoint 0 descriptor cluster includes the root node device type")
+        if not Clusters.Descriptor in self.endpoints[0]:
+            self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                              problem="No descriptor cluster on Endpoint 0", spec_location="Root node device type")
+            self.fail_current_test()
+        root_dev_type = Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=0x16, revision=1)
+        if root_dev_type not in self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
+            self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                              problem="Root node device type not listed on endpoint 0", spec_location="Root node device type")
+            self.fail_current_test()
 
+        self.print_step(4, "Verify that the root node device type does not appear in any of the non-zero endpoints")
+        for endpoint_id, endpoint in self.endpoints.items():
+            if endpoint_id == 0:
+                continue
+            if root_dev_type in endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
+                self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id),
+                                  problem=f'Root node device type listed on endpoint {endpoint_id}', spec_location="Root node device type")
+                self.fail_current_test()
+
+        self.print_step(5, "Verify the existence of all the root node clusters on EP0")
+        root = self.endpoints[0]
+        required_clusters = [Clusters.BasicInformation, Clusters.AccessControl, Clusters.GroupKeyManagement,
+                             Clusters.GeneralCommissioning, Clusters.AdministratorCommissioning, Clusters.OperationalCredentials, Clusters.GeneralDiagnostics]
+        for c in required_clusters:
+            if c not in root:
+                self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                                  problem=f'Root node does not contain required cluster {c}', spec_location="Root node device type")
+                self.fail_current_test()
+
+    def test_DT_1_1(self):
+        self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
+        self.print_step(2, "Verify that each endpoint includes a descriptor cluster")
         success = True
         for endpoint_id, endpoint in self.endpoints.items():
             has_descriptor = (Clusters.Descriptor in endpoint)
@@ -273,8 +304,10 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         if not success:
             self.fail_current_test("At least one endpoint was missing the descriptor cluster.")
 
-    def test_global_attributes_present_on_each_cluster(self):
-        logging.info("Validating each cluster has the mandatory global attributes")
+    def test_IDM_10_1(self):
+        self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
+
+        self.print_step(2, "Validate all global attributes are present")
 
         @dataclass
         class RequiredMandatoryAttribute:
@@ -297,6 +330,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                                        validator=check_list_of_ints_in_range(0, 0xFFFF_FFFF)),
         ]
 
+        self.print_step(3, "Validate all reported attributes match AttributeList")
         success = True
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
@@ -359,13 +393,37 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                             # Warn only for now
                             # TODO: Fail in the future
                             continue
+                    for attribute_id in cluster:
+                        if attribute_id not in attribute_list:
+                            attribute_string = self.cluster_mapper.get_attribute_string(cluster_id, attribute_id)
+                            location = AttributePathLocation(endpoint_id, cluster_id, attribute_id)
+                            self.record_error(self.get_test_name(), location=location,
+                                              problem=f'Found attribute {attribute_string} on {location.as_cluster_string(self.cluster_mapper)} not listed in attribute list', spec_location="AttributeList Attribute")
+                            success = False
 
         if not success:
             self.fail_current_test(
                 "At least one cluster was missing a mandatory global attribute or had differences between claimed attributes supported and actual.")
 
-    def test_all_attribute_strings_valid(self):
-        asserts.skip("TODO: Validate every string in the attribute tree is valid UTF-8 and has no nulls")
+    def test_IDM_11_1(self):
+        success = True
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster in endpoint.items():
+                for attribute_id, attribute in cluster.items():
+                    if cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES or attribute_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
+                        continue
+                    if Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id].attribute_type.Type is not str:
+                        continue
+                    try:
+                        cluster[attribute_id].encode('utf-8', errors='strict')
+                    except UnicodeError:
+                        location = AttributePathLocation(endpoint_id, cluster_id, attribute_id)
+                        attribute_string = self.cluster_mapper.get_attribute_string(cluster_id, attribute_id)
+                        self.record_error(self.get_test_name(
+                        ), location=location, problem=f'Attribute {attribute_string} on {location.as_cluster_string(self.cluster_mapper)} is invalid UTF-8', spec_location="Data types - Character String")
+                        success = False
+        if not success:
+            self.fail_current_test("At least one attribute string was not valid UTF-8")
 
     def test_all_event_strings_valid(self):
         asserts.skip("TODO: Validate every string in the read events is valid UTF-8 and has no nulls")
