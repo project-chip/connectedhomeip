@@ -18,20 +18,18 @@
 
 #include <AppMain.h>
 
+#include <ChipShellCollection.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/ConcreteAttributePath.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/shell/Engine.h>
-#include <ChipShellCollection.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::Shell;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-void ApplicationInit()
-{
-}
+void ApplicationInit() {}
 
 void ApplicationShutdown() {}
 

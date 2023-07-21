@@ -42,8 +42,7 @@ public:
     CHIP_ERROR HandleGetLineup(app::AttributeValueEncoder & aEncoder);
     CHIP_ERROR HandleGetCurrentChannel(app::AttributeValueEncoder & aEncoder);
 
-    void HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper,
-                                     const chip::CharSpan & match);
+    void HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper, const chip::CharSpan & match);
     bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber);
     bool HandleSkipChannel(const int16_t & count);
 
@@ -62,5 +61,4 @@ protected:
     uint16_t mCurrentChannelIndex;
     ChannelInfoType mCurrentChannel;
     std::vector<ChannelInfoType> mChannels;
-
 };

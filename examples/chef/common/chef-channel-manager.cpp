@@ -109,7 +109,7 @@ CHIP_ERROR ChefChannelManager::HandleGetCurrentChannel(app::AttributeValueEncode
 }
 
 void ChefChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper,
-                                 const chip::CharSpan & match)
+                                             const chip::CharSpan & match)
 {
     std::vector<ChannelInfoType> matchedChannels;
     uint16_t index = 0;
@@ -152,7 +152,6 @@ void ChefChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannel
         mCurrentChannelIndex = index;
         helper.Success(response);
     }
-
 }
 
 bool ChefChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber)
