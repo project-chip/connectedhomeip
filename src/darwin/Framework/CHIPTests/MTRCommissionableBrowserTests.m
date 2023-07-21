@@ -33,7 +33,7 @@ static const uint16_t kTestDiscriminator3 = 1113u;
 static const uint16_t kTestDiscriminator4 = 3840u;
 static const uint16_t kTestDiscriminator5 = 3839u;
 static const uint16_t kDiscoverDeviceTimeoutInSeconds = 10;
-static const uint16_t kExpectedDiscoveredDevicesCount = 4;
+static const uint16_t kExpectedDiscoveredDevicesCount = 5;
 
 // Singleton controller we use.
 static MTRDeviceController * sController = nil;
