@@ -82,11 +82,12 @@ def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: st
                                                                              'test_scripts',
                                                                              'mobile-device-test.py'), help='Test script to use.')
 @click.option("--script-args", type=str, default='',
-              help='Path to the test script to use, omit to use the default test script (mobile-device-test.py).')
+              help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')
 @click.option("--script-gdb", is_flag=True,
               help='Run script through gdb')
 def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: str, script_gdb: bool):
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
+    script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
 
     if factoryreset:
         # Remove native app config
