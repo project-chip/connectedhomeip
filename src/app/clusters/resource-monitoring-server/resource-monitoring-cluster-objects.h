@@ -150,20 +150,20 @@ enum class Fields : uint8_t
 
 class GenericType : protected app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type
 {
-    private:
-        ResourceMonitoring::ProductIdentifierTypeEnum productIdentifierType;
-        chip::CharSpan productIdentifierValue;
+private:
+    ResourceMonitoring::ProductIdentifierTypeEnum productIdentifierType;
+    chip::CharSpan productIdentifierValue;
 
-    public:
-        GenericType() {}
-        GenericType(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType, chip::CharSpan aProductIdentifierValue)
-        {
-            productIdentifierType = aProductIdentifierType;
-            productIdentifierValue = aProductIdentifierValue;
-        }
-        virtual ~GenericType() = default;
-        static constexpr bool kIsFabricScoped = false;
-        CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+public:
+    GenericType() {}
+    GenericType(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType, chip::CharSpan aProductIdentifierValue)
+    {
+        productIdentifierType  = aProductIdentifierType;
+        productIdentifierValue = aProductIdentifierValue;
+    }
+    virtual ~GenericType()                = default;
+    static constexpr bool kIsFabricScoped = false;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 } // namespace GenericReplacementProductStruct
 
