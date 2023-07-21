@@ -15,10 +15,8 @@
 #    limitations under the License.
 
 import argparse
-import json
 import os
 import sys
-from collections import namedtuple
 
 try:
     import qrcode
@@ -61,7 +59,7 @@ def get_args():
 
 
 def generate_qrcode_data(args):
-    if no_onboarding_modules == False:
+    if no_onboarding_modules is False:
         setup_payload = SetupPayload(discriminator=args.discriminator,
                                      pincode=args.pincode,
                                      rendezvous=2,  # fixed pairing BLE
