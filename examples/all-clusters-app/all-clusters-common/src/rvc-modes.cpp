@@ -109,7 +109,7 @@ CHIP_ERROR RvcCleanModeDelegate::Init()
 
 void RvcCleanModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    uint8_t rvcRunCurrentMode = mInstance->GetCurrentMode();
+    uint8_t rvcRunCurrentMode = gRvcRunModeInstance->GetCurrentMode();
 
     if (rvcRunCurrentMode == RvcRunMode::ModeCleaning)
     {
