@@ -1783,6 +1783,101 @@ PICS:
     - label: "Does the DUT(client) support the Color Temperature feature?"
       id: CC.C.F04
 
+    #  Dishwasher Alarm Cluster
+
+    - label:
+          "Does the device implement the Dishwasher Alarm cluster as a server?"
+      id: DISHALM.S
+
+    - label:
+          "Does the device implement the Dishwasher Alarm cluster as a client?"
+      id: DISHALM.C
+
+    #
+    # server / features
+    #
+    - label: "Does the device support the Reset command"
+      id: DISHALM.S.F00
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the Mask attribute?"
+      id: DISHALM.S.A0000
+
+    - label: "Does the device implement the Latch attribute?"
+      id: DISHALM.S.A0001
+
+    - label: "Does the device implement the State attribute?"
+      id: DISHALM.S.A0002
+
+    - label: "Does the DUT(server) support the PARTSLIST attribute?"
+      id: DISHALM.S.A0003
+
+    #
+    # server / events
+    #
+    - label: "Does the device implement the Notify event_?"
+      id: DISHALM.S.E00
+
+    #
+    # server / Manual controllable
+    #
+    - label:
+          "Can the Dishwasher Alarm attribute changed by physical control at the
+          device?"
+      id: DISHALM.M.ManuallyControlled
+
+    #
+    # server / Commands received
+    #
+    - label: "Does the device implement receiving the Reset command?"
+      id: DISHALM.S.C00.Rsp
+
+    - label: "Does the device implement receiving the Modify command?"
+      id: DISHALM.S.C01.Rsp
+
+    #  Dishwasher Mode Cluster
+
+    - label: "Does the device implement the DISHM cluster as a server?"
+      id: DISHM.S
+
+    #
+    # server / features
+    #
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same endpoint?"
+      id: DISHM.S.F00
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: DISHM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: DISHM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: DISHM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: DISHM.S.A0003
+
+    #
+    # server / Commands received
+    #
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: DISHM.S.C00.Rsp
+
+    #
+    # server / Commands generated
+    #
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: DISHM.S.C01.Tx
+
     # Descriptor Cluster TestPlan
     - label: "Does the device implement the Descriptor cluster as a server?"
       id: DESC.S
@@ -4945,10 +5040,10 @@ PICS:
     # server / manually
     #
     - label: "Does the Device support User Interface Display"
-      id: CADMIN.UserInterfaceDisplay
+      id: CADMIN.M.UserInterfaceDisplay
 
     - label: "Does the Device support Audio Interface"
-      id: CADMIN.AudioInterface
+      id: CADMIN.M.AudioInterface
 
     #
     # client / attributes
@@ -9119,6 +9214,28 @@ PICS:
       id: ICDM.S.A0005
 
     #
+    # Client Attribute
+    #
+    - label: "Does the device implement the IdleModeInterval attribute?"
+      id: ICDM.C.A0000
+
+    - label: "Does the device implement the ActiveModeInterval attribute?"
+      id: ICDM.C.A0001
+
+    - label: "Does the device implement the ActiveModeThreshold attribute?"
+      id: ICDM.C.A0002
+
+    - label: "Does the device implement the RegisteredClients attribute?"
+      id: ICDM.C.A0003
+
+    - label: "Does the device implement the IcdCounter attribute?"
+      id: ICDM.C.A0004
+
+    - label:
+          "Does the device implement the ClientsSupportedPerFabric attribute?"
+      id: ICDM.C.A0005
+
+    #
     # Features
     #
     - label: "Does the device support this specific cluster feature?"
@@ -9127,9 +9244,29 @@ PICS:
     #
     #Commands:
     #
+    - label: "Does the device implement receiving the RegisterClient command?"
+      id: ICDM.S.C00.Rsp
+
+    - label: "Does the device implement receiving the UnregisterClient command?"
+      id: ICDM.S.C02.Rsp
+
     - label:
           "Does the device implement receiving the StayActiveRequest command?"
       id: ICDM.S.C03.Rsp
+
+    #
+    #Commands generated
+    #
+    - label: "Does the device implement receiving the RegisterClient command?"
+      id: ICDM.S.C01.Tx
+
+    #
+    #Commands received
+    #
+    - label:
+          "Does the device implement receiving the RegisterClientResponse
+          command?"
+      id: ICDM.C.C00.Rsp
 
     #
     #RVC Clean Mode Select
@@ -9171,11 +9308,37 @@ PICS:
     #
     #Operational State
     #
+    - label:
+          "Does the device implement the Operational State cluster as a server?"
+      id: OPSTATE.S
+
+    - label:
+          "Does the device implement the Operational State cluster as a client?"
+      id: OPSTATE.C
+
     #Server Attributes
+    - label: "Does the device implement the PhaseList attribute?"
+      id: OPSTATE.S.A0000
+
+    - label: "Does the device implement the CurrentPhase attribute?"
+      id: OPSTATE.S.A0001
+
     - label: "Does the device implement the CountdownTime attribute?"
       id: OPSTATE.S.A0002
 
+    - label: "Does the device implement the OperationalStateList attribute?"
+      id: OPSTATE.S.A0003
+
+    - label: "Does the device implement the OperationalState attribute?"
+      id: OPSTATE.S.A0004
+
+    - label: "Does the device implement the OperationalError attribute?"
+      id: OPSTATE.S.A0005
     #Events Generated
+
+    - label: "Does the device generate the OperationalError event?"
+      id: OPSTATE.S.E00
+
     - label: "Does the device generate the OperationCompltion event?"
       id: OPSTATE.S.E01
 
@@ -9191,3 +9354,500 @@ PICS:
 
     - label: "Does the device implement receiving the Resume command?"
       id: OPSTATE.S.C03
+
+    #Commands recevied
+    - label: "Does the device implement receiving the Pause command?"
+      id: OPSTATE.S.C00.Rsp
+
+    - label: "Does the device implement receiving the Stop command?"
+      id: OPSTATE.S.C01.Rsp
+
+    - label: "Does the device implement receiving the Start command?"
+      id: OPSTATE.S.C02.Rsp
+
+    - label: "Does the device implement receiving the Resume command?"
+      id: OPSTATE.S.C03.Rsp
+
+    #Commands generated
+    - label:
+          "Does the device implement generating the OperationalCommandResponse
+          command?"
+      id: OPSTATE.S.C04.Tx
+
+    # Smoke CO Alarm Cluster Test Plan
+    - label: "Does the device implement the SMCO cluster as a server?"
+      id: SMCO.S
+
+    - label: "Does the device implement the SMCO cluster as a client?"
+      id: SMCO.C
+
+    #
+    # server / features
+    #
+    - label: "Does the device support this specific cluster feature?"
+      id: SMCO.S.F00
+
+    - label: "Does the device support this specific cluster feature?"
+      id: SMCO.S.F01
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the ExpressedState attribute?"
+      id: SMCO.S.A0000
+
+    - label: "Does the device implement the SmokeState attribute?"
+      id: SMCO.S.A0001
+
+    - label: "Does the device implement the COState attribute?"
+      id: SMCO.S.A0002
+
+    - label: "Does the device implement the BatteryAlert attribute?"
+      id: SMCO.S.A0003
+
+    - label: "Does the device implement the DeviceMuted attribute?"
+      id: SMCO.S.A0004
+
+    - label: "Does the device implement the TestInProgress attribute?"
+      id: SMCO.S.A0005
+
+    - label: "Does the device implement the HardwareFaultAlert attribute?"
+      id: SMCO.S.A0006
+
+    - label: "Does the device implement the EndOfServiceAlert attribute?"
+      id: SMCO.S.A0007
+
+    - label: "Does the device implement the InterconnectSmokeAlarm attribute?"
+      id: SMCO.S.A0008
+
+    - label: "Does the device implement the InterconnectCOAlarm attribute?"
+      id: SMCO.S.A0009
+
+    - label: "Does the device implement the ContaminationState attribute?"
+      id: SMCO.S.A0010
+
+    - label: "Does the device implement the SensitivityLevel attribute?"
+      id: SMCO.S.A0011
+
+    - label: "Does the device implement the ExpiryDate attribute?"
+      id: SMCO.S.A0012
+
+    - label: "Does the device implement the ContaminationState attribute?"
+      id: SMCO.S.A000a
+
+    - label: "Does the device implement the SensitivityLevel attribute?"
+      id: SMCO.S.A000b
+
+    - label: "Does the device implement the ExpiryDate attribute?"
+      id: SMCO.S.A000c
+
+    #
+    # server / Events
+    #
+    - label: "Does the device implement the SmokeAlarm event?"
+      id: SMCO.S.E00
+
+    - label: "Does the device implement the COAlarm event?"
+      id: SMCO.S.E01
+
+    - label: "Does the device implement the LowBattery event?"
+      id: SMCO.S.E02
+
+    - label: "Does the device implement the HardwareFault event?"
+      id: SMCO.S.E03
+
+    - label: "Does the device implement the EndOfService event?"
+      id: SMCO.S.E04
+
+    - label: "Does the device implement the SelfTestComplete event?"
+      id: SMCO.S.E05
+
+    - label: "Does the device implement the AlarmMuted event?"
+      id: SMCO.S.E06
+
+    - label: "Does the device implement the MuteEnded event?"
+      id: SMCO.S.E07
+
+    - label: "Does the device implement the InterconnectSmokeAlarm event?"
+      id: SMCO.S.E08
+
+    - label: "Does the device implement the InterconnectCOAlarm event?"
+      id: SMCO.S.E09
+
+    - label: "Does the device implement the AllClear event?"
+      id: SMCO.S.E10
+
+    #
+    # server / manually
+    #
+    - label:
+          "Can the TestInProgress attribute be changed by physical control at
+          the device?"
+      id: SMCO.M.ManuallyControlledTest
+
+    - label:
+          "Can the DeviceMuted attribute be changed by physical control at the
+          device?"
+      id: SMCO.M.ManuallyControlledMute
+
+    #
+    # server / commandsReceived
+    #
+    - label: "Does the device implement receiving the SelfTestRequest command?"
+      id: SMCO.S.C00.Rsp
+
+    #  Laundry Washer Mode Cluster
+
+    - label: "Does the device implement the LWM cluster as a server?"
+      id: LWM.S
+
+    #
+    # server / features
+    #
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same endpoint?"
+      id: LWM.S.F00
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: LWM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: LWM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: LWM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: LWM.S.A0003
+
+    #
+    # server / Commands received
+    #
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: LWM.S.C00.Rsp
+
+    #
+    # server / Commands generated
+    #
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: LWM.S.C01.Tx
+
+    # RVC Clean Mode Cluster
+
+    - label: "Does the device implement the RVCCLEANM cluster as a server?"
+      id: RVCCLEANM.S
+
+    #
+    # server / features
+    #
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same endpoint?"
+      id: RVCCLEANM.S.F00
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: RVCCLEANM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: RVCCLEANM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: RVCCLEANM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: RVCCLEANM.S.A0003
+
+    #
+    # server / Commands received
+    #
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: RVCCLEANM.S.C00.Rsp
+
+    #
+    # server / Commands generated
+    #
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: RVCCLEANM.S.C01.Tx
+
+    #
+    #Temperature Controlled Cabinet Mode Cluster
+    #
+    - label: "Does the device implement the TCCM cluster as a server?"
+      id: TCCM.S
+
+    #Features
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same endpoint?"
+      id: TCCM.S.F00
+
+    #Server Attributes
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: TCCM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: TCCM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: TCCM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: TCCM.S.A0003
+
+    #Commands received
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: TCCM.S.C00.Rsp
+
+    #Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: TCCM.S.C01.Tx
+
+    #
+    #Temperature Control
+    #
+    - label:
+          "Does the device implement the TemperatureControl cluster as a server?"
+      id: TCTL.S
+
+    - label:
+          "Does the device implement the TemperatureControl cluster as a client?"
+      id: TCTL.C
+
+    #Features
+    - label: "Does the device support temperature number feature"
+      id: TCTL.S.F00
+
+    - label: "Does the device support temperature level feature"
+      id: TCTL.S.F01
+
+    - label: "Does the device support step feature"
+      id: TCTL.S.F02
+
+    #Server Attributes
+    - label: "Does the device implement the TemperatureSetpoint attribute?"
+      id: TCTL.S.A0000
+
+    - label: "Does the device implement the MinTemperature attribute?"
+      id: TCTL.S.A0001
+
+    - label: "Does the device implement the MaxTemperature attribute?"
+      id: TCTL.S.A0002
+
+    - label: "Does the device implement the Step attribute?"
+      id: TCTL.S.A0003
+
+    - label: "Does the device implement the SelectedTemperatureLevel attribute?"
+      id: TCTL.S.A0004
+
+    - label:
+          "Does the device implement the SupportedTemperatureLevels attribute?"
+      id: TCTL.S.A0005
+
+    #Manual controllable
+    - label:
+          "Can the Temperature attribute changed by physical control at the
+          device?"
+      id: TCC.M.ManuallyControlledTemperature
+
+    #Commands received
+    - label:
+          "Does the device implement receiving the SetTemperatureCommand
+          command?"
+      id: TCTL.S.C00.Rsp
+
+    #Commands generated
+    - label:
+          "Does the device support sending the SetTemperatureCommand command?"
+      id: TCTL.C.C00.Tx
+
+    #
+    #Washer Controls
+    #
+    - label:
+          "Does the device implement the Laundry Washer Controls cluster as a
+          server?"
+      id: WASHERCTRL.S
+
+    - label:
+          "Does the device implement the Laundry Washer Controls cluster as a
+          client?"
+      id: WASHERCTRL.C
+
+    #Features
+    - label: "Does the device support spin feature"
+      id: WASHERCTRL.S.F00
+
+    - label: "Does the device support rinse feature"
+      id: WASHERCTRL.S.F01
+
+    #Server Attributes
+    - label: "Does the device implement the SpinSpeeds attribute?"
+      id: WASHERCTRL.S.A0000
+
+    - label: "Does the device implement the SpinSpeedCurrent attribute?"
+      id: WASHERCTRL.S.A0001
+
+    - label: "Does the device implement the NumberOfRinses attribute?"
+      id: WASHERCTRL.S.A0002
+
+    - label: "Does the device implement the SupportedRinses attribute?"
+      id: WASHERCTRL.S.A0003
+
+    #Manual controllable
+    - label: "Can the Spin attribute changed by physical control at the device?"
+      id: WASHERCTRL.S.M.ManuallyControlledSpin
+
+    - label:
+          "Can the Rinse attribute changed by physical control at the device?"
+      id: WASHERCTRL.S.M.ManuallyControlledRinse
+
+    #
+    #RVC Run Mode
+    #
+    - label: "Does the device implement the RVCRUNM cluster as a server?"
+      id: RVCRUNM.S
+
+    #Features
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same endpoint?"
+      id: RVCRUNM.S.F00
+
+    #Attributes
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: RVCRUNM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: RVCRUNM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: RVCRUNM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: RVCRUNM.S.A0003
+
+    #Commands received
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: RVCRUNM.S.C00.Rsp
+
+    #Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: RVCRUNM.S.C01.Tx
+
+    #
+    #Refrigerator Alarm
+    #
+    - label:
+          "Does the device implement the Refrigerator Alarm cluster as a server?"
+      id: REFALM.S
+
+    - label:
+          "Does the device implement the Refrigerator Alarm cluster as a client?"
+      id: REFALM.C
+
+    #Attributes
+    - label: "Does the device implement the Mask attribute?"
+      id: REFALM.S.A0000
+
+    - label: "Does the device implement the Latch attribute?"
+      id: REFALM.S.A0001
+
+    - label: "Does the device implement the State attribute?"
+      id: REFALM.S.A0002
+
+    - label: "Does the device implement the Supported attribute?"
+      id: REFALM.S.A0003
+
+    #Events
+    - label: "Does the device implement the Notify event?"
+      id: REFALM.S.E00
+
+    #Commands received
+    - label: "Does the device implement receiving the Reset command?"
+      id: REFALM.S.C00.Rsp
+
+    - label:
+          "Does the device implement receiving the ModifyEnabledAlarms command?"
+      id: REFALM.S.C01.Rsp
+
+    #
+    #RVC Operational State
+    #
+    - label:
+          "Does the device implement the RVC Operational State cluster as a
+          server?"
+      id: RVCOPSTATE.S
+
+    - label:
+          "Does the device implement the RVC Operational State cluster as a
+          client?"
+      id: RVCOPSTATE.C
+
+    #Attributes
+    - label: "Does the device implement the PhaseList attribute?"
+      id: RVCOPSTATE.S.A0000
+
+    - label: "Does the device implement the CurrentPhase attribute?"
+      id: RVCOPSTATE.S.A0001
+
+    - label: "Does the device implement the CountdownTime attribute?"
+      id: RVCOPSTATE.S.A0002
+
+    - label: "Does the device implement the OperationalStateList attribute?"
+      id: RVCOPSTATE.S.A0003
+
+    - label: "Does the device implement the OperationalState attribute?"
+      id: RVCOPSTATE.S.A0004
+
+    - label: "Does the device implement the OperationalError attribute?"
+      id: RVCOPSTATE.S.A0005
+
+    #Commands received
+    - label: "Does the device implement receiving the Pause command?"
+      id: RVCOPSTATE.S.C00.Rsp
+
+    - label: "Does the device implement receiving the Stop command?"
+      id: RVCOPSTATE.S.C01.Rsp
+
+    - label: "Does the device implement receiving the Start command?"
+      id: RVCOPSTATE.S.C02.Rsp
+
+    - label: "Does the device implement receiving the Resume command?"
+      id: RVCOPSTATE.S.C03.Rsp
+
+    #Commands generated
+    - label:
+          "Does the device implement generating the OperationalCommandResponse
+          command?"
+      id: RVCOPSTATE.S.C04.Tx
+
+    #Events
+    - label: "Does the device implement the OperationalError Event ?"
+      id: RVCOPSTATE.S.E00
+
+    - label: "Does the device implement the OperationCompletion Event ?"
+      id: RVCOPSTATE.S.E01
+
+    #Client Commands received
+    - label: "Does the device implement sending the Pause command?"
+      id: RVCOPSTATE.C.C00.Tx
+
+    - label: "Does the device implement sending the Stop command?"
+      id: RVCOPSTATE.C.C01.Tx
+
+    - label: "Does the device implement sending the Start command?"
+      id: RVCOPSTATE.C.C02.Tx
+
+    - label: "Does the device implement sending the Resume command?"
+      id: RVCOPSTATE.C.C04.Tx

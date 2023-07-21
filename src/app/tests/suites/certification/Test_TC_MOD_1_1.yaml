@@ -31,13 +31,23 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/26445
     - label: "Step 2: TH reads the ClusterRevision attribute from the DUT"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
-          value: 1
-          constraints:
-              type: int16u
+      verification: |
+          ./chip-tool modeselect read cluster-revision 1 1
+
+          Verify the "ClusterRevision" value is of unit16 and reflects the highest revision number 2 on the TH(Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1645775623.658997][3277:3282] CHIP:TOO:   ClusterRevision: 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 3a: TH reads the FeatureMap attribute from the DUT"
       PICS: MOD.S.F00
