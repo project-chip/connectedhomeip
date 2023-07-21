@@ -1,6 +1,7 @@
 name: Build Certification Image
 on:
     workflow_call:
+    workflow_dispatch:
 jobs:
     build-cert-bin:
         runs-on: ubuntu-latest
