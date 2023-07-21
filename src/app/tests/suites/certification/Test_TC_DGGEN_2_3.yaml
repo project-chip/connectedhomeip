@@ -24,7 +24,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label: "Step 1: Commission DUT to TH"
       verification: |
           execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
            ./chip-all-clusters-app
@@ -35,7 +35,7 @@ tests:
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
       disabled: true
 
-    - label: "TH reads TestEventTriggersEnabled attribute value"
+    - label: "Step 2: TH reads TestEventTriggersEnabled attribute value"
       verification: |
           ./chip-tool generaldiagnostics read test-event-triggers-enabled 1 0
           Verify that the TestEventTriggersEnabled value is of bool type. If this value is set to True, then proceed with step 3, otherwise skip step 3 On TH(chip-tool)
@@ -46,8 +46,8 @@ tests:
       disabled: true
 
     - label:
-          "Invoke the TestEventTrigger command with EnableKey field set to
-          PIXIT.DGGEN.ENABLEKEY and EventTrigger field set to 0."
+          "Step 3: Invoke the TestEventTrigger command with EnableKey field set
+          to PIXIT.DGGEN.ENABLEKEY and EventTrigger field set to 0."
       PICS: DGGEN.S.C00.Rsp
       verification: |
           Based on Spec, EnableKey value is to be provided by  manufacturer
@@ -56,8 +56,8 @@ tests:
       disabled: true
 
     - label:
-          "Invoke the TestEventTrigger command with EnableKey field set to 16
-          bytes of all zeroes and EventTrigger field set to 0."
+          "Step 4: Invoke the TestEventTrigger command with EnableKey field set
+          to 16 bytes of all zeroes and EventTrigger field set to 0."
       PICS: DGGEN.S.C00.Rsp
       verification: |
           ./chip-tool generaldiagnostics  test-event-trigger hex:0000000000000000  0 1 0
