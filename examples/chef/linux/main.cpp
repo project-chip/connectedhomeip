@@ -20,7 +20,6 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/util/config.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <lib/shell/Engine.h>
 #include <ChipShellCollection.h>
@@ -30,17 +29,8 @@ using namespace chip::Shell;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-#ifdef EMBER_AF_PLUGIN_CHANNEL_SERVER
-#include <chef-channel-manager.h>
-#endif
-
 void ApplicationInit()
 {
-#ifdef EMBER_AF_PLUGIN_CHANNEL_SERVER
-    // TODO: BasicVideoPlayer (with Channel Cluster Server) device's endpoint ID is 1
-    chip::EndpointId endpoint = 1;
-    chip::app::Clusters::Channel::SetDefaultDelegate(endpoint, static_cast<Channel::Delegate *>(&(ChefChannelManager::Instance())));
-#endif // EMBER_AF_PLUGIN_CHANNEL_SERVER
 }
 
 void ApplicationShutdown() {}

@@ -231,3 +231,12 @@ bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t cr
 }
 
 #endif /* EMBER_AF_PLUGIN_DOOR_LOCK_SERVER */
+
+#ifdef EMBER_AF_PLUGIN_CHANNEL_SERVER
+#include <chef-channel-manager.h>
+
+void emberAfChannelClusterInitCallback(EndpointId endpoint)
+{
+    app::Clusters::Channel::SetDefaultDelegate(endpoint, static_cast<app::Clusters::Channel::Delegate *>(&(ChefChannelManager::Instance())));
+}
+#endif // EMBER_AF_PLUGIN_CHANNEL_SERVER
