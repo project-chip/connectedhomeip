@@ -190,8 +190,7 @@ SECTIONS
     end = __end__;
     _end = __end__;
     KEEP(*(.heap*))
-    . = ORIGIN(RAM) + LENGTH(RAM);
-    __HeapLimit = .;
+    __HeapLimit = ORIGIN(RAM) + LENGTH(RAM);
   } > RAM
 
   __heap_size = __HeapLimit - __HeapBase;

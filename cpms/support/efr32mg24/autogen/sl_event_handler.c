@@ -10,7 +10,7 @@
 void sl_platform_init(void)
 {
   CHIP_Init();
-
+  nvm3_initDefault();
 }
 
 void sl_driver_init(void)
@@ -19,7 +19,8 @@ void sl_driver_init(void)
 
 void sl_service_init(void)
 {
-
+  sl_mbedtls_init();
+  psa_crypto_init();
   sl_iostream_init_instances();
 }
 

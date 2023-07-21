@@ -22,6 +22,10 @@ define block CSTACK with alignment = 8
   section .stack
 };
 
+define block RAMFUNCS with alignment = 8
+{
+};
+
 /* Note that "expanding size" is not used yet due to failures in 8.30.1 */
 define block HEAP with alignment = 8
 {
@@ -73,5 +77,12 @@ place at end of MAIN_FLASH_region {
   block nvm,
 };
 
+"ramfuncs":
+place at start of RAM_region { 
+  block RAMFUNCS,
+};
+
 "application_ram":
-place at start of RAM_region { block application_ram };
+place in RAM_region {
+  block application_ram,
+};
