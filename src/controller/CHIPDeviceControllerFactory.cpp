@@ -491,6 +491,18 @@ void DeviceControllerSystemState::Shutdown()
         mSessionMgr = nullptr;
     }
 
+    if (mReportScheduler != nullptr)
+    {
+        chip::Platform::Delete(mReportScheduler);
+        mReportScheduler = nullptr;
+    }
+
+    if (mTimerDelegate != nullptr)
+    {
+        chip::Platform::Delete(mTimerDelegate);
+        mTimerDelegate = nullptr;
+    }
+
     if (mTempFabricTable != nullptr)
     {
         mTempFabricTable->Shutdown();
