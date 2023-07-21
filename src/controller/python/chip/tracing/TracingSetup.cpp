@@ -38,31 +38,32 @@ public:
     ~ScopedStackLock() { PlatformMgr().UnlockChipStack(); }
 };
 
-::chip::Tracing::Json::JsonBackend mJsonBackend;
+chip::Tracing::Json::JsonBackend gJsonBackend;
 
-chip::Tracing::Perfetto::FileTraceOutput mPerfettoFileOutput;
-chip::Tracing::Perfetto::PerfettoBackend mPerfettoBackend;
+chip::Tracing::Perfetto::FileTraceOutput gPerfettoFileOutput;
+chip::Tracing::Perfetto::PerfettoBackend gPerfettoBackend;
 
 } // namespace
 
 extern "C" void pychip_tracing_start_json_log(const char * file_name)
+{
 
     ScopedStackLock lock;
 
-mJsonBackend.CloseFile(); // just in case, ensure no file output
-chip::Tracing::Register(mJsonBackend);
+    gJsonBackend.CloseFile(); // just in case, ensure no file output
+    chip::Tracing::Register(gJsonBackend);
 }
 
 extern "C" PyChipError pychip_tracing_start_json_file(const char * file_name)
 {
     ScopedStackLock lock;
 
-    CHIP_ERROR err = mJsonBackend.OpenFile(file_name);
+    CHIP_ERROR err = gJsonBackend.OpenFile(file_name);
     if (err != CHIP_NO_ERROR)
     {
         return ToPyChipError(err);
     }
-    chip::Tracing::Register(mJsonBackend);
+    chip::Tracing::Register(gJsonBackend);
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
@@ -72,7 +73,7 @@ extern "C" void pychip_tracing_start_perfetto_system()
 
     chip::Tracing::Perfetto::Initialize(perfetto::kSystemBackend);
     chip::Tracing::Perfetto::RegisterEventTrackingStorage();
-    chip::Tracing::Register(mPerfettoBackend);
+    chip::Tracing::Register(gPerfettoBackend);
 }
 
 extern "C" PyChipError pychip_tracing_start_perfetto_file(const char * file_name)
@@ -82,12 +83,12 @@ extern "C" PyChipError pychip_tracing_start_perfetto_file(const char * file_name
     chip::Tracing::Perfetto::Initialize(perfetto::kInProcessBackend);
     chip::Tracing::Perfetto::RegisterEventTrackingStorage();
 
-    CHIP_ERROR err = mPerfettoFileOutput.Open(file_name);
+    CHIP_ERROR err = gPerfettoFileOutput.Open(file_name);
     if (err != CHIP_NO_ERROR)
     {
         return ToPyChipError(err);
     }
-    chip::Tracing::Register(mPerfettoBackend);
+    chip::Tracing::Register(gPerfettoBackend);
 
     return ToPyChipError(CHIP_NO_ERROR);
 }
@@ -97,7 +98,7 @@ extern "C" void pychip_tracing_stop()
     ScopedStackLock lock;
 
     chip::Tracing::Perfetto::FlushEventTrackingStorage();
-    mPerfettoFileOutput.Close();
-    chip::Tracing::Unregister(mPerfettoBackend);
-    chip::Tracing::Unregister(mJsonBackend);
+    gPerfettoFileOutput.Close();
+    chip::Tracing::Unregister(gPerfettoBackend);
+    chip::Tracing::Unregister(gJsonBackend);
 }
