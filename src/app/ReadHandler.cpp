@@ -332,7 +332,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
         }
 
         // If we just finished a non-priming subscription report, notify our observers.
-        // Priming reports are handled when we send SubscribeResponse.
+        // Priming reports are handled when we send a SubscribeResponse.
         if (IsType(InteractionType::Subscribe) && !IsPriming() && !IsChunkedReport())
         {
             mObserver->OnSubscriptionAction(this);
