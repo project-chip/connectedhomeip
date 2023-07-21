@@ -68,7 +68,7 @@
         "Test_TC_FAN_2_5",
         "Test_TC_FAN_3_1",
         "Test_TC_FAN_3_2",
-        "Test_TC_FAN_3_4"
+        "Test_TC_FAN_3_6"
     ],
     "GeneralCommissioning": ["Test_TC_CGEN_1_1", "Test_TC_CGEN_2_1"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_1_1", "Test_TC_DGGEN_2_1"],
