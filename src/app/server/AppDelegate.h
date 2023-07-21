@@ -29,7 +29,7 @@ class AppDelegate
 public:
     virtual ~AppDelegate() {}
     /**
-     * This is called on start of session establishment process 
+     * This is called on start of session establishment process
      */
     virtual void OnCommissioningSessionEstablishmentStarted() {}
     virtual void OnCommissioningSessionStarted() {}
