@@ -391,6 +391,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         asserts.skip("TODO: Make a test that verifies each endpoint only lists direct descendants, except Root Node and Aggregator endpoints that list all their descendants")
 
     def test_TC_PS_3_1(self):
+        BRIDGED_NODE_DEVICE_TYPE_ID = 0x13
         success = True
         self.print_step(1, "Wildcard read of device - already done")
 
@@ -406,8 +407,11 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                 self.record_error(self.get_test_name(), location=location,
                                   problem=f'Did not find {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}', spec_location="EndpointList Attribute")
                 success = False
+                continue
+
             endpoint_list = endpoint[Clusters.PowerSource][Clusters.PowerSource.Attributes.EndpointList]
-            if endpoint_list and not all(id in self.endpoints.keys() for id in endpoint_list):
+            non_existent = set(endpoint_list) - set(self.endpoints.keys())
+            if non_existent:
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                 self.record_error(self.get_test_name(), location=location,
                                   problem=f'{attribute_string} lists a non-existent endpoint', spec_location="EndpointList Attribute")
@@ -419,21 +423,35 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         for endpoint_id, endpoint in self.endpoints.items():
             if Clusters.PowerSource not in endpoint or Clusters.PowerSource.Attributes.EndpointList not in endpoint[Clusters.PowerSource]:
                 continue
-            if Clusters.Descriptor not in endpoint or Clusters.Descriptor.Attributes.PartsList not in endpoint[Clusters.Descriptor] or Clusters.Descriptor.Attributes.DeviceTypeList not in endpoint[Clusters.Descriptor]:
+
+            def GetPartValidityProblem(endpoint):
+                if Clusters.Descriptor not in endpoint:
+                    return "Missing cluster descriptor"
+                if Clusters.Descriptor.Attributes.PartsList not in endpoint[Clusters.Descriptor]:
+                    return "Missing PartList in descriptor cluster"
+                if Clusters.Descriptor.Attributes.DeviceTypeList not in endpoint[Clusters.Descriptor]:
+                    return "Missing DeviceTypeList in descriptor cluster"
+                return None
+
+            problem = GetPartValidityProblem(endpoint)
+            if problem:
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id,
                                                  attribute_id=Clusters.Descriptor.Attributes.PartsList.id)
                 self.record_error(self.get_test_name(), location=location,
-                                  problem='Missing descriptor cluster PartsList or DeviceTypeList', spec_location="PartsList Attribute")
+                                  problem=problem, spec_location="PartsList Attribute")
                 success = False
+                continue
+
             device_types[endpoint_id] = [i.deviceType for i in endpoint[Clusters.Descriptor]
                                          [Clusters.Descriptor.Attributes.DeviceTypeList]]
             parts_list[endpoint_id] = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
-        bridged_nodes = [id for (id, dev_type) in device_types.items() if 0x13 in dev_type]
+        bridged_nodes = [id for (id, dev_type) in device_types.items() if BRIDGED_NODE_DEVICE_TYPE_ID in dev_type]
 
         for endpoint_id in bridged_nodes:
             if Clusters.PowerSource not in self.endpoints[endpoint_id]:
                 continue
+            # using a list because we do want to preserve duplicates and error on those.
             desired_endpoint_list = parts_list[endpoint_id].copy()
             desired_endpoint_list.append(endpoint_id)
             desired_endpoint_list.sort()
