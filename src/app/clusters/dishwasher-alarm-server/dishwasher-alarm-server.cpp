@@ -246,11 +246,12 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const Bi
     BitMask<AlarmMap> latch;
     if (!ignoreLatchState && (GetLatchValue(endpoint, &latch) == EMBER_ZCL_STATUS_SUCCESS))
     {
-        // only reset bits which can be reset based on latch value
-        BitMask<AlarmMap> finalState(latch & currentState, finalNewState);
-        finalNewState = finalState;
+        // Restore bits that have their Latch bit set.
+        auto bitsToKeep = latch & currentState;
+        finalNewState.Set(bitsToKeep);
     }
 
+    // Store the new value of the State attribute.
     status = Attributes::State::Set(endpoint, finalNewState);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -268,7 +269,7 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const Bi
     return status;
 }
 
-EmberAfStatus DishwasherAlarmServer::ResetStateValue(EndpointId endpoint, const BitMask<AlarmMap> alarms)
+EmberAfStatus DishwasherAlarmServer::ResetLatchedAlarms(EndpointId endpoint, const BitMask<AlarmMap> alarms)
 {
     BitMask<AlarmMap> supported;
     if (GetSupportedValue(endpoint, &supported) || !supported.HasAll(alarms))
@@ -366,7 +367,7 @@ static Status ResetHandler(const app::ConcreteCommandPath & commandPath, const B
     }
 
     // The cluster will do this update if delegate.ResetAlarmsCallback() returns true.
-    if (DishwasherAlarmServer::Instance().ResetStateValue(endpoint, alarms) != EMBER_ZCL_STATUS_SUCCESS)
+    if (DishwasherAlarmServer::Instance().ResetLatchedAlarms(endpoint, alarms) != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "reset alarms fail");
         return Status::Failure;

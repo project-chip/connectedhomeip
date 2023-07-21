@@ -47,25 +47,29 @@ public:
     EmberAfStatus SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported);
 
     /**
-     * @brief Set value of State attribute
-     * When State changes we are generating Notify event.
+     * @brief Set the value of the State attribute
+     * This method sets the State attribute to the value in newState, if allowed by the Mask
+     * and Supported attributes.  When the State attribute changes, a Notify event will be
+     * generated.
      * @param[in] endpoint The endpoint corresponding to the Dishwasher Alarm cluster.
-     * @param[in] newState The value of State which want to set.
-     * @param[in] ignoreLatchState The default value false means that if each bit set in the Latch
-     * attribute is true, the corresponding value of State attribute can not be reset to false.
-     * Otherwise, the ignoreLatchState value true means that the corresponding value of State
-     * attribute can be set true or reset to false.
+     * @param[in] newState The desired new value for the State attribute.
+     * @param[in] ignoreLatchState If false, the Latch attribute will be honored and the
+     * method will not reset any bits in the State attribute which have their 
+     * associated Latch bit set.  If true, the Latch attribute is ignored and the value of
+     * the State attribute will be set to the value of the newState parameter while 
+     * honoring the Mask and Supported attributes.
+     * The default value for the ignoreLatchState parameter is false.
      */
     EmberAfStatus SetStateValue(EndpointId endpoint, const BitMask<AlarmMap> newState, bool ignoreLatchState = false);
 
     /**
-     * @brief Reset value of State attribute
-     * When State changes we are generating Notify event.
+     * @brief Reset the value of latched alarms in the State attribute.
+     * When the State attribute changes a Notify event is generated.
      * @param[in] endpoint The endpoint corresponding to the Dishwasher Alarm cluster.
-     * @param[in] alarms Each bit set in this field corresponds to State that SHALL be reset to false.
-     * Even if the corresponding bit in the Latch attribute is true.
+     * @param[in] alarms Each bit set to a 1 in this parameters corresponds to a bit in the
+     * State attribute will SHALL be reset to false.
      */
-    EmberAfStatus ResetAlarms(EndpointId endpoint, const BitMask<AlarmMap> alarms);
+    EmberAfStatus ResetLatchedAlarms(EndpointId endpoint, const BitMask<AlarmMap> alarms);
 
     // check whether the Alarm featureMap has enabled Reset feature.
     bool HasResetFeature(EndpointId endpoint);
