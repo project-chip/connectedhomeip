@@ -999,6 +999,8 @@ int main(int argc, char * argv[])
     // This provides power for the composed endpoint
     std::vector<chip::EndpointId> endpointList;
     endpointList.push_back(ComposedDevice.GetEndpointId());
+    endpointList.push_back(ComposedTempSensor1.GetEndpointId());
+    endpointList.push_back(ComposedTempSensor2.GetEndpointId());
     ComposedPowerSource.SetEndpointList(endpointList);
 
     gRooms.push_back(&room1);
