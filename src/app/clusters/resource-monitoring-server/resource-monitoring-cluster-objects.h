@@ -148,7 +148,7 @@ enum class Fields : uint8_t
     kProductIdentifierValue = 1,
 };
 
-class GenericType : protected app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type 
+class GenericType : protected app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type
 {
     private:
         ResourceMonitoring::ProductIdentifierTypeEnum productIdentifierType;
