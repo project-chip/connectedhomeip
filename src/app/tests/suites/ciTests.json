@@ -227,15 +227,6 @@
         "Test_TC_RH_1_1",
         "Test_TC_RH_2_1"
     ],
-    "RvcCleanMode": [
-        "Test_TC_RVCCLEANM_1_1"
-    ],
-    "RvcOperationalState": [
-        "Test_TC_RVCOPSTATE_1_1"
-    ],
-    "RvcRunMode": [
-        "Test_TC_RVCRUNM_1_1"
-    ],
     "SecureChannel": [],
     "SmokeCOAlarm": [
         "Test_TC_SMCO_1_1",

@@ -88,6 +88,12 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
                     is_mfg = (0x8000 <= t.value and t.value <= 0xBFFF)
                     asserts.assert_true(t.value in commonTags.keys() or t.value in runTags or is_mfg,
                                         "Found a SupportedModes entry with invalid mode tag value!")
+                    if t.value == Clusters.RvcRunMode.Enums.ModeTag.kIdle:
+                        idle_present = True
+                    if t.value == Clusters.RvcRunMode.Enums.ModeTag.kCleaning:
+                        cleaning_present = True
+            asserts.assert_true(idle_present, "The Supported Modes does not have an entry of Idle(0x4000)")
+            asserts.assert_true(cleaning_present, "The Supported Modes does not have an entry of Cleaning(0x4001)")
 
         if self.check_pics("RVCRUNM.S.A0001"):
             self.print_step(3, "Read CurrentMode attribute")

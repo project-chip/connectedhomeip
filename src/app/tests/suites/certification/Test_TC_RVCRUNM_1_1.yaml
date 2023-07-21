@@ -109,10 +109,19 @@ tests:
               type: list
               excludes: [3]
 
+    - label: "Read the global attribute: EventList from the DUT"
+      PICS: RVCRUNM.S.Afffa
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
     - label:
           "Read the global attribute AcceptedCommandList. Check if it contains
           id 0x0 (ChangeToMode)"
-      PICS: RVCRUNM.S.Afff9
+      PICS: RVCRUNM.S.C00.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -123,19 +132,10 @@ tests:
     - label:
           "Read the global attribute: GeneratedCommandList. Check if it contains
           id 0x1 (ChangeToModeResponse)"
-      PICS: RVCRUNM.S.Afff8
+      PICS: RVCRUNM.S.C01.Tx
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
           value: [1]
-          constraints:
-              type: list
-
-    - label: "Read the global attribute: EventList from the DUT"
-      PICS: RVCRUNM.S.Afffa
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          value: []
           constraints:
               type: list
