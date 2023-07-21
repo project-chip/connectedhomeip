@@ -261,7 +261,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
             self.fail_current_test()
 
         self.print_step(3, "Verify that endpoint 0 descriptor cluster includes the root node device type")
-        if not Clusters.Descriptor in self.endpoints[0]:
+        if Clusters.Descriptor not in self.endpoints[0]:
             self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
                               problem="No descriptor cluster on Endpoint 0", spec_location="Root node device type")
             self.fail_current_test()
