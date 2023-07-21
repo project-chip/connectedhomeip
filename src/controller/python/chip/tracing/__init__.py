@@ -105,10 +105,10 @@ class TracingContext:
             self.Start(TraceType.PERFETTO)
         elif destination == 'json:log':
             self.Start(TraceType.JSON)
-        elif destination.startswith("json:")
-        self.Start(TraceType.JSON, destination[5:])
-        elif destination.startswith("perfetto:")
-        self.Start(TraceType.PERFETTO, destination[9:])
+        elif destination.startswith("json:"):
+            self.Start(TraceType.JSON, destination[5:])
+        elif destination.startswith("perfetto:"):
+            self.Start(TraceType.PERFETTO, destination[9:])
         else:
             raise ValueError("Invalid trace-to destination: %r", destination)
 

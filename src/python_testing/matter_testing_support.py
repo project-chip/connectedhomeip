@@ -36,7 +36,6 @@ from enum import Enum
 from typing import List, Optional, Tuple, Union
 
 from chip.tlv import float32, uint
-from chip.tracing import TracingContext
 
 # isort: off
 
@@ -48,6 +47,7 @@ import chip.CertificateAuthority
 import chip.clusters as Clusters
 import chip.logging
 import chip.native
+from chip.tracing import TracingContext
 from chip.ChipStack import ChipStack
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.interaction_model import InteractionModelError, Status
