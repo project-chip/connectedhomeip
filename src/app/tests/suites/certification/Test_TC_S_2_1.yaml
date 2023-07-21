@@ -26,7 +26,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -34,7 +34,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads from the DUT the (0x0000) SceneCount attribute"
+    - label: "Step 2: TH reads from the DUT the (0x0000) SceneCount attribute"
       PICS: S.S.A0000
       command: "readAttribute"
       attribute: "SceneCount"
@@ -42,7 +42,7 @@ tests:
           constraints:
               type: int8u
 
-    - label: "TH reads from the DUT the (0x0001) CurrentScene attribute"
+    - label: "Step 3: TH reads from the DUT the (0x0001) CurrentScene attribute"
       PICS: S.S.A0001
       command: "readAttribute"
       attribute: "CurrentScene"
@@ -50,7 +50,7 @@ tests:
           constraints:
               type: int8u
 
-    - label: "TH reads from the DUT the (0x0002) CurrentGroup attribute"
+    - label: "Step 4: TH reads from the DUT the (0x0002) CurrentGroup attribute"
       PICS: S.S.A0002
       command: "readAttribute"
       attribute: "CurrentGroup"
@@ -58,7 +58,7 @@ tests:
           constraints:
               type: groupid
 
-    - label: "TH reads from the DUT the (0x0003) SceneValid attribute"
+    - label: "Step 5: TH reads from the DUT the (0x0003) SceneValid attribute"
       PICS: S.S.A0003
       command: "readAttribute"
       attribute: "SceneValid"
@@ -66,7 +66,7 @@ tests:
           constraints:
               type: uint8
 
-    - label: "TH reads from the DUT the (0x0004) NameSupport attribute"
+    - label: "Step 6: TH reads from the DUT the (0x0004) NameSupport attribute"
       PICS: S.S.A0003 && S.S.F00
       command: "readAttribute"
       attribute: "NameSupport"
@@ -75,7 +75,7 @@ tests:
           constraints:
               type: uint8
 
-    - label: "TH reads from the DUT the (0x0004) NameSupport attribute"
+    - label: "Step 6: TH reads from the DUT the (0x0004) NameSupport attribute"
       PICS: S.S.A0004 && (!S.S.F00)
       command: "readAttribute"
       attribute: "NameSupport"
@@ -84,7 +84,8 @@ tests:
           constraints:
               type: uint8
 
-    - label: "TH reads from the DUT the (0x0005) LastConfiguredBy attribute"
+    - label:
+          "Step 7: TH reads from the DUT the (0x0005) LastConfiguredBy attribute"
       PICS: S.S.A0005
       command: "readAttribute"
       attribute: "LastConfiguredBy"
@@ -92,7 +93,8 @@ tests:
           constraints:
               type: nodeId
 
-    - label: "TH reads from the DUT the (0x0006) SceneTableSize attribute"
+    - label:
+          "Step 8: TH reads from the DUT the (0x0006) SceneTableSize attribute"
       PICS: S.S.A0006
       command: "readAttribute"
       attribute: "SceneTableSize"
@@ -100,7 +102,9 @@ tests:
           constraints:
               type: uint16
 
-    - label: "TH reads from the DUT the (0x0007) RemainingCapacity attribute"
+    - label:
+          "Step 9: TH reads from the DUT the (0x0007) RemainingCapacity
+          attribute"
       PICS: S.S.A0007
       command: "readAttribute"
       attribute: "RemainingCapacity"

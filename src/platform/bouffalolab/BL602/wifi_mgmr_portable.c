@@ -144,3 +144,8 @@ bool wifi_mgmr_security_type_is_wpa3(void)
 
     return false;
 }
+
+struct netif * deviceInterface_getNetif(void)
+{
+    return wifi_mgmr_sta_netif_get();
+}

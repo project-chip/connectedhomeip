@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,21 +31,21 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH writes 0 to the Options attribute"
+    - label: "Step 1a: TH writes 0 to the Options attribute"
       PICS: CC.S.F03 && CC.S.A000f
       command: "writeAttribute"
       attribute: "Options"
       arguments:
           value: 0
 
-    - label: "TH sends On command to DUT"
+    - label: "Step 1b: TH sends On command to DUT"
       PICS: OO.S.C01.Rsp
       cluster: "On/Off"
       command: "On"
 
     - label:
-          "TH sends MoveToColor command to DUT, with ColorX = 32768/0x8000
-          ColorY = 19660/0x4CCC TransitionTime = 0 (immediate)"
+          "Step 2a: TH sends MoveToColor command to DUT, with ColorX =
+          32768/0x8000 ColorY = 19660/0x4CCC TransitionTime = 0 (immediate)"
       PICS: CC.S.F03 && CC.S.C07.Rsp
       command: "MoveToColor"
       arguments:
@@ -70,7 +70,7 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label: "TH reads CurrentX attribute from DUT"
+    - label: "Step 2b: TH reads CurrentX attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
@@ -79,7 +79,7 @@ tests:
               minValue: 27853
               maxValue: 37683
 
-    - label: "TH reads CurrentY attribute from DUT"
+    - label: "Step 2b1: TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
@@ -89,8 +89,8 @@ tests:
               maxValue: 22609
 
     - label:
-          "TH sends MoveToColor command to DUT, with ColorX = 13107/0x3333
-          ColorY = 13107/0x3333 TransitionTime = 200 (20s)"
+          "Step 3a: TH sends MoveToColor command to DUT, with ColorX =
+          13107/0x3333 ColorY = 13107/0x3333 TransitionTime = 200 (20s)"
       PICS: CC.S.F03 && CC.S.C07.Rsp
       command: "MoveToColor"
       arguments:
@@ -115,7 +115,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentX attribute from DUT"
+    - label: "Step 3b: TH reads CurrentX attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0003 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
@@ -124,7 +124,7 @@ tests:
               minValue: 13107
               maxValue: 32768
 
-    - label: "TH reads CurrentY attribute from DUT"
+    - label: "Step 3b: TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
@@ -142,7 +142,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentX attribute from DUT"
+    - label: "Step 3c: TH reads CurrentX attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0003 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
@@ -151,7 +151,7 @@ tests:
               minValue: 11141
               maxValue: 15073
 
-    - label: "TH reads CurrentY attribute from DUT"
+    - label: "Step 3c: TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
@@ -169,7 +169,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "TH reads CurrentX attribute from DUT"
+    - label: "Step 3d: TH reads CurrentX attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0003 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
@@ -178,7 +178,7 @@ tests:
               minValue: 11141
               maxValue: 15073
 
-    - label: "TH reads CurrentY attribute from DUT"
+    - label: "Step 3d: TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
@@ -187,29 +187,29 @@ tests:
               minValue: 11141
               maxValue: 15073
 
-    - label: "TH writes 0 to the Options attribute"
+    - label: "Step 4a: TH writes 0 to the Options attribute"
       PICS: CC.S.A000f
       command: "writeAttribute"
       attribute: "Options"
       arguments:
           value: 0
 
-    - label: "TH read Options attribute"
+    - label: "Step 4b: TH read Options attribute"
       PICS: CC.S.A000f
       command: "readAttribute"
       attribute: "Options"
       response:
           value: 0
 
-    - label: "TH sends On command to DUT"
+    - label: "Step 4c: TH sends On command to DUT"
       PICS: OO.S.C01.Rsp
       cluster: "On/Off"
       command: "On"
 
     - label:
-          "TH sends a MoveToColor command to the DUT with ColorX = 32768/0x8000
-          (x=0.5) (purple) ColorY = 19660/0x4CCC (y=0.3) TransitionTime = 0
-          (immediate)"
+          "Step 4d: TH sends a MoveToColor command to the DUT with ColorX =
+          32768/0x8000 (x=0.5) (purple) ColorY = 19660/0x4CCC (y=0.3)
+          TransitionTime = 0 (immediate)"
       PICS: CC.S.F03 && CC.S.C07.Rsp
       command: "MoveToColor"
       arguments:
@@ -234,7 +234,7 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label: "TH reads CurrentX attribute from DUT"
+    - label: "Step 4e: TH reads CurrentX attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0003 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
@@ -243,7 +243,7 @@ tests:
               minValue: 27853
               maxValue: 37683
 
-    - label: "TH reads CurrentY attribute from DUT"
+    - label: "Step 4e: TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
@@ -252,14 +252,14 @@ tests:
               minValue: 16711
               maxValue: 22609
 
-    - label: "TH sends Off command to DUT"
+    - label: "Step 4f: TH sends Off command to DUT"
       PICS: OO.S.C00.Rsp
       cluster: "On/Off"
       command: "Off"
 
     - label:
-          "TH sends MoveToColor command to DUT, with ColorX = 13107/0x3333
-          ColorY = 13107/0x3333 TransitionTime = 0 (immediate)"
+          "Step 4g: TH sends MoveToColor command to DUT, with ColorX =
+          13107/0x3333 ColorY = 13107/0x3333 TransitionTime = 0 (immediate)"
       PICS: CC.S.F03 && CC.S.C07.Rsp
       command: "MoveToColor"
       arguments:
@@ -284,14 +284,14 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label: "TH reads CurrentX attribute from DUT"
+    - label: "Step 4h: TH reads CurrentX attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0003 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
       response:
           value: 32768
 
-    - label: "TH reads CurrentY attribute from DUT"
+    - label: "Step 4h: TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
@@ -299,8 +299,8 @@ tests:
           value: 19660
 
     - label:
-          "TH sends MoveToColor command to DUT, with ColorX = 13107/0x3333
-          ColorY = 32768/0x8000 TransitionTime = 0 (immediate)"
+          "Step 4i: TH sends MoveToColor command to DUT, with ColorX =
+          13107/0x3333 ColorY = 32768/0x8000 TransitionTime = 0 (immediate)"
       PICS: CC.S.F03 && CC.S.C07.Rsp
       command: "MoveToColor"
       arguments:
@@ -325,14 +325,14 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label: "TH reads CurrentX attribute from DUT"
+    - label: "Step 4j: TH reads CurrentX attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0003 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
       response:
           value: 32768
 
-    - label: "TH reads CurrentY attribute from DUT"
+    - label: "Step 4j: TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
@@ -340,8 +340,8 @@ tests:
           value: 19660
 
     - label:
-          "TH sends MoveToColor command to DUT, with ColorX = 26214/0x6666
-          ColorY = 32768/0x8000 TransitionTime = 0 (immediate)"
+          "Step 4k: TH sends MoveToColor command to DUT, with ColorX =
+          26214/0x6666 ColorY = 32768/0x8000 TransitionTime = 0 (immediate)"
       PICS: CC.S.F03 && CC.S.C07.Rsp
       command: "MoveToColor"
       arguments:
@@ -366,7 +366,7 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label: "TH reads CurrentX attribute from DUT"
+    - label: "Step 4i: TH reads CurrentX attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0003 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
@@ -375,7 +375,7 @@ tests:
               minValue: 22282
               maxValue: 30146
 
-    - label: "TH reads CurrentY attribute from DUT"
+    - label: "Step 4i: TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
@@ -384,28 +384,28 @@ tests:
               minValue: 27853
               maxValue: 37683
 
-    - label: "TH writes 1 to the Options attribute"
+    - label: "Step 5a: TH writes 1 to the Options attribute"
       PICS: CC.S.A000f
       command: "writeAttribute"
       attribute: "Options"
       arguments:
           value: 1
 
-    - label: "TH read Options attribute"
+    - label: "Step 5b: TH read Options attribute"
       PICS: CC.S.A000f
       command: "readAttribute"
       attribute: "Options"
       response:
           value: 1
 
-    - label: "TH sends On command to DUT"
+    - label: "Step 5c: TH sends On command to DUT"
       PICS: OO.S.C01.Rsp
       cluster: "On/Off"
       command: "On"
 
     - label:
-          "TH sends MoveToColor command to DUT, with ColorX = 32768/0x8000
-          ColorY = 19660/0x4CCC TransitionTime = 0 (immediate)"
+          "Step 5d: TH sends MoveToColor command to DUT, with ColorX =
+          32768/0x8000 ColorY = 19660/0x4CCC TransitionTime = 0 (immediate)"
       PICS: CC.S.F03 && CC.S.C07.Rsp
       command: "MoveToColor"
       arguments:
@@ -430,7 +430,7 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label: "TH reads CurrentX attribute from DUT"
+    - label: "Step 5e: TH reads CurrentX attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0003 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
@@ -439,7 +439,7 @@ tests:
               minValue: 27853
               maxValue: 37683
 
-    - label: "TH reads CurrentY attribute from DUT"
+    - label: "Step 5e: TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
@@ -448,14 +448,14 @@ tests:
               minValue: 16711
               maxValue: 22609
 
-    - label: "TH sends Off command to DUT"
+    - label: "Step 5f: TH sends Off command to DUT"
       PICS: OO.S.C00.Rsp
       cluster: "On/Off"
       command: "Off"
 
     - label:
-          "TH sends MoveToColor command to DUT, with ColorX = 13107/0x3333
-          ColorY = 13107/0x3333 TransitionTime = 0 (immediate)"
+          "Step 5g: TH sends MoveToColor command to DUT, with ColorX =
+          13107/0x3333 ColorY = 13107/0x3333 TransitionTime = 0 (immediate)"
       PICS: CC.S.F03 && CC.S.C07.Rsp
       command: "MoveToColor"
       arguments:
@@ -480,7 +480,7 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label: "TH reads CurrentX attribute from DUT"
+    - label: "Step 5h: TH reads CurrentX attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0003 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
@@ -489,7 +489,7 @@ tests:
               minValue: 11141
               maxValue: 15073
 
-    - label: "TH reads CurrentY attribute from DUT"
+    - label: "Step 5h: TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
@@ -499,8 +499,8 @@ tests:
               maxValue: 15073
 
     - label:
-          "TH sends MoveToColor command to DUT, with ColorX = 13107/0x3333
-          ColorY = 32768/0x8000 TransitionTime = 0 (immediate)"
+          "Step 5i: TH sends MoveToColor command to DUT, with ColorX =
+          13107/0x3333 ColorY = 32768/0x8000 TransitionTime = 0 (immediate)"
       PICS: CC.S.F03 && CC.S.C07.Rsp
       command: "MoveToColor"
       arguments:
@@ -525,14 +525,14 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label: "TH reads CurrentX attribute from DUT"
+    - label: "Step 5j: TH reads CurrentX attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0003 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
       response:
           value: 13107
 
-    - label: "TH reads CurrentY attribute from DUT"
+    - label: "Step 5j: TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
@@ -540,8 +540,8 @@ tests:
           value: 13107
 
     - label:
-          "TH sends MoveToColor command to DUT, with ColorX = 26214/0x6666
-          ColorY = 32768/0x8000 TransitionTime = 0 (immediate)"
+          "Step 5k: TH sends MoveToColor command to DUT, with ColorX =
+          26214/0x6666 ColorY = 32768/0x8000 TransitionTime = 0 (immediate)"
       PICS: CC.S.F03 && CC.S.C07.Rsp
       command: "MoveToColor"
       arguments:
@@ -566,7 +566,7 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label: "TH reads CurrentX attribute from DUT"
+    - label: "Step 5l: TH reads CurrentX attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0003 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
@@ -575,7 +575,7 @@ tests:
               minValue: 22282
               maxValue: 30146
 
-    - label: "TH reads CurrentY attribute from DUT"
+    - label: "Step 5l: TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
@@ -584,7 +584,7 @@ tests:
               minValue: 27853
               maxValue: 37683
 
-    - label: "TH reads ColorMode attribute from DUT"
+    - label: "Step 6a: TH reads ColorMode attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0008
       command: "readAttribute"
       attribute: "ColorMode"
@@ -594,7 +594,7 @@ tests:
               minValue: 0
               maxValue: 2
 
-    - label: "TH reads EnhancedColorMode attribute from DUT"
+    - label: "Step 6b: TH reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.F03 && CC.S.A4001
       command: "readAttribute"
       attribute: "EnhancedColorMode"

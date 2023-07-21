@@ -29,7 +29,10 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventLogging.h>
+#include <app/EventLoggingDelegate.h>
 #include <app/InteractionModelEngine.h>
+#include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/error-mapping.h>
@@ -106,12 +109,11 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
     Commands::OperationalCommandResponse::Type response;
     Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
-    GenericOperationalState opState;
 
     VerifyOrReturn(delegate != nullptr, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure));
-    delegate->GetCurrentOperationalState(opState);
+    uint8_t opState = delegate->GetCurrentOperationalState();
 
-    if (opState.operationalStateID != to_underlying(OperationalStateEnum::kPaused))
+    if (opState != to_underlying(OperationalStateEnum::kPaused))
     {
         delegate->HandlePauseStateCallback(err);
     }
@@ -126,18 +128,15 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
     Commands::OperationalCommandResponse::Type response;
     Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
-    GenericOperationalState opState;
 
     VerifyOrReturn(delegate != nullptr, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure));
+    uint8_t opState = delegate->GetCurrentOperationalState();
 
-    delegate->GetCurrentOperationalState(opState);
-
-    if (opState.operationalStateID != to_underlying(OperationalStateEnum::kPaused) &&
-        opState.operationalStateID != to_underlying(OperationalStateEnum::kRunning))
+    if (opState != to_underlying(OperationalStateEnum::kPaused) && opState != to_underlying(OperationalStateEnum::kRunning))
     {
         err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     }
-    else if (opState.operationalStateID == to_underlying(OperationalStateEnum::kPaused))
+    else if (opState == to_underlying(OperationalStateEnum::kPaused))
     {
         delegate->HandleResumeStateCallback(err);
     }
@@ -152,13 +151,11 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
     Commands::OperationalCommandResponse::Type response;
     Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
-    GenericOperationalState opState;
 
     VerifyOrReturn(delegate != nullptr, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure));
+    uint8_t opState = delegate->GetCurrentOperationalState();
 
-    delegate->GetCurrentOperationalState(opState);
-
-    if (opState.operationalStateID != to_underlying(OperationalStateEnum::kRunning))
+    if (opState != to_underlying(OperationalStateEnum::kRunning))
     {
         delegate->HandleStartStateCallback(err);
     }
@@ -173,13 +170,11 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
     Commands::OperationalCommandResponse::Type response;
     Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
-    GenericOperationalState opState;
 
     VerifyOrReturn(delegate != nullptr, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure));
+    uint8_t opState = delegate->GetCurrentOperationalState();
 
-    delegate->GetCurrentOperationalState(opState);
-
-    if (opState.operationalStateID != to_underlying(OperationalStateEnum::kStopped))
+    if (opState != to_underlying(OperationalStateEnum::kStopped))
     {
         delegate->HandleStopStateCallback(err);
     }
@@ -243,9 +238,8 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     case OperationalState::Attributes::OperationalState::Id: {
 
         Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
-        GenericOperationalState opState;
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
-        delegate->GetCurrentOperationalState(opState);
+        uint8_t opState = delegate->GetCurrentOperationalState();
         return aEncoder.Encode(opState);
     }
     break;
@@ -302,4 +296,46 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     break;
     }
     return CHIP_NO_ERROR;
+}
+
+void OperationalStateServer::OnOperationalErrorDetect(const Structs::ErrorStateStruct::Type & aError)
+{
+    ChipLogDetail(Zcl, "OperationalStateServer: OnOperationalErrorDetect");
+    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, OperationalState::Attributes::OperationalState::Id);
+
+    EventNumber eventNumber;
+    Events::OperationalError::Type event{ aError };
+    EventLogger<Events::OperationalError::Type> eventData(event);
+    ConcreteEventPath path(mEndpointId, mClusterId, event.GetEventId());
+    EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
+    EventOptions eventOptions;
+    eventOptions.mPath     = path;
+    eventOptions.mPriority = event.GetPriorityLevel();
+
+    CHIP_ERROR err = logMgmt.LogEvent(&eventData, eventOptions, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "OperationalStateServer: Failed to record OperationalError event: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+void OperationalStateServer::OnOperationCompletionDetect(const Events::OperationCompletion::Type & aEvent)
+{
+    ChipLogDetail(Zcl, "OperationalStateServer: OnOperationCompletionDetect");
+    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, OperationalState::Attributes::OperationalState::Id);
+
+    EventNumber eventNumber;
+    EventLogger<Events::OperationCompletion::Type> eventData(aEvent);
+    ConcreteEventPath path(mEndpointId, mClusterId, aEvent.GetEventId());
+    EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
+    EventOptions eventOptions;
+    eventOptions.mPath     = path;
+    eventOptions.mPriority = aEvent.GetPriorityLevel();
+
+    CHIP_ERROR err = logMgmt.LogEvent(&eventData, eventOptions, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "OperationalStateServer: Failed to record OnOperationCompletionDetect event: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+    }
 }

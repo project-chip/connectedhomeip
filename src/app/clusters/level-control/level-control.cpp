@@ -246,7 +246,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
         return;
     }
 
-    ChipLogProgress(Zcl, "Event: move from %d", currentLevel.Value());
+    ChipLogDetail(Zcl, "Event: move from %d", currentLevel.Value());
 
     // adjust by the proper amount, either up or down
     if (state->transitionTimeMs == 0)
@@ -267,8 +267,8 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
         currentLevel.SetNonNull(static_cast<uint8_t>(currentLevel.Value() - 1));
     }
 
-    ChipLogProgress(Zcl, " to %d ", currentLevel.Value());
-    ChipLogProgress(Zcl, "(diff %c1)", state->increasing ? '+' : '-');
+    ChipLogDetail(Zcl, " to %d ", currentLevel.Value());
+    ChipLogDetail(Zcl, "(diff %c1)", state->increasing ? '+' : '-');
 
     status = Attributes::CurrentLevel::Set(endpoint, currentLevel);
     if (status != EMBER_ZCL_STATUS_SUCCESS)

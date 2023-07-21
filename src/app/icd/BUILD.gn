@@ -25,9 +25,24 @@ source_set("manager-srcs") {
     "ICDManager.h",
   ]
 
+  deps = [ ":cluster-srcs" ]
+  public_deps = [ "${chip_root}/src/credentials:credentials" ]
+}
+
+# ICD management cluster source-set is broken out of the main source-set to enable unit tests
+# All sources and configurations used by the ICD management cluster need to go in this source-set
+source_set("cluster-srcs") {
+  sources = [
+    "IcdManagementServer.cpp",
+    "IcdManagementServer.h",
+    "IcdMonitoringTable.cpp",
+    "IcdMonitoringTable.h",
+  ]
+
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform:platform",
+    "${chip_root}/src/protocols:im_status",
   ]
 }
 

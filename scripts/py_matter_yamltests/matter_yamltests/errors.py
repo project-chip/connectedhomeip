@@ -133,6 +133,17 @@ class TestStepGroupResponseError(TestStepError):
         self.tag_key_with_error(content, 'response')
 
 
+class TestStepGroupEndPointError(TestStepError):
+    """Raise when a test step targeting a group of nodes targets an endpoint."""
+
+    def __init__(self, content):
+        message = 'Group command should not target an endpoint'
+        super().__init__(message)
+
+        self.tag_key_with_error(content, 'groupId')
+        self.tag_key_with_error(content, 'endpoint')
+
+
 class TestStepVerificationStandaloneError(TestStepError):
     """Raise when a test step with a verification key is enabled and not interactive."""
 

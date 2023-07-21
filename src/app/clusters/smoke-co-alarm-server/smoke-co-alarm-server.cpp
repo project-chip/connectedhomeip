@@ -351,15 +351,16 @@ bool SmokeCoAlarmServer::SetContaminationState(EndpointId endpointId, Contaminat
     return success;
 }
 
-bool SmokeCoAlarmServer::SetSensitivityLevel(EndpointId endpointId, SensitivityEnum newSensitivityLevel)
+bool SmokeCoAlarmServer::SetSmokeSensitivityLevel(EndpointId endpointId, SensitivityEnum newSmokeSensitivityLevel)
 {
-    SensitivityEnum sensitivityLevel;
-    bool success = GetAttribute(endpointId, Attributes::SensitivityLevel::Id, Attributes::SensitivityLevel::Get, sensitivityLevel);
+    SensitivityEnum smokeSensitivityLevel;
+    bool success = GetAttribute(endpointId, Attributes::SmokeSensitivityLevel::Id, Attributes::SmokeSensitivityLevel::Get,
+                                smokeSensitivityLevel);
 
-    if (success && (sensitivityLevel != newSensitivityLevel))
+    if (success && (smokeSensitivityLevel != newSmokeSensitivityLevel))
     {
-        success =
-            SetAttribute(endpointId, Attributes::SensitivityLevel::Id, Attributes::SensitivityLevel::Set, newSensitivityLevel);
+        success = SetAttribute(endpointId, Attributes::SmokeSensitivityLevel::Id, Attributes::SmokeSensitivityLevel::Set,
+                               newSmokeSensitivityLevel);
     }
 
     return success;
@@ -421,9 +422,10 @@ bool SmokeCoAlarmServer::GetContaminationState(EndpointId endpointId, Contaminat
     return GetAttribute(endpointId, Attributes::ContaminationState::Id, Attributes::ContaminationState::Get, contaminationState);
 }
 
-bool SmokeCoAlarmServer::GetSensitivityLevel(EndpointId endpointId, SensitivityEnum & sensitivityLevel)
+bool SmokeCoAlarmServer::GetSmokeSensitivityLevel(EndpointId endpointId, SensitivityEnum & smokeSensitivityLevel)
 {
-    return GetAttribute(endpointId, Attributes::SensitivityLevel::Id, Attributes::SensitivityLevel::Get, sensitivityLevel);
+    return GetAttribute(endpointId, Attributes::SmokeSensitivityLevel::Id, Attributes::SmokeSensitivityLevel::Get,
+                        smokeSensitivityLevel);
 }
 
 bool SmokeCoAlarmServer::GetExpiryDate(EndpointId endpointId, uint32_t & expiryDate)

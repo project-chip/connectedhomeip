@@ -108,6 +108,7 @@ private:
     int mExpressedStateMask = 1;
 
     bool mEndSelfTesting;
+    uint64_t mEventTrigger;
 
     void CancelTimer(void);
     void StartTimer(uint32_t aTimeoutMs);
@@ -115,6 +116,7 @@ private:
     static void TimerEventHandler(TimerHandle_t xTimer);
     static void SelfTestingEventHandler(AppEvent * aEvent);
     static void EndSelfTestingEventHandler(AppEvent * aEvent);
+    static void TriggerEventHandler(AppEvent * aEvent);
 
     static SmokeCoAlarmManager sAlarm;
 };

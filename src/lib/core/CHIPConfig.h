@@ -1461,5 +1461,41 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL
+ *
+ * @brief Default value for the ICD Management cluster IdleModeInterval attribute, in milliseconds
+ */
+#ifndef CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL
+#define CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL 500
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL
+ *
+ * @brief Default value for the ICD Management cluster ActiveModeInterval attribute, in milliseconds
+ */
+#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL 300
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD
+ *
+ * @brief Default value for the ICD Management cluster ActiveModeThreshold attribute, in milliseconds
+ */
+#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD 300
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
+ *
+ * @brief Default value for the ICD Management cluster ClientsSupportedPerFabric attribute, in milliseconds
+ */
+#ifndef CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
+#define CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC 2
+#endif
+
+/**
  * @}
  */
