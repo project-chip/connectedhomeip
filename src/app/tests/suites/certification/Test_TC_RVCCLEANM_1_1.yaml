@@ -120,8 +120,7 @@ tests:
           constraints:
               type: list
 
-    - label:
-          "Read the global attribute: EventList from the DUT"
+    - label: "Read the global attribute: EventList from the DUT"
       PICS: RVCCLEANM.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
