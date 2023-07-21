@@ -302,6 +302,7 @@ chip_python_wheel_action("chip-core") {
     "chip.clusters",
     "chip.setup_payload",
     "chip.storage",
+    "chip.tracing",
   ]
 
   if (!chip_controller) {
