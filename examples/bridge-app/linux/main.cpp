@@ -587,13 +587,18 @@ public:
     // Register on all endpoints.
     BridgedPowerSourceAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), PowerSource::Id) {}
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
+    CHIP_ERROR
+    Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
     {
         uint16_t powerSourceDeviceIndex = CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
         if ((gDevices[powerSourceDeviceIndex] != nullptr))
         {
             DevicePowerSource * dev = static_cast<DevicePowerSource *>(gDevices[powerSourceDeviceIndex]);
+            if (aPath.mEndpointId != dev->GetEndpointId())
+            {
+                return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
+            }
             switch (aPath.mAttributeId)
             {
             case PowerSource::Attributes::BatChargeLevel::Id:
@@ -610,15 +615,8 @@ public:
                 break;
             case PowerSource::Attributes::EndpointList::Id: {
                 std::vector<chip::EndpointId> & list = dev->GetEndpointList();
-                if (list.empty())
-                {
-                    aEncoder.EncodeEmptyList();
-                }
-                else
-                {
-                    DataModel::List<EndpointId> dm_list(chip::Span<chip::EndpointId>(list.data(), list.size()));
-                    aEncoder.Encode(dm_list);
-                }
+                DataModel::List<EndpointId> dm_list(chip::Span<chip::EndpointId>(list.data(), list.size()));
+                aEncoder.Encode(dm_list);
                 break;
             }
             case PowerSource::Attributes::ClusterRevision::Id:
@@ -635,7 +633,7 @@ public:
                 aEncoder.Encode(PowerSource::BatReplaceabilityEnum::kNotReplaceable);
                 break;
             default:
-                return CHIP_ERROR_NOT_IMPLEMENTED;
+                return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
             }
         }
         return CHIP_NO_ERROR;
@@ -1002,6 +1000,7 @@ int main(int argc, char * argv[])
     endpointList.push_back(ComposedTempSensor1.GetEndpointId());
     endpointList.push_back(ComposedTempSensor2.GetEndpointId());
     ComposedPowerSource.SetEndpointList(endpointList);
+    ComposedPowerSource.SetEndpointId(ComposedDevice.GetEndpointId());
 
     gRooms.push_back(&room1);
     gRooms.push_back(&room2);
