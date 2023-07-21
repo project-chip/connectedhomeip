@@ -1095,6 +1095,8 @@ void ReadClient::HandleDeviceConnected(void * context, Messaging::ExchangeManage
     _this->mReadPrepareParams.mSessionHolder.Grab(sessionHandle);
     _this->mpExchangeMgr = &exchangeMgr;
 
+    _this->mpCallback.OnCASESessionEstablished(sessionHandle, _this->mReadPrepareParams);
+
     auto err = _this->SendSubscribeRequest(_this->mReadPrepareParams);
     if (err != CHIP_NO_ERROR)
     {
