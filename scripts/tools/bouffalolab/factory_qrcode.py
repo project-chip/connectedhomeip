@@ -15,15 +15,10 @@
 #    limitations under the License.
 
 import argparse
-import base64
 import json
-import logging as log
 import os
-import secrets
-import subprocess
 import sys
 from collections import namedtuple
-from os.path import exists
 
 try:
     import qrcode
@@ -41,20 +36,11 @@ except ImportError:
 else:
     no_onboarding_modules = False
 
-try:
-    import jsonschema
-except ImportError:
-    no_jsonschema_module = True
-else:
-    no_jsonschema_module = False
-
 def allow_any_int(i): return int(i, 0)
 
 def get_args():
     parser = argparse.ArgumentParser(description="BouffaloLab QR Code generator tool")
     mandatory_arguments = parser.add_argument_group("Mandatory keys", "These arguments must be provided to generate QR Code JSON file")
-   
-    
     mandatory_arguments.add_argument("--vendor_id", type=allow_any_int, required=True,
                                      help="[int | hex int] Provide Vendor Identification Number")
     mandatory_arguments.add_argument("--product_id", type=allow_any_int, required=True,
@@ -71,9 +57,7 @@ def get_args():
     return parser.parse_args()
     
 def generate_qrcode_data(args):
-            
-            if no_jsonschema_module== False and no_onboarding_modules == False:
-
+            if no_onboarding_modules == False:
                 setup_payload = SetupPayload(discriminator=args.discriminator,
                                                 pincode=args.pincode,
                                                 rendezvous=2,  # fixed pairing BLE
@@ -91,7 +75,6 @@ def generate_qrcode_data(args):
 def main():
     args=get_args()
     generate_qrcode_data(args)
-
 
 if __name__ == "__main__":
     main()
