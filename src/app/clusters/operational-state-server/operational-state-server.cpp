@@ -29,7 +29,10 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventLogging.h>
+#include <app/EventLoggingDelegate.h>
 #include <app/InteractionModelEngine.h>
+#include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/error-mapping.h>
@@ -293,4 +296,46 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     break;
     }
     return CHIP_NO_ERROR;
+}
+
+void OperationalStateServer::OnOperationalErrorDetect(const Structs::ErrorStateStruct::Type & aError)
+{
+    ChipLogDetail(Zcl, "OperationalStateServer: OnOperationalErrorDetect");
+    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, OperationalState::Attributes::OperationalState::Id);
+
+    EventNumber eventNumber;
+    Events::OperationalError::Type event{ aError };
+    EventLogger<Events::OperationalError::Type> eventData(event);
+    ConcreteEventPath path(mEndpointId, mClusterId, event.GetEventId());
+    EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
+    EventOptions eventOptions;
+    eventOptions.mPath     = path;
+    eventOptions.mPriority = event.GetPriorityLevel();
+
+    CHIP_ERROR err = logMgmt.LogEvent(&eventData, eventOptions, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "OperationalStateServer: Failed to record OperationalError event: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+void OperationalStateServer::OnOperationCompletionDetect(const Events::OperationCompletion::Type & aEvent)
+{
+    ChipLogDetail(Zcl, "OperationalStateServer: OnOperationCompletionDetect");
+    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, OperationalState::Attributes::OperationalState::Id);
+
+    EventNumber eventNumber;
+    EventLogger<Events::OperationCompletion::Type> eventData(aEvent);
+    ConcreteEventPath path(mEndpointId, mClusterId, aEvent.GetEventId());
+    EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
+    EventOptions eventOptions;
+    eventOptions.mPath     = path;
+    eventOptions.mPriority = aEvent.GetPriorityLevel();
+
+    CHIP_ERROR err = logMgmt.LogEvent(&eventData, eventOptions, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "OperationalStateServer: Failed to record OnOperationCompletionDetect event: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+    }
 }

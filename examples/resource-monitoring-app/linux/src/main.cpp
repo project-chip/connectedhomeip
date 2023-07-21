@@ -17,6 +17,7 @@
  */
 
 #include <AppMain.h>
+#include <StaticReplacementProductListManager.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <bitset>
 #include <instances/ActivatedCarbonFilterMonitoring.h>
@@ -29,9 +30,11 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
 
 constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
-                                                static_cast<uint32_t>(Feature::kWarning) };
+                                                static_cast<uint32_t>(Feature::kWarning) |
+                                                static_cast<uint32_t>(Feature::kReplacementProductList) };
 constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
-                                                     static_cast<uint32_t>(Feature::kWarning) };
+                                                     static_cast<uint32_t>(Feature::kWarning) |
+                                                     static_cast<uint32_t>(Feature::kReplacementProductList) };
 
 static HepaFilterMonitoringInstance gHepaFilterInstance(0x1, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                                                         Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, true);

@@ -16,26 +16,45 @@
  *    limitations under the License.
  */
 
+#include <StaticReplacementProductListManager.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/data-model/Nullable.h>
+#include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
 #include <instances/HepaFilterMonitoring.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <system/SystemClock.h>
 
+using namespace chip;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::HepaFilterMonitoring;
 using namespace chip::app::Clusters::ResourceMonitoring;
 using chip::Protocols::InteractionModel::Status;
+
+static ResourceMonitoring::Attributes::ReplacementProductStruct::Type sHepaFilterReplacementProductsList[] = {
+    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kUpc,
+      .productIdentifierValue = CharSpan::fromCharString("111112222233") },
+    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8,
+      .productIdentifierValue = CharSpan::fromCharString("gtin8xhe") },
+    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kEan,
+      .productIdentifierValue = CharSpan::fromCharString("4444455555666") },
+    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14,
+      .productIdentifierValue = CharSpan::fromCharString("gtin14xhepaxxx") },
+    { .productIdentifierType  = ResourceMonitoring::ProductIdentifierTypeEnum::kOem,
+      .productIdentifierValue = CharSpan::fromCharString("oem20xhepaxxxxxxxxxx") },
+};
+StaticReplacementProductListManager sHepaFilterReplacementProductListManager(&sHepaFilterReplacementProductsList[0],
+                                                                             ArraySize(sHepaFilterReplacementProductsList));
 
 //-- Hepa filter Monitoring instance methods
 CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
 {
     ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::Init()");
+
+    SetReplacementProductListManagerInstance(&sHepaFilterReplacementProductListManager);
+
     return CHIP_NO_ERROR;
 }
 

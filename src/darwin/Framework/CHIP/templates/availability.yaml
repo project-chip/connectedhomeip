@@ -7390,33 +7390,6 @@
           - RefrigeratorAlarm
           - TemperatureControl
           - SmokeCOAlarm
-          ## Officially marked provisional: many concentration measurement clusters
-          - BromateConcentrationMeasurement
-          - BromodichloromethaneConcentrationMeasurement
-          - BromoformConcentrationMeasurement
-          - ChloraminesConcentrationMeasurement
-          - ChlorineConcentrationMeasurement
-          - ChlorodibromomethaneConcentrationMeasurement
-          - ChloroformConcentrationMeasurement
-          - CopperConcentrationMeasurement
-          - DissolvedOxygenConcentrationMeasurement
-          - EthyleneConcentrationMeasurement
-          - EthyleneOxideConcentrationMeasurement
-          - FecalColiformEColiConcentrationMeasurement
-          - FluorideConcentrationMeasurement
-          - HaloaceticAcidsConcentrationMeasurement
-          - HydrogenConcentrationMeasurement
-          - HydrogenSulfideConcentrationMeasurement
-          - LeadConcentrationMeasurement
-          - ManganeseConcentrationMeasurement
-          - NitricOxideConcentrationMeasurement
-          - OxygenConcentrationMeasurement
-          - SodiumConcentrationMeasurement
-          - SulfateConcentrationMeasurement
-          - SulfurDioxideConcentrationMeasurement
-          - TotalColiformBacteriaConcentrationMeasurement
-          - TotalTrihalomethanesConcentrationMeasurement
-          - TurbidityConcentrationMeasurement
           ## Not ready to be public API yet.
           - ICDManagement
           - LaundryWasherMode
@@ -7645,6 +7618,9 @@
 - release: "Future"
   versions: "future"
   introduced:
+      attributes:
+          PowerSource:
+              - EndpointList
       bitmap values:
           OnOff:
               Feature:
