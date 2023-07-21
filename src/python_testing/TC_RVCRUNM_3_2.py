@@ -19,7 +19,6 @@ import logging
 
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
-from matter_testing_support import stash_globally, MatterStackState
 from mobly import asserts
 
 # This test requires several additional command line arguments
@@ -102,16 +101,6 @@ class TC_RVCRUNM_3_2(MatterBaseTest):
 
         self.print_step(6, "Physically power cycle the device")
         input("Press Enter when done.\n")
-
-        stack = MatterStackState(self.matter_test_config)
-        stash_globally(stack)
-
-        default_controller = stack.certificate_authorities[0].adminList[0].NewController(
-            nodeId=self.matter_test_config.controller_node_id,
-            paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
-            catTags=self.matter_test_config.controller_cat_tags
-        )
-        stash_globally(default_controller)
 
         self.print_step(7, "Read CurrentMode attribute")
 
