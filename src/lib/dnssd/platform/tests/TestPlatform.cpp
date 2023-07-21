@@ -52,7 +52,7 @@ OperationalAdvertisingParameters operationalParams2 =
         .SetMac(ByteSpan(kMac))
         .SetPort(CHIP_PORT)
         .EnableIpV4(true)
-        .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(32_ms32, 30_ms32)) // SII and SAI to match below
+        .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(32_ms32, 30_ms32, 10_ms16)) // SII and SAI to match below
         .SetTcpSupported(Optional<bool>(true));
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(DnssdServiceProtocol::kDnssdProtocolTcp)
@@ -62,6 +62,7 @@ test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .AddSubtype("_I5555666677778888")
                                           .AddTxt("SII", "32")
                                           .AddTxt("SAI", "30")
+                                          .AddTxt("SAT", "10")
                                           .AddTxt("T", "1");
 
 CommissionAdvertisingParameters commissionableNodeParamsSmall =
@@ -96,7 +97,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"))
         .SetTcpSupported(chip::Optional<bool>(true))
         // 3600005 is over the max, so this should be adjusted by the platform
-        .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600005_ms32));
+        .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600005_ms32, 65535_ms16));
 
 test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .SetProtocol(DnssdServiceProtocol::kDnssdProtocolUdp)
@@ -113,6 +114,7 @@ test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .AddTxt("T", "1")
                                                   .AddTxt("SII", "3600000")
                                                   .AddTxt("SAI", "3600000")
+                                                  .AddTxt("SAT", "65535")
                                                   .AddSubtype("_S2")
                                                   .AddSubtype("_L22")
                                                   .AddSubtype("_V555")

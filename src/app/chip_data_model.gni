@@ -215,6 +215,13 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/supported-temperature-levels-manager.h",
         ]
+      } else if (cluster == "mode-base-server") {
+        sources += [
+          "${_app_root}/clusters/mode-base-server/mode-base-cluster-objects.cpp",
+          "${_app_root}/clusters/mode-base-server/mode-base-cluster-objects.h",
+          "${_app_root}/clusters/mode-base-server/mode-base-server.cpp",
+          "${_app_root}/clusters/mode-base-server/mode-base-server.h",
+        ]
       } else if (cluster == "application-launcher-server") {
         sources += [
           "${_app_root}/app-platform/ContentApp.cpp",

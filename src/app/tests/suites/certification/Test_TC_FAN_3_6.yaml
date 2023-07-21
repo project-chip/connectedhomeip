@@ -12,19 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 263.2.9. [TC-FAN-3.4] Optional wind functionality with DUT as Server
+name: 263.2.7. [TC-FAN-3.2] Optional direction functionality with DUT as Server
 
 PICS:
     - FAN.S
-    - FAN.S.F03
+    - FAN.S.F05
 
 config:
     nodeId: 0x12344321
     cluster: "Fan Control"
     endpoint: 1
-    ConfigWindSetting:
-        type: bitmap8
-        defaultValue: 1
 
 tests:
     - label: "Step 1: Wait for the commissioned device to be retrieved"
@@ -35,15 +32,15 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: TH writes WindSetting attribute a valid value to DUT"
-      PICS: FAN.S.A0008
+    - label: "Step 2: TH writes a value of Forward to the DUT"
+      PICS: FAN.S.A000B
       command: "writeAttribute"
-      attribute: "WindSetting"
+      attribute: "AirflowDirection"
       arguments:
-          value: ConfigWindSetting
+          value: 0
 
     - label: "Wait 1000ms"
-      PICS: FAN.S.A0008
+      PICS: FAN.S.A000B
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -51,9 +48,36 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label: "Step 3: TH reads from the DUT the the WindSetting attribute"
-      PICS: FAN.S.A0008
+    - label:
+          "Step 3: TH reads from the DUT the AirflowDirection attribute and
+          check it is forwards"
+      PICS: FAN.S.A000B
       command: "readAttribute"
-      attribute: "WindSetting"
+      attribute: "AirflowDirection"
       response:
-          value: ConfigWindSetting
+          value: 0
+
+    - label: "Step 4: TH writes a value of Reverse to the DUT"
+      PICS: FAN.S.A000B
+      command: "writeAttribute"
+      attribute: "AirflowDirection"
+      arguments:
+          value: 1
+
+    - label: "Wait 1000ms"
+      PICS: FAN.S.A000B
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label:
+          "Step 5: TH reads from the DUT the AirflowDirection attribute and
+          check it is reverse"
+      PICS: FAN.S.A000B
+      command: "readAttribute"
+      attribute: "AirflowDirection"
+      response:
+          value: 1

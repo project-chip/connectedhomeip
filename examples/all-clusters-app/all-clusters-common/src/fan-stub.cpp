@@ -43,14 +43,14 @@ public:
     {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    Status HandleStep(StepDirectionEnum direction, bool wrap, bool off) override;
+    Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
 
 private:
     CHIP_ERROR ReadPercentCurrent(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadSpeedCurrent(AttributeValueEncoder & aEncoder);
 };
 
-static FanControlManager * mFanControlManager;
+static FanControlManager * mFanControlManager = nullptr;
 
 CHIP_ERROR FanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncoder)
 {
@@ -80,12 +80,12 @@ CHIP_ERROR FanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEncoder)
     return aEncoder.Encode(ret);
 }
 
-Status FanControlManager::HandleStep(StepDirectionEnum direction, bool wrap, bool lowestOff)
+Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff)
 {
-    ChipLogProgress(NotSpecified, "FanControlManager::HandleStep direction %d, wrap %d, lowestOff %d", to_underlying(direction),
-                    wrap, lowestOff);
+    ChipLogProgress(NotSpecified, "FanControlManager::HandleStep aDirection %d, aWrap %d, aLowestOff %d", to_underlying(aDirection),
+                    aWrap, aLowestOff);
 
-    VerifyOrReturnError(direction != StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnError(aDirection != StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
     uint8_t speedMax;
     SpeedMax::Get(mEndpoint, &speedMax);
@@ -93,9 +93,9 @@ Status FanControlManager::HandleStep(StepDirectionEnum direction, bool wrap, boo
     DataModel::Nullable<uint8_t> speedSetting;
     SpeedSetting::Get(mEndpoint, speedSetting);
 
-    uint8_t newSpeedSetting = speedSetting.Value();
+    uint8_t newSpeedSetting = speedSetting.IsNull() ? 0 : speedSetting.Value();
 
-    if (direction == StepDirectionEnum::kIncrease)
+    if (aDirection == StepDirectionEnum::kIncrease)
     {
         if (speedSetting.IsNull())
         {
@@ -107,17 +107,17 @@ Status FanControlManager::HandleStep(StepDirectionEnum direction, bool wrap, boo
         }
         else if (speedSetting.Value() == speedMax)
         {
-            if (wrap)
+            if (aWrap)
             {
-                newSpeedSetting = lowestOff ? 0 : 1;
+                newSpeedSetting = aLowestOff ? 0 : 1;
             }
         }
     }
-    else if (direction == StepDirectionEnum::kDecrease)
+    else if (aDirection == StepDirectionEnum::kDecrease)
     {
         if (speedSetting.IsNull())
         {
-            newSpeedSetting = lowestOff ? 0 : 1;
+            newSpeedSetting = aLowestOff ? 0 : 1;
         }
         else if ((speedSetting.Value() > 1) && (speedSetting.Value() <= speedMax))
         {
@@ -125,18 +125,22 @@ Status FanControlManager::HandleStep(StepDirectionEnum direction, bool wrap, boo
         }
         else if (speedSetting.Value() == 1)
         {
-            if (lowestOff)
+            if (aLowestOff)
             {
                 newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() - 1);
+            }
+            else if (aWrap)
+            {
+                newSpeedSetting = speedMax;
             }
         }
         else if (speedSetting.Value() == 0)
         {
-            if (wrap)
+            if (aWrap)
             {
                 newSpeedSetting = speedMax;
             }
-            else if (!lowestOff)
+            else if (!aLowestOff)
             {
                 newSpeedSetting = 1;
             }
@@ -167,6 +171,7 @@ CHIP_ERROR FanControlManager::Read(const ConcreteReadAttributePath & aPath, Attr
 
 void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 {
+    VerifyOrDie(mFanControlManager == nullptr);
     mFanControlManager = new FanControlManager(endpoint);
     registerAttributeAccessOverride(mFanControlManager);
     FanControl::SetDefaultDelegate(endpoint, mFanControlManager);
