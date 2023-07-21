@@ -31,7 +31,6 @@
 #include <lib/core/Optional.h>
 
 #include "TLVCommon.h"
-
 #include "TLVWriter.h"
 
 /**
