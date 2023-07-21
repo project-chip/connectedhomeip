@@ -31,7 +31,6 @@ struct LockActionData
     OperationSourceEnum opSource;
     Nullable<uint16_t> userIndex;
     uint16_t credentialIndex;
-    Nullable<List<const LockOpCredentials>> credentials;
     Nullable<chip::FabricIndex> fabricIdx;
     Nullable<chip::NodeId> nodeId;
     bool moving = false;
@@ -429,6 +428,8 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
 
             if (gCurrentAction.moving == true)
             {
+                ChipLogProgress(Zcl, "Lock App: not executing lock action as another lock action is already active [endpointId=%d]",
+                                mEndpointId);
                 return false;
             }
 
@@ -440,7 +441,7 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
             gCurrentAction.fabricIdx  = fabricIdx;
             gCurrentAction.nodeId     = nodeId;
 
-            // simulate 3s lock movement duration
+            // Do this async as a real lock would do too but use 0s delay to speed up CI tests
             chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
 
             return true;
@@ -508,6 +509,9 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
 
     if (gCurrentAction.moving == true)
     {
+        ChipLogProgress(Zcl,
+                        "Lock App: not executing lock action as another lock action is already active [endpointId=%d,userIndex=%u]",
+                        mEndpointId, userIndex);
         return false;
     }
 
@@ -520,7 +524,7 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
     gCurrentAction.fabricIdx       = fabricIdx;
     gCurrentAction.nodeId          = nodeId;
 
-    // simulate 3s lock movement duration
+    // Do this async as a real lock would do too but use 0s delay to speed up CI tests
     chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
 
     return true;
@@ -528,7 +532,7 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
 
 void LockEndpoint::OnLockActionCompleteCallback(chip::System::Layer *, void * callbackContext)
 {
-    if (gCurrentAction.userIndex == NullNullable)
+    if (gCurrentAction.userIndex.IsNull())
     {
         DoorLockServer::Instance().SetLockState(gCurrentAction.endpointId, gCurrentAction.lockState, gCurrentAction.opSource,
                                                 NullNullable, NullNullable, gCurrentAction.fabricIdx, gCurrentAction.nodeId);
@@ -548,7 +552,7 @@ void LockEndpoint::OnLockActionCompleteCallback(chip::System::Layer *, void * ca
     {
         gCurrentAction.lockState = DlLockState::kUnlocked;
 
-        // simulate 1s lock movement duration
+        // Do this async as a real lock would do too but use 0s delay to speed up CI tests
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
     }
     else

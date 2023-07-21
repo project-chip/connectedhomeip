@@ -3426,8 +3426,7 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
     }
 
     // credentials check succeeded, try to lock/unlock door
-    success = opHandler(endpoint, Nullable<chip::FabricIndex>(getFabricIndex(commandObj)),
-                        Nullable<chip::NodeId>(getNodeId(commandObj)), pinCode, reason);
+    success = opHandler(endpoint, MakeNullable(getFabricIndex(commandObj)), MakeNullable(getNodeId(commandObj)), pinCode, reason);
     // The app should trigger the lock state change as it may take a while before the lock actually locks/unlocks
 exit:
     if (!success && reason == OperationErrorEnum::kInvalidCredential)
