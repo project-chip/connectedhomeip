@@ -252,6 +252,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
 
     # ======= START OF ACTUAL TESTS =======
     def test_TC_SM_1_1(self):
+        ROOT_NODE_DEVICE_TYPE = 0x16
         self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
         self.print_step(2, "Verify that endpoint 0 exists")
         if 0 not in self.endpoints:
@@ -264,8 +265,10 @@ class TC_DeviceBasicComposition(MatterBaseTest):
             self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
                               problem="No descriptor cluster on Endpoint 0", spec_location="Root node device type")
             self.fail_current_test()
-        root_dev_type = Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=0x16, revision=1)
-        if root_dev_type not in self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
+
+        listed_device_types = [i.deviceType for i in self.endpoints[0]
+                               [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
+        if ROOT_NODE_DEVICE_TYPE not in listed_device_types:
             self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
                               problem="Root node device type not listed on endpoint 0", spec_location="Root node device type")
             self.fail_current_test()
@@ -274,7 +277,9 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         for endpoint_id, endpoint in self.endpoints.items():
             if endpoint_id == 0:
                 continue
-            if root_dev_type in endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
+            listed_device_types = [i.deviceType for i in endpoint[Clusters.Descriptor]
+                                   [Clusters.Descriptor.Attributes.DeviceTypeList]]
+            if ROOT_NODE_DEVICE_TYPE in listed_device_types:
                 self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id),
                                   problem=f'Root node device type listed on endpoint {endpoint_id}', spec_location="Root node device type")
                 self.fail_current_test()
