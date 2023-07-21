@@ -2813,6 +2813,7 @@ server cluster HepaFilterMonitoring = 113 {
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+    kReplacementProductList = 0x3;
   }
 
   struct ReplacementProductStruct {
@@ -2825,6 +2826,7 @@ server cluster HepaFilterMonitoring = 113 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute boolean inPlaceIndicator = 3;
   attribute nullable epoch_s lastChangedTime = 4;
+  readonly attribute ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2859,6 +2861,7 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+    kReplacementProductList = 0x3;
   }
 
   struct ReplacementProductStruct {
@@ -2871,6 +2874,7 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute boolean inPlaceIndicator = 3;
   attribute nullable epoch_s lastChangedTime = 4;
+  readonly attribute ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6394,6 +6398,7 @@ endpoint 1 {
     callback attribute changeIndication default = 0;
     callback attribute inPlaceIndicator;
     callback attribute lastChangedTime;
+    callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6408,6 +6413,7 @@ endpoint 1 {
     callback attribute changeIndication default = 0;
     callback attribute inPlaceIndicator;
     callback attribute lastChangedTime;
+    callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
