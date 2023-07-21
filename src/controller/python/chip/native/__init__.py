@@ -201,5 +201,5 @@ class HandleFlags(enum.Flag):
     REQUIRE_INITIALIZATION = enum.auto()
 
 
-def GetLibraryHandle(flags = HandleFlags.REQUIRE_INITIALIZATION):
+def GetLibraryHandle(flags=HandleFlags.REQUIRE_INITIALIZATION):
     return _GetLibraryHandle(HandleFlags.REQUIRE_INITIALIZATION in flags)
