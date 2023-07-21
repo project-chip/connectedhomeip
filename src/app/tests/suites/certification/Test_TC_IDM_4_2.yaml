@@ -13,8 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    3.4.2. [TC-IDM-4.2] Subscription Response Messages from DUT Test Cases.
+name: 3.4.2. [TC-IDM-4.2] Subscription Response Messages from DUT Test Cases.
     [{DUT_Server}]
 
 PICS:
@@ -33,10 +32,19 @@ tests:
       disabled: true
 
     - label:
-          "Step 1: TH sends a subscription message to the DUT with
-          MaxIntervalCeiling set to a value greater than 60 mins. DUT sends a
-          report data action to the TH. TH sends a success status response to
-          the DUT. DUT sends a Subscribe Response Message to the TH to activate
+          If the device is has the ICD Management cluster, TH reads from the DUT the IdleModeInterval attribute
+          and sets the SubscriptionMaxIntervalPublisherLimit to the value read.
+          If the device does not have the ICD Management cluster, set the SubscriptionMaxIntervalPublisherLimit
+          to 60 minutes.
+      verification: |
+          The cluster used in the below command is an example,
+          icdmanagement read idle-mode-interval 12344321 0
+      disabled: true
+
+    - label: "Step 1: TH sends a subscription message to the DUT with
+          MaxIntervalCeiling set to a value greater than the SubscriptionMaxIntervalPublisherLimit.
+          DUT sends a report data action to the TH. TH sends a success status response to the DUT.
+          DUT sends a Subscribe Response Message to the TH to activate
           the subscription."
       verification: |
           onoff subscribe on-off  100  3900 1 1 --keepSubscriptions true
@@ -71,10 +79,9 @@ tests:
           [1686294743.441504][101362:101364] CHIP:DMG: MoveToState ReadClient[0x7fc7ec011c50]: Moving to [Subscripti]
       disabled: true
 
-    - label:
-          "Step 2: TH sends a subscription message to the DUT with
-          MaxIntervalCeiling set to a value less than 60 mins. DUT sends a
-          report data action to the TH. TH sends a success status response to
+    - label: "Step 2: TH sends a subscription message to the DUT with
+          MaxIntervalCeiling set to a value less than han the SubscriptionMaxIntervalPublisherLimit.
+          DUT sends a report data action to the TH. TH sends a success status response to
           the DUT. DUT sends a Subscribe Response Message to the TH to activate
           the subscription."
       verification: |
@@ -84,7 +91,7 @@ tests:
            Verify on the TH the Subscribe Response has the following fields,
            SubscriptionId - Verify it is of type uint32.
            MaxInterval - Verify it is of type uint32.
-           Verify that the MaxInterval is less than or equal to 60 mins.
+           Verify that the MaxInterval is less than or equal to the MaxIntervalCeiling.
 
           [1686294932.404445][101362:101364] CHIP:DMG:         InteractionModelRevision = 1
           [1686294932.404449][101362:101364] CHIP:DMG: }
@@ -107,7 +114,7 @@ tests:
           [1686294932.420847][101362:101364] CHIP:DMG: MoveToState ReadClient[0x7fc7ec00e400]: Moving to [Subscripti]
 
 
-           MaxInterval and MaxIntervalCeiling are different parameters. One is sent from the TH the other from DUT, verify MaxInterval >=  MaxIntervalCeiling
+           MaxInterval and MaxIntervalCeiling are different parameters. One is sent from the TH the other from DUT, verify MaxInterval <=  MaxIntervalCeiling
       disabled: true
 
     - label:
@@ -455,8 +462,7 @@ tests:
           On TH(chip-tool) Verify that the Subscription succeeds and the DUT sends back the attribute values for the global attribute
       disabled: true
 
-    - label:
-          "Step 11: TH sends a subscription request to subscribe to a global
+    - label: "Step 11: TH sends a subscription request to subscribe to a global
           attribute on an endpoint on all clusters. AttributePath = [[Attribute
           = Global Attribute, Endpoint = EndpointID ]]. +"
       verification: |

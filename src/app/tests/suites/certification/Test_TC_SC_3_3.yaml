@@ -47,8 +47,7 @@ tests:
             In the response of above read request command, please verify the below test steps
       disabled: true
 
-    - label:
-          "Step 2b: Responder receives the Sigma1 message and extracts the
+    - label: "Step 2b: Responder receives the Sigma1 message and extracts the
           following initiatorRandom initiatorSessionId destinationId
           resumptionID initiatorResumeMIC initiatorEphPubKey initiatorSEDParams"
       verification: |
@@ -73,10 +72,10 @@ tests:
           resumptionID is of Octet String maximum of length 16 bytes
           responderSessionID is of uint16
            sigma2ResumeMIC is of Octet String maximum of length 16 bytes
-          responderSEDParams is from any one of the following:
-                SLEEPY_IDLE_INTERVAL - Verify that it is of uint32
-                SLEEPY_ACTIVE_INTERVAL - Verify that it is of uint32
-
+          responderSessionParams is from any one of the following:
+                SESSION_IDLE_INTERVAL - Verify that it is of uint32
+                SESSION_ACTIVE_INTERVAL - Verify that it is of uint32
+                SESSION_ACTIVE_THRESHOLD - Verify that it is of uint16
 
           [1683973658.044236][21637:21637] CHIP:EM: Rxd Ack; Removing MessageCounter:113416101 from Retrans Table on exchange 32995r
           [1683973662.299442][21637:21637] CHIP:DMG: << from UDP:[fe80::e9f6:2c08:2794:357d%wlp0s20f3]:41363 | 167307433 | [Secure Channel  (0) / Certificate Authenticated Session Establishment Sigma '1' (0x30) / Session = 0 / Exchange = 32997]
@@ -123,8 +122,7 @@ tests:
           [1683973662.299943][21637:21637] CHIP:EM: >>> [E:32997r S:0 M:167307433] (U) Msg RX from 0:D379FA4FB43AD140 [0000] --- Type 0000:30 (SecureChannel:CASE_Sigma1)
       disabled: true
 
-    - label:
-          "Step 2c: Responder sends a TLV-encoded Sigma2_Resume message to
+    - label: "Step 2c: Responder sends a TLV-encoded Sigma2_Resume message to
           Initiator containing resumptionID responderSessionID sigma2ResumeMIC
           responderMRPParams"
       verification: |
@@ -181,8 +179,7 @@ tests:
           [1683973662.301880][21648:21650] CHIP:SC: Peer assigned session session ID 688
       disabled: true
 
-    - label:
-          "Step 3a: Responder receives the SigmaFinished message and extracts
+    - label: "Step 3a: Responder receives the SigmaFinished message and extracts
           the following 1.ProtocolId 2.ProtocolCode"
       verification: |
           On Responder(chip-tool),  verify that responder(chip-tool) received  the SigmaFinished(The status report should be GeneralCode:SUCCESS,
