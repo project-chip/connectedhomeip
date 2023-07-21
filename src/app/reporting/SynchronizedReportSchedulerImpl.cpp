@@ -182,8 +182,8 @@ void SynchronizedReportSchedulerImpl::TimerFired()
 {
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 
-    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
-    ChipLogProgress(DataManagement, "Engine run at time: %" PRIu64 " for Handlers:", now.count());
+    // Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    // ChipLogProgress(DataManagement, "Engine run at time: %" PRIu64 " for Handlers:", now.count());
     for (auto & iter : mReadHandlerList)
     {
         if (iter.IsReportableNow())

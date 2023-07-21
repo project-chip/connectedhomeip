@@ -82,10 +82,8 @@ struct DeviceControllerSystemStateParams
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
-    Credentials::GroupDataProvider * groupDataProvider                   = nullptr;
-    chip::app::reporting::ReportScheduler::TimerDelegate * timerDelegate = nullptr;
-    chip::app::reporting::ReportScheduler * reportScheduler              = nullptr;
-    Crypto::SessionKeystore * sessionKeystore                            = nullptr;
+    Credentials::GroupDataProvider * groupDataProvider = nullptr;
+    Crypto::SessionKeystore * sessionKeystore          = nullptr;
 
     // Params that will be deallocated via Platform::Delete in
     // DeviceControllerSystemState::Shutdown.
@@ -101,6 +99,8 @@ struct DeviceControllerSystemStateParams
     SessionSetupPool * sessionSetupPool                                           = nullptr;
     CASEClientPool * caseClientPool                                               = nullptr;
     FabricTable::Delegate * fabricTableDelegate                                   = nullptr;
+    chip::app::reporting::ReportScheduler::TimerDelegate * timerDelegate          = nullptr;
+    chip::app::reporting::ReportScheduler * reportScheduler                       = nullptr;
 };
 
 // A representation of the internal state maintained by the DeviceControllerFactory.
@@ -171,7 +171,7 @@ public:
         return mSystemLayer != nullptr && mUDPEndPointManager != nullptr && mTransportMgr != nullptr && mSessionMgr != nullptr &&
             mUnsolicitedStatusHandler != nullptr && mExchangeMgr != nullptr && mMessageCounterManager != nullptr &&
             mFabrics != nullptr && mCASESessionManager != nullptr && mSessionSetupPool != nullptr && mCASEClientPool != nullptr &&
-            mGroupDataProvider != nullptr && mSessionKeystore != nullptr;
+            mGroupDataProvider != nullptr && mReportScheduler != nullptr && mSessionKeystore != nullptr;
     };
 
     System::Layer * SystemLayer() const { return mSystemLayer; };

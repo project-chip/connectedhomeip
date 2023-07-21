@@ -42,12 +42,6 @@ public:
 
     void ReportTimerCallback() override;
 
-    ReportSchedulerImpl & operator=(const ReportSchedulerImpl & other)
-    {
-        this->mTimerDelegate = other.mTimerDelegate;
-        return *this;
-    }
-
 protected:
     virtual CHIP_ERROR ScheduleReport(Timeout timeout, ReadHandlerNode * node);
     void CancelReport(ReadHandler * aReadHandler);

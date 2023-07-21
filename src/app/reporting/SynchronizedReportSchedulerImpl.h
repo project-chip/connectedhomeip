@@ -36,7 +36,7 @@ public:
     void OnReadHandlerDestroyed(ReadHandler * aReadHandler) override;
 
     SynchronizedReportSchedulerImpl(TimerDelegate * aTimerDelegate) : ReportSchedulerImpl(aTimerDelegate) {}
-    ~SynchronizedReportSchedulerImpl() {}
+    ~SynchronizedReportSchedulerImpl() override { UnregisterAllHandlers(); }
 
     bool IsReportScheduled();
 

@@ -170,8 +170,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mGroupsProvider = initParams.groupDataProvider;
     SetGroupDataProvider(mGroupsProvider);
 
-    mReportScheduler = initParams.reportScheduler;
-
     mTestEventTriggerDelegate = initParams.testEventTriggerDelegate;
 
     deviceInfoprovider = DeviceLayer::GetDeviceInfoProvider();
@@ -318,7 +316,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                     &mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), mReportScheduler,
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), &mReportScheduler,
                                                                  &mCASESessionManager, mSubscriptionResumptionStorage);
     SuccessOrExit(err);
 
@@ -556,14 +554,6 @@ KvsPersistentStorageDelegate CommonCaseDeviceServerInitParams::sKvsPersistenStor
 PersistentStorageOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
 Credentials::PersistentStorageOpCertStore CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
 Credentials::GroupDataProviderImpl CommonCaseDeviceServerInitParams::sGroupDataProvider;
-chip::app::DefaultTimerDelegate CommonCaseDeviceServerInitParams::sTimerDelegate;
-#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
-app::reporting::SynchronizedReportSchedulerImpl
-    CommonCaseDeviceServerInitParams::sReportScheduler(&CommonCaseDeviceServerInitParams::sTimerDelegate);
-#else
-app::reporting::ReportSchedulerImpl
-    CommonCaseDeviceServerInitParams::sReportScheduler(&CommonCaseDeviceServerInitParams::sTimerDelegate);
-#endif
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
 SimpleSessionResumptionStorage CommonCaseDeviceServerInitParams::sSessionResumptionStorage;
 #endif
