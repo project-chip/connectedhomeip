@@ -38,6 +38,22 @@ namespace app {
 namespace Clusters {
 namespace ModeBase {
 
+void Instance::RegisterInstance(Instance * instance)
+{
+    if (!gModeBaseAliasesInstances.Contains(instance))
+    {
+        gModeBaseAliasesInstances.PushBack(instance);
+    }
+}
+
+void Instance::UnregisterInstance(Instance * instance)
+{
+    if (gModeBaseAliasesInstances.Contains(instance))
+    {
+        gModeBaseAliasesInstances.Remove(instance);
+    }
+}
+
 bool Instance::HasFeature(Feature feature) const
 {
     return (mFeature & to_underlying(feature)) != 0;
@@ -137,9 +153,9 @@ CHIP_ERROR Instance::Init()
 
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    RegisterInstance(this);
     ReturnErrorOnFailure(mDelegate->Init());
 
-    ModeBaseAliasesInstances.insert(this);
 
     // If the StartUpMode is set, the CurrentMode attribute SHALL be set to the StartUpMode value, when the server is powered up.
     if (!mStartUpMode.IsNull())
@@ -476,14 +492,14 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
 
 Instance::~Instance()
 {
-    ModeBaseAliasesInstances.erase(this);
+    UnregisterInstance(this);
     chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
     unregisterAttributeAccessOverride(this);
 }
 
-std::set<Instance *> * GetModeBaseInstances()
+IntrusiveList<Instance> & GetModeBaseInstanceList()
 {
-    return &ModeBaseAliasesInstances;
+    return gModeBaseAliasesInstances;
 }
 
 } // namespace ModeBase

@@ -23,7 +23,7 @@
 #include <app/AttributePersistenceProvider.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/util/af.h>
-#include <set>
+#include <lib/support/IntrusiveList.h>
 
 namespace chip {
 namespace app {
@@ -32,7 +32,7 @@ namespace ModeBase {
 
 class Delegate;
 
-class Instance : public CommandHandlerInterface, public AttributeAccessInterface
+class Instance : public CommandHandlerInterface, public AttributeAccessInterface, public IntrusiveListNodeBase<>
 {
 private:
     Delegate * mDelegate;
@@ -54,6 +54,18 @@ private:
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+
+    /**
+     * Register a ModeBase instance.
+     * @param instance The instance to register.
+     */
+    void RegisterInstance(Instance * instance);
+
+    /**
+     * Unregister a ModeBase instance.
+     * @param instance The instance to unregister.
+     */
+    void UnregisterInstance(Instance * instance);
 
     /**
      * Internal change-to-mode command handler function.
@@ -229,9 +241,9 @@ public:
 
 // A set of pointers to all initialised ModeBase instances. It provides a way to access all ModeBase derived clusters.
 // todo change once there is a clear public interface for the OnOff cluster data dependencies (#27508)
-static std::set<Instance *> ModeBaseAliasesInstances;
+static IntrusiveList<Instance> gModeBaseAliasesInstances;
 
-std::set<Instance *> * GetModeBaseInstances();
+IntrusiveList<Instance> & GetModeBaseInstanceList();
 
 } // namespace ModeBase
 } // namespace Clusters
