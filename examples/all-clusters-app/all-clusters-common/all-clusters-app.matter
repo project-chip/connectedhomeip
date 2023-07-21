@@ -6385,9 +6385,11 @@ endpoint 1 {
   }
 
   server cluster RvcOperationalState {
+    emits event OperationalError;
+    emits event OperationCompletion;
     callback attribute phaseList;
-    callback attribute currentPhase;
-    callback attribute countdownTime;
+    callback attribute currentPhase default = 0;
+    callback attribute countdownTime default = 0;
     callback attribute operationalStateList default = 0;
     callback attribute operationalState default = 0;
     callback attribute operationalError default = 0;
