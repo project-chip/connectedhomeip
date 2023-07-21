@@ -252,20 +252,32 @@ CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, chip::Optional<u
 }
 
 CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, const chip::Optional<ReliableMessageProtocolConfig> optional,
-                               bool isIdle)
+                               TxtFieldKey key)
 {
+    VerifyOrReturnError((key == TxtFieldKey::kSessionIdleInterval || key == TxtFieldKey::kSessionActiveInterval ||
+                         key == TxtFieldKey::kSessionActiveThreshold),
+                        CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(optional.HasValue(), CHIP_ERROR_WELL_UNINITIALIZED);
 
-    auto retryInterval = isIdle ? optional.Value().mIdleRetransTimeout : optional.Value().mActiveRetransTimeout;
-
-    if (retryInterval > kMaxRetryInterval)
+    CHIP_ERROR err;
+    if (key == TxtFieldKey::kSessionActiveThreshold)
     {
-        ChipLogProgress(Discovery, "MRP retry interval %s value exceeds allowed range of 1 hour, using maximum available",
-                        isIdle ? "idle" : "active");
-        retryInterval = kMaxRetryInterval;
+        err = CopyTextRecordValue(buffer, bufferLen, optional.Value().mActiveThresholdTime.count());
+    }
+    else
+    {
+        bool isIdle        = (key == TxtFieldKey::kSessionIdleInterval);
+        auto retryInterval = isIdle ? optional.Value().mIdleRetransTimeout : optional.Value().mActiveRetransTimeout;
+        if (retryInterval > kMaxRetryInterval)
+        {
+            ChipLogProgress(Discovery, "MRP retry interval %s value exceeds allowed range of 1 hour, using maximum available",
+                            isIdle ? "idle" : "active");
+            retryInterval = kMaxRetryInterval;
+        }
+        err = CopyTextRecordValue(buffer, bufferLen, retryInterval.count());
     }
 
-    return CopyTextRecordValue(buffer, bufferLen, retryInterval.count());
+    return err;
 }
 
 template <class T>
@@ -275,9 +287,10 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
     {
     case TxtFieldKey::kTcpSupported:
         return CopyTextRecordValue(buffer, bufferLen, params.GetTcpSupported());
-    case TxtFieldKey::kSleepyIdleInterval:
-    case TxtFieldKey::kSleepyActiveInterval:
-        return CopyTextRecordValue(buffer, bufferLen, params.GetLocalMRPConfig(), key == TxtFieldKey::kSleepyIdleInterval);
+    case TxtFieldKey::kSessionIdleInterval:
+    case TxtFieldKey::kSessionActiveInterval:
+    case TxtFieldKey::kSessionActiveThreshold:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetLocalMRPConfig(), key);
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -552,8 +565,9 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
 {
     PREPARE_RECORDS(Operational);
 
-    ADD_TXT_RECORD(SleepyIdleInterval);
-    ADD_TXT_RECORD(SleepyActiveInterval);
+    ADD_TXT_RECORD(SessionIdleInterval);
+    ADD_TXT_RECORD(SessionActiveInterval);
+    ADD_TXT_RECORD(SessionActiveThreshold);
     ADD_TXT_RECORD(TcpSupported);
 
     ADD_PTR_RECORD(CompressedFabricId);
@@ -570,8 +584,9 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     ADD_TXT_RECORD(VendorProduct);
     ADD_TXT_RECORD(DeviceType);
     ADD_TXT_RECORD(DeviceName);
-    ADD_TXT_RECORD(SleepyIdleInterval);
-    ADD_TXT_RECORD(SleepyActiveInterval);
+    ADD_TXT_RECORD(SessionIdleInterval);
+    ADD_TXT_RECORD(SessionActiveInterval);
+    ADD_TXT_RECORD(SessionActiveThreshold);
     ADD_TXT_RECORD(TcpSupported);
 
     ADD_PTR_RECORD(VendorId);

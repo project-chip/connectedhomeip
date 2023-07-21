@@ -129,11 +129,19 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
 void PlatformManagerImpl::_Shutdown()
 {
+    if (mGLibMainLoop == nullptr)
+    {
+        ChipLogError(DeviceLayer, "System Layer is already shutdown.");
+        return;
+    }
+
     Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
 
     g_main_loop_quit(mGLibMainLoop);
     g_main_loop_unref(mGLibMainLoop);
     g_thread_join(mGLibMainLoopThread);
+
+    mGLibMainLoop = nullptr;
 }
 
 CHIP_ERROR PlatformManagerImpl::_GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData)
