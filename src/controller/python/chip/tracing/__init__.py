@@ -94,6 +94,24 @@ class TracingContext:
     def Start(self, trace_type: TraceType, file_name: Optional[str] = None):
         StartTracingTo(trace_type, file_name)
 
+    def StartFromString(self, destination: str):
+        """
+        Convert a human string to a perfetto start.
+
+        Supports json:log, json:path, perfetto, perfetto:path
+        """
+        if destination == 'perfetto':
+            self.Start(TraceType.PERFETTO)
+        elif destination == 'json:log':
+            self.Start(TraceType.JSON)
+        elif destination.startswith("json:")
+            self.Start(TraceType.JSON, destination[5:])
+        elif destination.startswith("perfetto:")
+            self.Start(TraceType.PERFETTO, destination[9:])
+        else:
+            raise ValueError("Invalid trace-to destination: %r", destination)
+
+
     def __init__(self):
         pass
 
