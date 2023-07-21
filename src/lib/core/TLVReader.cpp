@@ -117,7 +117,7 @@ uint32_t TLVReader::GetLength() const
     return 0;
 }
 
-CHIP_ERROR TLVReader::Get(bool & v)
+CHIP_ERROR TLVReader::Get(bool & v) const
 {
     TLVElementType elemType = ElementType();
     if (elemType == TLVElementType::BooleanFalse)
@@ -129,7 +129,7 @@ CHIP_ERROR TLVReader::Get(bool & v)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::Get(int8_t & v)
+CHIP_ERROR TLVReader::Get(int8_t & v) const
 {
     int64_t v64    = 0;
     CHIP_ERROR err = Get(v64);
@@ -141,7 +141,7 @@ CHIP_ERROR TLVReader::Get(int8_t & v)
     return err;
 }
 
-CHIP_ERROR TLVReader::Get(int16_t & v)
+CHIP_ERROR TLVReader::Get(int16_t & v) const
 {
     int64_t v64    = 0;
     CHIP_ERROR err = Get(v64);
@@ -153,7 +153,7 @@ CHIP_ERROR TLVReader::Get(int16_t & v)
     return err;
 }
 
-CHIP_ERROR TLVReader::Get(int32_t & v)
+CHIP_ERROR TLVReader::Get(int32_t & v) const
 {
     int64_t v64    = 0;
     CHIP_ERROR err = Get(v64);
@@ -165,7 +165,7 @@ CHIP_ERROR TLVReader::Get(int32_t & v)
     return err;
 }
 
-CHIP_ERROR TLVReader::Get(int64_t & v)
+CHIP_ERROR TLVReader::Get(int64_t & v) const
 {
     // Internal callers of this method depend on it not modifying "v" on failure.
     switch (ElementType())
@@ -189,7 +189,7 @@ CHIP_ERROR TLVReader::Get(int64_t & v)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::Get(uint8_t & v)
+CHIP_ERROR TLVReader::Get(uint8_t & v) const
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
@@ -201,7 +201,7 @@ CHIP_ERROR TLVReader::Get(uint8_t & v)
     return err;
 }
 
-CHIP_ERROR TLVReader::Get(uint16_t & v)
+CHIP_ERROR TLVReader::Get(uint16_t & v) const
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
@@ -213,7 +213,7 @@ CHIP_ERROR TLVReader::Get(uint16_t & v)
     return err;
 }
 
-CHIP_ERROR TLVReader::Get(uint32_t & v)
+CHIP_ERROR TLVReader::Get(uint32_t & v) const
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
@@ -225,7 +225,7 @@ CHIP_ERROR TLVReader::Get(uint32_t & v)
     return err;
 }
 
-CHIP_ERROR TLVReader::Get(uint64_t & v)
+CHIP_ERROR TLVReader::Get(uint64_t & v) const
 {
     // Internal callers of this method depend on it not modifying "v" on failure.
     switch (ElementType())
