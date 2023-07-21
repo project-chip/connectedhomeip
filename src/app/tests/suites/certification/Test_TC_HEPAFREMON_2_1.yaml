@@ -69,3 +69,20 @@ tests:
       response:
           constraints:
               type: boolean
+
+    - label: "Step 6: TH reads from the DUT the LastChangedTime attribute"
+      PICS: HEPAFREMON.S.A0004
+      command: "readAttribute"
+      attribute: "LastChangedTime"
+      response:
+          constraints:
+              type: epoch_s
+
+    - label:
+          "Step 7: TH reads from the DUT the ReplacementProductList attribute"
+      PICS: HEPAFREMON.S.A0005
+      command: "readAttribute"
+      attribute: "ReplacementProductList"
+      response:
+          constraints:
+              type: list
