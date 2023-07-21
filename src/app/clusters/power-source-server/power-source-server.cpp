@@ -60,11 +60,8 @@ CHIP_ERROR PowerSourceAttrAccess::Read(const ConcreteReadAttributePath & aPath, 
         err = aEncoder.EncodeEmptyList();
         break;
     case EndpointList::Id: {
-        PowerSourceServer & server = PowerSourceServer::Instance();
-        // EndpointId id[2]           = { 1, 2 };
-        // server.SetEndpointList(aPath.mEndpointId, Span<EndpointId>(id));
+        PowerSourceServer & server    = PowerSourceServer::Instance();
         const Span<EndpointId> * span = server.GetEndpointList(aPath.mEndpointId);
-
         if (span == nullptr)
         {
             err = aEncoder.EncodeEmptyList();
@@ -98,12 +95,12 @@ CHIP_ERROR PowerSourceServer::SetEndpointList(EndpointId powerSourceClusterEndpo
 {
     // TODO: should check here that the power source cluster exists on the endpoint, but for now let's take the caller's word for it
 
-    int idx = PowerSourceClusterEndpointIndex(powerSourceClusterEndpoint);
-    if (idx == -1)
+    size_t idx = PowerSourceClusterEndpointIndex(powerSourceClusterEndpoint);
+    if (idx == std::numeric_limits<size_t>::max())
     {
         idx = NextEmptyIndex();
     }
-    if (idx == -1)
+    if (idx == std::numeric_limits<size_t>::max())
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -120,36 +117,36 @@ CHIP_ERROR PowerSourceServer::SetEndpointList(EndpointId powerSourceClusterEndpo
 }
 const Span<EndpointId> * PowerSourceServer::GetEndpointList(EndpointId powerSourceClusterEndpoint) const
 {
-    int idx = PowerSourceClusterEndpointIndex(powerSourceClusterEndpoint);
-    if (idx != -1)
+    size_t idx = PowerSourceClusterEndpointIndex(powerSourceClusterEndpoint);
+    if (idx != std::numeric_limits<size_t>::max())
     {
         return &mPowerSourceClusterInfo[idx].mEndpointList;
     }
     return nullptr;
 }
 
-int PowerSourceServer::PowerSourceClusterEndpointIndex(EndpointId endpointId) const
+size_t PowerSourceServer::PowerSourceClusterEndpointIndex(EndpointId endpointId) const
 {
-    for (int i = 0; i < nSupportedEndpoints; ++i)
+    for (size_t i = 0; i < kNumSupportedEndpoints; ++i)
     {
         if (mPowerSourceClusterInfo[i].mClusterEndpoint == endpointId)
         {
             return i;
         }
     }
-    return -1;
+    return std::numeric_limits<size_t>::max();
 }
 
-int PowerSourceServer::NextEmptyIndex() const
+size_t PowerSourceServer::NextEmptyIndex() const
 {
-    for (int i = 0; i < nSupportedEndpoints; ++i)
+    for (size_t i = 0; i < kNumSupportedEndpoints; ++i)
     {
         if (mPowerSourceClusterInfo[i].mClusterEndpoint == kInvalidEndpointId)
         {
             return i;
         }
     }
-    return -1;
+    return std::numeric_limits<size_t>::max();
 }
 
 } // namespace Clusters
