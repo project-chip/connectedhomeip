@@ -72,3 +72,30 @@ def StartTracingTo(trace_type: TraceType, file_name: Optional[str] = None):
     else:
         raise ValueError("unknown trace type")
 
+
+def StopTracing():
+    """
+    Make sure tracing is stopped.
+
+    MUST be called before application exits.
+    """
+    _GetTracingLibraryHandle().pychip_tracing_stop()
+
+
+class Tracing:
+    """Allows scoped enter/exit for tracing, like:
+
+    with Tracing() as tracing:
+       tracing.StartTracingTo(TraceType.JSON)
+       # ...
+
+    """
+
+    def __init__(self):
+        pass
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, type, value, traceback):
+        StopTracing()
