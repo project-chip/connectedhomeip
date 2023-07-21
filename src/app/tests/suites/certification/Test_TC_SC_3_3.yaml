@@ -73,10 +73,10 @@ tests:
           resumptionID is of Octet String maximum of length 16 bytes
           responderSessionID is of uint16
            sigma2ResumeMIC is of Octet String maximum of length 16 bytes
-          responderSEDParams is from any one of the following:
-                SLEEPY_IDLE_INTERVAL - Verify that it is of uint32
-                SLEEPY_ACTIVE_INTERVAL - Verify that it is of uint32
-
+          responderSessionParams is from any one of the following:
+                SESSION_IDLE_INTERVAL - Verify that it is of uint32
+                SESSION_ACTIVE_INTERVAL - Verify that it is of uint32
+                SESSION_ACTIVE_THRESHOLD - Verify that it is of uint16
 
           [1683973658.044236][21637:21637] CHIP:EM: Rxd Ack; Removing MessageCounter:113416101 from Retrans Table on exchange 32995r
           [1683973662.299442][21637:21637] CHIP:DMG: << from UDP:[fe80::e9f6:2c08:2794:357d%wlp0s20f3]:41363 | 167307433 | [Secure Channel  (0) / Certificate Authenticated Session Establishment Sigma '1' (0x30) / Session = 0 / Exchange = 32997]
