@@ -48,14 +48,16 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads the FeatureMap attribute from the DUT"
-      PICS: " RVCCLEANM.S.F00 "
+    - label:
+          "Given RVCCLEANM.S.F00(DEPONOFF) ensure featuremap has the correct bit
+          set"
+      PICS: RVCCLEANM.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 0x01
           constraints:
               type: bitmap32
+              hasMasksSet: [0x1]
 
     - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
       command: "readAttribute"
