@@ -69,7 +69,7 @@ tests:
     #Support 10 1111  (47) (0x2F)
     #Mask    10 1001  (41) (0x29)
     #Latch   00 0011  (3)  (0x03)
-    #State   00 0011  (3)  (0x03), bit 1 is latched, so unable to inactive while Mask attribute changed.
+    #State   00 0001  (1)  (0x01)
     - label: "Modify enabled alarms Command"
       command: "ModifyEnabledAlarms"
       arguments:
@@ -93,13 +93,13 @@ tests:
       command: "readAttribute"
       attribute: "State"
       response:
-          value: 3
+          value: 1
 
     #After Modify Enabled Alarm (Invalid, set for unknown alarms)
     #Support 10 1111  (47) (0x2F)
     #Mask   110 1001  (105) (0x69)
     #Latch   00 0011  (3)  (0x03)
-    #State   00 0011  (3)  (0x03)
+    #State   00 0001  (1)  (0x01)
     - label: "Modify enabled alarms Command"
       command: "ModifyEnabledAlarms"
       arguments:
@@ -125,13 +125,13 @@ tests:
       command: "readAttribute"
       attribute: "State"
       response:
-          value: 3
+          value: 1
 
     #After Modify Enabled Alarm (Invalid, set for alarms which are not supported)
     #Support 10 1111  (47) (0x2F)
     #Mask    11 1011  (59) (0x3B)
     #Latch   00 0011  (3)  (0x03)
-    #State   00 0011  (3)  (0x03)
+    #State   00 0001  (1)  (0x01)
     - label: "Modify enabled alarms Command"
       command: "ModifyEnabledAlarms"
       arguments:
@@ -157,19 +157,19 @@ tests:
       command: "readAttribute"
       attribute: "State"
       response:
-          value: 3
+          value: 1
 
-    #After Reset alarms bit 1
+    #After Reset alarms bit 0
     #Support 10 1111  (47) (0x2F)
     #Mask    10 1001  (41) (0x29)
     #Latch   00 0011  (3)  (0x03)
-    #State   00 0001  (1)  (0x01)
+    #State   00 0000  (0)  (0x00)
     - label: "Reset Command"
       command: "Reset"
       arguments:
           values:
               - name: "Alarms"
-                value: 2
+                value: 1
 
     - label: "Read Mask Attribute"
       command: "readAttribute"
@@ -187,4 +187,4 @@ tests:
       command: "readAttribute"
       attribute: "State"
       response:
-          value: 1
+          value: 0
