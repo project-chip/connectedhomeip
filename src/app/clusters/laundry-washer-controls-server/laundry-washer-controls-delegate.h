@@ -36,6 +36,8 @@ public:
 
     /**
      * Get the list of supported spin_speed list.
+     * Fills in the provided spin_speed at index `index` if there is one,
+     * or returns CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the list of spin_speed.
      * @param index The index of the spin_speed, with 0 representing the first one.
      * @param spinSpeed  The spin speed is filled.
      */
@@ -43,6 +45,8 @@ public:
 
     /**
      * Get the list of supported rinses list.
+     * Fills in the provided rinses  at index `index` if there is one,
+     * or returns CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the list of rinses.
      * @param index The index of the supported rinses with 0 representing the first one.
      * @param supportedRinse  The supported rinse is filled.
      */
