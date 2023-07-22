@@ -61,7 +61,7 @@ public:
      * @param newSpinSpeedCurrent attribute SpinSpeedCurrent
      * @return true on success, false on failure
      */
-    EmberAfStatus SetSpinSpeedCurrent(chip::EndpointId endpointId, DataModel::Nullable<uint8_t> newSpinSpeedCurrent);
+    EmberAfStatus SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> newSpinSpeedCurrent);
 
     /**
      * @brief Get the attribute newSpinSpeedCurrent
