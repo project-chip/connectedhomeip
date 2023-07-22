@@ -70,7 +70,7 @@ public:
      * @param SpinSpeedCurrent attribute SpinSpeedCurrent
      * @return true on success, false on failure
      */
-    EmberAfStatus GetSpinSpeedCurrent(chip::EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent);
+    EmberAfStatus GetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent);
 
     /**
      * @brief Set the attribute NumberOfRinses
