@@ -165,7 +165,7 @@ CHIP_ERROR LaundryWasherControlsServer::ReadSupportedRinses(const ConcreteReadAt
     Delegate * delegate = GetDelegate(aPath.mEndpointId);
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
 
-    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t i = 0; true; i++)
         {
             NumberOfRinsesEnum supportedRinse;
