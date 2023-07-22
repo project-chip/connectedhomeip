@@ -81,7 +81,7 @@ public:
      * @param newNumberOfRinses attribute NumberOfRinses
      * @return true on success, false on failure
      */
-    EmberAfStatus SetNumberOfRinses(chip::EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses);
+    EmberAfStatus SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses);
 
     /**
      * @brief Get the attribute NumberOfRinses
