@@ -36,8 +36,6 @@ public:
     LaundryWasherControlsServer() : AttributeAccessInterface(Optional<EndpointId>::Missing(), LaundryWasherControls::Id) {}
     static LaundryWasherControlsServer & Instance();
 
-    using SpinSpeedList       = DataModel::List<const chip::CharSpan>;
-    using SupportedRinsesList = DataModel::List<const NumberOfRinsesEnum>;
 
     static constexpr uint8_t kMaxSpinSpeedLength = 64;
 
