@@ -36,7 +36,7 @@ class Delegate
 public:
     /**
      *   @brief
-     *   A notification that the Mask attribute will be checked.  When this happens, some previously suppressed
+     *   A notification that the Mask attribute will be changed.  When this happens, some previously suppressed
      *   alarms may need to be enabled, and previously enabled alarms may need to be suppressed.
      *   @param[in] mask The new value of the Mask attribute.
      *   @return The cluster will do this update if ModifyEnabledAlarmsCallback() returns true.
