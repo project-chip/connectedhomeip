@@ -36,7 +36,6 @@ public:
     LaundryWasherControlsServer() : AttributeAccessInterface(Optional<EndpointId>::Missing(), LaundryWasherControls::Id) {}
     static LaundryWasherControlsServer & Instance();
 
-
     static constexpr uint8_t kMaxSpinSpeedLength = 64;
 
     /**
