@@ -37,7 +37,7 @@ void SynchronizedReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aRead
 
     mNodesPool.ReleaseObject(removeNode);
 
-    if (0 == mNodesPool.Allocated())
+    if (!mNodesPool.Allocated())
     {
         // Only cancel the timer if there are no more handlers registered
         CancelReport();
