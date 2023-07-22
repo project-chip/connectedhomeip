@@ -58,7 +58,6 @@ Delegate * GetDelegate(EndpointId endpoint)
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LaundryWasherControls::Id,
                                                        EMBER_AF_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kLaundryWasherControlsDelegateTableSize ? nullptr : gDelegateTable[ep]);
-
 }
 
 } // namespace
@@ -145,7 +144,6 @@ CHIP_ERROR LaundryWasherControlsServer::Read(const ConcreteReadAttributePath & a
 
 CHIP_ERROR LaundryWasherControlsServer::ReadSpinSpeeds(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    aEncoder.EncodeEmptyList();
     Delegate * delegate = GetDelegate(aPath.mEndpointId);
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
 
