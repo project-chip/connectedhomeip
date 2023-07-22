@@ -48,15 +48,6 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads the FeatureMap attribute from the DUT"
-      PICS: " RVCRUNM.S.F00 "
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 0x01
-          constraints:
-              type: bitmap32
-
     - label:
           "Given RVCRUNM.S.F00(DEPONOFF) ensure featuremap has the correct bit
           set"
