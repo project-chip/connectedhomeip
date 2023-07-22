@@ -571,7 +571,10 @@ CHIP_ERROR TimeSynchronizationServer::GetLocalTime(EndpointId ep, DataModel::Nul
     timeZoneOffset       = static_cast<int64_t>(tzStore.timeZone.offset);
     VerifyOrReturnError(GetDSTOffset().size() != 0, CHIP_ERROR_INVALID_TIME);
     const auto & dst = GetDSTOffset()[0];
-    dstOffset        = static_cast<int64_t>(dst.offset);
+    if (dst.validStarting <= chipEpochTime)
+    {
+        dstOffset = static_cast<int64_t>(dst.offset);
+    }
 
     uint64_t usRemainder = chipEpochTime % chip::kMicrosecondsPerSecond;   // microseconds part of chipEpochTime
     chipEpochTime        = (chipEpochTime / chip::kMicrosecondsPerSecond); // make it safe to cast to int64 by converting to seconds
