@@ -37,25 +37,34 @@ tests:
           5. Follow the Verification step below to generate the event in 2nd terminal of DUT
       disabled: true
 
-    - label: "Commission DUT to TH (can be skipped if done in a preceding test)"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)"
       verification: |
           Commission DUT to TH
       disabled: true
 
-    - label: "Set up subscription to SwitchLatched event"
+    - label: "Step 2a: Set up subscription to SwitchLatched event"
       PICS: SWTCH.S.F00
       verification: |
-          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
-
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT
+          (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
 
           echo '{"Name":"SwitchLatched","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-            Please use Interactive mode to Verify the subscription of an event
+          Verify DUT generated the SwitchLachted event :
+
+          [1687169759.564727][21941:21943] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":1}"
+          [1687169759.565067][21941:21941] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 5f83636d
+          [1687169759.565099][21941:21941] CHIP:-: The latching switch is moved to a new position:1
+          [1687169759.565108][21941:21941] CHIP:ZCL: SwitchServer: OnSwitchLatch
+
+          Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
           1. ./chip-tool interactive start
-           2. switch subscribe-event switch-latched 1 100 1 1
+          2. switch subscribe-event switch-latched 1 100 1 1
 
-          Verify SwitchLatched event in TH(chip-tool) Log:
+          Verify SwitchLatched event On TH(chip-tool) Log and below is the sample log provided for the raspi platform:
 
           [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
           [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 4
@@ -66,90 +75,127 @@ tests:
           [1659527630.476969][4774:4779] CHIP:TOO:    }
       disabled: true
 
-    - label: "Operator sets switch to first position"
+    - label: "Step 2b: Operator sets switch to first position"
       PICS: SWTCH.S.F00
       verification: |
-          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
-
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT
+          (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
 
           echo '{"Name":"SwitchLatched","NewPosition":0}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify SwitchLatched event with NewPosition set to 0 on DUT(all-cluster-app) log:
+          DUT generated the SwitchLatched event with NewPosition 0:
 
-          [1659599702.921797][7312:7312] CHIP:IN: SecureSession[0xaaaacdb77710]: MarkAsDefunct Type:2 LSID:24961
-          [1659599703.232994][7312:7321] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":0}"
-          [1659599703.233543][7312:7312] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 1755409b
-          [1659599703.233624][7312:7312] CHIP:-: The latching switch is moved to a new position:0
-          [1659599703.233682][7312:7312] CHIP:ZCL: SwitchServer: OnSwitchLatch
+          [1686289860.323236][30125:30127] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":0}"
+          [1686289860.323565][30125:30125] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 89759737
+          [1686289860.323602][30125:30125] CHIP:-: The latching switch is moved to a new position:0
+          [1686289860.323618][30125:30125] CHIP:ZCL: SwitchServer: OnSwitchLatch
+
+          ./chip-tool switch read-event switch-latched 1 1
+
+          Verify SwitchLatched event with NewPosition set to 0 on TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1687257759.711008][17346:17348] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1687257759.711011][17346:17348] CHIP:TOO:   Event number: 5
+          [1687257759.711013][17346:17348] CHIP:TOO:   Priority: Info
+          [1687257759.711015][17346:17348] CHIP:TOO:   Timestamp: 1687256995382
+          [1687257759.711018][17346:17348] CHIP:TOO:   SwitchLatched: {
+          [1687257759.711021][17346:17348] CHIP:TOO:     NewPosition: 0
+          [1687257759.711024][17346:17348] CHIP:TOO:    }
       disabled: true
 
-    - label: "Read CurrentPosition attribute"
+    - label: "Step 2c: Read CurrentPosition attribute"
       PICS: SWTCH.S.F00
       verification: |
-          1. ./chip-tool interactive start
-          2.  switch read current-position 1 1
+          ./chip-tool switch read current-position 1 1
 
-          Verify CurrentPosition value is 0 in TH(chip-tool) Log:
+          Verify CurrentPosition value is 0 in TH(chip-tool) Log and below is the sample log provided for the raspi platform:
 
           [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
-          [1646209289.746228][2617:2622] CHIP:TOO:   current position: 0
+          [1646209289.746228][2617:2622] CHIP:TOO:   CurrentPosition: 0
       disabled: true
 
-    - label: "Operator sets switch to second position"
+    - label: "Step 2d: Operator sets switch to second position"
       PICS: SWTCH.S.F00
       verification: |
-          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT
+          (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
 
           echo '{"Name":"SwitchLatched","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify SwitchLatched event with NewPosition set to 1 on DUT(all-cluster-app) log:
+          DUT generated the SwitchLatched event with NewPosition set to 1:
 
           [1659600080.279936][7312:7321] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":1}"
           [1659600080.280318][7312:7312] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 1755409c
           [1659600080.280376][7312:7312] CHIP:-: The latching switch is moved to a new position:1
           [1659600080.280412][7312:7312] CHIP:ZCL: SwitchServer: OnSwitchLatch
           [1659600080.280503][7312:7312] CHIP:EVL: LogEvent event number: 0x0000000000020005 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Sys timestamp: 0x0000000000EB91B3
+
+          ./chip-tool switch read-event switch-latched 1 1
+
+          Verify SwitchLatched event with NewPosition set to 1 on TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1687257297.110327][17168:17170] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1687257297.110330][17168:17170] CHIP:TOO:   Event number: 7
+          [1687257297.110333][17168:17170] CHIP:TOO:   Priority: Info
+          [1687257297.110336][17168:17170] CHIP:TOO:   Timestamp: 1687257190679
+          [1687257297.110341][17168:17170] CHIP:TOO:   SwitchLatched: {
+          [1687257297.110345][17168:17170] CHIP:TOO:     NewPosition: 1
+          [1687257297.110349][17168:17170] CHIP:TOO:    }
       disabled: true
 
-    - label: "Read CurrentPosition attribute"
+    - label: "Step 2e: Read CurrentPosition attribute"
       PICS: SWTCH.S.F00
       verification: |
-          1. ./chip-tool interactive start
-          2.  switch read current-position 1 1
-
-          Verify CurrentPosition value is 1 in TH(chip-tool) Log:
-
-          [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
-          [1646209289.746228][2617:2622] CHIP:TOO:   current position: 1
-      disabled: true
-
-    - label:
-          "If NumberOfPositions>2 (see 2a of TC-SWTCH-2.1) : - Operator sets
-          switch to next position - Read CurrentPosition attribute"
-      PICS: SWTCH.S.F00
-      verification: |
-          In the current SDK development, Max number of positions is configured as 2, hence the current  test step should fail as NewPosition reached more than the Max NumberOfPositions.
-          If the DUT supports more number of positions, then for the command in previous step, position should increase to the next level. Below is the sample command to execute, if the DUT supports NumberOfPositions >  2 .
-
           ./chip-tool switch read current-position 1 1
 
-          Verify CurrentPosition value in TH(chip-tool) Log:
+          Verify CurrentPosition value is 1 in TH(chip-tool) Log and below is the sample log provided for the raspi platform:
 
-          [1659600502.023560][4306:4311] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001 DataVersion: 391463069
-          [1659600502.023631][4306:4311] CHIP:TOO:   current position: 2
+          [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
+          [1646209289.746228][2617:2622] CHIP:TOO:  CurrentPosition: 1
       disabled: true
 
     - label:
-          "If NumberOfPositions>3 : - Repeat step 2f for NumberOfPositions-3
-          times - After each time Operator has set switch to next position, -
-          Read CurrentPosition attribute"
+          "Step 2f: If NumberOfPositions>2 (see 2a of TC-SWTCH-2.1) : - Operator
+          sets switch to next position - Read CurrentPosition attribute"
+      PICS: SWTCH.S.F00
+      verification: |
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT
+          (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
+
+          echo '{"Name":"SwitchLatched","NewPosition":2}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the SwitchLatched event with NewPosition set to 2:
+
+          [1659600438.058928][7312:7321] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":2}"
+          [1659600438.059436][7312:7312] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 1755409d
+          [1659600438.059519][7312:7312] CHIP:-: The latching switch is moved to a new position:2
+          [1659600438.059644][7312:7312] CHIP:ZCL: SwitchServer: OnSwitchLatch
+          [1659600438.059857][7312:7312] CHIP:EVL: LogEvent event number: 0x0000000000020006 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Sys timestamp: 0x0000000000F10746
+
+          ./chip-tool switch read-event switch-latched 1 1
+
+          Verify  SwitchLatched event with NewPosition set to 2 on TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1687257759.711126][17346:17348] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1687257759.711129][17346:17348] CHIP:TOO:   Event number: 8
+          [1687257759.711131][17346:17348] CHIP:TOO:   Priority: Info
+          [1687257759.711133][17346:17348] CHIP:TOO:   Timestamp: 1687257552953
+          [1687257759.711136][17346:17348] CHIP:TOO:   SwitchLatched: {
+          [1687257759.711140][17346:17348] CHIP:TOO:     NewPosition: 2
+          [1687257759.711141][17346:17348] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 2g: If NumberOfPositions>3 : - Repeat step 2f for
+          NumberOfPositions-3 times - After each time Operator has set switch to
+          next position, - Read CurrentPosition attribute"
       PICS: SWTCH.S.F00
       verification: |
           In Raspi platform to change the switch to third position use the below sample command, its required to  use equivalent command on the respective DUT. Open one more terminal on DUT side to execute the echo command .
 
           echo '{"Name":"SwitchLatched","NewPosition":3}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify SwitchLatched event with NewPosition set to 3 on DUT(all-cluster-app) log:
+          DUT generated the SwitchLatched event with NewPosition set to 3:
 
           [1659600438.058928][7312:7321] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":3}"
           [1659600438.059436][7312:7312] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 1755409d
@@ -157,51 +203,68 @@ tests:
           [1659600438.059644][7312:7312] CHIP:ZCL: SwitchServer: OnSwitchLatch
           [1659600438.059857][7312:7312] CHIP:EVL: LogEvent event number: 0x0000000000020006 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Sys timestamp: 0x0000000000F10746
 
-          In the current SDK development, Max number of positions are configured as 2, hence the current  test step should fail as its reached more than the numberof position. If the DUT supports more number of positions, then for the above command, it should increase to the next level. Below is the sample command to execute , if the DUT supports more than 2 NumberOfPositions.
+          ./chip-tool switch read-event switch-latched 1 1
 
-          ./chip-tool switch read current-position 1 1
+          Verify SwitchLatched event with NewPosition set to 3 on TH(Chip-tool) log and below is the sample log provided for the raspi platform:
 
-          Verify CurrentPosition value in TH(chip-tool) Log:
-
-          [1659600502.023560][4306:4311] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001 DataVersion: 391463069
-          [1659600502.023631][4306:4311] CHIP:TOO:   current position: 3
+          [1687258513.235224][17561:17563] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1687258513.235227][17561:17563] CHIP:TOO:   Event number: 9
+          [1687258513.235230][17561:17563] CHIP:TOO:   Priority: Info
+          [1687258513.235231][17561:17563] CHIP:TOO:   Timestamp: 1687258318347
+          [1687258513.235235][17561:17563] CHIP:TOO:   SwitchLatched: {
+          [1687258513.235238][17561:17563] CHIP:TOO:     NewPosition: 3
+          [1687258513.235239][17561:17563] CHIP:TOO:    }
       disabled: true
 
-    - label: "Operator returns switch to first position"
+    - label: "Step 2h: Operator returns switch to first position"
       PICS: SWTCH.S.F00
       verification: |
           On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
 
           echo '{"Name":"SwitchLatched","NewPosition":0}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify SwitchLatched event with NewPosition set to 0 on DUT(all-cluster-app) log:
+          DUT generated the SwitchLatched event with NewPosition set to 0:
 
-          [1659599702.921797][7312:7312] CHIP:IN: SecureSession[0xaaaacdb77710]: MarkAsDefunct Type:2 LSID:24961
           [1659599703.232994][7312:7321] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":0}"
           [1659599703.233543][7312:7312] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 1755409b
           [1659599703.233624][7312:7312] CHIP:-: The latching switch is moved to a new position:0
           [1659599703.233682][7312:7312] CHIP:ZCL: SwitchServer: OnSwitchLatch
+
+          ./chip-tool switch read-event switch-latched 1 1
+
+          Verify SwitchLatched event with NewPosition set to 0 on TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1687258655.138839][17617:17619] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1687258655.138841][17617:17619] CHIP:TOO:   Event number: 10
+          [1687258655.138844][17617:17619] CHIP:TOO:   Priority: Info
+          [1687258655.138846][17617:17619] CHIP:TOO:   Timestamp: 1687258651896
+          [1687258655.138849][17617:17619] CHIP:TOO:   SwitchLatched: {
+          [1687258655.138851][17617:17619] CHIP:TOO:     NewPosition: 0
+          [1687258655.138853][17617:17619] CHIP:TOO:    }
       disabled: true
 
-    - label: "Read CurrentPosition attribute"
+    - label: "Step 2i: Read CurrentPosition attribute"
       PICS: SWTCH.S.F00
       verification: |
-          1. ./chip-tool interactive start
-          2.  switch read current-position 1 1
+          ./chip-tool switch read current-position 1 1
 
-
-          Verify CurrentPosition value is 0 in TH(chip-tool) Log:
+          Verify CurrentPosition value is 0 On TH(chip-tool) Log and below is the sample log provided for the raspi platform:
 
           [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
-          [1646209289.746228][2617:2622] CHIP:TOO:   current position: 0
+          [1646209289.746228][2617:2622] CHIP:TOO:   CurrentPosition: 0
       disabled: true
 
-    - label: "Set up subscription to InitialPress event"
+    - label: "Step 3a: Set up subscription to InitialPress event"
       PICS: SWTCH.S.F01
       verification: |
-          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT
+          (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
 
           echo '{"Name":"InitialPress","NewPosition":0}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the InitialPress event with NewPosition set to 0:
 
           [1659612230.311864][7312:7321] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":0}"
           [1659612230.312345][7312:7312] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 175540a4
@@ -214,7 +277,7 @@ tests:
           1. ./chip-tool interactive start
           2. switch subscribe-event  initial-press 1 100 1 1
 
-          Verify InitialPress event with NewPosition set to 0 on DUT(all-cluster-app) log:
+          Verify InitialPress event with NewPosition set to 0 On TH(chip-tool) Log and below is the sample log provided for the raspi platform:
 
           [1659612272.121119][4957:4962] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659612272.121143][4957:4962] CHIP:TOO:          Event number: 131085
@@ -225,31 +288,34 @@ tests:
           [1659612272.121369][4957:4962] CHIP:TOO:    }
       disabled: true
 
-    - label: "Operator does not operate switch"
+    - label: "Step 3b: Operator does not operate switch"
       PICS: SWTCH.S.F01
       verification: |
           no Matter messages
       disabled: true
 
-    - label: "Read CurrentPosition attribute"
+    - label: "Step 3c: Read CurrentPosition attribute"
       PICS: SWTCH.S.F01
       verification: |
           ./chip-tool switch read current-position 1 1
 
-          Verify CurrentPosition value in TH (chip-tool) Log:
+          Verify CurrentPosition value is 0 On TH (chip-tool) Log and below is the sample log provided for the raspi platform:
 
           [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
-          [1646209289.746228][2617:2622] CHIP:TOO:   current position: 0
+          [1687847957.516951][19394:19396] CHIP:TOO:   CurrentPosition: 0
       disabled: true
 
-    - label: "Operator operates switch (keep it pressed)"
+    - label: "Step 3d: Operator operates switch (keep it pressed)"
       PICS: SWTCH.S.F01
       verification: |
-          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT
+          (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
 
           echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify InitialPress event with NewPosition set to 1 on DUT(all-cluster-app) log:
+          DUT generated the InitialPress event with NewPosition set to 1:
 
           [1659612460.072098][7312:7321] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
           [1659612460.072562][7312:7312] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 175540a5
@@ -258,25 +324,28 @@ tests:
           [1659612460.073008][7312:7312] CHIP:EVL: Copy Event to next buffer with priority 1
       disabled: true
 
-    - label: "Read CurrentPosition attribute"
+    - label: "Step 3e: Read CurrentPosition attribute"
       PICS: SWTCH.S.F01
       verification: |
           ./chip-tool switch read current-position 1 1
 
-          Verify CurrentPosition  value is 1 TH(chip-tool) Log:
+          Verify CurrentPosition  value is 1 On TH(chip-tool) Log and below is the sample log provided for the raspi platform:
+
           [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
-          [1646209289.746228][2617:2622] CHIP:TOO:   current position: 1
+          [1687847982.359195][19398:19400] CHIP:TOO:   CurrentPosition: 1
       disabled: true
 
-    - label: "Operator releases switch"
+    - label: "Step 3f: Operator releases switch"
       PICS: SWTCH.S.F01
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           On Raspi platform to trigger the event give the below command by opening an another terminal in DUT
           (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
 
           echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify ShortRelease event with PreviousPosition set to 1 on DUT(all-cluster-app) log:
+          Verify ShortRelease event with PreviousPosition set to 1 on DUT(all-cluster-app) log and below is the sample log provided for the raspi platform:
 
           [1669874154.289653][2239:2241] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
           [1669874154.290189][2239:2239] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 2c2733fa
@@ -285,27 +354,30 @@ tests:
           [1669874154.290460][2239:2239] CHIP:EVL: LogEvent event number: 0x000000000000000C priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Sys timestamp: 0x00000000004B0B8D
       disabled: true
 
-    - label: "Read CurrentPosition attribute"
+    - label: "Step 3g: Read CurrentPosition attribute"
       PICS: SWTCH.S.F01
       verification: |
           ./chip-tool switch read current-position 1 1
 
-          Verify CurrentPosition value in TH(chip-tool) Log:
+          Verify CurrentPosition value is 0 On TH(chip-tool) Log and below is the sample log provided for the raspi platform:
 
           [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
-          [1646209289.746228][2617:2622] CHIP:TOO:   current position: 0
+          [1687848004.040125][19402:19404] CHIP:TOO:   CurrentPosition: 0
       disabled: true
 
-    - label: "Set up subscription to InitialPress and ShortRelease events"
+    - label:
+          "Step 4a: Set up subscription to InitialPress and ShortRelease events"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
 
           Verify  InitialPress and ShortRelease events has been subscribed:
 
           echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify InitialPress event with NewPosition set to 1 on DUT(all-cluster-app) log:
+          Verify InitialPress event with NewPosition set to 1 on DUT(all-cluster-app) log and below is the sample log provided for the raspi platform:
 
           [1659686596.526276][2530:2538] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
           [1659686596.526734][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e771a
@@ -316,7 +388,7 @@ tests:
 
           echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify ShortRelease event with PreviousPosition set to 1 on DUT(all-cluster-app) log:
+          Verify ShortRelease event with PreviousPosition set to 1 on DUT(all-cluster-app) log and below is the sample log provided for the raspi platform:
 
           [1659686852.011134][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
           [1659686852.011424][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e771b
@@ -324,22 +396,24 @@ tests:
           [1659686852.011490][2530:2530] CHIP:ZCL: SwitchServer: OnShortRelease
       disabled: true
 
-    - label: "Operator does not operate switch"
+    - label: "Step 4b: Operator does not operate switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
           no Matter messages
       disabled: true
 
-    - label: "Operator operates switch (press briefly)"
+    - label: "Step 4c: Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event  initial-press 1 100 1 1
+          2. switch subscribe-event  initial-press 1 100 1 1
 
-          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log:
+          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659686631.947247][3045:3050] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659686631.947272][3045:3050] CHIP:TOO:          Event number: 23
@@ -350,16 +424,18 @@ tests:
           [1659686631.947397][3045:3050] CHIP:TOO:    }
       disabled: true
 
-    - label: "Operator releases switch"
+    - label: "Step 4d: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event short-release 1 100 1 1 --keepSubscriptions true
+          2. switch subscribe-event short-release 1 100 1 1 --keepSubscriptions true
 
-          Verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
+          Verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659686907.770389][3061:3066] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659686907.770413][3061:3066] CHIP:TOO:          Event number: 24
@@ -371,14 +447,17 @@ tests:
       disabled: true
 
     - label:
-          "Operator operates switch (keep pressed for long time, e.g. 5 seconds)"
+          "Step 4e: Operator operates switch (keep pressed for long time, e.g. 5
+          seconds)"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
 
           echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify InitialPress event with NewPosition set to 1 on DUT(all-cluster-app) log:
+          Verify InitialPress event with NewPosition set to 1 on DUT(all-cluster-app) log and below is the sample log provided for the raspi platform:
 
           [1659686596.526276][2530:2538] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
           [1659686596.526734][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e771a
@@ -389,9 +468,9 @@ tests:
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event  initial-press 1 100 1 1
+          2. switch subscribe-event  initial-press 1 100 1 1
 
-          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log:
+          Verify InitialPress event with NewPosition set to 1 on TH (chip-tool) log and below is the sample log provided for the raspi platform:
 
           [1659692069.006090][3668:3674] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659692069.006114][3668:3674] CHIP:TOO:          Event number: 26
@@ -402,14 +481,16 @@ tests:
           [1659692069.006233][3668:3674] CHIP:TOO:    }
       disabled: true
 
-    - label: "Operator releases switch"
+    - label: "Step 4f: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
 
           echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify ShortRelease event with PreviousPosition set to 1 on DUT(all-cluster-app) log:
+          Verify ShortRelease event with PreviousPosition set to 1 on DUT(all-cluster-app) log and below is the sample log provided for the raspi platform:
 
           [1659686852.011134][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
           [1659686852.011424][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e771b
@@ -422,7 +503,7 @@ tests:
           1. ./chip-tool interactive start
           2. switch subscribe-event short-release 1 100 1 1
 
-          Verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
+          Verify ShortRelease event with PreviousPosition set to 1 on TH (chip-tool) log and below is the sample log provided for the raspi platform:
 
           [1659692123.069593][3675:3680] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659692123.069616][3675:3680] CHIP:TOO:          Event number: 27
@@ -434,15 +515,17 @@ tests:
       disabled: true
 
     - label:
-          "Set up subscription to InitialPress, LongPress, ShortRelease,
-          LongRelease events"
+          "Step 5a: Set up subscription to InitialPress, LongPress,
+          ShortRelease, LongRelease events"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
 
            echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify InitialPress event with NewPosition set to 1 on DUT(all-cluster-app) log:
+          Verify InitialPress event with NewPosition set to 1 on DUT(all-cluster-app) log and below is the sample log provided for the raspi platform:
 
           [1659693098.031462][2530:2538] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
           [1659693098.031812][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7724
@@ -453,7 +536,7 @@ tests:
 
            echo '{"Name":"LongPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify LongPress event with NewPosition set to 1 on DUT(all-cluster-app) log:
+          Verify LongPress event with NewPosition set to 1 on DUT(all-cluster-app) log and below is the sample log provided for the raspi platform:
 
           1659693130.924755][2530:2538] CHIP:-: Received payload: "{"Name":"LongPress","NewPosition":1}"
           [1659693130.925030][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7725
@@ -464,7 +547,7 @@ tests:
 
            echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify ShortRelease event with PreviousPosition set to 1 on DUT(all-cluster-app) log:
+          Verify ShortRelease event with PreviousPosition set to 1 on DUT(all-cluster-app) log and below is the sample log provided for the raspi platform:
 
           [1659693174.708920][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
           [1659693174.709388][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7726
@@ -475,7 +558,7 @@ tests:
 
            echo '{"Name":"LongRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify LongRelease event with PreviousPosition set to 1 on DUT(all-cluster-app) log:
+          Verify LongRelease event with PreviousPosition set to 1 on DUT(all-cluster-app) log and below is the sample log provided for the raspi platform:
 
           [1674036547.915803][19172:19174] CHIP:-: Received payload: "{"Name":"LongRelease","PreviousPosition":1}"
           [1674036547.916262][19172:19172] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 40105288
@@ -483,22 +566,24 @@ tests:
           [1674036547.916493][19172:19172] CHIP:ZCL: SwitchServer: OnLongRelease
       disabled: true
 
-    - label: "Operator does not operate switch"
+    - label: "Step 5b: Operator does not operate switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
           no Matter messages
       disabled: true
 
-    - label: "Operator operates switch (press briefly)"
+    - label: "Step 5c: Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event  initial-press 1 100 1 1
+          2. switch subscribe-event  initial-press 1 100 1 1
 
-          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log:
+          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659692507.869323][3696:3701] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659692507.869342][3696:3701] CHIP:TOO:          Event number: 28
@@ -509,16 +594,18 @@ tests:
           [1659692507.869440][3696:3701] CHIP:TOO:    }
       disabled: true
 
-    - label: "Operator releases switch"
+    - label: "Step 5d: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event short-release 1 100 1 1
+          2. switch subscribe-event short-release 1 100 1 1
 
-          Verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
+          Verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659692890.665344][3721:3726] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659692890.665369][3721:3726] CHIP:TOO:          Event number: 31
@@ -530,16 +617,19 @@ tests:
       disabled: true
 
     - label:
-          "Operator operates switch (keep pressed for long time, e.g. 5 seconds)"
+          "Step 5e: Operator operates switch (keep pressed for long time, e.g. 5
+          seconds)"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event  initial-press 1 100 1 1
+          2. switch subscribe-event  initial-press 1 100 1 1
 
-          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log:
+          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659692507.869323][3696:3701] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659692507.869342][3696:3701] CHIP:TOO:          Event number: 28
@@ -553,9 +643,9 @@ tests:
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event long-press 1 100 1 1
+          2. switch subscribe-event long-press 1 100 1 1
 
-          Verify longPress event with NewPosition set to 1 on TH chip-tool log:
+          Verify longPress event with NewPosition set to 1 on TH (chip-tool) log and below is the sample log provided for the raspi platform:
 
           [1659692638.993482][3706:3712] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0002
           [1659692638.993504][3706:3712] CHIP:TOO:          Event number: 30
@@ -566,16 +656,18 @@ tests:
           [1659692638.993615][3706:3712] CHIP:TOO:    }
       disabled: true
 
-    - label: "Operator releases switch"
+    - label: "Step 5f: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event long-release 1 100 1 1
+          2. switch subscribe-event long-release 1 100 1 1
 
-          Verify longrelease event with previousPosition set to 1 on TH chip-tool log:
+          Verify LongRelease event with previousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659693001.739969][3732:3737] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0004
           [1659693001.740012][3732:3737] CHIP:TOO:          Event number: 32
@@ -587,15 +679,17 @@ tests:
       disabled: true
 
     - label:
-          "Set up subscription to InitialPress, ShortRelease, MultiPressOngoing,
-          MultiPressComplete events"
+          "Step 6a: Set up subscription to InitialPress, ShortRelease,
+          MultiPressOngoing, MultiPressComplete events"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
 
           echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify InitialPress event with NewPosition set to 1 on DUT(all-cluster-app) log:
+          Verify InitialPress event with NewPosition set to 1 on DUT(all-cluster-app) log and below is the sample log provided for the raspi platform:
 
           [1659693098.031462][2530:2538] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
           [1659693098.031812][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7724
@@ -606,7 +700,7 @@ tests:
 
           echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify ShortRelease  event with PreviousPosition set to 1 on DUT(all-cluster-app) log:
+          Verify ShortRelease  event with PreviousPosition set to 1 on DUT(all-cluster-app) log and below is the sample log provided for the raspi platform:
 
           [1659694387.719620][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
           [1659694387.720095][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7729
@@ -617,7 +711,7 @@ tests:
 
           echo '{"Name":"MultiPressComplete","PreviousPosition":1,"TotalNumberOfPressesCounted":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify MultiPressComplete  event with PreviousPosition set to 1 on DUT(all-cluster-app) log:
+          Verify MultiPressComplete  event with PreviousPosition set to 1 on DUT(all-cluster-app) log and below is the sample log provided for the raspi platform:
 
           [1659694592.347850][2530:2538] CHIP:-: Received payload: "{"Name":"MultiPressComplete","PreviousPosition":1,"TotalNumberOfPressesCounted":1}"
           [1659694592.348389][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e772b
@@ -627,7 +721,7 @@ tests:
 
           echo '{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":2}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Verify MultiPressOngoing event with NewPosition set to 1 on DUT(all-cluster-app) log:
+          Verify MultiPressOngoing event with NewPosition set to 1 on DUT(all-cluster-app) log and below is the sample log provided for the raspi platform:
 
           [1659695302.038797][2530:2538] CHIP:-: Received payload: "{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":2}"
           [1659695302.039933][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7730
@@ -638,22 +732,24 @@ tests:
           [1659694592.348585][2530:2530] CHIP:ZCL: SwitchServer: OnMultiPressOngoing
       disabled: true
 
-    - label: "Operator does not operate switch"
+    - label: "Step 6b: Operator does not operate switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           no Matter messages for this step
       disabled: true
 
-    - label: "Operator operates switch (press briefly)"
+    - label: "Step 6c: Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event initial-press 1 100 1 1
+          2. switch subscribe-event initial-press 1 100 1 1
 
-          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log:
+          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659694345.040034][3787:3792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659694345.040059][3787:3792] CHIP:TOO:          Event number: 37
@@ -663,16 +759,18 @@ tests:
           [1659694345.040160][3787:3792] CHIP:TOO:     NewPosition: 1
       disabled: true
 
-    - label: "Operator releases switch"
+    - label: "Step 6d: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event short-release 1 100 1 1
+          2. switch subscribe-event short-release 1 100 1 1
 
-          Verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
+          Verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659694426.794832][3797:3802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659694426.794853][3797:3802] CHIP:TOO:          Event number: 38
@@ -687,9 +785,9 @@ tests:
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event multi-press-complete 1 100 1 1
+          2. switch subscribe-event multi-press-complete 1 100 1 1
 
-          Verify MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 1 on TH chip-tool log:
+          Verify MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
           [1659695330.923264][3912:3918] CHIP:TOO:          Event number: 45
@@ -701,16 +799,18 @@ tests:
           [1659695330.923385][3912:3918] CHIP:TOO:    }
       disabled: true
 
-    - label: "Operator operates switch (press briefly)"
+    - label: "Step 6e: Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event initial-press 1 100 1 1
+          2. switch subscribe-event initial-press 1 100 1 1
 
-          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log:
+          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659695901.066563][3955:3960] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659695901.066583][3955:3960] CHIP:TOO:          Event number: 46
@@ -721,16 +821,18 @@ tests:
           [1659695901.066708][3955:3960] CHIP:TOO:    }
       disabled: true
 
-    - label: "Operator releases switch"
+    - label: "Step 6f: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event short-release 1 100 1 1
+          2. switch subscribe-event short-release 1 100 1 1
 
-          Verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
+          Verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659694426.794832][3797:3802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659694426.794853][3797:3802] CHIP:TOO:          Event number: 38
@@ -741,16 +843,20 @@ tests:
           [1659694426.794952][3797:3802] CHIP:TOO:    }
       disabled: true
 
-    - label: "Briefly after 6f, operator operates switch again (press briefly)"
+    - label:
+          "Step 6g: Briefly after 6f, operator operates switch again (press
+          briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event initial-press 1 100 1 1
+          2. switch subscribe-event initial-press 1 100 1 1
 
-          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log:
+          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659694345.040034][3787:3792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659694345.040059][3787:3792] CHIP:TOO:          Event number: 37
@@ -763,9 +869,9 @@ tests:
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event multi-press-ongoing 1 100 1 1
+          2. switch subscribe-event multi-press-ongoing 1 100 1 1
 
-          Verify MultiPressongoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 2 on TH chip-tool log:
+          Verify MultiPressongoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 2 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
           [1659695330.923264][3912:3918] CHIP:TOO:          Event number: 45
@@ -777,16 +883,18 @@ tests:
           [1659695330.923385][3912:3918] CHIP:TOO:    }
       disabled: true
 
-    - label: "Operator releases switch"
+    - label: "Step 6h: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event short-release 1 100 1 1
+          2. switch subscribe-event short-release 1 100 1 1
 
-          Verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
+          Verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659696223.568247][3981:3986] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659696223.568272][3981:3986] CHIP:TOO:          Event number: 53
@@ -805,9 +913,9 @@ tests:
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event multi-press-complete 1 100 1 1
+          2. switch subscribe-event multi-press-complete 1 100 1 1
 
-          Verify MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 2 on TH chip-tool log:
+          Verify MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 2 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
           [1659695330.923264][3912:3918] CHIP:TOO:          Event number: 45
@@ -820,22 +928,25 @@ tests:
       disabled: true
 
     - label:
-          "If MultiPressMax == 2 (see 2c of TC-SWTCH-2.1), skip steps 6j .. 6o"
+          "Step 6i: If MultiPressMax == 2 (see 2c of TC-SWTCH-2.1), skip steps
+          6j .. 6o"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           no Matter messages for this step
       disabled: true
 
-    - label: "Operator operates switch (press briefly)"
+    - label: "Step 6j: Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event initial-press 1 100 1 1
+          2. switch subscribe-event initial-press 1 100 1 1
 
-          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log:
+          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659695901.066563][3955:3960] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659695901.066583][3955:3960] CHIP:TOO:          Event number: 46
@@ -846,16 +957,18 @@ tests:
           [1659695901.066708][3955:3960] CHIP:TOO:    }
       disabled: true
 
-    - label: "Operator releases switch"
+    - label: "Step 6k: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event short-release 1 100 1 1
+          2. switch subscribe-event short-release 1 100 1 1
 
-          Verify  ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
+          Verify  ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659694426.794832][3797:3802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659694426.794853][3797:3802] CHIP:TOO:          Event number: 38
@@ -866,16 +979,20 @@ tests:
           [1659694426.794952][3797:3802] CHIP:TOO:    }
       disabled: true
 
-    - label: "Briefly after 6k, operator operates switch again (press briefly)"
+    - label:
+          "Step 6l: Briefly after 6k, operator operates switch again (press
+          briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event initial-press 1 100 1 1
+          2. switch subscribe-event initial-press 1 100 1 1
 
-          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log:
+          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659694345.040034][3787:3792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659694345.040059][3787:3792] CHIP:TOO:          Event number: 37
@@ -888,9 +1005,9 @@ tests:
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event multi-press-ongoing 1 100 1 1
+          2. switch subscribe-event multi-press-ongoing 1 100 1 1
 
-          Verify MultiPressongoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 2 on TH chip-tool log:
+          Verify MultiPressongoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 2 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
           [1659695330.923264][3912:3918] CHIP:TOO:          Event number: 45
@@ -902,16 +1019,18 @@ tests:
           [1659695330.923385][3912:3918] CHIP:TOO:    }
       disabled: true
 
-    - label: "Operator releases switch"
+    - label: "Step 6m: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event short-release 1 100 1 1
+          2. switch subscribe-event short-release 1 100 1 1
 
-          Verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log:
+          Verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659694426.794832][3797:3802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659694426.794853][3797:3802] CHIP:TOO:          Event number: 38
@@ -922,16 +1041,20 @@ tests:
           [1659694426.794952][3797:3802] CHIP:TOO:    }
       disabled: true
 
-    - label: "Briefly after 6m, operator operates switch again (press briefly)"
+    - label:
+          "Step 6n: Briefly after 6m, operator operates switch again (press
+          briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event initial-press 1 100 1 1
+          2. switch subscribe-event initial-press 1 100 1 1
 
-          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log:
+          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659694345.040034][3787:3792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659694345.040059][3787:3792] CHIP:TOO:          Event number: 37
@@ -944,13 +1067,21 @@ tests:
 
           echo '{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":3}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
+          Verify MultiPressongoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 3 on TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
+
+          [1686290991.699382][30125:30127] CHIP:-: Received payload: "{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":3}"
+          [1686290991.699646][30125:30125] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 89759738
+          [1686290991.699678][30125:30125] CHIP:-: The new position when the momentary switch has been pressed in a multi-press sequence:1
+          [1686290991.699687][30125:30125] CHIP:-: 3 times the momentary switch has been pressed
+          [1686290991.699694][30125:30125] CHIP:ZCL: SwitchServer: OnMultiPressOngoing
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event multi-press-ongoing 1 100 1 1
+          2. switch subscribe-event multi-press-ongoing 1 100 1 1
 
-          Verify MultiPressongoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 3 on TH chip-tool log:
+          Verify MultiPressongoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 3 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659698336.786184][4081:4086] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
           [1659698336.786209][4081:4086] CHIP:TOO:          Event number: 57
@@ -962,14 +1093,18 @@ tests:
           [1659698336.786360][4081:4086] CHIP:TOO:    }
       disabled: true
 
-    - label: "Operator releases switch"
+    - label: "Step 6o: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event short-release 1 100 1 1
+          2. switch subscribe-event short-release 1 100 1 1
+
+          Verify ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
           [1659696223.568247][3981:3986] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659696223.568272][3981:3986] CHIP:TOO:          Event number: 53
@@ -984,6 +1119,8 @@ tests:
 
           echo '{"Name":"MultiPressComplete","PreviousPosition":1,"TotalNumberOfPressesCounted":3}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
+          Verify MultiPressonComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 3 on TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
+
           [1659694592.347850][2530:2538] CHIP:-: Received payload: "{"Name":"MultiPressComplete","PreviousPosition":1,"TotalNumberOfPressesCounted":3}"
           [1659694592.348389][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e772b
           [1659694592.348481][2530:2530] CHIP:-: The new position when the momentary switch has been pressed in a multi-press sequence:1
@@ -992,7 +1129,9 @@ tests:
           Here the command to enter interactive mode:--
 
           1. ./chip-tool interactive start
-           2. switch subscribe-event multi-press-complete 1 100 1 1
+          2. switch subscribe-event multi-press-complete 1 100 1 1
+
+          Verify MultiPressonComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 3 on TH (chip-tool) log and below is the sample log provided for the raspi platform:
 
           [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
           [1659695330.923264][3912:3918] CHIP:TOO:          Event number: 45

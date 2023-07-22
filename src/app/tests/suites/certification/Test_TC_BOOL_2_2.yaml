@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 68.2.2. [TC-BOOL-2.2] Primary Functionality with Server as DUT
+name: 68.2.2. [TC-BOOL-2.2] Primary functionality with server as DUT
 
 PICS:
     - BOOL.S
@@ -29,45 +29,48 @@ tests:
           This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
       disabled: true
 
-    - label: "Commission DUT to TH"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       verification: |
 
       disabled: true
 
-    - label: "Bring the DUT into a state so StateValue is FALSE"
+    - label: "Step 2a: Bring the DUT into a state so StateValue is FALSE."
       PICS: BOOL.M.ManuallyControlled && BOOL.S.A0000
       verification: |
           Manual operation
       disabled: true
 
-    - label: "TH reads the StateValue attribute from the DUT"
+    - label: "Step 2b: TH reads the StateValue attribute from the DUT."
       PICS: BOOL.M.ManuallyControlled && BOOL.S.A0000
       verification: |
           ./chip-tool booleanstate read state-value 1 1
 
-          On TH(chip-tool), verify the StateValue value as FALSE
+          Verify the StateValue value is FALSE On TH(chip-tool), below is the sample log provided for the raspi platform
 
           [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: FALSE
       disabled: true
 
-    - label: "Bring the DUT into a state so StateValue is TRUE"
+    - label: "Step 3a: Bring the DUT into a state so StateValue is TRUE."
       PICS: BOOL.M.ManuallyControlled && BOOL.S.A0000
       verification: |
           Manual operation
       disabled: true
 
-    - label: "TH reads the StateValue attribute from the DUT"
+    - label: "Step 3b: TH reads the StateValue attribute from the DUT."
       PICS: BOOL.M.ManuallyControlled && BOOL.S.A0000
       verification: |
-          On TH(chip-tool), verify the StateValue value as TRUE
           ./chip-tool booleanstate read state-value 1 1
+
+          Verify the StateValue value is TRUE On TH(chip-tool), below is the sample log provided for the raspi platform
 
           [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: TRUE
       disabled: true
 
-    - label: "Set up subscription to StateChange event"
+    - label: "Step 4a: Set up subscription to StateChange event."
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
           Need an SDK implementation required
@@ -80,30 +83,30 @@ tests:
           booleanstate subscribe-event state-change 1 100 1 1 --is-urgent true
       disabled: true
 
-    - label: "Bring the DUT into a state so StateValue is FALSE"
+    - label: "Step 4b: Bring the DUT into a state so StateValue is FALSE."
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
-          On TH(chip-tool), verify the StateValue value as FALSE
+          Verify the StateValue value is FALSE On TH(chip-tool), below is the sample log provided for the raspi platform
       disabled: true
 
-    - label: "TH reads the StateValue attribute from the DUT"
+    - label: "Step 4c: TH reads the StateValue attribute from the DUT."
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
           booleanstate read state-value 1 1
 
-          On TH(chip-tool), verify the StateValue value as FALSE
+          Verify the StateValue value is FALSE On TH(chip-tool), below is the sample log provided for the raspi platform
       disabled: true
 
-    - label: "Bring the DUT into a state so StateValue is TRUE"
+    - label: "Step 4d: Bring the DUT into a state so StateValue is TRUE."
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
-          On TH(chip-tool), verify the StateValue value as TRUE
+          Verify the StateValue value is TRUE On TH(chip-tool), below is the sample log provided for the raspi platform
       disabled: true
 
-    - label: "TH reads the StateValue attribute from the DUT"
+    - label: "Step 4e: TH reads the StateValue attribute from the DUT."
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
           booleanstate read state-value 1 1
 
-          On TH(chip-tool), verify the StateValue value as TRUE
+          Verify the StateValue value is TRUE On TH(chip-tool), below is the sample log provided for the raspi platform
       disabled: true

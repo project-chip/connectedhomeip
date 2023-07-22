@@ -1,0 +1,186 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 226.2.2. [TC-RVCOPSTATE-2.2] Start and Stop commands [DUT as Server]
+
+PICS:
+    - RVCOPSTATE.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 2: Manually put the DUT into a state wherein it can receive a
+          Start Command"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the OperationalStateList attribute"
+      PICS: RVCOPSTATE.S.A0003
+      verification: |
+          ./chip-tool roboticvacuumoperationalstate read operationalstatelist 1 1
+
+           Via the TH (chip-tool), verify:
+           - all entries include an ID (enum8) and a label (string)
+           - all provided IDs are in the allowed range
+           - the list includes IDs for Error (0x03), Running (0x01), and Stopped (0x00)
+      disabled: true
+
+    - label: "Step 4: TH sends Start command to the DUT"
+      PICS: RVCOPSTATE.S.C02.Rsp && RVCOPSTATE.S.C04.Tx
+      verification: |
+          ./chip-tool roboticvacuumoperationalstate start 1 1
+
+           Via the TH (chip-tool), verify:
+           - the response is an instance of OperationalCommandResponse
+           - The ErrorStateID field is set to 0x00 (NoError)
+      disabled: true
+
+    - label: "Step 5: TH reads from the DUT the OperationalState attribute"
+      PICS: RVCOPSTATE.S.A0004
+      verification: |
+          ./chip-tool roboticvacuumoperationalstate read operationalstate 1 1
+
+           Via the TH (chip-tool), verify:
+           - the response has an operationalstateID field that is set to 0x01 (Running)
+      disabled: true
+
+    - label: "Step 6: TH reads from the DUT the OperationalError attribute"
+      PICS: RVCOPSTATE.S.A0005
+      verification: |
+          ./chip-tool roboticvacuumoperationalstate read countdowntime 1 1
+
+           Via the TH (chip-tool), verify:
+           - the response is an instance of a uint32
+      disabled: true
+
+    - label: "Step 7: TH reads from the DUT the CountdownTime attribute"
+      PICS: RVCOPSTATE.S.A0002
+      verification: |
+          ./chip-tool roboticvacuumoperationalstate read countdowntime 1 1
+
+           Via the TH (chip-tool), verify:
+           - that CountdownTime attribute contains either null our a uint32 value
+           - if non-null, verify that the value is in the range 1 to 259200
+           - store the value in 'initialcountdown-time'
+      disabled: true
+
+    - label: "Step 8: TH reads from the DUT the PhaseList attribute"
+      PICS: RVCOPSTATE.S.A0000
+      verification: |
+          ./chip-tool roboticvacuumoperationalstate read phaselist 1 1
+
+           Via the TH (chip-tool), verify:
+           - that PhaseList attribute value contains either null or a list of strings.
+
+           If not null, receord the number of entries in the list as 'phase-list-size'; execute step 7.
+           If null, go to step 8.
+      disabled: true
+
+    - label: "Step 9: TH reads from the DUT the CurrentPhase attribute"
+      PICS: RVCOPSTATE.S.A0001
+      verification: |
+          ./chip-tool roboticvacuumoperationalstate read currentphase 1 1
+
+           Via the TH (chip-tool), verify:
+           - that the CurrentPhase attribute value contains contains a uint8 value
+           - that the value is between 0 and 'phase-list-size - 1'.
+      disabled: true
+
+    - label:
+          "Step 10: TH waits for a vendor defined wait time, this being a period
+          of time less than the expected duration of the operation that has been
+          started"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 11: TH reads from the DUT the CountdownTime attribute"
+      PICS: RVCOPSTATE.S.A0002
+      verification: |
+          ./chip-tool roboticvacuumoperationalstate read countdowntime 1 1
+
+           Via the TH (chip-tool), verify:
+           - that CountdownTime attribute contains either null our a uint32 value
+           - if non-null, verify that the value is in the range 1 to 259200
+           - that the value is approximately 'initialcountdown-time minus the vendor defined wait time'
+      disabled: true
+
+    - label: "Step 12: TH sends Start command to the DUT"
+      PICS: RVCOPSTATE.S.C02.Rsp && RVCOPSTATE.S.C04.Tx
+      verification: |
+          ./chip-tool roboticvacuumoperationalstate start 1 1
+
+           Via the TH (chip-tool), verify:
+           - the response is an instance of OperationalCommandResponse
+           - The ErrorStateID field is set to 0x00 (NoError)
+      disabled: true
+
+    - label: "Step 13: TH sends Stop command to the DUT"
+      PICS: RVCOPSTATE.S.C01.Rsp && RVCOPSTATE.S.C04.Tx
+      verification: |
+          ./chip-tool roboticvacuumoperationalstate stop 1 1
+
+           Via the TH (chip-tool), verify:
+           - the response is an instance of OperationalCommandResponse
+           - The ErrorStateID field is set to 0x00 (NoError)
+      disabled: true
+
+    - label: "Step 14: TH reads from the DUT the OperationalState attribute"
+      PICS: RVCOPSTATE.S.A0004
+      verification: |
+          ./chip-tool roboticvacuumoperationalstate read operationalstate 1 1
+
+           Via the TH (chip-tool), verify:
+           - the response has an operationalstateID field that is set to 0x00 (Stopped)
+      disabled: true
+
+    - label: "Step 15: TH sends Stop command to the DUT"
+      PICS: RVCOPSTATE.S.C01.Rsp && RVCOPSTATE.S.C04.Tx
+      verification: |
+          ./chip-tool roboticvacuumoperationalstate stop 1 1
+
+           Via the TH (chip-tool), verify:
+           - the response is an instance of OperationalCommandResponse
+           - The ErrorStateID field is set to 0x00 (NoError)
+      disabled: true
+
+    - label:
+          "Step 16: Manually put the DUT into a state wherein it cannot receive
+          a Start Command"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 17: TH sends Start command to the DUT"
+      PICS: RVCOPSTATE.S.C02.Rsp && RVCOPSTATE.S.C04.Tx
+      verification: |
+          ./chip-tool roboticvacuumoperationalstate start 1 1
+
+           Via the TH (chip-tool), verify:
+           - the response is an instance of OperationalCommandResponse
+           - The ErrorStateID field is set to 0x01 (UnableToStartOrResume)
+      disabled: true

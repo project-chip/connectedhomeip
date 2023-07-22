@@ -1,0 +1,100 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 223.2.2. [TC-REFALM-2.2] Primary functionality with DUT as Server
+
+PICS:
+    - REFALM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: Ensure that the door on the DUT is closed"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the State attribute"
+      PICS: REFALM.S.A0002
+      verification: |
+          Verify that the DUT response contains a 32-bit value with bit 0 set to 0
+      disabled: true
+
+    - label: "Step 4: Manually open the door on the DUT"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 5: after a few seconds, TH reads State attribute from DUT"
+      verification: |
+          Wait for the time defined in PIXIT.REFALM.AlarmThreshold
+      disabled: true
+
+    - label: "Step 6: TH reads from the DUT the State attribute"
+      PICS: REFALM.S.A0002
+      verification: |
+          Verify that the DUT response contains a 32-bit value with bit 0 set to 1
+      disabled: true
+
+    - label: "Step 7: Ensure that the door on the DUT is closed"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 8: TH reads from the DUT the State attribute"
+      PICS: REFALM.S.A0002
+      verification: |
+          Verify that the DUT response contains a 32-bit value with bit 0 set to 0
+      disabled: true
+
+    - label: "Step 9: TH sends Reset command to the DUT"
+      PICS: REFALM.S.C00.Rsp
+      verification: |
+          Verify DUT responds w/ status UNSUPPORTED_COMMAND(0x81)
+      disabled: true
+
+    - label: "Step 10: TH sends ModifyEnabledAlarms command to the DUT"
+      PICS: REFALM.S.C01.Rsp
+      verification: |
+          Verify DUT responds w/ status UNSUPPORTED_COMMAND(0x81)
+      disabled: true
+
+    - label: "Step 11: Set up subscription to the Notify event."
+      PICS: REFALM.S.E00 && REFALM.S.A0002
+      verification: |
+          Verify that the DUT response contains a 32-bit value with bit 0 set to 0
+      disabled: true
+
+    - label: "Step 12: Repeat steps 4 then 5"
+      PICS: REFALM.S.E00
+      verification: |
+          After step 5 (repeated), receive a Notify event with the State attribute bit 0 set to 1.
+      disabled: true
+
+    - label: "Step 13: Repeat step 7"
+      PICS: REFALM.S.E00
+      verification: |
+          Receive a Notify event with the State attribute bit 0 set to 0.
+      disabled: true
