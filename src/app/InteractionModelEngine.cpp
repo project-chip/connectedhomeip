@@ -329,9 +329,9 @@ void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     if (!mSubscriptionResumptionScheduled && HasSubscriptionsToResume())
     {
-        mSubscriptionResumptionScheduled  = true;
-        auto timeTillNextResubscriptionMs = ComputeTimeTillNextSubscriptionResumption();
-        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(System::Clock::Seconds32(timeTillNextResubscriptionMs),
+        mSubscriptionResumptionScheduled    = true;
+        auto timeTillNextResubscriptionSecs = ComputeTimeSecondsTillNextSubscriptionResumption();
+        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(System::Clock::Seconds32(timeTillNextResubscriptionSecs),
                                                                       ResumeSubscriptionsTimerCallback, this);
         mNumSubscriptionResumptionRetries++;
     }
@@ -1873,22 +1873,16 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
 }
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
-uint32_t InteractionModelEngine::ComputeTimeTillNextSubscriptionResumption()
+uint32_t InteractionModelEngine::ComputeTimeSecondsTillNextSubscriptionResumption()
 {
-    uint32_t waitTimeInSeconds = 0;
-
-    if (mNumSubscriptionResumptionRetries <= CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX)
+    if (mNumSubscriptionResumptionRetries > CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX)
     {
-        waitTimeInSeconds = CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MIN_RETRY_INTERVAL_SECS +
-            GetFibonacciForIndex(mNumSubscriptionResumptionRetries) *
-                CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_WAIT_TIME_MULTIPLIER_SECS;
-    }
-    else
-    {
-        waitTimeInSeconds = CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS;
+        return CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS;
     }
 
-    return waitTimeInSeconds;
+    return CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MIN_RETRY_INTERVAL_SECS +
+        GetFibonacciForIndex(mNumSubscriptionResumptionRetries) *
+        CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_WAIT_TIME_MULTIPLIER_SECS;
 }
 
 bool InteractionModelEngine::HasSubscriptionsToResume()

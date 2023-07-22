@@ -236,7 +236,7 @@ void TestInteractionModelEngine::TestSubscriptionResumptionTimer(nlTestSuite * a
 
     uint32_t timeTillNextResubscriptionMs;
     InteractionModelEngine::GetInstance()->mNumSubscriptionResumptionRetries = 0;
-    timeTillNextResubscriptionMs = InteractionModelEngine::GetInstance()->ComputeTimeTillNextSubscriptionResumption();
+    timeTillNextResubscriptionMs = InteractionModelEngine::GetInstance()->ComputeTimeSecondsTillNextSubscriptionResumption();
     NL_TEST_ASSERT(apSuite, timeTillNextResubscriptionMs == CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MIN_RETRY_INTERVAL_SECS);
 
     uint32_t lastTimeTillNextResubscriptionMs = timeTillNextResubscriptionMs;
@@ -245,14 +245,14 @@ void TestInteractionModelEngine::TestSubscriptionResumptionTimer(nlTestSuite * a
          CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX;
          InteractionModelEngine::GetInstance()->mNumSubscriptionResumptionRetries++)
     {
-        timeTillNextResubscriptionMs = InteractionModelEngine::GetInstance()->ComputeTimeTillNextSubscriptionResumption();
+        timeTillNextResubscriptionMs = InteractionModelEngine::GetInstance()->ComputeTimeSecondsTillNextSubscriptionResumption();
         NL_TEST_ASSERT(apSuite, timeTillNextResubscriptionMs >= lastTimeTillNextResubscriptionMs);
         NL_TEST_ASSERT(apSuite, timeTillNextResubscriptionMs < CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS);
         lastTimeTillNextResubscriptionMs = timeTillNextResubscriptionMs;
     }
 
     InteractionModelEngine::GetInstance()->mNumSubscriptionResumptionRetries = 2000;
-    timeTillNextResubscriptionMs = InteractionModelEngine::GetInstance()->ComputeTimeTillNextSubscriptionResumption();
+    timeTillNextResubscriptionMs = InteractionModelEngine::GetInstance()->ComputeTimeSecondsTillNextSubscriptionResumption();
     NL_TEST_ASSERT(apSuite, timeTillNextResubscriptionMs == CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS);
 }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
