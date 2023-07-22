@@ -88,7 +88,7 @@ public:
      * @param NumberOfRinses attribute NumberOfRinses
      * @return true on success, false on failure
      */
-    EmberAfStatus GetNumberOfRinses(chip::EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses);
+    EmberAfStatus GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses);
 
 private:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
