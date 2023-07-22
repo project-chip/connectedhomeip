@@ -1961,6 +1961,48 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-refrigerator</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Refrigerator</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0070</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Refrigerator And Temperature Controlled Cabinet Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Refrigerator Alarm" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-laundry-washer</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Laundry Washer</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0073</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Laundry Washer Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Temperature Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-temperature-controlled-cabinet</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Temperature Controlled Cabinet</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0071</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Temperature Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Refrigerator And Temperature Controlled Cabinet Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-all-clusters-app</name>
         <domain>CHIP</domain>
         <typeName>Matter All-clusters-app Server Example</typeName>
