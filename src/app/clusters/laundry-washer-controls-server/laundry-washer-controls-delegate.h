@@ -39,7 +39,7 @@ public:
      * @param index The index of the spin_speed, with 0 representing the first one.
      * @param spinSpeed  The spin speed is filled.
      */
-    virtual CHIP_ERROR GetSpinSpeedAtIndex(size_t index, CharSpan & spinSpeed) = 0;
+    virtual CHIP_ERROR GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed) = 0;
 
     /**
      * Get the list of supported rinses list.

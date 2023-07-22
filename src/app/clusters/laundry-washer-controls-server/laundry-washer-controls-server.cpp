@@ -55,7 +55,10 @@ Delegate * gDelegateTable[kLaundryWasherControlsDelegateTableSize] = { nullptr }
 namespace {
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    return (endpoint > kLaundryWasherControlsDelegateTableSize ? nullptr : gDelegateTable[endpoint]);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LaundryWasherControls::Id,
+                                                       EMBER_AF_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kLaundryWasherControlsDelegateTableSize ? nullptr : gDelegateTable[ep]);
+
 }
 
 } // namespace
@@ -67,9 +70,12 @@ LaundryWasherControlsServer LaundryWasherControlsServer::sInstance;
  *********************************************************/
 void LaundryWasherControlsServer::SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    if (endpoint < kLaundryWasherControlsDelegateTableSize)
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LaundryWasherControls::Id,
+                                                       EMBER_AF_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
+    // if endpoint is found
+    if (ep < kLaundryWasherControlsDelegateTableSize)
     {
-        gDelegateTable[endpoint] = delegate;
+        gDelegateTable[ep] = delegate;
     }
 }
 
@@ -146,7 +152,8 @@ CHIP_ERROR LaundryWasherControlsServer::ReadSpinSpeeds(const ConcreteReadAttribu
     return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t i = 0; true; i++)
         {
-            CharSpan spinSpeed;
+            char buffer[kMaxSpinSpeedLength];
+            MutableCharSpan spinSpeed(buffer);
             auto err = delegate->GetSpinSpeedAtIndex(i, spinSpeed);
             if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
             {

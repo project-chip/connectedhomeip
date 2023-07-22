@@ -39,6 +39,8 @@ public:
     using SpinSpeedList       = DataModel::List<const chip::CharSpan>;
     using SupportedRinsesList = DataModel::List<const NumberOfRinsesEnum>;
 
+    static constexpr uint8_t kMaxSpinSpeedLength = 64;
+
     /**
      * Set the default delegate of laundry washer server at endpoint x
      * @param endpoint ID of the endpoint
