@@ -54,9 +54,9 @@ public:
      * @param[in] endpoint The endpoint corresponding to the Dishwasher Alarm cluster.
      * @param[in] newState The desired new value for the State attribute.
      * @param[in] ignoreLatchState If false, the Latch attribute will be honored and the
-     * method will not reset any bits in the State attribute which have their 
+     * method will not reset any bits in the State attribute which have their
      * associated Latch bit set.  If true, the Latch attribute is ignored and the value of
-     * the State attribute will be set to the value of the newState parameter while 
+     * the State attribute will be set to the value of the newState parameter while
      * honoring the Mask and Supported attributes.
      * The default value for the ignoreLatchState parameter is false.
      */
