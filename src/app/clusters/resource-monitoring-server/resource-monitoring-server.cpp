@@ -250,7 +250,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
 CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     if (HasFeature(ResourceMonitoring::Feature::kReplacementProductList))
     {
         ReplacementProductListManager * productListManagerInstance = Instance::GetReplacementProductListManagerInstance();
@@ -264,8 +264,8 @@ CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
 
         err = aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
             Attributes::GenericReplacementProductStruct::GenericType replacementProductStruct;
-            CHIP_ERROR iteratorError;
-            while (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED != iteratorError)
+            CHIP_ERROR iteratorError = CHIP_NO_ERROR;
+            while (CHIP_NO_ERROR == iteratorError)
             {
                 ReturnErrorOnFailure(encoder.Encode(replacementProductStruct));
                 iteratorError = productListManagerInstance->Next(replacementProductStruct);
@@ -273,7 +273,7 @@ CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
             return (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED != iteratorError) ? iteratorError : CHIP_NO_ERROR;
         });
     }
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 // Implements the read functionality for non-standard attributes.
