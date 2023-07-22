@@ -161,7 +161,6 @@ CHIP_ERROR LaundryWasherControlsServer::ReadSpinSpeeds(const ConcreteReadAttribu
 CHIP_ERROR LaundryWasherControlsServer::ReadSupportedRinses(const ConcreteReadAttributePath & aPath,
                                                             AttributeValueEncoder & aEncoder)
 {
-    aEncoder.EncodeEmptyList();
     Delegate * delegate = GetDelegate(aPath.mEndpointId);
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
 
