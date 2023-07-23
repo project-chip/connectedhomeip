@@ -17,19 +17,9 @@
 
 package chip.devicecontroller.cluster
 
-import chip.tlv.ArrayValue
-import chip.tlv.BooleanValue
-import chip.tlv.ByteStringValue
-import chip.tlv.DoubleValue
-import chip.tlv.FloatValue
-import chip.tlv.IntValue
-import chip.tlv.ListValue
 import chip.tlv.NullValue
-import chip.tlv.StructureValue
 import chip.tlv.Tag
 import chip.tlv.TlvReader
-import chip.tlv.UnsignedIntValue
-import chip.tlv.Utf8StringValue
 
 fun TlvReader.getBoolean(tag: Tag): Boolean {
   return getBool(tag)
