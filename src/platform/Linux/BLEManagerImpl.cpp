@@ -21,20 +21,25 @@
  *          Provides an implementation of the BLEManager singleton object
  *          for Linux platforms.
  */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <ble/CHIPBleServiceData.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <new>
-#include <platform/CommissionableDataProvider.h>
-#include <platform/internal/BLEManager.h>
+/**
+ * Note: BLEManager requires ConnectivityManager to be defined beforehand,
+ *       otherwise we will face circular dependency between them. */
+#include <platform/ConnectivityManager.h>
+
+/**
+ * Note: Use public include for BLEManager which includes our local
+ *       platform/<PLATFORM>/BLEManagerImpl.h after defining interface class. */
+#include "platform/internal/BLEManager.h"
 
 #include <cassert>
 #include <type_traits>
 #include <utility>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <ble/CHIPBleServiceData.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <platform/CommissionableDataProvider.h>
 
 #include "bluez/Helper.h"
 
@@ -837,5 +842,3 @@ void BLEManagerImpl::OnScanError(CHIP_ERROR err)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

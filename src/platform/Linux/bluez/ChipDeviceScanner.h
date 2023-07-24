@@ -19,8 +19,6 @@
 
 #include <platform/CHIPDeviceConfig.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
 #include <glib.h>
 #include <memory>
 
@@ -114,5 +112,3 @@ private:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

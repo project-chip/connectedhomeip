@@ -17,8 +17,6 @@
 
 #include "ChipDeviceScanner.h"
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
 #include <errno.h>
 #include <pthread.h>
 
@@ -335,5 +333,3 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

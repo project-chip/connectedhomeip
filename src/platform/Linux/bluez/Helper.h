@@ -50,9 +50,10 @@
 
 #pragma once
 
-#include "Types.h"
+#include <lib/core/CHIPError.h>
+#include <system/SystemPacketBuffer.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include "Types.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -80,5 +81,3 @@ void CancelConnect(BluezEndpoint * apEndpoint);
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

@@ -42,9 +42,6 @@ static_library("Linux") {
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
     "../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.cpp",
-    "BLEManagerImpl.h",
-    "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPLinuxStorage.cpp",
@@ -85,6 +82,9 @@ static_library("Linux") {
 
   if (chip_enable_ble) {
     sources += [
+      "BLEManagerImpl.cpp",
+      "BLEManagerImpl.h",
+      "BlePlatformConfig.h",
       "bluez/AdapterIterator.cpp",
       "bluez/AdapterIterator.h",
       "bluez/ChipDeviceScanner.cpp",

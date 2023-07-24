@@ -26,8 +26,6 @@
 #include <ble/BleLayer.h>
 #include <platform/internal/BLEManager.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
 #include "bluez/ChipDeviceScanner.h"
 #include "bluez/Types.h"
 
@@ -246,5 +244,3 @@ inline bool BLEManagerImpl::_IsAdvertising()
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

@@ -47,29 +47,30 @@
  *    @file
  *          Provides Bluez dbus implementation for BLE
  */
-#include <ble/BleUUID.h>
-#include <ble/CHIPBleServiceData.h>
-#include <lib/support/BitFlags.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CHIPMemString.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <protocols/Protocols.h>
-#include <setup_payload/AdditionalDataPayloadGenerator.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <cassert>
 #include <errno.h>
-#include <gio/gunixfdlist.h>
 #include <limits>
 #include <stdarg.h>
 #include <strings.h>
 #include <unistd.h>
 #include <utility>
 
+#include <gio/gio.h>
+#include <gio/gunixfdlist.h>
+#include <glib.h>
+
+#include <ble/BleUUID.h>
+#include <ble/CHIPBleServiceData.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/Linux/BLEManagerImpl.h>
+#include <protocols/Protocols.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 #include "BluezObjectIterator.h"
@@ -1823,4 +1824,3 @@ void CancelConnect(BluezEndpoint * apEndpoint)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
