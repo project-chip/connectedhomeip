@@ -198,3 +198,15 @@ class TestStepResponseVariableError(TestStepError):
         super().__init__(message)
 
         self.tag_key_with_error(content, 'response')
+
+
+class TestStepArgumentsValueError(TestStepError):
+    """Raise when a test step arguments use the 'value' keyword but the command is not trying to write to an attribute"""
+
+    def __init__(self, content):
+        message = 'The "value" key can not be used in conjuction with a command that is not "writeAttribute"'
+        super().__init__(message)
+
+        self.tag_key_with_error(content, 'command')
+        arguments = content.get('arguments')
+        self.tag_key_with_error(arguments, 'value')

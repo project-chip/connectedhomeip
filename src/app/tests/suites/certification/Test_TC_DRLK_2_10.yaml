@@ -55,23 +55,25 @@ tests:
       disabled: true
 
     - label:
-          "Trigger the DUT to generate DoorLockAlarm Event (by LockJammed
-          scenario)"
+          "Step 1a: Trigger the DUT to generate DoorLockAlarm Event (by
+          LockJammed scenario)"
       PICS: DRLK.S.E00 && DRLK.S.DetectLockJammed
       verification: |
           To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in lock-app to generate the event, Vendor Dut should have capability to generate this event)
 
           echo '{"Cmd": "SendDoorLockAlarm", "Params": { "EndpointId": 1, "AlarmCode": 0 } }' > /tmp/chip_lock_app_fifo-<PID>  (PID of lock-app)
           For example :
+
            echo '{"Cmd": "SendDoorLockAlarm", "Params": { "EndpointId": 1, "AlarmCode": 0 } }' > /tmp/chip_lock_app_fifo-3940 (PID may vary based on the actual DUT)
       disabled: true
 
-    - label: "TH reads the DoorLockAlarm event from DUT"
+    - label: "Step 1b: TH reads the DoorLockAlarm event from DUT"
       PICS: DRLK.S.E00
       verification: |
           ./chip-tool doorlock read-event door-lock-alarm 1 1
 
-          Verify "TH receives the DoorLockAlarm event  and AlarmCode is set to LockJammed " on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify TH receives the DoorLockAlarm event.
+          -In that event the AlarmCode is set to LockJammed(0) and priority is set to Critical.
 
           [1659521453.110272][4098:4103] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0000
           [1659521453.110310][4098:4103] CHIP:TOO:   Event number: 4
@@ -82,19 +84,20 @@ tests:
           [1659521453.110591][4098:4103] CHIP:TOO:    }
       disabled: true
 
-    - label: "Trigger the DUT to generate DoorStateChange Event"
+    - label: "Step 2a: Trigger the DUT to generate DoorStateChange Event"
       PICS: DRLK.S.F05 && DRLK.S.E01
       verification: |
           To trigger the event give the below command in another terminal of DUT
           echo '{"Cmd": "SetDoorState", "Params": { "EndpointId": 1, "DoorState": 1 } }' > /tmp/chip_lock_app_fifo-4055    (4055 - value changes)
       disabled: true
 
-    - label: "TH reads the DoorStateChange event from DUT"
+    - label: "Step 2b: TH reads the DoorStateChange event from DUT"
       PICS: DRLK.S.F05 && DRLK.S.E01
       verification: |
           ./chip-tool doorlock read-event door-state-change 1 1
 
-          Verify "TH recieve the DoorLockAlaram event and DoorState set to DoorClosed " on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify TH recieves the DoorLockAlaram event.
+          -In that event the DoorState set to DoorClosed(1) and priority is set to CRITICAL or INFO.
 
           [1659521576.156075][4109:4114] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0001
           [1659521576.156118][4109:4114] CHIP:TOO:   Event number: 1
@@ -106,19 +109,19 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Lock Door command (using Remote) to the DUT with valid
-          PINCode"
+          "Step 3a: TH sends the Lock Door command (using Remote) to the DUT
+          with valid PINCode"
       PICS: DRLK.S.C00.Rsp
       verification: |
           ./chip-tool doorlock set-user 0 1 xxx 6452 1 0 0 1 1  --timedInteractionTimeoutMs 1000
 
-          Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the SUCCESS response for setting the Users details.
 
           [1656497453.684077][25847:25853] CHIP:DMG:        status = 0x00 (SUCCESS),
 
           ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 2 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the SUCCESS response for setting the credential details.
 
           [1656497508.814196][25858:25863] CHIP:TOO:   SetCredentialResponse: {
           [1656497508.814257][25858:25863] CHIP:TOO:     status: 0
@@ -127,7 +130,7 @@ tests:
 
           ./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 123456
 
-          Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the SUCCESS response for door lock operation with valid PINCode.
 
           [1654687870.020678][4246:4251] CHIP:DMG:
           [1654687870.020715][4246:4251] CHIP:DMG:                                StatusIB =
@@ -145,12 +148,15 @@ tests:
           [1654687870.021160][4246:4251] CHIP:DMG: },"
       disabled: true
 
-    - label: "TH reads the LockOperation event from DUT"
+    - label: "Step 3b: TH reads the LockOperation event from DUT"
       PICS: DRLK.S.E02
       verification: |
           ./chip-tool doorlock read-event lock-operation 1 1
 
-          Verify " LockOperationType is set to Lock and Event priority is set to CRITICAL" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify that the:
+          -LockOperationType value as 0(Lock).
+          -OperationSource value as 7(Remote).
+          -Priority as Critical or INFO.
 
           [1659777214.883129][3089:3094] CHIP:DMG:        SuppressResponse = true,
           [1659777214.883159][3089:3094] CHIP:DMG:        InteractionModelRevision = 1
@@ -174,13 +180,13 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Unlock Door command(using Remote) to the DUT with valid
-          PINCode"
+          "Step 3c: TH sends the Unlock Door command(using Remote) to the DUT
+          with valid PINCode"
       PICS: DRLK.S.C01.Rsp
       verification: |
           ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 123456
 
-          Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the SUCCESS response for door unlock operation with valid PINCode.
 
           [1659777464.384962][3157:3162] CHIP:DMG:                                StatusIB =
           [1659777464.384997][3157:3162] CHIP:DMG:                                {
@@ -198,56 +204,135 @@ tests:
           [1659777464.385375][3157:3162] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0001 Status=0x0
       disabled: true
 
-    - label: "TH reads the LockOperation event from DUT"
-      PICS: DRLK.S.E02
+    - label: "Step 3d: TH reads the LockOperation event from DUT"
+      PICS: DRLK.S.E02&& DRLK.S.F0c
       verification: |
           ./chip-tool doorlock read-event lock-operation 1 1
 
-          Verify " LockOperationType is set to Lock and Event priority is set to CRITICAL" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify that the:
+          -LockOperationType value as 4(Unlatch).
+          -OperationSource value as 7 (Remote).
+          -Priority as Critical.
 
-          [1659777667.226139][3222:3227] CHIP:DMG: }
-          [1659777667.226318][3222:3227] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
-          [1659777667.226343][3222:3227] CHIP:TOO:         Event number: 5
-          [1659777667.226363][3222:3227] CHIP:TOO:         Priority: Critical
-          [1659777667.226383][3222:3227] CHIP:TOO:         Timestamp: 3327279
-          [1659777667.226482][3222:3227] CHIP:TOO:   LockOperation: {
-          [1659777667.226522][3222:3227] CHIP:TOO:     LockOperationType: 0
-          [1659777667.226544][3222:3227] CHIP:TOO:     OperationSource: 7
-          [1659777667.226565][3222:3227] CHIP:TOO:     UserIndex: 1
-          [1659777667.226653][3222:3227] CHIP:TOO:     FabricIndex: 1
-          [1659777667.226677][3222:3227] CHIP:TOO:     SourceNode: 112233
-          [1659777667.226707][3222:3227] CHIP:TOO:     Credentials: 1 entries
-          [1659777667.226758][3222:3227] CHIP:TOO:       [1]: {
-          [1659777667.226780][3222:3227] CHIP:TOO:         CredentialType: 1
-          [1659777667.226800][3222:3227] CHIP:TOO:         CredentialIndex: 2
-          [1659777667.226820][3222:3227] CHIP:TOO:        }
-          [1659777667.226841][3222:3227] CHIP:TOO:    }
-          [1659777667.226944][3222:3227] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
-          [1659777667.226965][3222:3227] CHIP:TOO:         Event number: 6
-          [1659777667.226984][3222:3227] CHIP:TOO:         Priority: Critical
-          [1659777667.227003][3222:3227] CHIP:TOO:         Timestamp: 3351552
-          [1659777667.227039][3222:3227] CHIP:TOO:   LockOperation: {
-          [1659777667.227061][3222:3227] CHIP:TOO:     LockOperationType: 1
-          [1659777667.227082][3222:3227] CHIP:TOO:     OperationSource: 7
-          [1659777667.227103][3222:3227] CHIP:TOO:     UserIndex: 1
-          [1659777667.227122][3222:3227] CHIP:TOO:     FabricIndex: 1
-          [1659777667.227143][3222:3227] CHIP:TOO:     SourceNode: 112233
-          [1659777667.227167][3222:3227] CHIP:TOO:     Credentials: 1 entries
-          [1659777667.227193][3222:3227] CHIP:TOO:       [1]: {
-          [1659777667.227213][3222:3227] CHIP:TOO:         CredentialType: 1
-          [1659777667.227232][3222:3227] CHIP:TOO:         CredentialIndex: 2
-          [1659777667.227251][3222:3227] CHIP:TOO:        }
-          [1659777667.227325][3222:3227] CHIP:TOO:    }
+
+          [1689767095.211849][2310:2312] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1689767095.211888][2310:2312] CHIP:TOO:   Event number: 7
+          [1689767095.211918][2310:2312] CHIP:TOO:   Priority: Critical
+          [1689767095.211947][2310:2312] CHIP:TOO:   Timestamp: 1689767075579
+          [1689767095.212076][2310:2312] CHIP:TOO:   LockOperation: {
+          [1689767095.212136][2310:2312] CHIP:TOO:     LockOperationType: 0
+          [1689767095.212176][2310:2312] CHIP:TOO:     OperationSource: 7
+          [1689767095.212227][2310:2312] CHIP:TOO:     UserIndex: 1
+          [1689767095.212264][2310:2312] CHIP:TOO:     FabricIndex: 1
+          [1689767095.212302][2310:2312] CHIP:TOO:     SourceNode: 112233
+          [1689767095.212383][2310:2312] CHIP:TOO:     Credentials: 1 entries
+          [1689767095.212455][2310:2312] CHIP:TOO:       [1]: {
+          [1689767095.212494][2310:2312] CHIP:TOO:         CredentialType: 1
+          [1689767095.212531][2310:2312] CHIP:TOO:         CredentialIndex: 2
+          [1689767095.212566][2310:2312] CHIP:TOO:        }
+          [1689767095.212603][2310:2312] CHIP:TOO:    }
+          [1689767095.212819][2310:2312] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1689767095.212858][2310:2312] CHIP:TOO:   Event number: 8
+          [1689767095.212888][2310:2312] CHIP:TOO:   Priority: Critical
+          [1689767095.212917][2310:2312] CHIP:TOO:   Timestamp: 1689767089876
+          [1689767095.212971][2310:2312] CHIP:TOO:   LockOperation: {
+          [1689767095.213010][2310:2312] CHIP:TOO:     LockOperationType: 4
+          [1689767095.213047][2310:2312] CHIP:TOO:     OperationSource: 7
+          [1689767095.213082][2310:2312] CHIP:TOO:     UserIndex: 1
+          [1689767095.213117][2310:2312] CHIP:TOO:     FabricIndex: 1
+          [1689767095.213153][2310:2312] CHIP:TOO:     SourceNode: 112233
+          [1689767095.213194][2310:2312] CHIP:TOO:     Credentials: 1 entries
+          [1689767095.213239][2310:2312] CHIP:TOO:       [1]: {
+          [1689767095.213277][2310:2312] CHIP:TOO:         CredentialType: 1
+          [1689767095.213313][2310:2312] CHIP:TOO:         CredentialIndex: 2
+          [1689767095.213347][2310:2312] CHIP:TOO:        }
+          [1689767095.213385][2310:2312] CHIP:TOO:    }
+          [1689767095.213581][2310:2312] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1689767095.213617][2310:2312] CHIP:TOO:   Event number: 9
+          [1689767095.213646][2310:2312] CHIP:TOO:   Priority: Critical
+          [1689767095.213674][2310:2312] CHIP:TOO:   Timestamp: 1689767089876
+          [1689767095.213727][2310:2312] CHIP:TOO:   LockOperation: {
+          [1689767095.213767][2310:2312] CHIP:TOO:     LockOperationType: 1
+          [1689767095.213803][2310:2312] CHIP:TOO:     OperationSource: 7
+          [1689767095.213838][2310:2312] CHIP:TOO:     UserIndex: 1
+          [1689767095.213873][2310:2312] CHIP:TOO:     FabricIndex: 1
+          [1689767095.213908][2310:2312] CHIP:TOO:     SourceNode: 112233
+          [1689767095.213951][2310:2312] CHIP:TOO:     Credentials: 1 entries
+          [1689767095.214021][2310:2312] CHIP:TOO:       [1]: {
+          [1689767095.214072][2310:2312] CHIP:TOO:         CredentialType: 1
+          [1689767095.214109][2310:2312] CHIP:TOO:         CredentialIndex: 2
+          [1689767095.214144][2310:2312] CHIP:TOO:        }
+          [1689767095.214196][2310:2312] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 3e: TH reads the LockOperation event from DUT"
+      PICS: DRLK.S.E02
+      verification: |
+          Note : This step can be validated in STEP 3d chip-tool log
+
+          Via the TH (chip-tool), verify that the:
+          -LockOperationType value as 1(Unlock).
+          -OperationSource value as 7 (Remote).
+          -Priority as Critical.
+
+          [1689767095.211849][2310:2312] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1689767095.211888][2310:2312] CHIP:TOO:   Event number: 7
+          [1689767095.211918][2310:2312] CHIP:TOO:   Priority: Critical
+          [1689767095.211947][2310:2312] CHIP:TOO:   Timestamp: 1689767075579
+          [1689767095.212076][2310:2312] CHIP:TOO:   LockOperation: {
+          [1689767095.212136][2310:2312] CHIP:TOO:     LockOperationType: 0
+          [1689767095.212176][2310:2312] CHIP:TOO:     OperationSource: 7
+          [1689767095.212227][2310:2312] CHIP:TOO:     UserIndex: 1
+          [1689767095.212264][2310:2312] CHIP:TOO:     FabricIndex: 1
+          [1689767095.212302][2310:2312] CHIP:TOO:     SourceNode: 112233
+          [1689767095.212383][2310:2312] CHIP:TOO:     Credentials: 1 entries
+          [1689767095.212455][2310:2312] CHIP:TOO:       [1]: {
+          [1689767095.212494][2310:2312] CHIP:TOO:         CredentialType: 1
+          [1689767095.212531][2310:2312] CHIP:TOO:         CredentialIndex: 2
+          [1689767095.212566][2310:2312] CHIP:TOO:        }
+          [1689767095.212603][2310:2312] CHIP:TOO:    }
+          [1689767095.212819][2310:2312] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1689767095.212858][2310:2312] CHIP:TOO:   Event number: 8
+          [1689767095.212888][2310:2312] CHIP:TOO:   Priority: Critical
+          [1689767095.212917][2310:2312] CHIP:TOO:   Timestamp: 1689767089876
+          [1689767095.212971][2310:2312] CHIP:TOO:   LockOperation: {
+          [1689767095.213010][2310:2312] CHIP:TOO:     LockOperationType: 4
+          [1689767095.213047][2310:2312] CHIP:TOO:     OperationSource: 7
+          [1689767095.213082][2310:2312] CHIP:TOO:     UserIndex: 1
+          [1689767095.213117][2310:2312] CHIP:TOO:     FabricIndex: 1
+          [1689767095.213153][2310:2312] CHIP:TOO:     SourceNode: 112233
+          [1689767095.213194][2310:2312] CHIP:TOO:     Credentials: 1 entries
+          [1689767095.213239][2310:2312] CHIP:TOO:       [1]: {
+          [1689767095.213277][2310:2312] CHIP:TOO:         CredentialType: 1
+          [1689767095.213313][2310:2312] CHIP:TOO:         CredentialIndex: 2
+          [1689767095.213347][2310:2312] CHIP:TOO:        }
+          [1689767095.213385][2310:2312] CHIP:TOO:    }
+          [1689767095.213581][2310:2312] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1689767095.213617][2310:2312] CHIP:TOO:   Event number: 9
+          [1689767095.213646][2310:2312] CHIP:TOO:   Priority: Critical
+          [1689767095.213674][2310:2312] CHIP:TOO:   Timestamp: 1689767089876
+          [1689767095.213727][2310:2312] CHIP:TOO:   LockOperation: {
+          [1689767095.213767][2310:2312] CHIP:TOO:     LockOperationType: 1
+          [1689767095.213803][2310:2312] CHIP:TOO:     OperationSource: 7
+          [1689767095.213838][2310:2312] CHIP:TOO:     UserIndex: 1
+          [1689767095.213873][2310:2312] CHIP:TOO:     FabricIndex: 1
+          [1689767095.213908][2310:2312] CHIP:TOO:     SourceNode: 112233
+          [1689767095.213951][2310:2312] CHIP:TOO:     Credentials: 1 entries
+          [1689767095.214021][2310:2312] CHIP:TOO:       [1]: {
+          [1689767095.214072][2310:2312] CHIP:TOO:         CredentialType: 1
+          [1689767095.214109][2310:2312] CHIP:TOO:         CredentialIndex: 2
+          [1689767095.214144][2310:2312] CHIP:TOO:        }
+          [1689767095.214196][2310:2312] CHIP:TOO:    }
       disabled: true
 
     - label:
-          "TH sends the Lock Door command( using Remote) to the DUT with invalid
-          PINCode"
+          "Step 4a: TH sends the Lock Door command( using Remote) to the DUT
+          with invalid PINCode"
       PICS: DRLK.S.C00.Rsp
       verification: |
           ./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 12345678
 
-          Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the FAILURE response for door unlock operation with invalid PINCode.
 
           [1659777735.863811][3232:3237] CHIP:DMG:                                StatusIB =
           [1659777735.863849][3232:3237] CHIP:DMG:                                {
@@ -266,12 +351,16 @@ tests:
           [1659777735.864317][3232:3237] CHIP:TOO: Error: IM Error 0x00000501: General error: 0x01 (FAILURE)
       disabled: true
 
-    - label: "TH reads the LockOperationError event from DUT"
+    - label: "Step 4b: TH reads the LockOperationError event from DUT"
       PICS: DRLK.S.E03
       verification: |
           ./chip-tool doorlock read-event lock-operation-error 1 1
 
-          Verify " LockOperationType is set to Unlock and Event priority is set to CRITICAL" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify that the:
+          -LockOperationType value as 0(Lock).
+          -OperationSource value as 7(Remote).
+          -OperationError is set to 1(InvalidCredential).
+          -Priority is set to Critical.
 
           [1659777833.226970][3243:3248] CHIP:DMG: }
           [1659777833.227194][3243:3248] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0003
@@ -289,12 +378,13 @@ tests:
           [1659777833.227696][3243:3248] CHIP:TOO:    }
       disabled: true
 
-    - label: "TH sends Unlock Door Command to the DUT with InvalidPINCode."
+    - label:
+          "Step 4c: TH sends Unlock Door Command to the DUT with InvalidPINCode."
       PICS: DRLK.S.C01.Rsp
       verification: |
           ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 12345678
 
-          Verify "DUT sends failure response" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the FAILURE response for door unlock operation with invalid PINCode.
 
           [1659777885.573854][3251:3256] CHIP:DMG:                                StatusIB =
           [1659777885.573896][3251:3256] CHIP:DMG:                                {
@@ -313,12 +403,16 @@ tests:
           [1659777885.574405][3251:3256] CHIP:TOO: Error: IM Error 0x00000501: General error: 0x01 (FAILURE)
       disabled: true
 
-    - label: "TH reads the LockOperationError event from DUT"
+    - label: "Step 4d: TH reads the LockOperationError event from DUT"
       PICS: DRLK.S.E03
       verification: |
           ./chip-tool doorlock read-event  lock-operation-error 1 1
 
-          Verify " LockOperationType is set to Lock and Event priority is set to info" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify that the:
+          -LockOperationType is set to Unlock.
+          -OperationSource is set to Remote.
+          -OperationError is set to InvalidCredential.
+          -Priority is set to Critical.
 
           [1659777937.333613][3260:3265] CHIP:DMG: }
           [1659777937.333844][3260:3265] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0003
@@ -349,8 +443,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends Set User Command to DUT with the following values:
-          OperationType as 0-Add UserIndex as 4( Different from an existing
+          "Step 5a: TH sends Set User Command to DUT with the following values:
+          OperationType as 0-Add UserIndex as 2( Different from an existing
           UserIndex) UserName as xxx UserUniqueID as 6452 UserStatus as
           1-OccupiedEnabled UserType as 0-UnrestrictedUser CredentialRule as
           0-Single"
@@ -358,7 +452,7 @@ tests:
       verification: |
           ./chip-tool doorlock set-user 0 4 xxx 6452 3 0 0 1 1  --timedInteractionTimeoutMs 1000
 
-          Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the SUCCESS response for setting the users details.
 
           [1658994912.123831][4290:4295] CHIP:DMG:                                StatusIB =
           [1658994912.123871][4290:4295] CHIP:DMG:                                {
@@ -376,12 +470,16 @@ tests:
           [1658994912.124341][4290:4295] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001A Status=0x0
       disabled: true
 
-    - label: "TH reads the LockUserChange event from DUT"
+    - label: "Step 5b: TH reads the LockUserChange event from DUT"
       PICS: DRLK.S.E04
       verification: |
           ./chip-tool doorlock read-event  lock-user-change 1 1
 
-          Verify " LockDataType is set to UserIndex and Event priority is set to INFO" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify that the:
+          -LockDataType is set to 2 (UserIndex).
+          -DataOperationType is set to Add.
+          -OperationSource is set to Remote.
+          -Priority is set to INFO.
 
           [1659778039.468487][3278:3283] CHIP:DMG: }
           [1659778039.468725][3278:3283] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0004
@@ -426,14 +524,14 @@ tests:
       disabled: true
 
     - label:
-          "TH send Set Week Day Schedule Command to DUT with the following
-          values: WeekDayIndex as 1 UserIndex as 1 DaysMaskMap as 2 StartHour as
-          15 StartMinute as 45 EndHour as 16 EndMinute as 55"
+          "Step 5c: TH send Set Week Day Schedule Command to DUT with the
+          following values: WeekDayIndex as 1 UserIndex as 1 DaysMaskMap as 2
+          StartHour as 15 StartMinute as 45 EndHour as 16 EndMinute as 55"
       PICS: DRLK.S.F04 && DRLK.S.C0b.Rsp
       verification: |
           ./chip-tool doorlock set-week-day-schedule 1 1 2  15 45 16 55 1 1
 
-          Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the SUCCESS response for setting the Week Day Schedule.
 
           [1658142169.347859][2900:2905] CHIP:DMG:                                StatusIB =
           [1658142169.347900][2900:2905] CHIP:DMG:                                {
@@ -450,12 +548,16 @@ tests:
           [1658142169.348331][2900:2905] CHIP:DMG: },
       disabled: true
 
-    - label: "TH reads the LockUserChange event from DUT"
+    - label: "Step 5d: TH reads the LockUserChange event from DUT"
       PICS: DRLK.S.E04
       verification: |
           ./chip-tool doorlock read-event  lock-user-change 1 1
 
-          Verify " LockDataType is set to WeekDaySchedule and Event priority is set to INFO" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify that the:
+          -LockDataType is set to 3 (WeekDaySchedule).
+          -DataOperationType is set to Add.
+          -OperationSource is set to Remote.
+          -Priority is set to INFO.
 
           [1659778136.032613][3293:3298] CHIP:DMG: }
           [1659778136.032856][3293:3298] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0004
@@ -513,14 +615,14 @@ tests:
       disabled: true
 
     - label:
-          "TH sends Set Credential Command to DUT with the following fields:
-          OperationType as 0-Add Credential as 1 1- PIN, Index CredentialData as
-          123456 UserIndex as 1 UserStatus as 0 UserType as 0"
+          "Step 5e: TH sends Set Credential Command to DUT with the following
+          fields: OperationType as 0-Add Credential as 1 1- PIN, Index
+          CredentialData as 123456 UserIndex as 1 UserStatus as 0 UserType as 0"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       verification: |
           ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 2 }'  1 1 --timedInteractionTimeoutMs 1000
 
-          Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the SUCCESS response for clearing the credential details.
 
 
           [1658995364.177998][4383:4388] CHIP:DMG:                                StatusIB =
@@ -528,9 +630,10 @@ tests:
           [1658995364.178137][4383:4388] CHIP:DMG:                                        status = 0x00 (SUCCESS),
           [1658995364.178185][4383:4388] CHIP:DMG:                                },
 
+
           ./chip-tool doorlock set-user 0 1 xxx 6452 3 0 0 1 1  --timedInteractionTimeoutMs 1000
 
-          Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the SUCCESS response for setting the users details.
 
           [1659778601.601596][3414:3419] CHIP:DMG:                                StatusIB =
           [1659778601.601636][3414:3419] CHIP:DMG:                                {
@@ -542,7 +645,7 @@ tests:
 
           ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify "DUT sends Set Credential Response command with status as SUCCESS" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the SUCCESS response for setting the credential details.
 
 
           [1658142472.351596][2966:2971] CHIP:DMG: },
@@ -555,12 +658,16 @@ tests:
           [1658142472.352012][2966:2971] CHIP:TOO:    }
       disabled: true
 
-    - label: "TH reads the LockUserChange event from DUT"
+    - label: "Step 5f: TH reads the LockUserChange event from DUT"
       PICS: DRLK.S.E04
       verification: |
           ./chip-tool doorlock read-event  lock-user-change 1 1
 
-          Verify "LockDataType is set to PIN and LockUserChange event has priority set as INFO " on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify that the:
+          -LockDataType is set to 6(PIN).
+          -DataOperationType is set to Add.
+          -OperationSource is set to Remote.
+          -Priority is set to INFO.
 
           [1658223096.124315][4517:4522] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0004
           [1658223096.124350][4517:4522] CHIP:TOO:         Event number: 3
@@ -590,12 +697,12 @@ tests:
           [1658223096.125372][4517:4522] CHIP:TOO:    }
       disabled: true
 
-    - label: "TH sends Clear Credential Command to DUT"
+    - label: "Step 5g: TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.C26.Rsp
       verification: |
           ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 1 }'  1 1 --timedInteractionTimeoutMs 1000
 
-          Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the SUCCESS response for clearing the credential details.
 
           [1658142697.890014][2985:2990] CHIP:DMG:                                StatusIB =
           [1658142697.890058][2985:2990] CHIP:DMG:                                {
@@ -614,12 +721,12 @@ tests:
           [1658142697.890616][2985:2990] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label: "TH sends Clear User Command to DUT"
+    - label: "Step 5h: TH sends Clear User Command to DUT"
       PICS: DRLK.S.C1d.Rsp
       verification: |
           ./chip-tool doorlock clear-user 1 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the SUCCESS response for clearing the users details.
 
           [1658142762.492854][2993:2998] CHIP:DMG:
           [1658142762.492888][2993:2998] CHIP:DMG:                                StatusIB =

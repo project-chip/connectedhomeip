@@ -116,6 +116,22 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         params.SetCountryCode(CharSpan::fromCharString(mCountryCode.Value()));
     }
 
+    // mTimeZoneList is an optional argument managed by TypedComplexArgument mComplex_TimeZones.
+    // Since optional Complex arguments are not currently supported via the <chip::Optional> class,
+    // we will use mTimeZoneList.data() value to determine if the argument was provided.
+    if (mTimeZoneList.data())
+    {
+        params.SetTimeZone(mTimeZoneList);
+    }
+
+    // miDSTOffsetList is an optional argument managed by TypedComplexArgument mComplex_DSTOffsets.
+    // Since optional Complex arguments are not currently supported via the <chip::Optional> class,
+    // we will use mTimeZoneList.data() value to determine if the argument was provided.
+    if (mDSTOffsetList.data())
+    {
+        params.SetDSTOffsets(mDSTOffsetList);
+    }
+
     return params;
 }
 

@@ -1,0 +1,42 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 185.2.2. [TC-WASHERCTRL-2.2] Optional rinse attributes with DUT as Server
+
+PICS:
+    - WASHERCTRL.S.F00
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the the NumberOfRinses attribute"
+      PICS: WASHERCTRL.S.A0002
+      verification: |
+          Verify that the DUT response contains if not null, an enum with up to 4 values.
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the the SupportedRinses attribute"
+      PICS: WASHERCTRL.S.A0003
+      verification: |
+          Verify that the DUT response contains a list of enums each containing up to 4 values.
+      disabled: true

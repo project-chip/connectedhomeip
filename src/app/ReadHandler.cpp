@@ -425,7 +425,6 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
     ChipLogError(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
                  ChipLogValueExchange(apExchangeContext));
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    // TODO: Have a retry mechanism tied to wake interval for IC devices
     Close(CloseOptions::kKeepPersistedSubscription);
 #else
     Close();

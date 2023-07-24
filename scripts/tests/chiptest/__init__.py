@@ -143,6 +143,11 @@ def _GetInDevelopmentTests() -> Set[str]:
         "Test_TC_PSCFG_1_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_2.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
+        "Test_TC_SMCO_2_2.yaml",   # chip-repl does not support timeout (07/20/2023)
+        "Test_TC_SMCO_2_3.yaml",   # chip-repl does not support timeout (07/20/2023)
+        "Test_TC_SMCO_2_4.yaml",   # chip-repl does not support timeout (07/20/2023)
+        "Test_TC_SMCO_2_5.yaml",   # chip-repl does not support timeout (07/20/2023)
+        "Test_TC_SMCO_2_6.yaml",   # chip-repl does not support timeout (07/20/2023)
     }
 
 

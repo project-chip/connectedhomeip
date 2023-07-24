@@ -226,14 +226,16 @@ tests:
               - name: "ms"
                 value: 10000
 
+    #Tolerance to be computed from the range
+    #Start value 50, expected value 10, 50 - 10 = 40, 40 % 15 = 6 , So 10+/-6
     - label: "Step 3c: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 8
-              maxValue: 12
+              minValue: 4
+              maxValue: 16
 
     - label: "Wait 10s"
       PICS: CC.S.F00

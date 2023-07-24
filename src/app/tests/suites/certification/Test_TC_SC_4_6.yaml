@@ -32,13 +32,13 @@ tests:
       disabled: true
 
     - label:
-          "DUT is instructed to start advertising its presence as a commissioner
-          in the network"
+          "Step 1: DUT is instructed to start advertising its presence as a
+          commissioner in the network"
       verification: |
           To verify this test case use TV Reference app
       disabled: true
 
-    - label: "Check DNS-SD subtypes used by DUT"
+    - label: "Step 2: Check DNS-SD subtypes used by DUT"
       PICS:
           MCORE.SC.DEVTYPE_SUBTYPE && MCORE.SC.VP_KEY && MCORE.SC.DT_KEY &&
           MCORE.SC.DN_KEY
@@ -50,10 +50,10 @@ tests:
 
           ++   eth0 IPv6 8BA9B3B40B98E9BB                              _matterd._udp        local
           =   eth0 IPv6 8BA9B3B40B98E9BB                              _matterd._udp        local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::e65f:1ff:fe49:ae29]
-             port = [5650]
-             txt = ["T=1" "SAI=300" "SII=5000" "DN=Test TV" "DT=35" "VP=65521+32769"]
+          hostname = [E45F0149AE290000.local]
+          address = [fe80::e65f:1ff:fe49:ae29]
+          port = [5650]
+          txt = ["T=1" "SAI=300" "SII=5000" "DN=Test TV" "DT=35" "VP=65521+32769"]
 
 
 
