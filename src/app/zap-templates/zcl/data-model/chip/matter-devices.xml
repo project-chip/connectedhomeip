@@ -1990,6 +1990,24 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-robotic-vacuum-cleaner</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Robotic Vacuum Cleaner</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0074</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="RVC Run Mode" client="false" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="RVC Clean Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="RVC Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-temperature-controlled-cabinet</name>
         <domain>CHIP</domain>
         <typeName>Matter Temperature Controlled Cabinet</typeName>

@@ -36,7 +36,7 @@ limitations under the License.
   </enum>
 
   <cluster>
-    <domain>General</domain>
+    <domain>Robots</domain>
     <name>RVC Run Mode</name>
     <code>0x0054</code>
     <define>RVC_RUN_MODE_CLUSTER</define>
