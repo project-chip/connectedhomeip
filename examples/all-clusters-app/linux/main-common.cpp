@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include "main-common.h"
 #include "AllClustersCommandDelegate.h"
 #include "WindowCoveringManager.h"
 #include "dishwasher-mode.h"
@@ -162,6 +161,7 @@ ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
 
 } // namespace
 
+
 void ApplicationInit()
 {
     std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
@@ -182,10 +182,18 @@ void ApplicationInit()
     MatterOperationalStateServerInit();
 #endif
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+
 }
 
 void ApplicationExit()
 {
+    // These have been initialised via the emberAfXxxClusterInitCallback methods. We need to destroy them before shutdown.
+    Clusters::DishwasherMode::Shutdown();
+    Clusters::LaundryWasherMode::Shutdown();
+    Clusters::RvcCleanMode::Shutdown();
+    Clusters::RvcRunMode::Shutdown();
+    Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Shutdown();
+
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
@@ -204,3 +212,4 @@ void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
     Clusters::WindowCovering::SetDefaultDelegate(endpoint, &sWindowCoveringManager);
     Clusters::WindowCovering::ConfigStatusUpdateFeatures(endpoint);
 }
+

@@ -76,12 +76,23 @@ CHIP_ERROR DishwasherModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<Mo
     return CHIP_NO_ERROR;
 }
 
+void DishwasherMode::Shutdown()
+{
+    if (gDishwasherModeInstance != nullptr)
+    {
+        gDishwasherModeInstance->~Instance();
+    }
+    if (gDishwasherModeDelegate != nullptr)
+    {
+        gDishwasherModeDelegate->~DishwasherModeDelegate();
+    }
+}
+
 void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gDishwasherModeDelegate == nullptr && gDishwasherModeInstance == nullptr);
     gDishwasherModeDelegate = new DishwasherMode::DishwasherModeDelegate;
-    // todo use Clusters::XxxMode::Feature::kXxxx to set features.
     gDishwasherModeInstance =
         new ModeBase::Instance(gDishwasherModeDelegate, 0x1, DishwasherMode::Id, chip::to_underlying(Feature::kOnOff));
     gDishwasherModeInstance->Init();

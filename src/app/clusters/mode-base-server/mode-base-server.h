@@ -241,6 +241,7 @@ public:
 // todo change once there is a clear public interface for the OnOff cluster data dependencies (#27508)
 static IntrusiveList<Instance> gModeBaseAliasesInstances;
 
+// This does not return a const of gModeBaseAliasesInstances since the caller might need to call the element's UpdateXxx methods.
 IntrusiveList<Instance> & GetModeBaseInstanceList();
 
 } // namespace ModeBase

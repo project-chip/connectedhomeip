@@ -75,6 +75,19 @@ CHIP_ERROR LaundryWasherModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List
     return CHIP_NO_ERROR;
 }
 
+void LaundryWasherMode::Shutdown()
+{
+    if (gLaundryWasherModeInstance != nullptr)
+    {
+        gLaundryWasherModeInstance->~Instance();
+    }
+    if (gLaundryWasherModeDelegate != nullptr)
+    {
+        gLaundryWasherModeDelegate->~LaundryWasherModeDelegate();
+    }
+}
+
+
 void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.

@@ -103,3 +103,4 @@ CommissionerDiscoveryController * GetCommissionerDiscoveryController();
 
 // For extra init calls, the function will be called right before running Matter main loop.
 void ApplicationInit();
+void ApplicationExit();

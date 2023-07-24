@@ -75,6 +75,18 @@ CHIP_ERROR TccModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagSt
     return CHIP_NO_ERROR;
 }
 
+void RefrigeratorAndTemperatureControlledCabinetMode::Shutdown()
+{
+    if (gTccModeInstance != nullptr)
+    {
+        gTccModeInstance->~Instance();
+    }
+    if (gTccModeDelegate != nullptr)
+    {
+        gTccModeDelegate->~TccModeDelegate();
+    }
+}
+
 void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
