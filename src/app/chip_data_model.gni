@@ -270,6 +270,12 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.h",
           "${_app_root}/clusters/${cluster}/operational-state-delegate.h",
         ]
+      } else if (cluster == "dishwasher-alarm-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/dishwasher-alarm-delegate.h",
+        ]
       } else if (cluster == "icd-management-server") {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
 

@@ -440,7 +440,7 @@ public:
      *                                      the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(ByteSpan & v);
+    CHIP_ERROR Get(ByteSpan & v) const;
 
     /**
      * Get the value of the current element as a FixedByteSpan
@@ -453,7 +453,7 @@ public:
      *
      */
     template <size_t N>
-    CHIP_ERROR Get(FixedByteSpan<N> & v)
+    CHIP_ERROR Get(FixedByteSpan<N> & v) const
     {
         const uint8_t * val;
         ReturnErrorOnFailure(GetDataPtr(val));
@@ -472,7 +472,7 @@ public:
      *                                      the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(CharSpan & v);
+    CHIP_ERROR Get(CharSpan & v) const;
 
     /**
      * Get the Localized String Identifier contained in the current element..
@@ -634,9 +634,8 @@ public:
      * Get a pointer to the initial encoded byte of a TLV byte or UTF8 string element.
      *
      * This method returns a direct pointer to the encoded string value within the underlying input buffer
-     * if a non-zero length string payload is present. To succeed, the method requires that the entirety of the
-     * string value be present in a single buffer. Otherwise the method returns #CHIP_ERROR_TLV_UNDERRUN.
-     * This makes the method of limited use when reading data from multiple discontiguous buffers.
+     * as fetched by `Next`. To succeed, the method requires that the entirety of the
+     * string value be present in a single buffer.
      *
      * If no string data is present (i.e the length is zero), data shall be updated to point to null.
      *
@@ -653,7 +652,7 @@ public:
      *                                      TLVBackingStore.
      *
      */
-    CHIP_ERROR GetDataPtr(const uint8_t *& data);
+    CHIP_ERROR GetDataPtr(const uint8_t *& data) const;
 
     /**
      * Prepares a TLVReader object for reading the members of TLV container element.

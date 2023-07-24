@@ -45,7 +45,7 @@ private:
     const Tag mTag;
 };
 
-CHIP_ERROR FormatCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
+CHIP_ERROR FormatCurrentValue(const TLVReader & reader, chip::StringBuilderBase & out)
 {
     switch (reader.GetType())
     {
@@ -105,7 +105,7 @@ CHIP_ERROR FormatCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
 }
 
 // Returns a null terminated string containing the current reader value
-void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out, PayloadDecoderBase::DecodePosition & position)
+void PrettyPrintCurrentValue(const TLVReader & reader, chip::StringBuilderBase & out, PayloadDecoderBase::DecodePosition & position)
 {
     CHIP_ERROR err = FormatCurrentValue(reader, out);
 
