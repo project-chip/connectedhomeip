@@ -316,7 +316,10 @@ kotlin_library("chipcluster_test") {
     "${chip_root}/third_party/java_deps:truth",
   ]
 
-  sources = [ "tests/chip/devicecontroller/cluster/ChipClusterTest.kt" ]
+  sources = [
+    "tests/chip/devicecontroller/cluster/ChipClusterEventStructTest.kt",
+    "tests/chip/devicecontroller/cluster/ChipClusterStructTest.kt",
+  ]
 
   kotlinc_flags = [ "-Xlint:deprecation" ]
 }
