@@ -84,6 +84,8 @@ static Identify gIdentify1 = {
 
 void ApplicationInit() {}
 
+void ApplicationExit() {}
+
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: LowPower::SetDefaultDelegate");

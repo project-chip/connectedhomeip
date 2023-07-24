@@ -255,6 +255,8 @@ void ApplicationInit()
     InitOTARequestor();
 }
 
+void ApplicationExit() {}
+
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions, MakeOptional(kNetworkCommissioningEndpointSecondary)) == 0);

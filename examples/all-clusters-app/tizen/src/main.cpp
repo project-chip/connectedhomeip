@@ -51,6 +51,8 @@ void ApplicationInit()
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
+void ApplicationExit() {}
+
 int main(int argc, char * argv[])
 {
     TizenServiceAppMain app;

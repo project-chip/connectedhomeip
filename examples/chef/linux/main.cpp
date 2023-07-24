@@ -32,6 +32,8 @@ using namespace chip::app;
 
 void ApplicationInit() {}
 
+void ApplicationExit() {}
+
 int main(int argc, char * argv[])
 {
     if (ChipLinuxAppInit(argc, argv) != 0)

@@ -71,6 +71,8 @@ static Identify gIdentify1 = {
 
 void ApplicationInit() {}
 
+void ApplicationExit() {}
+
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);

@@ -32,6 +32,8 @@ void ApplicationInit()
     MatterOperationalStateServerInit();
 }
 
+void ApplicationExit() {}
+
 int main(int argc, char * argv[])
 {
     if (ChipLinuxAppInit(argc, argv) != 0)
