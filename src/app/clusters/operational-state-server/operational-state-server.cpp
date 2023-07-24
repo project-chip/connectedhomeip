@@ -113,7 +113,11 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
     VerifyOrReturn(delegate != nullptr, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure));
     uint8_t opState = delegate->GetCurrentOperationalState();
 
-    if (opState != to_underlying(OperationalStateEnum::kPaused))
+    if (opState != to_underlying(OperationalStateEnum::kPaused) && opState != to_underlying(OperationalStateEnum::kRunning))
+    {
+        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
+    }
+    else if (opState != to_underlying(OperationalStateEnum::kPaused))
     {
         delegate->HandlePauseStateCallback(err);
     }

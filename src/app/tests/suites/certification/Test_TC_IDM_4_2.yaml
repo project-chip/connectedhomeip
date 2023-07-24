@@ -33,11 +33,22 @@ tests:
       disabled: true
 
     - label:
+          If the device is has the ICD Management cluster, TH reads from the DUT
+          the IdleModeInterval attribute and sets the
+          SubscriptionMaxIntervalPublisherLimit to the value read. If the device
+          does not have the ICD Management cluster, set the
+          SubscriptionMaxIntervalPublisherLimit to 60 minutes.
+      verification: |
+          The cluster used in the below command is an example,
+          icdmanagement read idle-mode-interval 12344321 0
+      disabled: true
+
+    - label:
           "Step 1: TH sends a subscription message to the DUT with
-          MaxIntervalCeiling set to a value greater than 60 mins. DUT sends a
-          report data action to the TH. TH sends a success status response to
-          the DUT. DUT sends a Subscribe Response Message to the TH to activate
-          the subscription."
+          MaxIntervalCeiling set to a value greater than the
+          SubscriptionMaxIntervalPublisherLimit. DUT sends a report data action
+          to the TH. TH sends a success status response to the DUT. DUT sends a
+          Subscribe Response Message to the TH to activate the subscription."
       verification: |
           onoff subscribe on-off  100  3900 1 1 --keepSubscriptions true
 
@@ -73,10 +84,10 @@ tests:
 
     - label:
           "Step 2: TH sends a subscription message to the DUT with
-          MaxIntervalCeiling set to a value less than 60 mins. DUT sends a
-          report data action to the TH. TH sends a success status response to
-          the DUT. DUT sends a Subscribe Response Message to the TH to activate
-          the subscription."
+          MaxIntervalCeiling set to a value less than han the
+          SubscriptionMaxIntervalPublisherLimit. DUT sends a report data action
+          to the TH. TH sends a success status response to the DUT. DUT sends a
+          Subscribe Response Message to the TH to activate the subscription."
       verification: |
           basicinformation subscribe location 10 2400 1 0 --keepSubscriptions true
           On the TH(chip-tool), verify a report data message is received and verify it contains the following data :
@@ -84,7 +95,7 @@ tests:
            Verify on the TH the Subscribe Response has the following fields,
            SubscriptionId - Verify it is of type uint32.
            MaxInterval - Verify it is of type uint32.
-           Verify that the MaxInterval is less than or equal to 60 mins.
+           Verify that the MaxInterval is less than or equal to the MaxIntervalCeiling.
 
           [1686294932.404445][101362:101364] CHIP:DMG:         InteractionModelRevision = 1
           [1686294932.404449][101362:101364] CHIP:DMG: }
@@ -105,9 +116,6 @@ tests:
           [1686294932.420822][101362:101364] CHIP:DMG: }
           [1686294932.420834][101362:101364] CHIP:DMG: Subscription established with SubscriptionID = 0xcbbba269 MinInterval = 10s MaxInterval = 2400s Peer = 01:0000000000000001
           [1686294932.420847][101362:101364] CHIP:DMG: MoveToState ReadClient[0x7fc7ec00e400]: Moving to [Subscripti]
-
-
-           MaxInterval and MaxIntervalCeiling are different parameters. One is sent from the TH the other from DUT, verify MaxInterval >=  MaxIntervalCeiling
       disabled: true
 
     - label:
