@@ -56,7 +56,7 @@ class BasicInformationClusterProductAppearanceStruct (
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : BasicInformationClusterProductAppearanceStruct {
       tlvReader.enterStructure(tag)
       val finish = tlvReader.getInt(ContextSpecificTag(TAG_FINISH))
-      val primaryColor = if (tlvReader.isNull()) {
+      val primaryColor = if (!tlvReader.isNull()) {
       tlvReader.getInt(ContextSpecificTag(TAG_PRIMARY_COLOR))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_PRIMARY_COLOR))

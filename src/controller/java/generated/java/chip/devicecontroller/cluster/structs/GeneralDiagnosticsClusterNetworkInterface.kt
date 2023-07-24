@@ -93,13 +93,13 @@ class GeneralDiagnosticsClusterNetworkInterface (
       tlvReader.enterStructure(tag)
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val isOperational = tlvReader.getBoolean(ContextSpecificTag(TAG_IS_OPERATIONAL))
-      val offPremiseServicesReachableIPv4 = if (tlvReader.isNull()) {
+      val offPremiseServicesReachableIPv4 = if (!tlvReader.isNull()) {
       tlvReader.getBoolean(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV4))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV4))
       null
     }
-      val offPremiseServicesReachableIPv6 = if (tlvReader.isNull()) {
+      val offPremiseServicesReachableIPv6 = if (!tlvReader.isNull()) {
       tlvReader.getBoolean(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV6))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV6))

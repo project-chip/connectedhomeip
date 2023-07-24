@@ -60,7 +60,7 @@ class OperationalCredentialsClusterNOCStruct (
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : OperationalCredentialsClusterNOCStruct {
       tlvReader.enterStructure(tag)
       val noc = tlvReader.getByteArray(ContextSpecificTag(TAG_NOC))
-      val icac = if (tlvReader.isNull()) {
+      val icac = if (!tlvReader.isNull()) {
       tlvReader.getByteArray(ContextSpecificTag(TAG_ICAC))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_ICAC))

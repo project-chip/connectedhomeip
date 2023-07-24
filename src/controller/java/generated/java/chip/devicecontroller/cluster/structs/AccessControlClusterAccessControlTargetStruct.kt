@@ -67,19 +67,19 @@ class AccessControlClusterAccessControlTargetStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : AccessControlClusterAccessControlTargetStruct {
       tlvReader.enterStructure(tag)
-      val cluster = if (tlvReader.isNull()) {
+      val cluster = if (!tlvReader.isNull()) {
       tlvReader.getLong(ContextSpecificTag(TAG_CLUSTER))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_CLUSTER))
       null
     }
-      val endpoint = if (tlvReader.isNull()) {
+      val endpoint = if (!tlvReader.isNull()) {
       tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_ENDPOINT))
       null
     }
-      val deviceType = if (tlvReader.isNull()) {
+      val deviceType = if (!tlvReader.isNull()) {
       tlvReader.getLong(ContextSpecificTag(TAG_DEVICE_TYPE))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_DEVICE_TYPE))

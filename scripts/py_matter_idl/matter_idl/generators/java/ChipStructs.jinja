@@ -40,7 +40,7 @@
 
 {%- macro decode_tlv(source, encodable, tag, depth) %}
   {%- if encodable.is_nullable -%}
-    if (tlvReader.isNull()) {
+    if (!tlvReader.isNull()) {
       {{decode_tlv(source, encodable.without_nullable(), tag, depth + 1)}}
     } else {
       tlvReader.getNull({{tag}})

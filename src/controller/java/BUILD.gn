@@ -290,17 +290,6 @@ kotlin_library("onboardingpayload_qr_code_test") {
   kotlinc_flags = [ "-Xlint:deprecation" ]
 }
 
-group("unit_tests") {
-  deps = [
-    ":json_to_tlv_to_json_test",
-    ":onboardingpayload_manual_code_test",
-    ":onboardingpayload_qr_code_test",
-    ":tlv_read_write_test",
-    ":tlv_reader_test",
-    ":tlv_writer_test",
-  ]
-}
-
 kotlin_library("chipcluster") {
   import(
       "${chip_root}/src/controller/java/src/chip/devicecontroller/cluster/files.gni")
@@ -315,6 +304,33 @@ kotlin_library("chipcluster") {
   sources += eventstructs_sources
 
   kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
+kotlin_library("chipcluster_test") {
+  output_name = "CHIPClustersTest.jar"
+
+  deps = [
+    ":chipcluster",
+    ":tlv",
+    "${chip_root}/third_party/java_deps:junit-4",
+    "${chip_root}/third_party/java_deps:truth",
+  ]
+
+  sources = [ "tests/chip/devicecontroller/cluster/ChipClusterTest.kt" ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
+group("unit_tests") {
+  deps = [
+    ":chipcluster_test",
+    ":json_to_tlv_to_json_test",
+    ":onboardingpayload_manual_code_test",
+    ":onboardingpayload_qr_code_test",
+    ":tlv_read_write_test",
+    ":tlv_reader_test",
+    ":tlv_writer_test",
+  ]
 }
 
 android_library("chipclusterID") {

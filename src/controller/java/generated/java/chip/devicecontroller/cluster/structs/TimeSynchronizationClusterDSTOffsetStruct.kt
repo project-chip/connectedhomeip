@@ -61,7 +61,7 @@ class TimeSynchronizationClusterDSTOffsetStruct (
       tlvReader.enterStructure(tag)
       val offset = tlvReader.getLong(ContextSpecificTag(TAG_OFFSET))
       val validStarting = tlvReader.getLong(ContextSpecificTag(TAG_VALID_STARTING))
-      val validUntil = if (tlvReader.isNull()) {
+      val validUntil = if (!tlvReader.isNull()) {
       tlvReader.getLong(ContextSpecificTag(TAG_VALID_UNTIL))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_VALID_UNTIL))

@@ -64,13 +64,13 @@ class ThermostatClusterThermostatScheduleTransition (
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : ThermostatClusterThermostatScheduleTransition {
       tlvReader.enterStructure(tag)
       val transitionTime = tlvReader.getInt(ContextSpecificTag(TAG_TRANSITION_TIME))
-      val heatSetpoint = if (tlvReader.isNull()) {
+      val heatSetpoint = if (!tlvReader.isNull()) {
       tlvReader.getInt(ContextSpecificTag(TAG_HEAT_SETPOINT))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_HEAT_SETPOINT))
       null
     }
-      val coolSetpoint = if (tlvReader.isNull()) {
+      val coolSetpoint = if (!tlvReader.isNull()) {
       tlvReader.getInt(ContextSpecificTag(TAG_COOL_SETPOINT))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_COOL_SETPOINT))

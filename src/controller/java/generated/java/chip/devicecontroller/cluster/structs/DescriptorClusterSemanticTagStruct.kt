@@ -70,7 +70,7 @@ class DescriptorClusterSemanticTagStruct (
 
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : DescriptorClusterSemanticTagStruct {
       tlvReader.enterStructure(tag)
-      val mfgCode = if (tlvReader.isNull()) {
+      val mfgCode = if (!tlvReader.isNull()) {
       tlvReader.getInt(ContextSpecificTag(TAG_MFG_CODE))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_MFG_CODE))
@@ -78,7 +78,7 @@ class DescriptorClusterSemanticTagStruct (
     }
       val namespaceID = tlvReader.getInt(ContextSpecificTag(TAG_NAMESPACE_I_D))
       val tag = tlvReader.getInt(ContextSpecificTag(TAG_TAG))
-      val label = if (tlvReader.isNull()) {
+      val label = if (!tlvReader.isNull()) {
       if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
       Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
     } else {

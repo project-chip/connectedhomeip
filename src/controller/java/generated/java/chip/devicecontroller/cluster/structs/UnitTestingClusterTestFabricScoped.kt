@@ -99,13 +99,13 @@ class UnitTestingClusterTestFabricScoped (
     } else {
       Optional.empty()
     }
-      val nullableFabricSensitiveInt8u = if (tlvReader.isNull()) {
+      val nullableFabricSensitiveInt8u = if (!tlvReader.isNull()) {
       tlvReader.getInt(ContextSpecificTag(TAG_NULLABLE_FABRIC_SENSITIVE_INT8U))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_NULLABLE_FABRIC_SENSITIVE_INT8U))
       null
     }
-      val nullableOptionalFabricSensitiveInt8u = if (tlvReader.isNull()) {
+      val nullableOptionalFabricSensitiveInt8u = if (!tlvReader.isNull()) {
       if (tlvReader.isNextTag(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_FABRIC_SENSITIVE_INT8U))) {
       Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_FABRIC_SENSITIVE_INT8U)))
     } else {

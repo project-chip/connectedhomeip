@@ -113,13 +113,13 @@ class ThreadNetworkDiagnosticsClusterNeighborTableStruct (
       val linkFrameCounter = tlvReader.getLong(ContextSpecificTag(TAG_LINK_FRAME_COUNTER))
       val mleFrameCounter = tlvReader.getLong(ContextSpecificTag(TAG_MLE_FRAME_COUNTER))
       val lqi = tlvReader.getInt(ContextSpecificTag(TAG_LQI))
-      val averageRssi = if (tlvReader.isNull()) {
+      val averageRssi = if (!tlvReader.isNull()) {
       tlvReader.getInt(ContextSpecificTag(TAG_AVERAGE_RSSI))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_AVERAGE_RSSI))
       null
     }
-      val lastRssi = if (tlvReader.isNull()) {
+      val lastRssi = if (!tlvReader.isNull()) {
       tlvReader.getInt(ContextSpecificTag(TAG_LAST_RSSI))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_LAST_RSSI))

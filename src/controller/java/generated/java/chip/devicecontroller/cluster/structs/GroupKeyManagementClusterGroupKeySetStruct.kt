@@ -101,37 +101,37 @@ class GroupKeyManagementClusterGroupKeySetStruct (
       tlvReader.enterStructure(tag)
       val groupKeySetID = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D))
       val groupKeySecurityPolicy = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_KEY_SECURITY_POLICY))
-      val epochKey0 = if (tlvReader.isNull()) {
+      val epochKey0 = if (!tlvReader.isNull()) {
       tlvReader.getByteArray(ContextSpecificTag(TAG_EPOCH_KEY0))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_KEY0))
       null
     }
-      val epochStartTime0 = if (tlvReader.isNull()) {
+      val epochStartTime0 = if (!tlvReader.isNull()) {
       tlvReader.getLong(ContextSpecificTag(TAG_EPOCH_START_TIME0))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME0))
       null
     }
-      val epochKey1 = if (tlvReader.isNull()) {
+      val epochKey1 = if (!tlvReader.isNull()) {
       tlvReader.getByteArray(ContextSpecificTag(TAG_EPOCH_KEY1))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_KEY1))
       null
     }
-      val epochStartTime1 = if (tlvReader.isNull()) {
+      val epochStartTime1 = if (!tlvReader.isNull()) {
       tlvReader.getLong(ContextSpecificTag(TAG_EPOCH_START_TIME1))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME1))
       null
     }
-      val epochKey2 = if (tlvReader.isNull()) {
+      val epochKey2 = if (!tlvReader.isNull()) {
       tlvReader.getByteArray(ContextSpecificTag(TAG_EPOCH_KEY2))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_KEY2))
       null
     }
-      val epochStartTime2 = if (tlvReader.isNull()) {
+      val epochStartTime2 = if (!tlvReader.isNull()) {
       tlvReader.getLong(ContextSpecificTag(TAG_EPOCH_START_TIME2))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME2))

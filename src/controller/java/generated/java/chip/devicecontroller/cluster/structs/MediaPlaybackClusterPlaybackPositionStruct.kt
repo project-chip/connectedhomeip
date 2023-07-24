@@ -56,7 +56,7 @@ class MediaPlaybackClusterPlaybackPositionStruct (
     fun fromTlv(tag: Tag, tlvReader: TlvReader) : MediaPlaybackClusterPlaybackPositionStruct {
       tlvReader.enterStructure(tag)
       val updatedAt = tlvReader.getLong(ContextSpecificTag(TAG_UPDATED_AT))
-      val position = if (tlvReader.isNull()) {
+      val position = if (!tlvReader.isNull()) {
       tlvReader.getLong(ContextSpecificTag(TAG_POSITION))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_POSITION))
