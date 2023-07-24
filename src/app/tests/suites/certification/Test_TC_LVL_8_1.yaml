@@ -30,8 +30,8 @@ tests:
       disabled: true
 
     - label:
-          "TH prompts the operator to make the DUT send one or more supported
-          commands from the Level Control cluster"
+          "Step 1: TH prompts the operator to make the DUT send one or more
+          supported commands from the Level Control cluster"
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 

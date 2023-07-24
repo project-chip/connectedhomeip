@@ -36,16 +36,16 @@ tests:
           Reset Devices to factory defaults
       disabled: true
 
-    - label: "TH_CR1 starts a commissioning process with TH_CE"
+    - label: "Step 1: TH_CR1 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
           "1. Provision the TH_CE (all-cluster-app) device using TH_CR1 (chip-tool ) on the raspi"
       disabled: true
 
     - label:
-          "TH_CR1 sends command to TH_CE to open a commissioning window with a
-          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM
-          (Basic Commissioning Method)"
+          "Step 2: TH_CR1 sends command to TH_CE to open a commissioning window
+          with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using
+          BCM (Basic Commissioning Method)"
       PICS: CADMIN.C.C01.Tx
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
@@ -61,7 +61,7 @@ tests:
           [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
-    - label: "TH_CR1 sends command to TH_CE to read the list of Fabrics"
+    - label: "Step 3: TH_CR1 sends command to TH_CE to read the list of Fabrics"
       PICS: OPCREDS.C.A0001
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command with their all-cluster-app and for the second and third commissioners.
@@ -106,20 +106,22 @@ tests:
           [1676355303.610660][997160:997162] CHIP:EM: <<< [E:41653i S:27265 M:61334885 (Ack:214003320)] (S) Msg TX to 1:0000000000000001 [6193] --- Type 0000:10 (SecureChannel:StandaloneAck)
       disabled: true
 
-    - label: "DUT_CR2 starts a commissioning process with TH_CE"
+    - label: "Step 4a: DUT_CR2 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
           On DUT_CR2 send the below command
 
-          ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta
+          ./chip-tool pairing code 2 34970112332 --commissioner-name beta
 
           Verify TH_CE logs for
           Commissioning completed successfully
       disabled: true
 
-    - label: "Verify TH_CE is now discoverable over DNS-SD with two SRV Records"
+    - label:
+          "Step 4b: Verify TH_CE is now discoverable over DNS-SD with two SRV
+          Records"
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
@@ -148,7 +150,7 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR2 sends command to TH_CE to write and read the Basic
+          "Step 4c: DUT_CR2 sends command to TH_CE to write and read the Basic
           Information Clusters NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
@@ -197,7 +199,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR2 sends command to TH_CE to read the list of Fabrics on TH_CE"
+          "Step 5: DUT_CR2 sends command to TH_CE to read the list of Fabrics on
+          TH_CE"
       PICS: OPCREDS.C.A0001
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
@@ -250,8 +253,8 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 sends command to TH_CE to write and read the Basic Information
-          Clusters NodeLabel mandatory attribute"
+          "Step 6: TH_CR1 sends command to TH_CE to write and read the Basic
+          Information Cluster’s NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
@@ -294,8 +297,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR2 sends command to TH_CE to read, write and then read the Basic
-          Information Clusters NodeLabel mandatory attribute"
+          "Step 7: DUT_CR2 sends command to TH_CE to read, write and then read
+          the Basic Information Cluster’s NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
           On DUT_CR2 read, write attribute and then read attribute to and from TH_CE
@@ -375,15 +378,15 @@ tests:
           [1660902253.380208][3045:3045] CHIP:DMG:         ],
       disabled: true
 
-    - label: "Turn off TH_CR1"
+    - label: "Step 8: Turn off TH_CR1"
       verification: |
           No need to do anything as chip-tool process exits after each command
       disabled: true
 
     - label:
-          "DUT_CR2 sends command to TH_CE to open a commissioning window with a
-          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM
-          (Basic Commissioning Method)"
+          "Step 9: DUT_CR2 sends command to TH_CE to open a commissioning window
+          with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using
+          BCM (Basic Commissioning Method)"
       PICS: CADMIN.C.C01.Tx
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
@@ -400,8 +403,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR2 sends command to TH_CE to revoke the commissioning window
-          using the Revoke Commissioning command"
+          "Step 10: DUT_CR2 sends command to TH_CE to revoke the commissioning
+          window using the Revoke Commissioning command"
       PICS: CADMIN.C.C02.Tx
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
@@ -417,46 +420,34 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR3 attempts to execute a PASE to starts a commissioning process
-          with TH_CE"
+          "Step 11: TH_CR3 attempts to execute a PASE to starts a commissioning
+          process with TH_CE"
       PICS: CADMIN.C
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command with their all-cluster-app and for the second and third commissioners.
 
           On TH_CR3 send the below command
 
-          ./chip-tool pairing onnetwork 3  20202021  --commissioner-name gamma
+          ./chip-tool pairing code 3 34970112332  --commissioner-name gamma
 
-          verify you got the following message in the TH_CR3(all-clusters-app) log
+          verify you got the following message in the TH_CR3 log
 
 
 
 
           If the DUT has to provision to verify the logs,  Verify that either no _matterc._udp commissionable records exist matching the previously obtained discriminator, or that TH_CE refuses to allow a PASE with the provided passcode from the onboarding payload.
 
-          [1676356124.529686][997434:997434] CHIP:TS: Reverted Last Known Good Time to previous value
-          [1676356124.529707][997434:997434] CHIP:CTL: Shutting down the commissioner
-          [1676356124.529711][997434:997434] CHIP:CTL: Stopping commissioning discovery over DNS-SD
-          [1676356124.529728][997434:997434] CHIP:CTL: Shutting down the controller
-          [1676356124.529732][997434:997434] CHIP:CTL: Shutting down the System State, this will teardown the CHIP Stack
-          [1676356124.530546][997434:997434] CHIP:DMG: All ReadHandler-s are clean, clear GlobalDirtySet
-          [1676356124.530584][997434:997434] CHIP:BLE: BleConnectionDelegate::CancelConnection is not implemented.
-          [1676356124.530603][997434:997434] CHIP:FP: Shutting down FabricTable
-          [1676356124.530617][997434:997434] CHIP:TS: Pending Last Known Good Time: 2023-02-13T11:57:54
-          [1676356124.530729][997434:997434] CHIP:TS: Previous Last Known Good Time: 2023-02-13T11:57:54
-          [1676356124.530736][997434:997434] CHIP:TS: Reverted Last Known Good Time to previous value
-          [1676356124.530884][997434:997434] CHIP:DL: writing settings to file (/tmp/chip_counters.ini-G154Fy)
-          [1676356124.531158][997434:997434] CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
-          [1676356124.531183][997434:997434] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
-          [1676356124.531192][997434:997434] CHIP:DL: Inet Layer shutdown
-          [1676356124.531199][997434:997434] CHIP:DL: BLE shutdown
-          [1676356124.531204][997434:997434] CHIP:DL: System Layer shutdown
-          [1676356124.531299][997434:997434] CHIP:TOO: Run command failure: ../../commands/pairing/PairingCommand.cpp:196: CHIP Error 0x00000003: Incorrect state
+          [1689719618872] [29136:5163326] [DIS] Browsing for: _matterc._udp,_S15
+          [1689719648874] [29136:5163326] [CTL] Discovery timed out
+          [1689719648874] [29136:5163326] [CTL] Stopping commissioning discovery over DNS-SD
+          [1689719648874] [29136:5163320] [CTL] Shutting down the commissioner
+          [1689719648874] [29136:5163320] [CTL] Stopping commissioning discovery over DNS-SD
+          [1689719648874] [29136:5163320] [CTL] Shutting down the controller
       disabled: true
 
     - label:
-          "DUT_CR2 sends command to TH_CE to write and read the Basic
-          Information Clusters NodeLabel mandatory attribute"
+          "Step 12: DUT_CR2 sends command to TH_CE to write and read the Basic
+          Information Cluster’s NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
@@ -494,8 +485,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR2 sends command to TH_CE to open a commissioning window using
-          BCM"
+          "Step 13: DUT_CR2 sends command to TH_CE to open a commissioning
+          window using BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
@@ -512,14 +503,15 @@ tests:
       disabled: true
 
     - label:
-          "Wait for commissioning window that was opened in step 13 to timeout"
+          "Step 14: Wait for commissioning window that was opened in step 13 to
+          timeout"
       verification: |
           Wait for the timeout of commissioning window in the above step
       disabled: true
 
     - label:
-          "DUT_CR2 sends command to TH_CE to open a commissioning window using
-          BCM"
+          "Step 15: DUT_CR2 sends command to TH_CE to open a commissioning
+          window using BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
@@ -536,15 +528,16 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 starts a commissioning process with TH_CE before the timeout
-          from step 15"
+          "Step 16: TH_CR1 starts a commissioning process with TH_CE before the
+          timeout from step 15"
       PICS: CADMIN.C
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
           On TH_CR1 send the below command
 
-          ./chip-tool pairing onnetwork 1 20202021
+
+          ./chip-tool pairing code 1 34970112332 --commissioner-name alpha
           [1676358083.879096][997283:997283] CHIP:SVR: Failsafe timer expired
           [1676358083.879098][997283:997283] CHIP:IN: SecureSession[0x563d5294d7b0]: MarkForEviction Type:1 LSID:55630
           [1676358083.879100][997283:997283] CHIP:SC: SecureSession[0x563d5294d7b0]: Moving from state 'kActive' --> 'kPendingEviction'

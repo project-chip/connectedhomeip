@@ -154,6 +154,8 @@ list(
     APPEND ${list_chip_main_sources}
 
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-instances.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp

@@ -31,7 +31,7 @@ tests:
           Commission TH to DUT, if not done so already. In some cases, such as with a Casting Video Player, the TH commissions the DUT.
       disabled: true
 
-    - label: "DUT sends LaunchApp command to TH"
+    - label: "Step 1: DUT sends LaunchApp command to TH"
       PICS: APPLAUNCHER.C.C00.Tx
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
@@ -40,7 +40,8 @@ tests:
 
           ./chip-tv-casting-app applicationlauncher launch-app '{"catalogVendorID": 123, "applicationID": "exampleid"}' 1 1
 
-          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
+
+          On TH (tv-app), Verify the launch app command is received successfully.
 
           [1674562560.376993][12550:12550] CHIP:EM: Handling via exchange: 22201r, Delegate: 0x5572d99d2b08
           [1674562560.377026][12550:12550] CHIP:DMG: InvokeRequestMessage =

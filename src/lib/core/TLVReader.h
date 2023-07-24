@@ -31,7 +31,6 @@
 #include <lib/core/Optional.h>
 
 #include "TLVCommon.h"
-
 #include "TLVWriter.h"
 
 /**
@@ -283,7 +282,7 @@ public:
      * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV boolean type, or the
      *                                      reader is not positioned on an element.
      */
-    CHIP_ERROR Get(bool & v);
+    CHIP_ERROR Get(bool & v) const;
 
     /**
      * Get the value of the current element as an 8-bit signed integer.
@@ -298,7 +297,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(int8_t & v);
+    CHIP_ERROR Get(int8_t & v) const;
 
     /**
      * Get the value of the current element as a 16-bit signed integer.
@@ -313,7 +312,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(int16_t & v);
+    CHIP_ERROR Get(int16_t & v) const;
 
     /**
      * Get the value of the current element as a 32-bit signed integer.
@@ -328,7 +327,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(int32_t & v);
+    CHIP_ERROR Get(int32_t & v) const;
 
     /**
      * Get the value of the current element as a 64-bit signed integer.
@@ -343,7 +342,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(int64_t & v);
+    CHIP_ERROR Get(int64_t & v) const;
 
     /**
      * Get the value of the current element as an 8-bit unsigned integer.
@@ -359,7 +358,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(uint8_t & v);
+    CHIP_ERROR Get(uint8_t & v) const;
 
     /**
      * Get the value of the current element as a 16-bit unsigned integer.
@@ -375,7 +374,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(uint16_t & v);
+    CHIP_ERROR Get(uint16_t & v) const;
 
     /**
      * Get the value of the current element as a 32-bit unsigned integer.
@@ -391,7 +390,7 @@ public:
      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(uint32_t & v);
+    CHIP_ERROR Get(uint32_t & v) const;
 
     /**
      * Get the value of the current element as a 64-bit unsigned integer.
@@ -405,7 +404,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(uint64_t & v);
+    CHIP_ERROR Get(uint64_t & v) const;
 
     /**
      * Get the value of the current element as a double-precision floating point number.
@@ -417,7 +416,7 @@ public:
      *                                      the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(double & v);
+    CHIP_ERROR Get(double & v) const;
 
     /**
      * Get the value of the current element as a single-precision floating point number.
@@ -429,7 +428,7 @@ public:
      *                                      the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(float & v);
+    CHIP_ERROR Get(float & v) const;
 
     /**
      * Get the value of the current element as a ByteSpan

@@ -38,8 +38,8 @@ tests:
       disabled: true
 
     - label:
-          "Reboot the DUT (i.e. restart by power cycle, not by making it factory
-          new) TH receives the StartUp event from DUT"
+          "Step 1: Reboot the DUT (i.e. restart by power cycle, not by making it
+          factory new) TH receives the StartUp event from DUT"
       PICS: BRBINFO.S.E00
       verification: |
           StartUp is an optional Event -
@@ -50,8 +50,8 @@ tests:
       disabled: true
 
     - label:
-          "Make the device on the bridged endpoint unreachable across the
-          bridge, such that the Reachable attribute changes, in a
+          "Step 2: Make the device on the bridged endpoint unreachable across
+          the bridge, such that the Reachable attribute changes, in a
           manufacturer-specific way, such as powering off or otherwise disabling
           the bridged device or the connectivity to it."
       PICS: BRBINFO.S.E03
@@ -73,7 +73,8 @@ tests:
           [1659441193.443331][2392:2397] CHIP:EM: Piggybacking Ack for MessageCounter:194624180 on exchange: 18196r
       disabled: true
 
-    - label: "TH subscribes to the shutdown event on the DUT. Shutdown DUT."
+    - label:
+          "Step 3: TH subscribes to the shutdown event on the DUT. Shutdown DUT."
       PICS: BRBINFO.S.E01
       verification: |
           ShutDown is an optional Event -
