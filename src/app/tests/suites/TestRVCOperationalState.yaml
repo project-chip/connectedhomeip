@@ -89,26 +89,26 @@ tests:
       response:
           values:
               - name: "CommandResponseState"
-                value: { ErrorStateID: 0 }
+                value: { ErrorStateID: 3 }
 
     - label: "Read current Operational State"
       command: "readAttribute"
       attribute: "OperationalState"
       response:
-          value: 2
+          value: 0
 
     - label: "Resume Command"
       command: "Resume"
       response:
           values:
               - name: "CommandResponseState"
-                value: { ErrorStateID: 0 }
+                value: { ErrorStateID: 3 }
 
     - label: "Read current Operational State"
       command: "readAttribute"
       attribute: "OperationalState"
       response:
-          value: 1
+          value: 0
 
     - label: "Stop Command"
       command: "Stop"
@@ -119,4 +119,4 @@ tests:
       command: "readAttribute"
       attribute: "OperationalState"
       response:
-          value: 1
+          value: 0

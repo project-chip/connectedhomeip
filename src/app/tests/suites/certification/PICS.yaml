@@ -9550,6 +9550,9 @@ PICS:
           the same endpoint?"
       id: RVCCLEANM.S.F00
 
+    - label: "Does the device read the global attribute: EventList from the DUT"
+      id: RVCCLEANM.S.Afffa
+
     #
     # server / attributes
     #
@@ -9722,6 +9725,9 @@ PICS:
           "Does the device support depending on an On/Off cluster implemented on
           the same endpoint?"
       id: RVCRUNM.S.F00
+
+    - label: "Does the device read the global attribute: EventList from the DUT"
+      id: RVCRUNM.S.Afffa
 
     #Attributes
     - label: "Does the device implement the SupportedModes attribute?"
