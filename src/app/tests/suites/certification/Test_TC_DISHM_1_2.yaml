@@ -1,0 +1,118 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 263.1.2. [TC-DISHM-1.2] Cluster attributes with DUT as Server
+
+PICS:
+    - DISHM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the SupportedModes attribute."
+      PICS: DISHM.S.A0000
+      verification: |
+          ./chip-tool dishwashermodeselect read supported-modes 1 1
+
+          On TH(chip-tool) log, Verify SupportedModes attribute should contains atleast two ModeOptionsStruct entries with unique mode field value and label field value below is the sample log provided for the raspi platform:
+
+          [1687687925.438666][18054:18056] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0002 DataVersion: 4148960394
+          [1687687925.438838][18054:18056] CHIP:TOO: SupportedModes: 3 entries
+          [1687687925.444452][18054:18056] CHIP:TOO: [1]: {
+          [1687687925.444485][18054:18056] CHIP:TOO: Label: Normal
+          [1687687925.444506][18054:18056] CHIP:TOO: Mode: 0
+          [1687687925.444532][18054:18056] CHIP:TOO: SemanticTags: 1 entries
+          [1687687925.444575][18054:18056] CHIP:TOO: [1]: {
+          [1687687925.444598][18054:18056] CHIP:TOO: MfgCode: 0
+          [1687687925.444632][18054:18056] CHIP:TOO: Value: 16384
+          [1687687925.444654][18054:18056] CHIP:TOO: }
+          [1687687925.444674][18054:18056] CHIP:TOO: }
+          [1687687925.444702][18054:18056] CHIP:TOO: [2]: {
+          [1687687925.444723][18054:18056] CHIP:TOO: Label: Heavy
+          [1687687925.444742][18054:18056] CHIP:TOO: Mode: 1
+          [1687687925.444764][18054:18056] CHIP:TOO: SemanticTags: 2 entries
+          [1687687925.444787][18054:18056] CHIP:TOO: [1]: {
+          [1687687925.444808][18054:18056] CHIP:TOO: MfgCode: 0
+          [1687687925.444828][18054:18056] CHIP:TOO: Value: 7
+          [1687687925.444847][18054:18056] CHIP:TOO: }
+          [1687687925.444869][18054:18056] CHIP:TOO: [2]: {
+          [1687687925.444928][18054:18056] CHIP:TOO: MfgCode: 0
+          [1687687925.444952][18054:18056] CHIP:TOO: Value: 16385
+          [1687687925.444971][18054:18056] CHIP:TOO: }
+          [1687687925.444991][18054:18056] CHIP:TOO: }
+          [1687687925.445016][18054:18056] CHIP:TOO: [3]: {
+          [1687687925.445036][18054:18056] CHIP:TOO: Label: Light
+          [1687687925.445056][18054:18056] CHIP:TOO: Mode: 2
+          [1687687925.445106][18054:18056] CHIP:TOO: SemanticTags: 3 entries
+          [1687687925.445133][18054:18056] CHIP:TOO: [1]: {
+          [1687687925.445154][18054:18056] CHIP:TOO: MfgCode: 0
+          [1687687925.445174][18054:18056] CHIP:TOO: Value: 16386
+          [1687687925.445194][18054:18056] CHIP:TOO: }
+          [1687687925.445216][18054:18056] CHIP:TOO: [2]: {
+          [1687687925.445236][18054:18056] CHIP:TOO: MfgCode: 0
+          [1687687925.445256][18054:18056] CHIP:TOO: Value: 8
+          [1687687925.445275][18054:18056] CHIP:TOO: }
+          [1687687925.445297][18054:18056] CHIP:TOO: [3]: {
+          [1687687925.445342][18054:18056] CHIP:TOO: MfgCode: 0
+          [1687687925.445365][18054:18056] CHIP:TOO: Value: 2
+          [1687687925.445385][18054:18056] CHIP:TOO: }
+          [1687687925.445405][18054:18056] CHIP:TOO: }
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
+      PICS: DISHM.S.A0001
+      verification: |
+          ./chip-tool dishwashermodeselect read current-mode 1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer and the value is from supported_modes_dut, below is the sample log provided for the raspi platform:
+
+          [1645776767.611140][4667:4672] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469718
+
+          [1645776767.611214][4667:4672] CHIP:TOO: CurrentMode: 0
+      disabled: true
+
+    - label: "Step 4: TH reads from the DUT the OnMode attribute."
+      PICS: DISHM.S.A0003
+      verification: |
+          ./chip-tool dishwashermodeselect read on-mode 1 1
+
+          Verify on TH(chip-tool) logs, OnMode attribute value is an integer and the value is from supported_modes_dut (As per spec default value is null) , below is the sample log provided for the raspi platform:
+
+
+          [1649676072.465968][10754:10759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065072
+
+          [1649676072.466094][10754:10759] CHIP:TOO: OnMode: null
+      disabled: true
+
+    - label: "Step 5: TH reads from the DUT the StartUpMode attribute."
+      PICS: DISHM.S.A0002
+      verification: |
+          ./chip-tool dishwashermodeselect read start-up-mode 1 1
+
+          Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer and value is from supported_modes_dut, below is the sample log provided for the raspi platform:
+
+          [1649677014.496348][10778:10784] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004 DataVersion: 4277065072
+          [1649677014.496469][10778:10784] CHIP:TOO: StartUpMode: 0
+      disabled: true

@@ -33,14 +33,13 @@ tests:
       disabled: true
 
     - label:
-          "Read attribute DeviceTypeList of the Descriptor cluster on endpoint 0"
+          "Step 1a: Read attribute DeviceTypeList of the Descriptor cluster on
+          endpoint 0"
       PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool  descriptor read device-type-list 1 0
 
-
-
-          Verify this  attribute contains device type Root Node (Type-22) in TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList attribute contains device type Root Node (Type-22).
 
           [1666243894.570786][44943:44948] CHIP:DMG: }
           [1666243894.572001][44943:44948] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 4030820095
@@ -51,12 +50,14 @@ tests:
           [1666243894.608126][44943:44948] CHIP:TOO:      }
       disabled: true
 
-    - label: "Read attribute PartsList of the Descriptor cluster on endpoint 0"
+    - label:
+          "Step 1b: Read attribute PartsList of the Descriptor cluster on
+          endpoint 0"
       PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool  descriptor read parts-list 1 0
 
-          Verify the endpoints listed in TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the PartList that contains list with 12 entries.
 
           [1657002201.045720][3893:3899] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3573910940
           [1657002201.045841][3893:3899] CHIP:TOO:   parts list: 12 entries
@@ -75,7 +76,7 @@ tests:
       disabled: true
 
     - label:
-          "For each of the endpoints read in step 1b, read attribute
+          "Step 1c: For each of the endpoints read in step 1b, read attribute
           DeviceTypeList of the Descriptor cluster on that endpoint"
       PICS: MCORE.BRIDGE
       verification: |
@@ -83,7 +84,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 1
 
-          Verify the DeviceTypeList entries with endpoint 1  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 1.
 
           1666244345.296680][44990:44995] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 3968445751
           [1666244345.296742][44990:44995] CHIP:TOO:   DeviceTypeList: 1 entries
@@ -94,7 +95,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 3
 
-          Verify the DeviceTypeList entries with endpoint 3  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 3.
 
           [1666244839.544979][45200:45205] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1513076890
           [1666244839.545006][45200:45205] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -111,7 +112,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 4
 
-          Verify the DeviceTypeList entries with endpoint 4  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 4.
 
           [1666244925.833459][45215:45220] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1944707282
           [1666244925.833553][45215:45220] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -127,7 +128,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 5
 
-          Verify the DeviceTypeList entries with endpoint 5  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 5.
 
           [1666244984.115887][45249:45254] CHIP:TOO: Endpoint: 5 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1760060075
           [1666244984.115918][45249:45254] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -143,7 +144,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 6
 
-          Verify the DeviceTypeList entries with endpoint 6  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 6.
 
           [1666246675.944572][45787:45792] CHIP:TOO: Endpoint: 6 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 3539120641
           [1666246675.944625][45787:45792] CHIP:TOO:   DeviceTypeList: 1 entries
@@ -155,7 +156,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 7
 
-          Verify the DeviceTypeList entries with endpoint 7  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 7.
 
           [1666246718.470591][45821:45826] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 3285189124
           [1666246718.470649][45821:45826] CHIP:TOO:   DeviceTypeList: 1 entries
@@ -167,7 +168,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 8
 
-          Verify the DeviceTypeList entries with endpoint 8  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 8.
 
           [1666246775.067195][45834:45839] CHIP:TOO: Endpoint: 8 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 3210151050
           [1666246775.067256][45834:45839] CHIP:TOO:   DeviceTypeList: 1 entries
@@ -179,7 +180,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 9
 
-          Verify the DeviceTypeList entries with endpoint 9  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 9.
 
           [1666246820.646933][45893:45898] CHIP:TOO: Endpoint: 9 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 3716023031
           [1666246820.647028][45893:45898] CHIP:TOO:   DeviceTypeList: 1 entries
@@ -191,7 +192,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 10
 
-          Verify the DeviceTypeList entries with endpoint 10  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 10.
 
           [1666246866.935280][45904:45909] CHIP:TOO: Endpoint: 10 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 4193039876
           [1666246866.935412][45904:45909] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -206,7 +207,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 11
 
-          Verify the DeviceTypeList entries with endpoint 11  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 11.
 
           [1666246922.797443][45920:45925] CHIP:TOO: Endpoint: 11 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2632191905
           [1666246922.797466][45920:45925] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -222,7 +223,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 12
 
-          Verify the DeviceTypeList entries with endpoint 12  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 12.
 
           [1666246970.442284][45932:45937] CHIP:TOO: Endpoint: 12 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 494395813
           [1666246970.442340][45932:45937] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -238,7 +239,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 13
 
-          Verify the DeviceTypeList entries with endpoint 13  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 13.
 
           [1666247013.621248][45940:45945] CHIP:TOO: Endpoint: 13 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1009438523
           [1666247013.621381][45940:45945] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -264,15 +265,15 @@ tests:
       disabled: true
 
     - label:
-          "Read attribute PartsList of the Descriptor cluster on endpoint found
-          in step 1c"
+          "Step 2a: Read attribute PartsList of the Descriptor cluster on
+          endpoint found in step 1c"
       PICS: MCORE.BRIDGE
       verification: |
-          Read attribute PartsList of the Descriptor cluster on endpoint found in step 1c
+          Read PartsList attribute of the Descriptor cluster on endpoint found in step 1c
 
           ./chip-tool  descriptor read parts-list 1 1
 
-          Verify the list contains 11 entries in TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the PartList attribute that contains 11 entries.
 
           [1657002810.697118][4121:4126] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3021853414
           [1657002810.697276][4121:4126] CHIP:TOO:   parts list: 11 entries
@@ -290,17 +291,16 @@ tests:
       disabled: true
 
     - label:
-          "For each of the endpoints found in this PartsList attribute, read the
-          DeviceTypeList attribute in the Descriptor cluster on such endpoint,
-          and select those endpoints which have (at least) a device type of
-          Bridged Node in their DeviceTypeList"
-      PICS: MCORE.BRIDGE
+          "Step 2b: For each of the endpoints found in this PartsList attribute,
+          read the DeviceTypeList attribute in the Descriptor cluster on such
+          endpoint, and select those endpoints which have (at least) a device
+          type of Bridged Node in their DeviceTypeList"
       verification: |
           Verify device type has either Bridged node (0x0013), i.e.,  Type=19 in their DeviceTypeList
 
           ./chip-tool  descriptor read device-type-list 1 3
 
-          Verify the DeviceTypeList entries with endpoint 3  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 3.
 
           [1666248913.681607][46430:46435] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1513076890
           [1666248913.681690][46430:46435] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -315,7 +315,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 4
 
-          Verify the DeviceTypeList entries with endpoint 4  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 4.
 
           [1666249581.063940][46547:46552] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1944707282
           [1666249581.064029][46547:46552] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -331,7 +331,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 5
 
-          Verify the DeviceTypeList entries with endpoint 5  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 5.
 
           [1666249707.579997][46594:46599] CHIP:TOO: Endpoint: 5 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1760060075
           [1666249707.580060][46594:46599] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -347,7 +347,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 6
 
-          Verify the DeviceTypeList entries with endpoint 6  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 6.
 
           [1666249778.844305][46630:46635] CHIP:TOO: Endpoint: 6 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 3539120641
           [1666249778.844394][46630:46635] CHIP:TOO:   DeviceTypeList: 1 entries
@@ -359,7 +359,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 7
 
-          Verify the DeviceTypeList entries with endpoint 7  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 7.
 
           [1666249851.031384][46650:46655] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 3285189124
           [1666249851.031468][46650:46655] CHIP:TOO:   DeviceTypeList: 1 entries
@@ -371,7 +371,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 8
 
-          Verify the DeviceTypeList entries with endpoint 8  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 8.
 
           [1666249888.738349][46686:46691] CHIP:TOO: Endpoint: 8 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 3210151050
           [1666249888.738375][46686:46691] CHIP:TOO:   DeviceTypeList: 1 entries
@@ -383,7 +383,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 9
 
-          Verify the DeviceTypeList entries with endpoint 9  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 9.
 
           [1666249928.585516][46696:46701] CHIP:TOO: Endpoint: 9 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 3716023031
           [1666249928.585580][46696:46701] CHIP:TOO:   DeviceTypeList: 1 entries
@@ -395,7 +395,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 10
 
-          Verify the DeviceTypeList entries with endpoint 10  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 10.
 
           [1666250003.848251][46707:46712] CHIP:TOO: Endpoint: 10 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 4193039876
           [1666250003.848342][46707:46712] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -411,7 +411,7 @@ tests:
           ./chip-tool  descriptor read device-type-list 1 11
 
 
-          Verify the DeviceTypeList entries with endpoint 11  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 11.
 
           [1666250205.808189][46800:46805] CHIP:TOO: Endpoint: 11 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2632191905
           [1666250205.808274][46800:46805] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -427,7 +427,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 12
 
-          Verify the DeviceTypeList entries with endpoint 12  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 12.
 
           [1666250398.116886][46821:46826] CHIP:TOO: Endpoint: 12 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 494395813
           [1666250398.116974][46821:46826] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -443,7 +443,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 13
 
-          Verify the DeviceTypeList entries with endpoint 13  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 13.
 
           [1666250472.105194][46833:46838] CHIP:TOO: Endpoint: 13 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1009438523
           [1666250472.105364][46833:46838] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -458,37 +458,133 @@ tests:
       disabled: true
 
     - label:
-          "For each of the endpoints for the bridged devices found in step 2b,
-          perform the tests for Bridged Device Basic Information cluster"
+          "Step 3a: For each of the endpoints for the bridged devices found in
+          step 2b, read attribute PartsList of the Descriptor cluster."
+      PICS: MCORE.BRIDGE
+      verification: |
+          Read PartList of the Descriptor cluster for For each of the endpoints for the bridged devices:
+
+          ./chip-tool descriptor read parts-list 1 3
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 3.
+
+          [1657013905.333904][5805:5810] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 4168180
+          [1657013905.333984][5805:5810] CHIP:TOO:   parts list: 0 entries
+
+
+          ./chip-tool descriptor read parts-list 1 4
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 4.
+
+          [1657014011.276060][5822:5827] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2935336058
+          [1657014011.276141][5822:5827] CHIP:TOO:   parts list: 0 entries
+
+
+          ./chip-tool descriptor read parts-list 1 5
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 5.
+
+          [1657014034.298958][5829:5834] CHIP:TOO: Endpoint: 5 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3372622835
+          [1657014034.299041][5829:5834] CHIP:TOO:   parts list: 0 entries
+
+          ./chip-tool descriptor read parts-list 1 6
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 6.
+
+          [1657014056.893995][5847:5852] CHIP:TOO: Endpoint: 6 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1565587733
+          [1657014056.894072][5847:5852] CHIP:TOO:   parts list: 3 entries
+          [1657014056.894104][5847:5852] CHIP:TOO:     [1]: 7
+          [1657014056.894130][5847:5852] CHIP:TOO:     [2]: 8
+          [1657014056.894154][5847:5852] CHIP:TOO:     [3]: 9
+
+          ./chip-tool descriptor read parts-list 1 7
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 7.
+
+          [1657014071.347535][5854:5859] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1352552269
+          [1657014071.347611][5854:5859] CHIP:TOO:   parts list: 0 entries
+
+          ./chip-tool descriptor read parts-list 1 8
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 8.
+
+          [1663236558.589003][5550:5555] CHIP:TOO: Endpoint: 8 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 310844624
+          [1663236558.589059][5550:5555] CHIP:TOO:   PartsList: 0 entries
+
+
+          ./chip-tool descriptor read parts-list 1 9
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 9.
+
+          [1663236593.607523][5556:5561] CHIP:TOO: Endpoint: 9 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3304459819
+          [1663236593.607583][5556:5561] CHIP:TOO:   PartsList: 0 entries
+
+
+          ./chip-tool descriptor read parts-list 1 10
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 10.
+
+          [1663236642.682033][5565:5570] CHIP:TOO: Endpoint: 10 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2389378730
+          [1663236642.682091][5565:5570] CHIP:TOO:   PartsList: 0 entries
+
+
+          ./chip-tool descriptor read parts-list 1 11
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 11.
+
+          [1663236682.900934][5573:5578] CHIP:TOO: Endpoint: 11 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3007496001
+          [1663236682.900988][5573:5578] CHIP:TOO:   PartsList: 0 entries
+
+
+          ./chip-tool descriptor read parts-list 1 12
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 12.
+
+          [1663236715.610271][5579:5584] CHIP:TOO: Endpoint: 12 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2445783348
+          [1663236715.610328][5579:5584] CHIP:TOO:   PartsList: 0 entries
+
+
+          ./chip-tool descriptor read parts-list 1 13
+
+          Via the TH (chip-tool), Verify the PartsList attribute entries with endpoint 13.
+
+          [1663236752.985450][5590:5595] CHIP:TOO: Endpoint: 13 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 4223376445
+          [1663236752.985512][5590:5595] CHIP:TOO:   PartsList: 0 entries
+      disabled: true
+
+    - label:
+          "Step 3b: For each of the endpoints for the bridged devices found in
+          step 2b, perform the tests for Bridged Device Basic Information
+          cluster"
       PICS: MCORE.BRIDGE
       verification: |
           For Bridged Device Basic Information cluster, ref the test plan
           (https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/bridged_device_basic_information.adoc)
 
-          ./chip-tool bridgeddevicebasicinformation read reachable 1 3
+           ./chip-tool bridgeddevicebasicinformation read reachable 1 3
 
-          Verify reachable attribute is read successfully in TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DUT reads reachable attribute successfully.
 
           [1657003614.269096][4564:4569] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0011 DataVersion: 1897994097
           [1657003614.269155][4564:4569] CHIP:TOO:   Reachable: TRUE
 
           ./chip-tool bridgeddevicebasicinformation read node-label 1 4
 
-          Verify Node-label is read sucessfully in TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DUT reads Node-label attribute sucessfully.
 
           [1657003598.573764][4552:4557] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_0039 Attribute 0x0000_0005 DataVersion: 3722118563
           [1657003598.573811][4552:4557] CHIP:TOO:   NodeLabel: TempSensor 1
       disabled: true
 
     - label:
-          "For each of the endpoints found in step 2b, if a Power Source
+          "Step 4: For each of the endpoints found in step 2b, if a Power Source
           Configuration cluster is present on this endpoint, perform the tests
           for this Power Source Configuration cluster plus the tests for the
           Power Source clusters at the endpoint(s) which this Power Source
           Configuration cluster refers to"
       PICS: MCORE.BRIDGE && MCORE.BRIDGE.BatInfo
       verification: |
-          For Power Source Configuration and Power Source clusters, ref the  test plan - Link1: https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/powersourceconfiguration.adoc  Link2: https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/powersource.adoc
+          For Power Source Configuration and Power Source clusters, ref the  test plan - Link1  Link2
 
           None of the endpoints listed in step 2b supports Power Source Configuration cluster and Power Source cluster.
 
@@ -498,16 +594,16 @@ tests:
       disabled: true
 
     - label:
-          "For each of the endpoints found in step 2b, from the DeviceTypeList
-          attribute in their Descriptor cluster, derive the (application) device
-          type(s) of the bridged device"
+          "Step 5: For each of the endpoints found in step 2b, from the
+          DeviceTypeList attribute in their Descriptor cluster, derive the
+          (application) device type(s) of the bridged device"
       PICS: MCORE.BRIDGE
       verification: |
           Verify the device-list attribute has devicetype application e.g., 0x0100 = 256(on/off light),0x0302=770( temperature sensor)
 
           ./chip-tool  descriptor read device-type-list 1 3
 
-          Verify the DeviceTypeList entries with endpoint 3  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 3.
 
           [1666250653.988384][46910:46915] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1513076890
           [1666250653.988484][46910:46915] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -521,10 +617,9 @@ tests:
           [1666250653.988715][46910:46915] CHIP:TOO:      }
 
 
-
           ./chip-tool  descriptor read device-type-list 1 4
 
-          Verify the DeviceTypeList entries with endpoint 4  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 4.
 
           [1666250817.223402][46942:46947] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1944707282
           [1666250817.223467][46942:46947] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -538,10 +633,9 @@ tests:
           [1666250817.223654][46942:46947] CHIP:TOO:      }
 
 
-
           ./chip-tool  descriptor read device-type-list 1 5
 
-          Verify the DeviceTypeList entries with endpoint 5  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 5.
 
           [1666250873.731351][46954:46959] CHIP:TOO: Endpoint: 5 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1760060075
           [1666250873.731439][46954:46959] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -557,7 +651,7 @@ tests:
 
           ./chip-tool descriptor read device-type-list 1 6
 
-          Verify the DeviceTypeList entries with endpoint 6  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 6.
 
           [1666777557.437994][150164:150169] CHIP:TOO: Endpoint: 6 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 3270810303
           [1666777557.438067][150164:150169] CHIP:TOO:   DeviceTypeList: 1 entries
@@ -569,7 +663,7 @@ tests:
 
           ./chip-tool descriptor read device-type-list 1 10
 
-          Verify the DeviceTypeList entries with endpoint 10  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 10.
 
           [1666777615.234902][150178:150183] CHIP:TOO: Endpoint: 10 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2077823451
           [1666777615.235002][150178:150183] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -585,7 +679,7 @@ tests:
 
           ./chip-tool descriptor read device-type-list 1 11
 
-          Verify the DeviceTypeList entries with endpoint 11  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 11.
 
           [1666777671.688839][150216:150221] CHIP:TOO: Endpoint: 11 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2814988377
           [1666777671.688927][150216:150221] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -600,7 +694,7 @@ tests:
 
           ./chip-tool descriptor read device-type-list 1 12
 
-          Verify the DeviceTypeList entries with endpoint 12  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 12.
 
           [1666777714.615379][150259:150264] CHIP:TOO: Endpoint: 12 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 312494071
           [1666777714.615443][150259:150264] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -616,7 +710,7 @@ tests:
 
           ./chip-tool descriptor read device-type-list 1 13
 
-          Verify the DeviceTypeList entries with endpoint 13  On TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the DeviceTypeList entries with endpoint 13.
 
           [1666777780.917239][150295:150300] CHIP:TOO: Endpoint: 13 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2475792486
           [1666777780.917356][150295:150300] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -631,8 +725,8 @@ tests:
       disabled: true
 
     - label:
-          "From the list acquired in step 5, choose one of the bridged devices
-          which is an actuator (e.g. light, window covering)"
+          "Step 6a: From the list acquired in step 5, choose one of the bridged
+          devices which is an actuator (e.g. light, window covering)"
       PICS: MCORE.BRIDGE
       verification: |
           From Step 5 output , choose one of the device type and identify the device from the device library.
@@ -640,27 +734,26 @@ tests:
       disabled: true
 
     - label:
-          "Read the state of this bridged device (through Matter), e.g. on/off,
-          brightness"
+          "Step 6b: Read the state of this bridged device (through Matter), e.g.
+          on/off, brightness"
       PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool onoff read on-off 1 3
 
-          Verify the state of this bridge device values match the actual state of the bridged device in TH(Chip-tool) log
+          Via the TH (chip-tool), Verify the On/Off state of this bridge device values match the actual state of the bridged device.
 
           [1657004454.213279][4792:4798] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3808303315
           [1657004454.213319][4792:4798] CHIP:TOO:   OnOff: FALSE
       disabled: true
 
     - label:
-          "Change the state of this bridged device (through Matter), e.g. change
-          its brightness or toggle its on/off state"
+          "Step 6c: Change the state of this bridged device (through Matter),
+          e.g. change its brightness or toggle its on/off state"
       PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool onoff toggle 1 3
 
-
-          Verify state change response of the bridged device in TH(chip-tool) Log
+          Via the TH (chip-tool),  Verify the SUCCESS response for On/Off state change response of the bridged device.
 
           [1657522278.539407][16698:16703] CHIP:DMG: {
           [1657522278.539447][16698:16703] CHIP:DMG:         suppressResponse = false,
@@ -694,21 +787,23 @@ tests:
           [1657522278.540981][16698:16703] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label: "Read the state of this bridged device (through Matter), as in 6b"
+    - label:
+          "Step 6d: Read the state of this bridged device (through Matter), as
+          in 6b"
       PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool onoff read on-off 1 3
 
-          Verify the value of onoff matches the value of onoff in step 6c in TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the value of On/Off state matches the value of step 6c.
 
           [1657004565.254591][4804:4809] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3808303316
           [1657004565.254635][4804:4809] CHIP:TOO:   OnOff: TRUE
       disabled: true
 
     - label:
-          "From the list acquired in step 5, choose one of the bridged devices
-          which is a sensor (e.g. occupancy sensor, contact sensor, temperature
-          sensor)or switch"
+          "Step 7a: From the list acquired in step 5, choose one of the bridged
+          devices which is a sensor (e.g. occupancy sensor, contact sensor,
+          temperature sensor)or switch"
       PICS: MCORE.BRIDGE
       verification: |
           From Step 5 output , choose one of the sensor device type and identify the device from the device library
@@ -716,13 +811,13 @@ tests:
       disabled: true
 
     - label:
-          "Read the state of this bridged device (through Matter), e.g.
+          "Step 7b: Read the state of this bridged device (through Matter), e.g.
           occupancy status, contact status, current temperature"
       PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool temperaturemeasurement read measured-value 1 4
 
-          Verify the state of the bridged device matches the actual physical state of the sensor  in TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the state of the bridged device matches the actual physical state of the sensor.
 
           [1659351487.005743][12201:12207] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_0402 Attribute 0x0000_0000 DataVersion: 2406690152
           [1659351487.005831][12201:12207] CHIP:TOO:   MeasuredValue: 100
@@ -730,8 +825,8 @@ tests:
       disabled: true
 
     - label:
-          "Change the state of this sensor (e.g. cover the occupancy sensor,
-          open the contact sensor, heat the temperature sensor)"
+          "Step 7c: Change the state of this sensor (e.g. cover the occupancy
+          sensor, open the contact sensor, heat the temperature sensor)"
       PICS: MCORE.BRIDGE
       verification: |
           Press a key 't' on bridge-app to change the simulated temperature
@@ -745,12 +840,13 @@ tests:
           [1659351537.116179][14237:14242] CHIP:DL: TempSensorDevice[Composed TempSensor 2]: New measurement="200"
       disabled: true
 
-    - label: "Read the state of this bridged device again, as in 7b"
+    - label: "Step 7d: Read the state of this bridged device again, as in 7b"
       PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool temperaturemeasurement read measured-value 1 4
 
-          Verify the state has changed and expect to get a different value than step 7b  in TH(chip-tool) Log
+          Via the TH (chip-tool), Verify the state has changed and expect to get a different value than step 7b.
+
           [1659351542.393349][12212:12217] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_0402 Attribute 0x0000_0000 DataVersion: 2406690153
           [1659351542.393429][12212:12217] CHIP:TOO:   MeasuredValue: 200
           [1659351542.393552][12212:12217] CHIP:EM: Sending Standalone Ack for MessageCounter:120981971 on exchange 25924i

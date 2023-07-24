@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    12.4.14. [TC-CNET-4.16] [Thread] NetworkIDNotFound returned in
-    LastNetworkingStatus field validation [DUT-Server]
+    12.4.14. [TC-CNET-4.16] [Thread] NetworkIDNotFound value as
+    LastNetworkingStatus argument validation [DUT-Server]
 
 PICS:
     - CNET.S.F01
@@ -35,11 +35,13 @@ tests:
           5. MaxNetworks attribute value is at least 1 which is saved as MaxNetworksValue for future use
       disabled: true
 
-    - label: "TH sends ArmFailSafe command to the DUT"
+    - label:
+          "Step 1: TH sends ArmFailSafe command to the DUT with the
+          ExpiryLengthSeconds field set to 900"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 0 54 0
 
-          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool),  Verify the DUT sends ArmFailSafe with timeout as 900 secs to the TH.
 
           [1650392597.976230][10152:10157] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1650392597.976363][10152:10157] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -52,19 +54,19 @@ tests:
       disabled: true
 
     - label:
-          "TH sends RemoveNetwork Command to the DUT with NetworkID field set to
-          the extended PAN ID of PIXIT.CNET.THRE AD_2ND_OPERATI ONALDATASET,
-          which does not match the commissioned network, and Breadcrumb field
-          set to 1"
+          "Step 2: TH sends RemoveNetwork Command to the DUT with NetworkID
+          field set to the extended PAN ID of
+          PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET, which does not match the
+          commissioned network, and Breadcrumb field set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
 
           Below is an example:
 
-          ./chip-tool networkcommissioning remove-network 47524C50726976617465 54 0
+          ./chip-tool networkcommissioning remove-network 2111111122222222 54 0
 
-          Verify "NetworkConfigResponse and its arguments" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 3 (NetworkIDNotFound).
 
           [1683268296.896031][12131:12134] CHIP:DMG:         InteractionModelRevision = 1
           [1683268296.896239][12131:12134] CHIP:DMG: },
@@ -80,10 +82,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ConnectNetwork Command to the DUT with NetworkID value as
-          the extended PAN ID of PIXIT.CNET.THRE AD_2ND_OPERATI ONALDATASET,
-          which does not match the commissioned network, and Breadcrumb field
-          set to 1"
+          "Step 3: TH sends ConnectNetwork Command to the DUT with NetworkID
+          value as the extended PAN ID of
+          PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET, which does not match the
+          commissioned network, and Breadcrumb field set to 1"
       PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
@@ -92,7 +94,7 @@ tests:
 
           ./chip-tool networkcommissioning connect-network 47524C50726976617465 54 0
 
-          Verify "ConnectNetworkResponse and its arguments" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify the ConnectNetworkResponse that contains Networking Status value as 3 (NetworkIDNotFound).
 
           [1650392982.606392][10188:10193] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
           [1650392982.606501][10188:10193] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007

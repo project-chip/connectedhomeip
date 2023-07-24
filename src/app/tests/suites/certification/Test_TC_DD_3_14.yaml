@@ -59,7 +59,7 @@ tests:
           - no variable-length TLV Data included (as defined in section 5.1.3.1. "Payload", subsection "TLV Data")
       disabled: true
 
-    - label: "Locate and scan/read the Commissionees QR code using DUT"
+    - label: "Step 1: Locate and scan/read the Commissionees QR code using DUT"
       verification: |
           Verify on the TH (All-cluster-app)
           ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 2 --capabilities 4 --discriminator 3840 --passcode 20202021
@@ -80,9 +80,9 @@ tests:
       disabled: true
 
     - label:
-          "Version String: Using the QR code from Step 1, generate a new QR code
-          but substituting out the current Version String with an invalid
-          Version String (i.e. '010' or any non-zero 3-bit value)"
+          "Step 2a: Version String: Using the QR code from Step 1, generate a
+          new QR code but substituting out the current Version String with an
+          invalid Version String (i.e. '010' or any non-zero 3-bit value)"
       verification: |
           1. Use chip-tool's "payload generate-qrcode" command to help generate the new, invalid QR code
           Verify on the TH (All-cluster-app)
@@ -91,7 +91,8 @@ tests:
       disabled: true
 
     - label:
-          "Scan/read the QR code, generated in the previous step, using the DUT"
+          "Step 2b: Scan/read the QR code, generated in the previous step, using
+          the DUT"
       verification: |
           Verify on the DUT (Chip-tool):
 
@@ -103,9 +104,9 @@ tests:
       disabled: true
 
     - label:
-          "Using the QR code from Step 1, ensure the THs Discovery Capability
-          bit string is NOT set to BLE for discovery (i.e. set to OnNetwork
-          discovery capability)"
+          "Step 3a: Using the QR code from Step 1, ensure the THs Discovery
+          Capability bit string is NOT set to BLE for discovery (i.e. set to
+          OnNetwork discovery capability)"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           1. Use chip-tool's "payload generate-qrcode" command to help generate the new, invalid QR code
@@ -117,7 +118,7 @@ tests:
           No applicable logs on the DUT side
       disabled: true
 
-    - label: "Scan/read the QR code of the TH device using the DUT"
+    - label: "Step 3b: Scan/read the QR code of the TH device using the DUT"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           Verify on the DUT (Chip-tool):
@@ -128,13 +129,13 @@ tests:
       disabled: true
 
     - label:
-          "Passcode: Using the QR code from Step 1, generate a new QR code using
-          all the same Onboarding Payload components except for the Passcode.
-          For each passcode in the following list, set the Passcode component to
-          one of the invalid Passcodes and generate a new QR code using all the
-          same Onboarding Payload components and one Passcode from the list:
-          00000000, 11111111, 22222222, 33333333, 44444444, 55555555, 66666666,
-          77777777, 88888888, 99999999, 12345678, 87654321"
+          "Step 4a: Passcode: Using the QR code from Step 1, generate a new QR
+          code using all the same Onboarding Payload components except for the
+          Passcode. For each passcode in the following list, set the Passcode
+          component to one of the invalid Passcodes and generate a new QR code
+          using all the same Onboarding Payload components and one Passcode from
+          the list: 00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
+          66666666, 77777777, 88888888, 99999999, 12345678, 87654321"
       verification: |
           No applicable TH or DUT Logs
           "MT:-24J029Q00OC0000000" (00000000),
@@ -152,7 +153,8 @@ tests:
       disabled: true
 
     - label:
-          "Scan each of the generated QR codes from the previous step using DUT"
+          "Step 4b: Scan each of the generated QR codes from the previous step
+          using DUT"
       verification: |
           Verify on the DUT (Chip-tool):
           No applicable TH Logs
@@ -211,9 +213,9 @@ tests:
       disabled: true
 
     - label:
-          "Prefix: Using the QR code from Step 1, generate a new QR code but
-          substituting out the current Prefix with an invalid Prefix that is not
-          'MT:' (i.e. Prefix='AB:')"
+          "Step 5a: Prefix: Using the QR code from Step 1, generate a new QR
+          code but substituting out the current Prefix with an invalid Prefix
+          that is not 'MT:' (i.e. Prefix='AB:')"
       verification: |
           AB:-24J029Q00KA0648G00
 
@@ -221,7 +223,8 @@ tests:
       disabled: true
 
     - label:
-          "Scan/read the QR code, generated in the previous step, using the DUT"
+          "Step 5b: Scan/read the QR code, generated in the previous step, using
+          the DUT"
       verification: |
           Verify on the DUT (Chip-tool):
 
