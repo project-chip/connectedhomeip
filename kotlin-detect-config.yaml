@@ -38,6 +38,8 @@ style:
             - "**/src/controller/java/src/chip/tlv/values.kt"
             - "**/src/controller/java/src/chip/WildcardImport
               examples/android/CHIPTest/app/src/androidTest/java/com/tcl/chip/chiptest/ExampleInstrumentedTest.kt"
+            - "**/src/controller/java/tests/chip/devicecontroller/cluster/ChipClusterEventStructTest.kt"
+            - "**/src/controller/java/tests/chip/devicecontroller/cluster/ChipClusterStructTest.kt"  
             - "**/src/controller/java/tests/chip/jsontlv/JsonToTlvToJsonTest.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
             - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
