@@ -33,6 +33,7 @@ public:
      */
     virtual void OnCommissioningSessionEstablishmentStarted() {}
     virtual void OnCommissioningSessionStarted() {}
+    virtual void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) {}
     virtual void OnCommissioningSessionStopped(CHIP_ERROR err) {}
 
     /*
