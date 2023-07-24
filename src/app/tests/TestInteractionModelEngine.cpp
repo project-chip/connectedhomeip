@@ -235,7 +235,7 @@ void TestInteractionModelEngine::TestSubscriptionResumptionTimer(nlTestSuite * a
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
     err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
-                                                                    app::reporting::GetDefaultReportScheduler());
+                                                      app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     uint32_t timeTillNextResubscriptionMs;
