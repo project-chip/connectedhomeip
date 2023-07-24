@@ -118,7 +118,8 @@ async def CreateControllersOnFabric(fabricAdmin: FabricAdmin,
                                     controllerNodeIds: typing.List[int],
                                     privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
                                     targetNodeId: int,
-                                    catTags: typing.List[int] = []) -> typing.List[ChipDeviceController]:
+                                    catTags: typing.List[int] = [],
+                                    paaTrustStorePath: str = "") -> typing.List[ChipDeviceController]:
     ''' Create new ChipDeviceController instances on a given fabric with a specific privilege on a target node.
 
         Args:
@@ -130,12 +131,13 @@ async def CreateControllersOnFabric(fabricAdmin: FabricAdmin,
             targetNodeId:               The Node ID of the target.
             catTags:                    CAT Tags to include in the NOC of controller, as well as when setting
                                         up the ACLs on the target.
+            paaTrustStorePath:          Path to the PAA trust store. If one isn't provided, a suitable default is selected.
     '''
 
     controllerList = []
 
     for nodeId in controllerNodeIds:
-        newController = fabricAdmin.NewController(nodeId=nodeId, catTags=catTags)
+        newController = fabricAdmin.NewController(nodeId=nodeId, paaTrustStorePath=paaTrustStorePath, catTags=catTags)
         await GrantPrivilege(adminDevCtrl, newController, privilege, targetNodeId, catTags)
         controllerList.append(newController)
 

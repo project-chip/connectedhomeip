@@ -44,9 +44,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the AddOrUpdateThreadNetwork command to the DUT with the
-          following fields: 1. OperationalDataset field set to PIXIT.CNET.THREAD
-          _1ST_OPERATIONAL DATASET 2. Breadcrumb field set to 1"
+          "Step 1: TH sends the AddOrUpdateThreadNetwork command to the DUT with
+          the following fields: OperationalDataset field set to
+          PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET Breadcrumb field set to 1"
       PICS: CNET.S.C03.Rsp
       verification: |
           ./chip-tool networkcommissioning add-or-update-thread-network-network hex:<your network id in hex> 1 0
@@ -55,7 +55,7 @@ tests:
 
           ./chip-tool networkcommissioning add-or-update-thread-network hex:1011101122222229 51 0
 
-          Verify  "FAILSAFE_REQUIRED status code"  on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the AddOrUpdateThreadNetwork command.
 
           [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
           [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
@@ -63,9 +63,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends RemoveNetwork command to the DUT with NetworkID field set to
-          PIXIT.CNET.THREAD_1ST_O PERATIONALDATASET and Breadcrumb field set to
-          1"
+          "Step 2: TH sends RemoveNetwork command to the DUT with NetworkID
+          field set to PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET and Breadcrumb
+          field set to 1"
       PICS: CNET.S.C04.Rsp
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
@@ -74,7 +74,7 @@ tests:
 
           ./chip-tool networkcommissioning remove-network hex:1011101122222229 51 0
 
-          Verify  "FAILSAFE_REQUIRED status code"  on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the RemoveNetwork command.
 
           [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
           [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
@@ -82,9 +82,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ConnectNetwork command to the DUT with NetworkID field set
-          to PIXIT.CNET.THREAD_1ST_O PERATIONALDATASET and Breadcrumb field set
-          to 1"
+          "Step 3: TH sends ConnectNetwork command to the DUT with NetworkID
+          field set to PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET and Breadcrumb
+          field set to 1"
       PICS: CNET.S.C06.Rsp
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
@@ -93,7 +93,7 @@ tests:
 
           ./chip-tool networkcommissioning connect-network hex:1011101122222229 51 0
 
-          Verify  "FAILSAFE_REQUIRED status code"  on the TH(chip-tool) Log:
+          Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the ConnectNetwork command.
 
           [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
           [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)

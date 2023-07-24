@@ -1,0 +1,252 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    132.2.6. [TC-S-2.6] RemainingCapacity functionality with DUT as Server -
+    Multi-Fabric
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1a: TH1 sends a RemoveAllScenes command to DUT with the GroupID
+          field set to 0x0000."
+      PICS: S.S.C03.Rsp
+      verification: |
+          ./chip-tool scenes remove-all-scenes 0x0000 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0003
+          CHIP:TOO:   RemoveAllScenesResponse: {
+          CHIP:TOO:     status: 0
+          CHIP:TOO:     groupID: 0
+          CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 1b: Repeat Step 1a with TH2 and TH3."
+      PICS: S.S.C03.Rsp
+      verification: |
+          ./chip-tool scenes remove-all-scenes 0x0000 2 1 --commissioner-name beta
+          ./chip-tool scenes remove-all-scenes 0x0000 3 1 --commissioner-name gamma
+      disabled: true
+
+    - label: "Step 2a: TH1 reads from the DUT the SceneTableSize attribute"
+      PICS: S.S.A0006
+      verification: |
+          ./chip-tool scenes read scene-table-size 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0006 DataVersion: 2793536935
+          CHIP:TOO:   SceneTableSize: 16
+      disabled: true
+
+    - label:
+          "Step 2b: TH1 sends a subscription request action for
+          RemainingCapacity to the DUT."
+      PICS: S.S.A0007
+      verification: |
+          ./chip-tool interactive start
+
+          >> scenes subscribe remaining-capacity 10 100 1 1  --keepSubscriptions 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536968
+          CHIP:TOO:   RemainingCapacity: 8
+          CHIP:DMG: MoveToState ReadClient[0xffff94002990]: Moving to [AwaitingSu]
+          CHIP:EM: <<< [E:32066i S:31983 M:88286544 (Ack:232770518)] (S) Msg TX to 1:0000000000000001 [573B] --- Type 0001:01 (IM:StatusResponse)
+          CHIP:IN: (S) Sending msg 88286544 on secure session with LSID: 31983
+          CHIP:EM: >>> [E:32066i S:31983 M:232770519 (Ack:88286544)] (S) Msg RX from 1:0000000000000001 [573B] --- Type 0001:04 (IM:SubscribeResponse)
+          CHIP:EM: Found matching exchange: 32066i, Delegate: 0xffff940029a0
+          CHIP:EM: Rxd Ack; Removing MessageCounter:88286544 from Retrans Table on exchange 32066i
+          CHIP:DMG: SubscribeResponse is received
+          CHIP:DMG: SubscribeResponseMessage =
+          CHIP:DMG: {
+          CHIP:DMG:         SubscriptionId = 0xf2e8c40c,
+          CHIP:DMG:         MaxInterval = 0x64,
+          CHIP:DMG:         InteractionModelRevision = 1
+          CHIP:DMG: }
+      disabled: true
+
+    - label:
+          "Step 2c:  Keep subscription session active for the remaining of the
+          test"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2d:  Repeat Step 2b and 2c with TH2 and TH3"
+      verification: |
+          TH2:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536968
+          CHIP:TOO:   RemainingCapacity: 8
+          TH3:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536968
+          CHIP:TOO:   RemainingCapacity: 8
+      disabled: true
+
+    - label:
+          "Step 3a: TH1 sends a AddScene command to DUT with the GroupID field
+          set to 0x0000, the SceneID field set to 0x01, the TransitionTime field
+          set to 0x0014 (20s) and no extension field sets."
+      PICS: S.S.C00.Rsp
+      verification: |
+          ./chip-tool scenes add-scene 0x0000 0x1 0x0014 scene1 [] 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
+          CHIP:TOO:   AddSceneResponse: {
+          CHIP:TOO:     status: 0
+          CHIP:TOO:     groupID: 0
+          CHIP:TOO:     sceneID: 1
+          CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 4a: TH1 sends AddScene command to DUT with same GroupID and
+          SceneID value starting at 2 and incrementing for each iteration for
+          RemainingCapacity1 more times until reported value to TH1 (after
+          MinIntervalFloor) for RemainingCapacity becomes 0."
+      PICS: S.S.C00.Rsp && S.S.A0007
+      verification: |
+          ./chip-tool scenes add-scene 0x0000 0x2 0x0014 scene2 [] 1 1
+
+          Repeat till RemainingCapacity is 0
+      disabled: true
+
+    - label:
+          "Step 4b: TH1 sends a AddScene command to DUT with the GroupID field
+          set to 0x0000, the SceneID field set to 1 more than last value used in
+          step 4a, the TransitionTime field set to 0x0014 (20s) and no extension
+          field sets."
+      PICS: S.S.C00.Rsp
+      verification: |
+          ./chip-tool scenes add-scene 0x0000 0x10 0x0014 scene101 [] 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
+          CHIP:TOO:   AddSceneResponse: {
+          CHIP:TOO:     status: 137
+          CHIP:TOO:     groupID: 0
+          CHIP:TOO:     sceneID: 16
+          CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 5a: Repeat Step 4a with TH2"
+      PICS: S.S.C00.Rsp && S.S.A0007
+      verification: |
+          ./chip-tool scenes add-scene 0x0000 0x1 0x0014 scene1 [] 2 1 --commissioner-name beta
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
+          CHIP:TOO:   AddSceneResponse: {
+          CHIP:TOO:     status: 0
+          CHIP:TOO:     groupID: 0
+          CHIP:TOO:     sceneID: 1
+          CHIP:TOO:    }
+
+          TH2:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536968
+          CHIP:TOO:   RemainingCapacity: 7
+          TH3:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536968
+          CHIP:TOO:   RemainingCapacity: 7
+
+          Repeat on TH2 till RemainingCapacity reaches 0
+          TH2:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536968
+          CHIP:TOO:   RemainingCapacity: 0
+          TH3:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536968
+          CHIP:TOO:   RemainingCapacity: 0
+      disabled: true
+
+    - label: "Step 5b: Repeat Step 4b with TH2"
+      PICS: S.S.C00.Rsp
+      verification: |
+          ./chip-tool scenes add-scene 0x0000 0x11 0x0014 scene201 [] 2 1 --commissioner-name beta
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
+          CHIP:TOO:   AddSceneResponse: {
+          CHIP:TOO:     status: 137
+          CHIP:TOO:     groupID: 0
+          CHIP:TOO:     sceneID: 17
+          CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 6: TH3 sends a AddScene command to DUT with the GroupID field
+          set to 0x0000, the SceneID field set to 0x01, the TransitionTime field
+          set to 0x0014 (20s) and no extension field sets."
+      PICS: S.S.C00.Rsp
+      verification: |
+          ./chip-tool scenes add-scene 0x0000 0x12 0x0014 scene301 [] 3 1 --commissioner-name gamma
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
+          CHIP:TOO:   AddSceneResponse: {
+          CHIP:TOO:     status: 137
+          CHIP:TOO:     groupID: 0
+          CHIP:TOO:     sceneID: 18
+          CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 7a: TH1 sends a RemoveAllScenes command to DUT with the GroupID
+          field set to 0x0000."
+      PICS: S.S.C03.Rsp
+      verification: |
+          ./chip-tool scenes remove-all-scenes 0x0000 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0003
+          CHIP:TOO:   RemoveAllScenesResponse: {
+          CHIP:TOO:     status: 0
+          CHIP:TOO:     groupID: 0
+          CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 7b: Verify that the DUT sends a report data to TH1 for
+          RemainingCapacity after the MinIntervalFloor time; store this value
+          into RemainingCapacity1; verify RemainingCapacity1 equals
+          (MaxRemainingCapacity)."
+      PICS: S.S.A0007
+      verification: |
+          CHIP:DMG: ReportDataMessage =
+          CHIP:DMG: {
+          CHIP:DMG:         SubscriptionId = 0xa9f0f186,
+          CHIP:DMG:         InteractionModelRevision = 1
+          CHIP:DMG: }
+      disabled: true
+
+    - label:
+          "Step 8a: TH2 sends a RemoveAllScenes command to DUT with the GroupID
+          field set to 0x0000."
+      PICS: S.S.C03.Rsp
+      verification: |
+          ./chip-tool scenes remove-all-scenes 0x0000 2 1 --commissioner-name beta
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0003
+          CHIP:TOO:   RemoveAllScenesResponse: {
+          CHIP:TOO:     status: 0
+          CHIP:TOO:     groupID: 0
+          CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 8b: Verify that the DUT sends a report data to TH2 for
+          RemainingCapacity after the MinIntervalFloor time; store this value
+          into RemainingCapacity2; verify RemainingCapacity2 equals
+          (MaxRemainingCapacity)."
+      PICS: S.S.A0007
+      verification: |
+          TH2:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536968
+          CHIP:TOO:   RemainingCapacity: 8
+      disabled: true

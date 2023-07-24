@@ -46,3 +46,16 @@ tests:
       PICS: DESC.C.A0003
       wait: "readAttribute"
       attribute: "PartsList"
+
+    - label: "DUT reads TagList from the TH"
+      PICS: PICS_USER_PROMPT
+      verification: |
+          Chip-tool has to implement the Taglist attribute
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

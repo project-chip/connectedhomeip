@@ -22,12 +22,15 @@ Due to the ModeBase cluster not having a clustre ID, these enems will need to be
 These enems can be used once the zap generation tool supports aliased and derived clusters.
 -->
 <!--  <enum name="StatusCode" type="ENUM8">-->
+<!--    <cluster code="0x..."/>-->
 <!--    <item value="0x0" name="Success"/>-->
 <!--    <item value="0x1" name="UnsupportedMode"/>-->
 <!--    <item value="0x2" name="GenericFailure"/>-->
+<!--    <item value="0x3" name="InvalidInMode"/>-->
 <!--  </enum>-->
 
 <!--  <enum name="ModeTag" type="ENUM16">-->
+<!--    <cluster code="0x..."/>-->
 <!--    <item value="0x0" name="Auto"/>-->
 <!--    <item value="0x1" name="Quick"/>-->
 <!--    <item value="0x2" name="Quiet"/>-->
@@ -65,16 +68,17 @@ These enems can be used once the zap generation tool supports aliased and derive
 <!--  <cluster>-->
 <!--    <domain>General</domain>-->
 <!--    <name>Mode Base</name>-->
+<!--    <code>0x...</code>-->
 <!--    <define>MODE_BASE_CLUSTER</define>-->
 <!--    <client init="false" tick="false">true</client>-->
 <!--    <server init="false" tick="false">true</server>-->
 <!--    <description>Attributes and commands for selecting a mode from a list of supported options.</description>-->
 <!--    <globalAttribute side="either" code="0xFFFD" value="2"/>-->
 <!--    &lt;!&ndash; Base data types &ndash;&gt;-->
-<!--    <attribute side="server" code="0x0000" define="SUPPORTED_MODES"  type="ARRAY" entryType="ModeOptionStruct" writable="false" optional="false" isNullable="false" length="255">SupportedModes</attribute>-->
-<!--    <attribute side="server" code="0x0001" define="CURRENT_MODE"     type="INT8U"                              writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>-->
-<!--    <attribute side="server" code="0x0002" define="START_UP_MODE"    type="INT8U"                              writable="true"  optional="true"  isNullable="true">StartUpMode</attribute>-->
-<!--    <attribute side="server" code="0x0003" define="ON_MODE"          type="INT8U"                              writable="true"  optional="true"  isNullable="true">OnMode</attribute>-->
+<!--    <attribute side="server" code="0x0000" define="SUPPORTED_MODES"  type="ARRAY" entryType="ModeOptionStruct" storage="external" writable="false" optional="false" isNullable="false" length="255">SupportedModes</attribute>-->
+<!--    <attribute side="server" code="0x0001" define="CURRENT_MODE"     type="INT8U"                              storage="external" writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>-->
+<!--    <attribute side="server" code="0x0002" define="START_UP_MODE"    type="INT8U"                              storage="external" writable="true"  optional="true"  isNullable="true">StartUpMode</attribute>-->
+<!--    <attribute side="server" code="0x0003" define="ON_MODE"          type="INT8U"                              storage="external" writable="true"  optional="true"  isNullable="true">OnMode</attribute>-->
 
 <!--    &lt;!&ndash; Commands &ndash;&gt;-->
 <!--    <command source="client" code="0x00" name="ChangeToMode" response="ChangeToModeResponse" optional="false">-->
@@ -92,10 +96,10 @@ These enems can be used once the zap generation tool supports aliased and derive
 <!--      <arg name="Status"     type="ENUM8"                   optional="false"/>-->
 <!--      <arg name="StatusText" type="CHAR_STRING" lenght="64" optional="true"/>-->
 <!--    </command>-->
-
 <!--  </cluster>-->
 
   <bitmap name="Feature" type="BITMAP32">
+<!--    <cluster code="0x..."/>-->
     <cluster code="0x0051"/>
     <cluster code="0x0052"/>
     <cluster code="0x0054"/>

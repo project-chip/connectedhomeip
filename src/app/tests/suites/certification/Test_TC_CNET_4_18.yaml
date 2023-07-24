@@ -36,12 +36,12 @@ tests:
 
       disabled: true
 
-    - label: "DUT reads the MaxNetworks attribute from the TH"
+    - label: "Step 1: DUT reads the MaxNetworks attribute from the TH"
       PICS: CNET.C.A0000
       verification: |
           ./chip-tool networkcommissioning read max-networks 54 0
 
-          Verify "MaxNetworks response" on the TH(All-cluster-app) Log:
+          Verify MaxNetworks attribute response on TH(all-clusters-app) log:
 
           D: 7993601 [SC]Allocated SecureSession (0x20003680) - waiting for Sigma1 msg
           D: 7993608 [EM]Retransmitting MessageCounter:53368032 on exchange 5643r Send Cnt 1
@@ -57,12 +57,12 @@ tests:
           I: 7993688 [IN]Prepared secure message 0x200048b4 to 0x00000000000
       disabled: true
 
-    - label: "DUT reads the Networks attribute from the TH"
+    - label: "Step 2: DUT reads the Networks attribute from the TH"
       PICS: CNET.C.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 54 0
 
-          Verify "Networks response" on the TH(All-cluster-app) Log:
+          Verify Networks attribute response on TH(all-clusters-app) log:
 
           D: 8065181 [SC]Allocated SecureSession (0x20003738) - waiting for Sigma1 msg
           D: 8065188 [EM]Retransmitting MessageCounter:53368036 on exchange 57159r Send Cnt 1
@@ -77,12 +77,13 @@ tests:
           D: 8065265 [DMG]<RE> Sending report (payload has 77 bytes)...
       disabled: true
 
-    - label: "DUT reads ScanMaxTimeSeconds attribute from the TH"
+    - label: "Step 3: DUT reads ScanMaxTimeSeconds attribute from the TH"
       PICS: CNET.C.A0002
       verification: |
           ./chip-tool networkcommissioning read scan-max-time-seconds 54 0
 
-          Verify  "ScanMaxTimeSeconds response" on the TH(All-cluster-app) Log:
+          Verify ScanMaxTimeSeconds attribute response on TH(all-clusters-app) log:
+
 
           D: 8108702 [SC]Allocated SecureSession (0x200037f0) - waiting for Sigma1 msg
           I: 8108710 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:194637583 on exchar
@@ -95,12 +96,12 @@ tests:
           D: 8108758 [DMG]<RE> Sending report (payload has 36 bytes)...
       disabled: true
 
-    - label: "DUT reads ConnectMaxTimeSeconds attribute from the TH"
+    - label: "Step 4: DUT reads ConnectMaxTimeSeconds attribute from the TH"
       PICS: CNET.C.A0003
       verification: |
           ./chip-tool networkcommissioning read connect-max-time-seconds 54 0
 
-          Verify "ConnectMaxTimeSeconds response" on the TH(All-cluster-app) Log:
+          Verify InterfaceEnabled attribute response on TH(all-clusters-app) log:
 
           D: 8145477 [SC]Allocated SecureSession (0x20002c70) - waiting for Sigma1 msg
           I: 8145484 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:134704639 on exchar
@@ -113,12 +114,12 @@ tests:
           D: 8145534 [DMG]<RE> Sending report (payload has 36 bytes)...
       disabled: true
 
-    - label: "DUT reads InterfaceEnabled attribute from the TH"
+    - label: "Step 5: DUT reads InterfaceEnabled attribute from the TH"
       PICS: CNET.C.A0004
       verification: |
           ./chip-tool networkcommissioning read interface-enabled 54 0
 
-          Verify "InterfaceEnabled response" on the TH(All-cluster-app) Log:
+          Verify InterfaceEnabled attribute response on TH(all-clusters-app) log:
 
           D: 8179717 [SC]Allocated SecureSession (0x20002de0) - waiting for Sigma1 msg
           I: 8179725 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:158532673 on exchar
@@ -131,13 +132,12 @@ tests:
           D: 8179775 [DMG]<RE> Sending report (payload has 35 bytes)...
       disabled: true
 
-    - label: "DUT reads LastNetworkingStatus attribute from the TH"
+    - label: "Step 6: DUT reads LastNetworkingStatus attribute from the TH"
       PICS: CNET.C.A0005
       verification: |
           ./chip-tool networkcommissioning read last-networking-status 54 0
 
-
-          Verify "LastNetworkingStatus response" on the TH(All-cluster-app) Log:
+          Verify LastNetworkingStatus attribute response on TH(all-clusters-app) log:
 
           D: 8428403 [SC]Allocated SecureSession (0x20002d28) - waiting for Sigma1 msg
           I: 8428410 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:135181543 on exchar
@@ -152,13 +152,12 @@ tests:
           D: 8428483 [DMG]<RE> Sending report (payload has 36 bytes)...
       disabled: true
 
-    - label: "DUT reads LastNetworkID attribute from the TH"
+    - label: "Step 7: DUT reads LastNetworkID attribute from the TH"
       PICS: CNET.C.A0006
       verification: |
           ./chip-tool networkcommissioning read last-network-id 54 0
 
-
-          Verify "LastNetworkID response" on the TH(All-cluster-app) Log:
+          Verify LastNetworkID attribute response on TH(all-clusters-app) log:
 
           D: 8469179 [SC]Allocated SecureSession (0x20002e98) - waiting for Sigma1 msg
           I: 8469187 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:91003604 on exchanr
@@ -173,13 +172,12 @@ tests:
           D: 8469258 [DMG]<RE> Sending report (payload has 44 bytes)...
       disabled: true
 
-    - label: "DUT reads LastConnectErrorValue attribute from the TH"
+    - label: "Step 8: DUT reads LastConnectErrorValue attribute from the TH"
       PICS: CNET.C.A0007
       verification: |
           ./chip-tool networkcommissioning read last-connect-error-value 54 0
 
-
-          Verify "LastConnectErrorValue response" on the TH(All-cluster-app) Log:
+          Verify LastConnectErrorValue attribute response on TH(all-clusters-app) log:
 
           D: 8729020 [SC]Allocated SecureSession (0x20002f50) - waiting for Sigma1 msg
           I: 8729028 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:249692114 on exchar
