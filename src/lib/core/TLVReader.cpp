@@ -290,7 +290,7 @@ CHIP_ERROR TLVReader::Get(double & v) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::Get(ByteSpan & v)
+CHIP_ERROR TLVReader::Get(ByteSpan & v) const
 {
     const uint8_t * val;
     ReturnErrorOnFailure(GetDataPtr(val));
@@ -304,7 +304,7 @@ constexpr int kUnicodeInformationSeparator1       = 0x1F;
 constexpr size_t kMaxLocalizedStringIdentifierLen = 2 * sizeof(LocalizedStringIdentifier);
 } // namespace
 
-CHIP_ERROR TLVReader::Get(CharSpan & v)
+CHIP_ERROR TLVReader::Get(CharSpan & v) const
 {
     if (!TLVTypeIsUTF8String(ElementType()))
     {
@@ -460,12 +460,9 @@ CHIP_ERROR TLVReader::DupString(char *& buf)
     return err;
 }
 
-CHIP_ERROR TLVReader::GetDataPtr(const uint8_t *& data)
+CHIP_ERROR TLVReader::GetDataPtr(const uint8_t *& data) const
 {
-    CHIP_ERROR err;
-
-    if (!TLVTypeIsString(ElementType()))
-        return CHIP_ERROR_WRONG_TLV_TYPE;
+    VerifyOrReturnError(TLVTypeIsString(ElementType()), CHIP_ERROR_WRONG_TLV_TYPE);
 
     if (GetLength() == 0)
     {
@@ -473,19 +470,12 @@ CHIP_ERROR TLVReader::GetDataPtr(const uint8_t *& data)
         return CHIP_NO_ERROR;
     }
 
-    err = EnsureData(CHIP_ERROR_TLV_UNDERRUN);
-    if (err != CHIP_NO_ERROR)
-        return err;
-
     uint32_t remainingLen = static_cast<decltype(mMaxLen)>(mBufEnd - mReadPoint);
 
     // Verify that the entirety of the data is available in the buffer.
     // Note that this may not be possible if the reader is reading from a chain of buffers.
-    if (remainingLen < static_cast<uint32_t>(mElemLenOrVal))
-        return CHIP_ERROR_TLV_UNDERRUN;
-
+    VerifyOrReturnError(remainingLen >= static_cast<uint32_t>(mElemLenOrVal), CHIP_ERROR_TLV_UNDERRUN);
     data = mReadPoint;
-
     return CHIP_NO_ERROR;
 }
 
@@ -576,20 +566,19 @@ CHIP_ERROR TLVReader::VerifyEndOfContainer()
 
 CHIP_ERROR TLVReader::Next()
 {
-    CHIP_ERROR err;
+    ReturnErrorOnFailure(Skip());
+    ReturnErrorOnFailure(ReadElement());
+
     TLVElementType elemType = ElementType();
 
-    err = Skip();
-    if (err != CHIP_NO_ERROR)
-        return err;
+    VerifyOrReturnError(elemType != TLVElementType::EndOfContainer, CHIP_END_OF_TLV);
 
-    err = ReadElement();
-    if (err != CHIP_NO_ERROR)
-        return err;
-
-    elemType = ElementType();
-    if (elemType == TLVElementType::EndOfContainer)
-        return CHIP_END_OF_TLV;
+    // Ensure that GetDataPtr calls can be called immediately after Next, so
+    // that `Get(ByteSpan&)` does not need to advance buffers and just works
+    if (TLVTypeIsString(elemType) && (GetLength() != 0))
+    {
+        ReturnErrorOnFailure(EnsureData(CHIP_ERROR_TLV_UNDERRUN));
+    }
 
     return CHIP_NO_ERROR;
 }
