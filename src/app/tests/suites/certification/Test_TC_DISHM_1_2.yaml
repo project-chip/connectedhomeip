@@ -13,18 +13,13 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-<<<<<<< HEAD
 name: 193.1.2. [TC-DISHM-1.2] Cluster attributes with DUT as Server
-=======
-name: 263.1.2. [TC-DISHM-1.2] Cluster attributes with DUT as Server
->>>>>>> master
 
 PICS:
     - DISHM.S
 
 config:
     nodeId: 0x12344321
-<<<<<<< HEAD
     cluster: "Dishwasher Mode"
     endpoint: 1
 
@@ -42,25 +37,6 @@ tests:
           ./chip-tool dishwashermode read supported-modes 1 1
 
           On TH(chip-tool) log, Verify SupportedModes attribute should contains atleast one ModeOptionsStruct entries with unique mode field value and label field value below is the sample log provided for the raspi platform:
-=======
-    cluster: "Basic Information"
-    endpoint: 0
-
-tests:
-    - label:
-          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
-          test)."
-      verification: |
-
-      disabled: true
-
-    - label: "Step 2: TH reads from the DUT the SupportedModes attribute."
-      PICS: DISHM.S.A0000
-      verification: |
-          ./chip-tool dishwashermodeselect read supported-modes 1 1
-
-          On TH(chip-tool) log, Verify SupportedModes attribute should contains atleast two ModeOptionsStruct entries with unique mode field value and label field value below is the sample log provided for the raspi platform:
->>>>>>> master
 
           [1687687925.438666][18054:18056] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0002 DataVersion: 4148960394
           [1687687925.438838][18054:18056] CHIP:TOO: SupportedModes: 3 entries
@@ -103,7 +79,6 @@ tests:
           [1687687925.445365][18054:18056] CHIP:TOO: Value: 2
           [1687687925.445385][18054:18056] CHIP:TOO: }
           [1687687925.445405][18054:18056] CHIP:TOO: }
-<<<<<<< HEAD
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT
@@ -117,21 +92,12 @@ tests:
     - label: "TH reads the CurrentMode attribute from the DUT"
       verification: |
           ./chip-tool dishwashermode read current-mode 1 1
-=======
-      disabled: true
-
-    - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
-      PICS: DISHM.S.A0001
-      verification: |
-          ./chip-tool dishwashermodeselect read current-mode 1 1
->>>>>>> master
 
           Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer and the value is from supported_modes_dut, below is the sample log provided for the raspi platform:
 
           [1645776767.611140][4667:4672] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469718
 
           [1645776767.611214][4667:4672] CHIP:TOO: CurrentMode: 0
-<<<<<<< HEAD
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT
@@ -145,14 +111,6 @@ tests:
     - label: "TH reads the OnMode attribute from the DUT"
       verification: |
           ./chip-tool dishwashermode read on-mode 1 1
-=======
-      disabled: true
-
-    - label: "Step 4: TH reads from the DUT the OnMode attribute."
-      PICS: DISHM.S.A0003
-      verification: |
-          ./chip-tool dishwashermodeselect read on-mode 1 1
->>>>>>> master
 
           Verify on TH(chip-tool) logs, OnMode attribute value is an integer and the value is from supported_modes_dut (As per spec default value is null) , below is the sample log provided for the raspi platform:
 
@@ -160,7 +118,6 @@ tests:
           [1649676072.465968][10754:10759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065072
 
           [1649676072.466094][10754:10759] CHIP:TOO: OnMode: null
-<<<<<<< HEAD
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT
@@ -174,20 +131,11 @@ tests:
     - label: "TH reads the StartUpMode attribute from the DUT"
       verification: |
           ./chip-tool dishwashermode read start-up-mode 1 1
-=======
-      disabled: true
-
-    - label: "Step 5: TH reads from the DUT the StartUpMode attribute."
-      PICS: DISHM.S.A0002
-      verification: |
-          ./chip-tool dishwashermodeselect read start-up-mode 1 1
->>>>>>> master
 
           Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer and value is from supported_modes_dut, below is the sample log provided for the raspi platform:
 
           [1649677014.496348][10778:10784] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004 DataVersion: 4277065072
           [1649677014.496469][10778:10784] CHIP:TOO: StartUpMode: 0
-<<<<<<< HEAD
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT
@@ -197,6 +145,3 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-=======
-      disabled: true
->>>>>>> master
