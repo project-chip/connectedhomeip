@@ -161,7 +161,6 @@ void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
 
     if (mAppDelegate != nullptr)
     {
-        ChipLogProgress(AppServer, "Calling mAppDelegate->OnCommissioningSessionEstablishmentError");
         mAppDelegate->OnCommissioningSessionEstablishmentError(prevErr);
     }
 
@@ -173,7 +172,7 @@ void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
 
         if (mAppDelegate != nullptr)
         {
-            mAppDelegate->OnCommissioningSessionStopped(err);
+            mAppDelegate->OnCommissioningSessionStopped();
         }
     }
 }

@@ -29,12 +29,26 @@ class AppDelegate
 public:
     virtual ~AppDelegate() {}
     /**
-     * This is called on start of session establishment process
+     * This is called when the PBKDFParamRequest is received and indicates the start of the session establishment process
      */
     virtual void OnCommissioningSessionEstablishmentStarted() {}
+
+    /**
+     * This is called when the commissioning session has been established
+     */
     virtual void OnCommissioningSessionStarted() {}
+
+    /**
+     * This is called when there is an error in establishing a commissioning session (such as, when an invalid passcode is provided)
+     *
+     * @param err CHIP_ERROR indicating the error that occurred during session establishment
+     */
     virtual void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) {}
-    virtual void OnCommissioningSessionStopped(CHIP_ERROR err) {}
+
+    /**
+     * This is called when the commissioning session establishment stops
+     */
+    virtual void OnCommissioningSessionStopped() {}
 
     /*
      * This is called anytime a basic or enhanced commissioning window is opened.
@@ -45,5 +59,9 @@ public:
      * fact open.
      */
     virtual void OnCommissioningWindowOpened() {}
+
+    /*
+     * This is called anytime a basic or enhanced commissioning window is closed.
+     */
     virtual void OnCommissioningWindowClosed() {}
 };
