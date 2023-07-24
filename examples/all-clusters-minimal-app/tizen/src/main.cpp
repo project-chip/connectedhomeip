@@ -47,7 +47,7 @@ void ApplicationInit()
     sEthernetNetworkCommissioningInstance.Init();
 }
 
-void ApplicationExit() {};
+void ApplicationExit(){};
 
 int main(int argc, char * argv[])
 {
