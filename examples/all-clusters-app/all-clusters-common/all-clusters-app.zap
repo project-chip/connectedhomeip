@@ -12994,6 +12994,48 @@
               "mfgCode": null,
               "side": "server",
               "included": 1
+            },
+            {
+              "name": "InitialPress",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "LongPress",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "ShortRelease",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "LongRelease",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "MultiPressOngoing",
+              "code": 5,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "MultiPressComplete",
+              "code": 6,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
