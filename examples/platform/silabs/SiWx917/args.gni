@@ -1,0 +1,43 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+declare_args() {
+  enable_heap_monitoring = false
+
+  # OTA timeout in seconds
+  ota_periodic_query_timeout_sec = 86400
+
+  # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
+  sl_wfx_config_softap = false
+  sl_wfx_config_scan = true
+
+  # Argument to force enable WPA3 security on rs91x
+  rs91x_wpa3_transition = false
+
+  # use commissionable data for SiWx917
+  siwx917_commissionable_data = false
+
+  #default WiFi SSID
+  chip_default_wifi_ssid = ""
+
+  #default Wifi Password
+  chip_default_wifi_psk = ""
+
+  # Enable TestEventTrigger in GeneralDiagnostics cluster
+  silabs_test_event_trigger_enabled = false
+
+  # The EnableKey in hex string format used by TestEventTrigger command in
+  # GeneralDiagnostics cluster. The length of the string should be 32.
+  silabs_test_event_trigger_enable_key = "00112233445566778899aabbccddeeff"
+}

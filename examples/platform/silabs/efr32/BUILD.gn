@@ -15,45 +15,15 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
-import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 import("${efr32_sdk_build_root}/silabs_board.gni")
 
-declare_args() {
-  enable_heap_monitoring = false
-
-  # OTA timeout in seconds
-  ota_periodic_query_timeout_sec = 86400
-
-  # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
-  sl_wfx_config_softap = false
-  sl_wfx_config_scan = true
-
-  # Argument to force enable WPA3 security on rs91x
-  rs91x_wpa3_transition = false
-
-  #default WiFi SSID
-  chip_default_wifi_ssid = ""
-
-  #default Wifi Password
-  chip_default_wifi_psk = ""
-
-  # Use default handler to negotiate subscription max interval
-  chip_config_use_icd_subscription_callbacks = chip_enable_icd_server
-
-  # Enable TestEventTrigger in GeneralDiagnostics cluster
-  silabs_test_event_trigger_enabled = false
-
-  # The EnableKey in hex string format used by TestEventTrigger command in
-  # GeneralDiagnostics cluster. The length of the string should be 32.
-  silabs_test_event_trigger_enable_key = "00112233445566778899aabbccddeeff"
-}
-
 silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 import("${silabs_common_plat_dir}/args.gni")
+import("${silabs_common_plat_dir}/efr32/args.gni")
 
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))
