@@ -555,7 +555,7 @@ public:
 
         // Confirm behavior when a read handler becomes dirty
         readHandler2->ForceDirtyState();
-        // OnBecome Reportable should have been called on ForceDirtyState because readHandler callbacks are now integrated
+        // OnBecomeReportable should have been called on ForceDirtyState because readHandler callbacks are now integrated
         NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler2));
         NL_TEST_ASSERT(aSuite, !syncScheduler.IsReportableNow(readHandler1));
         // Simulate wait enough for min timestamp of readHandler2 to be reached (1s)
@@ -763,7 +763,7 @@ public:
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMinReportingIntervalForTests(0));
         readHandler1->MoveToState(ReadHandler::HandlerState::GeneratingReports);
         syncScheduler.OnReadHandlerCreated(readHandler1);
-        // Forcing the dirty flag to will make the scheduler call Engine::ScheduleRun() immediately
+        // Forcing the dirty flag to  make the scheduler call Engine::ScheduleRun() immediately
         readHandler1->ForceDirtyState();
         NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler1));
 

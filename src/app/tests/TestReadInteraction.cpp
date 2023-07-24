@@ -1836,8 +1836,8 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mGotEventResponse);
 
-        // min-interval should have elapsed for urgen subscription, and our handler should still
-        // not be dirty or even reportable.
+        // The min-interval should have elapsed for urgen subscription, and our handler should still
+        // not be dirty or reportable.
         NL_TEST_ASSERT(apSuite,
                        reportScheduler->GetMinTimestampForHandler(delegate.mpReadHandler) <
                            System::SystemClock().GetMonotonicTimestamp());
