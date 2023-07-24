@@ -1392,6 +1392,10 @@ static BOOL sNeedsStackShutdown = YES;
 
     device = [MTRBaseDevice deviceWithNodeID:@(kDeviceId2) controller:sController];
     ResetCommissionee(device, dispatch_get_main_queue(), self, kTimeoutInSeconds);
+
+    device = [MTRBaseDevice deviceWithNodeID:@(kDeviceId3) controller:sController];
+    ResetCommissionee(device, dispatch_get_main_queue(), self, kTimeoutInSeconds);
+
     [[self class] shutdownStack];
 }
 
