@@ -78,6 +78,7 @@ shared_library("ChipDeviceCtrl") {
       "chip/internal/CommissionerImpl.cpp",
       "chip/logging/LoggingRedirect.cpp",
       "chip/native/PyChipError.cpp",
+      "chip/tracing/TracingSetup.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
     ]
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
@@ -120,7 +121,15 @@ shared_library("ChipDeviceCtrl") {
     public_deps += [
       "${chip_root}/src/controller/data_model",
       "${chip_root}/src/credentials:file_attestation_trust_store",
+      "${chip_root}/src/tracing/json",
+      "${chip_root}/src/tracing/perfetto",
+      "${chip_root}/src/tracing/perfetto:file_output",
       "${chip_root}/third_party/jsoncpp",
+    ]
+
+    deps = [
+      "${chip_root}/src/tracing/perfetto:event_storage",
+      "${chip_root}/src/tracing/perfetto:simple_initialization",
     ]
   } else {
     public_deps += [ "$chip_data_model" ]
@@ -238,6 +247,7 @@ chip_python_wheel_action("chip-core") {
         "chip/setup_payload/__init__.py",
         "chip/setup_payload/setup_payload.py",
         "chip/storage/__init__.py",
+        "chip/tracing/__init__.py",
         "chip/utils/CommissioningBuildingBlocks.py",
         "chip/utils/__init__.py",
         "chip/yaml/__init__.py",
@@ -292,6 +302,7 @@ chip_python_wheel_action("chip-core") {
     "chip.clusters",
     "chip.setup_payload",
     "chip.storage",
+    "chip.tracing",
   ]
 
   if (!chip_controller) {
