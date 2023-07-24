@@ -210,6 +210,18 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/supported-modes-manager.h",
         ]
+      } else if (cluster == "temperature-control-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/supported-temperature-levels-manager.h",
+        ]
+      } else if (cluster == "mode-base-server") {
+        sources += [
+          "${_app_root}/clusters/mode-base-server/mode-base-cluster-objects.cpp",
+          "${_app_root}/clusters/mode-base-server/mode-base-cluster-objects.h",
+          "${_app_root}/clusters/mode-base-server/mode-base-server.cpp",
+          "${_app_root}/clusters/mode-base-server/mode-base-server.h",
+        ]
       } else if (cluster == "application-launcher-server") {
         sources += [
           "${_app_root}/app-platform/ContentApp.cpp",
@@ -261,7 +273,15 @@ template("chip_data_model") {
       } else if (cluster == "icd-management-server") {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
 
-        deps += [ "${chip_root}/src/app/icd:monitoring-table" ]
+        deps += [ "${chip_root}/src/app/icd:cluster-srcs" ]
+      } else if (cluster == "resource-monitoring-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/replacement-product-list-manager.h",
+          "${_app_root}/clusters/${cluster}/resource-monitoring-cluster-objects.cpp",
+          "${_app_root}/clusters/${cluster}/resource-monitoring-cluster-objects.h",
+        ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }

@@ -22,9 +22,6 @@ config:
     nodeId: 0x12344321
     cluster: "Fan Control"
     endpoint: 1
-    ConfigSpeedSetting:
-        type: int8u
-        defaultValue: 50
 
 tests:
     - label: "Step 1: Wait for the commissioned device to be retrieved"
@@ -35,12 +32,21 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: TH writes SpeedSetting attribute a valid value to DUT"
+    - label: "Step 2: TH reads from the DUT the SpeedMax attribute"
+      PICS: FAN.S.A0004
+      command: "readAttribute"
+      attribute: "SpeedMax"
+      response:
+          saveAs: rSpeedMax
+
+    - label:
+          "Step 3: TH writes TH writes to the DUT the a value less than or equal
+          to the value read in step 2"
       PICS: FAN.S.A0005
       command: "writeAttribute"
       attribute: "SpeedSetting"
       arguments:
-          value: ConfigSpeedSetting
+          value: rSpeedMax
 
     - label: "Wait 1000ms"
       PICS: FAN.S.A0005
@@ -51,16 +57,16 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label: "Step 3: TH reads from the DUT the the SpeedSetting attribute"
+    - label: "Step 4: TH reads from the DUT the the SpeedSetting attribute"
       PICS: FAN.S.A0005
       command: "readAttribute"
       attribute: "SpeedSetting"
       response:
-          value: ConfigSpeedSetting
+          value: rSpeedMax
 
-    - label: "Step 4: TH reads from the DUT the the SpeedCurrent attribute"
+    - label: "Step 5: TH reads from the DUT the the SpeedCurrent attribute"
       PICS: FAN.S.A0006
       command: "readAttribute"
       attribute: "SpeedCurrent"
       response:
-          value: ConfigSpeedSetting
+          value: rSpeedMax

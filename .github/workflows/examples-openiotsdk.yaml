@@ -73,6 +73,8 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build lock-app example (mbedtls)
+              # Disabled being tracked here: https://github.com/project-chip/connectedhomeip/issues/28026
+              if: false
               id: build_lock_app_mbedtls
               run: |
                   scripts/examples/openiotsdk_example.sh -b mbedtls lock-app
@@ -112,6 +114,8 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build unit tests (mbedtls)
+              # Disabled being tracked here: https://github.com/project-chip/connectedhomeip/issues/28026
+              if: false
               id: build_unit_tests_mbedtls
               run: |
                   scripts/examples/openiotsdk_example.sh -b mbedtls unit-tests
@@ -175,6 +179,8 @@ jobs:
                     'scripts/examples/openiotsdk_example.sh --no-activate -C test unit-tests'
 
             - name: Build lock-app example (psa)
+              # Disabled being tracked here: https://github.com/project-chip/connectedhomeip/issues/28026
+              if: false
               id: build_lock_app_psa
               run: |
                   scripts/examples/openiotsdk_example.sh -c -b psa lock-app

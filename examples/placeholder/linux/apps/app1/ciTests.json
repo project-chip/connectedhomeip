@@ -1,6 +1,5 @@
 {
     "Test": [
-        "Test_TC_BINFO_2_3_Simulated",
         "Test_TC_ACT_3_1_Simulated",
         "Test_TC_BOOL_3_1_Simulated",
         "Test_TC_DESC_2_2_Simulated",

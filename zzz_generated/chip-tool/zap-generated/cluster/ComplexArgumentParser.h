@@ -66,6 +66,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Descriptor::Str
 
 static void Finalize(chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Binding::Structs::TargetStruct::Type & request,
                         Json::Value & value);
 
@@ -265,66 +270,6 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::CeramicFilterMonitoring::Structs::ReplacementProductStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::ElectrostaticFilterMonitoring::Structs::ReplacementProductStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::UvFilterMonitoring::Structs::ReplacementProductStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::IonizingFilterMonitoring::Structs::ReplacementProductStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::ZeoliteFilterMonitoring::Structs::ReplacementProductStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::OzoneFilterMonitoring::Structs::ReplacementProductStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::WaterTankMonitoring::Structs::ReplacementProductStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::FuelTankMonitoring::Structs::ReplacementProductStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::InkCartridgeMonitoring::Structs::ReplacementProductStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::TonerCartridgeMonitoring::Structs::ReplacementProductStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
                         Json::Value & value);

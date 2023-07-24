@@ -19,6 +19,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/icd/ICDManager.h>
+#include <app/icd/IcdManagementServer.h>
 #include <app/icd/IcdMonitoringTable.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -34,24 +35,21 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 
-void ICDManager::ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable)
+void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable)
 {
     VerifyOrDie(storage != nullptr);
     VerifyOrDie(fabricTable != nullptr);
     mStorage     = storage;
     mFabricTable = fabricTable;
 
-    uint32_t activeModeInterval;
-    if (Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval) != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        activeModeInterval = kMinActiveModeInterval;
-    }
+    uint32_t activeModeInterval = IcdManagementServer::GetInstance().GetActiveModeInterval();
     VerifyOrDie(kFastPollingInterval.count() < activeModeInterval);
+
     UpdateIcdMode();
     UpdateOperationState(OperationalState::ActiveMode);
 }
 
-void ICDManager::ICDManager::Shutdown()
+void ICDManager::Shutdown()
 {
     // cancel any running timer of the icd
     DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
@@ -106,11 +104,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
     if (state == OperationalState::IdleMode)
     {
         mOperationalState         = OperationalState::IdleMode;
-        uint32_t idleModeInterval = 0;
-        if (Attributes::IdleModeInterval::Get(kRootEndpointId, &idleModeInterval) != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            idleModeInterval = kMinIdleModeInterval;
-        }
+        uint32_t idleModeInterval = IcdManagementServer::GetInstance().GetIdleModeInterval();
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(idleModeInterval), OnIdleModeDone, this);
 
         System::Clock::Milliseconds32 slowPollInterval = GetSlowPollingInterval();
@@ -138,11 +132,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
             DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
 
             mOperationalState           = OperationalState::ActiveMode;
-            uint32_t activeModeInterval = 0;
-            if (Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval) != EMBER_ZCL_STATUS_SUCCESS)
-            {
-                activeModeInterval = kMinActiveModeInterval;
-            }
+            uint32_t activeModeInterval = IcdManagementServer::GetInstance().GetActiveModeInterval();
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeInterval), OnActiveModeDone, this);
 
             CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(GetFastPollingInterval());
@@ -153,11 +143,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
         }
         else
         {
-            uint16_t activeModeThreshold = 0;
-            if (Attributes::ActiveModeThreshold::Get(kRootEndpointId, &activeModeThreshold) != EMBER_ZCL_STATUS_SUCCESS)
-            {
-                activeModeThreshold = kMinActiveModeThreshold;
-            }
+            uint16_t activeModeThreshold = IcdManagementServer::GetInstance().GetActiveModeThreshold();
             DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeThreshold), OnActiveModeDone, this);
         }
     }

@@ -54,6 +54,13 @@
 #              Please examine codegen carefully when using "removed" to make
 #              sure all the things that should have been removed have been.
 #
+# * "swiftUnavailable": Can contain clusters, commands, attributes, etc as
+#                       described above for "introduced" and "deprecated".  This
+#                       can be used to mark APIs with NS_SWIFT_UNAVAILABLE,
+#                       typically when an API was renamed between two names that
+#                       map to the same Swift name and then both names were
+#                       deprecated.
+#
 # * "provisional": Can contain clusters, commands, attributes, etc as described
 #                  above for "introduced" and "deprecated".  Items can be
 #                  defined as provisional to prevent code generation for them.
@@ -4132,13 +4139,6 @@
                   - ValueA
                   - ValueB
                   - ValueC
-          FaultInjection:
-              FaultType:
-                  - Unspecified
-                  - SystemFault
-                  - InetFault
-                  - ChipFault
-                  - CertFault
       bitmaps:
           Groups:
               - GroupClusterFeature
@@ -4663,10 +4663,6 @@
           clusters:
               - PulseWidthModulation
               - TimeSynchronization
-              - ProxyConfiguration
-              - ProxyDiscovery
-              - ProxyValid
-              - FaultInjection
           attributes:
               PulseWidthModulation:
                   - GeneratedCommandList
@@ -4690,40 +4686,10 @@
                   - LocalTime
                   - TimeZoneDatabase
                   - NtpServerPort
-              ProxyConfiguration:
-                  - GeneratedCommandList
-                  - AcceptedCommandList
-                  - AttributeList
-                  - FeatureMap
-                  - ClusterRevision
-              ProxyDiscovery:
-                  - GeneratedCommandList
-                  - AcceptedCommandList
-                  - AttributeList
-                  - FeatureMap
-                  - ClusterRevision
-              ProxyValid:
-                  - GeneratedCommandList
-                  - AcceptedCommandList
-                  - AttributeList
-                  - FeatureMap
-                  - ClusterRevision
-              FaultInjection:
-                  - GeneratedCommandList
-                  - AcceptedCommandList
-                  - AttributeList
-                  - FeatureMap
-                  - ClusterRevision
           commands:
-              FaultInjection:
-                  - FailAtFault
-                  - FailRandomlyAtFault
               TimeSynchronization:
                   - SetUtcTime
       command payloads:
-          FaultInjection:
-              - FailAtFault
-              - FailRandomlyAtFault
           TimeSynchronization:
               - SetUtcTime
       global attributes:
@@ -4739,10 +4705,6 @@
       clusters:
           - PulseWidthModulation
           - TimeSynchronization
-          - ProxyConfiguration
-          - ProxyDiscovery
-          - ProxyValid
-          - FaultInjection
 
 - release: "First dot-release"
   versions:
@@ -7394,6 +7356,18 @@
           ModeSelect:
               Feature:
                   OnOff: DEPONOFF
+  swiftUnavailable:
+      bitmap values:
+          NetworkCommissioning:
+              WiFiSecurity:
+                  # The bitmap got renamed to WiFiSecurityBitmap, so now both
+                  # the Wpa* and WPA* names on WiFiSecurity are deprecated.
+                  # They get mapped to Swift with identical names, which leads
+                  # to the names being ambiguous.  Mark the "Wpa*" as
+                  # unavailable to Swift to work around this.
+                  - WpaPersonal
+                  - Wpa2Personal
+                  - Wpa3Personal
   provisional:
       clusters:
           ## Not ready at cutoff
@@ -7416,44 +7390,6 @@
           - RefrigeratorAlarm
           - TemperatureControl
           - SmokeCOAlarm
-          ## Officially marked provisional: many concentration measurement clusters
-          - BromateConcentrationMeasurement
-          - BromodichloromethaneConcentrationMeasurement
-          - BromoformConcentrationMeasurement
-          - ChloraminesConcentrationMeasurement
-          - ChlorineConcentrationMeasurement
-          - ChlorodibromomethaneConcentrationMeasurement
-          - ChloroformConcentrationMeasurement
-          - CopperConcentrationMeasurement
-          - DissolvedOxygenConcentrationMeasurement
-          - EthyleneConcentrationMeasurement
-          - EthyleneOxideConcentrationMeasurement
-          - FecalColiformEColiConcentrationMeasurement
-          - FluorideConcentrationMeasurement
-          - HaloaceticAcidsConcentrationMeasurement
-          - HydrogenConcentrationMeasurement
-          - HydrogenSulfideConcentrationMeasurement
-          - LeadConcentrationMeasurement
-          - ManganeseConcentrationMeasurement
-          - NitricOxideConcentrationMeasurement
-          - OxygenConcentrationMeasurement
-          - SodiumConcentrationMeasurement
-          - SulfateConcentrationMeasurement
-          - SulfurDioxideConcentrationMeasurement
-          - TotalColiformBacteriaConcentrationMeasurement
-          - TotalTrihalomethanesConcentrationMeasurement
-          - TurbidityConcentrationMeasurement
-          ## Officially marked provisional: many replaceable monitoring clusters
-          - CeramicFilterMonitoring
-          - ElectrostaticFilterMonitoring
-          - UVFilterMonitoring
-          - IonizingFilterMonitoring
-          - ZeoliteFilterMonitoring
-          - OzoneFilterMonitoring
-          - WaterTankMonitoring
-          - FuelTankMonitoring
-          - InkCartridgeMonitoring
-          - TonerCartridgeMonitoring
           ## Not ready to be public API yet.
           - ICDManagement
           - LaundryWasherMode
@@ -7535,12 +7471,6 @@
               - EventList
           UserLabel:
               - EventList
-          ProxyConfiguration:
-              - EventList
-          ProxyDiscovery:
-              - EventList
-          ProxyValid:
-              - EventList
           BooleanState:
               - EventList
           ModeSelect:
@@ -7606,8 +7536,6 @@
           ElectricalMeasurement:
               - EventList
           UnitTesting:
-              - EventList
-          FaultInjection:
               - EventList
           BasicInformation:
               - EventList
@@ -7689,3 +7617,20 @@
 
 - release: "Future"
   versions: "future"
+  introduced:
+      attributes:
+          PowerSource:
+              - EndpointList
+      bitmap values:
+          OnOff:
+              Feature:
+                  - DeadFront
+  removed:
+      clusters:
+          # Clusters that really should just not be exposed, even if they're in our XML.
+          - FaultInjection
+          # Clusters that are not going to end up shipping in their current form,
+          # so we should not be exposing the bits we expose now.
+          - ProxyConfiguration
+          - ProxyDiscovery
+          - ProxyValid

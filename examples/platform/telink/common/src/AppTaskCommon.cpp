@@ -138,8 +138,9 @@ class AppCallbacks : public AppDelegate
     bool isComissioningStarted;
 
 public:
+    void OnCommissioningSessionEstablishmentStarted() {}
     void OnCommissioningSessionStarted() override { isComissioningStarted = true; }
-    void OnCommissioningSessionStopped() override { isComissioningStarted = false; }
+    void OnCommissioningSessionStopped(CHIP_ERROR err) override { isComissioningStarted = false; }
     void OnCommissioningWindowClosed() override
     {
         if (!isComissioningStarted)

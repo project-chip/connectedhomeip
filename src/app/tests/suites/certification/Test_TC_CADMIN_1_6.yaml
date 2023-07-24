@@ -59,7 +59,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+    - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       PICS: CADMIN.S
@@ -68,7 +68,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+    - label: "Step 2: TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
@@ -80,7 +80,7 @@ tests:
                 value: 180
 
     #Check for DNS-SD advertisement CM is not possible in YAML
-    - label: "Verify that the DNS-SD advertisement shows CM=1"
+    - label: "Step 3: Verify that the DNS-SD advertisement shows CM=1"
       verification: |
           On TH_CR1 send the below command
 
@@ -115,7 +115,7 @@ tests:
               - name: "ms"
                 value: 190000
 
-    - label: "TH_CR2 starts a commissioning process with DUT_CE"
+    - label: "Step 4: TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -129,7 +129,7 @@ tests:
       response:
           error: FAILURE
 
-    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+    - label: "Step 5: TH_CR1 opens a commissioning window on DUT_CE"
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
@@ -147,14 +147,15 @@ tests:
               - name: "ms"
                 value: waitAfterCommissioning
 
-    - label: "TH_CR1 revokes the commissioning window on DUT_CE"
+    - label: "Step 6: TH_CR1 revokes the commissioning window on DUT_CE"
       cluster: "Administrator Commissioning"
       command: "RevokeCommissioning"
       PICS: CADMIN.S.C02.Rsp
       timedInteractionTimeoutMs: 10000
 
-    - label: "TH_CR2 starts a commissioning process with DUT_CE"
+    - label: "Step 7: TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
+      PICS: CADMIN.S
       cluster: "CommissionerCommands"
       command: "PairWithCode"
       arguments:
@@ -166,7 +167,7 @@ tests:
       response:
           error: FAILURE
 
-    - label: "TH_CR1 revokes the commissioning window on DUT_CE"
+    - label: "Step 8: TH_CR1 revokes the commissioning window on DUT_CE"
       cluster: "Administrator Commissioning"
       command: "RevokeCommissioning"
       timedInteractionTimeoutMs: 10000
@@ -174,7 +175,8 @@ tests:
       response:
           error: FAILURE
 
-    - label: "TH_CR1 writes the mandatory attribute NodeLabel of DUT_CE"
+    - label:
+          "Step 9a: TH_CR1 writes the mandatory attribute NodeLabel of DUT_CE"
       identity: "alpha"
       cluster: "Basic Information"
       command: "writeAttribute"
@@ -183,7 +185,7 @@ tests:
       arguments:
           value: "chiptest"
 
-    - label: "TH_CR1 read the mandatory attribute NodeLabel of DUT_CE"
+    - label: "Step 9b: TH_CR1 read the mandatory attribute NodeLabel of DUT_CE"
       identity: "alpha"
       cluster: "Basic Information"
       command: "readAttribute"
@@ -192,7 +194,7 @@ tests:
       response:
           value: "chiptest"
 
-    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+    - label: "Step 10: TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
@@ -211,7 +213,7 @@ tests:
               - name: "ms"
                 value: waitAfterCommissioning
 
-    - label: "TH_CR1 opens another commissioning window on DUT_CE"
+    - label: "Step 11: TH_CR1 opens another commissioning window on DUT_CE"
       identity: "alpha"
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
@@ -225,7 +227,7 @@ tests:
           error: FAILURE
           clusterError: 2
 
-    - label: "TH_CR2 starts a commissioning process on DUT_CE"
+    - label: "Step 12: TH_CR2 starts a commissioning process on DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -256,8 +258,8 @@ tests:
           saveAs: TH2FabricIndex
 
     - label:
-          "TH_CR1 tries to revoke the commissioning window on DUT_CE using
-          RevokeCommissioning command"
+          "Step 13: TH_CR1 tries to revoke the commissioning window on DUT_CE
+          using RevokeCommissioning command"
       cluster: "Administrator Commissioning"
       command: "RevokeCommissioning"
       PICS: CADMIN.S.C02.Rsp
@@ -266,7 +268,7 @@ tests:
           error: FAILURE
           clusterError: 4
 
-    - label: "TH_CR3 starts a commissioning process with DUT_CE"
+    - label: "Step 14: TH_CR3 starts a commissioning process with DUT_CE"
       identity: "gamma"
       cluster: "CommissionerCommands"
       command: "PairWithCode"

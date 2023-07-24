@@ -1,0 +1,175 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 263.2.8. [TC-FAN-3.3] Optional rock functionality with DUT as Server
+
+PICS:
+    - FAN.S
+    - FAN.S.F03
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the RockSupport attribute and store"
+      PICS: FAN.S.A0007
+      verification: |
+          ./chip-tool fancontrol read rock-support 1 1
+
+          On TH(chip-tool), Verify the RockSupport attribute value is in the range of 1 to 7.
+
+          [1689757789.384816][23225:23227] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0202 Attribute 0x0000_0007 DataVersion: 1958137194
+          [1689757789.384890][23225:23227] CHIP:TOO:   RockSupport: 3
+      disabled: true
+
+    - label:
+          "Step 3: If the RockSupport attribute read above has bit 0 set, then
+          TH writes to the DUT the RockSetting attribute with 0x01"
+      PICS: FAN.S.A0008(
+      verification: |
+          ./chip-tool fancontrol write rock-setting 1 1 1
+
+          On TH(chip-tool), Verify the SUCCESS response for RockSetting attribute write function
+
+          [1685104690.737557][30753:30755] CHIP:DMG:                                 Endpoint = 0x1,
+          [1685104690.737632][30753:30755] CHIP:DMG:                                 Cluster = 0x202,
+          [1685104690.737707][30753:30755] CHIP:DMG:                                 Attribute = 0x0000_0008,
+          [1685104690.737825][30753:30755] CHIP:DMG:                         }
+          [1685104690.737911][30753:30755] CHIP:DMG:
+          [1685104690.737980][30753:30755] CHIP:DMG:                         StatusIB =
+          [1685104690.738051][30753:30755] CHIP:DMG:                         {
+          [1685104690.738122][30753:30755] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1685104690.738199][30753:30755] CHIP:DMG:                         },
+          [1685104690.738270][30753:30755] CHIP:DMG:
+          [1685104690.738330][30753:30755] CHIP:DMG:                 },
+          [1685104690.738400][30753:30755] CHIP:DMG:
+          [1685104690.738455][30753:30755] CHIP:DMG:         ],
+          [1685104690.738524][30753:30755] CHIP:DMG:
+          [1685104690.738579][30753:30755] CHIP:DMG:         InteractionModelRevision = 1
+          [1685104690.738632][30753:30755] CHIP:DMG: }
+          [1685104690.738790][30753:30755] CHIP:DMG: WriteClient moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 4: If the previous step is written, after a few seconds, TH
+          reads from the DUT the RockSetting attribute"
+      PICS: FAN.S.A0008
+      verification: |
+          ./chip-tool fancontrol read rock-setting 1 1
+
+          On TH(chip-tool), Verify the RockSetting attribute value as 1.
+
+          [1689757942.179085][23325:23327] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0202 Attribute 0x0000_0008 DataVersion: 1958137195
+          [1689757942.179162][23325:23327] CHIP:TOO:   RockSetting: 1
+      disabled: true
+
+    - label:
+          "Step 5: If the RockSupport attribute read above has bit 1 set, then
+          TH writes to the DUT the RockSetting attribute with 0x02"
+      PICS: FAN.S.A0008
+      verification: |
+          ./chip-tool fancontrol write rock-setting 2 1 1
+
+          On TH(chip-tool), Verify the SUCCESS response for RockSetting attribute write function
+
+          [1685104690.737408][30753:30755] CHIP:DMG:                         AttributePathIB =
+          [1685104690.737488][30753:30755] CHIP:DMG:                         {
+          [1685104690.737557][30753:30755] CHIP:DMG:                                 Endpoint = 0x1,
+          [1685104690.737632][30753:30755] CHIP:DMG:                                 Cluster = 0x202,
+          [1685104690.737707][30753:30755] CHIP:DMG:                                 Attribute = 0x0000_0008,
+          [1685104690.737825][30753:30755] CHIP:DMG:                         }
+          [1685104690.737911][30753:30755] CHIP:DMG:
+          [1685104690.737980][30753:30755] CHIP:DMG:                         StatusIB =
+          [1685104690.738051][30753:30755] CHIP:DMG:                         {
+          [1685104690.738122][30753:30755] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1685104690.738199][30753:30755] CHIP:DMG:                         },
+          [1685104690.738270][30753:30755] CHIP:DMG:
+          [1685104690.738330][30753:30755] CHIP:DMG:                 },
+          [1685104690.738400][30753:30755] CHIP:DMG:
+          [1685104690.738455][30753:30755] CHIP:DMG:         ],
+          [1685104690.738524][30753:30755] CHIP:DMG:
+          [1685104690.738579][30753:30755] CHIP:DMG:         InteractionModelRevision = 1
+          [1685104690.738632][30753:30755] CHIP:DMG: }
+          [1685104690.738790][30753:30755] CHIP:DMG: WriteClient moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 6: If the previous step is written, after a few seconds, TH
+          reads from the DUT the RockSetting attribute"
+      PICS: FAN.S.A0008
+      verification: |
+          ./chip-tool fancontrol read rock-setting 1 1
+
+          On TH(chip-tool), Verify the RockSetting attribute value as 2.
+
+          [1689757942.179085][23325:23327] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0202 Attribute 0x0000_0008 DataVersion: 1958137195
+          [1689757942.179162][23325:23327] CHIP:TOO:   RockSetting: 2
+      disabled: true
+
+    - label:
+          "Step 7: If the RockSupport attribute read above has bit 2 set, then
+          TH writes to the DUT the RockSetting attribute with 0x04"
+      PICS: FAN.S.A0008
+      verification: |
+          ./chip-tool fancontrol write rock-setting 4 1 1
+
+          On TH(chip-tool), Verify the SUCCESS response for RockSetting attribute write function
+
+          Current sample apps do not have RockSupport attribute bit 2 . However, if the vendor has implemented it, the below response will be displayed.
+
+          [1685104690.737408][30753:30755] CHIP:DMG:                         AttributePathIB =
+          [1685104690.737488][30753:30755] CHIP:DMG:                         {
+          [1685104690.737557][30753:30755] CHIP:DMG:                                 Endpoint = 0x1,
+          [1685104690.737632][30753:30755] CHIP:DMG:                                 Cluster = 0x202,
+          [1685104690.737707][30753:30755] CHIP:DMG:                                 Attribute = 0x0000_0008,
+          [1685104690.737825][30753:30755] CHIP:DMG:                         }
+          [1685104690.737911][30753:30755] CHIP:DMG:
+          [1685104690.737980][30753:30755] CHIP:DMG:                         StatusIB =
+          [1685104690.738051][30753:30755] CHIP:DMG:                         {
+          [1685104690.738122][30753:30755] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1685104690.738199][30753:30755] CHIP:DMG:                         },
+          [1685104690.738270][30753:30755] CHIP:DMG:
+          [1685104690.738330][30753:30755] CHIP:DMG:                 },
+          [1685104690.738400][30753:30755] CHIP:DMG:
+          [1685104690.738455][30753:30755] CHIP:DMG:         ],
+          [1685104690.738524][30753:30755] CHIP:DMG:
+          [1685104690.738579][30753:30755] CHIP:DMG:         InteractionModelRevision = 1
+          [1685104690.738632][30753:30755] CHIP:DMG: }
+          [1685104690.738790][30753:30755] CHIP:DMG: WriteClient moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 8: If the previous step is written, after a few seconds, TH
+          reads from the DUT the RockSetting attribute"
+      PICS: FAN.S.A0008
+      verification: |
+          Note : Execute only if STEP 7 resulted with SUCCESS
+
+          ./chip-tool fancontrol read rock-setting 1 1
+
+          On TH(chip-tool), Verify the RockSetting attribute value as 4.
+
+          Current sample apps do not have RockSupport attribute bit 2 . However, if the vendor has implemented it, the below response will be displayed.
+
+          [1689757942.179085][23325:23327] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0202 Attribute 0x0000_0008 DataVersion: 1958137195
+          [1689757942.179162][23325:23327] CHIP:TOO:   RockSetting: 4
+      disabled: true

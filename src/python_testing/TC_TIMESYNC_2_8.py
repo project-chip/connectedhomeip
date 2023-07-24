@@ -17,7 +17,7 @@
 
 import time
 import typing
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -174,7 +174,23 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         local = await self.read_ts_attribute_expect_success(local_attr)
         compare_time(received=local, offset=timedelta(seconds=-3600), tolerance=timedelta(seconds=5))
 
-        self.print_step(27, "Send SetDSTOffset command")
+        self.print_step(27, "Send SetDSTOffset command with DST starting in the future")
+        valid = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
+        dst = [dst_struct(offset=3600, validStarting=valid, validUntil=NullValue)]
+        await self.send_set_dst_cmd(dst)
+
+        self.print_step(28, "Read Localtime")
+        local = await self.read_ts_attribute_expect_success(local_attr)
+        compare_time(received=local, offset=timedelta(seconds=0), tolerance=timedelta(seconds=5))
+
+        self.print_step(29, "Wait 15s")
+        time.sleep(15)
+
+        self.print_step(30, "Read Localtime")
+        local = await self.read_ts_attribute_expect_success(local_attr)
+        compare_time(received=local, offset=timedelta(seconds=3600), tolerance=timedelta(seconds=5))
+
+        self.print_step(31, "Send SetDSTOffset command")
         dst = [dst_struct(offset=0, validStarting=0, validUntil=NullValue)]
         await self.send_set_dst_cmd(dst)
 

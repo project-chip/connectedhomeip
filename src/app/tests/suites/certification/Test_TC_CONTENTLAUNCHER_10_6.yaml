@@ -29,7 +29,7 @@ tests:
           Commission TH to DUT, if not done so already. In some cases, such as with a Casting Video Player, the TH commissions the DUT.
       disabled: true
 
-    - label: "DUT sends LaunchURL command to TH"
+    - label: "Step 1: DUT sends LaunchURL command to TH"
       PICS: CONTENTLAUNCHER.C.C01.Tx
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
@@ -37,9 +37,7 @@ tests:
           ./chip-tool contentlauncher launch-url 'https://www.foo.com' '{"providerName": "provider"}' 1 1
           ./chip-tv-casting-app contentlauncher launch-url 'https://www.foo.com' '{"providerName": "provider"}' 1 1
 
-
-          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
-
+          On TH (tv-app), Verify the  launch url command is received successfully.
           [1658531502040] [21924:325733] CHIP: [DMG] InvokeRequestMessage =
           [1658531502040] [21924:325733] CHIP: [DMG] {
           [1658531502040] [21924:325733] CHIP: [DMG]         suppressResponse = false,

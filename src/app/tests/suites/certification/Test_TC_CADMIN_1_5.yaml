@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    24.1.5. [TC-CADMIN-1.5] Commissioning window handling timeout and revocation
+    4.1.5. [TC-CADMIN-1.5] Commissioning window handling timeout and revocation
     using ECM [DUT - Commissionee]
 
 PICS:
@@ -31,15 +31,15 @@ tests:
           Reset Devices to factory defaults
       disabled: true
 
-    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+    - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
           "1. Provision the DUT_CE (all-cluster-app) device using TH_CR1 (chip-tool ) on the raspi"
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+          "Step 2: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
       verification: |
           On TH_CR1 send the below command
@@ -61,7 +61,7 @@ tests:
           [1635864513.699685][3850:3855] CHIP:IN: Prepared plaintext message 0xffff8a7cd960 to 0x0000000000000000 of type
       disabled: true
 
-    - label: "DNS-SD records shows DUT_CE advertising"
+    - label: "Step 3: DNS-SD records shows DUT_CE advertising"
       verification: |
           On TH_CR1 send the below command
 
@@ -75,7 +75,7 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE after
+          "Step 4: TH_CR2 starts a commissioning process with DUT_CE after
           PIXIT.CADMIN.CwDuration (that was given in step 2) + 10 seconds"
       PICS: CADMIN.S.C00.Rsp
       verification: |
@@ -95,7 +95,7 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 opens a new commissioning window on DUT_CE using a
+          "Step 5: TH_CR1 opens a new commissioning window on DUT_CE using a
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
       verification: |
@@ -119,7 +119,7 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 revokes the commissioning window on DUT_CE using
+          "Step 6: TH_CR1 revokes the commissioning window on DUT_CE using
           RevokeCommissioning command"
       PICS: CADMIN.S.C02.Rsp
       verification: |
@@ -143,7 +143,7 @@ tests:
           [1648115245106] [6681:3894448] CHIP: [DMG]                                 },
       disabled: true
 
-    - label: "TH_CR2 starts a commissioning process with DUT_CE"
+    - label: "Step 7: TH_CR2 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
           On TH_CR2 send the below command
@@ -162,7 +162,7 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 revokes the commissioning window on DUT_CE using
+          "Step 8: TH_CR1 revokes the commissioning window on DUT_CE using
           RevokeCommissioning command"
       PICS: CADMIN.S.C02.Rsp
       verification: |
@@ -186,8 +186,8 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 writes and reads the Basic Information Clusters NodeLabel
-          mandatory attribute of DUT_CE"
+          "Step 9: TH_CR1 writes and reads the Basic Information Clusters
+          NodeLabel mandatory attribute of DUT_CE"
       PICS: BINFO.S.A0005
       verification: |
           On TH_CR1 send the below command
@@ -221,12 +221,14 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 opens a new commissioning window on DUT_CE using a
+          "Step 10: TH_CR1 opens a new commissioning window on DUT_CE using a
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM but
           with wrong PakeVerifier value"
       PICS: CADMIN.S.C00.Rsp
       verification: |
           On TH_CR1 send the below command
+          Below is example command by considering the "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd " as a wrong PakeVerifier value
+
 
           ./chip-tool administratorcommissioning open-commissioning-window 200 \x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd 3841 1000 16  1 0 --timedInteractionTimeoutMs 1000
 
@@ -250,7 +252,7 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 opens a new commissioning window on DUT_CE using a
+          "Step 11: TH_CR1 opens a new commissioning window on DUT_CE using a
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
       verification: |
@@ -274,7 +276,7 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 opens another commissioning window on DUT_CE using a
+          "Step 12: TH_CR1 opens another commissioning window on DUT_CE using a
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
       verification: |
@@ -299,7 +301,7 @@ tests:
           [1656405166.758014][5933:5938] CHIP:DMG:                         },
       disabled: true
 
-    - label: "TH_CR2 starts a commissioning process with DUT_CE"
+    - label: "Step 13: TH_CR2 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
           On TH_CR2 send the below command
@@ -312,8 +314,8 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 tries to revoke the commissioning window on DUT_CE using
-          RevokeCommissioning command"
+          "Step 14: TH_CR1 tries to revoke the commissioning window on DUT_CE
+          using RevokeCommissioning command"
       PICS: CADMIN.S.C02.Rsp
       verification: |
           On TH_CR1 send the below command
@@ -337,7 +339,7 @@ tests:
           [1656405166.758014][5933:5938] CHIP:DMG:                         },
       disabled: true
 
-    - label: "TH_CR3 starts a commissioning process with DUT_CE"
+    - label: "Step 15: TH_CR3 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
           On TH_CR3 send the below command

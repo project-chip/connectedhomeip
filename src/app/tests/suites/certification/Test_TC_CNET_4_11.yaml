@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    12.4.9. [TC-CNET-4.11] [Wi-Fi] Verification for ConnectNetwork Command
+    12.4.9. [TC-CNET-4.11] [WiFi] Verification for ConnectNetwork Command
     [DUT-Server]
 
 PICS:
@@ -81,12 +81,13 @@ tests:
           [1653478255.044428][27668:27673] CHIP:IN: Prepared secure message 0xffffa77ed958 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 5
       disabled: true
 
-    - label: "TH sends ArmFailSafe command to the DUT"
+    - label:
+          "Step 1: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 900"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 1 1 0
 
-          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
-
+          Via the TH (chip-tool),  Verify the DUT sends ArmFailSafe with timeout as 900 secs to the TH.
 
           [1653479952.284160][30473:30478] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1653479952.284231][30473:30478] CHIP:TOO:   ArmFailSafeResponse: {
@@ -98,13 +99,15 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Networks attribute from the DUT and saves the number of
-          entries as 'NumNetworks'"
+          "Step 2: TH reads Networks attribute from the DUT and saves the number
+          of entries as 'NumNetworks'"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify:
+          -the Networks attribute has NetworkID that contains value as PIXIT.CNET.WIFI_1ST_ ACCESSPOINT_SSID.
+          -that the connected status should be the type of bool value as TRUE.
 
           [1657733068.835240][7475:7480] CHIP:TOO:   Networks: 1 entries
           [1657733068.835354][7475:7480] CHIP:TOO:     [1]: {
@@ -114,16 +117,17 @@ tests:
       disabled: true
 
     - label:
-          "TH finds the index of the Networks list entry with NetworkID for
-          PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and saves it as
+          "Step 3: TH finds the index of the Networks list entry with NetworkID
+          for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and saves it as
           'Userwifi_netidx'"
       verification: |
 
       disabled: true
 
     - label:
-          "TH sends RemoveNetwork Command to the DUT with NetworkID field set to
-          PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and Breadcrumb field set to 1"
+          "Step 4: TH sends RemoveNetwork Command to the DUT with NetworkID
+          field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field
+          set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your 1st network id in hex> 1 0
@@ -132,7 +136,7 @@ tests:
 
           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1  0 --Breadcrumb 1
 
-          Verify "NetworkConfigResponse and its arguments" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 0 (success).
 
           [1657290079.168208][2668:2673] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
           [1657290079.168273][2668:2673] CHIP:TOO:   NetworkConfigResponse: {
@@ -142,10 +146,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends AddOrUpdateWiFi Network command to the DUT with SSID field
-          set to PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN T_SSID, Credentials field set
-          to PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN T_CREDENTIALS and Breadcrumb field
-          set to 1"
+          "Step 5: TH sends AddOrUpdateWiFiNetwork command to the DUT with SSID
+          field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, Credentials field
+          set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb
+          field set to 1"
       PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
           ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:<your network id in hex> 1 0
@@ -154,7 +158,7 @@ tests:
 
           ./chip-tool networkcommissioning add-or-update-wi-fi-network Sbee_Moto Sunsuraj 1 0 --Breadcrumb 1 ( second network)
 
-          Verify "NetworkConfigResponse and its arguments" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 0 (success).
 
           [1657288838.207746][2455:2460] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
           [1657288838.207816][2455:2460] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
@@ -164,12 +168,14 @@ tests:
           [1657288838.208068][2455:2460] CHIP:TOO:    }
       disabled: true
 
-    - label: "TH reads Networks attribute from the DUT"
+    - label: "Step 6: TH reads Networks attribute from the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify:
+          -the Networks attribute has NetworkID that contains value as PIXIT.CNET.WIFI_2ND_ ACCESSPOINT_SSID.
+          -that the connected status should be the type of bool value as FALSE.
 
           [1657733345.351745][7595:7600] CHIP:TOO:   Networks: 1 entries
           [1657733345.351888][7595:7600] CHIP:TOO:     [1]: {
@@ -179,9 +185,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ConnectNetwork command to the DUT with NetworkID field set
-          to PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN T_SSID and Breadcrumb field set to
-          2"
+          "Step 7: TH sends ConnectNetwork command to the DUT with NetworkID
+          field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field
+          set to 2"
       PICS: CNET.S.C06.Rsp
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your second network id in hex> 1 0
@@ -190,8 +196,7 @@ tests:
 
           ./chip-tool networkcommissioning connect-network hex:536265655F4D6F746F 1 0 --Breadcrumb 2 (second network)
 
-          Verify "NetworkConfigResponse and its arguments" on the TH(Chip-tool) Log:
-
+          Via the TH (chip-tool), Verify the ConnectNetworkResponse that contains Networking Status value as 0 (success).
 
           [1653479953.633815][30491:30496] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
           [1653479953.633986][30491:30496] CHIP:TOO:   ConnectNetworkResponse: {
@@ -203,20 +208,21 @@ tests:
       disabled: true
 
     - label:
-          "TH changes its WiFi connection to
+          "Step 8: TH changes its WiFi connection to
           PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"
       verification: |
           Make sure TH also joins the 2nd Wifi network to have a connectivity to the DUT.
       disabled: true
 
     - label:
-          "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_
-          2ND_ACCESSPOIN T_SSID operational network"
+          "Step 9: TH discovers and connects to DUT on the
+          PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network"
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
-
+          Via the TH (chip-tool), Verify:
+          -the Networks attribute has NetworkID that contains value as PIXIT.CNET.WIFI_2ND_ ACCESSPOINT_SSID.
+          -that the connected status should be the type of bool value as TRUE.
 
           [1657733596.457792][7640:7645] CHIP:TOO:   Networks: 1 entries
           [1657733596.457867][7640:7645] CHIP:TOO:     [1]: {
@@ -226,29 +232,27 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Breadcrumb attribute from the General Commissioning cluster
-          of the DUT"
+          "Step 10: TH reads Breadcrumb attribute from the General Commissioning
+          cluster of the DUT"
       PICS: CNET.S.C06.Rsp
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
-          Verify "Breadcrumb: 2" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the Breadcumb attribute that contains value as 2.
 
           [1657733618.370511][7653:7658] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2956231097
           [1657733618.370581][7653:7658] CHIP:TOO:   Breadcrumb: 2
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
-          to 0. This forcibly disarms the fail-safe and is expected to cause the
-          changes of configuration to NetworkCommissi oning cluster done so far
-          to be reverted."
+          "Step 11: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 0. This forcibly disarms the fail-safe and
+          is expected to cause the changes of configuration to
+          NetworkCommissioning cluster done so far to be reverted."
       verification: |
-          Mark as not applicable and proceed to next step
-
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
 
-          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool),  Verify the DUT sends ArmFailSafe with timeout as 0 secs to the TH.
 
           [1657289119.775902][2519:2524] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1657289119.775973][2519:2524] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -259,36 +263,32 @@ tests:
       disabled: true
 
     - label:
-          "TH changes its WiFi connection to PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT
-          _SSID"
+          "Step 12 & 13: TH changes its WiFi connection to
+          PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and TH discovers and connects to
+          DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network"
       verification: |
-          Mark as not applicable and proceed to next step
-      disabled: true
-
-    - label:
-          "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_
-          1ST_ACCESSPOINT _SSID operational network"
-      verification: |
-          Mark as not applicable and proceed to next step
-
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify:
+          -the Networks attribute has NetworkID that should be as PIXIT.CNET.WIFI_1ST_ ACCESSPOINT_SSID.
+          -that the connected status should be the type of bool value as TRUE.
 
-          [1657881740.139492][3022:3027] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 4005581086
-          [1657881740.139598][3022:3027] CHIP:TOO:   Networks: 0 entries
-          [1657881740.139716][3022:3027] CHIP:EM: Sending Standalone Ack for MessageCounter:261851669 on exchange 34342i
+          [1684497703.596528][3941:3943] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 873070909
+          [1684497703.596592][3941:3943] CHIP:TOO:   Networks: 1 entries
+          [1684497703.596640][3941:3943] CHIP:TOO:     [1]: {
+          [1684497703.596668][3941:3943] CHIP:TOO:       NetworkID: 47524C50726976617465
+          [1684497703.596697][3941:3943] CHIP:TOO:       Connected: FALSE
+          [1684497703.596721][3941:3943] CHIP:TOO:      }
+          [1684497703.596882][3941:3943] CHIP:EM: <<< [E:51584i S:48726 M:88313254 (Ack:206238679)] (S) Msg TX to 1:0000000000000001 [3A8F] --- Type 0000:10 (SecureChannel:StandaloneAck)
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
-          to 900"
+          "Step 14: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 900"
       verification: |
-          Mark as not applicable and proceed to next step
+          ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
 
-           ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
-
-          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool),  Verify the DUT sends ArmFailSafe with timeout of 900 secs to the TH.
 
           [1657289228.311622][2529:2534] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1657289228.311668][2529:2534] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -299,41 +299,41 @@ tests:
       disabled: true
 
     - label:
-          "TH sends RemoveNetwork Command to the DUT with NetworkID field set to
-          PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and Breadcrumb field set to 1"
+          "Step 15: TH sends RemoveNetwork Command to the DUT with NetworkID
+          field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field
+          set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
-          Mark as not applicable and proceed to next step
+          ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
 
-           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
           Below is an example:
           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1  0 --Breadcrumb 1
 
-          Verify "NetworkConfigResponse and its arguments" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 0 (success).
 
-          [1653479953.633815][30491:30496] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
-          [1653479953.633986][30491:30496] CHIP:TOO:   ConnectNetworkResponse: {
-          [1653479953.634133][30491:30496] CHIP:TOO:     networkingStatus: 0
-          [1653479953.634195][30491:30496] CHIP:TOO:     errorValue: null
-          [1653479953.634275][30491:30496] CHIP:TOO:    }
-          [1653479953.634367][30491:30496] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1653479953.634501][30491:30496] CHIP:EM: Sending Standalone Ack for MessageCounter:490923 on exchange 21425i
+          [1684497783.207292][4010:4012] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1684497783.207338][4010:4012] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1684497783.207481][4010:4012] CHIP:TOO:   NetworkConfigResponse: {
+          [1684497783.207531][4010:4012] CHIP:TOO:     networkingStatus: 0
+          [1684497783.207555][4010:4012] CHIP:TOO:     networkIndex: 0
+          [1684497783.207578][4010:4012] CHIP:TOO:    }
+          [1684497783.207635][4010:4012] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1684497783.207723][4010:4012] CHIP:EM: <<< [E:60874i S:60117 M:37627612 (Ack:227520870)] (S) Msg TX to 1:
       disabled: true
 
     - label:
-          "TH sends AddOrUpdateWiFi Network command to the DUT with SSID field
-          set to PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN T_SSID, Credentials field set
-          to PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN T_CREDENTIALS and Breadcrumb field
-          set to 1"
+          "Step 16: TH sends AddOrUpdateWiFiNetwork command to the DUT with SSID
+          field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, Credentials field
+          set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb
+          field set to 1"
       PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
-          Mark as not applicable and proceed to next step
+          ./chip-tool networkcommissioning add-or-update-wi-fi-network-network hex:<your network id in hex> 1 0
 
-           ./chip-tool networkcommissioning add-or-update-wi-fi-network-network hex:<your network id in hex> 1 0
           Below is an example:
           ./chip-tool networkcommissioning add-or-update-wi-fi-network Sbee_Moto Sunsuraj 1 0 --Breadcrumb 1 ( second network)
 
-          Verify "NetworkConfigResponse and its arguments" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 0 (success).
 
           [1657734444.832145][7736:7741] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
           [1657734444.832215][7736:7741] CHIP:TOO:   NetworkConfigResponse: {
@@ -344,16 +344,16 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ConnectNetwork command to the DUT with NetworkID field set
-          to PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN T_SSID and Breadcrumb field set to
-          3"
+          "Step 17: TH sends ConnectNetwork command to the DUT with NetworkID
+          field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field
+          set to 3"
       PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
           Below is an example:
           ./chip-tool networkcommissioning connect-network hex:536265655F4D6F746F 1 0 --Breadcrumb 3 (second network)
 
-          Verify "ConnectNetworkResponse and its arguments" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify the ConnectNetworkResponse that contains Networking Status value as 0 (success).
 
           [1657734624.698518][7768:7773] CHIP:TOO:   ConnectNetworkResponse: {
           [1657734624.698601][7768:7773] CHIP:TOO:     networkingStatus: 0
@@ -362,19 +362,15 @@ tests:
       disabled: true
 
     - label:
-          "TH changes its WiFi connection to PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN
-          T_SSID"
-      verification: |
-
-      disabled: true
-
-    - label:
-          "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_
-          2ND_ACCESSPOIN T_SSID operational network"
+          "Step 18 & 19: TH changes its WiFi connection to
+          PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and TH discovers and connects to
+          DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network"
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify:
+          -the Networks attribute has NetworkID that contains value as PIXIT.CNET.WIFI_2ND_ ACCESSPOINT_SSID.
+          -that the connected status should be the type of bool value as TRUE.
 
           [1657733596.457792][7640:7645] CHIP:TOO:   Networks: 1 entries
           [1657733596.457867][7640:7645] CHIP:TOO:     [1]: {
@@ -384,24 +380,23 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Breadcrumb attribute from the General Commissioning cluster
-          of the DUT"
+          "Step 20: TH reads Breadcrumb attribute from the General Commissioning
+          cluster of the DUT"
       PICS: CNET.S.C06.Rsp
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
-
-          Verify "Breadcrumb: 3" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify the Breadcumb attribute that contains value as 3.
 
           [1657734757.740003][7793:7798] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2956231102
           [1657734757.740140][7793:7798] CHIP:TOO:   Breadcrumb: 3
       disabled: true
 
-    - label: "TH sends the CommissioningCo mplete command to the DUT"
+    - label: "Step 21: TH sends the CommissioningComplete command to the DUT"
       verification: |
           ./chip-tool generalcommissioning commissioning-complete 1 0
 
-          Verify "CommissioningCompleteResponse and its arguments" on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), Verify the DUT sends CommissioningComplete command and the errorCode field is 0(OK).
 
           [1657734803.411199][7802:7808] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0005
           [1657734803.411256][7802:7808] CHIP:TOO:   CommissioningCompleteResponse: {
@@ -410,13 +405,14 @@ tests:
           [1657734803.411356][7802:7808] CHIP:TOO:    }
       disabled: true
 
-    - label: "TH reads Networks attribute from the DUT"
+    - label: "Step 23: TH reads Networks attribute from the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
-
+          Via the TH (chip-tool), Verify:
+          -the Networks attribute has NetworkID that should be as PIXIT.CNET.WIFI_2ND_ ACCESSPOINT_SSID.
+          -that the connected status should be the type of bool value as TRUE.
 
           [1657734855.925075][7819:7824] CHIP:TOO:   Networks: 1 entries
           [1657734855.925147][7819:7824] CHIP:TOO:     [1]: {

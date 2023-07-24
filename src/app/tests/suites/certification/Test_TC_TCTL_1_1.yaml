@@ -1,0 +1,131 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 178.1.1. [TC-TCTL-1.1] Global attributes with DUT as Server
+
+PICS:
+    - TCTL.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute"
+      verification: |
+          ./chip-tool temperaturecontrol read cluster-revision 1 1
+          Verify the "ClusterRevision" value is of unit16 and reflects the highest revision number 1 on the TH(Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1689770372.878629][9188:9190] CHIP:DMG: }
+          [1689770372.878690][9188:9190] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_FFFD DataVersion: 2844459846
+          [1689770372.878714][9188:9190] CHIP:TOO:   ClusterRevision: 1
+          [1689770372.878763][9188:9190] CHIP:EM: <<< [E:16332i S:45296 M:45197941 (Ack:243112600)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1689770372.878774][9188:9190] CHIP:IN: (S) Sending msg 45197941 on secure session with LSID: 45296
+          [1689770372.878797][9188:9190] CHIP:EM: Flushed pending ack for MessageCounter:243112600 on exchange 16332i
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
+      verification: |
+          ./chip-tool temperaturecontrol read feature-map 1 1
+          On TH(chip-tool), verify that DUT responds the  Featuremap value as 2 and below is the sample log provided for the raspi platform:
+
+          [1689770405.503132][9196:9198] CHIP:DMG:         InteractionModelRevision = 1
+          [1689770405.503140][9196:9198] CHIP:DMG: }
+          [1689770405.503215][9196:9198] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_FFFC DataVersion: 2844459846
+          [1689770405.503248][9196:9198] CHIP:TOO:   FeatureMap: 2
+          [1689770405.503310][9196:9198] CHIP:EM: <<< [E:40699i S:20178 M:144688303 (Ack:177462983)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1689770405.503325][9196:9198] CHIP:IN: (S) Sending msg 144688303 on secure session with LSID: 20178
+          [1689770405.503372][9196:9198] CHIP:EM: Flushed pending ack for MessageCounter:177462983 on exchange 40699i
+      disabled: true
+
+    - label: "Step 4: TH reads from the DUT the AttributeList attribute."
+      verification: |
+          ./chip-tool temperaturecontrol read attribute-list 1 1
+
+          Verify " AttributeList " value consists the list of mandatory attributes (65533, 65532, 65531, 65529, 65528) and it may include the optional attributes(0, 1, 2,3,4 and 5) on the TH(Chip-tool) Log:
+          Below is the sample log provided for the raspi platform:
+          [1689770447.604182][9210:9212] CHIP:DMG:         InteractionModelRevision = 1
+          [1689770447.604188][9210:9212] CHIP:DMG: }
+          [1689770447.604313][9210:9212] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_FFFB DataVersion: 2844459846
+          [1689770447.604352][9210:9212] CHIP:TOO:   AttributeList: 8 entries
+          [1689770447.604362][9210:9212] CHIP:TOO:     [1]: 4
+          [1689770447.604369][9210:9212] CHIP:TOO:     [2]: 5
+          [1689770447.604384][9210:9212] CHIP:TOO:     [3]: 65528
+          [1689770447.604390][9210:9212] CHIP:TOO:     [4]: 65529
+          [1689770447.604396][9210:9212] CHIP:TOO:     [5]: 65530
+          [1689770447.604402][9210:9212] CHIP:TOO:     [6]: 65531
+          [1689770447.604409][9210:9212] CHIP:TOO:     [7]: 65532
+          [1689770447.604415][9210:9212] CHIP:TOO:     [8]: 65533
+          [1689770447.604475][9210:9212] CHIP:EM: <<< [E:34971i S:24852 M:231380196 (Ack:110557130)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1689770447.604489][9210:9212] CHIP:IN: (S) Sending msg 231380196 on secure session with LSID: 24852
+          [1689770447.604514][9210:9212] CHIP:EM: Flushed pending ack for MessageCounter:110557130 on exchange 34971i
+          [1689770447.604623][9210:9210] CHIP:CTL: Shutting down the commissioner
+      disabled: true
+
+    - label: "Step 5: TH reads from the DUT the AcceptedCommandList attribute."
+      verification: |
+          ./chip-tool temperaturecontrol read accepted-command-list 1 1
+
+          Verify " AcceptedCommandList " consists the list of all mandatory commands(0)  on the TH(Chip-tool) Log:
+          Below is the sample log provided for the raspi platform:
+
+          [1689770504.251374][9226:9228] CHIP:DMG:         InteractionModelRevision = 1
+          [1689770504.251377][9226:9228] CHIP:DMG: }
+          [1689770504.251408][9226:9228] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_FFF9 DataVersion: 2844459846
+          [1689770504.251418][9226:9228] CHIP:TOO:   AcceptedCommandList: 1 entries
+          [1689770504.251423][9226:9228] CHIP:TOO:     [1]: 0
+          [1689770504.251446][9226:9228] CHIP:EM: <<< [E:6933i S:52597 M:176057927 (Ack:264727649)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1689770504.251450][9226:9228] CHIP:IN: (S) Sending msg 176057927 on secure session with LSID: 52597
+          [1689770504.251461][9226:9228] CHIP:EM: Flushed pending ack for MessageCounter:264727649 on exchange 6933i
+      disabled: true
+
+    - label: "Step 6: TH reads from the DUT the GeneratedCommandList attribute."
+      verification: |
+          ./chip-tool temperaturecontrol read generated-command-list 1 1
+          Verify "  GeneratedCommandList " consists the list of supported events,  which for this cluster should be an empty list on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+
+
+          [1689770475.939806][9215:9217] CHIP:DMG:         InteractionModelRevision = 1
+          [1689770475.939807][9215:9217] CHIP:DMG: }
+          [1689770475.939834][9215:9217] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_FFF8 DataVersion: 2844459846
+          [1689770475.939846][9215:9217] CHIP:TOO:   GeneratedCommandList: 0 entries
+          [1689770475.939868][9215:9217] CHIP:EM: <<< [E:56043i S:30992 M:36313621 (Ack:205412119)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1689770475.939872][9215:9217] CHIP:IN: (S) Sending msg 36313621 on secure session with LSID: 30992
+          [1689770475.939880][9215:9217] CHIP:EM: Flushed pending ack for MessageCounter:205412119 on exchange 56043i
+      disabled: true
+
+    - label: "Step 7: TH reads from the DUT the EventList attribute."
+      verification: |
+          ./chip-tool temperaturecontrol read event-list 1 1
+          Verify "  EventList attribute " consists the list of supported events,  which for this cluster should be an empty list on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1689770528.788582][9233:9235] CHIP:DMG:         InteractionModelRevision = 1
+          [1689770528.788587][9233:9235] CHIP:DMG: }
+          [1689770528.788671][9233:9235] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_FFFA DataVersion: 2844459846
+          [1689770528.788703][9233:9235] CHIP:TOO:   EventList: 0 entries
+          [1689770528.788768][9233:9235] CHIP:EM: <<< [E:60387i S:1870 M:236365893 (Ack:64478273)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1689770528.788782][9233:9235] CHIP:IN: (S) Sending msg 236365893 on secure session with LSID: 1870
+          [1689770528.788826][9233:9235] CHIP:EM: Flushed pending ack for MessageCounter:64478273 on exchange 60387i
+          [1689770528.788927][9233:9233] CHIP:CTL: Shutting down the commissioner
+          [1689770528.788948][9233:9233] CHIP:CTL: Stopping commissioning discovery over DNS-SD
+      disabled: true

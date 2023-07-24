@@ -34,9 +34,22 @@
 #include <app/ReadHandler.h>
 #include <app/reporting/Engine.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/IcdManagementServer.h> // nogncheck
+#endif
+
 namespace chip {
 namespace app {
 using Status = Protocols::InteractionModel::Status;
+
+uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
+{
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    return static_cast<uint16_t>(IcdManagementServer::GetInstance().GetIdleModeInterval() / 1000);
+#else
+    return kSubscriptionMaxIntervalPublisherLimit;
+#endif
+}
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
                          InteractionType aInteractionType, Observer * observer) :
@@ -412,7 +425,6 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
     ChipLogError(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
                  ChipLogValueExchange(apExchangeContext));
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    // TODO: Have a retry mechanism tied to wake interval for IC devices
     Close(CloseOptions::kKeepPersistedSubscription);
 #else
     Close();

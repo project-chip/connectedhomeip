@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads EndProductType attribute from DUT"
+    - label: "Step 1: TH reads EndProductType attribute from DUT"
       command: "readAttribute"
       attribute: "EndProductType"
       PICS: WNCV.S.A000d

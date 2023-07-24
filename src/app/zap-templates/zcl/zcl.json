@@ -192,6 +192,14 @@
             "MaxGroupKeysPerFabric",
             "FeatureMap"
         ],
+        "ICD Management": [
+            "IdleModeInterval",
+            "ActiveModeInterval",
+            "ActiveModeThreshold",
+            "RegisteredClients",
+            "ICDCounter",
+            "ClientsSupportedPerFabric"
+        ],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",
@@ -304,6 +312,41 @@
             "DSTOffsetListMaxSize"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
+        "Dishwasher Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode",
+            "FeatureMap"
+        ],
+        "Laundry Washer Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode",
+            "FeatureMap"
+        ],
+        "Refrigerator And Temperature Controlled Cabinet Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode",
+            "FeatureMap"
+        ],
+        "RVC Clean Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode",
+            "FeatureMap"
+        ],
+        "RVC Run Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode",
+            "FeatureMap"
+        ],
         "Operational State": [
             "OperationalState",
             "OperationalError",
@@ -315,6 +358,24 @@
             "OperationalError",
             "CurrentPhase",
             "CountdownTime"
+        ],
+        "Activated Carbon Filter Monitoring": [
+            "Condition",
+            "DegradationDirection",
+            "ChangeIndication",
+            "InPlaceIndicator",
+            "LastChangedTime",
+            "ReplacementProductList",
+            "FeatureMap"
+        ],
+        "HEPA Filter Monitoring": [
+            "Condition",
+            "DegradationDirection",
+            "ChangeIndication",
+            "InPlaceIndicator",
+            "LastChangedTime",
+            "ReplacementProductList",
+            "FeatureMap"
         ]
     },
     "defaultReportingPolicy": "mandatory",

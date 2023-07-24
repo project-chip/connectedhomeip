@@ -8,7 +8,7 @@ ARG COMMITHASH=7b99e6399c6069037c613782d78132c69b9dcabb
 # ZAP Development install, so that it runs on both x64 and arm64
 # Generally this should match with the ZAP version that is used for codegen within the
 # specified SHA
-ARG ZAP_VERSION=v2023.05.22-nightly
+ARG ZAP_VERSION=v2023.07.21-nightly
 
 # Ensure TARGETPLATFORM is set
 RUN case ${TARGETPLATFORM} in \
@@ -203,14 +203,9 @@ WORKDIR /root/connectedhomeip/
 RUN git checkout ${COMMITHASH}
 RUN ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
 RUN bash scripts/bootstrap.sh
-SHELL ["/bin/bash", "-c"]
-RUN set -x && \
-    source scripts/activate.sh \
-    && gn gen out/debug --args='chip_mdns="platform" chip_inet_config_enable_ipv4=false' \
-    && ninja -C out/debug
 
 # Stage 2: Build.
-from chip-build-cert as chip-build-cert-bins
+FROM chip-build-cert as chip-build-cert-bins
 
 SHELL ["/bin/bash", "-c"]
 
@@ -222,6 +217,9 @@ RUN case ${TARGETPLATFORM} in \
     set -x \
     && source scripts/activate.sh \
     && scripts/build/build_examples.py \
+    --target linux-x64-chip-tool-ipv6only-platform-mdns \
+    --target linux-x64-shell-ipv6only-platform-mdns \
+    --target linux-x64-chip-cert-ipv6only-platform-mdns \
     --target linux-x64-all-clusters-ipv6only \
     --target linux-x64-all-clusters-minimal-ipv6only \
     --target linux-x64-bridge-ipv6only \
@@ -234,6 +232,9 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-lock-ipv6only \
     --target linux-x64-simulated-app1-ipv6only \
     build \
+    && mv out/linux-x64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
+    && mv out/linux-x64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
+    && mv out/linux-x64-chip-cert-ipv6only-platform-mdns/chip-cert out/chip-cert \
     && mv out/linux-x64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
     && mv out/linux-x64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
     && mv out/linux-x64-bridge-ipv6only/chip-bridge-app out/chip-bridge-app \
@@ -250,6 +251,9 @@ RUN case ${TARGETPLATFORM} in \
     set -x \
     && source scripts/activate.sh \
     && scripts/build/build_examples.py \
+    --target linux-arm64-chip-tool-ipv6only-platform-mdns \
+    --target linux-arm64-shell-ipv6only-platform-mdns \
+    --target linux-arm64-chip-cert-ipv6only-platform-mdns \
     --target linux-arm64-all-clusters-ipv6only \
     --target linux-arm64-all-clusters-minimal-ipv6only \
     --target linux-arm64-bridge-ipv6only \
@@ -262,6 +266,9 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-lock-ipv6only \
     --target linux-arm64-simulated-app1-ipv6only \
     build \
+    && mv out/linux-arm64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
+    && mv out/linux-arm64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
+    && mv out/linux-arm64-chip-cert-ipv6only-platform-mdns/chip-cert out/chip-cert \
     && mv out/linux-arm64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
     && mv out/linux-arm64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
     && mv out/linux-arm64-bridge-ipv6only/chip-bridge-app out/chip-bridge-app \
@@ -277,7 +284,7 @@ RUN case ${TARGETPLATFORM} in \
     *) ;; \
     esac
 
-RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i no
+RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true
 
 # Stage 3: Copy relevant cert bins to a minimal image to reduce size.
 FROM ubuntu:22.04
@@ -287,9 +294,9 @@ RUN apt-get update -y
 RUN apt-get install -y libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev avahi-utils iproute2 libcairo2-dev libgirepository1.0-dev python3-pip
 WORKDIR /root/
 COPY --from=chip-build-cert-bins /root/.sdk-sha-version .sdk-sha-version
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/debug/chip-tool chip-tool
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/debug/chip-shell chip-shell
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/debug/chip-cert chip-cert
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tool chip-tool
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-shell chip-shell
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-cert chip-cert
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app chip-all-clusters-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-minimal-app chip-all-clusters-minimal-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lighting-app chip-lighting-app
