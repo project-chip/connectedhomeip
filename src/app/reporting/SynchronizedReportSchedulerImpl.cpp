@@ -183,8 +183,6 @@ void SynchronizedReportSchedulerImpl::TimerFired()
 {
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 
-    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
-    ChipLogProgress(DataManagement, "Engine run at time: %" PRIu64 " for Handlers:", now.count());
     mNodesPool.ForEachActiveObject([](ReadHandlerNode * node) {
         if (node->IsReportableNow())
         {
