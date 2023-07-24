@@ -43,7 +43,7 @@ asr_sdk_sources("dishwasher_app_sdk_sources") {
   defines = [
     "ASR_LOG_ENABLED=1",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
-    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}"
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
   ]
 
   if (chip_enable_factory_data) {
@@ -71,6 +71,8 @@ asr_executable("dishwasher_app") {
   output_name = "chip-asr-dishwasher-example.out"
 
   sources = [
+    "${chip_root}/examples/dishwasher-app/dishwasher-common/src/operational-state-delegate-impl.cpp",
+    "${chip_root}/examples/dishwasher-app/dishwasher-common/src/operational-state-delegates.cpp",
     "${examples_plat_dir}/CHIPDeviceManager.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/init_Matter.cpp",
@@ -79,8 +81,6 @@ asr_executable("dishwasher_app") {
     "src/AppTask.cpp",
     "src/DeviceCallbacks.cpp",
     "src/main.cpp",
-    "${chip_root}/examples/dishwasher-app/dishwasher-common/src/operational-state-delegates.cpp",
-    "${chip_root}/examples/dishwasher-app/dishwasher-common/src/operational-state-delegate-impl.cpp",
   ]
 
   if (chip_enable_ota_requestor) {
