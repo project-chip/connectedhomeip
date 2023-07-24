@@ -763,7 +763,7 @@ public:
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMinReportingIntervalForTests(0));
         readHandler1->MoveToState(ReadHandler::HandlerState::GeneratingReports);
         syncScheduler.OnReadHandlerCreated(readHandler1);
-        // Forcing the dirty flag to  make the scheduler call Engine::ScheduleRun() immediately
+        // Forcing the dirty flag to make the scheduler call Engine::ScheduleRun() immediately
         readHandler1->ForceDirtyState();
         NL_TEST_ASSERT(aSuite, syncScheduler.IsReportableNow(readHandler1));
 
