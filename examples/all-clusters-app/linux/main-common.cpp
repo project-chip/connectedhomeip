@@ -212,4 +212,3 @@ void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
     Clusters::WindowCovering::SetDefaultDelegate(endpoint, &sWindowCoveringManager);
     Clusters::WindowCovering::ConfigStatusUpdateFeatures(endpoint);
 }
-
