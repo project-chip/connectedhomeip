@@ -161,7 +161,6 @@ ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
 
 } // namespace
 
-
 void ApplicationInit()
 {
     std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
@@ -182,7 +181,6 @@ void ApplicationInit()
     MatterOperationalStateServerInit();
 #endif
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
-
 }
 
 void ApplicationExit()
