@@ -147,8 +147,8 @@ void IdentifyTimerHandler(Layer * systemLayer, void * appState)
         identifyTimerCount--;
         systemLayer->StartTimer(Clock::Milliseconds32(kIdentifyTimerDelayMS), IdentifyTimerHandler, appState);
 
-        emberAfWriteAttribute(1, app::Clusters::Identify::Id, app::Clusters::Identify::Attributes::IdentifyTime::Id, (uint8_t *) &identifyTimerCount,
-                           sizeof(identifyTimerCount));
+        emberAfWriteAttribute(1, app::Clusters::Identify::Id, app::Clusters::Identify::Attributes::IdentifyTime::Id,
+                              (uint8_t *) &identifyTimerCount, sizeof(identifyTimerCount));
     }
 }
 

@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
-#include "operational-state-delegates.h"
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
+#include "operational-state-delegates.h"
 #include "qrcodegen.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
