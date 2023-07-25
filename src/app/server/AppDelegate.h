@@ -42,11 +42,16 @@ public:
      * This is called when there is an error in establishing a commissioning session (such as, when an invalid passcode is provided)
      *
      * @param err CHIP_ERROR indicating the error that occurred during session establishment
+     *
+     * @return true if the commissioning window should be closed, false otherwise
      */
-    virtual void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) {}
+    virtual bool OnCommissioningSessionEstablishmentError(CHIP_ERROR err) { return false; }
 
     /**
-     * This is called when the commissioning session establishment stops
+     * This is called in addition to OnCommissioningSessionEstablishmentError i.e. when there is an error in establishing a
+     * commissioning session AND the commissioning window is closed. The window may be closed because
+     * OnCommissioningSessionEstablishmentError returned 'true', the commissioning attempts limit was reached or listening for PASE
+     * failed.
      */
     virtual void OnCommissioningSessionStopped() {}
 
