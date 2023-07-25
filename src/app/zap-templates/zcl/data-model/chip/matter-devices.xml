@@ -1997,12 +1997,9 @@ limitations under the License.
         <deviceId editable="false">0x0074</deviceId>
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>IDENTIFY_TIME</requireAttribute>
-                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
-                <requireCommand>Identify</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="RVC Run Mode" client="false" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="RVC Run Mode" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="RVC Clean Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="RVC Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
