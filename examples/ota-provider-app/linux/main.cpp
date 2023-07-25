@@ -380,6 +380,8 @@ void ApplicationInit()
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &gOtaProvider);
 }
 
+void ApplicationShutdown() {}
+
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions) == 0);

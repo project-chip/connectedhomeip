@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,4 +18,26 @@
 
 #pragma once
 
-void ApplicationExit();
+#include <stdbool.h>
+#include <stdint.h>
+
+#include <lega_rtos_api.h>
+#include <platform/CHIPDeviceLayer.h>
+
+class AppTask
+{
+
+public:
+    CHIP_ERROR StartAppTask();
+    static void AppTaskMain(void * pvParameter);
+
+private:
+    friend AppTask & GetAppTask(void);
+
+    static AppTask sAppTask;
+};
+
+inline AppTask & GetAppTask(void)
+{
+    return AppTask::sAppTask;
+}
