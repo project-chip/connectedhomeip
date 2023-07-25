@@ -9253,6 +9253,14 @@ PICS:
 
     ##  Dishwasher Alarm Cluster
 
+    - label:
+          "Does the device implement the Dishwasher Alarm cluster as a server?"
+      id: DISHALM.S
+
+    - label:
+          "Does the device implement the Dishwasher Alarm cluster as a client?"
+      id: DISHALM.C
+      
     # Features
     - label: "Does the device support the Reset command"
       id: DISHALM.S.F00
