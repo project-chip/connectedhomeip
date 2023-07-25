@@ -41,14 +41,13 @@ class LaundryWasherControlDelegate : public Delegate
 
 public:
     CHIP_ERROR GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed);
-    CHIP_ERROR GetSupportedRinseAtIndex(size_t index,  NumberOfRinsesEnum & supportedRinse);
+    CHIP_ERROR GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse);
 
     ~LaundryWasherControlDelegate(){};
     LaundryWasherControlDelegate(){};
 
     static inline LaundryWasherControlDelegate & getLaundryWasherControlDelegate() { return instance; }
 };
-
 
 } // namespace LaundryWasherControls
 } // namespace Clusters

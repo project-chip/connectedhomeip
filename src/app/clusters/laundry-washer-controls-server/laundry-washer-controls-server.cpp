@@ -83,8 +83,7 @@ LaundryWasherControlsServer & LaundryWasherControlsServer::Instance()
     return sInstance;
 }
 
-EmberAfStatus LaundryWasherControlsServer::SetSpinSpeedCurrent(EndpointId endpointId,
-                                                               DataModel::Nullable<uint8_t> spinSpeedCurrent)
+EmberAfStatus LaundryWasherControlsServer::SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> spinSpeedCurrent)
 {
     DataModel::Nullable<uint8_t> spinSpeedCurrentNow;
     EmberAfStatus res = SpinSpeedCurrent::Get(endpointId, spinSpeedCurrentNow);

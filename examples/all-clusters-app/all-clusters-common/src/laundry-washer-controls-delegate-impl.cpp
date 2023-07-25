@@ -1,6 +1,6 @@
+#include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/util/config.h>
 #include <laundry-washer-controls-delegate-impl.h>
-#include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 
 using namespace std;
 using namespace chip;
@@ -24,15 +24,17 @@ LaundryWasherControlDelegate LaundryWasherControlDelegate::instance;
 
 CHIP_ERROR LaundryWasherControlDelegate::GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed)
 {
-    if (index >= ArraySize(spinSpeedsNameOptions)) {
+    if (index >= ArraySize(spinSpeedsNameOptions))
+    {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
     return chip::CopyCharSpanToMutableCharSpan(LaundryWasherControlDelegate::spinSpeedsNameOptions[index], spinSpeed);
 }
 
-CHIP_ERROR LaundryWasherControlDelegate::GetSupportedRinseAtIndex(size_t index,  NumberOfRinsesEnum & supportedRinse)
+CHIP_ERROR LaundryWasherControlDelegate::GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse)
 {
-    if (index >= ArraySize(supportRinsesOptions)) {
+    if (index >= ArraySize(supportRinsesOptions))
+    {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
     supportedRinse = LaundryWasherControlDelegate::supportRinsesOptions[index];
