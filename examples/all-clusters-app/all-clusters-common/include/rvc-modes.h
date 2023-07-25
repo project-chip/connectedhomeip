@@ -66,6 +66,8 @@ public:
     ~RvcRunModeDelegate() override = default;
 };
 
+void Shutdown();
+
 } // namespace RvcRunMode
 
 namespace RvcCleanMode {
@@ -106,6 +108,8 @@ private:
 public:
     ~RvcCleanModeDelegate() override = default;
 };
+
+void Shutdown();
 
 } // namespace RvcCleanMode
 

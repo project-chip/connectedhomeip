@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include "main-common.h"
 #include "AllClustersCommandDelegate.h"
 #include "WindowCoveringManager.h"
 #include "dishwasher-mode.h"
@@ -191,8 +190,15 @@ void ApplicationInit()
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
-void ApplicationExit()
+void ApplicationShutdown()
 {
+    // These may have been initialised via the emberAfXxxClusterInitCallback methods. We need to destroy them before shutdown.
+    Clusters::DishwasherMode::Shutdown();
+    Clusters::LaundryWasherMode::Shutdown();
+    Clusters::RvcCleanMode::Shutdown();
+    Clusters::RvcRunMode::Shutdown();
+    Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Shutdown();
+
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
