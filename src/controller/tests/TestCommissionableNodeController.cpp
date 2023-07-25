@@ -49,6 +49,9 @@ public:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+    CHIP_ERROR StartBrowse(Optional<uint64_t> compressedFabricIdFilter) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StartBrowse() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StopBrowse() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     CHIP_ERROR InitStatus                  = CHIP_NO_ERROR;
     CHIP_ERROR ResolveNodeIdStatus         = CHIP_NO_ERROR;

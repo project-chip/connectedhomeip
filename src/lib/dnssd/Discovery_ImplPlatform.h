@@ -62,6 +62,9 @@ public:
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR StopDiscovery() override;
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
+    CHIP_ERROR StartBrowse(Optional<uint64_t> compressedFabricIdFilter) override;
+    CHIP_ERROR StartBrowse() override;
+    CHIP_ERROR StopBrowse() override;
 
     static DiscoveryImplPlatform & GetInstance();
 

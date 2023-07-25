@@ -318,7 +318,7 @@ ResolveContext * MdnsContexts::GetExistingResolveForInstanceName(const char * in
     return nullptr;
 }
 
-BrowseWithDelegateContext * MdnsContexts::GetExistingBrowseForDelegate(DnssdBrowseDelegate * delegate)
+BrowseWithDelegateContext * MdnsContexts::GetExistingBrowseForDelegate(BrowseDelegate * delegate)
 {
     for (auto & ctx : mContexts)
     {
@@ -426,7 +426,7 @@ void BrowseContext::OnBrowseRemove(const char * name, const char * type, const c
                    services.end());
 }
 
-BrowseWithDelegateContext::BrowseWithDelegateContext(DnssdBrowseDelegate * delegate, DnssdServiceProtocol cbContextProtocol)
+BrowseWithDelegateContext::BrowseWithDelegateContext(BrowseDelegate * delegate, DnssdServiceProtocol cbContextProtocol)
 {
     type     = ContextType::BrowseWithDelegate;
     context  = static_cast<void *>(delegate);
@@ -437,14 +437,14 @@ void BrowseWithDelegateContext::DispatchFailure(const char * errorStr, CHIP_ERRO
 {
     ChipLogError(Discovery, "Mdns: Browse failure (%s)", errorStr);
 
-    auto delegate = static_cast<DnssdBrowseDelegate *>(context);
+    auto delegate = static_cast<BrowseDelegate *>(context);
     delegate->OnBrowseStop(err);
     MdnsContexts::GetInstance().Remove(this);
 }
 
 void BrowseWithDelegateContext::DispatchSuccess()
 {
-    auto delegate = static_cast<DnssdBrowseDelegate *>(context);
+    auto delegate = static_cast<BrowseDelegate *>(context);
     delegate->OnBrowseStop(CHIP_NO_ERROR);
     MdnsContexts::GetInstance().Remove(this);
 }
@@ -462,9 +462,17 @@ void BrowseWithDelegateContext::OnBrowseAdd(const char * name, const char * type
 
     VerifyOrReturn(IsLocalDomain(domain));
 
-    auto delegate = static_cast<DnssdBrowseDelegate *>(context);
-    auto service  = GetService(name, type, protocol, interfaceId);
-    delegate->OnBrowseAdd(service);
+    auto typeWithoutDomain = GetStrWithoutDomain(type);
+    auto protocol          = GetProtocolType(typeWithoutDomain);
+    VerifyOrReturn(protocol == DnssdServiceProtocol::kDnssdProtocolUdp || protocol == DnssdServiceProtocol::kDnssdProtocolTcp);
+
+    NodeBrowseData nodeData;
+    chip::Platform::CopyString(nodeData.mName, name);
+    nodeData.mInterfaceId = chip::Inet::InterfaceId(interfaceId);
+    nodeData.protocol     = protocol;
+
+    auto delegate = static_cast<BrowseDelegate *>(context);
+    delegate->OnBrowseAdd(nodeData);
 }
 
 void BrowseWithDelegateContext::OnBrowseRemove(const char * name, const char * type, const char * domain, uint32_t interfaceId)
@@ -475,9 +483,17 @@ void BrowseWithDelegateContext::OnBrowseRemove(const char * name, const char * t
     VerifyOrReturn(name != nullptr);
     VerifyOrReturn(IsLocalDomain(domain));
 
-    auto delegate = static_cast<DnssdBrowseDelegate *>(context);
-    auto service  = GetService(name, type, protocol, interfaceId);
-    delegate->OnBrowseRemove(service);
+    auto typeWithoutDomain = GetStrWithoutDomain(type);
+    auto protocol          = GetProtocolType(typeWithoutDomain);
+    VerifyOrReturn(protocol == DnssdServiceProtocol::kDnssdProtocolUdp || protocol == DnssdServiceProtocol::kDnssdProtocolTcp);
+
+    NodeBrowseData nodeData;
+    chip::Platform::CopyString(nodeData.mName, name);
+    nodeData.mInterfaceId = chip::Inet::InterfaceId(interfaceId);
+    nodeData.protocol     = protocol;
+
+    auto delegate = static_cast<BrowseDelegate *>(context);
+    delegate->OnBrowseRemove(nodeData);
 }
 
 ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,

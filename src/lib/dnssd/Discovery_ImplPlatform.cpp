@@ -680,6 +680,24 @@ CHIP_ERROR DiscoveryImplPlatform::ReconfirmRecord(const char * hostname, Inet::I
     return mResolverProxy.ReconfirmRecord(hostname, address, interfaceId);
 }
 
+CHIP_ERROR DiscoveryImplPlatform::StartBrowse(Optional<uint64_t> compressedFabricIdFilter)
+{
+    ReturnErrorOnFailure(InitImpl());
+    return mResolverProxy.StartBrowse(compressedFabricIdFilter);
+}
+
+CHIP_ERROR DiscoveryImplPlatform::StartBrowse()
+{
+    ReturnErrorOnFailure(InitImpl());
+    return mResolverProxy.StartBrowse();
+}
+
+CHIP_ERROR DiscoveryImplPlatform::StopBrowse()
+{
+    ReturnErrorOnFailure(InitImpl());
+    return mResolverProxy.StopBrowse();
+}
+
 DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
 {
     return sManager;
@@ -806,6 +824,55 @@ CHIP_ERROR ResolverProxy::StopDiscovery()
 CHIP_ERROR ResolverProxy::ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId)
 {
     return ChipDnssdReconfirmRecord(hostname, address, interfaceId);
+}
+
+CHIP_ERROR ResolverProxy::StartBrowse(Optional<uint64_t> compressedFabricIdFilter)
+{
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+    char serviceName[kMaxOperationalServiceNameSize];
+    auto filter = DiscoveryFilter(DiscoveryFilterType::kNone);
+    if (compressedFabricIdFilter.HasValue())
+    {
+        filter = DiscoveryFilter(DiscoveryFilterType::kCompressedFabricId, compressedFabricIdFilter.Value());
+    }
+    auto type     = DiscoveryType::kOperational;
+    auto protocol = DnssdServiceProtocol::kDnssdProtocolTcp;
+
+    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, type));
+    ReturnErrorOnFailure(ChipDnssdBrowse(serviceName, protocol, Inet::IPAddressType::kAny, Inet::InterfaceId::Null(),
+                                         static_cast<BrowseDelegate *>(mDelegate)));
+
+    return CHIP_NO_ERROR;
+#else  // CHIP_DEVICE_LAYER_TARGET_DARWIN
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
+}
+
+CHIP_ERROR ResolverProxy::StartBrowse()
+{
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+    char serviceName[kMaxCommissionableServiceNameSize];
+    auto filter   = DiscoveryFilterType::kNone;
+    auto type     = DiscoveryType::kCommissionableNode;
+    auto protocol = DnssdServiceProtocol::kDnssdProtocolUdp;
+
+    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, type));
+    ReturnErrorOnFailure(ChipDnssdBrowse(serviceName, protocol, Inet::IPAddressType::kAny, Inet::InterfaceId::Null(),
+                                         static_cast<BrowseDelegate *>(mDelegate)));
+
+    return CHIP_NO_ERROR;
+#else  // CHIP_DEVICE_LAYER_TARGET_DARWIN
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
+}
+
+CHIP_ERROR ResolverProxy::StopBrowse()
+{
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+    return ChipDnssdStopBrowse(static_cast<BrowseDelegate *>(mDelegate));
+#else  // CHIP_DEVICE_LAYER_TARGET_DARWIN
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 }
 
 } // namespace Dnssd

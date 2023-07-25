@@ -291,6 +291,9 @@ public:
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR StopDiscovery() override;
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
+    CHIP_ERROR StartBrowse(Optional<uint64_t> compressedFabricIdFilter) override;
+    CHIP_ERROR StartBrowse() override;
+    CHIP_ERROR StopBrowse() override;
 
 private:
     OperationalResolveDelegate * mOperationalDelegate     = nullptr;
@@ -692,6 +695,21 @@ CHIP_ERROR MinMdnsResolver::ReconfirmRecord(const char * hostname, Inet::IPAddre
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR MinMdnsResolver::StartBrowse(Optional<uint64_t> compressedFabricIdFilter)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR MinMdnsResolver::StartBrowse()
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR MinMdnsResolver::StopBrowse()
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filter)
 {
     mActiveResolves.MarkPending(filter, type);
@@ -791,6 +809,27 @@ CHIP_ERROR ResolverProxy::StopDiscovery()
 CHIP_ERROR ResolverProxy::ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ResolverProxy::StartBrowse(Optional<uint64_t> compressedFabricIdFilter)
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chip::Dnssd::Resolver::Instance().SetBrowseDelegate(mDelegate);
+    return chip::Dnssd::Resolver::Instance().StartBrowse(compressedFabricIdFilter);
+}
+
+CHIP_ERROR ResolverProxy::StartBrowse()
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chip::Dnssd::Resolver::Instance().SetBrowseDelegate(mDelegate);
+    return chip::Dnssd::Resolver::Instance().StartBrowse();
+}
+
+CHIP_ERROR ResolverProxy::StopBrowse()
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chip::Dnssd::Resolver::Instance().SetBrowseDelegate(mDelegate);
+    return chip::Dnssd::Resolver::Instance().StopBrowse();
 }
 
 } // namespace Dnssd

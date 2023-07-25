@@ -202,7 +202,7 @@ CHIP_ERROR Browse(void * context, DnssdBrowseCallback callback, uint32_t interfa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Browse(DnssdBrowseDelegate * delegate, uint32_t interfaceId, const char * type, DnssdServiceProtocol protocol)
+CHIP_ERROR Browse(BrowseDelegate * delegate, uint32_t interfaceId, const char * type, DnssdServiceProtocol protocol)
 {
     auto sdCtx = chip::Platform::New<BrowseWithDelegateContext>(delegate, protocol);
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
@@ -415,7 +415,7 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                           chip::Inet::InterfaceId interface, DnssdBrowseDelegate * delegate)
+                           chip::Inet::InterfaceId interface, BrowseDelegate * delegate)
 {
     VerifyOrReturnError(type != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -426,7 +426,7 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
     return Browse(delegate, interfaceId, regtype.c_str(), protocol);
 }
 
-CHIP_ERROR ChipDnssdStopBrowse(DnssdBrowseDelegate * delegate)
+CHIP_ERROR ChipDnssdStopBrowse(BrowseDelegate * delegate)
 {
     auto existingCtx = MdnsContexts::GetInstance().GetExistingBrowseForDelegate(delegate);
     if (existingCtx == nullptr)

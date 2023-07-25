@@ -33,10 +33,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/dnssd/Constants.h>
+#include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <system/TimeSource.h>
-
-#include "DnssdBrowseDelegate.h"
 
 namespace chip {
 namespace Dnssd {
@@ -244,13 +243,13 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier);
  *
  */
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                           chip::Inet::InterfaceId interface, DnssdBrowseDelegate * delegate);
+                           chip::Inet::InterfaceId interface, BrowseDelegate * delegate);
 
 /**
  * Stop an ongoing browse, if supported by this backend.  If successful, this
  * will call the OnBrowseStop method of the delegate.
  */
-CHIP_ERROR ChipDnssdStopBrowse(DnssdBrowseDelegate * delegate);
+CHIP_ERROR ChipDnssdStopBrowse(BrowseDelegate * delegate);
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
 /**

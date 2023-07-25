@@ -493,6 +493,29 @@ public:
     virtual CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) = 0;
 
     /**
+     * @brief Start Browsing for operational devices.
+     *
+     * This will start periodical browsing of devices. When a new operational node is
+     * found the delegate set with SetBrowseDelegate is called. The mDNS queryies
+     * will continue until StopBrowse is called.
+     */
+    virtual CHIP_ERROR StartBrowse(Optional<uint64_t> compressedFabricIdFilter) = 0;
+
+    /**
+     * @brief Start Browsing for commissionable devices.
+     *
+     * This will start periodical browsing of devices. When a new commissionable node is
+     * found the delegate set with SetBrowseDelegate is called. The mDNS queryies
+     * will continue until StopBrowse is called.
+     */
+    virtual CHIP_ERROR StartBrowse() = 0;
+
+    /**
+     * @brief Stop browsing for devices.
+     */
+    virtual CHIP_ERROR StopBrowse() = 0;
+
+    /**
      * Provides the system-wide implementation of the service resolver
      */
     static Resolver & Instance();

@@ -53,6 +53,9 @@ public:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+    CHIP_ERROR StartBrowse(Optional<uint64_t> compressedFabricIdFilter) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StartBrowse() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StopBrowse() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
 
 NoneResolver gResolver;
@@ -92,6 +95,19 @@ CHIP_ERROR ResolverProxy::StopDiscovery()
 }
 
 CHIP_ERROR ResolverProxy::ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ResolverProxy::StartBrowse(Optional<uint64_t> compressedFabricIdFilter)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+CHIP_ERROR ResolverProxy::StartBrowse()
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+CHIP_ERROR ResolverProxy::StopBrowse()
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
