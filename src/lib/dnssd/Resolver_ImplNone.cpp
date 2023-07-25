@@ -32,6 +32,7 @@ public:
     void Shutdown() override {}
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override {}
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override {}
+    void SetBrowseDelegate(BrowseDelegate * delegate) override {}
 
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override
     {

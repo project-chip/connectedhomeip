@@ -49,13 +49,6 @@ static constexpr uint8_t kDnssdTypeAndProtocolMaxSize     = kDnssdTypeMaxSize + 
 static constexpr uint16_t kDnssdTextMaxSize               = 64;
 static constexpr uint8_t kDnssdFullTypeAndProtocolMaxSize = Common::kSubTypeMaxLength + /* '.' */ 1 + kDnssdTypeAndProtocolMaxSize;
 
-enum class DnssdServiceProtocol : uint8_t
-{
-    kDnssdProtocolUdp = 0,
-    kDnssdProtocolTcp,
-    kDnssdProtocolUnknown = 255,
-};
-
 struct TextEntry
 {
     const char * mKey;

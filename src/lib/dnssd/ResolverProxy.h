@@ -25,12 +25,14 @@ namespace Dnssd {
 
 class ResolverDelegateProxy : public ReferenceCounted<ResolverDelegateProxy>,
                               public OperationalResolveDelegate,
-                              public CommissioningResolveDelegate
+                              public CommissioningResolveDelegate,
+                              public BrowseDelegate
 
 {
 public:
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) { mOperationalDelegate = delegate; }
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) { mCommissioningDelegate = delegate; }
+    void SetBrowseDelegate(BrowseDelegate * delegate) { mBrowseDelegate = delegate; }
 
     // OperationalResolveDelegate
     void OnOperationalNodeResolved(const ResolvedNodeData & nodeData) override
@@ -70,9 +72,47 @@ public:
         }
     }
 
+    // BrowseDelegate
+    void OnBrowseAdd(const NodeBrowseData & nodeData) override
+    {
+        if (mBrowseDelegate != nullptr)
+        {
+            mBrowseDelegate->OnBrowseAdd(nodeData);
+        }
+        else
+        {
+            ChipLogError(Discovery, "Missing browse delegate. Data discarded.");
+        }
+    }
+
+    void OnBrowseRemove(const NodeBrowseData & nodeData) override
+    {
+        if (mBrowseDelegate != nullptr)
+        {
+            mBrowseDelegate->OnBrowseRemove(nodeData);
+        }
+        else
+        {
+            ChipLogError(Discovery, "Missing browse delegate. Data discarded.");
+        }
+    }
+
+    void OnBrowseStop(CHIP_ERROR error) override
+    {
+        if (mBrowseDelegate != nullptr)
+        {
+            mBrowseDelegate->OnBrowseStop(error);
+        }
+        else
+        {
+            ChipLogError(Discovery, "Missing browse delegate. Data discarded.");
+        }
+    }
+
 private:
     OperationalResolveDelegate * mOperationalDelegate     = nullptr;
     CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
+    BrowseDelegate * mBrowseDelegate                      = nullptr;
 };
 
 class ResolverProxy : public Resolver
@@ -102,6 +142,13 @@ public:
                 ChipLogProgress(Discovery, "Setting commissioning delegate post init");
                 mDelegate->SetCommissioningDelegate(mPreInitCommissioningDelegate);
                 mPreInitCommissioningDelegate = nullptr;
+            }
+
+            if (mPreInitBrowseDelegate != nullptr)
+            {
+                ChipLogProgress(Discovery, "Setting browse delegate post init");
+                mDelegate->SetBrowseDelegate(mPreInitBrowseDelegate);
+                mPreInitBrowseDelegate = nullptr;
             }
         }
 
@@ -142,11 +189,28 @@ public:
         }
     }
 
+    void SetBrowseDelegate(BrowseDelegate * delegate) override
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->SetBrowseDelegate(delegate);
+        }
+        else
+        {
+            if (delegate != nullptr)
+            {
+                ChipLogError(Discovery, "Delaying proxy of browse discovery: missing delegate");
+            }
+            mPreInitBrowseDelegate = delegate;
+        }
+    }
+
     void Shutdown() override
     {
         VerifyOrReturn(mDelegate != nullptr);
         mDelegate->SetOperationalDelegate(nullptr);
         mDelegate->SetCommissioningDelegate(nullptr);
+        mDelegate->SetBrowseDelegate(nullptr);
         mDelegate->Release();
         mDelegate = nullptr;
     }
@@ -162,6 +226,7 @@ private:
     ResolverDelegateProxy * mDelegate                            = nullptr;
     OperationalResolveDelegate * mPreInitOperationalDelegate     = nullptr;
     CommissioningResolveDelegate * mPreInitCommissioningDelegate = nullptr;
+    BrowseDelegate * mPreInitBrowseDelegate                      = nullptr;
 
     // While discovery (commissionable or commissioner) is ongoing,
     // mDiscoveryContext may have a value to allow StopDiscovery to work.

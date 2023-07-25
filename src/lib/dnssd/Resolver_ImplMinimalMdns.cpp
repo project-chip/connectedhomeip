@@ -284,6 +284,7 @@ public:
     void Shutdown() override;
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override { mCommissioningDelegate = delegate; }
+    void SetBrowseDelegate(BrowseDelegate * delegate) override { mBrowseDelegate = delegate; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
@@ -294,6 +295,7 @@ public:
 private:
     OperationalResolveDelegate * mOperationalDelegate     = nullptr;
     CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
+    BrowseDelegate * mBrowseDelegate                      = nullptr;
     System::Layer * mSystemLayer                          = nullptr;
     ActiveResolveAttempts mActiveResolves;
     PacketParser mPacketParser;

@@ -55,6 +55,7 @@ public:
     {
         mResolverProxy.SetCommissioningDelegate(delegate);
     }
+    void SetBrowseDelegate(BrowseDelegate * delegate) override { mResolverProxy.SetBrowseDelegate(delegate); }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;

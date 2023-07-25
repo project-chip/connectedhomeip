@@ -35,6 +35,21 @@
 namespace chip {
 namespace Dnssd {
 
+enum class DnssdServiceProtocol : uint8_t
+{
+    kDnssdProtocolUdp = 0,
+    kDnssdProtocolTcp,
+    kDnssdProtocolUnknown = 255,
+};
+
+/// Node browsing data common to both operational and commissionable browse discovery
+struct NodeBrowseData
+{
+    char mName[Common::kInstanceNameMaxLength + 1] = {};
+    Inet::InterfaceId mInterfaceId;
+    DnssdServiceProtocol protocol;
+};
+
 /// Node resolution data common to both operational and commissionable discovery
 struct CommonResolutionData
 {
@@ -295,6 +310,39 @@ enum class DiscoveryType
     kCommissionerNode
 };
 
+/**
+ * A delegate that can be notified of node additions/removals as a mdns browse proceeds.
+ */
+class BrowseDelegate
+{
+public:
+    virtual ~BrowseDelegate() {}
+
+    /**
+     * @brief
+     *   Called when an operational/commissionable node is discovered on the network.
+     *
+     * @param[in] nodeData The node data
+     */
+    virtual void OnBrowseAdd(const NodeBrowseData & nodeData) = 0;
+
+    /**
+     * @brief
+     *   Called when an operational/commissionable node is removed from the network.
+     *
+     * @param[in] nodeData The node data
+     */
+    virtual void OnBrowseRemove(const NodeBrowseData & nodeData) = 0;
+
+    /**
+     * @brief
+     *   Called when the browse stops.
+     *
+     * @param error Error cause, if any
+     */
+    virtual void OnBrowseStop(CHIP_ERROR error) = 0;
+};
+
 /// Callbacks for resolving operational node resolution
 class OperationalResolveDelegate
 {
@@ -370,6 +418,11 @@ public:
      * If nullptr is passed, the previously registered delegate is unregistered.
      */
     virtual void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) = 0;
+
+    /**
+     * If nullptr is passed, the previously registered delegate is unregistered.
+     */
+    virtual void SetBrowseDelegate(BrowseDelegate * delegate){};
 
     /**
      * Requests resolution of the given operational node service.
