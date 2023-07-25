@@ -168,7 +168,7 @@ struct GenericType : private HepaFilterMonitoring::Structs::ReplacementProductSt
 
         /**
          * Sets the product identifier type.
-         * 
+         *
          * @param aProductIdentifierType The product identifier type.
         */
         void setProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType)
@@ -179,7 +179,7 @@ struct GenericType : private HepaFilterMonitoring::Structs::ReplacementProductSt
         /**
          * Sets the product identifier value.
          * This implementation will copy the argument to the local implementation.
-         * 
+         *
          * @param aProductIdentifierValue The value of the product identifier to set.
          * @return CHIP_ERROR_INVALID_ARGUMENT when aProductIdentifierValue is invalid, CHIP_NO_ERROR otherwise.
         */
