@@ -84,7 +84,8 @@ void LaundryWasherMode::Shutdown()
     }
     if (gLaundryWasherModeDelegate != nullptr)
     {
-        gLaundryWasherModeDelegate->~LaundryWasherModeDelegate();
+        delete gLaundryWasherModeDelegate;
+        gLaundryWasherModeDelegate = nullptr;
     }
 }
 
