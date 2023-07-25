@@ -171,6 +171,9 @@ bool ChefChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumbe
                 mCurrentChannelIndex = index;
                 mCurrentChannel      = channel;
             }
+
+	    // return since we've already found the unique matched channel
+	    return channelChanged;
         }
         index++;
     }
