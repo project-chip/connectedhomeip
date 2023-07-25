@@ -148,7 +148,13 @@ enum class Fields : uint8_t
     kProductIdentifierValue = 1,
 };
 
-class GenericType : protected app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type
+// A struct used during reads of the ReplacementProductList to store a single list instance we request
+// from the application.
+// 
+// Inherit from an auto-generated struct to pick up the implementation bits, but make
+// it private inheritance so people can't accidentally use this struct where the other
+// is expected.
+class GenericType : private HepaFilterMonitoring::Structs::ReplacementProductStruct::Type
 {
 private:
     ResourceMonitoring::ProductIdentifierTypeEnum productIdentifierType;

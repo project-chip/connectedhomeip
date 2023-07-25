@@ -253,7 +253,7 @@ CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (HasFeature(ResourceMonitoring::Feature::kReplacementProductList))
     {
-        ReplacementProductListManager * productListManagerInstance = Instance::GetReplacementProductListManagerInstance();
+        ReplacementProductListManager * productListManagerInstance = GetReplacementProductListManagerInstance();
         if (nullptr == productListManagerInstance)
         {
             aEncoder.EncodeEmptyList();
@@ -262,7 +262,7 @@ CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
 
         productListManagerInstance->Reset();
 
-        err = aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        err = aEncoder.EncodeList([productListManagerInstance](const auto & encoder) -> CHIP_ERROR {
             Attributes::GenericReplacementProductStruct::GenericType replacementProductStruct;
             CHIP_ERROR iteratorError = CHIP_NO_ERROR;
             while (CHIP_NO_ERROR == iteratorError)
