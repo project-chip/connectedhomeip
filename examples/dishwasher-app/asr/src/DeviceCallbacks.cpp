@@ -120,4 +120,3 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
         ASR_LOG("Lost IPv6 connectivity...");
     }
 }
-
