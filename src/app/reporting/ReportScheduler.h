@@ -188,9 +188,8 @@ public:
 
     virtual void ReportTimerCallback() = 0;
 
-    /// @brief Method that triggers a report emission on each ReadHandler that are above their min interval
-    ///        It checks if all read handlers are above their min interval and if so forces them in a dirty state to trigger a
-    ///        report emission
+    /// @brief Method that triggers a report emission on each ReadHandler that is not blocked on its min interval.
+    ///        Each read handler that is not blocked is immediately marked dirty so that it will report as soon as possible.
     void TriggerReportEmission()
     {
         Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
