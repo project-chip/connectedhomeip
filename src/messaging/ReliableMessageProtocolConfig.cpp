@@ -28,7 +28,8 @@
 #include <system/SystemClock.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDManager.h> // nogncheck
+#include <app/icd/ICDManager.h>          // nogncheck
+#include <app/icd/IcdManagementServer.h> // nogncheck
 #endif
 
 namespace chip {
@@ -38,17 +39,21 @@ using namespace System::Clock::Literals;
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 static Optional<System::Clock::Timeout> idleRetransTimeoutOverride   = NullOptional;
 static Optional<System::Clock::Timeout> activeRetransTimeoutOverride = NullOptional;
+static Optional<System::Clock::Timeout> activeThresholdTimeOverride  = NullOptional;
 
-void OverrideLocalMRPConfig(System::Clock::Timeout idleRetransTimeout, System::Clock::Timeout activeRetransTimeout)
+void OverrideLocalMRPConfig(System::Clock::Timeout idleRetransTimeout, System::Clock::Timeout activeRetransTimeout,
+                            System::Clock::Timeout activeThresholdTime)
 {
     idleRetransTimeoutOverride.SetValue(idleRetransTimeout);
     activeRetransTimeoutOverride.SetValue(activeRetransTimeout);
+    activeThresholdTimeOverride.SetValue(activeThresholdTime);
 }
 
 void ClearLocalMRPConfigOverride()
 {
     activeRetransTimeoutOverride.ClearValue();
     idleRetransTimeoutOverride.ClearValue();
+    activeThresholdTimeOverride.ClearValue();
 }
 #endif
 
@@ -57,7 +62,8 @@ ReliableMessageProtocolConfig GetDefaultMRPConfig()
     // Default MRP intervals are defined in spec <2.11.3. Parameters and Constants>
     static constexpr const System::Clock::Milliseconds32 idleRetransTimeout   = 300_ms32;
     static constexpr const System::Clock::Milliseconds32 activeRetransTimeout = 300_ms32;
-    return ReliableMessageProtocolConfig(idleRetransTimeout, activeRetransTimeout);
+    static constexpr const System::Clock::Milliseconds16 activeThresholdTime  = 4000_ms16;
+    return ReliableMessageProtocolConfig(idleRetransTimeout, activeRetransTimeout, activeThresholdTime);
 }
 
 Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
@@ -69,6 +75,7 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
     // which the device can be at sleep and not be able to receive any messages).
     config.mIdleRetransTimeout += app::ICDManager::GetSlowPollingInterval();
     config.mActiveRetransTimeout += app::ICDManager::GetFastPollingInterval();
+    config.mActiveThresholdTime = System::Clock::Milliseconds16(IcdManagementServer::GetInstance().GetActiveModeThreshold());
 #elif CHIP_DEVICE_CONFIG_ENABLE_SED
     DeviceLayer::ConnectivityManager::SEDIntervalsConfig sedIntervalsConfig;
 
@@ -90,6 +97,11 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
     if (activeRetransTimeoutOverride.HasValue())
     {
         config.mActiveRetransTimeout = activeRetransTimeoutOverride.Value();
+    }
+
+    if (activeThresholdTimeOverride.HasValue())
+    {
+        config.mActiveThresholdTime = activeRetransTimeoutOverride.Value();
     }
 #endif
 

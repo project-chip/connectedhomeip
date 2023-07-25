@@ -4651,7 +4651,7 @@ System::Clock::Timeout TestReadInteraction::ComputeSubscriptionTimeout(System::C
     const auto & ourMrpConfig = GetDefaultMRPConfig();
     auto publisherTransmissionTimeout =
         GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
-                                 System::SystemClock().GetMonotonicTimestamp(), Transport::kMinActiveTime);
+                                 System::SystemClock().GetMonotonicTimestamp(), ourMrpConfig.mActiveThresholdTime);
 
     return publisherTransmissionTimeout + aMaxInterval + System::Clock::Milliseconds32(1000);
 }

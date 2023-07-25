@@ -19,7 +19,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Robotic Vacuum Operational State"
+    cluster: "Rvc Operational State"
     endpoint: 1
 
 tests:

@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    3.2.1. [TC-OPCREDS-3.1] Attribute-NOCs, TrustedRootCertificates list
+    15.2.1. [TC-OPCREDS-3.1] Attribute-NOCs, TrustedRootCertificates list
     validation [DUT-Server]
 
 PICS:
@@ -35,15 +35,17 @@ tests:
       disabled: true
 
     - label:
-          "Factory Reset DUT (to ensure NOC list is empty at the beginning of
-          the following steps)"
+          "Step 1: Factory Reset DUT (to ensure NOC list is empty at the
+          beginning of the following steps)"
       PICS: OPCREDS.S.A0000
       verification: |
           On both DUT and TH side
           sudo rm -rf /tmp/chip_*
       disabled: true
 
-    - label: "Start the commissioning process of DUT by TH1 on a first Fabric"
+    - label:
+          "Step 2: Start the commissioning process of DUT by TH1 on a first
+          Fabric"
       verification: |
           DUT side:
           sudo ./chip-all-clusters-app --wifi  --trace_decode 1
@@ -55,8 +57,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
-          field set to 900"
+          "Step 3: TH1 sends ArmFailSafe command to the DUT with the
+          ExpiryLengthSeconds field set to 900"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 600 1 0
@@ -73,7 +75,7 @@ tests:
           [1659676500.055920][2475:2480] CHIP:EM: Sending Standalone Ack for MessageCounter:225116044 on exchange 37810i
       disabled: true
 
-    - label: "TH1 sends SetRegulatoryConfig command to the DUT"
+    - label: "Step 4: TH1 sends SetRegulatoryConfig command to the DUT"
       PICS: CGEN.S.C02.Rsp && CGEN.S.C03.Tx
       verification: |
           ./chip-tool generalcommissioning set-regulatory-config 0 new 0 1 0
@@ -88,7 +90,7 @@ tests:
           [1658223287.237205][5570:5575] CHIP:TOO:    }
       disabled: true
 
-    - label: "TH1 sends AttestationRequest command to DUT"
+    - label: "Step 5: TH1 sends AttestationRequest command to DUT"
       PICS: OPCREDS.S.C00.Rsp && OPCREDS.S.C01.Tx
       verification: |
           To get attestation nonce give below command Raspi platform on TH
@@ -109,8 +111,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends CertificateChainRequest Command to DUT for the PAI and
-          saves the certififate as 'PAICert'"
+          "Step 6: TH1 sends CertificateChainRequest Command to DUT for the PAI
+          and saves the certififate as 'PAICert'"
       PICS: OPCREDS.S.C02.Rsp && OPCREDS.S.C03.Tx
       verification: |
           ./chip-tool operationalcredentials certificate-chain-request 2 1 0 --trace_decode 1
@@ -215,8 +217,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends CertificateChainRequest Command to DUT for the DAC and
-          saves the certififate as 'DACCert'"
+          "Step 7: TH1 sends CertificateChainRequest Command to DUT for the DAC
+          and saves the certififate as 'DACCert'"
       PICS: OPCREDS.S.C02.Rsp && OPCREDS.S.C03.Tx
       verification: |
           ./chip-tool operationalcredentials certificate-chain-request 1 1 0
@@ -320,7 +322,7 @@ tests:
           [1660218221.827357][17048:17053] CHIP:DMG: ICR moving to [ResponseRe]
       disabled: true
 
-    - label: "TH1 Sends CSRRequest command with a random 32-byte nonce"
+    - label: "Step 8: TH1 Sends CSRRequest command with a random 32-byte nonce"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
           To get SCR Nonce give below command 2 times
@@ -343,14 +345,14 @@ tests:
           EB731B40B20501AF32C468AA522948F7848D3AEDFA24D9A879575B4A265886C97109EE0DE1ECEB969B1A7F98F127DB4C275292B986BF8DA56EF7B16DA8EC8ABE
       disabled: true
 
-    - label: "TH1 validates the attestation response"
+    - label: "Step 9: TH1 validates the attestation response"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 obtains or generates the NOC, the Root CA Certificate and ICAC
-          using the CSR elements from step 8 and selects an IPK. The
+          "Step 10: TH1 obtains or generates the NOC, the Root CA Certificate
+          and ICAC using the CSR elements from step 8 and selects an IPK. The
           certificates shall have their subjects padded with additional data
           such that they are each the maximum certificate size of 400 bytes when
           encoded in the MatterCertificateEncoding. Save RCAC as
@@ -362,32 +364,33 @@ tests:
       disabled: true
 
     - label:
-          "TH1 obtains or generates Root Certificate with a different Root CA ID
-          and the corresponding ICAC, NOC and IPK using the CSR elements from
-          step 8 Save RCAC as Root_CA_Certificate_TH1_2 Save ICAC as
-          Intermediate_Certificate_TH1_2 Save NOC as
+          "Step 11: TH1 obtains or generates Root Certificate with a different
+          Root CA ID and the corresponding ICAC, NOC and IPK using the CSR
+          elements from step 8 Save RCAC as Root_CA_Certificate_TH1_2 Save ICAC
+          as Intermediate_Certificate_TH1_2 Save NOC as
           Node_Operational_Certificate_TH1_2 Save IPK as IPK_TH1_2"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 generates an INVALID Root Certificate where the signature does
-          not match the public key and saves it as Root_CA_Malformed"
+          "Step 12: TH1 generates an INVALID Root Certificate where the
+          signature does not match the public key and saves it as
+          Root_CA_Malformed"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends AddTrustedRootCertificate command to DUT to install
-          Root_CA_Malformed"
+          "Step 13: TH1 sends AddTrustedRootCertificate command to DUT to
+          install Root_CA_Malformed"
       PICS: OPCREDS.S.C0b.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends AddTrustedRootCertificate command to DUT with
+          "Step 14: TH1 sends AddTrustedRootCertificate command to DUT with
           RootCACertificate set to Root_CA_Certificate_TH1"
       PICS: OPCREDS.S.C0b.Rsp
       verification: |
@@ -395,46 +398,46 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends AddTrustedRootCertificate command to DUT again with the
-          RootCACertificate field set to Root_CA_Certificate_TH1"
+          "Step 15: TH1 sends AddTrustedRootCertificate command to DUT again
+          with the RootCACertificate field set to Root_CA_Certificate_TH1"
       PICS: OPCREDS.S.C0b.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends AddTrustedRootCertificate command to DUT again with the
-          RootCACertificate field set to Root_CA_Certificate_TH1_2"
+          "Step 16: TH1 sends AddTrustedRootCertificate command to DUT again
+          with the RootCACertificate field set to Root_CA_Certificate_TH1_2"
       PICS: OPCREDS.S.C0b.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 reads the TrustedRootCertificates list from DUT and saves as
-          TrustedRootsList"
+          "Step 17: TH1 reads the TrustedRootCertificates list from DUT and
+          saves as TrustedRootsList"
       PICS: OPCREDS.S.A0004
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 appends Root_CA_Certificate_TH1_2 to TrustedRootsList and writes
-          the TrustedRootCertificates attribute with that value"
+          "Step 18: TH1 appends Root_CA_Certificate_TH1_2 to TrustedRootsList
+          and writes the TrustedRootCertificates attribute with that value"
       PICS: OPCREDS.S.A0004
       verification: |
 
       disabled: true
 
-    - label: "TH1 reads the TrustedRootCertificates list from DUT"
+    - label: "Step 19: TH1 reads the TrustedRootCertificates list from DUT"
       PICS: OPCREDS.S.A0004
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends the AddNOC Command to DUT with the following fields:
-          NOCValue as Node_Operational_Certificate_TH1_2 ICACValue as
+          "Step 20: TH1 sends the AddNOC Command to DUT with the following
+          fields: NOCValue as Node_Operational_Certificate_TH1_2 ICACValue as
           Intermediate_Certificate_TH1_2 IpkValue as IPK_TH1_2 CaseAdminSubject
           as the NodeID of TH1 AdminVendorId as the Vendor ID of TH1"
       PICS: OPCREDS.S.C06.Rsp
@@ -443,8 +446,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends the AddNOC Command to DUT with the following fields:
-          NOCValue as Node_Operational_Certificate_TH1 ICACValue as
+          "Step 21: TH1 sends the AddNOC Command to DUT with the following
+          fields: NOCValue as Node_Operational_Certificate_TH1 ICACValue as
           Intermediate_Certificate_TH1 IpkValue as IPK_TH1 CaseAdminSubject is
           an invalid NodeID (not an operational Node ID or Case Authenticated
           Tag - ex. 0) AdminVendorId as the Vendor ID of TH1"
@@ -454,8 +457,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends the AddNOC Command to DUT with the following fields:
-          NOCValue as Node_Operational_Certificate_TH1 ICACValue as
+          "Step 22: TH1 sends the AddNOC Command to DUT with the following
+          fields: NOCValue as Node_Operational_Certificate_TH1 ICACValue as
           Intermediate_Certificate_TH1 IpkValue as IPK_TH1 CaseAdminSubject as
           the NodeID of TH1 AdminVendorId as the Vendor ID of TH1"
       PICS: OPCREDS.S.C06.Rsp
@@ -463,14 +466,15 @@ tests:
 
       disabled: true
 
-    - label: "TH1 saves the FabricIndex as FabricIndex_TH1 for future use"
+    - label:
+          "Step 23: TH1 saves the FabricIndex as FabricIndex_TH1 for future use"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends the AddNOC Command to DUT with the following fields:
-          NOCValue as Node_Operational_Certificate_TH1_1 ICACValue as
+          "Step 24: TH1 sends the AddNOC Command to DUT with the following
+          fields: NOCValue as Node_Operational_Certificate_TH1_1 ICACValue as
           Intermediate_Certificate_TH1_1 IpkValue as IPK_TH1_1 CaseAdminSubject
           as the NodeID of TH1 AdminVendorId as the Vendor ID of TH1"
       PICS: OPCREDS.S.C06.Rsp
@@ -479,74 +483,74 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the NOCs attribute from DUT using a non-fabric-filtered
-          read and saves the list as NOClist"
+          "Step 25: TH1 reads the NOCs attribute from DUT using a
+          non-fabric-filtered read and saves the list as NOClist"
       PICS: OPCREDS.S.A0000
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 appends a second list item to 'NOClist' and writes that value to
-          the NOCs attribute"
+          "Step 26: TH1 appends a second list item to 'NOClist' and writes that
+          value to the NOCs attribute"
       PICS: OPCREDS.S.A0000
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 reads the NOCs attribute from DUT using a non-fabric-filtered
-          read"
+          "Step 27: TH1 reads the NOCs attribute from DUT using a
+          non-fabric-filtered read"
       PICS: OPCREDS.S.A0000
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends UpdateFabricLabel command with 'Label 1' as Label field to
-          DUT"
+          "Step 28: TH1 sends UpdateFabricLabel command with 'Label 1' as Label
+          field to DUT"
       PICS: OPCREDS.S.C09.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 reads the Fabrics Attribute from DUT using a non-fabric-filtered
-          read and gets the FabricDescriptorStruct for which the FabricIndex
-          field equals FabricIndex_TH1"
+          "Step 29: TH1 reads the Fabrics Attribute from DUT using a
+          non-fabric-filtered read and gets the FabricDescriptorStruct for which
+          the FabricIndex field equals FabricIndex_TH1"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
-          field set to 0"
+          "Step 31: TH1 sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds field set to 0"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
 
       disabled: true
 
-    - label: "TH1 reconnects to the DUT over PASE"
+    - label: "Step 32: TH1 reconnects to the DUT over PASE"
       verification: |
 
       disabled: true
 
-    - label: "TH1 reads the TrustedRootCertificates list from DUT"
+    - label: "Step 33: TH1 reads the TrustedRootCertificates list from DUT"
       PICS: OPCREDS.S.A0004
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 reads the NOCs attribute from DUT using a non-fabric-filtered
-          read"
+          "Step 34: TH1 reads the NOCs attribute from DUT using a
+          non-fabric-filtered read"
       PICS: OPCREDS.S.A0000
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 reads the Fabrics attribute from the DUT using a
+          "Step 35: TH1 reads the Fabrics attribute from the DUT using a
           non-fabric-filtered read"
       PICS: OPCREDS.S.A0001
       verification: |
@@ -554,7 +558,7 @@ tests:
       disabled: true
 
     - label:
-          "TH1 fully commissions DUT onto the fabric, using
+          "Step 36: TH1 fully commissions DUT onto the fabric, using
           'Root_CA_Certificate_TH1' and the AddNOC parameters specified in step
           . This will update the value of FabricIndex_TH1 so that it references
           the fabric the DUT was just commissioned onto"
@@ -562,73 +566,77 @@ tests:
 
       disabled: true
 
-    - label: "TH1 reads the TrustedRootCertificates list from DUT"
+    - label: "Step 37: TH1 reads the TrustedRootCertificates list from DUT"
       PICS: OPCREDS.S.A0004
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 reads the NOCs attribute from DUT using a non-fabric-filtered
-          read"
+          "Step 38: TH1 reads the NOCs attribute from DUT using a
+          non-fabric-filtered read"
       PICS: OPCREDS.S.A0000
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends UpdateFabricLabel command with 'Label 1' as Label field to
-          DUT"
+          "Step 39: TH1 sends UpdateFabricLabel command with 'Label 1' as Label
+          field to DUT"
       PICS: OPCREDS.S.C09.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 reads the Fabrics Attribute from DUT using a non-fabric-filtered
-          read and gets the FabricDescriptorStruct for which the FabricIndex
-          field equals FabricIndex_TH1"
+          "Step 40: TH1 reads the Fabrics Attribute from DUT using a
+          non-fabric-filtered read and gets the FabricDescriptorStruct for which
+          the FabricIndex field equals FabricIndex_TH1"
       PICS: OPCREDS.S.A0001
       verification: |
 
       disabled: true
 
-    - label: "TH1 reads the ACL attribute from the Access Control cluster"
+    - label:
+          "Step 42: TH1 reads the ACL attribute from the Access Control cluster"
       PICS: OPCREDS.S.C06.Rsp
       verification: |
 
       disabled: true
 
-    - label: "TH1 issues a KeySetRead command to the DUT for GroupKeySetID 0"
+    - label:
+          "Step 43: TH1 issues a KeySetRead command to the DUT for GroupKeySetID
+          0"
       PICS: OPCREDS.S.C06.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends an OpenCommissioningWindow command to the Administrator
-          Commissioning cluster"
+          "Step 44: TH1 sends an OpenCommissioningWindow command to the
+          Administrator Commissioning cluster"
       verification: |
 
       disabled: true
 
     - label:
-          "TH2 begins the process of commissionning the DUT. After receiving the
-          CSRResponse TH2 obtains or generates a NOC, the Root CA Certificate,
-          ICAC and IPK. The certificates shall have their subjects padded with
-          additional data such that they are each the maximum certificate size
-          of 400 bytes when encoded in the MatterCertificateEncoding. Save RCAC
-          as Root_CA_Certificate_TH2 Save ICAC as Intermediate_Certificate_TH2
-          Save NOC as Node_Operational_Certificate_TH2 Save IPK as IPK_TH2
-          Extract the RCAC public key and save as Root_Public_Key_TH2"
+          "Step 45: TH2 begins the process of commissionning the DUT. After
+          receiving the CSRResponse TH2 obtains or generates a NOC, the Root CA
+          Certificate, ICAC and IPK. The certificates shall have their subjects
+          padded with additional data such that they are each the maximum
+          certificate size of 400 bytes when encoded in the
+          MatterCertificateEncoding. Save RCAC as Root_CA_Certificate_TH2 Save
+          ICAC as Intermediate_Certificate_TH2 Save NOC as
+          Node_Operational_Certificate_TH2 Save IPK as IPK_TH2 Extract the RCAC
+          public key and save as Root_Public_Key_TH2"
       verification: |
 
       disabled: true
 
     - label:
-          "TH2 completes the commissioning process using Root_CA_Certificate_TH2
-          when performing the AddTrustedRootCertificate command and sending
-          AddNOC with the following parameters: NOCValue as
+          "Step 46: TH2 completes the commissioning process using
+          Root_CA_Certificate_TH2 when performing the AddTrustedRootCertificate
+          command and sending AddNOC with the following parameters: NOCValue as
           Node_Operational_Certificate_TH2 ICACValue as
           Intermediate_Certificate_TH2 IpkValue as IPK_TH2 CaseAdminSubject as
           CAT_TH2 AdminVendorId as the Vendor ID of TH2"
@@ -636,52 +644,54 @@ tests:
           Not verifiable
       disabled: true
 
-    - label: "TH2 reads the TrustedRootCertificates list from DUT"
+    - label: "Step 47: TH2 reads the TrustedRootCertificates list from DUT"
       PICS: OPCREDS.S.A0004
       verification: |
 
       disabled: true
 
     - label:
-          "TH2 reads the NOCs attribute from DUT using a non-fabric-filtered
-          read"
+          "Step 48: TH2 reads the NOCs attribute from DUT using a
+          non-fabric-filtered read"
       PICS: OPCREDS.S.A0000
       verification: |
 
       disabled: true
 
     - label:
-          "TH2 sends UpdateFabricLabel command with 'Label 2' as Label field to
-          DUT"
+          "Step 49: TH2 sends UpdateFabricLabel command with 'Label 2' as Label
+          field to DUT"
       PICS: OPCREDS.S.C09.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH2 sends UpdateFabricLabel command with 'Label 1' as Label field to
-          DUT"
+          "Step 50: TH2 sends UpdateFabricLabel command with 'Label 1' as Label
+          field to DUT"
       PICS: OPCREDS.S.C09.Rsp
       verification: |
 
       disabled: true
 
-    - label: "Read the Fabrics List from DUT using a non-fabric-filtered read"
+    - label:
+          "Step 51: Read the Fabrics List from DUT using a non-fabric-filtered
+          read"
       PICS: OPCREDS.S.A0001
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
-          field set to 900"
+          "Step 52: TH1 sends ArmFailSafe command to the DUT with the
+          ExpiryLengthSeconds field set to 900"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends AddTrustedRootCertificate command to DUT with
+          "Step 53: TH1 sends AddTrustedRootCertificate command to DUT with
           RootCACertificate set to Root_CA_Certificate_TH1_2"
       PICS: OPCREDS.S.C0b.Rsp
       verification: |
@@ -689,8 +699,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends the AddNOC Command to DUT with the following fields:
-          NOCValue as Node_Operational_Certificate_TH1_2 ICACValue as
+          "Step 54: TH1 sends the AddNOC Command to DUT with the following
+          fields: NOCValue as Node_Operational_Certificate_TH1_2 ICACValue as
           Intermediate_Certificate_TH1_2 IpkValue as IPK_TH1_2 CaseAdminSubject
           as the NodeID of TH1 AdminVendorId as the Vendor ID of TH1"
       PICS: OPCREDS.S.C06.Rsp
@@ -698,15 +708,15 @@ tests:
 
       disabled: true
 
-    - label: "TH1 Sends CSRRequest command with a random 32-byte nonce"
+    - label: "Step 55: TH1 Sends CSRRequest command with a random 32-byte nonce"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends the AddNOC Command to DUT with the following fields:
-          NOCValue as Node_Operational_Certificate_TH1_2 ICACValue as
+          "Step 56: TH1 sends the AddNOC Command to DUT with the following
+          fields: NOCValue as Node_Operational_Certificate_TH1_2 ICACValue as
           Intermediate_Certificate_TH1_2 IpkValue as IPK_TH1_2 CaseAdminSubject
           as the NodeID of TH1 AdminVendorId as the Vendor ID of TH1"
       PICS: OPCREDS.S.C06.Rsp
@@ -715,9 +725,9 @@ tests:
       disabled: true
 
     - label:
-          "TH1 obtains or generates a NOC and ICAC using the CSR elements from
-          step 55 with a different NodeID, but the same Root CA Certificate and
-          fabric ID as step 10. Save as
+          "Step 57: TH1 obtains or generates a NOC and ICAC using the CSR
+          elements from step 55 with a different NodeID, but the same Root CA
+          Certificate and fabric ID as step 10. Save as
           Node_Operational_Certificates_TH1_fabric_conflict and
           Intermediate_Certificate_TH1_fabric_conflict"
       verification: |
@@ -725,48 +735,49 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends the AddNOC Command to DUT with the following fields:
-          NOCValue as Node_Operational_Certificate_TH1_fabric_conflict ICACValue
-          as Intermediate_Certificate_TH1_fabric_conflict CaseAdminSubject as
-          the NodeID of TH1 AdminVendorId as the Vendor ID of TH1"
+          "Step 58: TH1 sends the AddNOC Command to DUT with the following
+          fields: NOCValue as Node_Operational_Certificate_TH1_fabric_conflict
+          ICACValue as Intermediate_Certificate_TH1_fabric_conflict
+          CaseAdminSubject as the NodeID of TH1 AdminVendorId as the Vendor ID
+          of TH1"
       PICS: OPCREDS.S.C06.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set
-          to 0"
+          "Step 59: TH1 sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 0"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
 
       disabled: true
 
-    - label: "TH1 reads the TrustedRootCertificates list from DUT"
+    - label: "Step 60: TH1 reads the TrustedRootCertificates list from DUT"
       PICS: OPCREDS.S.A0004
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
-          field set to 900"
+          "Step 61: TH1 sends ArmFailSafe command to the DUT with the
+          ExpiryLengthSeconds field set to 900"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 Sends CSRRequest command with a random 32-byte nonce and the
-          IsForUpdateNOC field set to true"
+          "Step 62: TH1 Sends CSRRequest command with a random 32-byte nonce and
+          the IsForUpdateNOC field set to true"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 obtains or generates a NOC, Root CA Certificate, ICAC using the
-          CSR elements from the previous step Save RCAC as
+          "Step 63: TH1 obtains or generates a NOC, Root CA Certificate, ICAC
+          using the CSR elements from the previous step Save RCAC as
           Root_CA_Certificate_TH1_3 Save ICAC as Intermediate_Certificate_TH1_3
           Save NOC as Node_Operational_Certificate_TH1_3"
       verification: |
@@ -774,7 +785,7 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends AddTrustedRootCertificate command to DUT with
+          "Step 64: TH1 sends AddTrustedRootCertificate command to DUT with
           RootCACertificate set to Root_CA_Certificate_TH1_3"
       PICS: OPCREDS.S.C0b.Rsp
       verification: |
@@ -782,8 +793,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends the AddNOC Command to DUT with the following fields:
-          NOCValue as Node_Operational_Certificate_TH1_3 ICACValue as
+          "Step 65: TH1 sends the AddNOC Command to DUT with the following
+          fields: NOCValue as Node_Operational_Certificate_TH1_3 ICACValue as
           Intermediate_Certificate_TH1_3 CaseAdminSubject as the NodeID of TH1
           AdminVendorId as the Vendor ID of TH1"
       PICS: OPCREDS.S.C06.Rsp
@@ -792,123 +803,125 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set
-          to 0"
+          "Step 66: TH1 sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 0"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
-          field set to 900"
+          "Step 67: TH1 sends ArmFailSafe command to the DUT with the
+          ExpiryLengthSeconds field set to 900"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
 
       disabled: true
 
     - label:
-          "TH2 sends RemoveFabric command with Fabric Index as FabricIndexTH2 +
-          5 (Invalid Fabric Index) to DUT"
+          "Step 68: TH2 sends RemoveFabric command with Fabric Index as
+          FabricIndexTH2 + 5 (Invalid Fabric Index) to DUT"
       PICS: OPCREDS.S.C0a.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH2 reads the Fabrics List from DUT using a non-fabric-filtered read"
+          "Step 69: TH2 reads the Fabrics List from DUT using a
+          non-fabric-filtered read"
       PICS: OPCREDS.S.A0001
       verification: |
 
       disabled: true
 
     - label:
-          "TH2 sends RemoveFabric command with Fabric Index as FabricIndex_TH1
-          (Valid Fabric Index) to DUT"
+          "Step 70: TH2 sends RemoveFabric command with Fabric Index as
+          FabricIndex_TH1 (Valid Fabric Index) to DUT"
       PICS: OPCREDS.S.C0a.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH2 reads the Fabrics List from DUT using a non-fabric-filtetered
-          read"
+          "Step 71: TH2 reads the Fabrics List from DUT using a
+          non-fabric-filtetered read"
       PICS: OPCREDS.S.A0001
       verification: |
 
       disabled: true
 
-    - label: "TH2 sends a CommissioningComplete command to the DUT"
+    - label: "Step 72: TH2 sends a CommissioningComplete command to the DUT"
       verification: |
 
       disabled: true
 
     - label:
-          "TH2 sends an OpenCommissioningWindow command to the Administrator
-          Commissioning cluster"
+          "Step 73: TH2 sends an OpenCommissioningWindow command to the
+          Administrator Commissioning cluster"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 fully commissions the DUT using subject-padded, 400 byte
+          "Step 74: TH1 fully commissions the DUT using subject-padded, 400 byte
           certificates"
       verification: |
 
       disabled: true
 
     - label:
-          "Repeat steps 73 and 74 to fill the fabric table using the remaining
-          test harnesses (TH3 through TH NumSupportedFabrics). Each test harness
-          should commission the DUT using subject-padded, 400-byte certificates"
+          "Step 75: Repeat steps 73 and 74 to fill the fabric table using the
+          remaining test harnesses (TH3 through TH NumSupportedFabrics). Each
+          test harness should commission the DUT using subject-padded, 400-byte
+          certificates"
       verification: |
 
       disabled: true
 
-    - label: "TH1 reads CommissionedFabrics attribute"
+    - label: "Step 76: TH1 reads CommissionedFabrics attribute"
       PICS: OPCREDS.S.A0003
       verification: |
 
       disabled: true
 
-    - label: "Repeat steps 73 and 74 with TH NumSupportedFabrics + 1"
+    - label: "Step 77: Repeat steps 73 and 74 with TH NumSupportedFabrics + 1"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 reads the SubjectsPerAccessControlEntry attribute from the Access
-          Control Cluster and saves the value as maxSubjects"
+          "Step 78: TH1 reads the SubjectsPerAccessControlEntry attribute from
+          the Access Control Cluster and saves the value as maxSubjects"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 reads the TargetsPerAccessControlEntry attribute from the Access
-          Control Cluster and saves the value as maxTargets"
+          "Step 79: TH1 reads the TargetsPerAccessControlEntry attribute from
+          the Access Control Cluster and saves the value as maxTargets"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 reads the AccessControlEntriesPerFabric attribute from the Access
-          Control Cluster and saves the value as maxEntries"
+          "Step 80: TH1 reads the AccessControlEntriesPerFabric attribute from
+          the Access Control Cluster and saves the value as maxEntries"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 creates a valid list of AccessControlEntryStructs with maxEntries
-          entries. Each AccessControlEntryStruct specifies maxSubjects subjects
-          and maxTargets targets. TH1 writes this list to the AccessControl
-          cluster ACL attribute"
+          "Step 81: TH1 creates a valid list of AccessControlEntryStructs with
+          maxEntries entries. Each AccessControlEntryStruct specifies
+          maxSubjects subjects and maxTargets targets. TH1 writes this list to
+          the AccessControl cluster ACL attribute"
       verification: |
 
       disabled: true
 
     - label:
-          "Repeat step 81 for TH2 through TH NumSupportedFabrics to fill the ACL
-          table"
+          "Step 82: Repeat step 81 for TH2 through TH NumSupportedFabrics to
+          fill the ACL table"
       verification: |
 
       disabled: true

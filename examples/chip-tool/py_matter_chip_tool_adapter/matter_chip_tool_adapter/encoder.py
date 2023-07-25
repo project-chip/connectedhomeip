@@ -309,6 +309,8 @@ class Encoder:
 
         endpoint_argument_name = 'endpoint-id-ignored-for-group-commands'
         endpoint_argument_value = request.endpoint
+        if endpoint_argument_value == '*':
+            endpoint_argument_value = 0xFFFF
 
         if (request.is_attribute and not request.command == "writeAttribute") or request.is_event or (request.command in _ANY_COMMANDS_LIST and not request.command == "WriteById"):
             endpoint_argument_name = 'endpoint-ids'

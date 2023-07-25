@@ -37,15 +37,16 @@ tests:
           Reset Devices to factory defaults
       disabled: true
 
-    - label: "DUT_CR1 starts a commissioning process with TH_CE"
+    - label: "Step 1: DUT_CR1 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
           "1. Provision the TH_CE (all-cluster-app) device using DUT_CR1 (chip-tool ) on the raspi" "
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
-          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+          "Step 2: DUT_CR1 sends command to TH_CE to open a commissioning window
+          with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using
+          ECM"
       PICS: CADMIN.C.C00.Tx
       verification: |
           On DUT_CR1 send the below command
@@ -63,29 +64,30 @@ tests:
       disabled: true
 
     - label:
-          "A User Consent screen pops up asking for Users permission to allow
-          second commissioner to control TH_CE"
-      PICS: CADMIN.UserInterfaceDisplay
+          "Step 3a: A User Consent screen pops up asking for Users permission to
+          allow second commissioner to control TH_CE"
+      PICS: CADMIN.M.UserInterfaceDisplay
       verification: |
           Verify the User Consent pop up screen. Verify that the pop up closes after user gives permission
       disabled: true
 
     - label:
-          "11 digit Manual Code is displayed on the screen in textual format for
-          User to see"
-      PICS: CADMIN.UserInterfaceDisplay
+          "Step 3.b: 11 digit Manual Code is displayed on the screen in textual
+          format for User to see"
+      PICS: CADMIN.M.UserInterfaceDisplay
       verification: |
           Verify that the displayed Manual Code is 11 digits long and doesn’t contain Vendor_ID or Product_ID.
       disabled: true
 
-    - label: "A voice prompt of the Manual Code format should be heard"
-      PICS: CADMIN.AudioInterface
+    - label:
+          "Step 3.c: A voice prompt of the Manual Code format should be heard"
+      PICS: CADMIN.M.AudioInterface
       verification: |
           Verify voice prompt saying the manual code. Verify the voice prompt repeats if user asks.
       disabled: true
 
     - label:
-          "TH_CR2 starts a commissioning process with TH_CE after
+          "Step 4: TH_CR2 starts a commissioning process with TH_CE after
           PIXIT.CADMIN.CwDuration (that was given in step 2) + 10 seconds"
       PICS: CADMIN.C
       verification: |
@@ -106,9 +108,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to open a new commissioning window
-          with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using
-          ECM"
+          "Step 5: DUT_CR1 sends command to TH_CE to open a new commissioning
+          window with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds
+          using ECM"
       PICS: CADMIN.C.C00.Tx
       verification: |
           On DUT_CR1 send the below command
@@ -124,7 +126,9 @@ tests:
           [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
-    - label: "DUT_CR1 sends command to TH_CE to revoke the commissioning window"
+    - label:
+          "Step 6: DUT_CR1 sends command to TH_CE to revoke the commissioning
+          window"
       PICS: CADMIN.C.C02.Tx
       verification: |
           On DUT_CR1 send the below command
@@ -140,7 +144,7 @@ tests:
           [1661485834.635328][6993:6993] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
-    - label: "TH_CR2 starts a commissioning process with TH_CE"
+    - label: "Step 7: TH_CR2 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
           On TH_CR2 send the below command
@@ -162,7 +166,9 @@ tests:
           [1665481996.787363][4913:4913] CHIP:TOO: Run command failure: ../../commands/pairing/PairingCommand.cpp:164: CHIP Error 0x00000003: Incorrect state
       disabled: true
 
-    - label: "DUT_CR1 sends command to TH_CE to revoke the commissioning window"
+    - label:
+          "Step 8: DUT_CR1 sends command to TH_CE to revoke the commissioning
+          window"
       PICS: CADMIN.C.C02.Tx
       verification: |
           On DUT_CR1 send the below command
@@ -180,7 +186,7 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 sends commands to TH_CE to write and read the Basic
+          "Step 9: DUT_CR1 sends commands to TH_CE to write and read the Basic
           Information Clusters NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
@@ -232,8 +238,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
-          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+          "Step 10: DUT_CR1 sends command to TH_CE to open a commissioning
+          window with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds
+          using ECM"
       PICS: CADMIN.C.C00.Tx
       verification: |
           On DUT_CR1 send the below command
@@ -249,7 +256,7 @@ tests:
           [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
-    - label: "TH_CR2 starts a commissioning process with TH_CE"
+    - label: "Step 11: TH_CR2 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
           On TH_CR2 send the below command
@@ -263,7 +270,7 @@ tests:
           Device commissioning completed with success
       disabled: true
 
-    - label: "TH_CR3 starts a commissioning process with TH_CE"
+    - label: "Step 12: TH_CR3 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
           On TH_CR3 send the below command

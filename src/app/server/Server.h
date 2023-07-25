@@ -63,7 +63,13 @@
 #if CONFIG_NETWORK_LAYER_BLE
 #include <transport/raw/BLE.h>
 #endif
+#include <app/TimerDelegates.h>
 #include <transport/raw/UDP.h>
+#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+#include <app/reporting/SynchronizedReportSchedulerImpl.h>
+#else
+#include <app/reporting/ReportSchedulerImpl.h>
+#endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/ICDEventManager.h> // nogncheck
@@ -254,6 +260,7 @@ private:
     static PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
     static Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
     static Credentials::GroupDataProviderImpl sGroupDataProvider;
+
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
     static SimpleSessionResumptionStorage sSessionResumptionStorage;
 #endif
@@ -333,6 +340,8 @@ public:
 
     app::DefaultAttributePersistenceProvider & GetDefaultAttributePersister() { return mAttributePersister; }
 
+    app::reporting::ReportScheduler & GetReportScheduler() { return mReportScheduler; }
+
     /**
      * This function causes the ShutDown event to be generated async on the
      * Matter event loop.  Should be called before stopping the event loop.
@@ -351,7 +360,7 @@ public:
     static Server & GetInstance() { return sServer; }
 
 private:
-    Server() = default;
+    Server() : mTimerDelegate(), mReportScheduler(&mTimerDelegate) {}
 
     static Server sServer;
 
@@ -585,6 +594,12 @@ private:
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;
     ServerFabricDelegate mFabricDelegate;
+    app::DefaultTimerDelegate mTimerDelegate;
+#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+    app::reporting::SynchronizedReportSchedulerImpl mReportScheduler;
+#else
+    app::reporting::ReportSchedulerImpl mReportScheduler;
+#endif
 
     Access::AccessControl mAccessControl;
     app::AclStorage * mAclStorage;

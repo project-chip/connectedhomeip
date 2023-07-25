@@ -25,17 +25,19 @@ config:
 
 tests:
     - label:
-          "Commission DUT to TH (can be skipped if done in a preceding test)."
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       verification: |
 
       disabled: true
 
-    - label: "TH reads from the DUT the SupportedModes attribute."
+    - label: "Step 2: TH reads from the DUT the SupportedModes attribute."
       PICS: MOD.S.A0002
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          On TH(chip-tool) log, Verify SupportedModes attribute should contains two or more ModeOptionsStruct entries and save  the Mode field values as supported_modes_dut,  below is the sample log provided for the raspi platform:
+          On TH(chip-tool) log, Verify SupportedModes attribute should contains two or more ModeOptionsStruct entries and
+          Save the Mode field values as supported_modes_dut,  below is the sample log provided for the raspi platform:
 
           [1685018204.991818][16390:16392] CHIP:DMG: }
           [1685018204.992182][16390:16392] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 3673378954
@@ -69,15 +71,15 @@ tests:
           [1685018204.992695][16390:16392] CHIP:TOO:      }
       disabled: true
 
-    - label: "TH reads from the DUT the CurrentMode attribute."
+    - label: "Step 2: TH reads from the DUT the CurrentMode attribute."
       PICS: MOD.S.A0003
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
           Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer value
-          -  save tha value as old_current_mode_dut
-          - select a value from supported_modes_dut, different from old_current_mode_dut, and which corresponds to a mode the device can switch to, given its current state and save this value as new_mode_th
-          - select a value which is NOT in supported_modes_dut and save it as invalid_mode_th,
+          - Save the value as old_current_mode_dut
+          - Select a value from supported_modes_dut, different from old_current_mode_dut, and which corresponds to a mode the device can switch to, given its current state and save this value as new_mode_th
+          - Select a value which is NOT in supported_modes_dut and save it as invalid_mode_th,
            below is the sample log provided for the raspi platform:
 
           [1685018283.726571][16418:16420] CHIP:DMG:         SuppressResponse = true,
@@ -88,9 +90,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a ChangeToModeWithStatus command to the DUT with NewMode set
-          to old_current_mode_dut [Petru] note that currently this constraint is
-          not in the spec. The unapproved proposal is here:
+          "Step 3: TH sends a ChangeToModeWithStatus command to the DUT with
+          NewMode set to old_current_mode_dut [Petru] note that currently this
+          constraint is not in the spec. The unapproved proposal is here:
           https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/7096
           Until that's approved, please skip this step."
       PICS: MOD.S.C01.Rsp
@@ -99,14 +101,14 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a ChangeToModeWithStatus command to the DUT with NewMode set
-          to new_mode_th"
+          "Step 4: TH sends a ChangeToModeWithStatus command to the DUT with
+          NewMode set to new_mode_th"
       PICS: MOD.S.C01.Rsp
       verification: |
-          ChangeToModeWithStatus Command is not impleented.
+          ChangeToModeWithStatus Command is not implemented.
       disabled: true
 
-    - label: "TH reads from the DUT the CurrentMode attribute."
+    - label: "Step 5: TH reads from the DUT the CurrentMode attribute."
       PICS: MOD.S.A0003
       verification: |
           ./chip-tool modeselect read current-mode 1 1
@@ -121,9 +123,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a ChangeToModeWithStatus command to the DUT with NewMode set
-          to invalid_mode_th"
+          "Step 6: TH sends a ChangeToModeWithStatus command to the DUT with
+          NewMode set to invalid_mode_th"
       PICS: MOD.S.C01.Rsp
       verification: |
-          ChangeToModeWithStatus Command is not impleented.
+          ChangeToModeWithStatus Command is not implemented.
       disabled: true
