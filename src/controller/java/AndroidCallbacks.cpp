@@ -17,10 +17,8 @@
 #include "AndroidCallbacks.h"
 #include <controller/java/AndroidClusterExceptions.h>
 #include <controller/java/AndroidControllerExceptions.h>
-#if USE_JAVA_TLV_ENCODE_DECODE
 #include <controller/java/CHIPAttributeTLVValueDecoder.h>
 #include <controller/java/CHIPEventTLVValueDecoder.h>
-#endif
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
@@ -245,17 +243,14 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
         return;
     }
 
+    TLV::TLVReader readerForJavaObject;
     TLV::TLVReader readerForJavaTLV;
     TLV::TLVReader readerForJson;
+    readerForJavaObject.Init(*apData);
     readerForJavaTLV.Init(*apData);
     readerForJson.Init(*apData);
 
-    jobject value = nullptr;
-#if USE_JAVA_TLV_ENCODE_DECODE
-    TLV::TLVReader readerForJavaObject;
-    readerForJavaObject.Init(*apData);
-
-    value = DecodeAttributeValue(aPath, readerForJavaObject, &err);
+    jobject value = DecodeAttributeValue(aPath, readerForJavaObject, &err);
     // If we don't know this attribute, suppress it.
     if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB)
     {
@@ -265,7 +260,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(attributePathObj, nullptr, err));
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe(),
                    ReportError(attributePathObj, nullptr, CHIP_JNI_ERROR_EXCEPTION_THROWN));
-#endif
+
     // Create TLV byte array to pass to Java layer
     size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
     std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen]);
@@ -359,8 +354,10 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
         return;
     }
 
+    TLV::TLVReader readerForJavaObject;
     TLV::TLVReader readerForJavaTLV;
     TLV::TLVReader readerForJson;
+    readerForJavaObject.Init(*apData);
     readerForJavaTLV.Init(*apData);
     readerForJson.Init(*apData);
 
@@ -368,11 +365,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     jlong priorityLevel = static_cast<jint>(aEventHeader.mPriorityLevel);
     jlong timestamp     = static_cast<jlong>(aEventHeader.mTimestamp.mValue);
 
-    jobject value = nullptr;
-#if USE_JAVA_TLV_ENCODE_DECODE
-    TLV::TLVReader readerForJavaObject;
-    readerForJavaObject.Init(*apData);
-    value = DecodeEventValue(aEventHeader.mPath, readerForJavaObject, &err);
+    jobject value = DecodeEventValue(aEventHeader.mPath, readerForJavaObject, &err);
     // If we don't know this event, just skip it.
     if (err == CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB)
     {
@@ -381,7 +374,6 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(nullptr, eventPathObj, err));
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe(),
                    ReportError(nullptr, eventPathObj, CHIP_JNI_ERROR_EXCEPTION_THROWN));
-#endif
 
     // Create TLV byte array to pass to Java layer
     size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
@@ -707,8 +699,10 @@ void ReportEventCallback::OnEventData(const app::EventHeader & aEventHeader, TLV
         return;
     }
 
+    TLV::TLVReader readerForJavaObject;
     TLV::TLVReader readerForJavaTLV;
     TLV::TLVReader readerForJson;
+    readerForJavaObject.Init(*apData);
     readerForJavaTLV.Init(*apData);
     readerForJson.Init(*apData);
 
@@ -716,16 +710,11 @@ void ReportEventCallback::OnEventData(const app::EventHeader & aEventHeader, TLV
     jlong priorityLevel = static_cast<jint>(aEventHeader.mPriorityLevel);
     jlong timestamp     = static_cast<jlong>(aEventHeader.mTimestamp.mValue);
 
-    jobject value = nullptr;
-#if USE_JAVA_TLV_ENCODE_DECODE
-    TLV::TLVReader readerForJavaObject;
-    readerForJavaObject.Init(*apData);
-    value = DecodeEventValue(aEventHeader.mPath, readerForJavaObject, &err);
+    jobject value = DecodeEventValue(aEventHeader.mPath, readerForJavaObject, &err);
     // If we don't know this event, just skip it.
     VerifyOrReturn(err != CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
     VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(eventPathObj, err));
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe(), ReportError(eventPathObj, CHIP_JNI_ERROR_EXCEPTION_THROWN));
-#endif
 
     // Create TLV byte array to pass to Java layer
     size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
