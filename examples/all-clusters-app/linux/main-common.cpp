@@ -28,6 +28,8 @@
 #include <app/att-storage.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
+#include "laundry-washer-controls-delegate-impl.h"
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <lib/support/CHIPMem.h>
@@ -203,6 +205,12 @@ void ApplicationShutdown()
     {
         ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
     }
+}
+
+using namespace chip::app::Clusters::LaundryWasherControls;
+void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
+{
+    LaundryWasherControlsServer::SetDefaultDelegate(1, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
 }
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
