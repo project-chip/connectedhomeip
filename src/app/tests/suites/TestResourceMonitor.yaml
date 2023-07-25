@@ -19,15 +19,30 @@ config:
     cluster: "Resource Monitor"
     endpoint: 1
     ReplacementProductList:
-      type: "ReplacementProductStruct"
-      defaultValue:
-        [
-            { ProductIdentifierType: 0, ProductIdentifierValue: "111112222233" },
-            { ProductIdentifierType: 1, ProductIdentifierValue: "gtin8xxx" },
-            { ProductIdentifierType: 2, ProductIdentifierValue: "4444455555666" },
-            { ProductIdentifierType: 3, ProductIdentifierValue: "gtin14xxxxxxxx" },
-            { ProductIdentifierType: 4, ProductIdentifierValue: "oem20xxxxxxxxxxxxxxx" },
-        ]
+        type: "ReplacementProductStruct"
+        defaultValue:
+            [
+                {
+                    ProductIdentifierType: 0,
+                    ProductIdentifierValue: "111112222233",
+                },
+                {
+                    ProductIdentifierType: 1,
+                    ProductIdentifierValue: "gtin8xxx",
+                },
+                {
+                    ProductIdentifierType: 2,
+                    ProductIdentifierValue: "4444455555666",
+                },
+                {
+                    ProductIdentifierType: 3,
+                    ProductIdentifierValue: "gtin14xxxxxxxx",
+                },
+                {
+                    ProductIdentifierType: 4,
+                    ProductIdentifierValue: "oem20xxxxxxxxxxxxxxx",
+                },
+            ]
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -42,11 +57,26 @@ tests:
       command: "readAttribute"
       attribute: "ReplacementProductList"
       response:
-        value:
-          [
-              { ProductIdentifierType: 0, ProductIdentifierValue: "111112222233" },
-              { ProductIdentifierType: 1, ProductIdentifierValue: "gtin8xxx" },
-              { ProductIdentifierType: 2, ProductIdentifierValue: "4444455555666" },
-              { ProductIdentifierType: 3, ProductIdentifierValue: "gtin14xxxxxxxx" },
-              { ProductIdentifierType: 4, ProductIdentifierValue: "oem20xxxxxxxxxxxxxxx" },
-          ]
+          value:
+              [
+                  {
+                      ProductIdentifierType: 0,
+                      ProductIdentifierValue: "111112222233",
+                  },
+                  {
+                      ProductIdentifierType: 1,
+                      ProductIdentifierValue: "gtin8xxx",
+                  },
+                  {
+                      ProductIdentifierType: 2,
+                      ProductIdentifierValue: "4444455555666",
+                  },
+                  {
+                      ProductIdentifierType: 3,
+                      ProductIdentifierValue: "gtin14xxxxxxxx",
+                  },
+                  {
+                      ProductIdentifierType: 4,
+                      ProductIdentifierValue: "oem20xxxxxxxxxxxxxxx",
+                  },
+              ]
