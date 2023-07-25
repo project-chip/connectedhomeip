@@ -6553,8 +6553,6 @@ endpoint 1 {
     emits event LongPress;
     emits event ShortRelease;
     emits event LongRelease;
-    emits event MultiPressOngoing;
-    emits event MultiPressComplete;
     ram      attribute numberOfPositions default = 2;
     ram      attribute currentPosition;
     ram      attribute multiPressMax default = 2;
