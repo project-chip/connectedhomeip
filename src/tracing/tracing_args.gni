@@ -43,10 +43,7 @@ declare_args() {
   # since tracing is very noisy, we generally expect it to be explicitly
   # set up.
   #
-  # TODO: cpp_standard check is not ideal, it should be >= 17,
-  #       however for now this is what we use in compilations
-  if ((current_os == "linux" || current_os == "android") &&
-      cpp_standard == "gnu++17") {
+  if (current_os == "linux" || current_os == "android") {
     matter_trace_config = "${chip_root}/src/tracing/perfetto:perfetto_tracing"
   } else {
     matter_trace_config = "${chip_root}/src/tracing/none"
