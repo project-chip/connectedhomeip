@@ -53,7 +53,7 @@ tests:
               type: bitmap32
 
     - label: "Step 4a: TH reads AttributeList from DUT"
-      PICS: BINFO.S.Afffb
+      PICS: PICS_EVENT_LIST_ENABLED && BINFO.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -76,6 +76,35 @@ tests:
                       65528,
                       65529,
                       65530,
+                      65531,
+                      65532,
+                      65533,
+                  ]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED && BINFO.S.Afffb"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0,
+                      1,
+                      2,
+                      3,
+                      4,
+                      5,
+                      6,
+                      7,
+                      8,
+                      9,
+                      10,
+                      19,
+                      65528,
+                      65529,
+
                       65531,
                       65532,
                       65533,

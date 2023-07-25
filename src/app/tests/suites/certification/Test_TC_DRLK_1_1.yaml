@@ -174,6 +174,7 @@ tests:
               hasMasksSet: [0x1000]
 
     - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -181,6 +182,15 @@ tests:
               type: list
               contains:
                   [0, 1, 2, 37, 38, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 37, 38, 65528, 65529, 65531, 65532, 65533]
 
     - label:
           "Step 4b: TH reads Feature dependent(DRLK.S.F05) attributes in

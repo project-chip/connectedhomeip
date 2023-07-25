@@ -139,6 +139,7 @@ tests:
     ##########################
     # Mandatory entries
     - label: "TS4: Check for mandatory attributes in AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -154,6 +155,15 @@ tests:
                       0xFFFC,
                       0xFFFD,
                   ]
+
+    # Optional
+    - label: "TS4: Check for mandatory attributes in AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              contains: [0x0000, 0x0001, 0xFFF8, 0xFFF9, 0xFFFB, 0xFFFC, 0xFFFD]
 
     # Optional
     - label: "TS4: Check for optional attribute TimeSource in AttributeList"
