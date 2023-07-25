@@ -97,6 +97,7 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
 }
 void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 {
+    VerifyOrDie(gHepaFilterInstance == nullptr);
     gHepaFilterInstance = new HepaFilterMonitoringInstance(endpoint, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                                                            DegradationDirectionEnum::kDown, true);
     gHepaFilterInstance->Init();

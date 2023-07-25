@@ -169,8 +169,8 @@ The ZAP tool scripting uses the following detection, in order of importance:
     -   Use this if you are developing ZAP locally and would like to run ZAP
         with your changes.
 
--   `$ZAP_INSTALL_PATH` to point to where `zap-linux.zip` or `zap-mac.zip` was
-    unpacked.
+-   `$ZAP_INSTALL_PATH` to point to where `zap-linux-x64.zip`,
+    `zap-linux-arm64.zip` or `zap-mac-x64.zip` was unpacked.
 
     -   This allows you to not need to place `zap` or `zap-cli` (or both) in
         `$PATH`.

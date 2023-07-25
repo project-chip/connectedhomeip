@@ -20,7 +20,6 @@
 
 #include <app/ReadHandler.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/IntrusiveList.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -31,6 +30,13 @@ namespace reporting {
 class TestReportScheduler;
 
 using Timestamp = System::Clock::Timestamp;
+
+class TimerContext
+{
+public:
+    virtual ~TimerContext() {}
+    virtual void TimerFired() = 0;
+};
 
 class ReportScheduler : public ReadHandler::Observer
 {
@@ -45,17 +51,28 @@ public:
         /// CancelTimer) before starting a new one for that context.
         /// @param context context to pass to the timer callback.
         /// @param aTimeout time in miliseconds before the timer expires
-        virtual CHIP_ERROR StartTimer(void * context, System::Clock::Timeout aTimeout) = 0;
+        virtual CHIP_ERROR StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) = 0;
         /// @brief Cancel a timer for a given context
         /// @param context used to identify the timer to cancel
-        virtual void CancelTimer(void * context)         = 0;
-        virtual bool IsTimerActive(void * context)       = 0;
-        virtual Timestamp GetCurrentMonotonicTimestamp() = 0;
+        virtual void CancelTimer(TimerContext * context)   = 0;
+        virtual bool IsTimerActive(TimerContext * context) = 0;
+        virtual Timestamp GetCurrentMonotonicTimestamp()   = 0;
     };
 
-    class ReadHandlerNode : public IntrusiveListNodeBase<>
+    class ReadHandlerNode : public TimerContext
     {
     public:
+#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        /// Test flags to allow TestReadInteraction to simulate expiration of the minimal and maximal intervals without
+        /// waiting
+        enum class TestFlags : uint8_t{
+            MinIntervalElapsed = (1 << 0),
+            MaxIntervalElapsed = (1 << 1),
+        };
+        void SetTestFlags(TestFlags aFlag, bool aValue) { mFlags.Set(aFlag, aValue); }
+        bool GetTestFlags(TestFlags aFlag) const { return mFlags.Has(aFlag); }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
         ReadHandlerNode(ReadHandler * aReadHandler, TimerDelegate * aTimerDelegate, ReportScheduler * aScheduler) :
             mTimerDelegate(aTimerDelegate), mScheduler(aScheduler)
         {
@@ -67,20 +84,37 @@ public:
             SetIntervalTimeStamps(aReadHandler);
         }
         ReadHandler * GetReadHandler() const { return mReadHandler; }
+
         /// @brief Check if the Node is reportable now, meaning its readhandler was made reportable by attribute dirtying and
         /// handler state, and minimal time interval since last report has elapsed, or the maximal time interval since last
         /// report has elapsed
         bool IsReportableNow() const
         {
-            // TODO: Add flags to allow for test to simulate waiting for the min interval or max intrval to elapse when integrating
-            // the scheduler in the ReadHandler
             Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+
+#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+            return (mReadHandler->IsGeneratingReports() && (now >= mMinTimestamp || mFlags.Has(TestFlags::MinIntervalElapsed)) &&
+                    (mReadHandler->IsDirty() || (now >= mMaxTimestamp || mFlags.Has(TestFlags::MaxIntervalElapsed)) ||
+                     now >= mSyncTimestamp));
+#else
             return (mReadHandler->IsGeneratingReports() &&
                     (now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || now >= mSyncTimestamp)));
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
         }
 
         bool IsEngineRunScheduled() const { return mEngineRunScheduled; }
-        void SetEngineRunScheduled(bool aEnginRunScheduled) { mEngineRunScheduled = aEnginRunScheduled; }
+        void SetEngineRunScheduled(bool aEngineRunScheduled)
+        {
+            mEngineRunScheduled = aEngineRunScheduled;
+#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+            // If the engine becomes unscheduled, this means a run just took place so we reset the test flags
+            if (!mEngineRunScheduled)
+            {
+                mFlags.Set(TestFlags::MinIntervalElapsed, false);
+                mFlags.Set(TestFlags::MaxIntervalElapsed, false);
+            }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        }
 
         void SetIntervalTimeStamps(ReadHandler * aReadHandler)
         {
@@ -92,7 +126,7 @@ public:
             mSyncTimestamp = mMaxTimestamp;
         }
 
-        void RunCallback()
+        void TimerFired() override
         {
             mScheduler->ReportTimerCallback();
             SetEngineRunScheduled(true);
@@ -111,6 +145,9 @@ public:
         System::Clock::Timestamp GetSyncTimestamp() const { return mSyncTimestamp; }
 
     private:
+#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        BitFlags<TestFlags> mFlags;
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
         TimerDelegate * mTimerDelegate;
         ReadHandler * mReadHandler;
         ReportScheduler * mScheduler;
@@ -132,18 +169,41 @@ public:
 
     /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
     /// @param aReadHandler read handler to check
-    bool IsReportableNow(ReadHandler * aReadHandler)
-    {
-        return FindReadHandlerNode(aReadHandler)->IsReportableNow();
-    } // TODO: Change the IsReportableNow to IsReportable() for readHandlers
+    bool IsReportableNow(ReadHandler * aReadHandler) { return FindReadHandlerNode(aReadHandler)->IsReportableNow(); }
     /// @brief Check if a ReadHandler is reportable without considering the timing
-    bool IsReadHandlerReportable(ReadHandler * aReadHandler) const
-    {
-        return aReadHandler->IsGeneratingReports() && aReadHandler->IsDirty();
-    }
+    bool IsReadHandlerReportable(ReadHandler * aReadHandler) const { return aReadHandler->IsReportable(); }
 
     /// @brief Get the number of ReadHandlers registered in the scheduler's node pool
     size_t GetNumReadHandlers() const { return mNodesPool.Allocated(); }
+
+#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    void RunNodeCallbackForHandler(const ReadHandler * aReadHandler)
+    {
+        ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
+        node->TimerFired();
+    }
+    void SetFlagsForHandler(const ReadHandler * aReadHandler, ReadHandlerNode::TestFlags aFlag, bool aValue)
+    {
+        ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
+        node->SetTestFlags(aFlag, aValue);
+    }
+
+    bool CheckFlagsForHandler(const ReadHandler * aReadHandler, ReadHandlerNode::TestFlags aFlag)
+    {
+        ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
+        return node->GetTestFlags(aFlag);
+    }
+    Timestamp GetMinTimestampForHandler(const ReadHandler * aReadHandler)
+    {
+        ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
+        return node->GetMinTimestamp();
+    }
+    Timestamp GetMaxTimestampForHandler(const ReadHandler * aReadHandler)
+    {
+        ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
+        return node->GetMaxTimestamp();
+    }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 protected:
     friend class chip::app::reporting::TestReportScheduler;
@@ -153,17 +213,19 @@ protected:
     /// @return Node Address if node was found, nullptr otherwise
     ReadHandlerNode * FindReadHandlerNode(const ReadHandler * aReadHandler)
     {
-        for (auto & iter : mReadHandlerList)
-        {
-            if (iter.GetReadHandler() == aReadHandler)
+        ReadHandlerNode * foundNode = nullptr;
+        mNodesPool.ForEachActiveObject([&foundNode, aReadHandler](ReadHandlerNode * node) {
+            if (node->GetReadHandler() == aReadHandler)
             {
-                return &iter;
+                foundNode = node;
+                return Loop::Break;
             }
-        }
-        return nullptr;
+
+            return Loop::Continue;
+        });
+        return foundNode;
     }
 
-    IntrusiveList<ReadHandlerNode> mReadHandlerList;
     ObjectPool<ReadHandlerNode, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> mNodesPool;
     TimerDelegate * mTimerDelegate;
 };
