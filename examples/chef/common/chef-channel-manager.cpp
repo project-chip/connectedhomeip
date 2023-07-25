@@ -82,7 +82,6 @@ static bool isChannelMatched(const ChannelInfoType & channel, const CharSpan & m
 
 CHIP_ERROR ChefChannelManager::HandleGetChannelList(app::AttributeValueEncoder & aEncoder)
 {
-    // TODO: Insert code here
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         for (auto const & channel : ChefChannelManager().mChannels)
         {
@@ -156,7 +155,6 @@ void ChefChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannel
 
 bool ChefChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber)
 {
-    // TODO: Insert code here
     bool channelChanged = false;
     uint16_t index      = 0;
     for (auto const & channel : mChannels)
