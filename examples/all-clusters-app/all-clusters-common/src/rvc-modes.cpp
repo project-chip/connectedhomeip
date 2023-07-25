@@ -92,7 +92,8 @@ void RvcRunMode::Shutdown()
 {
     if (gRvcRunModeInstance != nullptr)
     {
-        gRvcRunModeInstance->~Instance();
+        delete gRvcRunModeInstance;
+        gRvcRunModeInstance = nullptr;
     }
     if (gRvcRunModeDelegate != nullptr)
     {
@@ -174,7 +175,8 @@ void RvcCleanMode::Shutdown()
 {
     if (gRvcCleanModeInstance != nullptr)
     {
-        gRvcCleanModeInstance->~Instance();
+        delete gRvcCleanModeInstance;
+        gRvcCleanModeInstance = nullptr;
     }
     if (gRvcCleanModeDelegate != nullptr)
     {

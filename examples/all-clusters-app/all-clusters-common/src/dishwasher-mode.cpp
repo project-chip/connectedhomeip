@@ -80,7 +80,8 @@ void DishwasherMode::Shutdown()
 {
     if (gDishwasherModeInstance != nullptr)
     {
-        gDishwasherModeInstance->~Instance();
+        delete gDishwasherModeInstance;
+        gDishwasherModeInstance = nullptr;
     }
     if (gDishwasherModeDelegate != nullptr)
     {

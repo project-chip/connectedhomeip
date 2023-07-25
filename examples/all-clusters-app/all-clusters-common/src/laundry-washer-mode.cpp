@@ -79,7 +79,8 @@ void LaundryWasherMode::Shutdown()
 {
     if (gLaundryWasherModeInstance != nullptr)
     {
-        gLaundryWasherModeInstance->~Instance();
+        delete gLaundryWasherModeInstance;
+        gLaundryWasherModeInstance = nullptr;
     }
     if (gLaundryWasherModeDelegate != nullptr)
     {
