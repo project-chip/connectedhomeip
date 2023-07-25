@@ -28,24 +28,31 @@ namespace Clusters {
 namespace ResourceMonitoring {
 
 /**
- * This implementation statically defines the options.
+ * This implementation allows for items to be added dynamically.
  */
 
-class StaticReplacementProductListManager : public ReplacementProductListManager
+class DynamicReplacementProductListManager : public ReplacementProductListManager
 {
 public:
     CHIP_ERROR Next(Attributes::GenericType & item) override;
 
-    ~StaticReplacementProductListManager() {}
-    StaticReplacementProductListManager(Attributes::GenericType * aReplacementProductsList,
-                                        uint8_t aReplacementProductListSize)
+    CHIP_ERROR addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType, chip::CharSpan aProductIdentifierValue)
     {
-        mReplacementProductsList    = aReplacementProductsList;
-        mReplacementProductListSize = aReplacementProductListSize;
+        Attributes::GenericType * type = &mReplacementProductsList[mReplacementProductListSize];
+        CHIP_ERROR err = type->setProductIdentifierValue(aProductIdentifierValue);
+        if (CHIP_NO_ERROR != err)
+        {
+            return err;
+        };
+
+        type->setProductIdentifierType(aProductIdentifierType);
+        mReplacementProductListSize++;
+
+        return CHIP_NO_ERROR;
     }
 
 private:
-    Attributes::GenericType * mReplacementProductsList;
+    Attributes::GenericType mReplacementProductsList[ReplacementProductListManager::kReplacementProductListMaxSize];
     uint8_t mReplacementProductListSize;
 };
 

@@ -29,6 +29,8 @@ namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
 
+// max of 20 characters + 1 for null terminator
+static constexpr size_t kProductIdentifierValueMaxNameLength = 21u;
 static constexpr std::array<ClusterId, 2> AliasedClusters = { HepaFilterMonitoring::Id, ActivatedCarbonFilterMonitoring::Id };
 
 // Enum for ChangeIndicationEnum
@@ -141,45 +143,72 @@ struct TypeInfo
 };
 } // namespace LastChangedTime
 
-namespace GenericReplacementProductStruct {
-enum class Fields : uint8_t
-{
-    kProductIdentifierType  = 0,
-    kProductIdentifierValue = 1,
-};
-
 // A struct used during reads of the ReplacementProductList to store a single list instance we request
 // from the application.
-// 
+//
 // Inherit from an auto-generated struct to pick up the implementation bits, but make
 // it private inheritance so people can't accidentally use this struct where the other
 // is expected.
-class GenericType : private HepaFilterMonitoring::Structs::ReplacementProductStruct::Type
+struct GenericType : private HepaFilterMonitoring::Structs::ReplacementProductStruct::Type
 {
-private:
-    ResourceMonitoring::ProductIdentifierTypeEnum productIdentifierType;
-    chip::CharSpan productIdentifierValue;
+    private:
+        char productIdentifierValueBuffer[kProductIdentifierValueMaxNameLength];
 
-public:
-    GenericType() {}
-    GenericType(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType, chip::CharSpan aProductIdentifierValue)
-    {
-        productIdentifierType  = aProductIdentifierType;
-        productIdentifierValue = aProductIdentifierValue;
-    }
-    virtual ~GenericType()                = default;
-    static constexpr bool kIsFabricScoped = false;
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    public:
+        static constexpr bool kIsFabricScoped = false;
+        virtual ~GenericType()                = default;
+        GenericType() {}
+        GenericType(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType, chip::CharSpan aProductIdentifierValue)
+        {
+            setProductIdentifierType(aProductIdentifierType);
+            setProductIdentifierValue(aProductIdentifierValue);
+        }
+
+        using HepaFilterMonitoring::Structs::ReplacementProductStruct::Type::Encode;
+
+        /**
+         * Sets the product identifier type.
+         * 
+         * @param aProductIdentifierType The product identifier type.
+        */
+        void setProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType)
+        {
+            productIdentifierType = static_cast<HepaFilterMonitoring::ProductIdentifierTypeEnum>(aProductIdentifierType);
+        }
+
+        /**
+         * Sets the product identifier value.
+         * This implementation will copy the argument to the local implementation.
+         * 
+         * @param aProductIdentifierValue The value of the product identifier to set.
+         * @return CHIP_ERROR_INVALID_ARGUMENT when aProductIdentifierValue is invalid, CHIP_NO_ERROR otherwise.
+        */
+        CHIP_ERROR setProductIdentifierValue(chip::CharSpan aProductIdentifierValue)
+        {
+            VerifyOrReturnError(IsSpanUsable(aProductIdentifierValue), CHIP_ERROR_INVALID_ARGUMENT);
+
+            if (aProductIdentifierValue.size() > sizeof(productIdentifierValueBuffer))
+            {
+                memcpy(productIdentifierValueBuffer, aProductIdentifierValue.data(), sizeof(productIdentifierValueBuffer));
+                productIdentifierValue = CharSpan(productIdentifierValueBuffer, sizeof(productIdentifierValueBuffer));
+            }
+            else
+            {
+                memcpy(productIdentifierValueBuffer, aProductIdentifierValue.data(), aProductIdentifierValue.size());
+                productIdentifierValue = CharSpan(productIdentifierValueBuffer, aProductIdentifierValue.size());
+            }
+
+            return CHIP_NO_ERROR;
+        }
 };
-} // namespace GenericReplacementProductStruct
 
 namespace ReplacementProductList {
 static constexpr AttributeId Id = 0x00000005;
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const GenericReplacementProductStruct::GenericType>;
-    using DecodableType    = chip::app::DataModel::DecodableList<GenericReplacementProductStruct::GenericType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<GenericReplacementProductStruct::GenericType> &;
+    using Type             = chip::app::DataModel::List<const GenericType>;
+    using DecodableType    = chip::app::DataModel::DecodableList<GenericType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<GenericType> &;
 
     static constexpr AttributeId GetAttributeId() { return Attributes::ReplacementProductList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }

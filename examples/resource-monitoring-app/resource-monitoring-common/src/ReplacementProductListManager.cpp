@@ -17,6 +17,7 @@
  */
 
 #include <StaticReplacementProductListManager.h>
+#include <DynamicReplacementProductListManager.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
@@ -25,7 +26,19 @@
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
 
-CHIP_ERROR StaticReplacementProductListManager::Next(Attributes::GenericReplacementProductStruct::GenericType & item)
+CHIP_ERROR StaticReplacementProductListManager::Next(Attributes::GenericType & item)
+{
+    if (mIndex < mReplacementProductListSize)
+    {
+        item = mReplacementProductsList[mIndex];
+        mIndex++;
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+}
+
+CHIP_ERROR DynamicReplacementProductListManager::Next(Attributes::GenericType & item)
 {
     if (mIndex < mReplacementProductListSize)
     {

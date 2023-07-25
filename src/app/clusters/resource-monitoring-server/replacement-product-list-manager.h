@@ -34,12 +34,21 @@ namespace ResourceMonitoring {
 class ReplacementProductListManager
 {
 public:
+    static constexpr size_t kReplacementProductListMaxSize = 5u;
+
     ReplacementProductListManager() {}
     virtual ~ReplacementProductListManager() = default;
 
     void Reset() { mIndex = 0; }
 
-    virtual CHIP_ERROR Next(Attributes::GenericReplacementProductStruct::GenericType & item) = 0;
+    /**
+     * Iterates through the entries in the ReplacementProductListManager. Each call to this function move the list pointer to the next element. Calls to this function will return CHIP_NO_ERROR if there are still valid elements in the list. The function will return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the end of the list has been reached.
+     *
+     * @param[out] item An out parameter that is populated with the address of the item in the list. Will be empty if there are no remaining items in the list. In normal circumstances this parameter should never be modified.
+     * @return CHIP_NO_ERROR if the pointer to the list element has moved to the next element and there are still valid remaining entries in the list.
+     * Otherwise returns CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the list has hit the last element.
+    */
+    virtual CHIP_ERROR Next(Attributes::GenericType & item) = 0;
 
 protected:
     uint8_t mIndex;

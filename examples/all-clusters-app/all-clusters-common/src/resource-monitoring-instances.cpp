@@ -25,7 +25,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
-using namespace ResourceMonitoring::Attributes::GenericReplacementProductStruct;
 using chip::Protocols::InteractionModel::Status;
 
 constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(Feature::kCondition) |
@@ -38,12 +37,12 @@ constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Featu
 static HepaFilterMonitoringInstance * gHepaFilterInstance                       = nullptr;
 static ActivatedCarbonFilterMonitoringInstance * gActivatedCarbonFilterInstance = nullptr;
 
-static GenericType sReplacementProductsList[] = {
-    GenericType(ProductIdentifierTypeEnum::kUpc, CharSpan::fromCharString("111112222233")),
-    GenericType(ProductIdentifierTypeEnum::kGtin8, CharSpan::fromCharString("gtin8xxx")),
-    GenericType(ProductIdentifierTypeEnum::kEan, CharSpan::fromCharString("4444455555666")),
-    GenericType(ProductIdentifierTypeEnum::kGtin14, CharSpan::fromCharString("gtin14xxxxxxxx")),
-    GenericType(ProductIdentifierTypeEnum::kOem, CharSpan::fromCharString("oem20xxxxxxxxxxxxxxx")),
+static ResourceMonitoring::Attributes::GenericType sReplacementProductsList[] = {
+    { ProductIdentifierTypeEnum::kUpc, CharSpan::fromCharString("111112222233") },
+    { ProductIdentifierTypeEnum::kGtin8, CharSpan::fromCharString("gtin8xxx") },
+    { ProductIdentifierTypeEnum::kEan, CharSpan::fromCharString("4444455555666") },
+    { ProductIdentifierTypeEnum::kGtin14, CharSpan::fromCharString("gtin14xxxxxxxx") },
+    { ProductIdentifierTypeEnum::kOem, CharSpan::fromCharString("oem20xxxxxxxxxxxxxxx") },
 };
 StaticReplacementProductListManager sReplacementProductListManager(&sReplacementProductsList[0],
                                                                    ArraySize(sReplacementProductsList));
@@ -103,7 +102,7 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
     gHepaFilterInstance->Init();
 }
 
-CHIP_ERROR StaticReplacementProductListManager::Next(Attributes::GenericReplacementProductStruct::GenericType & item)
+CHIP_ERROR StaticReplacementProductListManager::Next(Attributes::GenericType & item)
 {
     if (mIndex < mReplacementProductListSize)
     {

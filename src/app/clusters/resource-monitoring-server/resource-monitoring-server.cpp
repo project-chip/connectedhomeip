@@ -197,12 +197,6 @@ Status Instance::OnResetCondition()
         }
     }
 
-    ReplacementProductListManager * productListManagerInstance = Instance::GetReplacementProductListManagerInstance();
-    if (nullptr != productListManagerInstance)
-    {
-        productListManagerInstance->Reset();
-    }
-
     // call application specific post reset logic
     status = PostResetCondition();
     return status;
@@ -263,8 +257,9 @@ CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
         productListManagerInstance->Reset();
 
         err = aEncoder.EncodeList([productListManagerInstance](const auto & encoder) -> CHIP_ERROR {
-            Attributes::GenericReplacementProductStruct::GenericType replacementProductStruct;
-            CHIP_ERROR iteratorError = CHIP_NO_ERROR;
+            Attributes::GenericType replacementProductStruct;
+            CHIP_ERROR iteratorError = productListManagerInstance->Next(replacementProductStruct);
+
             while (CHIP_NO_ERROR == iteratorError)
             {
                 ReturnErrorOnFailure(encoder.Encode(replacementProductStruct));

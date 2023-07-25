@@ -44,22 +44,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace ResetCondition.
 } // namespace Commands
 
-namespace Attributes {
-namespace GenericReplacementProductStruct {
-
-CHIP_ERROR GenericType::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kProductIdentifierType), productIdentifierType));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kProductIdentifierValue), productIdentifierValue));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-} // namespace GenericReplacementProductStruct
-} // namespace Attributes
-
 } // namespace ResourceMonitoring
 } // namespace Clusters
 } // namespace app

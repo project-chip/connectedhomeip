@@ -32,16 +32,16 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ActivatedCarbonFilterMonitoring;
 using namespace chip::app::Clusters::ResourceMonitoring;
-using namespace ResourceMonitoring::Attributes::GenericReplacementProductStruct;
+using namespace chip::app::Clusters::ResourceMonitoring::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-static ResourceMonitoring::Attributes::GenericReplacementProductStruct::GenericType
+static GenericType
     sActivatedCarbonFilterReplacementProductsList[] = {
-        GenericType(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc, CharSpan::fromCharString("111112222233")),
-        GenericType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8, CharSpan::fromCharString("gtin8xca")),
-        GenericType(ResourceMonitoring::ProductIdentifierTypeEnum::kEan, CharSpan::fromCharString("4444455555666")),
-        GenericType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14, CharSpan::fromCharString("gtin14xcarbonx")),
-        GenericType(ResourceMonitoring::ProductIdentifierTypeEnum::kOem, CharSpan::fromCharString("oem20xcarbonxxxxxxxx")),
+        { ResourceMonitoring::ProductIdentifierTypeEnum::kUpc, CharSpan::fromCharString("111112222233") },
+        { ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8, CharSpan::fromCharString("gtin8xca") },
+        { ResourceMonitoring::ProductIdentifierTypeEnum::kEan, CharSpan::fromCharString("4444455555666") },
+        { ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14, CharSpan::fromCharString("gtin14xcarbonx") },
+        { ResourceMonitoring::ProductIdentifierTypeEnum::kOem, CharSpan::fromCharString("oem20xcarbonxxxxxxxx") },
     };
 StaticReplacementProductListManager
     sActivatedCarbonFilterReplacementProductListManager(&sActivatedCarbonFilterReplacementProductsList[0],

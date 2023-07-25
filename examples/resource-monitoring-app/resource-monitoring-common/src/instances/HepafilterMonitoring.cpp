@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <StaticReplacementProductListManager.h>
+#include <DynamicReplacementProductListManager.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
@@ -31,25 +31,23 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
-using namespace ResourceMonitoring::Attributes::GenericReplacementProductStruct;
+using namespace chip::app::Clusters::ResourceMonitoring::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-static GenericType sHepaFilterReplacementProductsList[] = {
-    GenericType(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc, CharSpan::fromCharString("111112222233")),
-    GenericType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8, CharSpan::fromCharString("gtin8xhe")),
-    GenericType(ResourceMonitoring::ProductIdentifierTypeEnum::kEan, CharSpan::fromCharString("4444455555666")),
-    GenericType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14, CharSpan::fromCharString("gtin14xhepaxxx")),
-    GenericType(ResourceMonitoring::ProductIdentifierTypeEnum::kOem, CharSpan::fromCharString("oem20xhepaxxxxxxxxxx")),
-};
-StaticReplacementProductListManager sHepaFilterReplacementProductListManager(&sHepaFilterReplacementProductsList[0],
-                                                                             ArraySize(sHepaFilterReplacementProductsList));
+DynamicReplacementProductListManager mHepaFilterReplacementProductListManager;
 
 //-- Hepa filter Monitoring instance methods
 CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
 {
     ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::Init()");
 
-    SetReplacementProductListManagerInstance(&sHepaFilterReplacementProductListManager);
+    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc, CharSpan::fromCharString("111112222233"));
+    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8, CharSpan::fromCharString("gtin8xhe"));
+    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kEan, CharSpan::fromCharString("4444455555666"));
+    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14, CharSpan::fromCharString("gtin14xhepaxxx"));
+    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kOem, CharSpan::fromCharString("oem20xhepaxxxxxxxxxx"));
+
+    SetReplacementProductListManagerInstance(&mHepaFilterReplacementProductListManager);
 
     return CHIP_NO_ERROR;
 }
