@@ -9251,7 +9251,7 @@ PICS:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: RVCCLEANMS.S.C03.Tx
 
-    ##  Dishwasher Alarm
+    ##  Dishwasher Alarm Cluster
 
     # Features
     - label: "Does the device support the Reset command"
