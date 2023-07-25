@@ -1551,7 +1551,6 @@ server cluster Switch = 59 {
 
   readonly attribute int8u numberOfPositions = 0;
   readonly attribute int8u currentPosition = 1;
-  readonly attribute int8u multiPressMax = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2360,11 +2359,8 @@ endpoint 0 {
     emits event LongPress;
     emits event ShortRelease;
     emits event LongRelease;
-    emits event MultiPressOngoing;
-    emits event MultiPressComplete;
     ram      attribute numberOfPositions default = 2;
     ram      attribute currentPosition;
-    ram      attribute multiPressMax default = 2;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
