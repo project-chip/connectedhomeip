@@ -31,7 +31,7 @@ namespace ResourceMonitoring {
 
 // max of 20 characters + 1 for null terminator
 static constexpr size_t kProductIdentifierValueMaxNameLength = 21u;
-static constexpr std::array<ClusterId, 2> AliasedClusters = { HepaFilterMonitoring::Id, ActivatedCarbonFilterMonitoring::Id };
+static constexpr std::array<ClusterId, 2> AliasedClusters    = { HepaFilterMonitoring::Id, ActivatedCarbonFilterMonitoring::Id };
 
 // Enum for ChangeIndicationEnum
 enum class ChangeIndicationEnum : uint8_t
@@ -151,55 +151,55 @@ struct TypeInfo
 // is expected.
 struct GenericType : private HepaFilterMonitoring::Structs::ReplacementProductStruct::Type
 {
-    private:
-        char productIdentifierValueBuffer[kProductIdentifierValueMaxNameLength];
+private:
+    char productIdentifierValueBuffer[kProductIdentifierValueMaxNameLength];
 
-    public:
-        static constexpr bool kIsFabricScoped = false;
-        virtual ~GenericType()                = default;
-        GenericType() {}
-        GenericType(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType, chip::CharSpan aProductIdentifierValue)
+public:
+    static constexpr bool kIsFabricScoped = false;
+    virtual ~GenericType()                = default;
+    GenericType() {}
+    GenericType(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType, chip::CharSpan aProductIdentifierValue)
+    {
+        setProductIdentifierType(aProductIdentifierType);
+        setProductIdentifierValue(aProductIdentifierValue);
+    }
+
+    using HepaFilterMonitoring::Structs::ReplacementProductStruct::Type::Encode;
+
+    /**
+     * Sets the product identifier type.
+     *
+     * @param aProductIdentifierType The product identifier type.
+     */
+    void setProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType)
+    {
+        productIdentifierType = static_cast<HepaFilterMonitoring::ProductIdentifierTypeEnum>(aProductIdentifierType);
+    }
+
+    /**
+     * Sets the product identifier value.
+     * This implementation will copy the argument to the local implementation.
+     *
+     * @param aProductIdentifierValue The value of the product identifier to set.
+     * @return CHIP_ERROR_INVALID_ARGUMENT when aProductIdentifierValue is invalid, CHIP_NO_ERROR otherwise.
+     */
+    CHIP_ERROR setProductIdentifierValue(chip::CharSpan aProductIdentifierValue)
+    {
+        VerifyOrReturnError(IsSpanUsable(aProductIdentifierValue), CHIP_ERROR_INVALID_ARGUMENT);
+
+        if (aProductIdentifierValue.size() > sizeof(productIdentifierValueBuffer))
         {
-            setProductIdentifierType(aProductIdentifierType);
-            setProductIdentifierValue(aProductIdentifierValue);
+            memcpy(productIdentifierValueBuffer, aProductIdentifierValue.data(), sizeof(productIdentifierValueBuffer));
+            productIdentifierValue = CharSpan(productIdentifierValueBuffer, sizeof(productIdentifierValueBuffer));
+        }
+        else
+        {
+            memcpy(productIdentifierValueBuffer, aProductIdentifierValue.data(), aProductIdentifierValue.size());
+            productIdentifierValue = CharSpan(productIdentifierValueBuffer, aProductIdentifierValue.size());
         }
 
-        using HepaFilterMonitoring::Structs::ReplacementProductStruct::Type::Encode;
-
-        /**
-         * Sets the product identifier type.
-         *
-         * @param aProductIdentifierType The product identifier type.
-        */
-        void setProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType)
-        {
-            productIdentifierType = static_cast<HepaFilterMonitoring::ProductIdentifierTypeEnum>(aProductIdentifierType);
-        }
-
-        /**
-         * Sets the product identifier value.
-         * This implementation will copy the argument to the local implementation.
-         *
-         * @param aProductIdentifierValue The value of the product identifier to set.
-         * @return CHIP_ERROR_INVALID_ARGUMENT when aProductIdentifierValue is invalid, CHIP_NO_ERROR otherwise.
-        */
-        CHIP_ERROR setProductIdentifierValue(chip::CharSpan aProductIdentifierValue)
-        {
-            VerifyOrReturnError(IsSpanUsable(aProductIdentifierValue), CHIP_ERROR_INVALID_ARGUMENT);
-
-            if (aProductIdentifierValue.size() > sizeof(productIdentifierValueBuffer))
-            {
-                memcpy(productIdentifierValueBuffer, aProductIdentifierValue.data(), sizeof(productIdentifierValueBuffer));
-                productIdentifierValue = CharSpan(productIdentifierValueBuffer, sizeof(productIdentifierValueBuffer));
-            }
-            else
-            {
-                memcpy(productIdentifierValueBuffer, aProductIdentifierValue.data(), aProductIdentifierValue.size());
-                productIdentifierValue = CharSpan(productIdentifierValueBuffer, aProductIdentifierValue.size());
-            }
-
-            return CHIP_NO_ERROR;
-        }
+        return CHIP_NO_ERROR;
+    }
 };
 
 namespace ReplacementProductList {

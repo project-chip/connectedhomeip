@@ -37,8 +37,7 @@ public:
     CHIP_ERROR Next(Attributes::GenericType & item) override;
 
     ~StaticReplacementProductListManager() {}
-    StaticReplacementProductListManager(Attributes::GenericType * aReplacementProductsList,
-                                        uint8_t aReplacementProductListSize)
+    StaticReplacementProductListManager(Attributes::GenericType * aReplacementProductsList, uint8_t aReplacementProductListSize)
     {
         mReplacementProductsList    = aReplacementProductsList;
         mReplacementProductListSize = aReplacementProductListSize;

@@ -62,9 +62,8 @@ public:
     Next(chip::app::Clusters::ResourceMonitoring::Attributes::GenericType & item) override;
 
     ~StaticReplacementProductListManager() {}
-    StaticReplacementProductListManager(chip::app::Clusters::ResourceMonitoring::Attributes::GenericType *
-            aReplacementProductsList,
-        uint8_t aReplacementProductListSize)
+    StaticReplacementProductListManager(chip::app::Clusters::ResourceMonitoring::Attributes::GenericType * aReplacementProductsList,
+                                        uint8_t aReplacementProductListSize)
     {
         mReplacementProductsList    = aReplacementProductsList;
         mReplacementProductListSize = aReplacementProductListSize;

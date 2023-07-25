@@ -36,10 +36,11 @@ class DynamicReplacementProductListManager : public ReplacementProductListManage
 public:
     CHIP_ERROR Next(Attributes::GenericType & item) override;
 
-    CHIP_ERROR addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType, chip::CharSpan aProductIdentifierValue)
+    CHIP_ERROR addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType,
+                             chip::CharSpan aProductIdentifierValue)
     {
         Attributes::GenericType * type = &mReplacementProductsList[mReplacementProductListSize];
-        CHIP_ERROR err = type->setProductIdentifierValue(aProductIdentifierValue);
+        CHIP_ERROR err                 = type->setProductIdentifierValue(aProductIdentifierValue);
         if (CHIP_NO_ERROR != err)
         {
             return err;

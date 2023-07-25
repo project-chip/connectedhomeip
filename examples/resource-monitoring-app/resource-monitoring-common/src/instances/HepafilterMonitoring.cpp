@@ -41,11 +41,16 @@ CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
 {
     ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::Init()");
 
-    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc, CharSpan::fromCharString("111112222233"));
-    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8, CharSpan::fromCharString("gtin8xhe"));
-    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kEan, CharSpan::fromCharString("4444455555666"));
-    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14, CharSpan::fromCharString("gtin14xhepaxxx"));
-    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kOem, CharSpan::fromCharString("oem20xhepaxxxxxxxxxx"));
+    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc,
+                                                           CharSpan::fromCharString("111112222233"));
+    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8,
+                                                           CharSpan::fromCharString("gtin8xhe"));
+    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kEan,
+                                                           CharSpan::fromCharString("4444455555666"));
+    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14,
+                                                           CharSpan::fromCharString("gtin14xhepaxxx"));
+    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kOem,
+                                                           CharSpan::fromCharString("oem20xhepaxxxxxxxxxx"));
 
     SetReplacementProductListManagerInstance(&mHepaFilterReplacementProductListManager);
 
