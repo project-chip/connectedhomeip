@@ -17,24 +17,28 @@
  */
 package chip.appserver;
 
+import chip.appserver.ChipAppServerDelegate;
+
 /** Controller to interact with the CHIP device. */
 public class ChipAppServer {
-  private static final String TAG = ChipAppServer.class.getSimpleName();
+    private static final String TAG = ChipAppServer.class.getSimpleName();
 
-  private volatile ChipFabricProvider mChipFabricProvider;
+    private volatile ChipFabricProvider mChipFabricProvider;
 
-  public ChipFabricProvider getFabricProvider() {
+    public ChipFabricProvider getFabricProvider() {
 
-    if (mChipFabricProvider == null) {
-      synchronized (this) {
-        if (mChipFabricProvider == null) mChipFabricProvider = new ChipFabricProvider();
-      }
+        if (mChipFabricProvider == null) {
+            synchronized (this) {
+                if (mChipFabricProvider == null) mChipFabricProvider = new ChipFabricProvider();
+            }
+        }
+
+        return mChipFabricProvider;
     }
 
-    return mChipFabricProvider;
-  }
+    public native boolean startApp();
 
-  public native boolean startApp();
+    public native boolean startAppWithDelegate(ChipAppServerDelegate appDelegate);
 
-  public native boolean stopApp();
+    public native boolean stopApp();
 }
