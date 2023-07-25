@@ -27,7 +27,9 @@ PICS:
     - label: "Run steps in SDK and CI only"
       id: PICS_SDK_CI_ONLY
 
-    - label: "EventList attribute enabled (default to false while EventList is provisional)"
+    - label:
+          "EventList attribute enabled (default to false while EventList is
+          provisional)"
       id: PICS_EVENT_LIST_ENABLED
 
     #
