@@ -192,7 +192,7 @@ void ApplicationInit()
 
 void ApplicationShutdown()
 {
-    // These have been initialised via the emberAfXxxClusterInitCallback methods. We need to destroy them before shutdown.
+    // These may have been initialised via the emberAfXxxClusterInitCallback methods. We need to destroy them before shutdown.
     Clusters::DishwasherMode::Shutdown();
     Clusters::LaundryWasherMode::Shutdown();
     Clusters::RvcCleanMode::Shutdown();
