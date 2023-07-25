@@ -277,7 +277,21 @@ tests:
                 constraints:
                     maxValue: 3600000
 
-    - label: "Step 2m: TXT key for commissioning mode (CM) CM=1 must be present"
+    - label:
+          "Step 2m: If (MCORE.SC.SAT_OP_DISCOVERY_KEY) present, SAT key must be
+          an unsigned integer with units of milliseconds and shall be encoded as
+          a variable length decimal number in ASCII, omitting leading zeros.
+          Shall not exceed 65535."
+      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryActiveThreshold"
+                constraints:
+                    maxValue: 65535
+
+    - label: "Step 2n: TXT key for commissioning mode (CM) CM=1 must be present"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -286,7 +300,7 @@ tests:
                 value: 1
 
     - label:
-          "Step 2n: If (MCORE.SC.DT_KEY) present, DT key must contain the device
+          "Step 2o: If (MCORE.SC.DT_KEY) present, DT key must contain the device
           type identifier from Data Model Device Types and must be encoded as a
           variable length decimal ASCII number without leading zeros"
       PICS: MCORE.SC.DT_KEY
@@ -298,7 +312,7 @@ tests:
                 value: deviceType
 
     - label:
-          "Step 2o: If (MCORE.SC.DN_KEY) present, DN key must be a UTF-8 encoded
+          "Step 2p: If (MCORE.SC.DN_KEY) present, DN key must be a UTF-8 encoded
           string with a maximum length of 32B"
       PICS: MCORE.SC.DN_KEY
       cluster: "DiscoveryCommands"
@@ -310,7 +324,7 @@ tests:
                     maxLength: 32
 
     - label:
-          "Step 2p: If (MCORE.SC.RI_KEY ) present, key RI must include the
+          "Step 2q: If (MCORE.SC.RI_KEY ) present, key RI must include the
           Rotating Device Identifier encoded as a uppercase string with a
           maximum length of 100 chars"
       PICS: MCORE.SC.RI_KEY
@@ -323,7 +337,7 @@ tests:
                     maxValue: 100
 
     - label:
-          "Step 2q: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
+          "Step 2r: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
           variable-length decimal number in ASCII text, omitting any leading
           zeros. If present value must be different of 0"
       PICS: MCORE.SC.PH_KEY
@@ -336,7 +350,7 @@ tests:
                     notValue: 0
 
     - label:
-          "Step 2r: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
+          "Step 2s: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
           valid UTF-8 string with a maximum length of 128 bytes"
       PICS: MCORE.SC.PI_KEY
       cluster: "DiscoveryCommands"
@@ -348,7 +362,7 @@ tests:
                     maxLength: 128
 
     - label:
-          "Step 2s: DUT must publish AAAA records for each IPv6 address upon
+          "Step 2t: DUT must publish AAAA records for each IPv6 address upon
           which they are willing to accept Matter messages."
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -609,7 +623,21 @@ tests:
                     maxValue: 3600000
 
     - label:
-          "Step 4n: TXT key for commissioning mode (CM) key CM=1 must be present"
+          "Step 4n: If (MCORE.SC.SAT_OP_DISCOVERY_KEY) present, SAT key must be
+          an unsigned integer with units of milliseconds and shall be encoded as
+          a variable length decimal number in ASCII, omitting leading zeros.
+          Shall not exceed 65535."
+      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryActiveThreshold"
+                constraints:
+                    maxValue: 65535
+
+    - label:
+          "Step 4o: TXT key for commissioning mode (CM) key CM=1 must be present"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -618,7 +646,7 @@ tests:
                 value: 1
 
     - label:
-          "Step 4o: If (MCORE.SC.DT_KEY) present, DT key must contain the device
+          "Step 4p: If (MCORE.SC.DT_KEY) present, DT key must contain the device
           type identifier from Data Model Device Types and must be encoded as a
           variable length decimal ASCII number without leading zeros"
       PICS: MCORE.SC.DT_KEY
@@ -630,7 +658,7 @@ tests:
                 value: deviceType
 
     - label:
-          "Step 4p: If (MCORE.SC.DN_KEY) present, DN key must be a UTF-8 encoded
+          "Step 4q: If (MCORE.SC.DN_KEY) present, DN key must be a UTF-8 encoded
           string with a maximum length of 32B"
       PICS: MCORE.SC.DN_KEY
       cluster: "DiscoveryCommands"
@@ -642,7 +670,7 @@ tests:
                     maxLength: 32
 
     - label:
-          "Step 4q: If (MCORE.SC.RI_KEY) present, key RI must include the
+          "Step 4r: If (MCORE.SC.RI_KEY) present, key RI must include the
           Rotating Device Identifier encoded as a uppercase string with a
           maximum length of 100 chars"
       PICS: MCORE.SC.RI_KEY
@@ -655,7 +683,7 @@ tests:
                     maxValue: 100
 
     - label:
-          "Step 4r: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
+          "Step 4s: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
           variable-length decimal number in ASCII text, omitting any leading
           zeros. If present value must be different of 0"
       PICS: MCORE.SC.PH_KEY
@@ -668,7 +696,7 @@ tests:
                     notValue: 0
 
     - label:
-          "Step 4s: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
+          "Step 4t: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
           valid UTF-8 string with a maximum length of 128 bytes"
       PICS: MCORE.SC.PI_KEY
       cluster: "DiscoveryCommands"
@@ -680,7 +708,7 @@ tests:
                     maxLength: 128
 
     - label:
-          "Step 4t: DUT must publish AAAA records for each IPv6 address upon
+          "Step 4u: DUT must publish AAAA records for each IPv6 address upon
           which they are willing to accept Matter messages."
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -926,7 +954,22 @@ tests:
                 constraints:
                     maxValue: 3600000
 
-    - label: "Step 7l: TXT key for commissioning mode. CM=2 must be present"
+    - label:
+          "Step 7l: Optional TXT key for MRP Retry Active Mode Threshold. If
+          (MCORE.SC.SAT_OP_DISCOVERY_KEY) present, SAT key must be an unsigned
+          integer with units of milliseconds and shall be encoded as a variable
+          length decimal number in ASCII, omitting leading zeros. Shall not
+          exceed 65535."
+      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryActiveThreshold"
+                constraints:
+                    maxValue: 65535
+
+    - label: "Step 7m: TXT key for commissioning mode. CM=2 must be present"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -935,7 +978,7 @@ tests:
                 value: 2
 
     - label:
-          "Step 7m: If (MCORE.SC.DT_KEY) present, DT key must contain the device
+          "Step 7n: If (MCORE.SC.DT_KEY) present, DT key must contain the device
           type identifier from Data Model Device Types and must be encoded as a
           variable length decimal ASCII number without leading zeros"
       PICS: MCORE.SC.DT_KEY
@@ -947,7 +990,7 @@ tests:
                 value: deviceType
 
     - label:
-          "Step 7n: If (MCORE.SC.DN_KEY) present, DN key must be a UTF-8 encoded
+          "Step 7o: If (MCORE.SC.DN_KEY) present, DN key must be a UTF-8 encoded
           string with a maximum length of 32B"
       PICS: MCORE.SC.DN_KEY
       cluster: "DiscoveryCommands"
@@ -959,7 +1002,7 @@ tests:
                     maxLength: 32
 
     - label:
-          "Step 7o: If (MCORE.SC.RI_KEY) present, key RI must include the
+          "Step 7p: If (MCORE.SC.RI_KEY) present, key RI must include the
           Rotating Device Identifier encoded as a uppercase string with a
           maximum length of 100 chars"
       PICS: MCORE.SC.RI_KEY
@@ -972,7 +1015,7 @@ tests:
                     maxValue: 100
 
     - label:
-          "Step 7p: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
+          "Step 7q: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
           variable-length decimal number in ASCII text, omitting any leading
           zeros. If present value must be different of 0"
       PICS: MCORE.SC.PH_KEY
@@ -985,7 +1028,7 @@ tests:
                     notValue: 0
 
     - label:
-          "Step 7q: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
+          "Step 7r: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
           valid UTF-8 string with a maximum length of 128 bytes"
       PICS: MCORE.SC.PI_KEY
       cluster: "DiscoveryCommands"
@@ -997,7 +1040,7 @@ tests:
                     maxLength: 128
 
     - label:
-          "Step 7r: DUT must publish AAAA records for each IPv6 address upon
+          "Step 7s: DUT must publish AAAA records for each IPv6 address upon
           which they are willing to accept Matter messages"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -1228,7 +1271,21 @@ tests:
                     maxValue: 3600000
 
     - label:
-          "Step 10n: TXT key for commissioning mode (CM), CM=0 may be present"
+          "Step 10n: If (MCORE.SC.SAT_OP_DISCOVERY_KEY) present, SAT key must be
+          an unsigned integer with units of milliseconds and shall be encoded as
+          a variable length decimal number in ASCII, omitting leading zeros.
+          Shall not exceed 65535."
+      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryActiveThreshold"
+                constraints:
+                    maxValue: 65535
+
+    - label:
+          "Step 10o: TXT key for commissioning mode (CM), CM=0 may be present"
       PICS: MCORE.SC.EXTENDED_DISCOVERY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -1238,7 +1295,7 @@ tests:
                 value: 0
 
     - label:
-          "Step 10o: If (MCORE.SC.DT_KEY) present, DT key must contain the
+          "Step 10p: If (MCORE.SC.DT_KEY) present, DT key must contain the
           device type identifier from Data Model Device Types and must be
           encoded as a variable length decimal ASCII number without leading
           zeros"
@@ -1251,7 +1308,7 @@ tests:
                 value: deviceType
 
     - label:
-          "Step 10p: If (MCORE.SC.DN_KEY) present, DN key must be a UTF-8
+          "Step 10q: If (MCORE.SC.DN_KEY) present, DN key must be a UTF-8
           encoded string with a maximum length of 32B"
       PICS: MCORE.SC.DN_KEY && MCORE.SC.EXTENDED_DISCOVERY
       cluster: "DiscoveryCommands"
@@ -1263,7 +1320,7 @@ tests:
                     maxLength: 32
 
     - label:
-          "Step 10q: If (MCORE.SC.RI_KEY) present, key RI must include the
+          "Step 10r: If (MCORE.SC.RI_KEY) present, key RI must include the
           Rotating Device Identifier encoded as a uppercase string with a
           maximum length of 100 chars"
       PICS: MCORE.SC.RI_KEY && MCORE.SC.EXTENDED_DISCOVERY
@@ -1276,7 +1333,7 @@ tests:
                     maxValue: 100
 
     - label:
-          "Step 10r: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
+          "Step 10s: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
           variable-length decimal number in ASCII text, omitting any leading
           zeros. If present value must be different of 0"
       PICS: MCORE.SC.PH_KEY && MCORE.SC.EXTENDED_DISCOVERY
@@ -1289,7 +1346,7 @@ tests:
                     notValue: 0
 
     - label:
-          "Step 10s: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
+          "Step 10t: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
           valid UTF-8 string with a maximum length of 128 bytes"
       PICS: MCORE.SC.PI_KEY && MCORE.SC.EXTENDED_DISCOVERY
       cluster: "DiscoveryCommands"

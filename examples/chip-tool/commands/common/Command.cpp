@@ -212,6 +212,9 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
     switch (arg.type)
     {
     case ArgumentType::Complex: {
+        // Complex arguments may be optional, but they are not currently supported via the <chip::Optional> class.
+        // Instead, they must be explicitly specified as optional using the kOptional flag,
+        // and the base TypedComplexArgument<T> class is still referenced.
         auto complexArgument = static_cast<ComplexArgument *>(arg.value);
         return CHIP_NO_ERROR == complexArgument->Parse(arg.name, argValue);
     }
@@ -731,13 +734,13 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, chip::
     return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, ComplexArgument * value, const char * desc)
+size_t Command::AddArgument(const char * name, ComplexArgument * value, const char * desc, uint8_t flags)
 {
     Argument arg;
     arg.type  = ArgumentType::Complex;
     arg.name  = name;
     arg.value = static_cast<void *>(value);
-    arg.flags = 0;
+    arg.flags = flags;
     arg.desc  = desc;
 
     return AddArgumentToList(std::move(arg));
@@ -955,8 +958,11 @@ void Command::ResetArguments()
             switch (type)
             {
             case ArgumentType::Complex: {
-                // No optional complex arguments so far.
-                VerifyOrDie(false);
+                // Optional Complex arguments are not currently supported via the <chip::Optional> class.
+                // Instead, they must be explicitly specified as optional using the kOptional flag,
+                // and the base TypedComplexArgument<T> class is referenced.
+                auto argument = static_cast<ComplexArgument *>(arg.value);
+                argument->Reset();
                 break;
             }
             case ArgumentType::Custom: {

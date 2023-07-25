@@ -24,23 +24,25 @@ config:
     endpoint: 0
 
 tests:
-    - label: "TH1 fully commissions the DUT"
+    - label: "Step 1: TH1 fully commissions the DUT"
       verification: |
-          "DUT side:
+          On DUT side:
           sudo ./chip-all-clusters-app --wifi
 
-          TH side:
+          On TH side:
           ./chip-tool pairing code 1 34970112332 --trace_decode 1
-
+          Verify the TH1 commissioning is success
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success"
       disabled: true
 
     - label:
-          "TH1 sends RemoveFabric command with Fabric Index as FabricIndex_TH1
-          to DUT"
+          "Step 2: TH1 sends RemoveFabric command with Fabric Index as
+          FabricIndex_TH1 to DUT"
       PICS: OPCREDS.S.C0a.Rsp
       verification: |
           ./chip-tool operationalcredentials remove-fabric 1 1 0
+
+          On TH1(Chip-tool)  in NOCResponse Verify the statuscode is success(0)
 
           [1674780232627] [8807:372926] CHIP: [DMG] InvokeResponseMessage =
           [1674780232627] [8807:372926] CHIP: [DMG] {
@@ -89,8 +91,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT shouldnt be discoverable via both commissionable and operational
-          advertisements"
+          "Step 3: DUT shouldnt be discoverable via both commissionable and
+          operational advertisements"
       PICS: "!MCORE.DD.EXTENDED_DISCOVERY"
       verification: |
           Verify DUT is not discoverable over DNS-SD in both TCP and UDP
@@ -100,8 +102,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT should be discoverable via commissionable service advertisements
-          but shall not be in the commissioning mode"
+          "Step 4: DUT should be discoverable via commissionable service
+          advertisements but shall not be in the commissioning mode"
       PICS: MCORE.DD.EXTENDED_DISCOVERY
       verification: |
           Verify that the DUT is discoverable over DNS-SD with service type _matterc._udp with no subtype _CM and text key for CM with value 0
@@ -109,8 +111,8 @@ tests:
           avahi-browse -rt _matterc._udp
 
           br-aa67f1f8401d IPv4 DC126952E0AC4BD5                              _matterc._udp        local
-          hostname = [E45F012EED550000.local]
-          address = [172.18.0.1]
-          port = [5540]
-          txt = ["PI=" "PH=33" "CM=0" "D=3840" "T=1" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
+             hostname = [E45F012EED550000.local]
+             address = [172.18.0.1]
+             port = [5540]
+             txt = ["PI=" "PH=33" "CM=0" "D=3840" "T=1" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
       disabled: true

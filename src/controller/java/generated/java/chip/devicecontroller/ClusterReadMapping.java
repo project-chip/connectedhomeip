@@ -1081,6 +1081,17 @@ public class ClusterReadMapping {
           readDescriptorPartsListCommandParams
         );
         result.put("readPartsListAttribute", readDescriptorPartsListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDescriptorTagListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDescriptorTagListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DescriptorCluster) cluster).readTagListAttribute(
+              (ChipClusters.DescriptorCluster.TagListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDescriptorClusterTagListAttributeCallback(),
+          readDescriptorTagListCommandParams
+        );
+        result.put("readTagListAttribute", readDescriptorTagListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readDescriptorGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readDescriptorGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 15.4.2. [TC-SC-4.2] Discovery [DUT as Commissioner]
+name: 3.4.2. [TC-SC-4.2] Discovery [DUT as Commissioner]
 
 PICS:
     - MCORE.ROLE.COMMISSIONER
@@ -30,23 +30,24 @@ tests:
       disabled: true
 
     - label:
-          "By any means, TH adds an unknown key/value pair in the advertised
-          data(e.g. AB=12345) and is in Commissioning Mode"
+          "Step 1: By any means, TH adds an unknown key/value pair in the
+          advertised data(e.g. AB=12345) and is in Commissioning Mode"
       verification: |
           Run all cluster app in one TH Terminal
 
           Run the  unknown key/value pair on second TH Terminal with the same discriminator as the one in the first teminal:
 
           avahi-publish-service --subtype=_S3._sub._matterc._udp --subtype=_L840._sub._matterc._udp DD200C20D25AE5F7 --subtype=_CM._sub._matterc._udp _matterc._udp 11111 D=3840 CM=1  INVALID_TEST=40 SII=5000 SAI=300 PH=36 PI= VP=65521+3276 T=1
+          TH(all-clusters-app) must advertise with new data added
           Established under name 'DD200C20D25AE5F7'
       disabled: true
 
-    - label: "DUT attempts to commission TH"
+    - label: "Step 2: DUT attempts to commission TH"
       verification: |
           Verify the DUT is able to commission the TH, in spite of the avahi publish with unknown key/value pair.
           As an example, In the case of chip-tool as commissioner, you can verify commissioning DUT with the below command, (Use the equivalent command on the DUT)
 
-          % sudo ./out/debug/chip-tool pairing code 1 MT:-24J0YXE00KA0648G00
+          ./chip-tool pairing code 1 MT:-24J0YXE00KA0648G00
 
           [1661234861.142378][2599:2602] CHIP:BLE: New device scanned: E4:5F:01:0B:F6:6F
           [1661234861.142474][2599:2602] CHIP:BLE: Device discriminator match. Attempting to connect.

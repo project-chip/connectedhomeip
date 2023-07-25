@@ -31,7 +31,6 @@
 #include <lib/core/Optional.h>
 
 #include "TLVCommon.h"
-
 #include "TLVWriter.h"
 
 /**
@@ -283,7 +282,7 @@ public:
      * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV boolean type, or the
      *                                      reader is not positioned on an element.
      */
-    CHIP_ERROR Get(bool & v);
+    CHIP_ERROR Get(bool & v) const;
 
     /**
      * Get the value of the current element as an 8-bit signed integer.
@@ -298,7 +297,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(int8_t & v);
+    CHIP_ERROR Get(int8_t & v) const;
 
     /**
      * Get the value of the current element as a 16-bit signed integer.
@@ -313,7 +312,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(int16_t & v);
+    CHIP_ERROR Get(int16_t & v) const;
 
     /**
      * Get the value of the current element as a 32-bit signed integer.
@@ -328,7 +327,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(int32_t & v);
+    CHIP_ERROR Get(int32_t & v) const;
 
     /**
      * Get the value of the current element as a 64-bit signed integer.
@@ -343,7 +342,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(int64_t & v);
+    CHIP_ERROR Get(int64_t & v) const;
 
     /**
      * Get the value of the current element as an 8-bit unsigned integer.
@@ -359,7 +358,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(uint8_t & v);
+    CHIP_ERROR Get(uint8_t & v) const;
 
     /**
      * Get the value of the current element as a 16-bit unsigned integer.
@@ -375,7 +374,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(uint16_t & v);
+    CHIP_ERROR Get(uint16_t & v) const;
 
     /**
      * Get the value of the current element as a 32-bit unsigned integer.
@@ -391,7 +390,7 @@ public:
      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(uint32_t & v);
+    CHIP_ERROR Get(uint32_t & v) const;
 
     /**
      * Get the value of the current element as a 64-bit unsigned integer.
@@ -405,7 +404,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(uint64_t & v);
+    CHIP_ERROR Get(uint64_t & v) const;
 
     /**
      * Get the value of the current element as a double-precision floating point number.
@@ -417,7 +416,7 @@ public:
      *                                      the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(double & v);
+    CHIP_ERROR Get(double & v) const;
 
     /**
      * Get the value of the current element as a single-precision floating point number.
@@ -429,7 +428,7 @@ public:
      *                                      the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(float & v);
+    CHIP_ERROR Get(float & v) const;
 
     /**
      * Get the value of the current element as a ByteSpan
@@ -441,7 +440,7 @@ public:
      *                                      the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(ByteSpan & v);
+    CHIP_ERROR Get(ByteSpan & v) const;
 
     /**
      * Get the value of the current element as a FixedByteSpan
@@ -454,7 +453,7 @@ public:
      *
      */
     template <size_t N>
-    CHIP_ERROR Get(FixedByteSpan<N> & v)
+    CHIP_ERROR Get(FixedByteSpan<N> & v) const
     {
         const uint8_t * val;
         ReturnErrorOnFailure(GetDataPtr(val));
@@ -473,7 +472,7 @@ public:
      *                                      the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(CharSpan & v);
+    CHIP_ERROR Get(CharSpan & v) const;
 
     /**
      * Get the Localized String Identifier contained in the current element..
@@ -635,9 +634,8 @@ public:
      * Get a pointer to the initial encoded byte of a TLV byte or UTF8 string element.
      *
      * This method returns a direct pointer to the encoded string value within the underlying input buffer
-     * if a non-zero length string payload is present. To succeed, the method requires that the entirety of the
-     * string value be present in a single buffer. Otherwise the method returns #CHIP_ERROR_TLV_UNDERRUN.
-     * This makes the method of limited use when reading data from multiple discontiguous buffers.
+     * as fetched by `Next`. To succeed, the method requires that the entirety of the
+     * string value be present in a single buffer.
      *
      * If no string data is present (i.e the length is zero), data shall be updated to point to null.
      *
@@ -654,7 +652,7 @@ public:
      *                                      TLVBackingStore.
      *
      */
-    CHIP_ERROR GetDataPtr(const uint8_t *& data);
+    CHIP_ERROR GetDataPtr(const uint8_t *& data) const;
 
     /**
      * Prepares a TLVReader object for reading the members of TLV container element.

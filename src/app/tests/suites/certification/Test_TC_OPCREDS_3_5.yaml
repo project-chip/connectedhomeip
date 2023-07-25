@@ -24,7 +24,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "TH1 fully commissions the DUT"
+    - label: "Step 1: TH1 fully commissions the DUT"
       verification: |
           "DUT side:
           sudo ./chip-all-clusters-app --wifi
@@ -36,8 +36,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the NOCs attribute from the Node Operational Credentials
-          cluster using a fabric-filtered read"
+          "Step 2: TH1 reads the NOCs attribute from the Node Operational
+          Credentials cluster using a fabric-filtered read"
       verification: |
           ./chip-tool operationalcredentials read nocs 1 0 --fabric-filtered 1
 
@@ -53,7 +53,7 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the TrustedRootCertificates attribute from the Node
+          "Step 3: TH1 reads the TrustedRootCertificates attribute from the Node
           Operational Credentials cluster"
       verification: |
           ./chip-tool operationalcredentials read trusted-root-certificates    1 0
@@ -66,8 +66,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
-          field set to 900"
+          "Step 4: TH1 sends ArmFailSafe command to the DUT with the
+          ExpiryLengthSeconds field set to 900"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
 
@@ -82,8 +82,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 Sends CSRRequest command with the IsForUpdateNOC field set to
-          true"
+          "Step 5: TH1 Sends CSRRequest command with the IsForUpdateNOC field
+          set to true"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
           To get csr nonce give below command 2 times in TH(chip-tool)
@@ -100,110 +100,111 @@ tests:
       disabled: true
 
     - label:
-          "TH1 generates a new NOC and ICAC with the following properties: new
-          NOC is generated from the NOCSR returned in csr_update1. The subject
-          is set to match noc_original. The NOC is signed by the new ICA. Save
-          as noc_update1 new ICAC must be distinguishable from icac_original.
-          This can be accomplished by changing any of the following: the
-          subject, subject public key or validity. The certificate must be
-          valid. ICAC is signed by the original key for trusted_root_original.
-          Save as icac_update1"
+          "Step 6: TH1 generates a new NOC and ICAC with the following
+          properties: new NOC is generated from the NOCSR returned in
+          csr_update1. The subject is set to match noc_original. The NOC is
+          signed by the new ICA. Save as noc_update1 new ICAC must be
+          distinguishable from icac_original. This can be accomplished by
+          changing any of the following: the subject, subject public key or
+          validity. The certificate must be valid. ICAC is signed by the
+          original key for trusted_root_original. Save as icac_update1"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends the UpdateNOC command to the Node Operational Credentials
-          cluster with the following fields: NOCValue is set to noc_update1
-          ICACValue is to set icac_update1"
+          "Step 7: TH1 sends the UpdateNOC command to the Node Operational
+          Credentials cluster with the following fields: NOCValue is set to
+          noc_update1 ICACValue is to set icac_update1"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 reads the NOCs attribute from the Node Operational Credentials
-          cluster using a fabric-filtered read"
+          "Step 8: TH1 reads the NOCs attribute from the Node Operational
+          Credentials cluster using a fabric-filtered read"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
-          field set to 0"
+          "Step 9: TH1 sends ArmFailSafe command to the DUT with the
+          ExpiryLengthSeconds field set to 0"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 reads the NOCs attribute from the Node Operational Credentials
-          cluster using a fabric-filtered read"
+          "Step 10: TH1 reads the NOCs attribute from the Node Operational
+          Credentials cluster using a fabric-filtered read"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
-          field set to 900"
+          "Step 11: TH1 sends ArmFailSafe command to the DUT with the
+          ExpiryLengthSeconds field set to 900"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 Sends CSRRequest command with the IsForUpdateNOC field set to
-          true"
+          "Step 12: TH1 Sends CSRRequest command with the IsForUpdateNOC field
+          set to true"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 generates a new NOC and ICAC with the following properties: new
-          NOC is generated from the NOCSR returned in csr_update2. The subject
-          is set to match noc_original. The NOC is signed by new ICA. Save as
-          noc_update2 new ICAC must be distinguishable from icac_original and
-          icac_update1. This can be accomplished by changing any of the
-          following: the subject, subject public key or validity. The
-          certificate must be valid. ICAC is signed by the original key for
-          trusted_root_original. Save as icac_update2"
+          "Step 13: TH1 generates a new NOC and ICAC with the following
+          properties: new NOC is generated from the NOCSR returned in
+          csr_update2. The subject is set to match noc_original. The NOC is
+          signed by new ICA. Save as noc_update2 new ICAC must be
+          distinguishable from icac_original and icac_update1. This can be
+          accomplished by changing any of the following: the subject, subject
+          public key or validity. The certificate must be valid. ICAC is signed
+          by the original key for trusted_root_original. Save as icac_update2"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends the UpdateNOC command to the Node Operational Credentials
-          cluster with the following fields: NOCValue is set to noc_update2
-          ICACValue is to set icac_update2"
+          "Step 14: TH1 sends the UpdateNOC command to the Node Operational
+          Credentials cluster with the following fields: NOCValue is set to
+          noc_update2 ICACValue is to set icac_update2"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 reads the NOCs attribute from the Node Operational Credentials
-          cluster using a fabric-filtered read"
+          "Step 15: TH1 reads the NOCs attribute from the Node Operational
+          Credentials cluster using a fabric-filtered read"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends the CommissioningComplete command to the General
+          "Step 16: TH1 sends the CommissioningComplete command to the General
           Commissioning cluster"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
-          field set to 0 to verify that the CommissioningComplete command
-          successfully persisted the failsafe context."
+          "Step 17: TH1 sends ArmFailSafe command to the DUT with the
+          ExpiryLengthSeconds field set to 0 to verify that the
+          CommissioningComplete command successfully persisted the failsafe
+          context."
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 reads the NOCs attribute from the Node Operational Credentials
-          cluster using a fabric-filtered read"
+          "Step 18: TH1 reads the NOCs attribute from the Node Operational
+          Credentials cluster using a fabric-filtered read"
       verification: |
 
       disabled: true

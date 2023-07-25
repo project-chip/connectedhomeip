@@ -19,7 +19,7 @@ PICS:
     - MCORE.BDX.SynchronousSender
 
 config:
-    nodeId: 0x12344321
+    nodeId: "0x12344321"
     cluster: "Basic Information"
     endpoint: 0
 
@@ -31,10 +31,12 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends the first Block message to TH + TH sends a BlockAck message
-          back to DUT."
+          "Step 1: DUT sends the first Block message to TH + TH sends a BlockAck
+          message back to DUT."
       verification: |
-          1. Verify that the OTA Reference Requester App logs show Block message from DUT
+          On OTA Reference Requester App logs,  Verify that the Block message has the following mandatory fields
+          - Block Counter - Must start at 0 at the start of the transfer.
+          - Data - The length must be in the range [0 < Length ⇐ Max Block Size], where Max Block Size is the negotiated Max Block Size matching the SendAccept message that initiated the transfer.
 
           [1636410923701] [59208:62970584] CHIP: [ATM] Handling received BDX Message
           [1636410923701] [59208:62970584] CHIP: [ATM] Block
@@ -52,10 +54,10 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends further Block messages to TH + TH sends BlockAck messages
-          back to DUT."
+          "Step 2: DUT sends further Block messages to TH + TH sends BlockAck
+          messages back to DUT."
       verification: |
-          1. Verify from the OTA Reference Requester App logs that the Blocks are sent in ascending and sequential block counter order.
+          On OTA Reference Requester App logs,  Verify that the Blocks are sent in ascending and sequential block counter order.
 
           [1636410925203] [59208:62970585] CHIP: [ATM] Block
           [1636410925203] [59208:62970585] CHIP: [ATM]   Block Counter: 1
@@ -67,10 +69,14 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends a BlockEOF message to TH + TH sends a BlockAckEOF message
-          back to DUT"
+          "Step 3: DUT sends a BlockEOF message to TH + TH sends a BlockAckEOF
+          message back to DUT."
       verification: |
-          1. Verify that the OTA Reference Requester App logs show BlockEOF message from DUT
+          On OTA Reference Requester App logs, Verify that the BlockEOF message has the following mandatory fields.
+           - Block Counter.
+           - Data - The length must be in the range [0 ⇐ Length ⇐ Max Block Size], where Max Block Size is the negotiated Max Block Size matching the SendAccept message that initiated the transfer.
+           - Verify that the pre-negotiated file size was transferred, if a definite size had been given.
+
 
           [1636410935710] [59208:62970585] CHIP: [ATM] Handling received BDX Message
           [1636410935710] [59208:62970585] CHIP: [ATM] BlockEOF

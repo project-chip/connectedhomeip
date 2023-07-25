@@ -33,6 +33,14 @@
 #include <app/clusters/level-control/level-control.h>
 #endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
 
+#ifdef EMBER_AF_PLUGIN_MODE_BASE
+// nogncheck because the gn dependency checker does not understand
+// conditional includes, so will fail in an application that has an On/Off
+// cluster but no ModeBase-derived cluster.
+#include <app/clusters/mode-base-server/mode-base-cluster-objects.h> // nogncheck
+#include <app/clusters/mode-base-server/mode-base-server.h>          // nogncheck
+#endif                                                               // EMBER_AF_PLUGIN_MODE_BASE
+
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
@@ -40,6 +48,45 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OnOff;
 using chip::Protocols::InteractionModel::Status;
+
+namespace {
+
+#ifdef EMBER_AF_PLUGIN_MODE_BASE
+
+/**
+ * For all ModeBase alias clusters on the given endpoint, if the OnOff feature is supported and
+ * the OnMode attribute is set, update the CurrentMode attribute value to the OnMode value.
+ * @param endpoint
+ */
+void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
+{
+    for (auto & modeBaseInstance : ModeBase::GetModeBaseInstanceList())
+    {
+        if (modeBaseInstance.GetEndpointId() == endpoint)
+        {
+            if (modeBaseInstance.HasFeature(ModeBase::Feature::kOnOff))
+            {
+                ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance.GetOnMode();
+                if (!onMode.IsNull())
+                {
+                    Status status = modeBaseInstance.UpdateCurrentMode(onMode.Value());
+                    if (status == Status::Success)
+                    {
+                        ChipLogProgress(Zcl, "Changed the Current Mode to %x", onMode.Value());
+                    }
+                    else
+                    {
+                        ChipLogError(Zcl, "Failed to Changed the Current Mode to %x: %u", onMode.Value(), to_underlying(status));
+                    }
+                }
+            }
+        }
+    }
+}
+
+#endif // EMBER_AF_PLUGIN_MODE_BASE
+
+} // namespace
 
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
 static bool LevelControlWithOnOffFeaturePresent(EndpointId endpoint)
@@ -465,6 +512,10 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
                 status = ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
             }
         }
+#endif
+#ifdef EMBER_AF_PLUGIN_MODE_BASE
+        // If OnMode is not a null value, then change the current mode to it.
+        UpdateModeBaseCurrentModeToOnMode(endpoint);
 #endif
     }
     else // Set Off

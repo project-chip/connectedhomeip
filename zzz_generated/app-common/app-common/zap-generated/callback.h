@@ -8742,42 +8742,11 @@ bool emberAfModeSelectClusterChangeToModeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ModeSelect::Commands::ChangeToMode::DecodableType & commandData);
 /**
- * @brief Laundry Washer Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfLaundryWasherModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::LaundryWasherMode::Commands::ChangeToMode::DecodableType & commandData);
-/**
- * @brief Refrigerator And Temperature Controlled Cabinet Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToMode::DecodableType &
-        commandData);
-/**
- * @brief RVC Run Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfRvcRunModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RvcRunMode::Commands::ChangeToMode::DecodableType & commandData);
-/**
- * @brief RVC Clean Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfRvcCleanModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RvcCleanMode::Commands::ChangeToMode::DecodableType & commandData);
-/**
  * @brief Temperature Control Cluster SetTemperature Command callback (from client)
  */
 bool emberAfTemperatureControlClusterSetTemperatureCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TemperatureControl::Commands::SetTemperature::DecodableType & commandData);
-/**
- * @brief Dishwasher Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfDishwasherModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DishwasherMode::Commands::ChangeToMode::DecodableType & commandData);
 /**
  * @brief Smoke CO Alarm Cluster SelfTestRequest Command callback (from client)
  */
@@ -8796,30 +8765,6 @@ bool emberAfDishwasherAlarmClusterResetCallback(
 bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
-/**
- * @brief RVC Operational State Cluster Pause Command callback (from client)
- */
-bool emberAfRvcOperationalStateClusterPauseCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RvcOperationalState::Commands::Pause::DecodableType & commandData);
-/**
- * @brief RVC Operational State Cluster Stop Command callback (from client)
- */
-bool emberAfRvcOperationalStateClusterStopCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RvcOperationalState::Commands::Stop::DecodableType & commandData);
-/**
- * @brief RVC Operational State Cluster Start Command callback (from client)
- */
-bool emberAfRvcOperationalStateClusterStartCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RvcOperationalState::Commands::Start::DecodableType & commandData);
-/**
- * @brief RVC Operational State Cluster Resume Command callback (from client)
- */
-bool emberAfRvcOperationalStateClusterResumeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RvcOperationalState::Commands::Resume::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */

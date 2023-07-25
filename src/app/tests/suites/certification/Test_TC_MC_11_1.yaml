@@ -27,8 +27,8 @@ config:
 
 tests:
     - label:
-          "TH start scanning for available commissioners using Commissioner
-          Discovery"
+          "Step 1: TH start scanning for available commissioners using
+          Commissioner Discovery"
       verification: |
           ./chip-tv-casting-app
 
@@ -50,7 +50,8 @@ tests:
           [1653089767279] [88361:1149415] CHIP: [SVR] Example: cast request 0
       disabled: true
 
-    - label: "TH is instructed to select the commissioner found in step 1"
+    - label:
+          "Step 2: TH is instructed to select the commissioner found in step 1"
       verification: |
           Into the shell, enter "cast request 0" to send a user-directed-commissioning request to the DUT
 
@@ -61,8 +62,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT prompt user for onboarding by giving an option to accept or
-          reject the commissioning of TH ."
+          "Step 3: DUT prompt user for onboarding by giving an option to accept
+          or reject the commissioning of TH ."
       verification: |
           UX will vary by product maker. The following is the tv-app shell output:
 
@@ -72,8 +73,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT start the commissioning procedure with TH, when user accepts the
-          commissioning"
+          "Step 4: DUT start the commissioning procedure with TH, when user
+          accepts the commissioning"
       verification: |
           Into the DUT UX, accept request for commissioning. Manufacturer may utilize a custom method for obtaining user consent other than an on-screen prompt.
 
@@ -86,7 +87,7 @@ tests:
           [1653088463910] [86837:1122544] CHIP: [SVR] Commissioning completed successfully
       disabled: true
 
-    - label: "TH reads the endpoints from the DUT"
+    - label: "Step 5: TH reads the endpoints from the DUT"
       verification: |
           Into the shell, enter " cast cluster descriptor read  device-type-list  0 1" to read the device list of the descriptor cluster on endpoint 1
 
@@ -100,7 +101,7 @@ tests:
           [1653180010083] [48426:1914389] CHIP: [TOO]      }
       disabled: true
 
-    - label: "TH reads the endpoints from the DUT"
+    - label: "Step 6: TH reads the endpoints from the DUT"
       verification: |
           Into the shell, enter "cast cluster descriptor read  device-type-list  0 2" to read the device list of the descriptor cluster on endpoint 2
 
@@ -114,7 +115,7 @@ tests:
           [1653180162379] [48426:1917385] CHIP: [TOO]      }
       disabled: true
 
-    - label: "TH reads the endpoints from the DUT"
+    - label: "Step 7: TH reads the endpoints from the DUT"
       verification: |
           Into the shell, enter "cast cluster descriptor read  device-type-list 0 4" to read the device list of the descriptor cluster on endpoint 4
 

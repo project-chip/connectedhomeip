@@ -893,6 +893,9 @@ typedef void (*DescriptorClientListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::ClusterId> & data);
 typedef void (*DescriptorPartsListListAttributeCallback)(void * context,
                                                          const chip::app::DataModel::DecodableList<chip::EndpointId> & data);
+typedef void (*DescriptorTagListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType> & data);
 typedef void (*DescriptorGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DescriptorAcceptedCommandListListAttributeCallback)(
@@ -3896,6 +3899,39 @@ public:
     void OnSubscriptionEstablished();
     using MTRDescriptorPartsListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDescriptorPartsListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDescriptorTagListListAttributeCallbackBridge : public MTRCallbackBridge<DescriptorTagListListAttributeCallback>
+{
+public:
+    MTRDescriptorTagListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DescriptorTagListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDescriptorTagListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<DescriptorTagListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType> &
+            value);
+};
+
+class MTRDescriptorTagListListAttributeCallbackSubscriptionBridge : public MTRDescriptorTagListListAttributeCallbackBridge
+{
+public:
+    MTRDescriptorTagListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action,
+                                                                MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDescriptorTagListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDescriptorTagListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDescriptorTagListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
