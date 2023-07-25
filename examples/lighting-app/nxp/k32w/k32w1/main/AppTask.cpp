@@ -395,7 +395,7 @@ button_status_t AppTask::KBD_Callback(void * buttonHandle, button_callback_messa
         switch (pinNb)
         {
         case BLE_BUTTON:
-            K32W_LOG("pb1 short press");
+            // K32W_LOG("pb1 short press");
             if (sAppTask.mResetTimerActive)
             {
                 ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
@@ -407,7 +407,7 @@ button_status_t AppTask::KBD_Callback(void * buttonHandle, button_callback_messa
             break;
 
         case LIGHT_BUTTON:
-            K32W_LOG("pb2 short press");
+            // K32W_LOG("pb2 short press");
             ButtonEventHandler(LIGHT_BUTTON, LIGHT_BUTTON_PUSH);
             break;
         }
@@ -417,12 +417,12 @@ button_status_t AppTask::KBD_Callback(void * buttonHandle, button_callback_messa
         switch (pinNb)
         {
         case BLE_BUTTON:
-            K32W_LOG("pb1 long press");
+            // K32W_LOG("pb1 long press");
             ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
             break;
 
         case LIGHT_BUTTON:
-            K32W_LOG("pb2 long press");
+            // K32W_LOG("pb2 long press");
             ButtonEventHandler(OTA_BUTTON, OTA_BUTTON_PUSH);
             break;
         }

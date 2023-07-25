@@ -63,6 +63,7 @@ public:
     static void OnIdentifyStop(Identify * identify);
     static void OnTriggerEffect(Identify * identify);
     static void OnTriggerEffectComplete(chip::System::Layer * systemLayer, void * appState);
+    static void ButtonEventHandler(uint8_t pin_no, uint8_t button_action);
 
 private:
     friend AppTask & GetAppTask(void);
@@ -85,7 +86,6 @@ private:
     static void ResetActionEventHandler(AppEvent * aEvent);
     static void InstallEventHandler(AppEvent * aEvent);
 
-    static void ButtonEventHandler(uint8_t pin_no, uint8_t button_action);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
     static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import("//build_overrides/chip.gni")
 import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
@@ -24,6 +25,13 @@ import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+  import("${chip_root}/examples/platform/nxp/pw_rpc_server.gni")
+}
 
 declare_args() {
   chip_software_version = 0
@@ -67,12 +75,29 @@ k32w1_sdk("sdk") {
       "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_software_version}",
     ]
   }
+
+  if (chip_enable_pw_rpc) {
+    defines += [
+      "PW_RPC_ENABLED",
+      "STREAMER_UART_FLUSH_DELAY_MS=0",
+      "BOARD_APP_UART_CLK_FREQ=96000000"
+    ]
+  }
 }
 
 k32w1_executable("light_app") {
   output_name = "chip-k32w1-light-example"
 
-  sources = [
+  sources = []
+  deps = []
+
+  if (chip_enable_pw_rpc) {
+    forward_variables_from(pw_rpc_server, "*")
+  } else {
+    cflags = [ "-Wconversion" ]
+  }
+
+  sources += [
     "${k32w1_platform_dir}/util/LEDWidget.cpp",
     "${k32w1_platform_dir}/util/include/LEDWidget.h",
     "main/AppTask.cpp",
@@ -86,7 +111,7 @@ k32w1_executable("light_app") {
 
   public = [ "${chip_root}/src/platform/nxp/k32w/k32w1/DefaultTestEventTriggerDelegate.h" ]
 
-  deps = [
+  deps += [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/lighting-app/nxp/zap/",

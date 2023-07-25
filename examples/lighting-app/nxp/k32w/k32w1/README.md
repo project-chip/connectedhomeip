@@ -33,6 +33,7 @@ into an existing Matter network and can be controlled by this network.
     -   [Convert sb3 into ota file](#convert-sb3-into-ota-file)
     -   [Running OTA](#running-ota)
     -   [Known issues](#known-issues)
+-   [Running RPC console](#running-rpc-console)
 
 </hr>
 
@@ -434,4 +435,22 @@ user@computer1:~/connectedhomeip$ sudo ifconfig eth0 -multicast
 
 -   If Wi-Fi is used on a RPI4, then a 5Ghz network should be selected.
     Otherwise, issues related to BLE-WiFi combo may appear.
+
+## Running RPC console
+
+To build example with RPC enabled, use the following gn command:
+`gn gen out/debug --args='import("//with_pw_rpc.gni") treat_warnings_as_errors=false'`
+
+The application runs an RPC server and processes events coming from an RPC client.
+An example of an RPC client is the `chip-console`, which can be accessed by running:
+`chip-console --device /dev/tty.<SERIALDEVICE> -b 115200 -o pw_log.out`
+
+The console should already have been installed in the virtual environment.
+From the `chip-console`, a user can send specific commands to the device, e.g.:
+-   To toggle the LED (`#define LIGHT_BUTTON 2` in `app_config.h`)
+    `rpcs.chip.rpc.Button.Event(idx=2)`
+-   To start BLE advertising (`#define BLE_BUTTON 4` in `app_config.h`)
+    `rpcs.chip.rpc.Button.Event(idx=4)`
+-   To reboot the device
+    `rpcs.chip.rpc.Device.Reboot()`
 
