@@ -19,5 +19,4 @@ jobs:
                   password: ${{ secrets.GITHUB_TOKEN }}
                   registry: ghcr.io
                   platforms: linux/amd64,linux/arm64
-                  buildargs: COMMITHASH=${{ github.sha }}
                   no_push: true

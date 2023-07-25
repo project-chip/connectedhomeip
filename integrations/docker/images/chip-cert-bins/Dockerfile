@@ -156,7 +156,6 @@ RUN set -x \
 RUN mkdir /root/connectedhomeip
 RUN git clone https://github.com/project-chip/connectedhomeip.git /root/connectedhomeip
 WORKDIR /root/connectedhomeip/
-RUN git checkout ${COMMITHASH}
 RUN ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
 RUN bash scripts/bootstrap.sh
 
