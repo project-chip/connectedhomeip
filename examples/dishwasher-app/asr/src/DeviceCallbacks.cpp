@@ -42,8 +42,6 @@
 #include "route_hook/asr_route_hook.h"
 #endif
 
-static const char * TAG = "app-devicecallbacks";
-
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
@@ -51,8 +49,6 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::Logging;
 
-uint16_t identifyTimerCount;
-constexpr uint32_t kIdentifyTimerDelayMS = 1000;
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 constexpr uint32_t kInitOTARequestorDelaySec = 3;
 
@@ -125,43 +121,3 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     }
 }
 
-void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t type,
-                                                  uint16_t size, uint8_t * value)
-{
-    switch (clusterId)
-    {
-    case app::Clusters::Identify::Id:
-        OnIdentifyPostAttributeChangeCallback(endpointId, attributeId, value);
-        break;
-    default:
-        ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-        break;
-    }
-}
-
-void IdentifyTimerHandler(Layer * systemLayer, void * appState)
-{
-    if (identifyTimerCount)
-    {
-        // Decrement the timer count.
-        identifyTimerCount--;
-        systemLayer->StartTimer(Clock::Milliseconds32(kIdentifyTimerDelayMS), IdentifyTimerHandler, appState);
-        app::Clusters::Identify::Attributes::IdentifyTime::Set(1, identifyTimerCount);
-    }
-}
-
-void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
-{
-    VerifyOrExit(attributeId == app::Clusters::Identify::Attributes::IdentifyTime::Id,
-                 ChipLogError(DeviceLayer, "[%s] Unhandled Attribute ID: '0x%04lx", TAG, attributeId));
-    VerifyOrExit(endpointId == 1, ChipLogError(DeviceLayer, "[%s] Unexpected EndPoint ID: `0x%02x'", TAG, endpointId));
-
-    // timerCount represents the number of callback executions before we stop the timer.
-    identifyTimerCount = (*value);
-
-    DeviceLayer::SystemLayer().CancelTimer(IdentifyTimerHandler, this);
-    DeviceLayer::SystemLayer().StartTimer(Clock::Milliseconds32(kIdentifyTimerDelayMS), IdentifyTimerHandler, this);
-
-exit:
-    return;
-}
