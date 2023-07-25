@@ -2,11 +2,9 @@
 
 To use Infineon OPTIGA&trade; Trust M for device attestation, Provisioning for OPTIGA&trade; Trust M with Matter test device Attestation certificate is needed.
 
-The provisioning can be done on Matter Test-Harness using Raspberry Pi4, please refer to Matter_TH_User_Guide from [CSA](https://www.csagroup.org/) for details for Matter Test-Harness setup.
-
 ## Hardware setup:
 
-[Raspberry Pi 4](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/)
+[Raspberry Pi](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/)
 
 [OPTIGA™ Trust M S2GO](https://www.infineon.com/cms/en/product/evaluation-boards/s2go-security-optiga-m/)
 
@@ -14,13 +12,15 @@ The provisioning can be done on Matter Test-Harness using Raspberry Pi4, please 
 
 ## Provisioning for OPTIGA&trade; Trust M
 
--   Clone the repo from Infineon Public Github
+The [Linux Tools for  OPTIGA&trade; Trust M ](https://github.com/Infineon/linux-optiga-trust-m) can be used to perform provisioning by following the steps mentioned below:
+
+-   Clone the repo from Infineon Public GitHub
 
 ```
  $ git clone --recurse-submodules https://github.com/Infineon/linux-optiga-trust-m.git
 ```
 
--   Build the Linux tools for OPTIGA&trade; Trust M:
+-   Build the Linux tools for OPTIGA&trade; Trust M
 
 ```
  $ cd linux-optiga-trust-m/
@@ -40,7 +40,7 @@ $ ./matter_dac_provisioning.sh
 
  *Step1: Extract the public key from the Infineon pre-provisioned Certificate(0xe0e0) using openssl command.*
 
- *Step2: Generate DAC test certificate using the extracted public key, Signed by [Matter test PAI](https://github.com/project-chip/connectedhomeip/blob/v1.1-branch/credentials/development/attestation/Matter-Development-PAI-FFF1-noPID-Cert.pem)_*
+ *Step2: Generate DAC test certificate using the extracted public key, Signed by [Matter test PAI](https://github.com/project-chip/connectedhomeip/blob/v1.1-branch/credentials/development/attestation/Matter-Development-PAI-FFF1-noPID-Cert.pem)*
 
  *Step3: Write DAC test certificate into OPTIGA&trade; Trust M certificate slot 0xe0e3*
 

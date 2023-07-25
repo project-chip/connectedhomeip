@@ -15,7 +15,7 @@ An example showing the use of Matter on the Infineon CY8CKIT-062S2-43012 board.
         -   [Cluster control](#cluster-control)
         -   [Factory Reset](#factory-reset)
     -   [Building with OPTIGA™ Trust M as HSM](#build-trustm-hsm)
-    -   [OPTIGA™ Trust M Provisioning](#provisioning-trustm)
+        -   [OPTIGA™ Trust M Provisioning](#provisioning-trustm)
     -   [OTA Software Update](#ota-software-update)
 
 <hr>
@@ -191,9 +191,11 @@ For different security use cases, please set the flags in CHIPCryptoPALHsm_confi
       $ cd examples/lock-app/infineon/psoc6
       $ rm -rf out/
 
-## <a name="provisioning-trustm"></a>
+- Proceed to OPTIGA™ Trust M Provisioning section to complete the credential storage into HSM.
 
-## OPTIGA™ Trust M Provisioning
+### <a name="provisioning-trustm"></a>
+
+### OPTIGA™ Trust M Provisioning
 
 For the description of OPTIGA™ Trust M Provisioning with test DAC generation and PAI and CD storage, please refer to 
 [Infineon OPTIGA™ Trust M Provisioning](../../../../docs/guides/infineon_trustm_provisioning.md) 
