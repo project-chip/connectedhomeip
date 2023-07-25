@@ -590,6 +590,7 @@ getManualTests
 getstarted
 getTests
 GH
+ghcr
 ghp
 githubusercontent
 gitignore
@@ -640,6 +641,7 @@ HomePods
 hostapd
 hostname
 href
+HEPA
 HTTPS
 HW
 hwadr

@@ -602,7 +602,7 @@ static void wfx_events_task(void * p_arg)
             retryJoin     = 0;
             retryInterval = WLAN_MIN_RETRY_TIMER_MS;
             wfx_lwip_set_sta_link_up();
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
             if (!(wfx_get_wifi_state() & SL_WFX_AP_INTERFACE_UP))
             {
                 // Enable the power save
@@ -610,7 +610,7 @@ static void wfx_events_task(void * p_arg)
                 sl_wfx_set_power_mode(WFM_PM_MODE_DTIM, WFM_PM_POLL_FAST_PS, BEACON_1);
                 sl_wfx_enable_device_power_save();
             }
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
+#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
         }
 
         if (flags & SL_WFX_DISCONNECT)

@@ -27,7 +27,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "0: Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -39,12 +39,12 @@ tests:
     ### Step 1x -> Initialize the Covering position before any testing
     ### MANDATORY Init Commands
     - label:
-          "1a: TH sends DownOrClose command to preposition the DUT in the
+          "Step 1a: TH sends DownOrClose command to preposition the DUT in the
           opposite direction"
       command: "DownOrClose"
       PICS: WNCV.S.C01.Rsp
 
-    - label: "1b: TH Waits for 6-8 seconds movement(s) on the device"
+    - label: "Step 1b: TH Waits for 6-8 seconds movement(s) on the device"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -53,12 +53,12 @@ tests:
                 value: 6000
 
     - label:
-          "1c: TH sends UpOrOpen command to preposition the DUT in the opposite
-          direction"
+          "Step 1c: TH sends UpOrOpen command to preposition the DUT in the
+          opposite direction"
       command: "UpOrOpen"
       PICS: WNCV.S.C00.Rsp
 
-    - label: "1d: TH Waits for 2 seconds movement(s) on the device"
+    - label: "Step 1d: TH Waits for 2 seconds movement(s) on the device"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -66,7 +66,7 @@ tests:
               - name: "ms"
                 value: 2000
 
-    - label: "1e: TH reads OperationalStatus attribute from DUT"
+    - label: "Step 1e: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
       PICS: WNCV.S.A000a
@@ -74,7 +74,7 @@ tests:
           constraints:
               notValue: 0
 
-    - label: "1d: TH Waits for 2 seconds movement(s) on the device"
+    - label: "Step 1d: TH Waits for 2 seconds movement(s) on the device"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -85,7 +85,7 @@ tests:
     ######## StopMotion Command #######
     ### Step 2x -> Check StopMotion fast effects
     ### Before subscribe to reports
-    - label: "2: Subscribe to DUT reports on OperationalStatus attribute"
+    - label: "Step 2: Subscribe to DUT reports on OperationalStatus attribute"
       command: "subscribeAttribute"
       attribute: "OperationalStatus"
       minInterval: 4
@@ -95,14 +95,14 @@ tests:
               type: bitmap8
 
     ### MANDATORY Command
-    - label: "2a: TH sends a StopMotion command to DUT"
+    - label: "Step 2a: TH sends a StopMotion command to DUT"
       command: "StopMotion"
       PICS: WNCV.S.C02.Rsp
 
     ### DUT Slow down and stop
     - label:
-          "2b: TH waits for 3 seconds the end of inertial movement(s) on the
-          device"
+          "Step 2b: TH waits for 3 seconds the end of inertial movement(s) on
+          the device"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -113,7 +113,8 @@ tests:
     ### Must Be ZERO
     # The value of bit 0..1 must be 00b & if (LF) value of bit 2..3 must be 00b & if (TL) value of bit 4..5 must be 00b
     - label:
-          "2c: TH reads OperationalStatus attribute from DUT after a StopMotion"
+          "Step 2c: TH reads OperationalStatus attribute from DUT after a
+          StopMotion"
       command: "readAttribute"
       attribute: "OperationalStatus"
       PICS: WNCV.S.A000a
@@ -121,7 +122,7 @@ tests:
           value: 0
 
     ### DUT updates its attributes
-    - label: "2d: TH waits for 100ms - 3s attributes update on the device"
+    - label: "Step 2d: TH waits for 100ms - 3s attributes update on the device"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -130,7 +131,7 @@ tests:
                 value: 2000
 
     ### MANDATORY reads
-    - label: "2e: TH reads OperationalStatus attribute from DUT"
+    - label: "Step 2e: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
       PICS: WNCV.S.A000a
@@ -143,8 +144,8 @@ tests:
 
     ### Read Current Position -> Store this value for step 4c
     - label:
-          "3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
-          from DUT"
+          "Step 3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
@@ -157,8 +158,9 @@ tests:
     ### Read Target Position -> Compare this value w/ Current
     ### Shall be tested as equals CurrentPositionLiftPercent100ths
     - label:
-          "3b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute
-          3c: it Must be equal with CurrentPositionLiftPercent100ths from DUT"
+          "Step 3b: If (PA & LF) TH reads TargetPositionLiftPercent100ths
+          attribute 3c: it Must be equal with CurrentPositionLiftPercent100ths
+          from DUT"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b && WNCV.S.A000e
@@ -171,8 +173,8 @@ tests:
 
     ### Read Current Position -> Store this value for step 4c
     - label:
-          "4a: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
-          from DUT"
+          "Step 4a: If (PA & TL) TH reads CurrentPositionTiltPercent100ths
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
@@ -185,8 +187,9 @@ tests:
     ### Read Target Position -> Compare this value w/ Current
     ### Shall be tested as equals CurrentPositionTiltPercent100ths
     - label:
-          "4b: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute
-          4c: it Must be equal with CurrentPositionTiltPercent100ths from DUT"
+          "Step 4b: If (PA & TL) TH reads TargetPositionTiltPercent100ths
+          attribute 4c: it Must be equal with CurrentPositionTiltPercent100ths
+          from DUT"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
       PICS:

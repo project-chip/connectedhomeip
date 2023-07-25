@@ -24,6 +24,9 @@ static id _Nullable DecodeAttributeValueFor{{asUpperCamelCase name preserveAcron
     switch (aAttributeId) {
         {{#zcl_attributes_server removeKeys='isOptional'}}
         {{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
+        {{#if (isProvisional (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
+        #if MTR_ENABLE_PROVISIONAL
+        {{/if}}
         case Attributes::{{asUpperCamelCase name}}::Id: {
             using TypeInfo = Attributes::{{asUpperCamelCase name}}::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -36,6 +39,9 @@ static id _Nullable DecodeAttributeValueFor{{asUpperCamelCase name preserveAcron
             {{>decode_value target="value" source="cppValue" cluster=parent.name errorCode="*aError = err; return nil;" depth=0}}
             return value;
         }
+        {{#if (isProvisional (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
+        #endif // MTR_ENABLE_PROVISIONAL
+        {{/if}}
         {{/if}}
         {{/zcl_attributes_server}}
         default: {

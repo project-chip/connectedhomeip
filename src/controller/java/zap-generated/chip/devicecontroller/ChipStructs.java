@@ -105,6 +105,45 @@ public Integer revision;
   }
 }
 
+public static class DescriptorClusterSemanticTagStruct {
+public @Nullable Integer mfgCode;
+public Integer namespaceID;
+public Integer tag;
+public @Nullable Optional<String> label;
+
+  public DescriptorClusterSemanticTagStruct(
+    @Nullable Integer mfgCode
+      , Integer namespaceID
+      , Integer tag
+      , @Nullable Optional<String> label
+  ) {
+    this.mfgCode = mfgCode;
+    this.namespaceID = namespaceID;
+    this.tag = tag;
+    this.label = label;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DescriptorClusterSemanticTagStruct {\n");
+    output.append("\tmfgCode: ");
+    output.append(mfgCode);
+        output.append("\n");
+    output.append("\tnamespaceID: ");
+    output.append(namespaceID);
+        output.append("\n");
+    output.append("\ttag: ");
+    output.append(tag);
+        output.append("\n");
+    output.append("\tlabel: ");
+    output.append(label);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
 public static class BindingClusterTargetStruct {
 public Optional<Long> node;
 public Optional<Integer> group;
@@ -2016,6 +2055,60 @@ public Optional<String> operationalStateLabel;
         output.append("\n");
     output.append("\toperationalStateLabel: ");
     output.append(operationalStateLabel);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class HepaFilterMonitoringClusterReplacementProductStruct {
+public Integer productIdentifierType;
+public String productIdentifierValue;
+
+  public HepaFilterMonitoringClusterReplacementProductStruct(
+    Integer productIdentifierType
+      , String productIdentifierValue
+  ) {
+    this.productIdentifierType = productIdentifierType;
+    this.productIdentifierValue = productIdentifierValue;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("HepaFilterMonitoringClusterReplacementProductStruct {\n");
+    output.append("\tproductIdentifierType: ");
+    output.append(productIdentifierType);
+        output.append("\n");
+    output.append("\tproductIdentifierValue: ");
+    output.append(productIdentifierValue);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class ActivatedCarbonFilterMonitoringClusterReplacementProductStruct {
+public Integer productIdentifierType;
+public String productIdentifierValue;
+
+  public ActivatedCarbonFilterMonitoringClusterReplacementProductStruct(
+    Integer productIdentifierType
+      , String productIdentifierValue
+  ) {
+    this.productIdentifierType = productIdentifierType;
+    this.productIdentifierValue = productIdentifierValue;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ActivatedCarbonFilterMonitoringClusterReplacementProductStruct {\n");
+    output.append("\tproductIdentifierType: ");
+    output.append(productIdentifierType);
+        output.append("\n");
+    output.append("\tproductIdentifierValue: ");
+    output.append(productIdentifierValue);
         output.append("\n");
     output.append("}\n");
     return output.toString();

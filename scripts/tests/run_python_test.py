@@ -17,6 +17,7 @@
 import datetime
 import logging
 import os
+import os.path
 import queue
 import re
 import shlex
@@ -72,7 +73,7 @@ def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: st
 @click.option("--factoryreset", is_flag=True,
               help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests.')
 @click.option("--app-args", type=str, default='',
-              help='The extra arguments passed to the device.')
+              help='The extra arguments passed to the device. Can use placholders like {SCRIPT_BASE_NAME}')
 @click.option("--script", type=click.Path(exists=True), default=os.path.join(DEFAULT_CHIP_ROOT,
                                                                              'src',
                                                                              'controller',
@@ -81,10 +82,13 @@ def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: st
                                                                              'test_scripts',
                                                                              'mobile-device-test.py'), help='Test script to use.')
 @click.option("--script-args", type=str, default='',
-              help='Path to the test script to use, omit to use the default test script (mobile-device-test.py).')
+              help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')
 @click.option("--script-gdb", is_flag=True,
               help='Run script through gdb')
 def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: str, script_gdb: bool):
+    app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
+    script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
+
     if factoryreset:
         # Remove native app config
         retcode = subprocess.call("rm -rf /tmp/chip* /tmp/repl*", shell=True)

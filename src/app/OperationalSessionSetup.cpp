@@ -276,7 +276,7 @@ void OperationalSessionSetup::EnqueueConnectionCallbacks(Callback::Callback<OnDe
     }
 }
 
-void OperationalSessionSetup::DequeueConnectionCallbacksWithoutReleasing(CHIP_ERROR error)
+void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, ReleaseBehavior releaseBehavior)
 {
     Cancelable failureReady, successReady;
 
@@ -297,6 +297,29 @@ void OperationalSessionSetup::DequeueConnectionCallbacksWithoutReleasing(CHIP_ER
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
+    // Gather up state we will need for our notifications.
+    bool performingAddressUpdate                  = mPerformingAddressUpdate;
+    auto * exchangeMgr                            = mInitParams.exchangeMgr;
+    Optional<SessionHandle> optionalSessionHandle = mSecureSession.Get();
+    ScopedNodeId peerId                           = mPeerId;
+
+    if (releaseBehavior == ReleaseBehavior::Release)
+    {
+        VerifyOrDie(mReleaseDelegate != nullptr);
+        mReleaseDelegate->ReleaseSession(this);
+    }
+
+    // DO NOT touch any members of this object after this point.  It's dead.
+
+    NotifyConnectionCallbacks(failureReady, successReady, error, peerId, performingAddressUpdate, exchangeMgr,
+                              optionalSessionHandle);
+}
+
+void OperationalSessionSetup::NotifyConnectionCallbacks(Cancelable & failureReady, Cancelable & successReady, CHIP_ERROR error,
+                                                        const ScopedNodeId & peerId, bool performingAddressUpdate,
+                                                        Messaging::ExchangeManager * exchangeMgr,
+                                                        const Optional<SessionHandle> & optionalSessionHandle)
+{
     //
     // If we encountered no error, go ahead and call all success callbacks. Otherwise,
     // call the failure callbacks.
@@ -304,7 +327,7 @@ void OperationalSessionSetup::DequeueConnectionCallbacksWithoutReleasing(CHIP_ER
     while (failureReady.mNext != &failureReady)
     {
         // We expect that we only have callbacks if we are not performing just address update.
-        VerifyOrDie(!mPerformingAddressUpdate);
+        VerifyOrDie(!performingAddressUpdate);
         Callback::Callback<OnDeviceConnectionFailure> * cb =
             Callback::Callback<OnDeviceConnectionFailure>::FromCancelable(failureReady.mNext);
 
@@ -312,33 +335,24 @@ void OperationalSessionSetup::DequeueConnectionCallbacksWithoutReleasing(CHIP_ER
 
         if (error != CHIP_NO_ERROR)
         {
-            cb->mCall(cb->mContext, mPeerId, error);
+            cb->mCall(cb->mContext, peerId, error);
         }
     }
 
     while (successReady.mNext != &successReady)
     {
         // We expect that we only have callbacks if we are not performing just address update.
-        VerifyOrDie(!mPerformingAddressUpdate);
+        VerifyOrDie(!performingAddressUpdate);
         Callback::Callback<OnDeviceConnected> * cb = Callback::Callback<OnDeviceConnected>::FromCancelable(successReady.mNext);
 
         cb->Cancel();
         if (error == CHIP_NO_ERROR)
         {
-            auto * exchangeMgr = mInitParams.exchangeMgr;
             VerifyOrDie(exchangeMgr);
             // We know that we for sure have the SessionHandle in the successful case.
-            auto optionalSessionHandle = mSecureSession.Get();
             cb->mCall(cb->mContext, *exchangeMgr, optionalSessionHandle.Value());
         }
     }
-}
-
-void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error)
-{
-    DequeueConnectionCallbacksWithoutReleasing(error);
-    VerifyOrDie(mReleaseDelegate != nullptr);
-    mReleaseDelegate->ReleaseSession(this);
 }
 
 void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
@@ -447,7 +461,7 @@ OperationalSessionSetup::~OperationalSessionSetup()
     CancelSessionSetupReattempt();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
-    DequeueConnectionCallbacksWithoutReleasing(CHIP_ERROR_CANCELLED);
+    DequeueConnectionCallbacks(CHIP_ERROR_CANCELLED, ReleaseBehavior::DoNotRelease);
 }
 
 CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()

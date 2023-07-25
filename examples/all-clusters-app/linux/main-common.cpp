@@ -19,12 +19,16 @@
 #include "main-common.h"
 #include "AllClustersCommandDelegate.h"
 #include "WindowCoveringManager.h"
+#include "dishwasher-mode.h"
 #include "include/tv-callbacks.h"
+#include "laundry-washer-mode.h"
+#include "rvc-modes.h"
+#include "tcc-mode.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/att-storage.h>
 #include <app/clusters/identify-server/identify-server.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <lib/support/CHIPMem.h>
@@ -32,20 +36,10 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
+#include <static-supported-temperature-levels.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
-
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-#include <platform/Darwin/NetworkCommissioningDriver.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <platform/Darwin/WiFi/NetworkCommissioningWiFiDriver.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
-
-#if CHIP_DEVICE_LAYER_TARGET_LINUX
-#include <platform/Linux/NetworkCommissioningDriver.h>
-#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 
 #include <Options.h>
 
@@ -59,9 +53,17 @@ constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_all_clusters_fifo_"
 LowPowerManager sLowPowerManager;
 NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
-chip::app::Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
+Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 } // namespace
+
+#ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
+extern void MatterOperationalStateServerInit();
+#endif
+#ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
+extern void MatterDishwasherAlarmServerInit();
+#endif
 
 void OnIdentifyStart(::Identify *)
 {
@@ -105,42 +107,7 @@ static Identify gIdentify1 = {
     OnTriggerEffect,
 };
 
-// Network commissioning
 namespace {
-// This file is being used by platforms other than Linux, so we need this check to disable related features since we only
-// implemented them on linux.
-constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
-constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
-
-#if CHIP_DEVICE_LAYER_TARGET_LINUX
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-NetworkCommissioning::LinuxThreadDriver sThreadDriver;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-NetworkCommissioning::LinuxWiFiDriver sWiFiDriver;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-
-NetworkCommissioning::LinuxEthernetDriver sEthernetDriver;
-#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
-
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-NetworkCommissioning::DarwinWiFiDriver sWiFiDriver;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-
-NetworkCommissioning::DarwinEthernetDriver sEthernetDriver;
-#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sThreadDriver);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointSecondary, &sWiFiDriver);
-#endif
-
-Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sEthernetDriver);
 
 class ExampleDeviceInstanceInfoProvider : public DeviceInstanceInfoProvider
 {
@@ -200,58 +167,6 @@ ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
 
 void ApplicationInit()
 {
-    (void) kNetworkCommissioningEndpointMain;
-    // Enable secondary endpoint only when we need it, this should be applied to all platforms.
-    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
-
-    const bool kThreadEnabled = {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        LinuxDeviceOptions::GetInstance().mThread
-#else
-        false
-#endif
-    };
-
-    const bool kWiFiEnabled = {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        LinuxDeviceOptions::GetInstance().mWiFi
-#else
-        false
-#endif
-    };
-
-    if (kThreadEnabled && kWiFiEnabled)
-    {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        sThreadNetworkCommissioningInstance.Init();
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        sWiFiNetworkCommissioningInstance.Init();
-#endif
-        // Only enable secondary endpoint for network commissioning cluster when both WiFi and Thread are enabled.
-        emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, true);
-    }
-    else if (kThreadEnabled)
-    {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        sThreadNetworkCommissioningInstance.Init();
-#endif
-    }
-    else if (kWiFiEnabled)
-    {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        // If we only enable WiFi on this device, "move" WiFi instance to main NetworkCommissioning cluster endpoint.
-        sWiFiNetworkCommissioningInstance.~Instance();
-        new (&sWiFiNetworkCommissioningInstance)
-            Clusters::NetworkCommissioning::Instance(kNetworkCommissioningEndpointMain, &sWiFiDriver);
-        sWiFiNetworkCommissioningInstance.Init();
-#endif
-    }
-    else
-    {
-        sEthernetNetworkCommissioningInstance.Init();
-    }
-
     std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
 
     if (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR)
@@ -266,6 +181,14 @@ void ApplicationInit()
         gExampleDeviceInstanceInfoProvider.Init(defaultProvider);
         SetDeviceInstanceInfoProvider(&gExampleDeviceInstanceInfoProvider);
     }
+#ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
+    MatterOperationalStateServerInit();
+#endif
+
+#ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
+    MatterDishwasherAlarmServerInit();
+#endif
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 void ApplicationExit()
@@ -279,12 +202,12 @@ void ApplicationExit()
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(NotSpecified, "Setting LowPower default delegate to global manager");
-    chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &sLowPowerManager);
+    Clusters::LowPower::SetDefaultDelegate(endpoint, &sLowPowerManager);
 }
 
 void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
 {
     sWindowCoveringManager.Init(endpoint);
-    chip::app::Clusters::WindowCovering::SetDefaultDelegate(endpoint, &sWindowCoveringManager);
-    chip::app::Clusters::WindowCovering::ConfigStatusUpdateFeatures(endpoint);
+    Clusters::WindowCovering::SetDefaultDelegate(endpoint, &sWindowCoveringManager);
+    Clusters::WindowCovering::ConfigStatusUpdateFeatures(endpoint);
 }

@@ -28,7 +28,6 @@ from dataclasses import dataclass
 from enum import IntEnum
 from operator import attrgetter
 from pathlib import Path
-from xml.etree.ElementInclude import include
 
 
 @dataclass

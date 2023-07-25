@@ -673,6 +673,8 @@
                 "telink-tlsr9518adk80d-ota-requestor",
                 "telink-tlsr9518adk80d-pump-app",
                 "telink-tlsr9518adk80d-pump-controller-app",
+                "telink-tlsr9518adk80d-shell",
+                "telink-tlsr9518adk80d-smoke-co-alarm-app",
                 "telink-tlsr9518adk80d-temperature-measurement",
                 "telink-tlsr9518adk80d-thermostat",
                 "telink-tlsr9518adk80d-window-covering",

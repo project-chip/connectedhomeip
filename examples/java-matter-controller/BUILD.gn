@@ -18,26 +18,12 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tools.gni")
 
-java_library("java") {
-  output_name = "JavaMatterController.jar"
-  deps = [
-    "${chip_root}/src/controller/java",
-    "${chip_root}/third_party/java_deps:annotation",
-  ]
-
-  sources = [
-    "java/src/com/matter/controller/commands/common/FutureResult.java",
-    "java/src/com/matter/controller/commands/common/RealResult.java",
-  ]
-
-  javac_flags = [ "-Xlint:deprecation" ]
-}
-
 kotlin_binary("java-matter-controller") {
   output_name = "java-matter-controller"
   deps = [
-    ":java",
+    "${chip_root}/src/controller/java",
     "${chip_root}/src/controller/java:onboarding_payload",
+    "${chip_root}/third_party/java_deps:annotation",
     "${chip_root}/third_party/java_deps:kotlin-stdlib",
   ]
 
@@ -48,8 +34,10 @@ kotlin_binary("java-matter-controller") {
     "java/src/com/matter/controller/commands/common/Command.kt",
     "java/src/com/matter/controller/commands/common/CommandManager.kt",
     "java/src/com/matter/controller/commands/common/CredentialsIssuer.kt",
+    "java/src/com/matter/controller/commands/common/FutureResult.kt",
     "java/src/com/matter/controller/commands/common/IPAddress.kt",
     "java/src/com/matter/controller/commands/common/MatterCommand.kt",
+    "java/src/com/matter/controller/commands/common/RealResult.kt",
     "java/src/com/matter/controller/commands/discover/DiscoverCommand.kt",
     "java/src/com/matter/controller/commands/discover/DiscoverCommissionablesCommand.kt",
     "java/src/com/matter/controller/commands/discover/DiscoverCommissionersCommand.kt",

@@ -157,5 +157,8 @@ ALLOW: Dict[str, Set[str]] = {
 
     # Library meant for non-embedded
     'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
-    'src/tracing/json/json_tracing.h': {'fstream'}
+    'src/tracing/json/json_tracing.h': {'fstream'},
+
+    # Temporary solution util the OnOff server can provide a callback API for state change.
+    'src/app/clusters/mode-base-server/mode-base-server.h': {'set'}
 }

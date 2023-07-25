@@ -17,6 +17,7 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/jlink.gni")
 import("//build_overrides/mbedtls.gni")
 
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("silabs_board.gni")
 
@@ -52,13 +53,9 @@ declare_args() {
 
   silabs_log_enabled = true
 
-  # Enable Sleepy end device
-  enable_sleepy_device = false
-
   # Argument to enable IPv4 for wifi
   # aligning to match chip_inet_config_enable_ipv4 default configuration
   chip_enable_wifi_ipv4 = false
-  silabs_gen_folder = ""
 
   # Calls SLC-CLI at run time
   slc_generate = false
@@ -74,14 +71,20 @@ declare_args() {
   sl_ot_efr32_root =
       "${efr32_sdk_root}/protocol/openthread/platform-abstraction/efr32"
   sl_openthread_root = "${efr32_sdk_root}/util/third_party/openthread"
+
+  # board related pre-generated files path (default)
+  sl_pre_gen_path =
+      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/"
+
+  # board related generated files path (used if slc_generate or slc_reuse_files is set)
+  slc_gen_path = "${chip_root}/third_party/silabs/slc_gen/${silabs_board}/"
 }
 
 if (slc_generate || slc_reuse_files) {
-  silabs_gen_folder = "${chip_root}/third_party/silabs/slc_gen/${silabs_board}/"
+  silabs_gen_folder = slc_gen_path
 } else {
   print("Using pre-generate files")
-  silabs_gen_folder =
-      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/"
+  silabs_gen_folder = sl_pre_gen_path
 }
 
 # Defines an efr32 SDK build target.
@@ -214,6 +217,7 @@ template("efr32_sdk") {
       "PLAT=EMBER_PLATFORM_CORTEXM3",
       "${silabs_mcu}=1",
       "${silabs_board}=1",
+      "SL_BOARD_NAME=${silabs_board}",
       "SL_SUPRESS_DEPRECATION_WARNINGS_SDK_3_1",
       "__HEAP_SIZE=0",
       "SL_CATALOG_FREERTOS_KERNEL_PRESENT=1",
@@ -326,9 +330,8 @@ template("efr32_sdk") {
       _include_dirs += [ "${efr32_sdk_root}/platform/driver/button/inc" ]
     }
 
-    if (enable_sleepy_device) {
+    if (chip_enable_icd_server) {
       defines += [
-        "CHIP_DEVICE_CONFIG_ENABLE_SED=1",
         "SL_OT_IDLE_INTERVAL=${sl_ot_idle_interval_ms}",
         "SL_OT_ACTIVE_INTERVAL=${sl_ot_active_interval_ms}",
         "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold}",

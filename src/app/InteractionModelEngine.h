@@ -57,6 +57,7 @@
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
+#include <app/reporting/ReportScheduler.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/basic-types.h>
 
@@ -115,7 +116,7 @@ public:
      *
      */
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
-                    CASESessionManager * apCASESessionMgr                         = nullptr,
+                    reporting::ReportScheduler * reportScheduler, CASESessionManager * apCASESessionMgr = nullptr,
                     SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr);
 
     void Shutdown();
@@ -177,6 +178,8 @@ public:
     uint32_t GetMagicNumber() const { return mMagic; }
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
+
+    reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
     void ReleaseAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList);
 
@@ -366,6 +369,7 @@ public:
 private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
+    friend class TestInteractionModelEngine;
     using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandHandler & apCommandObj) override;
@@ -565,6 +569,7 @@ private:
     ObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
+    reporting::ReportScheduler * mReportScheduler = nullptr;
 
     static constexpr size_t kReservedHandlersForReads = kMinSupportedReadRequestsPerFabric * (CHIP_CONFIG_MAX_FABRICS);
     static constexpr size_t kReservedPathsForReads    = kMinSupportedPathsPerReadRequest * kReservedHandlersForReads;
@@ -611,6 +616,13 @@ private:
     // enforce such check based on the configured size. This flag is used for unit tests only, there is another compare time flag
     // CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK for stress tests.
     bool mForceHandlerQuota = false;
+#endif
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    bool HasSubscriptionsToResume();
+    uint32_t ComputeTimeSecondsTillNextSubscriptionResumption();
+    uint32_t mNumSubscriptionResumptionRetries = 0;
+    bool mSubscriptionResumptionScheduled      = false;
 #endif
 
     FabricTable * mpFabricTable;

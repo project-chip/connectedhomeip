@@ -20,8 +20,6 @@ import("${chip_root}/src/lib/lib.gni")
 
 declare_args() {
   bl_iot_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
-
-  enable_cdc_module = false
 }
 
 assert(bl_iot_sdk_root != "", "bl_iot_sdk_root must be specified")
@@ -33,14 +31,6 @@ assert(bl_iot_sdk_root != "", "bl_iot_sdk_root must be specified")
 #   sources - The sources files to build.
 template("bl_iot_sdk") {
   sdk_target_name = target_name
-
-  if (defined(invoker.enable_zigbee)) {
-    enable_zigbee = invoker.enable_zigbee
-  }
-
-  if (defined(invoker.enable_cdc_module)) {
-    enable_cdc_module = invoker.enable_cdc_module
-  }
 
   config("${sdk_target_name}_config") {
     defines = [
@@ -241,7 +231,10 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_hosal") {
-    defines = [ "CFG_USE_XTAL32K=1" ]
+    defines = [
+      "CFG_USE_XTAL32K=1",
+      "DISABLE_PRINT=1",
+    ]
 
     sources = [
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_adc.c",
@@ -542,7 +535,9 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/platform_util.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/sha256.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/sha512.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509_create.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509_crt.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509write_csr.c",
     ]
 
@@ -726,62 +721,27 @@ template("bl_iot_sdk") {
     ]
   }
 
-  config("${sdk_target_name}_config_lwip_port") {
-    _include_dirs = [
-      "${bl_iot_sdk_root}/components/network/lwip/lwip-port",
-      "${bl_iot_sdk_root}/components/network/lwip/lwip-port/config",
-      "${bl_iot_sdk_root}/components/stage/virt_net/include",
-      "${bl_iot_sdk_root}/components/stage/throughput/bl702/inc",
-    ]
-
-    defines = [
-      "TCPIP_THREAD_PRIO=24",
-      "CFG_ETHERNET_ENABLE=1",
-    ]
-
-    cflags = []
-    foreach(include_dir, _include_dirs) {
-      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
-    }
-
-    cflags += [
-      "-Wno-conversion",
-      "-Wno-unused-function",
+  config("${sdk_target_name}_config_ethernet") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_ethernet/Inc",
     ]
   }
 
-  source_set("${sdk_target_name}_lwip_port") {
-    defines = [
-      "SPI_WIFI_RXBUFF_IN_PSRAM=1",
-      "VIRT_NET_SPI_RX_TASK_PRIORITY=25",
-    ]
+  source_set("${sdk_target_name}_ethernet") {
+    defines = [ "DISABLE_PRINT=1" ]
+    sources = [ "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_ethernet/Src/eth_bd.c" ]
 
-    #    include_dirs = [
-    #      "${bl_iot_sdk_root}/components/network/lwip/lwip-port/arch",
-    #      "${bl_iot_sdk_root}/components/network/lwip/lwip-port/FreeRTOS",
-    #      "${bl_iot_sdk_root}/components/stage/throughput"
-    #    ]
-
-    #    sources = [
-    #      "${bl_iot_sdk_root}/components/network/lwip/lwip-port/FreeRTOS/ethernetif.c",
-    #      "${bl_iot_sdk_root}/components/network/lwip/lwip-port/FreeRTOS/sys_arch.c"
-    #    ]
-
-    #    sources += [
-    #      "${bl_iot_sdk_root}/components/stage/throughput/bl702/src/tp_spi_master.c",
-    #    ]
-    #    sources += [
-    #      "${bl_iot_sdk_root}/components/stage/virt_net/src/virt_net.c",
-    #      "${bl_iot_sdk_root}/components/stage/virt_net/src/virt_net_spi.c",
-    #    ]
-
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_lwip_port",
+    configs += [
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_hosal",
+      ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_freertos",
       ":${sdk_target_name}_config_lwip",
     ]
-
-    cflags = [ "-Wno-sign-compare" ]
+    public_configs = [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_ethernet",
+    ]
   }
 
   config("${sdk_target_name}_config_lwip") {
@@ -795,12 +755,15 @@ template("bl_iot_sdk") {
     ]
 
     defines = [
+      "CFG_ETHERNET_ENABLE=1",
       "LWIP_IPV6=1",
       "LWIP_IPV4=1",
       "LWIP_IPV6_DHCP6=1",
       "LWIP_IPV6_SCOPES=0",
       "PBUF_POOL_SIZE=20",
-      "PBUF_POOL_BUFSIZE=(1280+150)",
+      "PBUF_POOL_BUFSIZE=1600",
+      "CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT",
+      "CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT",
     ]
   }
 
@@ -879,6 +842,12 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_lwip",
     ]
+
+    cflags = [
+      "-Wno-incompatible-pointer-types",
+      "-Wno-unused-variable",
+      "-Wno-sign-compare",
+    ]
   }
 
   group(sdk_target_name) {
@@ -886,6 +855,7 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_BSP_Driver",
       ":${sdk_target_name}_bl702_freertos",
       ":${sdk_target_name}_ble",
+      ":${sdk_target_name}_ethernet",
       ":${sdk_target_name}_fs",
       ":${sdk_target_name}_hosal",
       ":${sdk_target_name}_libc",
@@ -896,16 +866,16 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_utils",
     ]
 
-    if (chip_enable_openthread) {
+    if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
+    } else if (defined(invoker.chip_enable_openthread) &&
+               invoker.chip_enable_openthread) {
       public_deps += [ ":${sdk_target_name}_openthread_port" ]
-    }
-
-    if (chip_enable_wifi) {
-      public_deps += [ ":${sdk_target_name}_lwip_port" ]
+    } else {
+      public_deps += [ ":${sdk_target_name}_ethernet" ]
       public_deps += [ ":${sdk_target_name}_lwip" ]
     }
 
-    if (enable_cdc_module) {
+    if (defined(invoker.enable_cdc_module) && invoker.enable_cdc_module) {
       public_deps += [ ":${sdk_target_name}_bl702_usb_cdc" ]
     }
   }

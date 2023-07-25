@@ -56,20 +56,89 @@ using namespace chip::Decoders;
 
 using PayloadDecoderType = chip::Decoders::PayloadDecoder<64, 256>;
 
+/// Figures out a unique name within a json object.
+///
+/// Decoded keys may be duplicated, like list elements are denoted as "[]".
+/// The existing code does not attempt to encode lists and everything is an object,
+/// so this name builder attempts to find unique keys for elements inside a json.
+///
+/// In particular a repeated "Anonymous<>", "Anonymous<>", ... will become "Anonymous<0>", ...
+class UniqueNameBuilder
+{
+public:
+    UniqueNameBuilder(chip::StringBuilderBase & formatter) : mFormatter(formatter) {}
+    const char * c_str() const { return mFormatter.c_str(); }
+
+    // Figure out the next unique name in the given value
+    //
+    // After this returns, c_str() will return a name based on `baseName` that is
+    // not a key of `value` (unless on overflows, which are just logged)
+    void ComputeNextUniqueName(const char * baseName, ::Json::Value & value)
+    {
+        FirstName(baseName);
+        while (value.isMember(mFormatter.c_str()))
+        {
+            NextName(baseName);
+            if (!mFormatter.Fit())
+            {
+                ChipLogError(Automation, "Potential data loss: insufficient space for unique keys in json");
+                return;
+            }
+        }
+    }
+
+private:
+    void FirstName(const char * baseName)
+    {
+        if (strcmp(baseName, "Anonymous<>") == 0)
+        {
+            mFormatter.Reset().Add("Anonymous<0>");
+        }
+        else
+        {
+            mFormatter.Reset().Add(baseName);
+        }
+    }
+
+    void NextName(const char * baseName)
+    {
+        if (strcmp(baseName, "Anonymous<>") == 0)
+        {
+            mFormatter.Reset().Add("Anonymous<").Add(mUniqueIndex++).Add(">");
+        }
+        else
+        {
+            mFormatter.Reset().Add(baseName).Add("@").Add(mUniqueIndex++);
+        }
+    }
+
+    chip::StringBuilderBase & mFormatter;
+    int mUniqueIndex = 0;
+};
+
 // Gets the current value of the decoder until a NEST exit is returned
 ::Json::Value GetPayload(PayloadDecoderType & decoder)
 {
     ::Json::Value value;
     PayloadEntry entry;
     StringBuilder<128> formatter;
+    UniqueNameBuilder nameBuilder(formatter);
 
     while (decoder.Next(entry))
     {
         switch (entry.GetType())
         {
         case PayloadEntry::IMPayloadType::kNestingEnter:
-            formatter.Reset().Add(entry.GetName()); // name gets destroyed by decoding
-            value[formatter.c_str()] = GetPayload(decoder);
+            // PayloadEntry validity is only until any decoder calls are made,
+            // because the entry Name/Value may point into a shared Decoder buffer.
+            //
+            // As such entry.GetName() is only valid here and would not be valid once
+            // GetPayload() is called as GetPayload calls decoder.Next, which invalidates
+            // internal name and value buffers (makes them point to the next element).
+            //
+            // TLDR: name MUST be used and saved before GetPayload is executed.
+            nameBuilder.ComputeNextUniqueName(entry.GetName(), value);
+            value[nameBuilder.c_str()] = GetPayload(decoder);
             break;
         case PayloadEntry::IMPayloadType::kNestingExit:
             return value;
@@ -84,7 +153,8 @@ using PayloadDecoderType = chip::Decoders::PayloadDecoder<64, 256>;
             value[formatter.Reset().AddFormat("EVNT(%u/%u)", entry.GetClusterId(), entry.GetEventId()).c_str()] = "<NOT_DECODED>";
             continue;
         default:
-            value[entry.GetName()] = entry.GetValueText();
+            nameBuilder.ComputeNextUniqueName(entry.GetName(), value);
+            value[nameBuilder.c_str()] = entry.GetValueText();
             break;
         }
     }
@@ -147,7 +217,7 @@ void DecodePayloadData(::Json::Value & value, chip::ByteSpan payload, Protocols:
     value["size"] = static_cast<::Json::Value::UInt>(payload.size());
 
 #if MATTER_LOG_JSON_DECODE_HEX
-    char hex_buffer[1024];
+    char hex_buffer[4096];
     if (chip::Encoding::BytesToUppercaseHexString(payload.data(), payload.size(), hex_buffer, sizeof(hex_buffer)) == CHIP_NO_ERROR)
     {
         value["hex"] = hex_buffer;
@@ -301,6 +371,7 @@ void JsonBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
 
         result["mrp"]["idle_retransmit_timeout_ms"]   = info.result->mrpRemoteConfig.mIdleRetransTimeout.count();
         result["mrp"]["active_retransmit_timeout_ms"] = info.result->mrpRemoteConfig.mActiveRetransTimeout.count();
+        result["mrp"]["active_threshold_time_ms"]     = info.result->mrpRemoteConfig.mActiveThresholdTime.count();
 
         value["result"] = result;
     }

@@ -23,6 +23,7 @@
 #include "AppConfig.h"
 #include "SmokeCoAlarmManager.h"
 
+#include "SilabsTestEventTriggerDelegate.h"
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
@@ -63,5 +64,10 @@ void emberAfSmokeCoAlarmClusterInitCallback(EndpointId endpoint)
 
 bool emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId)
 {
-    return AlarmMgr().StartSelfTesting();
+    return AlarmMgr().OnSelfTesting();
+}
+
+bool emberAfHandleEventTrigger(uint64_t eventTrigger)
+{
+    return AlarmMgr().OnEventTriggerHandle(eventTrigger);
 }

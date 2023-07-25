@@ -33,7 +33,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.7.16
+            image: ghcr.io/project-chip/chip-build:1
             options: --user root
 
         steps:
@@ -54,7 +54,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.7.16
+            image: ghcr.io/project-chip/chip-build-esp32:1
             options: --user root
 
         steps:
@@ -64,6 +64,8 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: esp32
+            - name: Fixup GdbGui requirement
+              run: perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt
             - name: CI Examples ESP32
               shell: bash
               run: |
@@ -75,7 +77,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.7.16
+            image: ghcr.io/project-chip/chip-build-nrf-platform:1
             options: --user root
 
         steps:

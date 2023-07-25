@@ -27,7 +27,6 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/LockTracker.h>
 #include <transport/SessionDelegate.h>
-#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace Transport {
@@ -156,8 +155,6 @@ class SecureSession;
 class UnauthenticatedSession;
 class IncomingGroupSession;
 class OutgoingGroupSession;
-
-constexpr System::Clock::Milliseconds32 kMinActiveTime = System::Clock::Milliseconds32(4000);
 
 class Session
 {

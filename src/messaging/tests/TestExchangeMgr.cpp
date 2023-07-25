@@ -179,16 +179,19 @@ void CheckSessionExpirationDuringTimeout(nlTestSuite * inSuite, void * inContext
     ExpireSessionFromTimeoutDelegate sendDelegate;
     ExchangeContext * ec1 = ctx.NewExchangeToBob(&sendDelegate);
 
-    ec1->SetResponseTimeout(System::Clock::Timeout(100));
+    auto timeout = System::Clock::Timeout(100);
+    ec1->SetResponseTimeout(timeout);
+
+    NL_TEST_ASSERT(inSuite, !sendDelegate.IsOnResponseTimeoutCalled);
 
     ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
-
     ctx.DrainAndServiceIO();
-    NL_TEST_ASSERT(inSuite, !sendDelegate.IsOnResponseTimeoutCalled);
 
-    // Wait for our timeout to elapse. Give it an extra 100ms.
-    ctx.GetIOContext().DriveIOUntil(200_ms32, [&sendDelegate] { return sendDelegate.IsOnResponseTimeoutCalled; });
+    // Wait for our timeout to elapse. Give it an extra 1000ms of slack,
+    // because if we lose the timeslice for longer than the slack we could end
+    // up breaking out of the loop before the timeout timer has actually fired.
+    ctx.GetIOContext().DriveIOUntil(timeout + 1000_ms32, [&sendDelegate] { return sendDelegate.IsOnResponseTimeoutCalled; });
 
     NL_TEST_ASSERT(inSuite, sendDelegate.IsOnResponseTimeoutCalled);
 

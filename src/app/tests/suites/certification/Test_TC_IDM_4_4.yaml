@@ -25,15 +25,9 @@ config:
 
 tests:
     - label:
-          "TH sends a subscription request action for an attribute to the DUT.
-          Activate the subscription between DUT and the TH."
+          "Step 1: TH sends a subscription request action for an attribute to
+          the DUT. Activate the subscription between DUT and the TH."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
-
-           Please use Interactive mode to Verify subscription test cases
-          Here the command to enter interactive mode:--   ./chip-tool interactive start
-
-
           onoff subscribe on-time 10 100 1 1 --auto-resubscribe true
           Verify on the TH(chip-tool) that the Report data messages are sent from the DUT(Reference app) for subscription request action to the TH(chip-tool) with the correct attribute values.
 
@@ -55,7 +49,7 @@ tests:
           [1675085714.397832][208829:208831] CHIP:DMG: Subscription established with SubscriptionID = 0xa11efe71 MinInterval = 10s MaxInterval = 100s Peer = 01:0000000000000001
       disabled: true
 
-    - label: "Power off the DUT. Power on the DUT immediately."
+    - label: "Step 2: Power off the DUT. Power on the DUT immediately."
       verification: |
           Verify on the TH(chip-tool) that the subscription between the DUT(Reference-app) and TH(chip-tool) is restablished and DUT(Reference-app) is able to send report data messages for the attribute which was subscribed to in step 1 within the MaxInterval time.
 

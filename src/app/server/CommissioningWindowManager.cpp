@@ -165,7 +165,7 @@ void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
 
         if (mAppDelegate != nullptr)
         {
-            mAppDelegate->OnCommissioningSessionStopped();
+            mAppDelegate->OnCommissioningSessionStopped(err);
         }
     }
 }
@@ -175,6 +175,12 @@ void CommissioningWindowManager::OnSessionEstablishmentStarted()
     // As per specifications, section 5.5: Commissioning Flows
     constexpr System::Clock::Timeout kPASESessionEstablishmentTimeout = System::Clock::Seconds16(60);
     DeviceLayer::SystemLayer().StartTimer(kPASESessionEstablishmentTimeout, HandleSessionEstablishmentTimeout, this);
+
+    ChipLogProgress(AppServer, "Commissioning session establishment step started");
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnCommissioningSessionEstablishmentStarted();
+    }
 }
 
 void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & session)
@@ -564,7 +570,21 @@ void CommissioningWindowManager::ExpireFailSafeIfArmed()
 void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnum aNewStatus)
 {
     CommissioningWindowStatusEnum oldClusterStatus = CommissioningWindowStatusForCluster();
-    mWindowStatus                                  = aNewStatus;
+    if (mWindowStatus != aNewStatus)
+    {
+        mWindowStatus = aNewStatus;
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        DeviceLayer::ChipDeviceEvent event;
+        event.Type                           = DeviceLayer::DeviceEventType::kCommissioningWindowStatusChanged;
+        event.CommissioningWindowStatus.open = (mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen);
+        CHIP_ERROR err                       = DeviceLayer::PlatformMgr().PostEvent(&event);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to post kCommissioningWindowStatusChanged event %" CHIP_ERROR_FORMAT, err.Format());
+        }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+    }
+
     if (CommissioningWindowStatusForCluster() != oldClusterStatus)
     {
         // The Administrator Commissioning cluster is always on the root endpoint.

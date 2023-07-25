@@ -15,9 +15,9 @@
 
 from typing import Tuple, Union
 
-from .errors import (TestStepError, TestStepGroupResponseError, TestStepInvalidTypeError, TestStepKeyError,
-                     TestStepNodeIdAndGroupIdError, TestStepResponseVariableError, TestStepValueAndValuesError,
-                     TestStepVerificationStandaloneError, TestStepWaitResponseError)
+from .errors import (TestStepArgumentsValueError, TestStepError, TestStepGroupEndPointError, TestStepGroupResponseError,
+                     TestStepInvalidTypeError, TestStepKeyError, TestStepNodeIdAndGroupIdError, TestStepResponseVariableError,
+                     TestStepValueAndValuesError, TestStepVerificationStandaloneError, TestStepWaitResponseError)
 from .fixes import add_yaml_support_for_scientific_notation_without_dot
 
 try:
@@ -103,8 +103,10 @@ class YamlLoader:
             'PICS': str,
             'arguments': dict,
             'response': (dict, list, str),  # Can be a variable
+            'saveResponseAs': str,
             'minInterval': int,
             'maxInterval': int,
+            'timeout': int,
             'timedInteractionTimeoutMs': int,
             'dataVersion': (list, int, str),  # Can be a variable
             'busyWaitMs': int,
@@ -114,10 +116,12 @@ class YamlLoader:
         self.__check(content, schema)
         self.__rule_node_id_and_group_id_are_mutually_exclusive(content)
         self.__rule_group_step_should_not_expect_a_response(content)
+        self.__rule_group_step_should_not_target_an_endpoint(content)
         self.__rule_step_with_verification_should_be_disabled_or_interactive(
             content)
         self.__rule_wait_should_not_expect_a_response(content)
         self.__rule_response_variable_should_exist_in_config(config, content)
+        self.__rule_argument_value_is_only_when_writing_attributes(content)
 
         if 'arguments' in content:
             arguments = content.get('arguments')
@@ -232,9 +236,11 @@ class YamlLoader:
 
     def __rule_group_step_should_not_expect_a_response(self, content):
         if 'groupId' in content and 'response' in content:
-            response = content.get('response')
-            if 'value' in response or 'values' in response:
-                raise TestStepGroupResponseError(content)
+            raise TestStepGroupResponseError(content)
+
+    def __rule_group_step_should_not_target_an_endpoint(self, content):
+        if 'groupId' in content and 'endpoint' in content:
+            raise TestStepGroupEndPointError(content)
 
     def __rule_step_with_verification_should_be_disabled_or_interactive(self, content):
         if 'verification' in content:
@@ -256,3 +262,10 @@ class YamlLoader:
             response = content.get('response')
             if isinstance(response, str) and response not in config:
                 raise TestStepResponseVariableError(content)
+
+    def __rule_argument_value_is_only_when_writing_attributes(self, content):
+        if 'arguments' in content:
+            command = content.get('command')
+            arguments = content.get('arguments')
+            if 'value' in arguments and command != 'writeAttribute':
+                raise TestStepArgumentsValueError(content)

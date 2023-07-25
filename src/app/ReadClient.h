@@ -249,6 +249,16 @@ public:
          * @param[in] apReadClient the ReadClient for the subscription.
          */
         virtual void OnUnsolicitedMessageFromPublisher(ReadClient * apReadClient) {}
+
+        /**
+         * OnCASESessionEstablished will be called for a subscription ReadClient when
+         * it finishes setting up a CASE session, as part of either automatic
+         * re-subscription or doing an initial subscribe based on ScopedNodeId.
+         *
+         * The callee is allowed to modify the ReadPrepareParams (e.g. to change
+         * things like min/max intervals based on the session parameters).
+         */
+        virtual void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) {}
     };
 
     enum class InteractionType : uint8_t
@@ -267,7 +277,9 @@ public:
      *  this object will cease to function correctly since it depends on the engine for a number of critical functions.
      *
      *  @param[in]    apImEngine       A valid pointer to the IM engine.
-     *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
+     *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object. Allowed to be null
+     *                                 if the version of SendAutoResubscribeRequest that takes a
+     *                                 ScopedNodeId is used.
      *  @param[in]    apCallback       Callback set by application.
      *  @param[in]    aInteractionType Type of interaction (read or subscribe)
      *
@@ -352,11 +364,21 @@ public:
      *  OnDeallocatePaths. Note: At a given time in the system, you can either have a single subscription with re-sub enabled that
      *  has mKeepSubscriptions = false, OR, multiple subs with re-sub enabled with mKeepSubscriptions = true. You shall not
      *  have a mix of both simultaneously. If SendAutoResubscribeRequest is called at all, it guarantees that it will call
-     *  OnDeallocatePaths when OnDone is called. SendAutoResubscribeRequest is the only case that calls OnDeallocatePaths, since
-     *  that's the only case when the consumer moved a ReadParams into the client.
+     *  OnDeallocatePaths (either befor returning error, or when OnDone is called). SendAutoResubscribeRequest is the only case
+     *  that calls OnDeallocatePaths, since that's the only case when the consumer moved a ReadParams into the client.
      *
      */
     CHIP_ERROR SendAutoResubscribeRequest(ReadPrepareParams && aReadPrepareParams);
+
+    /**
+     * Like SendAutoResubscribeRequest above, but without a session being
+     * available in the ReadPrepareParams.  When this is used, the ReadClient is
+     * responsible for setting up the CASE session itself.
+     *
+     * When using this version of SendAutoResubscribeRequest, any session to
+     * which ReadPrepareParams has a reference will be ignored.
+     */
+    CHIP_ERROR SendAutoResubscribeRequest(const ScopedNodeId & aPublisherId, ReadPrepareParams && aReadPrepareParams);
 
     /**
      *   This provides a standard re-subscription policy implementation that given a termination cause, does the following:
@@ -537,6 +559,13 @@ private:
     static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     CHIP_ERROR GetMinEventNumber(const ReadPrepareParams & aReadPrepareParams, Optional<EventNumber> & aEventMin);
+
+    /**
+     * Start setting up a CASE session to our peer, if we can locate a
+     * CASESessionManager.  Returns error if we did not even manage to kick off
+     * a CASE attempt.
+     */
+    CHIP_ERROR EstablishSessionToPeer();
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeHolder mExchange;

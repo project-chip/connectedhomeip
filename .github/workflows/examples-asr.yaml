@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-asr:0.7.14
+            image: ghcr.io/project-chip/chip-build-asr:1
             options: --user root
 
         steps:
@@ -50,12 +50,12 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target asr-asr582x-all-clusters \
                         --target asr-asr582x-all-clusters-minimal \
-                        --target asr-asr582x-lighting \
-                        --target asr-asr582x-light-switch \
-                        --target asr-asr582x-lock \
+                        --target asr-asr582x-lighting-ota \
+                        --target asr-asr582x-light-switch-shell \
+                        --target asr-asr582x-lock-no_logging \
                         --target asr-asr582x-ota-requestor \
-                        --target asr-asr582x-bridge \
-                        --target asr-asr582x-temperature-measurement \
-                        --target asr-asr582x-thermostat \
+                        --target asr-asr582x-bridge-factory \
+                        --target asr-asr582x-temperature-measurement-rotating_id \
+                        --target asr-asr582x-thermostat-rio \
                         build \
                      "
