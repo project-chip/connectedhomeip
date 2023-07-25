@@ -2,6 +2,8 @@
 #include <app-common/zap-generated/callback.h>
 #include <app/util/config.h>
 
+using namespace chip;
+
 // Include door lock callbacks only when the server is enabled
 #ifdef EMBER_AF_PLUGIN_DOOR_LOCK_SERVER
 #include <app/clusters/door-lock-server/door-lock-server.h>

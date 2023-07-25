@@ -21,9 +21,6 @@
 #include <app/clusters/channel-server/channel-server.h>
 #include <vector>
 
-using namespace chip;
-using namespace chip::app;
-
 using chip::CharSpan;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
@@ -38,9 +35,9 @@ class ChefChannelManager : public ChannelDelegate
 public:
     ChefChannelManager();
 
-    CHIP_ERROR HandleGetChannelList(app::AttributeValueEncoder & aEncoder);
-    CHIP_ERROR HandleGetLineup(app::AttributeValueEncoder & aEncoder);
-    CHIP_ERROR HandleGetCurrentChannel(app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR HandleGetChannelList(chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR HandleGetLineup(chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR HandleGetCurrentChannel(chip::app::AttributeValueEncoder & aEncoder);
 
     void HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper, const chip::CharSpan & match);
     bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber);
