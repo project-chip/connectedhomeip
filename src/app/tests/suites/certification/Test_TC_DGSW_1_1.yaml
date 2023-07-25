@@ -154,7 +154,7 @@ tests:
                 value: "y"
 
     - label: "Step 5a: TH reads EventList from DUT"
-      PICS: DGSW.S.E00 && DGSW.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && DGSW.S.E00 && DGSW.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -163,7 +163,7 @@ tests:
               contains: [0]
 
     - label: "Step 5b: TH reads EventList from DUT"
-      PICS: " !DGSW.S.E00 && DGSW.S.Afffa "
+      PICS: "PICS_EVENT_LIST_ENABLED &&  !DGSW.S.E00 && DGSW.S.Afffa "
       command: "readAttribute"
       attribute: "EventList"
       response:

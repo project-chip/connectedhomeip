@@ -229,7 +229,7 @@ tests:
               contains: [58]
 
     - label: "Step 5a: TH reads EventList from DUT"
-      PICS: " !DGTHREAD.S.E00 && !DGTHREAD.S.E01 "
+      PICS: "PICS_EVENT_LIST_ENABLED &&  !DGTHREAD.S.E00 && !DGTHREAD.S.E01 "
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -239,7 +239,7 @@ tests:
 
     - label:
           "Step 5b: TH reads DGTHREAD.S.E00(ConnectionStatus) event in EventList"
-      PICS: DGTHREAD.S.E00
+      PICS: PICS_EVENT_LIST_ENABLED && DGTHREAD.S.E00
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -250,7 +250,7 @@ tests:
     - label:
           "Step 5c: TH reads DGTHREAD.S.E01(NetworkFaultChange) event in
           EventList"
-      PICS: DGTHREAD.S.E01
+      PICS: PICS_EVENT_LIST_ENABLED && DGTHREAD.S.E01
       command: "readAttribute"
       attribute: "EventList"
       response:

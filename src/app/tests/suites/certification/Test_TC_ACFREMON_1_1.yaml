@@ -112,6 +112,7 @@ tests:
               contains: [3]
 
     - label: "Step 5: TH reads EventList attribute from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:

@@ -165,7 +165,7 @@ tests:
                 value: "y"
 
     - label: "Step 5a: Read the global attribute: EventList"
-      PICS: DGGEN.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && DGGEN.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -174,7 +174,7 @@ tests:
               contains: [3]
 
     - label: "Step 5b: Read optional event(HardwareFaultChange) in EventList"
-      PICS: DGGEN.S.Afffa && DGGEN.S.E00
+      PICS: PICS_EVENT_LIST_ENABLED && DGGEN.S.Afffa && DGGEN.S.E00
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -183,7 +183,7 @@ tests:
               contains: [0]
 
     - label: "Step 5c: Read optional event(RadioFaultChange) in EventList"
-      PICS: DGGEN.S.Afffa && DGGEN.S.E01
+      PICS: PICS_EVENT_LIST_ENABLED && DGGEN.S.Afffa && DGGEN.S.E01
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -192,7 +192,7 @@ tests:
               contains: [1]
 
     - label: "Step 5d: Read optional event(NetworkFaultChange) in EventList"
-      PICS: DGGEN.S.Afffa && DGGEN.S.E02
+      PICS: PICS_EVENT_LIST_ENABLED && DGGEN.S.Afffa && DGGEN.S.E02
       command: "readAttribute"
       attribute: "EventList"
       response:

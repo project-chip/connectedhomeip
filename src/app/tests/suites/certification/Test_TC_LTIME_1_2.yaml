@@ -82,7 +82,7 @@ tests:
               contains: [2]
 
     - label: "Step 5: TH reads EventList from DUT"
-      PICS: LTIME.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && LTIME.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:

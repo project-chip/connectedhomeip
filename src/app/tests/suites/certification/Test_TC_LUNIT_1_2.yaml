@@ -81,7 +81,7 @@ tests:
               contains: [0]
 
     - label: "Step 5: TH reads EventList from DUT"
-      PICS: LUNIT.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && LUNIT.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:

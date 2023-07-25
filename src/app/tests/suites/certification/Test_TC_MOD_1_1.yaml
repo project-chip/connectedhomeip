@@ -98,6 +98,7 @@ tests:
               contains: [5]
 
     - label: "Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:

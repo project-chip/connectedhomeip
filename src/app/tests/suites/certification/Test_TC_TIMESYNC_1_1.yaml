@@ -247,6 +247,7 @@ tests:
     ##########################
     # mandatory
     - label: "TS5: Check for mandatory events in EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -255,7 +256,7 @@ tests:
 
     # Feature TZ
     - label: "TS5: Check for TZ feature-based events in EventList"
-      PICS: TIMESYNC.S.F00
+      PICS: PICS_EVENT_LIST_ENABLED && TIMESYNC.S.F00
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -263,7 +264,7 @@ tests:
               contains: [0x00, 0x01, 0x02]
 
     - label: "TS5: Check for TZ feature-based events not in EventList"
-      PICS: "!TIMESYNC.S.F00"
+      PICS: "PICS_EVENT_LIST_ENABLED && !TIMESYNC.S.F00"
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -272,14 +273,14 @@ tests:
 
     # Feature TSC
     - label: "TS5: Check for TSC feature-based events in EventList"
-      PICS: TIMESYNC.S.F03
+      PICS: PICS_EVENT_LIST_ENABLED && TIMESYNC.S.F03
       command: "readAttribute"
       attribute: "EventList"
       response:
           constraints:
               contains: [0x04]
     - label: "TS5: Check for TSC feature-based events not in EventList"
-      PICS: "!TIMESYNC.S.F03"
+      PICS: "PICS_EVENT_LIST_ENABLED && !TIMESYNC.S.F03"
       command: "readAttribute"
       attribute: "EventList"
       response:

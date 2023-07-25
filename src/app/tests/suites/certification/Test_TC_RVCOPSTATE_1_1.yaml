@@ -71,7 +71,7 @@ tests:
               contains: [2]
 
     - label: "Step 5a: TH reads from the DUT the EventList attribute."
-      PICS: RVCOPSTATE.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && RVCOPSTATE.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -82,7 +82,7 @@ tests:
     - label:
           "Step 5b: TH reads from the DUT the optional
           event(OperationCompletion) in EventList."
-      PICS: RVCOPSTATE.S.E01 && RVCOPSTATE.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && RVCOPSTATE.S.E01 && RVCOPSTATE.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:

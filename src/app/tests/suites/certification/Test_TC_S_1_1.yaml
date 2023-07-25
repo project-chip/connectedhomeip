@@ -110,6 +110,7 @@ tests:
                   ]
 
     - label: "Step 5: Read EventList (global attribute 65530)"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:

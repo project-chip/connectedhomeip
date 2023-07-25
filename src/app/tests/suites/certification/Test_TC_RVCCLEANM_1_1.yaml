@@ -101,7 +101,7 @@ tests:
               excludes: [3]
 
     - label: "Read the global attribute: EventList from the DUT"
-      PICS: RVCCLEANM.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && RVCCLEANM.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:

@@ -177,6 +177,7 @@ tests:
               contains: [12, 15]
 
     - label: "Step 5: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:

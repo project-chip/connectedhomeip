@@ -108,7 +108,7 @@ tests:
                 value: "y"
 
     - label: "Step 5a: TH reads EventList attribute from DUT"
-      PICS: ACL.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && ACL.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:

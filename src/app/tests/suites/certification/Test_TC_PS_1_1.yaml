@@ -162,7 +162,7 @@ tests:
               type: list
 
     - label: "Step 7a: Read the global attribute: EventList"
-      PICS: " !PS.S.E00 && !PS.S.E01 && !PS.S.E02 "
+      PICS: "PICS_EVENT_LIST_ENABLED &&  !PS.S.E00 && !PS.S.E01 && !PS.S.E02 "
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -171,7 +171,7 @@ tests:
               type: list
 
     - label: "Step 7b: Read PS.S.E00(WiredFaultChange) event in EventList"
-      PICS: PS.S.E00
+      PICS: PICS_EVENT_LIST_ENABLED && PS.S.E00
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -180,7 +180,7 @@ tests:
               contains: [0]
 
     - label: "Step 7c: Read PS.S.E01(BatFaultChange) event in EventList"
-      PICS: PS.S.E01
+      PICS: PICS_EVENT_LIST_ENABLED && PS.S.E01
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -189,7 +189,7 @@ tests:
               contains: [1]
 
     - label: "Step 7d: Read PS.S.E02(BatChargeFaultChange) event in EventList"
-      PICS: PS.S.E02
+      PICS: PICS_EVENT_LIST_ENABLED && PS.S.E02
       command: "readAttribute"
       attribute: "EventList"
       response:

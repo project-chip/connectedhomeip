@@ -308,7 +308,7 @@ tests:
     - label: "Step 5: Read the global attribute: EventList"
       command: "readAttribute"
       attribute: "EventList"
-      PICS: CDOCONC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && CDOCONC.S.Afffa
       response:
           value: []
           constraints:

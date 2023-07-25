@@ -165,6 +165,7 @@ tests:
               contains: [12]
 
     - label: "TH reads from the DUT the EventList attribute"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -173,7 +174,7 @@ tests:
               contains: [2, 3, 4, 5, 10]
 
     - label: "TH reads from the DUT the EventList attribute(SmokeAlarm)"
-      PICS: SMOKECO.S.E00
+      PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E00
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -182,7 +183,7 @@ tests:
               contains: [0]
 
     - label: "TH reads from the DUT the EventList attribute(COAlarm)"
-      PICS: SMOKECO.S.E01
+      PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E01
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -191,7 +192,7 @@ tests:
               contains: [1]
 
     - label: "TH reads from the DUT the EventList attribute(AlarmMuted)"
-      PICS: SMOKECO.S.E06
+      PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E06
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -200,7 +201,7 @@ tests:
               contains: [6]
 
     - label: "TH reads from the DUT the EventList attribute(MuteEnded)"
-      PICS: SMOKECO.S.E07
+      PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E07
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -210,7 +211,7 @@ tests:
 
     - label:
           "TH reads from the DUT the EventList attribute(InterconnectSmokeAlarm)"
-      PICS: SMOKECO.S.E08
+      PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E08
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -220,7 +221,7 @@ tests:
 
     - label:
           "TH reads from the DUT the EventList attribute(InterconnectCOAlarm)"
-      PICS: SMOKECO.S.E09
+      PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E09
       command: "readAttribute"
       attribute: "EventList"
       response:

@@ -68,6 +68,7 @@ tests:
               contains: [2]
 
     - label: "Step 5a: TH reads from the DUT the EventList attribute."
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -78,7 +79,7 @@ tests:
     - label:
           "Step 5b: TH reads from the DUT the optional
           event(OperationCompletion) in EventList."
-      PICS: OPSTATE.S.E01
+      PICS: PICS_EVENT_LIST_ENABLED && OPSTATE.S.E01
       command: "readAttribute"
       attribute: "EventList"
       response:

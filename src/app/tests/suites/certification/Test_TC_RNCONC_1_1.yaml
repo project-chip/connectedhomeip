@@ -308,7 +308,7 @@ tests:
     - label: "Step 5: Read the global attribute: EventList"
       command: "readAttribute"
       attribute: "EventList"
-      PICS: RNCONC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && RNCONC.S.Afffa
       response:
           value: []
           constraints:

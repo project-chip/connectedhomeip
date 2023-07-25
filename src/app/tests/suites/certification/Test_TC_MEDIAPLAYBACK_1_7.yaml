@@ -236,6 +236,7 @@ tests:
               contains: [10]
 
     - label: "Step 6: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
