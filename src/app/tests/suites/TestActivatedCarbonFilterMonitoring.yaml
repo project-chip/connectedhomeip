@@ -21,12 +21,7 @@ config:
     ReplacementProductList:
         type: "ReplacementProductStruct"
         defaultValue:
-            [
-                {
-                    ProductIdentifierType: 1,
-                    ProductIdentifierValue: "gtin8xac",
-                },
-            ]
+            [{ ProductIdentifierType: 1, ProductIdentifierValue: "gtin8xac" }]
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -42,9 +37,4 @@ tests:
       attribute: "ReplacementProductList"
       response:
           value:
-              [
-                  {
-                      ProductIdentifierType: 1,
-                      ProductIdentifierValue: "gtin8xac",
-                  },
-              ]
+              [{ ProductIdentifierType: 1, ProductIdentifierValue: "gtin8xac" }]
