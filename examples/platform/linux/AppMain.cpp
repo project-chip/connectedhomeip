@@ -578,7 +578,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     }
     gMainLoopImplementation = nullptr;
 
-    ApplicationExit();
+    ApplicationShutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ShutdownCommissioner();

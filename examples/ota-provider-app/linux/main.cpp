@@ -380,7 +380,7 @@ void ApplicationInit()
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &gOtaProvider);
 }
 
-void ApplicationExit() {}
+void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {

@@ -84,7 +84,7 @@ static Identify gIdentify1 = {
 
 void ApplicationInit() {}
 
-void ApplicationExit() {}
+void ApplicationShutdown() {}
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {

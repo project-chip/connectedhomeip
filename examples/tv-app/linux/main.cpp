@@ -47,7 +47,7 @@ void ApplicationInit()
     // emberAfEndpointEnableDisable(3, false);
 }
 
-void ApplicationExit() {}
+void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {

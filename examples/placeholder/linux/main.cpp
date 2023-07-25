@@ -22,7 +22,7 @@
 
 void ApplicationInit() {}
 
-void ApplicationExit() {}
+void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {

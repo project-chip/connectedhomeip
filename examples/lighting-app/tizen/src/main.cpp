@@ -52,7 +52,7 @@ void ApplicationInit()
 #endif
 }
 
-void ApplicationExit() {}
+void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {

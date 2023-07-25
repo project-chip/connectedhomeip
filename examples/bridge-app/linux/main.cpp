@@ -741,7 +741,7 @@ bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj
 
 void ApplicationInit() {}
 
-void ApplicationExit() {}
+void ApplicationShutdown() {}
 
 const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
                                                        { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };

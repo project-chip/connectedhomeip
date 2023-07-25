@@ -51,7 +51,7 @@ void ApplicationInit()
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
-void ApplicationExit() {}
+void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {

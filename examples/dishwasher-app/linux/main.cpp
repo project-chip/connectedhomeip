@@ -32,7 +32,7 @@ void ApplicationInit()
     MatterOperationalStateServerInit();
 }
 
-void ApplicationExit() {}
+void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {

@@ -190,7 +190,7 @@ void ApplicationInit()
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
-void ApplicationExit()
+void ApplicationShutdown()
 {
     // These have been initialised via the emberAfXxxClusterInitCallback methods. We need to destroy them before shutdown.
     Clusters::DishwasherMode::Shutdown();
