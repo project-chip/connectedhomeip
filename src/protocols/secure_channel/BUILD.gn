@@ -10,6 +10,7 @@ static_library("secure_channel") {
     "CASEServer.h",
     "CASESession.cpp",
     "CASESession.h",
+    "Constants.h",
     "DefaultSessionResumptionStorage.cpp",
     "DefaultSessionResumptionStorage.h",
     "PASESession.cpp",
@@ -38,5 +39,18 @@ static_library("secure_channel") {
     "${chip_root}/src/system",
     "${chip_root}/src/tracing",
     "${chip_root}/src/tracing:macros",
+    "${chip_root}/src/transport",
+  ]
+
+  # secure channel requires messaging so it can send messages (e.g. for
+  # CASE/PASE handshakes).  messaging requires secure channel so that it can do
+  # things like send standalone acks, which are a secure channel concept.
+  #
+  # secure channel requires transport so it can deal with sessions.  transport
+  # requires secure channel so it can detect control messages, which are a
+  # secure channel concept.
+  allow_circular_includes_from = [
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/transport",
   ]
 }
