@@ -23,6 +23,7 @@ source_set("manager-srcs") {
   sources = [
     "ICDManager.cpp",
     "ICDManager.h",
+    "${chip_root}/src/app/reporting/ReportScheduler.h",
   ]
 
   deps = [ ":cluster-srcs" ]
@@ -54,6 +55,7 @@ source_set("server-srcs") {
   sources = [
     "ICDEventManager.cpp",
     "ICDEventManager.h",
+    
   ]
 
   public_deps = [ ":manager-srcs" ]

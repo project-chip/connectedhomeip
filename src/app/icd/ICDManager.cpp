@@ -21,6 +21,7 @@
 #include <app/icd/ICDManager.h>
 #include <app/icd/IcdManagementServer.h>
 #include <app/icd/IcdMonitoringTable.h>
+#include <app/reporting/ReportScheduler.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
@@ -39,13 +40,17 @@ namespace app {
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
+using ReportScheduler = reporting::ReportScheduler;
 
-void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable)
+void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ReportScheduler * reportScheduler)
 {
     VerifyOrDie(storage != nullptr);
     VerifyOrDie(fabricTable != nullptr);
-    mStorage     = storage;
-    mFabricTable = fabricTable;
+    VerifyOrDie(reportScheduler != nullptr);
+
+    mStorage         = storage;
+    mFabricTable     = fabricTable;
+    mReportScheduler = reportScheduler;
 
     uint32_t activeModeInterval = IcdManagementServer::GetInstance().GetActiveModeInterval();
     VerifyOrDie(kFastPollingInterval.count() < activeModeInterval);
@@ -153,7 +158,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
                 ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
             }
 
-            InteractionModelEngine::GetInstance()->GetReportScheduler()->OnActiveModeEntered();
+            mReportScheduler->TriggerReportEmission();
         }
         else
         {
