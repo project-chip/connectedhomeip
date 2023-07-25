@@ -51,7 +51,7 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::Logging;
 
-uint32_t identifyTimerCount;
+uint16_t identifyTimerCount;
 constexpr uint32_t kIdentifyTimerDelayMS = 1000;
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 constexpr uint32_t kInitOTARequestorDelaySec = 3;
@@ -146,9 +146,7 @@ void IdentifyTimerHandler(Layer * systemLayer, void * appState)
         // Decrement the timer count.
         identifyTimerCount--;
         systemLayer->StartTimer(Clock::Milliseconds32(kIdentifyTimerDelayMS), IdentifyTimerHandler, appState);
-
-        emberAfWriteAttribute(1, app::Clusters::Identify::Id, app::Clusters::Identify::Attributes::IdentifyTime::Id,
-                              (uint8_t *) &identifyTimerCount, sizeof(identifyTimerCount));
+        app::Clusters::Identify::Attributes::IdentifyTime::Set(1, identifyTimerCount);
     }
 }
 
