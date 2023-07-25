@@ -109,8 +109,8 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
         // Init OTA requestor only when we have gotten IPv6 address
         if (!isOTAInitialized)
         {
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kInitOTARequestorDelaySec),
-                                                        InitOTARequestorHandler, nullptr);
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kInitOTARequestorDelaySec), InitOTARequestorHandler,
+                                                  nullptr);
             isOTAInitialized = true;
         }
 #endif
