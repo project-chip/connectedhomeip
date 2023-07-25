@@ -100,9 +100,9 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     // Print setup info
 #if CONFIG_NETWORK_LAYER_BLE
-    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+    PrintOnboardingCodes(RendezvousInformationFlag(RendezvousInformationFlag::kBLE));
 #else
-    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
+    PrintOnboardingCodes(RendezvousInformationFlag(RendezvousInformationFlag::kOnNetwork));
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
     /*Operational State Server Init*/

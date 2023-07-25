@@ -73,7 +73,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
             // will not trigger a 'internet connectivity change' as there is no internet
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
-            chip::app::DnssdServer::Instance().StartServer();
+            app::DnssdServer::Instance().StartServer();
 
             if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
             {
@@ -95,7 +95,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {
         ASR_LOG("IPv4 Server ready...");
-        chip::app::DnssdServer::Instance().StartServer();
+        app::DnssdServer::Instance().StartServer();
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -104,12 +104,12 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
     {
         ASR_LOG("IPv6 Server ready...");
-        chip::app::DnssdServer::Instance().StartServer();
+        app::DnssdServer::Instance().StartServer();
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         // Init OTA requestor only when we have gotten IPv6 address
         if (!isOTAInitialized)
         {
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kInitOTARequestorDelaySec),
                                                         InitOTARequestorHandler, nullptr);
             isOTAInitialized = true;
         }
