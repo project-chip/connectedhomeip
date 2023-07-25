@@ -38,4 +38,3 @@ CHIP_ERROR LaundryWasherControlDelegate::GetSupportedRinseAtIndex(size_t index, 
     supportedRinse = LaundryWasherControlDelegate::supportRinsesOptions[index];
     return CHIP_NO_ERROR;
 }
-
