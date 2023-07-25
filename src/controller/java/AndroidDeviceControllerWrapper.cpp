@@ -653,11 +653,12 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             chip::JniReferences::GetInstance().CreateBoxedObject<int8_t>("java/lang/Integer", "(I)V", entry.rssi, newElement_rssi);
 
             jclass wiFiInterfaceScanResultStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/WiFiScanResult",
-                                                                 wiFiInterfaceScanResultStructClass);
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResultStruct",
+                wiFiInterfaceScanResultStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class WiFiScanResult");
+                ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResultStruct");
                 return;
             }
             jmethodID wiFiInterfaceScanResultStructCtor =
@@ -665,7 +666,8 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
                                  "(Ljava/lang/Integer;[B[BLjava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
             if (wiFiInterfaceScanResultStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find WiFiScanResult constructor");
+                ChipLogError(Zcl,
+                             "Could not find ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResultStruct constructor");
                 return;
             }
 
@@ -715,11 +717,12 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>("java/lang/Integer", "(I)V", entry.lqi, newElement_lqi);
 
             jclass threadInterfaceScanResultStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ThreadScanResult",
-                                                                 threadInterfaceScanResultStructClass);
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResultStruct",
+                threadInterfaceScanResultStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ThreadScanResult");
+                ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResultStruct");
                 return;
             }
             jmethodID threadInterfaceScanResultStructCtor =
@@ -728,7 +731,8 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
                                  "Integer;[BLjava/lang/Integer;Ljava/lang/Integer;)V");
             if (threadInterfaceScanResultStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ThreadScanResult constructor");
+                ChipLogError(Zcl,
+                             "Could not find ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResultStruct constructor");
                 return;
             }
 
