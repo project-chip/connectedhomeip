@@ -111,13 +111,11 @@ void sl_ble_event_handling_task(void)
     // Application event map
     while (1)
     {
+        //! This semaphore is waiting for next ble event task
+        rsi_semaphore_wait(&sl_ble_event_sem, 0);
+
+        // checking for events list
         event_id = rsi_ble_app_get_event();
-        if (event_id == RSI_FAILURE)
-        {
-            //! This semaphore is waiting for next ble event task
-            rsi_semaphore_wait(&sl_ble_event_sem, 0);
-            continue;
-        }
         switch (event_id)
         {
         case RSI_BLE_CONN_EVENT: {
