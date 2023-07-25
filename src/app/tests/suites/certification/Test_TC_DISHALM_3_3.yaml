@@ -16,7 +16,11 @@ name: 197.2.4. [TC-DISHALM-3.3] Door alarm functionality with DUT as Server
 
 PICS:
     - DISHALM.S
-    - PIXIT.DISHALM.DoorAlarmSupported
+    - DISHALM.S.A0001
+    - DISHALM.S.A0002
+    - DISHALM.S.E00
+    - DISHALM.S.C00.Rsp
+    - PICS_USER_PROMPT
 
 config:
     nodeId: 0x12344321
@@ -67,8 +71,7 @@ tests:
       command: "readAttribute"
       attribute: "State"
       response:
-          constraints:
-              value: 0
+          value: 0
 
     - label: "TH reads from the DUT the State attribute"
       PICS: DISHALM.S.A0001 && DISHALM.S.A0002
@@ -97,8 +100,7 @@ tests:
       command: "readAttribute"
       attribute: "State"
       response:
-          constraints:
-              value: 0
+          value: 0
 
     - label: "Set up subscription to Notify event"
       PICS: DISHALM.S.E00

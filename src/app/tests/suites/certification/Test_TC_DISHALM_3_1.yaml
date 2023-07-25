@@ -71,8 +71,7 @@ tests:
       command: "readAttribute"
       attribute: "State"
       response:
-          constraints:
-              value: 0
+          value: 0
 
     - label: "TH reads from the DUT the State attribute"
       PICS: DISHALM.S.A0001 && DISHALM.S.A0002
@@ -101,8 +100,7 @@ tests:
       command: "readAttribute"
       attribute: "State"
       response:
-          constraints:
-              value: 0
+          value: 0
 
     - label: "Set up subscription to Notify event"
       PICS: DISHALM.S.E00
