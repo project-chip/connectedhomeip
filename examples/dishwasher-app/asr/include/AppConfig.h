@@ -15,32 +15,31 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "operational-state-delegates.h"
-#include <AppMain.h>
 
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/ConcreteAttributePath.h>
-#include <lib/support/logging/CHIPLogging.h>
+#pragma once
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
+// ---- Dishwasher Example App Config ----
 
-void ApplicationInit()
-{
-    MatterOperationalStateServerInit();
+#if (CFG_EASY_LOG_ENABLE == 1)
+#include "elog.h"
+#endif
+
+#define APP_TASK_NAME "APP"
+
+#define APP_TASK_STACK_SIZE (1024 * 4)
+
+#define MATTER_DEVICE_NAME "Dishwasher"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void appError(int err);
+void ASR_LOG(const char * aFormat, ...);
+
+#ifdef __cplusplus
 }
 
-void ApplicationShutdown() {}
-
-int main(int argc, char * argv[])
-{
-    if (ChipLinuxAppInit(argc, argv) != 0)
-    {
-        return -1;
-    }
-
-    ChipLinuxAppMainLoop();
-    return 0;
-}
+#include <lib/core/CHIPError.h>
+void appError(CHIP_ERROR error);
+#endif

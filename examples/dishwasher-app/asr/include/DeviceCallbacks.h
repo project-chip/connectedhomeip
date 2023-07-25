@@ -15,32 +15,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "operational-state-delegates.h"
-#include <AppMain.h>
 
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/ConcreteAttributePath.h>
-#include <lib/support/logging/CHIPLogging.h>
+/**
+ * @file DeviceCallbacks.h
+ *
+ * Implementations for the DeviceManager callbacks for this application
+ *
+ **/
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
+#pragma once
 
-void ApplicationInit()
+#include "CHIPDeviceManager.h"
+#include <app/util/af-types.h>
+#include <app/util/basic-types.h>
+#include <platform/CHIPDeviceLayer.h>
+
+class DeviceCallbacks : public chip::DeviceManager::CHIPDeviceManagerCallbacks
 {
-    MatterOperationalStateServerInit();
-}
+public:
+    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg) override;
 
-void ApplicationShutdown() {}
-
-int main(int argc, char * argv[])
-{
-    if (ChipLinuxAppInit(argc, argv) != 0)
-    {
-        return -1;
-    }
-
-    ChipLinuxAppMainLoop();
-    return 0;
-}
+private:
+    void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
+};
