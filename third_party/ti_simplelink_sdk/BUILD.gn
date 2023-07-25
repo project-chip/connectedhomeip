@@ -110,7 +110,7 @@ config("ti_simplelink_freertos_config") {
 config("ti_simplelink_posix_config") {
   include_dirs = [ "${ti_simplelink_sdk_root}/source/ti/posix/gcc" ]
   cflags_c = [ "-std=c11" ]
-  cflags_cc = [ "-std=c++14" ]
+  cflags_cc = [ "-std=c++17" ]
   cflags = [
     "-Wno-maybe-uninitialized",
     "-Wno-sign-compare",
