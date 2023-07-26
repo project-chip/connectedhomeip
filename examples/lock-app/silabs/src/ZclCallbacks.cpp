@@ -84,7 +84,7 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const
 
     return status;
 }
-// TODO : Add helper function to call from Unlock command if we establish Unbolt doesn't work need a diffrent behaviour than Unlock
+// TODO : Add helper function to call from the Unlock command if we establish Unbolt doesn't need a different behaviour than Unlock
 bool emberAfPluginDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
                                               const Nullable<chip::NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
                                               OperationErrorEnum & err)
