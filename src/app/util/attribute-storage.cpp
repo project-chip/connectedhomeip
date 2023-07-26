@@ -1227,7 +1227,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                     MutableByteSpan bytes(attrData);
                     CHIP_ERROR err =
                         attrStorage->ReadValue(app::ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId),
-                                               am->attributeType, am->size, bytes);
+                                               am, bytes);
                     if (err == CHIP_NO_ERROR)
                     {
                         ptr = attrData;

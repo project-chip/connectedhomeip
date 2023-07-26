@@ -17,7 +17,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/AttributePersistenceProvider.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
@@ -60,7 +60,7 @@ void Instance::LoadPersistentAttributes()
 {
     // Load Current Mode
     uint8_t tempCurrentMode;
-    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadScalarValue(
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
         ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), tempCurrentMode);
     if (err == CHIP_NO_ERROR)
     {
@@ -83,7 +83,7 @@ void Instance::LoadPersistentAttributes()
 
     // Load Start-Up Mode
     DataModel::Nullable<uint8_t> tempStartUpMode;
-    err = GetAttributePersistenceProvider()->ReadScalarValue(
+    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
         ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), tempStartUpMode);
     if (err == CHIP_NO_ERROR)
     {
@@ -111,7 +111,7 @@ void Instance::LoadPersistentAttributes()
 
     // Load On Mode
     DataModel::Nullable<uint8_t> tempOnMode;
-    err = GetAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id),
+    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id),
                                                              tempOnMode);
     if (err == CHIP_NO_ERROR)
     {
@@ -398,7 +398,7 @@ Status Instance::UpdateCurrentMode(uint8_t aNewMode)
     {
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id);
-        GetAttributePersistenceProvider()->WriteScalarValue(path, mCurrentMode);
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mCurrentMode);
         MatterReportingAttributeChangeCallback(path);
     }
     return Protocols::InteractionModel::Status::Success;
@@ -419,7 +419,7 @@ Status Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
     {
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id);
-        GetAttributePersistenceProvider()->WriteScalarValue(path, mStartUpMode);
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mStartUpMode);
         MatterReportingAttributeChangeCallback(path);
     }
     return Protocols::InteractionModel::Status::Success;
@@ -440,7 +440,7 @@ Status Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
     {
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id);
-        GetAttributePersistenceProvider()->WriteScalarValue(path, mOnMode);
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mOnMode);
         MatterReportingAttributeChangeCallback(path);
     }
     return Protocols::InteractionModel::Status::Success;

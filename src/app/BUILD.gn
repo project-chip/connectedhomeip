@@ -76,6 +76,7 @@ static_library("app") {
     "AttributePathExpandIterator.h",
     "AttributePathParams.h",
     "AttributePersistenceProvider.h",
+    "SafeAttributePersistenceProvider.h",
     "BufferedReadCallback.cpp",
     "CASEClient.cpp",
     "CASEClient.h",

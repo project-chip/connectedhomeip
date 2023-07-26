@@ -16,6 +16,7 @@
 #pragma once
 
 #include <app/AttributePersistenceProvider.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
@@ -30,7 +31,7 @@ namespace app {
  * of this class, since it can't be constructed automatically without knowing
  * what PersistentStorageDelegate is to be used.
  */
-class DefaultAttributePersistenceProvider : public AttributePersistenceProvider
+class DefaultAttributePersistenceProvider : public AttributePersistenceProvider, public SafeAttributePersistenceProvider
 {
 public:
     DefaultAttributePersistenceProvider() {}
@@ -47,11 +48,21 @@ public:
     }
 
     void Shutdown() {}
+private:
+    CHIP_ERROR InternalWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue, const StorageKeyName& key);
+    CHIP_ERROR InternalReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, size_t aSize,
+                                 MutableByteSpan & aValue, const StorageKeyName& key);
+
+public:
 
     // AttributePersistenceProvider implementation.
     CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
-    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, size_t aSize,
+    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata,
                          MutableByteSpan & aValue) override;
+
+    CHIP_ERROR SafeWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
+    CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, size_t aSize,
+                             MutableByteSpan & aValue) override;
 
 protected:
     PersistentStorageDelegate * mStorage;
