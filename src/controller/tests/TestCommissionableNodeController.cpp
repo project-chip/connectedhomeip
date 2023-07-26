@@ -52,6 +52,8 @@ public:
     CHIP_ERROR StartBrowse(Optional<uint64_t> compressedFabricIdFilter) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StartBrowse() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StopBrowse() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR ResolveNode(const NodeBrowseData & nodeData) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    void NodeNameResolutionNoLongerNeeded(const char * name) override {}
 
     CHIP_ERROR InitStatus                  = CHIP_NO_ERROR;
     CHIP_ERROR ResolveNodeIdStatus         = CHIP_NO_ERROR;

@@ -698,6 +698,17 @@ CHIP_ERROR DiscoveryImplPlatform::StopBrowse()
     return mResolverProxy.StopBrowse();
 }
 
+CHIP_ERROR DiscoveryImplPlatform::ResolveNode(const NodeBrowseData & nodeData)
+{
+    ReturnErrorOnFailure(InitImpl());
+    return mResolverProxy.ResolveNode(nodeData);
+}
+
+void DiscoveryImplPlatform::NodeNameResolutionNoLongerNeeded(const char * name)
+{
+    ChipDnssdResolveNoLongerNeeded(name);
+}
+
 DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
 {
     return sManager;
@@ -873,6 +884,40 @@ CHIP_ERROR ResolverProxy::StopBrowse()
 #else  // CHIP_DEVICE_LAYER_TARGET_DARWIN
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
+}
+
+CHIP_ERROR ResolverProxy::ResolveNode(const NodeBrowseData & nodeData)
+{
+    CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(nodeData.protocol == DnssdServiceProtocol::kDnssdProtocolUdp ||
+                            nodeData.protocol == DnssdServiceProtocol::kDnssdProtocolTcp,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+    DnssdService service = {};
+    chip::Platform::CopyString(service.mName, nodeData.mName);
+    service.mInterface = nodeData.mInterfaceId;
+
+    if (nodeData.protocol == DnssdServiceProtocol::kDnssdProtocolTcp)
+    {
+        service.mProtocol = DnssdServiceProtocol::kDnssdProtocolTcp;
+        chip::Platform::CopyString(service.mType, kOperationalServiceName);
+        error = ChipDnssdResolve(&service, service.mInterface, static_cast<OperationalResolveDelegate *>(mDelegate));
+    }
+    else
+    {
+        service.mProtocol = DnssdServiceProtocol::kDnssdProtocolUdp;
+        chip::Platform::CopyString(service.mType, kCommissionableServiceName);
+        error = ChipDnssdResolve(&service, service.mInterface, static_cast<CommissioningResolveDelegate *>(mDelegate));
+    }
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
+
+    return error;
+}
+
+void ResolverProxy::NodeNameResolutionNoLongerNeeded(const char * name)
+{
+    ChipDnssdResolveNoLongerNeeded(name);
 }
 
 } // namespace Dnssd

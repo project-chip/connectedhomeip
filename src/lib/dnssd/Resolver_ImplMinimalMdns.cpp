@@ -294,6 +294,8 @@ public:
     CHIP_ERROR StartBrowse(Optional<uint64_t> compressedFabricIdFilter) override;
     CHIP_ERROR StartBrowse() override;
     CHIP_ERROR StopBrowse() override;
+    CHIP_ERROR ResolveNode(const NodeBrowseData & nodeData) override;
+    void NodeNameResolutionNoLongerNeeded(const char * name) override;
 
 private:
     OperationalResolveDelegate * mOperationalDelegate     = nullptr;
@@ -710,6 +712,16 @@ CHIP_ERROR MinMdnsResolver::StopBrowse()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR MinMdnsResolver::ResolveNode(const NodeBrowseData & nodeData)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+void MinMdnsResolver::NodeNameResolutionNoLongerNeeded(const char * name)
+{
+    ChipLogError(Discovery, "Failed to stop resolving node name: dnssd resolving not available");
+}
+
 CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filter)
 {
     mActiveResolves.MarkPending(filter, type);
@@ -830,6 +842,16 @@ CHIP_ERROR ResolverProxy::StopBrowse()
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     chip::Dnssd::Resolver::Instance().SetBrowseDelegate(mDelegate);
     return chip::Dnssd::Resolver::Instance().StopBrowse();
+}
+
+CHIP_ERROR ResolverProxy::ResolveNode(const NodeBrowseData & nodeData)
+{
+    return chip::Dnssd::Resolver::Instance().ResolveNode(nodeData);
+}
+
+void ResolverProxy::NodeNameResolutionNoLongerNeeded(const char * name)
+{
+    return chip::Dnssd::Resolver::Instance().NodeNameResolutionNoLongerNeeded(name);
 }
 
 } // namespace Dnssd

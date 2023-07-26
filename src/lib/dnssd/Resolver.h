@@ -516,6 +516,44 @@ public:
     virtual CHIP_ERROR StopBrowse() = 0;
 
     /**
+     * Requests resolution of the given node data.
+     *
+     * This will trigger a DNSSD query.
+     *
+     * When the operation succeeds or fails, and a resolver delegate has been registered,
+     * the result of the operation is passed to the delegate's `OnOperationalNodeResolved`, `OnNodeDiscovered` or
+     * `OnOperationalNodeResolutionFailed` method, respectively.
+     *
+     * Multiple calls to ResolveNode may be coalesced by the implementation
+     * and lead to just one call to
+     * OnOperationalNodeResolved/OnNodeDiscovered/OnOperationalNodeResolutionFailed, as long as
+     * the later calls cause the underlying querying mechanism to re-query as if
+     * there were no coalescing.
+     *
+     * A single call to ResolveNode may lead to multiple calls to
+     * OnOperationalNodeResolved with different IP addresses.
+     *
+     * @see NodeNameResolutionNoLongerNeeded.
+     */
+    virtual CHIP_ERROR ResolveNode(const NodeBrowseData & nodeData) = 0;
+
+    /*
+     * Notify the resolver that one of the consumers that called ResolveNode
+     * successfully no longer needs the resolution result (e.g. because it got
+     * the result via OnOperationalNodeResolved/OnNodeDiscovered, or got an via
+     * OnOperationalNodeResolutionFailed, or no longer cares about future
+     * updates).
+     *
+     * There must be a NodeNameResolutionNoLongerNeeded call that matches every
+     * successful ResolveNode call.  In particular, implementations of
+     * OnOperationalNodeResolved,OnNodeDiscovered and OnOperationalNodeResolutionFailed must call
+     * NodeNameResolutionNoLongerNeeded once for each prior successful call to
+     * ResolveNode for the relevant name that has not yet had a matching
+     * NodeNameResolutionNoLongerNeeded call made.
+     */
+    virtual void NodeNameResolutionNoLongerNeeded(const char * name) = 0;
+
+    /**
      * Provides the system-wide implementation of the service resolver
      */
     static Resolver & Instance();

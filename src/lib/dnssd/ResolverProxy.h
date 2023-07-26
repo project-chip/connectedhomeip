@@ -224,6 +224,8 @@ public:
     CHIP_ERROR StartBrowse(Optional<uint64_t> compressedFabricIdFilter) override;
     CHIP_ERROR StartBrowse() override;
     CHIP_ERROR StopBrowse() override;
+    CHIP_ERROR ResolveNode(const NodeBrowseData & nodeData) override;
+    void NodeNameResolutionNoLongerNeeded(const char * name) override;
 
 private:
     ResolverDelegateProxy * mDelegate                            = nullptr;
