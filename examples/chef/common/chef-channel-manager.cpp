@@ -37,7 +37,7 @@ ChefChannelManager::ChefChannelManager()
     abc.name              = MakeOptional(chip::CharSpan::fromCharString("ABC"));
     abc.majorNumber       = static_cast<uint8_t>(6);
     abc.minorNumber       = static_cast<uint16_t>(0);
-    mChannels.push_back(abc);
+    mChannels[mTotalChannels++] = abc;
 
     ChannelInfoType pbs;
     pbs.affiliateCallSign = MakeOptional(chip::CharSpan::fromCharString("KCTS"));
@@ -45,7 +45,7 @@ ChefChannelManager::ChefChannelManager()
     pbs.name              = MakeOptional(chip::CharSpan::fromCharString("PBS"));
     pbs.majorNumber       = static_cast<uint8_t>(9);
     pbs.minorNumber       = static_cast<uint16_t>(1);
-    mChannels.push_back(pbs);
+    mChannels[mTotalChannels++] = pbs;
 
     ChannelInfoType pbsKids;
     pbsKids.affiliateCallSign = MakeOptional(chip::CharSpan::fromCharString("KCTS"));
@@ -53,7 +53,7 @@ ChefChannelManager::ChefChannelManager()
     pbsKids.name              = MakeOptional(chip::CharSpan::fromCharString("PBS Kids"));
     pbsKids.majorNumber       = static_cast<uint8_t>(9);
     pbsKids.minorNumber       = static_cast<uint16_t>(2);
-    mChannels.push_back(pbsKids);
+    mChannels[mTotalChannels++] = pbsKids;
 
     ChannelInfoType worldChannel;
     worldChannel.affiliateCallSign = MakeOptional(chip::CharSpan::fromCharString("KCTS"));
@@ -61,31 +61,41 @@ ChefChannelManager::ChefChannelManager()
     worldChannel.name              = MakeOptional(chip::CharSpan::fromCharString("World Channel"));
     worldChannel.majorNumber       = static_cast<uint8_t>(9);
     worldChannel.minorNumber       = static_cast<uint16_t>(3);
-    mChannels.push_back(worldChannel);
-
-    mCurrentChannelIndex = 0;
-    mCurrentChannel      = mChannels[mCurrentChannelIndex];
+    mChannels[mTotalChannels++] = worldChannel;
 }
 
 static bool isChannelMatched(const ChannelInfoType & channel, const CharSpan & match)
 {
-    char number[32];
-    sprintf(number, "%d.%d", channel.majorNumber, channel.minorNumber);
-    bool nameMatch = channel.name.HasValue() ? channel.name.Value().data_equal(match) : false;
-    bool affiliateCallSignMatch =
-        channel.affiliateCallSign.HasValue() ? channel.affiliateCallSign.Value().data_equal(match) : false;
-    bool callSignMatch = channel.callSign.HasValue() ? channel.callSign.Value().data_equal(match) : false;
-    bool numberMatch   = match.data_equal(chip::CharSpan::fromCharString(number));
+    if (channel.name.HasValue() && channel.name.Value().data_equal(match))
+    {
+        return true;
+    }
 
-    return affiliateCallSignMatch || callSignMatch || nameMatch || numberMatch;
+    if (channel.affiliateCallSign.HasValue() && channel.affiliateCallSign.Value().data_equal(match))
+    {
+        return true;
+    }
+
+    if (channel.callSign.HasValue() && channel.callSign.Value().data_equal(match))
+    {
+        return true;
+    }
+
+    StringBuilder<32> nr;
+    nr.AddFormat("%d.%d", channel.majorNumber, channel.minorNumber);
+    return match.data_equal(CharSpan::fromCharString(nr.c_str()));
 }
 
 CHIP_ERROR ChefChannelManager::HandleGetChannelList(app::AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        int index = 0;
         for (auto const & channel : ChefChannelManager().mChannels)
         {
             ReturnErrorOnFailure(encoder.Encode(channel));
+            index++;
+            if (index >= ChefChannelManager().mTotalChannels)
+                break;
         }
         return CHIP_NO_ERROR;
     });
@@ -104,7 +114,7 @@ CHIP_ERROR ChefChannelManager::HandleGetLineup(app::AttributeValueEncoder & aEnc
 
 CHIP_ERROR ChefChannelManager::HandleGetCurrentChannel(app::AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.Encode(mCurrentChannel);
+    return aEncoder.Encode(mChannels[mCurrentChannelIndex]);
 }
 
 void ChefChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper,
@@ -147,7 +157,6 @@ void ChefChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannel
     {
         response.status      = chip::app::Clusters::Channel::ChannelStatusEnum::kSuccess;
         response.data        = chip::MakeOptional(CharSpan::fromCharString("data response"));
-        mCurrentChannel      = matchedChannels[0];
         mCurrentChannelIndex = index;
         helper.Success(response);
     }
@@ -159,21 +168,24 @@ bool ChefChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumbe
     uint16_t index      = 0;
     for (auto const & channel : mChannels)
     {
+
         // verify if major & minor matches one of the channel from the list
         if (channel.minorNumber == minorNumber && channel.majorNumber == majorNumber)
         {
             // verify if channel changed by comparing values of current channel with the requested channel
-            if (channel.minorNumber != mCurrentChannel.minorNumber || channel.majorNumber != mCurrentChannel.majorNumber)
+            if (channel.minorNumber != mChannels[mCurrentChannelIndex].minorNumber ||
+                channel.majorNumber != mChannels[mCurrentChannelIndex].majorNumber)
             {
                 channelChanged       = true;
                 mCurrentChannelIndex = index;
-                mCurrentChannel      = channel;
             }
 
-	    // return since we've already found the unique matched channel
-	    return channelChanged;
+	        // return since we've already found the unique matched channel
+	        return channelChanged;
         }
         index++;
+        if (index >= mTotalChannels)
+            break;
     }
     return channelChanged;
 }
@@ -192,7 +204,6 @@ bool ChefChannelManager::HandleSkipChannel(const int16_t & count)
     }
 
     mCurrentChannelIndex = static_cast<uint16_t>(newChannelIndex);
-    mCurrentChannel      = mChannels[mCurrentChannelIndex];
     return true;
 }
 

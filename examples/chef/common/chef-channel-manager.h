@@ -29,6 +29,8 @@ using ChangeChannelResponseType = chip::app::Clusters::Channel::Commands::Change
 using ChannelInfoType           = chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type;
 using LineupInfoType            = chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type;
 
+#define CHEF_CHANNEL_MANAGER_MAX_CHANNELS 10
+
 class ChefChannelManager : public ChannelDelegate
 {
 
@@ -55,7 +57,7 @@ public:
     ~ChefChannelManager() = default;
 
 protected:
-    uint16_t mCurrentChannelIndex;
-    ChannelInfoType mCurrentChannel;
-    std::vector<ChannelInfoType> mChannels;
+    uint16_t mCurrentChannelIndex{0};
+    uint16_t mTotalChannels{0};
+    std::array<ChannelInfoType, CHEF_CHANNEL_MANAGER_MAX_CHANNELS> mChannels;
 };
