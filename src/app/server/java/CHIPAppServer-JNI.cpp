@@ -139,7 +139,7 @@ exit:
 JNI_METHOD(jboolean, startAppWithDelegate)(JNIEnv * env, jobject self, jobject appDelegate)
 {
     chip::DeviceLayer::StackLock lock;
-    
+
     CHIP_ERROR err = sChipAppServerDelegate.InitializeWithObjects(appDelegate);
     SuccessOrExit(err);
 
