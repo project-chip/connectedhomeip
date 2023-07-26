@@ -22,7 +22,7 @@
 #import "MTRLogging_Internal.h"
 
 #include <controller/CHIPDeviceController.h>
-#include <lib/dnssd/platform/Dnssd.h>
+#include <lib/dnssd/Resolver.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip::Dnssd;
@@ -50,7 +50,7 @@ constexpr const char * kBleKey = "BLE";
 @end
 
 class CommissionableBrowserInternal : public CommissioningResolveDelegate,
-                                      public DnssdBrowseDelegate
+                                      public BrowseDelegate
 #if CONFIG_NETWORK_LAYER_BLE
     ,
                                       public BleScannerDelegate
@@ -75,14 +75,10 @@ public:
         ReturnErrorOnFailure(PlatformMgrImpl().StartBleScan(this));
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-        ReturnErrorOnFailure(Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager()));
-
-        char serviceName[kMaxCommissionableServiceNameSize];
-        auto filter = DiscoveryFilterType::kNone;
-        ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
-
-        return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, chip::Inet::IPAddressType::kAny,
-            chip::Inet::InterfaceId::Null(), this);
+        ReturnLogErrorOnFailure(mDNSResolver.Init(chip::DeviceLayer::UDPEndPointManager()));
+        mDNSResolver.SetBrowseDelegate(this);
+        mDNSResolver.SetCommissioningDelegate(this);
+        return mDNSResolver.StartBrowse();
     }
 
     CHIP_ERROR Stop()
@@ -106,7 +102,9 @@ public:
         ReturnErrorOnFailure(PlatformMgrImpl().StopBleScan());
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-        return ChipDnssdStopBrowse(this);
+        ReturnErrorOnFailure(mDNSResolver.StopBrowse());
+        mDNSResolver.Shutdown();
+        return CHIP_NO_ERROR;
     }
 
     void ClearBleDiscoveredDevices()
@@ -132,7 +130,7 @@ public:
                 // Check if the interface data has been resolved already, otherwise, just inform the
                 // back end that we may not need it anymore.
                 if (!interfaces[interfaceKey].resolutionData.HasValue()) {
-                    ChipDnssdResolveNoLongerNeeded(key.UTF8String);
+                    mDNSResolver.NodeNameResolutionNoLongerNeeded(key.UTF8String);
                 }
             }
 
@@ -188,8 +186,8 @@ public:
         });
     }
 
-    /////////// DnssdBrowseDelegate Interface /////////
-    void OnBrowseAdd(DnssdService service) override
+    /////////// BrowseDelegate Interface /////////
+    void OnBrowseAdd(const NodeBrowseData & nodeData) override
     {
         assertChipStackLockedByCurrentThread();
 
@@ -197,20 +195,20 @@ public:
         VerifyOrReturn(mController != nil);
         VerifyOrReturn(mDispatchQueue != nil);
 
-        auto key = [NSString stringWithUTF8String:service.mName];
+        auto key = [NSString stringWithUTF8String:nodeData.mName];
         if ([mDiscoveredResults objectForKey:key] == nil) {
             mDiscoveredResults[key] = [[MTRCommissionableBrowserResult alloc] init];
             mDiscoveredResults[key].interfaces = [[NSMutableDictionary alloc] init];
         }
 
         auto * interfaces = mDiscoveredResults[key].interfaces;
-        auto interfaceKey = @(service.mInterface.GetPlatformInterface());
+        auto interfaceKey = @(nodeData.mInterfaceId.GetPlatformInterface());
         interfaces[interfaceKey] = [[MTRCommissionableBrowserResultInterfaces alloc] init];
 
-        LogErrorOnFailure(ChipDnssdResolve(&service, service.mInterface, this));
+        LogErrorOnFailure(mDNSResolver.ResolveNode(nodeData));
     }
 
-    void OnBrowseRemove(DnssdService service) override
+    void OnBrowseRemove(const NodeBrowseData & nodeData) override
     {
         assertChipStackLockedByCurrentThread();
 
@@ -218,7 +216,7 @@ public:
         VerifyOrReturn(mController != nil);
         VerifyOrReturn(mDispatchQueue != nil);
 
-        auto key = [NSString stringWithUTF8String:service.mName];
+        auto key = [NSString stringWithUTF8String:nodeData.mName];
         if ([mDiscoveredResults objectForKey:key] == nil) {
             // It should not happens.
             return;
@@ -226,12 +224,12 @@ public:
 
         auto result = mDiscoveredResults[key];
         auto * interfaces = result.interfaces;
-        auto interfaceKey = @(service.mInterface.GetPlatformInterface());
+        auto interfaceKey = @(nodeData.mInterfaceId.GetPlatformInterface());
 
         // Check if the interface data has been resolved already, otherwise, just inform the
         // back end that we may not need it anymore.
         if (!interfaces[interfaceKey].resolutionData.HasValue()) {
-            ChipDnssdResolveNoLongerNeeded(service.mName);
+            mDNSResolver.NodeNameResolutionNoLongerNeeded(nodeData.mName);
         }
 
         // Delete the interface placeholder.
@@ -301,6 +299,7 @@ private:
     id<MTRCommissionableBrowserDelegate> mDelegate;
     MTRDeviceController * mController;
     NSMutableDictionary<NSString *, MTRCommissionableBrowserResult *> * mDiscoveredResults;
+    chip::Dnssd::ResolverProxy mDNSResolver;
 };
 
 @interface MTRCommissionableBrowser ()
