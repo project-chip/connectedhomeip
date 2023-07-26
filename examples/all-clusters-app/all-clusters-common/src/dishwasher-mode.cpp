@@ -85,7 +85,8 @@ void DishwasherMode::Shutdown()
     }
     if (gDishwasherModeDelegate != nullptr)
     {
-        gDishwasherModeDelegate->~DishwasherModeDelegate();
+        delete gDishwasherModeDelegate;
+        gDishwasherModeDelegate = nullptr;
     }
 }
 

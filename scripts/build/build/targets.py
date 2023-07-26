@@ -433,6 +433,7 @@ def BuildASRTarget():
         TargetPart('temperature-measurement', app=ASRApp.TEMPERATURE_MEASUREMENT),
         TargetPart('thermostat', app=ASRApp.THERMOSTAT),
         TargetPart('ota-requestor', app=ASRApp.OTA_REQUESTOR),
+        TargetPart('dishwasher', app=ASRApp.DISHWASHER),
     ])
 
     # modifiers
