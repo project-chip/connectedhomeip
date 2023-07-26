@@ -267,25 +267,28 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     }
 }
 
-void ExchangeContext::SendStatusReport(const Protocols::SecureChannel::StatusReport & statusReport)
+CHIP_ERROR ExchangeContext::SendStatusReport(const Protocols::SecureChannel::StatusReport & statusReport)
 {
-    ChipLogProgress(ExchangeManager, "Sending status report. Protocol code %u, exchange %" ChipLogFormatExchange, statusReport.GetProtocolCode(),
-                    ChipLogValueExchange(this));
+    ChipLogProgress(ExchangeManager, "Sending status report. Protocol code %u, exchange " ChipLogFormatExchange,
+                    statusReport.GetProtocolCode(), ChipLogValueExchange(this));
 
     auto handle = System::PacketBufferHandle::New(statusReport.Size());
-    VerifyOrReturn(!handle.IsNull(), ChipLogError(SecureChannel, "Failed to allocate status report message"));
+    VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(SecureChannel, "Failed to allocate status report message"));
     Encoding::LittleEndian::PacketBufferWriter bbuf(std::move(handle));
 
     statusReport.WriteToBuffer(bbuf);
 
     System::PacketBufferHandle msg = bbuf.Finalize();
-    VerifyOrReturn(!msg.IsNull(), ChipLogError(SecureChannel, "Failed to finalize status report message"));
+    VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_BUFFER_TOO_SMALL,
+                        ChipLogError(SecureChannel, "Failed to finalize status report message"));
 
     CHIP_ERROR err = SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SecureChannel, "Failed to send status report message: %" CHIP_ERROR_FORMAT, err.Format());
     }
+    return err;
 }
 
 void ExchangeContext::DoClose(bool clearRetransTable)

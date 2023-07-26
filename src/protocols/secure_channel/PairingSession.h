@@ -167,14 +167,14 @@ protected:
             if (report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kBusy &&
                 report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeBusy)
             {
-                uint16_t minimumWaitTime = 0;
-                if (!report.GetProtocolData().IsNull() && report.GetProtocolData()->DataLength() >= sizeof(minimumWaitTime))
+                if (!report.GetProtocolData().IsNull())
                 {
                     Encoding::LittleEndian::Reader reader(report.GetProtocolData()->Start(),
                                                           report.GetProtocolData()->DataLength());
 
                     // TODO: https://github.com/project-chip/connectedhomeip/issues/28290
-                    err = reader.Read16(&minimumWaitTime).StatusCode();
+                    uint16_t minimumWaitTime = 0;
+                    err                      = reader.Read16(&minimumWaitTime).StatusCode();
                     if (err != CHIP_NO_ERROR)
                     {
                         ChipLogError(SecureChannel, "Failed to read the minimum wait time: %" CHIP_ERROR_FORMAT, err.Format());

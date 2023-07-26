@@ -84,6 +84,7 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
         bool watchdogFired = GetSession().InvokeBackgroundWorkWatchdog();
         if (!watchdogFired)
         {
+            // Handshake wasn't stuck, send the busy status report
             SendBusyStatusReport(ec);
             return CHIP_NO_ERROR;
         }
@@ -189,19 +190,18 @@ void CASEServer::SendBusyStatusReport(Messaging::ExchangeContext * ec)
     // A successful CASE handshake can take several seconds and some may time out (30 seconds or more).
     // TODO: Come up with better estimate: https://github.com/project-chip/connectedhomeip/issues/28288
     // For now, setting minimum wait time to 5 seconds.
-    uint16_t minimumWaitTime                            = 5 * 1000; // milliseconds
-    constexpr uint8_t kBusyStatusReportProtocolDataSize = sizeof(minimumWaitTime);        // 16-bits
+    uint16_t minimumWaitTime                            = 5 * 1000;                // milliseconds
+    constexpr uint8_t kBusyStatusReportProtocolDataSize = sizeof(minimumWaitTime); // 16-bits
 
     auto handle = System::PacketBufferHandle::New(kBusyStatusReportProtocolDataSize, 0);
     VerifyOrReturn(!handle.IsNull(), ChipLogError(SecureChannel, "Failed to allocate protocol data for busy status report"));
 
     Encoding::LittleEndian::PacketBufferWriter protocolDataBufferWriter(std::move(handle));
     protocolDataBufferWriter.Put16(minimumWaitTime);
-    System::PacketBufferHandle protocolDataHandle = protocolDataBufferWriter.Finalize();
-    VerifyOrReturn(!protocolDataHandle.IsNull(),
-                   ChipLogError(SecureChannel, "Failed to finalize protocol data for busy status report"));
+    handle = protocolDataBufferWriter.Finalize();
+    VerifyOrReturn(!handle.IsNull(), ChipLogError(SecureChannel, "Failed to finalize protocol data for busy status report"));
 
-    StatusReport statusReport(GeneralStatusCode::kBusy, Id, kProtocolCodeBusy, std::move(protocolDataHandle));
+    StatusReport statusReport(GeneralStatusCode::kBusy, Id, kProtocolCodeBusy, std::move(handle));
     ec->SendStatusReport(statusReport);
 }
 

@@ -135,8 +135,10 @@ public:
      *  Helper API to send a protocol status report
      *
      *  @param[in]  statusReport A secure channel status report
+     *
+     *  @retval CHIP_NO_ERROR on success, appropriate error code otherwise
      */
-    void SendStatusReport(const Protocols::SecureChannel::StatusReport & statusReport);
+    CHIP_ERROR SendStatusReport(const Protocols::SecureChannel::StatusReport & statusReport);
 
     /**
      *  Handle a received CHIP message on this exchange.
