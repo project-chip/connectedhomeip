@@ -27,55 +27,6 @@ namespace app {
 namespace Clusters {
 namespace OperationalState {
 
-/**
- * A class which represents the operational error event of an Operational State cluster derivation instance.
- */
-class GenericErrorEvent : private app::Clusters::OperationalState::Events::OperationalError::Type
-{
-    using super = app::Clusters::OperationalState::Events::OperationalError::Type;
-
-public:
-    GenericErrorEvent(ClusterId aClusterId, const Structs::ErrorStateStruct::Type & aError) : mClusterId(aClusterId)
-    {
-        errorState = aError;
-    }
-    using super::GetEventId;
-    using super::GetPriorityLevel;
-    ClusterId GetClusterId() const { return mClusterId; }
-    using super::Encode;
-    using super::kIsFabricScoped;
-
-private:
-    ClusterId mClusterId;
-};
-
-/**
- * A class which represents the operational completion event of an Operational State cluster derivation instance.
- */
-class GenericOperationCompletionEvent : private app::Clusters::OperationalState::Events::OperationCompletion::Type
-{
-    using super = app::Clusters::OperationalState::Events::OperationCompletion::Type;
-
-public:
-    GenericOperationCompletionEvent(ClusterId aClusterId, uint8_t aCompletionErrorCode,
-                                    const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = NullOptional,
-                                    const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional) :
-        mClusterId(aClusterId)
-    {
-        completionErrorCode  = aCompletionErrorCode;
-        totalOperationalTime = aTotalOperationalTime;
-        pausedTime           = aPausedTime;
-    }
-    using super::GetEventId;
-    using super::GetPriorityLevel;
-    ClusterId GetClusterId() const { return mClusterId; }
-    using super::Encode;
-    using super::kIsFabricScoped;
-
-private:
-    ClusterId mClusterId;
-};
-
 class Uncopyable
 {
 protected:
