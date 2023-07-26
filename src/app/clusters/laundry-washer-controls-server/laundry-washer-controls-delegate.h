@@ -44,7 +44,7 @@ public:
     virtual CHIP_ERROR GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed) = 0;
 
     /**
-     * Get the supported rinses string at the given index in the list.
+     * Get the supported rinses value at the given index in the list.
      * @param index The index of the supported rinses with 0 representing the first one.
      * @param supportedRinse The MutableCharSpan to copy the string data into.  On success, the callee must update
      *        the length to the length of the copied data.
