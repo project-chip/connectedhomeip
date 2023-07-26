@@ -18,10 +18,6 @@ config:
     nodeId: 0x12344321
     cluster: "Activated Carbon Filter Monitoring"
     endpoint: 1
-    ReplacementProductList:
-        type: "ReplacementProductStruct"
-        defaultValue:
-            [{ ProductIdentifierType: 1, ProductIdentifierValue: "gtin8xac" }]
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -37,4 +33,25 @@ tests:
       attribute: "ReplacementProductList"
       response:
           value:
-              [{ ProductIdentifierType: 1, ProductIdentifierValue: "gtin8xac" }]
+              [
+                  {
+                      ProductIdentifierType: 0,
+                      ProductIdentifierValue: "111112222233",
+                  },
+                  {
+                      ProductIdentifierType: 1,
+                      ProductIdentifierValue: "gtin8xxx",
+                  },
+                  {
+                      ProductIdentifierType: 2,
+                      ProductIdentifierValue: "4444455555666",
+                  },
+                  {
+                      ProductIdentifierType: 3,
+                      ProductIdentifierValue: "gtin14xxxxxxxx",
+                  },
+                  {
+                      ProductIdentifierType: 4,
+                      ProductIdentifierValue: "oem20xxxxxxxxxxxxxxx",
+                  },
+              ]
