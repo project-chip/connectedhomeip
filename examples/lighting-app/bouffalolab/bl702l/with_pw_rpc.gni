@@ -22,6 +22,4 @@ import("${chip_root}/examples/platform/bouffalolab/bl702l/args.gni")
 
 chip_enable_pw_rpc = true
 chip_build_pw_trace_lib = false
-
-cpp_standard = "gnu++17"
 #pw_trace_BACKEND = "$dir_pw_trace_tokenized"

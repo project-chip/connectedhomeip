@@ -64,6 +64,7 @@ source_set("protocol-decoder") {
     ":tlv-metadata-headers",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols:type_definitions",
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]
