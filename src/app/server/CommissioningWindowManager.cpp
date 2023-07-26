@@ -129,6 +129,8 @@ void CommissioningWindowManager::ResetState()
 
     DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
     mCommissioningTimeoutTimerArmed = false;
+
+    DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 }
 
 void CommissioningWindowManager::Cleanup()
