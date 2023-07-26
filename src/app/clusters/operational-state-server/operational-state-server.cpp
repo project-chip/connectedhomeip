@@ -324,6 +324,7 @@ void OperationalStateServer::OnOperationCompletionDetected(const GenericOperatio
 
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "OperationalStateServer: Failed to record OperationCompletion event: %" CHIP_ERROR_FORMAT, error.Format());
+        ChipLogError(Zcl, "OperationalStateServer: Failed to record OperationCompletion event: %" CHIP_ERROR_FORMAT,
+                     error.Format());
     }
 }
