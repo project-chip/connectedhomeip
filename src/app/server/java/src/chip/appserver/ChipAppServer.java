@@ -17,7 +17,6 @@
  */
 package chip.appserver;
 
-
 /** Controller to interact with the CHIP device. */
 public class ChipAppServer {
   private static final String TAG = ChipAppServer.class.getSimpleName();
