@@ -1484,6 +1484,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
 
     XCTAssertNotEqual(attributeReportsReceived, 0);
+    XCTAssertNotEqual(eventReportsReceived, 0);
 
     attributeReportsReceived = 0;
     eventReportsReceived = 0;
