@@ -1070,7 +1070,6 @@ exit:
 void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncCallback(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
     ConnectivityManagerImpl * this_ = reinterpret_cast<ConnectivityManagerImpl *>(user_data);
-    std::unique_ptr<GVariant, GVariantDeleter> attachRes;
     std::unique_ptr<GError, GErrorDeleter> err;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
@@ -1336,6 +1335,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
     GVariant * ssid       = g_variant_lookup_value(properties, "ssid", nullptr);
     gsize length;
     const gchar * ssidStr = g_variant_get_string(ssid, &length);
+    g_variant_unref(ssid);
     // TODO: wpa_supplicant will return ssid with quotes! We should have a better way to get the actual ssid in bytes.
     gsize length_actual = length - 2;
     VerifyOrReturnError(length_actual <= sizeof(network.networkID), CHIP_ERROR_INTERNAL);

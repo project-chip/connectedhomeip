@@ -69,6 +69,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/Linux/BLEManagerImpl.h>
+#include <platform/Linux/GlibTypeDeleter.h>
 #include <protocols/Protocols.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <system/TLVPacketBufferBackingStore.h>
@@ -1351,38 +1352,35 @@ static void BluezOnNameLost(GDBusConnection * aConn, const gchar * aName, gpoint
 
 static CHIP_ERROR StartupEndpointBindings(BluezEndpoint * endpoint)
 {
-    GDBusObjectManager * manager;
-    GError * error         = nullptr;
-    GDBusConnection * conn = nullptr;
-    VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
+    VerifyOrReturnError(endpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
 
-    conn = g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error);
-    VerifyOrExit(conn != nullptr, ChipLogError(DeviceLayer, "FAIL: get bus sync in %s, error: %s", __func__, error->message));
+    std::unique_ptr<GError, GErrorDeleter> err;
+    std::unique_ptr<GDBusConnection, GObjectDeleter> conn(
+        g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &MakeUniquePointerReceiver(err).Get()));
+    VerifyOrReturnError(conn != nullptr, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "FAIL: get bus sync in %s, error: %s", __func__, err->message));
 
     if (endpoint->mpAdapterName != nullptr)
         endpoint->mpOwningName = g_strdup_printf("%s", endpoint->mpAdapterName);
     else
         endpoint->mpOwningName = g_strdup_printf("C-%04x", getpid() & 0xffff);
 
-    BluezOnBusAcquired(conn, endpoint->mpOwningName, endpoint);
+    BluezOnBusAcquired(conn.get(), endpoint->mpOwningName, endpoint);
 
-    manager = g_dbus_object_manager_client_new_sync(
-        conn, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/", bluez_object_manager_client_get_proxy_type,
-        nullptr /* unused user data in the Proxy Type Func */, nullptr /*destroy notify */, nullptr /* cancellable */, &error);
-
-    VerifyOrExit(manager != nullptr, ChipLogError(DeviceLayer, "FAIL: Error getting object manager client: %s", error->message));
+    GDBusObjectManager * manager = g_dbus_object_manager_client_new_sync(
+        conn.get(), G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/", bluez_object_manager_client_get_proxy_type,
+        nullptr /* unused user data in the Proxy Type Func */, nullptr /*destroy notify */, nullptr /* cancellable */,
+        &MakeUniquePointerReceiver(err).Get());
+    VerifyOrReturnError(manager != nullptr, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "FAIL: Error getting object manager client: %s", err->message));
 
     endpoint->mpObjMgr = manager;
-
     bluezObjectsSetup(endpoint);
 
     g_signal_connect(manager, "object-added", G_CALLBACK(BluezSignalOnObjectAdded), endpoint);
     g_signal_connect(manager, "object-removed", G_CALLBACK(BluezSignalOnObjectRemoved), endpoint);
     g_signal_connect(manager, "interface-proxy-properties-changed", G_CALLBACK(BluezSignalInterfacePropertiesChanged), endpoint);
-
-exit:
-    if (error != nullptr)
-        g_error_free(error);
 
     return CHIP_NO_ERROR;
 }
@@ -1632,12 +1630,13 @@ static void OnCharacteristicChanged(GDBusProxy * aInterface, GVariant * aChanged
                                     gpointer apConnection)
 {
     BLE_CONNECTION_OBJECT connection = static_cast<BLE_CONNECTION_OBJECT>(apConnection);
-    GVariant * value                 = g_variant_lookup_value(aChangedProperties, "Value", G_VARIANT_TYPE_BYTESTRING);
-    VerifyOrReturn(value != nullptr);
+    std::unique_ptr<GVariant, GVariantDeleter> dataValue(
+        g_variant_lookup_value(aChangedProperties, "Value", G_VARIANT_TYPE_BYTESTRING));
+    VerifyOrReturn(dataValue != nullptr);
 
     size_t bufferLen;
-    auto buffer = g_variant_get_fixed_array(value, &bufferLen, sizeof(uint8_t));
-    VerifyOrReturn(value != nullptr, ChipLogError(DeviceLayer, "Characteristic value has unexpected type"));
+    auto buffer = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    VerifyOrReturn(buffer != nullptr, ChipLogError(DeviceLayer, "Characteristic value has unexpected type"));
 
     BLEManagerImpl::HandleTXCharChanged(connection, static_cast<const uint8_t *>(buffer), bufferLen);
 }

@@ -76,11 +76,12 @@ bool BluezGetChipDeviceInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLEDeviceIden
     GVariant * serviceData = bluez_device1_get_service_data(&aDevice);
     VerifyOrReturnError(serviceData != nullptr, false);
 
-    GVariant * dataValue = g_variant_lookup_value(serviceData, CHIP_BLE_UUID_SERVICE_STRING, nullptr);
+    std::unique_ptr<GVariant, GVariantDeleter> dataValue(
+        g_variant_lookup_value(serviceData, CHIP_BLE_UUID_SERVICE_STRING, nullptr));
     VerifyOrReturnError(dataValue != nullptr, false);
 
     size_t dataLen         = 0;
-    const void * dataBytes = g_variant_get_fixed_array(dataValue, &dataLen, sizeof(uint8_t));
+    const void * dataBytes = g_variant_get_fixed_array(dataValue.get(), &dataLen, sizeof(uint8_t));
     VerifyOrReturnError(dataBytes != nullptr && dataLen >= sizeof(aDeviceInfo), false);
 
     memcpy(&aDeviceInfo, dataBytes, sizeof(aDeviceInfo));
