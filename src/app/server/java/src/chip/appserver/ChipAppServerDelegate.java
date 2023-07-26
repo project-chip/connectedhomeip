@@ -18,13 +18,13 @@
 package chip.appserver;
 
 public interface ChipAppServerDelegate {
-    void onCommissioningSessionEstablishmentStarted();
+  void onCommissioningSessionEstablishmentStarted();
 
-    void onCommissioningSessionStarted();
+  void onCommissioningSessionStarted();
 
-    void onCommissioningSessionStopped(int errorCode);
+  void onCommissioningSessionStopped(int errorCode);
 
-    void onCommissioningWindowOpened();
+  void onCommissioningWindowOpened();
 
-    void onCommissioningWindowClosed();
+  void onCommissioningWindowClosed();
 }
