@@ -111,15 +111,19 @@ public:
 
     /**
      * @brief Called when the Node detects a OperationalError has been raised.
-     * @param aEvent GenericErrorEvent is generated
+     * @param aError OperationalError which detects
      */
-    void OnOperationalErrorDetected(const GenericErrorEvent & aEvent);
+    void OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type & aError);
 
     /**
      * @brief Called when the Node detects a OperationCompletion has been raised.
-     * @param aEvent OperationCompletionEvent is generated
+     * @param aCompletionErrorCode CompletionErrorCode
+     * @param aTotalOperationalTime TotalOperationalTime
+     * @param aPausedTime PausedTime
      */
-    void OnOperationCompletionDetected(const GenericOperationCompletionEvent & aEvent);
+    void OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
+                               const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = NullOptional,
+                               const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional);
 
     /**
      * Creates an operational state cluster instance. The Init() function needs to be called for this instance to be registered and

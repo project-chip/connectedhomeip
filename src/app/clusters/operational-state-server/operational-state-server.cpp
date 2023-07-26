@@ -301,13 +301,14 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     return CHIP_NO_ERROR;
 }
 
-void OperationalStateServer::OnOperationalErrorDetected(const GenericErrorEvent & aEvent)
+void OperationalStateServer::OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type & aError)
 {
     ChipLogDetail(Zcl, "OperationalStateServer: OnOperationalErrorDetected");
-    MatterReportingAttributeChangeCallback(mEndpointId, aEvent.GetClusterId(), Attributes::OperationalState::Id);
+    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OperationalState::Id);
 
+    GenericErrorEvent event(mClusterId, aError);
     EventNumber eventNumber;
-    CHIP_ERROR error = app::LogEvent(aEvent, mEndpointId, eventNumber);
+    CHIP_ERROR error = app::LogEvent(event, mEndpointId, eventNumber);
 
     if (error != CHIP_NO_ERROR)
     {
@@ -315,12 +316,15 @@ void OperationalStateServer::OnOperationalErrorDetected(const GenericErrorEvent 
     }
 }
 
-void OperationalStateServer::OnOperationCompletionDetected(const GenericOperationCompletionEvent & aEvent)
+void OperationalStateServer::OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
+                           const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime,
+                           const Optional<DataModel::Nullable<uint32_t>> & aPausedTime)
 {
     ChipLogDetail(Zcl, "OperationalStateServer: OnOperationCompletionDetected");
 
+    GenericOperationCompletionEvent event(mClusterId, aCompletionErrorCode, aTotalOperationalTime, aPausedTime);
     EventNumber eventNumber;
-    CHIP_ERROR error = app::LogEvent(aEvent, mEndpointId, eventNumber);
+    CHIP_ERROR error = app::LogEvent(event, mEndpointId, eventNumber);
 
     if (error != CHIP_NO_ERROR)
     {
