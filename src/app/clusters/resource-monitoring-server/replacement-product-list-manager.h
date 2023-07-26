@@ -43,7 +43,7 @@ public:
     void Reset() { mIndex = 0; }
 
     /**
-     * Iterates through the entries in the ReplacementProductListManager. Each call to this function copies the next item into 
+     * Iterates through the entries in the ReplacementProductListManager. Each call to this function copies the next item into
      * the out param. Calls to this function will return CHIP_NO_ERROR if there are still valid elements in the list. The function
      * will return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the end of the list has been reached.
      *

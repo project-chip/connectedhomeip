@@ -39,7 +39,7 @@ public:
     /**
      * Creates a ReplacementProductStruct and adds it to the list. Can only add up to kReplacementProductListMaxSize
      * entries to a list (as defined by the spec).
-     * 
+     *
      * @param aProductIdentifierType The identifier type of the product.
      * @param aProductIdentifierValue The value of the product.
      * @return CHIP_ERROR_NO_MEMORY if the list is full, a CHIP_ERROR if there was a problem creating the
