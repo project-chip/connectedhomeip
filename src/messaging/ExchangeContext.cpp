@@ -269,8 +269,8 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
 void ExchangeContext::SendStatusReport(const Protocols::SecureChannel::StatusReport & statusReport)
 {
-    ChipLogDetail(ExchangeManager, "Sending status report. Protocol code %u, exchange %u", statusReport.GetProtocolCode(),
-                  GetExchangeId());
+    ChipLogProgress(ExchangeManager, "Sending status report. Protocol code %u, exchange %" ChipLogFormatExchange, statusReport.GetProtocolCode(),
+                    ChipLogValueExchange(this));
 
     auto handle = System::PacketBufferHandle::New(statusReport.Size());
     VerifyOrReturn(!handle.IsNull(), ChipLogError(SecureChannel, "Failed to allocate status report message"));

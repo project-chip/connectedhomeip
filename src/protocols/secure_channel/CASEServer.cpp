@@ -186,11 +186,11 @@ void CASEServer::SendBusyStatusReport(Messaging::ExchangeContext * ec)
 
     ChipLogProgress(SecureChannel, "Already in the middle of CASE handshake, sending busy status report");
 
-    // A successful CASE handshake can take several seconds and some may timeout (30 seconds).
+    // A successful CASE handshake can take several seconds and some may time out (30 seconds or more).
     // TODO: Come up with better estimate: https://github.com/project-chip/connectedhomeip/issues/28288
     // For now, setting minimum wait time to 5 seconds.
     uint16_t minimumWaitTime                            = 5 * 1000; // milliseconds
-    constexpr uint8_t kBusyStatusReportProtocolDataSize = 2;        // 16-bits
+    constexpr uint8_t kBusyStatusReportProtocolDataSize = sizeof(minimumWaitTime);        // 16-bits
 
     auto handle = System::PacketBufferHandle::New(kBusyStatusReportProtocolDataSize, 0);
     VerifyOrReturn(!handle.IsNull(), ChipLogError(SecureChannel, "Failed to allocate protocol data for busy status report"));
