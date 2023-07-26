@@ -69,6 +69,8 @@ public:
     ~DishwasherModeDelegate() override = default;
 };
 
+void Shutdown();
+
 } // namespace DishwasherMode
 
 } // namespace Clusters

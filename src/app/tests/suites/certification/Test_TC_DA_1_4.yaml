@@ -153,7 +153,7 @@ tests:
       verification: |
           "The all-cluster-app in the sample application is not a certified commissionee (Certification Declaration has certification_type 0). Launch all-cluster-app on TH raspi and provision the app using the DUT
           "
-      disabled: true\
+      disabled: true
 
     - label:
           "Verify that DUT notifies a warning stating that Commissionee is not a
