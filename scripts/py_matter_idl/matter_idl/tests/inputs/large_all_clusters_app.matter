@@ -2603,7 +2603,7 @@ server cluster Thermostat = 513 {
     kHeat = 4;
   }
 
-  enum ThermostatSystemMode : ENUM8 {
+  enum ThermostatSystemModeEnum : ENUM8 {
     kOff = 0;
     kAuto = 1;
     kCool = 3;

@@ -3213,7 +3213,7 @@
               - SetpointAdjustMode
               - ThermostatControlSequence
               - ThermostatRunningMode
-              - ThermostatSystemMode
+              - ThermostatSystemModeEnum
           FanControl:
               - FanModeSequenceType
               - FanModeType
@@ -3902,7 +3902,7 @@
                   - Off
                   - Cool
                   - Heat
-              ThermostatSystemMode:
+              ThermostatSystemModeEnum:
                   - Off
                   - Auto
                   - Cool
@@ -5847,7 +5847,7 @@
               ParameterEnum:
                   - Video
           Thermostat:
-              ThermostatSystemMode:
+              ThermostatSystemModeEnum:
                   - EmergencyHeat
                   - Dry
                   - Sleep
@@ -6267,7 +6267,7 @@
                   - PIXELS
                   - PERCENTAGE
           Thermostat:
-              ThermostatSystemMode:
+              ThermostatSystemModeEum:
                   - EmergencyHeating
               SetpointAdjustMode:
                   - HeatSetpoint
@@ -6656,7 +6656,7 @@
                   Pixels: PIXELS
                   Percentage: PERCENTAGE
           Thermostat:
-              ThermostatSystemMode:
+              ThermostatSystemModeEnum:
                   EmergencyHeat: EmergencyHeating
               SetpointAdjustMode:
                   Heat: HeatSetpoint

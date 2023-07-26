@@ -408,9 +408,9 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         {
             return imcode::InvalidValue;
         }
-        auto RequestedSystemMode = static_cast<ThermostatSystemMode>(*value);
+        auto RequestedSystemMode = static_cast<ThermostatSystemModeEnum>(*value);
         if (ControlSequenceOfOperation > ThermostatControlSequence::kCoolingAndHeatingWithReheat ||
-            RequestedSystemMode > ThermostatSystemMode::kFanOnly)
+            RequestedSystemMode > ThermostatSystemModeEnum::kFanOnly)
         {
             return imcode::InvalidValue;
         }
@@ -419,14 +419,14 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         {
         case ThermostatControlSequence::kCoolingOnly:
         case ThermostatControlSequence::kCoolingWithReheat:
-            if (RequestedSystemMode == ThermostatSystemMode::kHeat || RequestedSystemMode == ThermostatSystemMode::kEmergencyHeat)
+            if (RequestedSystemMode == ThermostatSystemModeEnum::kHeat || RequestedSystemMode == ThermostatSystemModeEnum::kEmergencyHeat)
                 return imcode::InvalidValue;
             else
                 return imcode::Success;
 
         case ThermostatControlSequence::kHeatingOnly:
         case ThermostatControlSequence::kHeatingWithReheat:
-            if (RequestedSystemMode == ThermostatSystemMode::kCool || RequestedSystemMode == ThermostatSystemMode::kPrecooling)
+            if (RequestedSystemMode == ThermostatSystemModeEnum::kCool || RequestedSystemMode == ThermostatSystemModeEnum::kPrecooling)
                 return imcode::InvalidValue;
             else
                 return imcode::Success;
