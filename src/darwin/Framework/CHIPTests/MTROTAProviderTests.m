@@ -950,7 +950,7 @@ static BOOL sNeedsStackShutdown = YES;
     NSString * otaRawImagePath1 = @"/tmp/ota-raw-image-v10";
     NSString * otaRawImagePath2 = @"/tmp/ota-raw-image-v5";
 
-    // Check if the ota raw image exists at kOtaRawImagePath1 and kOtaRawImagePath2
+    // Check whether the ota raw image exists at otaRawImagePath1 and otaRawImagePath2
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath1]);
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath2]);
 
@@ -1315,12 +1315,10 @@ static BOOL sNeedsStackShutdown = YES;
     NSString * otaRawImagePath1 = @"/tmp/ota-raw-image-v5";
     NSString * otaRawImagePath2 = @"/tmp/ota-raw-image-v10";
 
-    // Check if the ota raw image exists at kOtaRawImagePath1 and kOtaRawImagePath2
+    // Check whether the ota raw image exists at otaRawImagePath1 and otaRawImagePath2
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath1]);
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath2]);
 
-    // Test that if we advertise ourselves as a provider we end up getting a
-    // QueryImage callbacks that we can respond to.
     __auto_type * device = sConnectedDevice3;
 
     __auto_type * checker =
