@@ -40,18 +40,6 @@ CHIP_ERROR StaticReplacementProductListManager::Next(ReplacementProductStruct & 
 
 CHIP_ERROR DynamicReplacementProductListManager::Next(ReplacementProductStruct & item)
 {
-    //    if (mIndex < mReplacementProductListSize)
-    //    {
-    //        item = mReplacementProductsList[mIndex];
-    //        mIndex++;
-    //        return CHIP_NO_ERROR;
-    //    }
-    //
-    //    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    //}
-
-    // CHIP_ERROR ReplacementProductListManager::Next(ReplacementProductStruct & item)
-    //{
     if (mIndex < mReplacementProductListSize)
     {
         item.SetProductIdentifierType(mReplacementProductsList[mIndex].GetProductIdentifierType());
