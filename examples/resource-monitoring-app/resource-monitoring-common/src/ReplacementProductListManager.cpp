@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <DynamicReplacementProductListManager.h>
+#include <ImmutableReplacementProductListManager.h>
 #include <StaticReplacementProductListManager.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -38,15 +38,41 @@ CHIP_ERROR StaticReplacementProductListManager::Next(ReplacementProductStruct & 
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-CHIP_ERROR DynamicReplacementProductListManager::Next(ReplacementProductStruct & item)
+CHIP_ERROR ImmutableReplacementProductListManager::Next(ReplacementProductStruct & item)
 {
-    if (mIndex < mReplacementProductListSize)
+    if (mIndex >= kReplacementProductListMaxSize)
     {
-        item.SetProductIdentifierType(mReplacementProductsList[mIndex].GetProductIdentifierType());
-        item.SetProductIdentifierValue(mReplacementProductsList[mIndex].GetProductIdentifierValue());
-        mIndex++;
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
 
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    switch(mIndex)
+    {
+        case 0:
+        {
+            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc);
+            item.SetProductIdentifierValue(CharSpan::fromCharString("111112222233"));
+            break;
+        case 1:
+            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8);
+            item.SetProductIdentifierValue(CharSpan::fromCharString("gtin8xxx"));
+            break;
+        case 2:
+            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kEan);
+            item.SetProductIdentifierValue(CharSpan::fromCharString("4444455555666"));
+            break;
+        case 3:
+            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14);
+            item.SetProductIdentifierValue(CharSpan::fromCharString("gtin14xxxxxxxx"));
+            break;
+        case 4:
+            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kOem);
+            item.SetProductIdentifierValue(CharSpan::fromCharString("oem20xxxxxxxxxxxxxxx"));
+            break;
+        default:
+            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+            break;
+        }
+    }
+    mIndex++;
+    return CHIP_NO_ERROR;
 }

@@ -55,22 +55,9 @@ public:
                  aResetConditionCommandSupported){};
 };
 
-class StaticReplacementProductListManager : public chip::app::Clusters::ResourceMonitoring::ReplacementProductListManager
+class ImmutableReplacementProductListManager : public chip::app::Clusters::ResourceMonitoring::ReplacementProductListManager
 {
 public:
     CHIP_ERROR
     Next(chip::app::Clusters::ResourceMonitoring::ReplacementProductStruct & item) override;
-
-    ~StaticReplacementProductListManager() {}
-    StaticReplacementProductListManager(
-        chip::app::Clusters::ResourceMonitoring::ReplacementProductStruct * aReplacementProductsList,
-        uint8_t aReplacementProductListSize)
-    {
-        mReplacementProductsList    = aReplacementProductsList;
-        mReplacementProductListSize = aReplacementProductListSize;
-    }
-
-private:
-    chip::app::Clusters::ResourceMonitoring::ReplacementProductStruct * mReplacementProductsList;
-    uint8_t mReplacementProductListSize;
 };

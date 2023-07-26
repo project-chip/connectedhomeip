@@ -37,15 +37,7 @@ constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Featu
 static HepaFilterMonitoringInstance * gHepaFilterInstance                       = nullptr;
 static ActivatedCarbonFilterMonitoringInstance * gActivatedCarbonFilterInstance = nullptr;
 
-static ResourceMonitoring::ReplacementProductStruct sReplacementProductsList[] = {
-    { ProductIdentifierTypeEnum::kUpc, CharSpan::fromCharString("111112222233") },
-    { ProductIdentifierTypeEnum::kGtin8, CharSpan::fromCharString("gtin8xxx") },
-    { ProductIdentifierTypeEnum::kEan, CharSpan::fromCharString("4444455555666") },
-    { ProductIdentifierTypeEnum::kGtin14, CharSpan::fromCharString("gtin14xxxxxxxx") },
-    { ProductIdentifierTypeEnum::kOem, CharSpan::fromCharString("oem20xxxxxxxxxxxxxxx") },
-};
-StaticReplacementProductListManager sReplacementProductListManager(&sReplacementProductsList[0],
-                                                                   ArraySize(sReplacementProductsList));
+static ImmutableReplacementProductListManager sReplacementProductListManager;
 
 //-- Activated Carbon Filter Monitoring Instance methods
 CHIP_ERROR ActivatedCarbonFilterMonitoringInstance::AppInit()
@@ -102,14 +94,41 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
     gHepaFilterInstance->Init();
 }
 
-CHIP_ERROR StaticReplacementProductListManager::Next(ReplacementProductStruct & item)
+CHIP_ERROR ImmutableReplacementProductListManager::Next(ReplacementProductStruct & item)
 {
-    if (mIndex < mReplacementProductListSize)
+    if (mIndex >= kReplacementProductListMaxSize)
     {
-        item = mReplacementProductsList[mIndex];
-        mIndex++;
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
 
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    switch(mIndex)
+    {
+        case 0:
+        {
+            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc);
+            item.SetProductIdentifierValue(CharSpan::fromCharString("111112222233"));
+            break;
+        case 1:
+            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8);
+            item.SetProductIdentifierValue(CharSpan::fromCharString("gtin8xxx"));
+            break;
+        case 2:
+            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kEan);
+            item.SetProductIdentifierValue(CharSpan::fromCharString("4444455555666"));
+            break;
+        case 3:
+            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14);
+            item.SetProductIdentifierValue(CharSpan::fromCharString("gtin14xxxxxxxx"));
+            break;
+        case 4:
+            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kOem);
+            item.SetProductIdentifierValue(CharSpan::fromCharString("oem20xxxxxxxxxxxxxxx"));
+            break;
+        default:
+            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+            break;
+        }
+    }
+    mIndex++;
+    return CHIP_NO_ERROR;
 }

@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <DynamicReplacementProductListManager.h>
+#include <ImmutableReplacementProductListManager.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
@@ -34,23 +34,12 @@ using namespace chip::app::Clusters::ResourceMonitoring;
 using namespace chip::app::Clusters::ResourceMonitoring::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-DynamicReplacementProductListManager hepaFilterReplacementProductListManager;
+ImmutableReplacementProductListManager hepaFilterReplacementProductListManager;
 
 //-- Hepa filter Monitoring instance methods
 CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
 {
     ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::Init()");
-
-    hepaFilterReplacementProductListManager.AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc,
-                                                          CharSpan::fromCharString("111112222233"));
-    hepaFilterReplacementProductListManager.AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8,
-                                                          CharSpan::fromCharString("gtin8xhe"));
-    hepaFilterReplacementProductListManager.AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kEan,
-                                                          CharSpan::fromCharString("4444455555666"));
-    hepaFilterReplacementProductListManager.AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14,
-                                                          CharSpan::fromCharString("gtin14xhepaxxx"));
-    hepaFilterReplacementProductListManager.AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kOem,
-                                                          CharSpan::fromCharString("oem20xhepaxxxxxxxxxx"));
 
     SetReplacementProductListManagerInstance(&hepaFilterReplacementProductListManager);
 
