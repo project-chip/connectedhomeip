@@ -1714,7 +1714,7 @@ CHIP_ERROR BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn)
 struct ConnectParams
 {
     ConnectParams(BluezDevice1 * device, BluezEndpoint * endpoint) :
-        mDevice(g_object_ref(device)), mEndpoint(endpoint), mNumRetries(0)
+        mDevice(reinterpret_cast<BluezDevice1 *>(g_object_ref(device))), mEndpoint(endpoint), mNumRetries(0)
     {}
     ~ConnectParams() { g_object_unref(mDevice); }
     BluezDevice1 * mDevice;
