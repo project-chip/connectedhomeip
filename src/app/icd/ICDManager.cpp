@@ -102,7 +102,7 @@ void ICDManager::UpdateIcdMode()
     // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
     if (mICDMode == ICDMode::SIT && GetSlowPollingInterval() > GetSITPollingThreshold())
     {
-        ChipLogDetail(AppServer, "The Slow Polling Interval of an ICD in SIT mode should be <= %" PRIu32,
+        ChipLogDetail(AppServer, "The Slow Polling Interval of an ICD in SIT mode should be <= %" PRIu32 " seconds",
                       (GetSITPollingThreshold().count() / 1000));
     }
 }
