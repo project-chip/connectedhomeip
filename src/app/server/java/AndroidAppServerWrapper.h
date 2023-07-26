@@ -17,9 +17,9 @@
  */
 
 #pragma once
+#include <app/server/AppDelegate.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
-#include <app/server/AppDelegate.h>
 
 CHIP_ERROR ChipAndroidAppInit(AppDelegate * appDelegate = nullptr);
 

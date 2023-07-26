@@ -22,9 +22,9 @@
  *
  */
 #include "AndroidAppServerWrapper.h"
+#include "ChipAppServerDelegate.h"
 #include "ChipFabricProvider-JNI.h"
 #include "ChipThreadWork.h"
-#include "ChipAppServerDelegate.h"
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>

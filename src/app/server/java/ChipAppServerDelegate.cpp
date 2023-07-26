@@ -25,7 +25,8 @@ void ChipAppServerDelegate::OnCommissioningSessionEstablishmentStarted()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(AppServer, "JNIEnv is nullptr"));
-    VerifyOrReturn(mOnCommissioningSessionEstablishmentStartedMethod != nullptr, ChipLogError(AppServer, "mOnCommissioningSessionEstablishmentStartedMethod is nullptr"));
+    VerifyOrReturn(mOnCommissioningSessionEstablishmentStartedMethod != nullptr,
+                   ChipLogError(AppServer, "mOnCommissioningSessionEstablishmentStartedMethod is nullptr"));
 
     env->ExceptionClear();
     env->CallVoidMethod(mChipAppServerDelegateObject, mOnCommissioningSessionEstablishmentStartedMethod);
@@ -41,7 +42,8 @@ void ChipAppServerDelegate::OnCommissioningSessionStarted()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(AppServer, "JNIEnv is nullptr"));
-    VerifyOrReturn(mOnCommissioningSessionStartedMethod != nullptr, ChipLogError(AppServer, "mOnCommissioningSessionStartedMethod is nullptr"));
+    VerifyOrReturn(mOnCommissioningSessionStartedMethod != nullptr,
+                   ChipLogError(AppServer, "mOnCommissioningSessionStartedMethod is nullptr"));
 
     env->ExceptionClear();
     env->CallVoidMethod(mChipAppServerDelegateObject, mOnCommissioningSessionStartedMethod);
@@ -57,7 +59,8 @@ void ChipAppServerDelegate::OnCommissioningSessionStopped(CHIP_ERROR err)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(AppServer, "JNIEnv is nullptr"));
-    VerifyOrReturn(mOnCommissioningSessionStoppedMethod != nullptr, ChipLogError(AppServer, "mOnCommissioningSessionStoppedMethod is nullptr"));
+    VerifyOrReturn(mOnCommissioningSessionStoppedMethod != nullptr,
+                   ChipLogError(AppServer, "mOnCommissioningSessionStoppedMethod is nullptr"));
 
     env->ExceptionClear();
     env->CallVoidMethod(mChipAppServerDelegateObject, mOnCommissioningSessionStoppedMethod, static_cast<jint>(err.AsInteger()));
@@ -73,7 +76,8 @@ void ChipAppServerDelegate::OnCommissioningWindowOpened()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(AppServer, "JNIEnv is nullptr"));
-    VerifyOrReturn(mOnCommissioningWindowOpenedMethod != nullptr, ChipLogError(AppServer, "mOnCommissioningWindowOpenedMethod is nullptr"));
+    VerifyOrReturn(mOnCommissioningWindowOpenedMethod != nullptr,
+                   ChipLogError(AppServer, "mOnCommissioningWindowOpenedMethod is nullptr"));
 
     env->ExceptionClear();
     env->CallVoidMethod(mChipAppServerDelegateObject, mOnCommissioningWindowOpenedMethod);
@@ -89,7 +93,8 @@ void ChipAppServerDelegate::OnCommissioningWindowClosed()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(AppServer, "JNIEnv is nullptr"));
-    VerifyOrReturn(mOnCommissioningWindowClosedMethod != nullptr, ChipLogError(AppServer, "mOnCommissioningWindowClosedMethod is nullptr"));
+    VerifyOrReturn(mOnCommissioningWindowClosedMethod != nullptr,
+                   ChipLogError(AppServer, "mOnCommissioningWindowClosedMethod is nullptr"));
 
     env->ExceptionClear();
     env->CallVoidMethod(mChipAppServerDelegateObject, mOnCommissioningWindowClosedMethod);
@@ -112,7 +117,8 @@ CHIP_ERROR ChipAppServerDelegate::InitializeWithObjects(jobject appDelegateObjec
     jclass chipAppServerDelegateClass = env->GetObjectClass(mChipAppServerDelegateObject);
     VerifyOrReturnLogError(chipAppServerDelegateClass != nullptr, CHIP_JNI_ERROR_JAVA_ERROR);
 
-    mOnCommissioningSessionEstablishmentStartedMethod = env->GetMethodID(chipAppServerDelegateClass, "onCommissioningSessionEstablishmentStarted", "()V");
+    mOnCommissioningSessionEstablishmentStartedMethod =
+        env->GetMethodID(chipAppServerDelegateClass, "onCommissioningSessionEstablishmentStarted", "()V");
     VerifyOrReturnLogError(mOnCommissioningSessionEstablishmentStartedMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     mOnCommissioningSessionStartedMethod = env->GetMethodID(chipAppServerDelegateClass, "onCommissioningSessionStarted", "()V");

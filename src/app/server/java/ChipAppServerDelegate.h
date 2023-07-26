@@ -17,11 +17,12 @@
 
 #pragma once
 
+#include <app/server/AppDelegate.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
-#include <app/server/AppDelegate.h>
 
-class ChipAppServerDelegate : public AppDelegate {
+class ChipAppServerDelegate : public AppDelegate
+{
 public:
     void OnCommissioningSessionEstablishmentStarted() override;
     void OnCommissioningSessionStarted() override;
