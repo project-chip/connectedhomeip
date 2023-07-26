@@ -16,10 +16,13 @@
 #
 
 import logging
+import random
 
 import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+from chip.interaction_model import Status
 
 # This test requires several additional command line arguments
 # run with
@@ -37,6 +40,10 @@ class TC_RVCRUNM_3_2(MatterBaseTest):
         asserts.assert_true(type_matches(ret, Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse),
                             "Unexpected return type for ChangeToMode")
         return ret
+
+    async def write_start_up_mode(self, newMode):
+        ret = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, Clusters.RvcRunMode.Attributes.StartUpMode(newMode))])
+        asserts.assert_equal(ret[0].Status, Status.Success, "Writing to StartUpMode failed")
 
     @async_test_body
     async def test_TC_RVCRUNM_3_2(self):
@@ -69,8 +76,22 @@ class TC_RVCRUNM_3_2(MatterBaseTest):
         startup_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.StartUpMode)
 
         logging.info("StartUpMode: %s" % (startup_mode))
+        if startup_mode == NullValue:
+            self.print_step(3, "Read SupportedModes attribute")
+            supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
-        self.print_step(3, "Read CurrentMode attribute")
+            logging.info("SupportedModes: %s" % (supported_modes))
+
+            asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
+
+            modes = [m.mode for m in supported_modes]
+            startup_mode = random.choice(modes)
+
+            self.print_step(4, "Write the value %s to StartUpMode" % (startup_mode))
+
+            await self.write_start_up_mode(newMode=startup_mode)
+
+        self.print_step(5, "Read CurrentMode attribute")
 
         old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
@@ -78,7 +99,7 @@ class TC_RVCRUNM_3_2(MatterBaseTest):
 
         if old_current_mode == startup_mode:
 
-            self.print_step(4, "Read SupportedModes attribute")
+            self.print_step(6, "Read SupportedModes attribute")
             supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
             logging.info("SupportedModes: %s" % (supported_modes))
@@ -92,17 +113,17 @@ class TC_RVCRUNM_3_2(MatterBaseTest):
                     new_mode = m.mode
                     break
 
-            self.print_step(5, "Send ChangeToMode command with NewMode set to %d" % (new_mode))
+            self.print_step(7, "Send ChangeToMode command with NewMode set to %d" % (new_mode))
 
             ret = await self.send_change_to_mode_cmd(newMode=new_mode)
             asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode should succeed")
 
         self.default_controller.ExpireSessions(self.dut_node_id)
 
-        self.print_step(6, "Physically power cycle the device")
+        self.print_step(8, "Physically power cycle the device")
         input("Press Enter when done.\n")
 
-        self.print_step(7, "Read CurrentMode attribute")
+        self.print_step(9, "Read CurrentMode attribute")
 
         current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
