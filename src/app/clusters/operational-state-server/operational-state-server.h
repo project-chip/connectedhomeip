@@ -27,6 +27,50 @@ namespace app {
 namespace Clusters {
 namespace OperationalState {
 
+/**
+ * A class which represents the operational error event of an Operational State cluster derivation instance.
+ */
+class GenericErrorEvent : private app::Clusters::OperationalState::Events::OperationalError::Type
+{
+    using super = app::Clusters::OperationalState::Events::OperationalError::Type;
+public:
+    GenericErrorEvent(ClusterId aClusterId, const Structs::ErrorStateStruct::Type & aError) : mClusterId(aClusterId)
+    {
+        errorState = aError;
+    }
+    using super::GetPriorityLevel;
+    using super::GetEventId;
+    ClusterId GetClusterId() const { return mClusterId; }
+    using super::kIsFabricScoped;
+    using super::Encode;
+private:
+   ClusterId mClusterId;
+};
+
+/**
+ * A class which represents the operational completion event of an Operational State cluster derivation instance.
+ */
+class GenericOperationCompletionEvent : private app::Clusters::OperationalState::Events::OperationCompletion::Type
+{
+    using super = app::Clusters::OperationalState::Events::OperationCompletion::Type;
+public:
+    GenericOperationCompletionEvent(ClusterId aClusterId, uint8_t aCompletionErrorCode,
+                               const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = NullOptional,
+                               const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional) : mClusterId(aClusterId)
+    {
+        completionErrorCode  = aCompletionErrorCode;
+        totalOperationalTime = aTotalOperationalTime;
+        pausedTime           = aPausedTime;
+    }
+    using super::GetPriorityLevel;
+    using super::GetEventId;
+    ClusterId GetClusterId() const { return mClusterId; }
+    using super::kIsFabricScoped;
+    using super::Encode;
+private:
+   ClusterId mClusterId;
+};
+
 class Uncopyable
 {
 protected:
@@ -62,15 +106,15 @@ public:
 
     /**
      * @brief Called when the Node detects a OperationalError has been raised.
-     * @param aError OperationalError which detects
+     * @param aEvent GenericErrorEvent is generated
      */
-    void OnOperationalErrorDetect(const Structs::ErrorStateStruct::Type & aError);
+    void OnOperationalErrorDetected(const GenericErrorEvent & aEvent);
 
     /**
      * @brief Called when the Node detects a OperationCompletion has been raised.
-     * @param aEvent OperationCompletion event
+     * @param aEvent OperationCompletionEvent is generated
      */
-    void OnOperationCompletionDetect(const Events::OperationCompletion::Type & aEvent);
+    void OnOperationCompletionDetected(const GenericOperationCompletionEvent & aEvent);
 
     /**
      * Creates an operational state cluster instance. The Init() function needs to be called for this instance to be registered and
