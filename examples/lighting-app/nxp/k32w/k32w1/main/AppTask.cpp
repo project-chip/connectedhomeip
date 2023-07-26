@@ -807,11 +807,24 @@ void AppTask::PostTurnOnActionRequest(int32_t aActor, LightingManager::Action_t 
 
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
+    portBASE_TYPE taskToWake = pdFALSE;
     if (sAppEventQueue != NULL)
     {
-        if (!xQueueSend(sAppEventQueue, aEvent, 1))
+        if (__get_IPSR())
         {
-            K32W_LOG("Failed to post event to app task event queue");
+            if (!xQueueSendToFrontFromISR(sAppEventQueue, aEvent, &taskToWake))
+            {
+                K32W_LOG("Failed to post event to app task event queue");
+            }
+
+            portYIELD_FROM_ISR(taskToWake);
+        }
+        else
+        {
+            if (!xQueueSend(sAppEventQueue, aEvent, 1))
+            {
+                K32W_LOG("Failed to post event to app task event queue");
+            }
         }
     }
 }
