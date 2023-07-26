@@ -89,9 +89,10 @@ private:
 
 public:
     static constexpr bool kIsFabricScoped = false;
-    virtual ~ReplacementProductStruct()                = default;
+    virtual ~ReplacementProductStruct()   = default;
     ReplacementProductStruct() {}
-    ReplacementProductStruct(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType, chip::CharSpan aProductIdentifierValue)
+    ReplacementProductStruct(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType,
+                             chip::CharSpan aProductIdentifierValue)
     {
         SetProductIdentifierType(aProductIdentifierType);
         SetProductIdentifierValue(aProductIdentifierValue);

@@ -44,7 +44,7 @@ public:
      * @param aProductIdentifierValue The value of the product.
      * @return CHIP_ERROR_NO_MEMORY if the list is full, a CHIP_ERROR if there was a problem creating the
      * ReplacementProductStruct and a CHIP_NO_ERROR otherwise.
-    */
+     */
     CHIP_ERROR AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType,
                              chip::CharSpan aProductIdentifierValue)
     {

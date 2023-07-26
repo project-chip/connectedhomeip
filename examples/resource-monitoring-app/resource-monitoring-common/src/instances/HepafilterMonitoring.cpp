@@ -42,15 +42,15 @@ CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
     ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::Init()");
 
     hepaFilterReplacementProductListManager.AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc,
-                                                           CharSpan::fromCharString("111112222233"));
+                                                          CharSpan::fromCharString("111112222233"));
     hepaFilterReplacementProductListManager.AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8,
-                                                           CharSpan::fromCharString("gtin8xhe"));
+                                                          CharSpan::fromCharString("gtin8xhe"));
     hepaFilterReplacementProductListManager.AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kEan,
-                                                           CharSpan::fromCharString("4444455555666"));
+                                                          CharSpan::fromCharString("4444455555666"));
     hepaFilterReplacementProductListManager.AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14,
-                                                           CharSpan::fromCharString("gtin14xhepaxxx"));
+                                                          CharSpan::fromCharString("gtin14xhepaxxx"));
     hepaFilterReplacementProductListManager.AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kOem,
-                                                           CharSpan::fromCharString("oem20xhepaxxxxxxxxxx"));
+                                                          CharSpan::fromCharString("oem20xhepaxxxxxxxxxx"));
 
     SetReplacementProductListManagerInstance(&hepaFilterReplacementProductListManager);
 
