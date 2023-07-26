@@ -1938,6 +1938,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
 
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
         // We have 29 attributes in our mock attribute storage. And we subscribed twice.
         // And attribute 3/2/4 is a list with 6 elements and list chunking is
         // applied to it, but the way the packet boundaries fall we get two of
@@ -1946,7 +1947,12 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
         // items for the other.
         //
         // Thus we should receive 29*2 + 4 + 3 = 65 attribute data in total.
-        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 65);
+        constexpr size_t kExpectedAttributeResponse = 65;
+#else
+        // Adjustment without the eventlist attributes
+        constexpr size_t kExpectedAttributeResponse = 68;
+#endif
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == kExpectedAttributeResponse);
         NL_TEST_ASSERT(apSuite, delegate.mNumArrayItems == 12);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
