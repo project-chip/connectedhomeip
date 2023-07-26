@@ -28,6 +28,11 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <stdlib.h>
 
+#ifndef ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
+// Set to 1 to enforce SIT Slow Polling Max value to 15seconds (spec 9.16.1.5)
+#define ICD_ENFORCE_SIT_SLOW_POLL_LIMIT 0
+#endif
+
 namespace chip {
 namespace app {
 
@@ -116,8 +121,8 @@ void ICDManager::UpdateOperationState(OperationalState state)
 
         System::Clock::Milliseconds32 slowPollInterval = GetSlowPollingInterval();
 
-#if 0 // TODO ICD Spec to define this conformance as a SHALL
-      // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
+#if ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
+        // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
         if (mICDMode == ICDMode::SIT && GetSlowPollingInterval() > GetSITPollingThreshold())
         {
             slowPollInterval = GetSITPollingThreshold();
