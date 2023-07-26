@@ -42,7 +42,8 @@ public:
      * This is called when the PASE establishment failed (such as, when an invalid passcode is provided) or PASE was established
      * fine but then the fail-safe expired (including being expired by the commissioner)
      *
-     * @param err CHIP_ERROR indicating the error that occurred during session establishment or the error accompanying the fail-safe timeout.
+     * @param err CHIP_ERROR indicating the error that occurred during session establishment or the error accompanying the fail-safe
+     * timeout.
      */
     virtual void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) {}
 
