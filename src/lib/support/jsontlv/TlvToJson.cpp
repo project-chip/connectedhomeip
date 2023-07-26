@@ -301,6 +301,7 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
                 nextSubType = kElementTypeStruct;
                 break;
             }
+            case TLV::kTLVType_Array:
             default:
                 return CHIP_ERROR_INVALID_TLV_ELEMENT;
                 break;
