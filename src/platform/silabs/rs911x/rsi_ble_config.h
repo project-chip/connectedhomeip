@@ -24,7 +24,7 @@
  * *                      Macros
  * ******************************************************/
 //! application event list
-//TODO: remove this define after integration of the new wifi sdk
+// TODO: remove this define after integration of the new wifi sdk
 #ifndef RSI_FAILURE
 // failure return value
 #define RSI_FAILURE -1
