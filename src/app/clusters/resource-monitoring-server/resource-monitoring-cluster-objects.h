@@ -98,6 +98,13 @@ public:
         SetProductIdentifierValue(aProductIdentifierValue);
     }
 
+    ReplacementProductStruct & operator=(const ReplacementProductStruct & aReplacementProductStruct) 
+    {
+        SetProductIdentifierType(aReplacementProductStruct.GetProductIdentifierType());
+        SetProductIdentifierValue(aReplacementProductStruct.GetProductIdentifierValue());
+        return *this;
+    }
+
     using HepaFilterMonitoring::Structs::ReplacementProductStruct::Type::Encode;
 
     /**
@@ -130,8 +137,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    ProductIdentifierTypeEnum GetProductIdentifierType() { return static_cast<ProductIdentifierTypeEnum>(productIdentifierType); };
-    chip::CharSpan GetProductIdentifierValue() { return productIdentifierValue; };
+    ProductIdentifierTypeEnum GetProductIdentifierType() const { return static_cast<ProductIdentifierTypeEnum>(productIdentifierType); };
+    chip::CharSpan GetProductIdentifierValue() const { return productIdentifierValue; };
 };
 
 namespace Attributes {

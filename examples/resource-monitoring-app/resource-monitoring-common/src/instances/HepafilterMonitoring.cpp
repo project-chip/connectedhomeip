@@ -34,14 +34,14 @@ using namespace chip::app::Clusters::ResourceMonitoring;
 using namespace chip::app::Clusters::ResourceMonitoring::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-ImmutableReplacementProductListManager hepaFilterReplacementProductListManager;
+static ImmutableReplacementProductListManager sHepaFilterReplacementProductListManager;
 
 //-- Hepa filter Monitoring instance methods
 CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
 {
     ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::Init()");
 
-    SetReplacementProductListManagerInstance(&hepaFilterReplacementProductListManager);
+    SetReplacementProductListManagerInstance(&sHepaFilterReplacementProductListManager);
 
     return CHIP_NO_ERROR;
 }
