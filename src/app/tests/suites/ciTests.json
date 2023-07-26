@@ -48,6 +48,7 @@
         "Test_TC_OPCREDS_1_2",
         "Test_TC_BINFO_1_1",
         "Test_TC_BINFO_2_1",
+        "Test_TC_BINFO_2_2",
         "Test_TC_CNET_1_3"
     ],
     "Descriptor": ["Test_TC_DESC_1_1"],
@@ -269,7 +270,8 @@
         "TestCommissionerNodeId",
         "TestTimeSynchronization",
         "TestOperationalState",
-        "TestRVCOperationalState"
+        "TestRVCOperationalState",
+        "TestDishwasherAlarm"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],

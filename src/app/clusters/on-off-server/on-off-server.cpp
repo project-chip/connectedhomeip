@@ -60,16 +60,16 @@ namespace {
  */
 void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
 {
-    for (const auto & modeBaseInstance : *ModeBase::GetModeBaseInstances())
+    for (auto & modeBaseInstance : ModeBase::GetModeBaseInstanceList())
     {
-        if (modeBaseInstance->GetEndpointId() == endpoint)
+        if (modeBaseInstance.GetEndpointId() == endpoint)
         {
-            if (modeBaseInstance->HasFeature(ModeBase::Feature::kOnOff))
+            if (modeBaseInstance.HasFeature(ModeBase::Feature::kOnOff))
             {
-                ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance->GetOnMode();
+                ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance.GetOnMode();
                 if (!onMode.IsNull())
                 {
-                    Status status = modeBaseInstance->UpdateCurrentMode(onMode.Value());
+                    Status status = modeBaseInstance.UpdateCurrentMode(onMode.Value());
                     if (status == Status::Success)
                     {
                         ChipLogProgress(Zcl, "Changed the Current Mode to %x", onMode.Value());

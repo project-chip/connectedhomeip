@@ -1,0 +1,94 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 219.1.1. [TC-TCCM-1.1] Global attributes with DUT as Server
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
+      verification: |
+          Verify that the DUT response contains the ClusterRevision attribute and has the value 1.
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
+      verification: |
+          Verify that the DUT response contains the FeatureMap attribute and have the following bit set:
+
+          bit 0: SHALL be 1 if and only if TCCM.S.F00(DEPONOFF)
+      disabled: true
+
+    - label: "Step 4: TH reads from the DUT the AttributeList attribute."
+      verification: |
+          Verify that the DUT response contains the AttributeList attribute and have the list of supported attributes:
+
+          The list SHALL include all the mandatory entries:
+          0x0000, 0x0001, 0xfff8, 0xfff9, 0xfffa, 0xfffb, 0xfffc & 0xfffd.
+
+          The list MAY include these optional entries:
+          - 0x0002: SHALL be included if and only if TCCM.S.A0002(StartUpMode)
+
+          The list include entries based on feature support:
+
+
+          0x0003 SHALL be included if and only if TCCM.S.F00(DEPONOFF)
+
+
+          and SHALL NOT be included otherwise.
+
+          The list SHALL NOT contain any additional values in the standard or scoped range: (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE)
+
+
+          The list MAY contain values in the Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1), these values SHALL be ignored.
+
+
+          The list SHALL NOT contain any values in the Test Vendor or invalid range: (0x0000_5000 - 0x0000_EFFF and 0x0000_FFFF), (0xXXXX_5000 - 0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1)
+      disabled: true
+
+    - label: "Step 5: TH reads from the DUT the AcceptedCommandList attribute."
+      verification: |
+          Verify that the DUT response contains the AcceptedCommandList attribute and have the list of Accepted Command:
+          The list SHALL include all the mandatory entries:
+
+          0x00
+          The list SHALL NOT contain any additional values in the standard or scoped range: (0x0000_0000 - 0x0000_00FF)
+
+          The list MAY contain values in the Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1), these values SHALL be ignored.
+
+          The list SHALL NOT contain any values in the Test Vendor or invalid range: (0x0000_0100 - 0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1)
+      disabled: true
+
+    - label: "Step 6: TH reads from the DUT the GeneratedCommandList attribute."
+      verification: |
+          Verify that the DUT response contains the GeneratedCommandList attribute and have the list of Generated Command:
+          The list SHALL include all the mandatory entries:
+
+          0x01
+          The list SHALL NOT contain any additional values in the standard or scoped range: (0x0000_0000 - 0x0000_00FF)
+
+          The list MAY contain values in the Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1), these values SHALL be ignored.
+
+          The list SHALL NOT contain any values in the Test Vendor or invalid range: (0x0000_0100 - 0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1)
+      disabled: true

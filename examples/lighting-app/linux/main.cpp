@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "LightingAppCommandDelegate.h"
 #include "LightingManager.h"
 #include <AppMain.h>
 
@@ -36,6 +37,13 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+
+namespace {
+
+constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_lighting_fifo_";
+NamedPipeCommands sChipNamedPipeCommands;
+LightingAppCommandDelegate sLightingAppCommandDelegate;
+} // namespace
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
@@ -66,7 +74,24 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     // TODO: implement any additional Cluster Server init actions
 }
 
-void ApplicationInit() {}
+void ApplicationInit()
+{
+    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
+
+    if (sChipNamedPipeCommands.Start(path, &sLightingAppCommandDelegate) != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
+        sChipNamedPipeCommands.Stop();
+    }
+}
+
+void ApplicationShutdown()
+{
+    if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
+    }
+}
 
 int main(int argc, char * argv[])
 {

@@ -30,7 +30,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
-#include <app/EventLoggingDelegate.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
@@ -45,6 +44,55 @@ using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::OperationalState::Attributes;
 
 using Status = Protocols::InteractionModel::Status;
+
+/**
+ * A class which represents the operational error event of an Operational State cluster derivation instance.
+ */
+class GenericErrorEvent : private app::Clusters::OperationalState::Events::OperationalError::Type
+{
+    using super = app::Clusters::OperationalState::Events::OperationalError::Type;
+
+public:
+    GenericErrorEvent(ClusterId aClusterId, const Structs::ErrorStateStruct::Type & aError) : mClusterId(aClusterId)
+    {
+        errorState = aError;
+    }
+    using super::GetEventId;
+    using super::GetPriorityLevel;
+    ClusterId GetClusterId() const { return mClusterId; }
+    using super::Encode;
+    using super::kIsFabricScoped;
+
+private:
+    ClusterId mClusterId;
+};
+
+/**
+ * A class which represents the operational completion event of an Operational State cluster derivation instance.
+ */
+class GenericOperationCompletionEvent : private app::Clusters::OperationalState::Events::OperationCompletion::Type
+{
+    using super = app::Clusters::OperationalState::Events::OperationCompletion::Type;
+
+public:
+    GenericOperationCompletionEvent(ClusterId aClusterId, uint8_t aCompletionErrorCode,
+                                    const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = NullOptional,
+                                    const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional) :
+        mClusterId(aClusterId)
+    {
+        completionErrorCode  = aCompletionErrorCode;
+        totalOperationalTime = aTotalOperationalTime;
+        pausedTime           = aPausedTime;
+    }
+    using super::GetEventId;
+    using super::GetPriorityLevel;
+    ClusterId GetClusterId() const { return mClusterId; }
+    using super::Encode;
+    using super::kIsFabricScoped;
+
+private:
+    ClusterId mClusterId;
+};
 
 CHIP_ERROR OperationalStateServer::Init()
 {
@@ -113,7 +161,11 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
     VerifyOrReturn(delegate != nullptr, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure));
     uint8_t opState = delegate->GetCurrentOperationalState();
 
-    if (opState != to_underlying(OperationalStateEnum::kPaused))
+    if (opState != to_underlying(OperationalStateEnum::kPaused) && opState != to_underlying(OperationalStateEnum::kRunning))
+    {
+        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
+    }
+    else if (opState != to_underlying(OperationalStateEnum::kPaused))
     {
         delegate->HandlePauseStateCallback(err);
     }
@@ -298,44 +350,34 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     return CHIP_NO_ERROR;
 }
 
-void OperationalStateServer::OnOperationalErrorDetect(const Structs::ErrorStateStruct::Type & aError)
+void OperationalStateServer::OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type & aError)
 {
-    ChipLogDetail(Zcl, "OperationalStateServer: OnOperationalErrorDetect");
-    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, OperationalState::Attributes::OperationalState::Id);
+    ChipLogDetail(Zcl, "OperationalStateServer: OnOperationalErrorDetected");
+    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OperationalState::Id);
 
+    GenericErrorEvent event(mClusterId, aError);
     EventNumber eventNumber;
-    Events::OperationalError::Type event{ aError };
-    EventLogger<Events::OperationalError::Type> eventData(event);
-    ConcreteEventPath path(mEndpointId, mClusterId, event.GetEventId());
-    EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
-    EventOptions eventOptions;
-    eventOptions.mPath     = path;
-    eventOptions.mPriority = event.GetPriorityLevel();
+    CHIP_ERROR error = app::LogEvent(event, mEndpointId, eventNumber);
 
-    CHIP_ERROR err = logMgmt.LogEvent(&eventData, eventOptions, eventNumber);
-    if (err != CHIP_NO_ERROR)
+    if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "OperationalStateServer: Failed to record OperationalError event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "OperationalStateServer: Failed to record OperationalError event: %" CHIP_ERROR_FORMAT, error.Format());
     }
 }
 
-void OperationalStateServer::OnOperationCompletionDetect(const Events::OperationCompletion::Type & aEvent)
+void OperationalStateServer::OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
+                                                           const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime,
+                                                           const Optional<DataModel::Nullable<uint32_t>> & aPausedTime)
 {
-    ChipLogDetail(Zcl, "OperationalStateServer: OnOperationCompletionDetect");
-    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, OperationalState::Attributes::OperationalState::Id);
+    ChipLogDetail(Zcl, "OperationalStateServer: OnOperationCompletionDetected");
 
+    GenericOperationCompletionEvent event(mClusterId, aCompletionErrorCode, aTotalOperationalTime, aPausedTime);
     EventNumber eventNumber;
-    EventLogger<Events::OperationCompletion::Type> eventData(aEvent);
-    ConcreteEventPath path(mEndpointId, mClusterId, aEvent.GetEventId());
-    EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
-    EventOptions eventOptions;
-    eventOptions.mPath     = path;
-    eventOptions.mPriority = aEvent.GetPriorityLevel();
+    CHIP_ERROR error = app::LogEvent(event, mEndpointId, eventNumber);
 
-    CHIP_ERROR err = logMgmt.LogEvent(&eventData, eventOptions, eventNumber);
-    if (err != CHIP_NO_ERROR)
+    if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "OperationalStateServer: Failed to record OnOperationCompletionDetect event: %" CHIP_ERROR_FORMAT,
-                     err.Format());
+        ChipLogError(Zcl, "OperationalStateServer: Failed to record OperationCompletion event: %" CHIP_ERROR_FORMAT,
+                     error.Format());
     }
 }

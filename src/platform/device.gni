@@ -111,6 +111,11 @@ declare_args() {
   }
 }
 
+declare_args() {
+  # Enable subscription resumption after timeout - separate configuration for power use measurement
+  chip_subscription_timeout_resumption = chip_persist_subscriptions
+}
+
 if (chip_device_platform == "bl702" || chip_device_platform == "bl702l") {
   if (chip_enable_openthread) {
     chip_mdns = "platform"

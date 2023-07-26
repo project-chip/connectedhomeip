@@ -30,17 +30,17 @@ using Milliseconds64  = System::Clock::Milliseconds64;
 using ReadHandlerNode = ReportScheduler::ReadHandlerNode;
 using TimerDelegate   = ReportScheduler::TimerDelegate;
 
-class SynchronizedReportSchedulerImpl : public ReportSchedulerImpl
+class SynchronizedReportSchedulerImpl : public ReportSchedulerImpl, public TimerContext
 {
 public:
     void OnReadHandlerDestroyed(ReadHandler * aReadHandler) override;
 
     SynchronizedReportSchedulerImpl(TimerDelegate * aTimerDelegate) : ReportSchedulerImpl(aTimerDelegate) {}
-    ~SynchronizedReportSchedulerImpl() {}
+    ~SynchronizedReportSchedulerImpl() override { UnregisterAllHandlers(); }
 
     bool IsReportScheduled();
 
-    void ReportTimerCallback() override;
+    void TimerFired() override;
 
 protected:
     CHIP_ERROR ScheduleReport(System::Clock::Timeout timeout, ReadHandlerNode * node) override;

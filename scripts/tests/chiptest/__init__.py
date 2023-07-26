@@ -148,6 +148,7 @@ def _GetInDevelopmentTests() -> Set[str]:
         "Test_TC_SMCO_2_4.yaml",   # chip-repl does not support timeout (07/20/2023)
         "Test_TC_SMCO_2_5.yaml",   # chip-repl does not support timeout (07/20/2023)
         "Test_TC_SMCO_2_6.yaml",   # chip-repl does not support timeout (07/20/2023)
+        "Test_TC_IDM_1_2.yaml",              # chip-repl does not support AnyCommands (19/07/2023)
     }
 
 

@@ -38,8 +38,8 @@ tests:
       disabled: true
 
     - label:
-          "Provide the 11-digit/21-digit Manual Pairing Code from the TH Device
-          in text, speech or any format supported by DUT"
+          "Step 1: Provide the 11-digit/21-digit Manual Pairing Code from the TH
+          Device in text, speech or any format supported by DUT"
       verification: |
           1. Launch all-clusters-app on the raspi , get the Manual Pairing code from the log
 
@@ -67,7 +67,7 @@ tests:
 
 
           2. Parse 11-digit Manual Pairing code
-          ./chip-tool payload parse-setup-payload 34970112332
+           ./chip-tool payload parse-setup-payload 34970112332
 
           Verify in DUT(CHIP-TOOL)
           [1667811737.160767][10335:10335] CHIP:SPL: Parsing decimalRepresentation: 34970112332
@@ -81,7 +81,7 @@ tests:
 
 
           3. Parse 21-digit Manual Pairing code
-          ./chip-tool payload parse-setup-payload 749701123365521327694
+           ./chip-tool payload parse-setup-payload 749701123365521327694
 
           Verify in DUT as commissoiner side:
           CHIP:SPL: Parsing decimalRepresentation: 749701123365521327694

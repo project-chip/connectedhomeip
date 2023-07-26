@@ -32,8 +32,9 @@ _DEFAULT_EXTENSIONS_DIR = 'scripts/tests/yaml/extensions'
 
 
 @click.pass_context
-def send_yaml_command(ctx, test_name: str, server_path: str, server_arguments: str, pics: str, additional_pseudo_clusters_directory: str, commands: List[str]):
-    kwargs = {'test_name': test_name, 'pics': pics, 'additional_pseudo_clusters_directory': additional_pseudo_clusters_directory}
+def send_yaml_command(ctx, test_name: str, server_path: str, server_arguments: str, show_adapter_logs: bool, pics: str, additional_pseudo_clusters_directory: str, commands: List[str]):
+    kwargs = {'test_name': test_name, 'show_adapter_logs': show_adapter_logs, 'pics': pics,
+              'additional_pseudo_clusters_directory': additional_pseudo_clusters_directory}
 
     index = 0
     while len(commands) - index > 1:
@@ -83,6 +84,8 @@ def chiptool_runner_options(f):
                      help='Name of a websocket server to run at launch.')(f)
     f = click.option('--server_arguments', type=str, default='interactive server',
                      help='Optional arguments to pass to the websocket server at launch.')(f)
+    f = click.option('--show_adapter_logs', type=bool, default=False, show_default=True,
+                     help='Show additional logs provided by the adapter.')(f)
     f = click.option('--trace_file', type=click.Path(), default=None,
                      help='Optional file path to save the tracing output to.')(f)
     f = click.option('--trace_decode', type=bool, default=True,
@@ -126,14 +129,14 @@ def maybe_update_stop_on_error(ctx):
 @click.argument('commands', nargs=-1)
 @chiptool_runner_options
 @click.pass_context
-def chiptool_py(ctx, commands: List[str], server_path: str, server_name: str, server_arguments: str, trace_file: str, trace_decode: bool, delay_in_ms: int, continueonfailure: bool, pics: str, additional_pseudo_clusters_directory: str):
+def chiptool_py(ctx, commands: List[str], server_path: str, server_name: str, server_arguments: str, show_adapter_logs: bool, trace_file: str, trace_decode: bool, delay_in_ms: int, continueonfailure: bool, pics: str, additional_pseudo_clusters_directory: str):
     success = False
 
     server_arguments = maybe_update_server_arguments(ctx)
     maybe_update_stop_on_error(ctx)
 
     if len(commands) > 1 and commands[0] == 'tests':
-        success = send_yaml_command(commands[1], server_path, server_arguments, pics,
+        success = send_yaml_command(commands[1], server_path, server_arguments, show_adapter_logs, pics,
                                     additional_pseudo_clusters_directory, commands[2:])
     else:
         if server_path is None and server_name:

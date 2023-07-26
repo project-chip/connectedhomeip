@@ -253,46 +253,65 @@ tests:
           field set to GroupID_2 and the GroupName set to an GroupName_2. The
           command is sent as a group command using GroupID_1"
       verification: |
-          ./chip-tool groups add-group 257 '' 0xffffffffffff0103 1
-          Verify that  AddGroup command with GroupID as 257 and group name as "grp2" is generated as groupcast message from GroupID 259 is present on TH(Reference app)log:
-          1684167429.420171][29723:29723] CHIP:EM: Received Groupcast Message with GroupId 0x0103 (259)
-          [1684167429.420179][29723:29723] CHIP:EM: Handling via exchange: 1950r, Delegate: 0x56422560dca8
-          [1684166549.863617][29708:29710] CHIP:DMG: InvokeResponseMessage =
-          [1684166549.863619][29708:29710] CHIP:DMG: {
-          [1684166549.863621][29708:29710] CHIP:DMG:         suppressResponse = false,
-          [1684166549.863623][29708:29710] CHIP:DMG:         InvokeResponseIBs =
-          [1684166549.863627][29708:29710] CHIP:DMG:         [
-          [1684166549.863629][29708:29710] CHIP:DMG:                 InvokeResponseIB =
-          [1684166549.863632][29708:29710] CHIP:DMG:                 {
-          [1684166549.863634][29708:29710] CHIP:DMG:                         CommandDataIB =
-          [1684166549.863637][29708:29710] CHIP:DMG:                         {
-          [1684166549.863639][29708:29710] CHIP:DMG:                                 CommandPathIB =
-          [1684166549.863641][29708:29710] CHIP:DMG:                                 {
-          [1684166549.863644][29708:29710] CHIP:DMG:                                         EndpointId = 0x1,
-          [1684166549.863646][29708:29710] CHIP:DMG:                                         ClusterId = 0x4,
-          [1684166549.863649][29708:29710] CHIP:DMG:                                         CommandId = 0x1,
-          [1684166549.863651][29708:29710] CHIP:DMG:                                 },
-          [1684166549.863653][29708:29710] CHIP:DMG:
-          [1684166549.863656][29708:29710] CHIP:DMG:                                 CommandFields =
-          [1684166549.863658][29708:29710] CHIP:DMG:                                 {
-          [1684166549.863661][29708:29710] CHIP:DMG:                                         0x0 = 0,
-          [1684166549.863664][29708:29710] CHIP:DMG:                                         0x1 = 257,
-          [1684166549.863667][29708:29710] CHIP:DMG:                                         0x2 = "grp2" (4 chars),
-          [1684166549.863669][29708:29710] CHIP:DMG:                                 },
-          [1684166549.863671][29708:29710] CHIP:DMG:                         },
-          [1684166549.863674][29708:29710] CHIP:DMG:
-          [1684166549.863676][29708:29710] CHIP:DMG:                 },
-          [1684166549.863679][29708:29710] CHIP:DMG:
-          [1684166549.863681][29708:29710] CHIP:DMG:         ],
-          [1684166549.863685][29708:29710] CHIP:DMG:
-          [1684166549.863687][29708:29710] CHIP:DMG:         InteractionModelRevision = 1
-          [1684166549.863688][29708:29710] CHIP:DMG: },
+          ./chip-tool groups add-group 257 'grp2' 0xffffffffffff0103 0
 
-          [1684167429.420308][29723:29723] CHIP:DMG: Received group command for Group=259 Cluster=0x0000_0004 Command=0x0000_0000
-          [1684167429.420390][29723:29723] CHIP:DMG: Processing group command for Endpoint=1 Cluster=0x0000_0004 Command=0x0000_0000
-          [1684167429.420398][29723:29723] CHIP:DMG: AccessControl: checking f=1 a=g s=0xFFFFFFFFFFFF0103 t= c=0x0000_0004 e=1 p=m
-          [1684167429.420406][29723:29723] CHIP:DMG: AccessControl: allowed
+          Verify that  AddGroup command with GroupID as 257 and group name as "grp2" is generated as groupcast message from GroupID 259 is present on TH(Reference app)log:
+
+          [1686319509.379776][8834:8834] CHIP:EM: Received Groupcast Message with GroupId 0x0103 (259)
+          [1686319509.379782][8834:8834] CHIP:EM: Handling via exchange: 28261r, Delegate: 0x558cfb749be8
+          [1686319509.379795][8834:8834] CHIP:DMG: InvokeRequestMessage =
+          [1686319509.379797][8834:8834] CHIP:DMG: {
+          [1686319509.379800][8834:8834] CHIP:DMG:         suppressResponse = false,
+          [1686319509.379803][8834:8834] CHIP:DMG:         timedRequest = false,
+          [1686319509.379805][8834:8834] CHIP:DMG:         InvokeRequests =
+          [1686319509.379810][8834:8834] CHIP:DMG:         [
+          [1686319509.379813][8834:8834] CHIP:DMG:                 CommandDataIB =
+          [1686319509.379816][8834:8834] CHIP:DMG:                 {
+          [1686319509.379819][8834:8834] CHIP:DMG:                         CommandPathIB =
+          [1686319509.379822][8834:8834] CHIP:DMG:                         {
+          [1686319509.379825][8834:8834] CHIP:DMG:                                 ClusterId = 0x4,
+          [1686319509.379828][8834:8834] CHIP:DMG:                                 CommandId = 0x0,
+          [1686319509.379831][8834:8834] CHIP:DMG:                         },
+          [1686319509.379834][8834:8834] CHIP:DMG:
+          [1686319509.379837][8834:8834] CHIP:DMG:                         CommandFields =
+          [1686319509.379840][8834:8834] CHIP:DMG:                         {
+          [1686319509.379844][8834:8834] CHIP:DMG:                                 0x0 = 257,
+          [1686319509.379847][8834:8834] CHIP:DMG:                                 0x1 = "grp2" (4 chars),
+          [1686319509.379851][8834:8834] CHIP:DMG:                         },
+          [1686319509.379854][8834:8834] CHIP:DMG:                 },
+          [1686319509.379858][8834:8834] CHIP:DMG:
+          [1686319509.379860][8834:8834] CHIP:DMG:         ],
+          [1686319509.379865][8834:8834] CHIP:DMG:
+          [1686319509.379867][8834:8834] CHIP:DMG:         InteractionModelRevision = 1
+          [1686319509.379870][8834:8834] CHIP:DMG: },
+          [1686319509.379881][8834:8834] CHIP:DMG: Rec
+
+          Verify the Destination Node ID matches the GroupID_1  On TH(all-cluster-app) log:
+
+          [1689748128.875980][2588:2588] CHIP:DMG: Received group command for Group=259 Cluster=0x0000_0004 Command=0x0000_0000
+          [1689748128.876384][2588:2588] CHIP:DMG: Processing group command for Endpoint=0 Cluster=0x0000_0004 Command=0x0000_0000
+          [1689748128.876430][2588:2588] CHIP:DMG: AccessControl: checking f=1 a=g s=0xFFFFFFFFFFFF0103 t= c=0x0000_0004 e=0 p=m
+          [1689748128.876468][2588:2588] CHIP:DMG: AccessControl: allowed
+
+
+          Verify the IPv6 Destination Multicast address follows the format "FF35:0040:FD<Fabric ID>00:<Group ID> and UDP port is 5540 on TH(Reference app)log:
 
           [1684167429.421010][29723:29723] CHIP:IN: Joining Multicast Group with address UDP:[ff35:40:fd00::100:101]:5540
           [1684167429.421129][29723:29723] CHIP:IN:   Joined multicast group on interface wlp0s20f3
+
+          Verify the DSIZ flag is set to Group On TH(all-cluster-app) log:
+          (Here in below log the value recived is 0X04 = 0100 (decimal) - Here the bit 2 is enabled then DSIZ flag is set to group)
+
+          [1686317564.742205][7679:7679] CHIP:DMG: Header Flags =
+          [1686317564.742207][7679:7679] CHIP:DMG: {
+          [1686317564.742212][7679:7679] CHIP:DMG:     Message (0x04) =
+          [1686317564.742214][7679:7679] CHIP:DMG:     {
+          [1686317564.742217][7679:7679] CHIP:DMG:         SourceNodeId = C831420E9B16886B
+          [1686317564.742219][7679:7679] CHIP:DMG:     }
+          [1686317564.742224][7679:7679] CHIP:DMG:     Exchange (0x03) =
+          [1686317564.742226][7679:7679] CHIP:DMG:     {
+          [1686317564.742228][7679:7679] CHIP:DMG:         Initiator = true
+          [1686317564.742231][7679:7679] CHIP:DMG:         AckMsg = 48718950
+          [1686317564.742233][7679:7679] CHIP:DMG:     }
+          [1686317564.742237][7679:7679] CHIP:DMG: }
       disabled: true

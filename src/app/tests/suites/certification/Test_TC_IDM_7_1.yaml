@@ -62,7 +62,7 @@ tests:
       disabled: true
 
     - label:
-          "RD1, RD2, RD3, RD4, RD5 send 3 Subscribe Request Messages to
+          "Step 1: RD1, RD2, RD3, RD4, RD5 send 3 Subscribe Request Messages to
           DUT.(Total - 15 active subscriptions) Each subscribe request should
           contain 3 different paths. They can subscribe to different attributes
           and events. Once all subscriptions are active, change the value of all
@@ -342,7 +342,7 @@ tests:
       disabled: true
 
     - label:
-          "RD1, RD2, RD3, RD4, RD5 send 3 Subscribe Request Messages to
+          "Step 2: RD1, RD2, RD3, RD4, RD5 send 3 Subscribe Request Messages to
           DUT.(Total - 15 active subscriptions) Each subscribe requests should
           contain 3 different paths. The subscription request from RD1 should
           contain 4 paths. +"
@@ -500,11 +500,11 @@ tests:
       disabled: true
 
     - label:
-          "RD2, RD3, RD4, RD5 send 3 Subscribe request messages each with each
-          of them having 3 different paths. Verify that the subscription request
-          messages from all reference devices succeed. Once all the Subscription
-          Requests are activated, RD1 sends 6 subscription request messages with
-          each of them having 3 different paths."
+          "Step 3: RD2, RD3, RD4, RD5 send 3 Subscribe request messages each
+          with each of them having 3 different paths. Verify that the
+          subscription request messages from all reference devices succeed. Once
+          all the Subscription Requests are activated, RD1 sends 6 subscription
+          request messages with each of them having 3 different paths."
       verification: |
           #1. on the 2nd reference device(RD2) send a Subscribe Request Messages to DUT.(Below is the example command to send a subscribe requests with 3 different paths in a single command )
           any subscribe-by-id '0x0028,0x0028,0x0028' '5,6,16' 100 1000 2 '0,0,0' --commissioner-name beta --keepSubscriptions true
@@ -645,11 +645,11 @@ tests:
       disabled: true
 
     - label:
-          "RD1, RD2, RD3, RD4, RD5 send 3 Subscribe request messages each with
-          each of them having 3 different paths. Verify that the subscription
-          request messages from RD1, RD2, RD3, RD4 and RD5 succeed. Once all the
-          Subscription Requests are activated, send a Subscribe request messages
-          having 3 different paths from RD1A to the DUT."
+          "Step 4: RD1, RD2, RD3, RD4, RD5 send 3 Subscribe request messages
+          each with each of them having 3 different paths. Verify that the
+          subscription request messages from RD1, RD2, RD3, RD4 and RD5 succeed.
+          Once all the Subscription Requests are activated, send a Subscribe
+          request messages having 3 different paths from RD1A to the DUT."
       verification: |
           #1. on the first reference device(RD1) send a Subscribe Request Messages to DUT. (Below is the example command to send a subscribe requests with 3 different paths in a single command )
           any subscribe-by-id '0x0028,0x0028,0x0028' '5,6,16' 100 1000 1 '0,0,0' --keepSubscriptions true

@@ -31,15 +31,15 @@ tests:
           Reset Devices to factory defaults
       disabled: true
 
-    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+    - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
           "1. Provision the DUT_CE (all-cluster-app) device using TH_CR1 (chip-tool ) on the raspi"
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+          "Step 2: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
       verification: |
           On TH_CR1 send the below command
@@ -61,7 +61,7 @@ tests:
           [1635864513.699685][3850:3855] CHIP:IN: Prepared plaintext message 0xffff8a7cd960 to 0x0000000000000000 of type
       disabled: true
 
-    - label: "DNS-SD records shows DUT_CE advertising"
+    - label: "Step 3: DNS-SD records shows DUT_CE advertising"
       verification: |
           On TH_CR1 send the below command
            avahi-browse -rt _matterc._udp
@@ -75,10 +75,10 @@ tests:
       disabled: true
 
     - label:
-          "Before the expiration of PIXIT.CADMIN.CwDuration set in step 2, Set
-          up a TH_CR2 to start attempting to do PASE to DUT_CE and failing 20
-          times. This can be done using a valid onboarding payload with an
-          incorrect setupcode"
+          "Step 4: Before the expiration of PIXIT.CADMIN.CwDuration set in step
+          2, Set up a TH_CR2 to start attempting to do PASE to DUT_CE and
+          failing 20 times. This can be done using a valid onboarding payload
+          with an incorrect setupcode"
       PICS: CADMIN.S
       verification: |
           On TH_CR2 send the below command
@@ -108,8 +108,8 @@ tests:
       disabled: true
 
     - label:
-          "Before the expiration of PIXIT.CADMIN.CwDuration set in step 2,
-          TH_CR2 attempts to do PASE to DUT_CE using the correct onboarding
+          "Step 5: Before the expiration of PIXIT.CADMIN.CwDuration set in step
+          2, TH_CR2 attempts to do PASE to DUT_CE using the correct onboarding
           payload"
       PICS: CADMIN.S
       verification: |
@@ -127,8 +127,8 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR3 starts a commissioning process with DUT_CE using the correct
-          PAKEVerifier"
+          "Step 6: TH_CR3 starts a commissioning process with DUT_CE using the
+          correct PAKEVerifier"
       PICS: CADMIN.S
       verification: |
           On TH_CR3 send the below command  (with correct passcode)

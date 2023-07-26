@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 263.2.7. [TC-FAN-3.2] Optional direction functionality with DUT as Server
+name: 263.2.11. [TC-FAN-3.6] Optional direction functionality with DUT as Server
 
 PICS:
     - FAN.S
