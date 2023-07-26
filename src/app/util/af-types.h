@@ -64,6 +64,7 @@ typedef void (*EmberAfGenericClusterFunction)(void);
 /**
  * @brief Struct describing cluster
  */
+
 typedef struct
 {
     /**
@@ -177,7 +178,7 @@ typedef struct
      */
     uint8_t clusterCount;
     /**
-     * Size of all non-external, non-singlet attribute in this endpoint type.
+     * Size of all non-external, non-singleton attributes in this endpoint type.
      */
     uint16_t endpointSize;
 } EmberAfEndpointType;
@@ -217,6 +218,13 @@ struct EmberAfDefinedEndpoint
      * endpoint
      */
     chip::DataVersion * dataVersions = nullptr;
+
+    /**
+     * Pointer to the memory block to be used for automatic attribute storage if
+     * this is a dynamic endpoint. If set, the memory block pointed at
+     * must have the sum of all endpointType->clusters[*].clustersize.
+     */
+    uint8_t * dynamicAttributeStorage = nullptr;
 
     /**
      * Root endpoint id for composed device type.
