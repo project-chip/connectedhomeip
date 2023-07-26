@@ -151,17 +151,17 @@ void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
     mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
 
-    bool closeWindow = false;
-    if (mAppDelegate != nullptr)
-    {
-        closeWindow = mAppDelegate->OnCommissioningSessionEstablishmentError(err);
-    }
-
-    if (!closeWindow && mFailedCommissioningAttempts < kMaxFailedCommissioningAttempts)
+    CHIP_ERROR prevErr = err;
+    if (mFailedCommissioningAttempts < kMaxFailedCommissioningAttempts)
     {
         // If the number of commissioning attempts has not exceeded maximum
         // retries, let's start listening for commissioning connections again.
         err = AdvertiseAndListenForPASE();
+    }
+
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnCommissioningSessionEstablishmentError(prevErr);
     }
 
     if (err != CHIP_NO_ERROR)
