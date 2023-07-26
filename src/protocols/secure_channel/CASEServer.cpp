@@ -84,7 +84,7 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
         bool watchdogFired = GetSession().InvokeBackgroundWorkWatchdog();
         if (!watchdogFired)
         {
-            // Handshake wasn't stuck, send the busy status report
+            // Handshake wasn't stuck, send the busy status report and let the existing handshake continue.
             SendBusyStatusReport(ec);
             return CHIP_NO_ERROR;
         }

@@ -279,11 +279,11 @@ CHIP_ERROR ExchangeContext::SendStatusReport(const Protocols::SecureChannel::Sta
 
     statusReport.WriteToBuffer(bbuf);
 
-    System::PacketBufferHandle msg = bbuf.Finalize();
-    VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_BUFFER_TOO_SMALL,
+    handle = bbuf.Finalize();
+    VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_BUFFER_TOO_SMALL,
                         ChipLogError(SecureChannel, "Failed to finalize status report message"));
 
-    CHIP_ERROR err = SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg));
+    CHIP_ERROR err = SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(handle));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SecureChannel, "Failed to send status report message: %" CHIP_ERROR_FORMAT, err.Format());
