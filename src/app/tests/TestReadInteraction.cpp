@@ -1949,7 +1949,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
         // Thus we should receive 29*2 + 4 + 3 = 65 attribute data in total.
         constexpr size_t kExpectedAttributeResponse = 65;
 #else
-        // Adjustment without the eventlist attributes
+        // Receiving 29*2 + 4 + 6 = 68 when eventlist attribute is not available.
         constexpr size_t kExpectedAttributeResponse = 68;
 #endif
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == kExpectedAttributeResponse);
