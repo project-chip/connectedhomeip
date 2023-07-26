@@ -17,7 +17,10 @@
 
 #pragma once
 
+#include <memory>
+
 #include <gio/gio.h>
+#include <glib.h>
 
 template <typename T, typename Deleter>
 class UniquePointerReceiver

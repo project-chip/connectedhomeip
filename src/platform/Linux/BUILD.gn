@@ -125,7 +125,6 @@ static_library("Linux") {
 
   if (chip_enable_openthread) {
     sources += [
-      "GlibTypeDeleter.h",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
@@ -138,10 +137,7 @@ static_library("Linux") {
   }
 
   if (chip_enable_wifi) {
-    sources += [
-      "GlibTypeDeleter.h",
-      "NetworkCommissioningWiFiDriver.cpp",
-    ]
+    sources += [ "NetworkCommissioningWiFiDriver.cpp" ]
 
     public_deps += [ "dbus/wpa" ]
   }
