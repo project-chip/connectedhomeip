@@ -22,6 +22,8 @@
 #include <gio/gio.h>
 #include <glib.h>
 
+namespace chip {
+
 template <typename T, typename Deleter>
 class UniquePointerReceiver
 {
@@ -72,3 +74,49 @@ struct GBytesDeleter
 {
     void operator()(GBytes * object) { g_bytes_unref(object); }
 };
+
+template <typename T>
+struct GAutoPtrDeleter
+{
+};
+
+template <>
+struct GAutoPtrDeleter<char>
+{
+    using deleter = GFree;
+};
+
+template <>
+struct GAutoPtrDeleter<GBytes>
+{
+    using deleter = GBytesDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<GDBusConnection>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<GError>
+{
+    using deleter = GErrorDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<GVariant>
+{
+    using deleter = GVariantDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<GVariantIter>
+{
+    using deleter = GVariantIterDeleter;
+};
+
+template <typename T>
+using GAutoPtr = std::unique_ptr<T, typename GAutoPtrDeleter<T>::deleter>;
+
+} // namespace chip

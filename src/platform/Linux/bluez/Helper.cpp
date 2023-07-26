@@ -1355,9 +1355,8 @@ static CHIP_ERROR StartupEndpointBindings(BluezEndpoint * endpoint)
     VerifyOrReturnError(endpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
 
-    std::unique_ptr<GError, GErrorDeleter> err;
-    std::unique_ptr<GDBusConnection, GObjectDeleter> conn(
-        g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &MakeUniquePointerReceiver(err).Get()));
+    GAutoPtr<GError> err;
+    GAutoPtr<GDBusConnection> conn(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &MakeUniquePointerReceiver(err).Get()));
     VerifyOrReturnError(conn != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: get bus sync in %s, error: %s", __func__, err->message));
 
@@ -1630,8 +1629,7 @@ static void OnCharacteristicChanged(GDBusProxy * aInterface, GVariant * aChanged
                                     gpointer apConnection)
 {
     BLE_CONNECTION_OBJECT connection = static_cast<BLE_CONNECTION_OBJECT>(apConnection);
-    std::unique_ptr<GVariant, GVariantDeleter> dataValue(
-        g_variant_lookup_value(aChangedProperties, "Value", G_VARIANT_TYPE_BYTESTRING));
+    GAutoPtr<GVariant> dataValue(g_variant_lookup_value(aChangedProperties, "Value", G_VARIANT_TYPE_BYTESTRING));
     VerifyOrReturn(dataValue != nullptr);
 
     size_t bufferLen;

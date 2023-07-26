@@ -59,7 +59,7 @@ CHIP_ERROR MainLoopCreateObjectManager(GDBusCreateObjectManagerContext * context
     // all D-Bus signals will be delivered to the GLib global default main context.
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
-    std::unique_ptr<GError, GErrorDeleter> err;
+    GAutoPtr<GError> err;
     context->object = g_dbus_object_manager_client_new_for_bus_sync(
         G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
         bluez_object_manager_client_get_proxy_type, nullptr /* unused user data in the Proxy Type Func */,
@@ -76,8 +76,7 @@ bool BluezGetChipDeviceInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLEDeviceIden
     GVariant * serviceData = bluez_device1_get_service_data(&aDevice);
     VerifyOrReturnError(serviceData != nullptr, false);
 
-    std::unique_ptr<GVariant, GVariantDeleter> dataValue(
-        g_variant_lookup_value(serviceData, CHIP_BLE_UUID_SERVICE_STRING, nullptr));
+    GAutoPtr<GVariant> dataValue(g_variant_lookup_value(serviceData, CHIP_BLE_UUID_SERVICE_STRING, nullptr));
     VerifyOrReturnError(dataValue != nullptr, false);
 
     size_t dataLen         = 0;

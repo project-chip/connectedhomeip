@@ -76,6 +76,19 @@ using namespace ::chip::app::Clusters::WiFiNetworkDiagnostics;
 using namespace ::chip::DeviceLayer::NetworkCommissioning;
 
 namespace chip {
+
+template <>
+struct GAutoPtrDeleter<WpaFiW1Wpa_supplicant1BSS>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<WpaFiW1Wpa_supplicant1Network>
+{
+    using deleter = GObjectDeleter;
+};
+
 namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
@@ -1070,7 +1083,7 @@ exit:
 void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncCallback(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
     ConnectivityManagerImpl * this_ = reinterpret_cast<ConnectivityManagerImpl *>(user_data);
-    std::unique_ptr<GError, GErrorDeleter> err;
+    GAutoPtr<GError> err;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
@@ -1158,7 +1171,7 @@ void ConnectivityManagerImpl::PostNetworkConnect()
 CHIP_ERROR ConnectivityManagerImpl::CommitConfig()
 {
     gboolean result;
-    std::unique_ptr<GError, GErrorDeleter> err;
+    GAutoPtr<GError> err;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
@@ -1289,7 +1302,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(WiFiVersionEnum & wiFiVersion
 int32_t ConnectivityManagerImpl::GetDisconnectReason()
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-    std::unique_ptr<GError, GErrorDeleter> err;
+    GAutoPtr<GError> err;
 
     gint errorValue = wpa_fi_w1_wpa_supplicant1_interface_get_disconnect_reason(mWpaSupplicant.iface);
     // wpa_supplicant DBus API: DisconnectReason: The most recent IEEE 802.11 reason code for disconnect. Negative value
@@ -1305,7 +1318,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
     // with the proxy object.
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-    std::unique_ptr<GError, GErrorDeleter> err;
+    GAutoPtr<GError> err;
 
     if (mWpaSupplicant.iface == nullptr)
     {
@@ -1321,10 +1334,9 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
 
-    std::unique_ptr<WpaFiW1Wpa_supplicant1Network, GObjectDeleter> networkInfo(
-        wpa_fi_w1_wpa_supplicant1_network_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE,
-                                                                 kWpaSupplicantServiceName, networkPath, nullptr,
-                                                                 &MakeUniquePointerReceiver(err).Get()));
+    GAutoPtr<WpaFiW1Wpa_supplicant1Network> networkInfo(wpa_fi_w1_wpa_supplicant1_network_proxy_new_for_bus_sync(
+        G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, networkPath, nullptr,
+        &MakeUniquePointerReceiver(err).Get()));
     if (networkInfo == nullptr)
     {
         return CHIP_ERROR_INTERNAL;
@@ -1350,7 +1362,7 @@ CHIP_ERROR ConnectivityManagerImpl::StopAutoScan()
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     VerifyOrReturnError(mWpaSupplicant.iface != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    std::unique_ptr<GError, GErrorDeleter> err;
+    GAutoPtr<GError> err;
     gboolean result;
 
     ChipLogDetail(DeviceLayer, "wpa_supplicant: disabling auto scan");
@@ -1407,6 +1419,7 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, WiFiDriver::Sca
 }
 
 namespace {
+
 // wpa_supplicant's scan results don't contains the channel infomation, so we need this lookup table for resolving the band and
 // channel infomation.
 std::pair<WiFiBand, uint16_t> GetBandAndChannelFromFrequency(uint32_t freq)
@@ -1505,6 +1518,7 @@ std::pair<WiFiBand, uint16_t> GetBandAndChannelFromFrequency(uint32_t freq)
     }
     return ret;
 }
+
 } // namespace
 
 bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result)
@@ -1514,8 +1528,8 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     // completed before this function returns. Also, no external callbacks are registered
     // with the proxy object.
 
-    std::unique_ptr<GError, GErrorDeleter> err;
-    std::unique_ptr<WpaFiW1Wpa_supplicant1BSS, GObjectDeleter> bss(
+    GAutoPtr<GError> err;
+    GAutoPtr<WpaFiW1Wpa_supplicant1BSS> bss(
         wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
                                                              bssPath, nullptr, &MakeUniquePointerReceiver(err).Get()));
 
@@ -1526,8 +1540,8 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
 
     WpaFiW1Wpa_supplicant1BSSProxy * bssProxy = WPA_FI_W1_WPA_SUPPLICANT1_BSS_PROXY(bss.get());
 
-    std::unique_ptr<GVariant, GVariantDeleter> ssid(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "SSID"));
-    std::unique_ptr<GVariant, GVariantDeleter> bssid(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "BSSID"));
+    GAutoPtr<GVariant> ssid(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "SSID"));
+    GAutoPtr<GVariant> bssid(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "BSSID"));
 
     // Network scan is performed in the background, so the BSS
     // may be gone when we try to get the properties.
@@ -1635,8 +1649,8 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         return res;
     };
     auto GetNetworkSecurityType = [IsNetworkWPAPSK, IsNetworkWPA2PSK](WpaFiW1Wpa_supplicant1BSSProxy * proxy) -> uint8_t {
-        std::unique_ptr<GVariant, GVariantDeleter> wpa(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(proxy), "WPA"));
-        std::unique_ptr<GVariant, GVariantDeleter> rsn(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(proxy), "RSN"));
+        GAutoPtr<GVariant> wpa(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(proxy), "WPA"));
+        GAutoPtr<GVariant> rsn(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(proxy), "RSN"));
 
         uint8_t res = IsNetworkWPAPSK(wpa.get()) | IsNetworkWPA2PSK(rsn.get());
         if (res == 0)

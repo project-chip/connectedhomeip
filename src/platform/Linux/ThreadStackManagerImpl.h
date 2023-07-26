@@ -29,6 +29,13 @@
 #include <platform/internal/DeviceNetworkInfo.h>
 
 namespace chip {
+
+template <>
+struct GAutoPtrDeleter<OpenthreadIoOpenthreadBorderRouter>
+{
+    using deleter = GObjectDeleter;
+};
+
 namespace DeviceLayer {
 
 class ThreadStackManagerImpl : public ThreadStackManager
@@ -148,7 +155,7 @@ private:
         uint8_t lqi;
     };
 
-    std::unique_ptr<OpenthreadIoOpenthreadBorderRouter, GObjectDeleter> mProxy;
+    GAutoPtr<OpenthreadIoOpenthreadBorderRouter> mProxy;
 
     static CHIP_ERROR GLibMatterContextInitThreadStack(ThreadStackManagerImpl * self);
     static CHIP_ERROR GLibMatterContextCallAttach(ThreadStackManagerImpl * self);
