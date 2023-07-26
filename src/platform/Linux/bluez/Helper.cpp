@@ -1157,7 +1157,7 @@ exit:
 }
 #endif // CHIP_BLUEZ_CENTRAL_SUPPORT
 
-void EndpointCleanup(BluezEndpoint * apEndpoint)
+static void EndpointCleanup(BluezEndpoint * apEndpoint)
 {
     if (apEndpoint != nullptr)
     {
@@ -1455,10 +1455,9 @@ CHIP_ERROR SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::Packe
     return PlatformMgrImpl().GLibMatterContextInvokeSync(BluezC2Indicate, MakeConnectionDataBundle(apConn, apBuf));
 }
 
-static CHIP_ERROR BluezDisconnect(void * apClosure)
+static CHIP_ERROR BluezDisconnect(BluezConnection * conn)
 {
-    BluezConnection * conn = static_cast<BluezConnection *>(apClosure);
-    GError * error         = nullptr;
+    GError * error = nullptr;
     gboolean success;
 
     VerifyOrExit(conn != nullptr, ChipLogError(DeviceLayer, "conn is NULL in %s", __func__));
@@ -1475,14 +1474,9 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR CloseBleconnectionCB(void * apAppState)
-{
-    return BluezDisconnect(apAppState);
-}
-
 CHIP_ERROR CloseBluezConnection(BLE_CONNECTION_OBJECT apConn)
 {
-    return PlatformMgrImpl().GLibMatterContextInvokeSync(CloseBleconnectionCB, apConn);
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(BluezDisconnect, static_cast<BluezConnection *>(apConn));
 }
 
 CHIP_ERROR StartBluezAdv(BluezEndpoint * apEndpoint)
@@ -1517,12 +1511,12 @@ CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint)
     return err;
 }
 
-CHIP_ERROR ConfigureBluezAdv(BLEAdvConfig & aBleAdvConfig, BluezEndpoint * apEndpoint)
+static CHIP_ERROR ConfigureBluezAdv(const BLEAdvConfig & aBleAdvConfig, BluezEndpoint * apEndpoint)
 {
     const char * msg = nullptr;
     CHIP_ERROR err   = CHIP_NO_ERROR;
     VerifyOrExit(aBleAdvConfig.mpBleName != nullptr, msg = "FAIL: BLE name is NULL");
-    VerifyOrExit(aBleAdvConfig.mpAdvertisingUUID != nullptr, msg = "FAIL: BLE mpAdvertisingUUID is NULL in %s");
+    VerifyOrExit(aBleAdvConfig.mpAdvertisingUUID != nullptr, msg = "FAIL: BLE mpAdvertisingUUID is NULL");
 
     apEndpoint->mpAdapterName     = g_strdup(aBleAdvConfig.mpBleName);
     apEndpoint->mpAdvertisingUUID = g_strdup(aBleAdvConfig.mpAdvertisingUUID);
@@ -1547,20 +1541,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, BluezEndpoint *& apEndpoint)
+CHIP_ERROR InitBluezBleLayer(bool aIsCentral, const char * apBleAddr, const BLEAdvConfig & aBleAdvConfig,
+                             BluezEndpoint *& apEndpoint)
 {
+    BluezEndpoint * endpoint = g_new0(BluezEndpoint, 1);
     CHIP_ERROR err           = CHIP_NO_ERROR;
-    bool retval              = false;
-    BluezEndpoint * endpoint = nullptr;
-
-    // initialize server endpoint
-    endpoint = g_new0(BluezEndpoint, 1);
-    VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "FAIL: memory allocation in %s", __func__));
 
     if (apBleAddr != nullptr)
         endpoint->mpAdapterAddr = g_strdup(apBleAddr);
-    else
-        endpoint->mpAdapterAddr = nullptr;
 
     endpoint->mpConnMap  = g_hash_table_new(g_str_hash, g_str_equal);
     endpoint->mIsCentral = aIsCentral;
@@ -1579,10 +1567,8 @@ CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & a
     err = PlatformMgrImpl().GLibMatterContextInvokeSync(StartupEndpointBindings, endpoint);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization"));
 
-    retval = TRUE;
-
 exit:
-    if (retval)
+    if (err == CHIP_NO_ERROR)
     {
         apEndpoint = endpoint;
         ChipLogDetail(DeviceLayer, "PlatformBlueZInit init success");
