@@ -26,7 +26,7 @@
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
 
-CHIP_ERROR StaticReplacementProductListManager::Next(Attributes::GenericType & item)
+CHIP_ERROR StaticReplacementProductListManager::Next(ReplacementProductStruct & item)
 {
     if (mIndex < mReplacementProductListSize)
     {
@@ -38,11 +38,24 @@ CHIP_ERROR StaticReplacementProductListManager::Next(Attributes::GenericType & i
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-CHIP_ERROR DynamicReplacementProductListManager::Next(Attributes::GenericType & item)
+CHIP_ERROR DynamicReplacementProductListManager::Next(ReplacementProductStruct & item)
 {
+//    if (mIndex < mReplacementProductListSize)
+//    {
+//        item = mReplacementProductsList[mIndex];
+//        mIndex++;
+//        return CHIP_NO_ERROR;
+//    }
+//
+//    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+//}
+
+//CHIP_ERROR ReplacementProductListManager::Next(ReplacementProductStruct & item)
+//{
     if (mIndex < mReplacementProductListSize)
     {
-        item = mReplacementProductsList[mIndex];
+        item.SetProductIdentifierType(mReplacementProductsList[mIndex].GetProductIdentifierType());
+        item.SetProductIdentifierValue(mReplacementProductsList[mIndex].GetProductIdentifierValue());
         mIndex++;
         return CHIP_NO_ERROR;
     }

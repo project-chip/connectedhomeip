@@ -37,7 +37,7 @@ constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Featu
 static HepaFilterMonitoringInstance * gHepaFilterInstance                       = nullptr;
 static ActivatedCarbonFilterMonitoringInstance * gActivatedCarbonFilterInstance = nullptr;
 
-static ResourceMonitoring::Attributes::GenericType sReplacementProductsList[] = {
+static ReplacementProductStruct sReplacementProductsList[] = {
     { ProductIdentifierTypeEnum::kUpc, CharSpan::fromCharString("111112222233") },
     { ProductIdentifierTypeEnum::kGtin8, CharSpan::fromCharString("gtin8xxx") },
     { ProductIdentifierTypeEnum::kEan, CharSpan::fromCharString("4444455555666") },
@@ -102,7 +102,7 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
     gHepaFilterInstance->Init();
 }
 
-CHIP_ERROR StaticReplacementProductListManager::Next(Attributes::GenericType & item)
+CHIP_ERROR StaticReplacementProductListManager::Next(ReplacementProductStruct & item)
 {
     if (mIndex < mReplacementProductListSize)
     {

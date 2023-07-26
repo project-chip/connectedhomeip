@@ -34,26 +34,39 @@ namespace ResourceMonitoring {
 class DynamicReplacementProductListManager : public ReplacementProductListManager
 {
 public:
-    CHIP_ERROR Next(Attributes::GenericType & item) override;
+    CHIP_ERROR Next(ReplacementProductStruct & item) override;
 
-    CHIP_ERROR addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType,
+    /**
+     * Creates a ReplacementProductStruct and adds it to the list. Can only add up to kReplacementProductListMaxSize
+     * entries to a list (as defined by the spec).
+     * 
+     * @param aProductIdentifierType The identifier type of the product.
+     * @param aProductIdentifierValue The value of the product.
+     * @return CHIP_ERROR_NO_MEMORY if the list is full, a CHIP_ERROR if there was a problem creating the
+     * ReplacementProductStruct and a CHIP_NO_ERROR otherwise.
+    */
+    CHIP_ERROR AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum aProductIdentifierType,
                              chip::CharSpan aProductIdentifierValue)
     {
-        Attributes::GenericType * type = &mReplacementProductsList[mReplacementProductListSize];
-        CHIP_ERROR err                 = type->setProductIdentifierValue(aProductIdentifierValue);
+        if (mReplacementProductListSize == kReplacementProductListMaxSize)
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        ReplacementProductStruct * type = &mReplacementProductsList[mReplacementProductListSize];
+        CHIP_ERROR err                  = type->SetProductIdentifierValue(aProductIdentifierValue);
         if (CHIP_NO_ERROR != err)
         {
             return err;
         };
 
-        type->setProductIdentifierType(aProductIdentifierType);
+        type->SetProductIdentifierType(aProductIdentifierType);
         mReplacementProductListSize++;
 
         return CHIP_NO_ERROR;
     }
 
 private:
-    Attributes::GenericType mReplacementProductsList[ReplacementProductListManager::kReplacementProductListMaxSize];
+    ReplacementProductStruct mReplacementProductsList[ReplacementProductListManager::kReplacementProductListMaxSize];
     uint8_t mReplacementProductListSize;
 };
 

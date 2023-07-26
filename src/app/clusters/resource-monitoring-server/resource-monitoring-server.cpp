@@ -257,7 +257,7 @@ CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
         productListManagerInstance->Reset();
 
         err = aEncoder.EncodeList([productListManagerInstance](const auto & encoder) -> CHIP_ERROR {
-            Attributes::GenericType replacementProductStruct;
+            ReplacementProductStruct replacementProductStruct;
             CHIP_ERROR iteratorError = productListManagerInstance->Next(replacementProductStruct);
 
             while (CHIP_NO_ERROR == iteratorError)
@@ -265,7 +265,7 @@ CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
                 ReturnErrorOnFailure(encoder.Encode(replacementProductStruct));
                 iteratorError = productListManagerInstance->Next(replacementProductStruct);
             }
-            return (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED != iteratorError) ? iteratorError : CHIP_NO_ERROR;
+            return (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED == iteratorError) ? CHIP_NO_ERROR : iteratorError;
         });
     }
     return err;
@@ -300,7 +300,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(mLastChangedTime));
         break;
     }
-    case Attributes::ReplacementProductList::Id: {
+    case HepaFilterMonitoring::Attributes::ReplacementProductList::TypeInfo::GetAttributeId(): {
         return ReadReplacableProductList(aEncoder);
         break;
     }

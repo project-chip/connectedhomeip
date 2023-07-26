@@ -59,10 +59,10 @@ class StaticReplacementProductListManager : public chip::app::Clusters::Resource
 {
 public:
     CHIP_ERROR
-    Next(chip::app::Clusters::ResourceMonitoring::Attributes::GenericType & item) override;
+    Next(chip::app::Clusters::ResourceMonitoring::ReplacementProductStruct & item) override;
 
     ~StaticReplacementProductListManager() {}
-    StaticReplacementProductListManager(chip::app::Clusters::ResourceMonitoring::Attributes::GenericType * aReplacementProductsList,
+    StaticReplacementProductListManager(chip::app::Clusters::ResourceMonitoring::ReplacementProductStruct * aReplacementProductsList,
                                         uint8_t aReplacementProductListSize)
     {
         mReplacementProductsList    = aReplacementProductsList;
@@ -70,6 +70,6 @@ public:
     }
 
 private:
-    chip::app::Clusters::ResourceMonitoring::Attributes::GenericType * mReplacementProductsList;
+    chip::app::Clusters::ResourceMonitoring::ReplacementProductStruct * mReplacementProductsList;
     uint8_t mReplacementProductListSize;
 };

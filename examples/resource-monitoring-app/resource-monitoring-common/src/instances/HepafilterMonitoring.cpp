@@ -34,25 +34,25 @@ using namespace chip::app::Clusters::ResourceMonitoring;
 using namespace chip::app::Clusters::ResourceMonitoring::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-DynamicReplacementProductListManager mHepaFilterReplacementProductListManager;
+DynamicReplacementProductListManager hepaFilterReplacementProductListManager;
 
 //-- Hepa filter Monitoring instance methods
 CHIP_ERROR HepaFilterMonitoringInstance::AppInit()
 {
     ChipLogDetail(Zcl, "HepaFilterMonitoringInstance::Init()");
 
-    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc,
+    hepaFilterReplacementProductListManager.AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc,
                                                            CharSpan::fromCharString("111112222233"));
-    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8,
+    hepaFilterReplacementProductListManager.AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8,
                                                            CharSpan::fromCharString("gtin8xhe"));
-    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kEan,
+    hepaFilterReplacementProductListManager.AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kEan,
                                                            CharSpan::fromCharString("4444455555666"));
-    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14,
+    hepaFilterReplacementProductListManager.AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14,
                                                            CharSpan::fromCharString("gtin14xhepaxxx"));
-    mHepaFilterReplacementProductListManager.addItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kOem,
+    hepaFilterReplacementProductListManager.AddItemToList(ResourceMonitoring::ProductIdentifierTypeEnum::kOem,
                                                            CharSpan::fromCharString("oem20xhepaxxxxxxxxxx"));
 
-    SetReplacementProductListManagerInstance(&mHepaFilterReplacementProductListManager);
+    SetReplacementProductListManagerInstance(&hepaFilterReplacementProductListManager);
 
     return CHIP_NO_ERROR;
 }
