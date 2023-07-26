@@ -152,11 +152,18 @@ void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
 #if CONFIG_NETWORK_LAYER_BLE
     mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
+
+    CHIP_ERROR prevErr = err;
     if (mFailedCommissioningAttempts < kMaxFailedCommissioningAttempts)
     {
         // If the number of commissioning attempts has not exceeded maximum
         // retries, let's start listening for commissioning connections again.
         err = AdvertiseAndListenForPASE();
+    }
+
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnCommissioningSessionEstablishmentError(prevErr);
     }
 
     if (err != CHIP_NO_ERROR)
@@ -167,7 +174,7 @@ void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
 
         if (mAppDelegate != nullptr)
         {
-            mAppDelegate->OnCommissioningSessionStopped(err);
+            mAppDelegate->OnCommissioningSessionStopped();
         }
     }
 }
