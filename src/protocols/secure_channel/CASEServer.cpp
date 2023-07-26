@@ -84,9 +84,7 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
         bool watchdogFired = GetSession().InvokeBackgroundWorkWatchdog();
         if (!watchdogFired)
         {
-            // Handshake wasn't stuck, let it continue its work
-            // TODO: Send Busy response, #27473
-            ChipLogError(Inet, "CASE session is in establishing state, returning without responding");
+            SendBusyStatusReport(ec);
             return CHIP_NO_ERROR;
         }
     }
@@ -181,4 +179,30 @@ void CASEServer::OnSessionEstablished(const SessionHandle & session)
                     ChipLogValueScopedNodeId(session->GetPeer()));
     PrepareForSessionEstablishment(session->GetPeer());
 }
+
+void CASEServer::SendBusyStatusReport(Messaging::ExchangeContext * ec)
+{
+    using namespace Protocols::SecureChannel;
+
+    ChipLogProgress(SecureChannel, "Already in the middle of CASE handshake, sending busy status report");
+
+    // A successful CASE handshake can take several seconds and some may timeout (30 seconds).
+    // TODO: Come up with better estimate: https://github.com/project-chip/connectedhomeip/issues/28288
+    // For now, setting minimum wait time to 5 seconds.
+    uint16_t minimumWaitTime                            = 5 * 1000; // milliseconds
+    constexpr uint8_t kBusyStatusReportProtocolDataSize = 2;        // 16-bits
+
+    auto handle = System::PacketBufferHandle::New(kBusyStatusReportProtocolDataSize, 0);
+    VerifyOrReturn(!handle.IsNull(), ChipLogError(SecureChannel, "Failed to allocate protocol data for busy status report"));
+
+    Encoding::LittleEndian::PacketBufferWriter protocolDataBufferWriter(std::move(handle));
+    protocolDataBufferWriter.Put16(minimumWaitTime);
+    System::PacketBufferHandle protocolDataHandle = protocolDataBufferWriter.Finalize();
+    VerifyOrReturn(!protocolDataHandle.IsNull(),
+                   ChipLogError(SecureChannel, "Failed to finalize protocol data for busy status report"));
+
+    StatusReport statusReport(GeneralStatusCode::kBusy, Id, kProtocolCodeBusy, std::move(protocolDataHandle));
+    ec->SendStatusReport(statusReport);
+}
+
 } // namespace chip

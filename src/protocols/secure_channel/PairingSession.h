@@ -132,31 +132,20 @@ protected:
         return CHIP_ERROR_INTERNAL;
     }
 
+    /*
+     * Helper function to send a status report. This function sends a status report without any protocol data.
+     */
     void SendStatusReport(Messaging::ExchangeContext * exchangeCtxt, uint16_t protocolCode)
     {
+        VerifyOrReturn(exchangeCtxt);
+
         Protocols::SecureChannel::GeneralStatusCode generalCode = (protocolCode == Protocols::SecureChannel::kProtocolCodeSuccess)
             ? Protocols::SecureChannel::GeneralStatusCode::kSuccess
             : Protocols::SecureChannel::GeneralStatusCode::kFailure;
 
-        ChipLogDetail(SecureChannel, "Sending status report. Protocol code %d, exchange %d", protocolCode,
-                      exchangeCtxt->GetExchangeId());
-
         Protocols::SecureChannel::StatusReport statusReport(generalCode, Protocols::SecureChannel::Id, protocolCode);
 
-        auto handle = System::PacketBufferHandle::New(statusReport.Size());
-        VerifyOrReturn(!handle.IsNull(), ChipLogError(SecureChannel, "Failed to allocate status report message"));
-        Encoding::LittleEndian::PacketBufferWriter bbuf(std::move(handle));
-
-        statusReport.WriteToBuffer(bbuf);
-
-        System::PacketBufferHandle msg = bbuf.Finalize();
-        VerifyOrReturn(!msg.IsNull(), ChipLogError(SecureChannel, "Failed to allocate status report message"));
-
-        CHIP_ERROR err = exchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg));
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(SecureChannel, "Failed to send status report message: %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        exchangeCtxt->SendStatusReport(statusReport);
     }
 
     CHIP_ERROR HandleStatusReport(System::PacketBufferHandle && msg, bool successExpected)
@@ -174,6 +163,29 @@ protected:
         else
         {
             err = OnFailureStatusReport(report.GetGeneralCode(), report.GetProtocolCode());
+
+            if (report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kBusy &&
+                report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeBusy)
+            {
+                uint16_t minimumWaitTime = 0;
+                if (!report.GetProtocolData().IsNull() && report.GetProtocolData()->DataLength() >= sizeof(minimumWaitTime))
+                {
+                    Encoding::LittleEndian::Reader reader(report.GetProtocolData()->Start(),
+                                                          report.GetProtocolData()->DataLength());
+
+                    // TODO: https://github.com/project-chip/connectedhomeip/issues/28290
+                    err = reader.Read16(&minimumWaitTime).StatusCode();
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(SecureChannel, "Failed to read the minimum wait time: %" CHIP_ERROR_FORMAT, err.Format());
+                    }
+                    else
+                    {
+                        ChipLogProgress(SecureChannel, "Received busy status report with minimum wait time: %u ms",
+                                        minimumWaitTime);
+                    }
+                }
+            }
         }
 
         return err;

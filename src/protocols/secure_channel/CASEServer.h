@@ -107,6 +107,9 @@ private:
      *
      */
     void PrepareForSessionEstablishment(const ScopedNodeId & previouslyEstablishedPeer = ScopedNodeId());
+
+    // If we are in the middle of handshake and receive a Sigma1 then respond with Busy status code.
+    void SendBusyStatusReport(Messaging::ExchangeContext * ec);
 };
 
 } // namespace chip

@@ -32,6 +32,7 @@
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
 #include <protocols/Protocols.h>
+#include <protocols/secure_channel/StatusReport.h>
 #include <transport/SessionManager.h>
 
 namespace chip {
@@ -129,6 +130,13 @@ public:
      * (and should stay open until that happens).
      */
     void WillSendMessage() { mFlags.Set(Flags::kFlagWillSendMessage); }
+
+    /**
+     *  Helper API to send a protocol status report
+     *
+     *  @param[in]  statusReport A secure channel status report
+     */
+    void SendStatusReport(const Protocols::SecureChannel::StatusReport & statusReport);
 
     /**
      *  Handle a received CHIP message on this exchange.
