@@ -143,7 +143,7 @@ public:
         {}
 
         // The actual keys for the group key set
-        EpochKey epoch_keys[kEpochKeysMax];
+        EpochKey epoch_keys[kEpochKeysMax] = {};
         // Logical id provided by the Administrator that configured the entry
         uint16_t keyset_id = 0;
         // Security policy to use for groups that use this keyset
@@ -202,7 +202,7 @@ public:
     virtual ~GroupDataProvider() = default;
 
     // Not copyable
-    GroupDataProvider(const GroupDataProvider &) = delete;
+    GroupDataProvider(const GroupDataProvider &)             = delete;
     GroupDataProvider & operator=(const GroupDataProvider &) = delete;
 
     uint16_t GetMaxGroupsPerFabric() const { return mMaxGroupsPerFabric; }
