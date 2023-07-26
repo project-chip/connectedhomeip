@@ -93,6 +93,13 @@ void ICDManager::UpdateIcdMode()
         }
     }
     mICDMode = tempMode;
+
+    // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
+    if (mICDMode == ICDMode::SIT && GetSlowPollingInterval() > GetSITPollingThreshold())
+    {
+        ChipLogDetail(AppServer, "The Slow Polling Interval of an ICD in SIT mode should be <= %" PRIu32,
+                      (GetSITPollingThreshold().count() / 1000));
+    }
 }
 
 void ICDManager::UpdateOperationState(OperationalState state)
@@ -108,14 +115,14 @@ void ICDManager::UpdateOperationState(OperationalState state)
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(idleModeInterval), OnIdleModeDone, this);
 
         System::Clock::Milliseconds32 slowPollInterval = GetSlowPollingInterval();
-        // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
-        if (mICDMode == ICDMode::SIT && slowPollInterval > GetSITPollingThreshold())
+
+#if 0 // TODO ICD Spec to define this conformance as a SHALL
+      // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
+        if (mICDMode == ICDMode::SIT && GetSlowPollingInterval() > GetSITPollingThreshold())
         {
-            ChipLogDetail(AppServer, "The Slow Polling Interval of an ICD in SIT mode should be <= %" PRIu32,
-                          (GetSITPollingThreshold().count() / 1000));
-            // TODO Spec to define this conformance as a SHALL
-            // slowPollInterval = GetSITPollingThreshold();
+            slowPollInterval = GetSITPollingThreshold();
         }
+#endif
 
         CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(slowPollInterval);
         if (err != CHIP_NO_ERROR)
