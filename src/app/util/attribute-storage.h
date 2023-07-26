@@ -251,6 +251,10 @@ void emberAfEndpointConfigure();
 //
 // An optional parent endpoint id should be passed for child endpoints of composed device.
 //
+// An optional dynamicAttributeStorage can be passed to allow automatic attribute storage.
+// This must point to a memory block of ep->endpointSize bytes size. If provided, the memory
+// needs to remain allocated until this dynamic endpoint is cleared.
+//
 // Returns  CHIP_NO_ERROR                   No error.
 //          CHIP_ERROR_NO_MEMORY            MAX_ENDPOINT_COUNT is reached or when no storage is left for clusters
 //          CHIP_ERROR_INVALID_ARGUMENT     The EndpointId value passed is kInvalidEndpointId
@@ -259,7 +263,8 @@ void emberAfEndpointConfigure();
 CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
                                      const chip::Span<chip::DataVersion> & dataVersionStorage,
                                      chip::Span<const EmberAfDeviceType> deviceTypeList = {},
-                                     chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
+                                     chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId,
+                                     uint8_t * dynamicAttributeStorage                  = nullptr);
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 /**
