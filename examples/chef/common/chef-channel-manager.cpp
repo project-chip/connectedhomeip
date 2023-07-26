@@ -32,27 +32,27 @@ using namespace chip::Uint8;
 ChefChannelManager::ChefChannelManager()
 {
     ChannelInfoType abc;
-    abc.affiliateCallSign = MakeOptional(chip::CharSpan::fromCharString("KAAL"));
-    abc.callSign          = MakeOptional(chip::CharSpan::fromCharString("KAAL-TV"));
-    abc.name              = MakeOptional(chip::CharSpan::fromCharString("ABC"));
-    abc.majorNumber       = static_cast<uint8_t>(6);
-    abc.minorNumber       = static_cast<uint16_t>(0);
+    abc.affiliateCallSign       = MakeOptional(chip::CharSpan::fromCharString("KAAL"));
+    abc.callSign                = MakeOptional(chip::CharSpan::fromCharString("KAAL-TV"));
+    abc.name                    = MakeOptional(chip::CharSpan::fromCharString("ABC"));
+    abc.majorNumber             = static_cast<uint8_t>(6);
+    abc.minorNumber             = static_cast<uint16_t>(0);
     mChannels[mTotalChannels++] = abc;
 
     ChannelInfoType pbs;
-    pbs.affiliateCallSign = MakeOptional(chip::CharSpan::fromCharString("KCTS"));
-    pbs.callSign          = MakeOptional(chip::CharSpan::fromCharString("KCTS-TV"));
-    pbs.name              = MakeOptional(chip::CharSpan::fromCharString("PBS"));
-    pbs.majorNumber       = static_cast<uint8_t>(9);
-    pbs.minorNumber       = static_cast<uint16_t>(1);
+    pbs.affiliateCallSign       = MakeOptional(chip::CharSpan::fromCharString("KCTS"));
+    pbs.callSign                = MakeOptional(chip::CharSpan::fromCharString("KCTS-TV"));
+    pbs.name                    = MakeOptional(chip::CharSpan::fromCharString("PBS"));
+    pbs.majorNumber             = static_cast<uint8_t>(9);
+    pbs.minorNumber             = static_cast<uint16_t>(1);
     mChannels[mTotalChannels++] = pbs;
 
     ChannelInfoType pbsKids;
-    pbsKids.affiliateCallSign = MakeOptional(chip::CharSpan::fromCharString("KCTS"));
-    pbsKids.callSign          = MakeOptional(chip::CharSpan::fromCharString("KCTS-TV"));
-    pbsKids.name              = MakeOptional(chip::CharSpan::fromCharString("PBS Kids"));
-    pbsKids.majorNumber       = static_cast<uint8_t>(9);
-    pbsKids.minorNumber       = static_cast<uint16_t>(2);
+    pbsKids.affiliateCallSign   = MakeOptional(chip::CharSpan::fromCharString("KCTS"));
+    pbsKids.callSign            = MakeOptional(chip::CharSpan::fromCharString("KCTS-TV"));
+    pbsKids.name                = MakeOptional(chip::CharSpan::fromCharString("PBS Kids"));
+    pbsKids.majorNumber         = static_cast<uint8_t>(9);
+    pbsKids.minorNumber         = static_cast<uint16_t>(2);
     mChannels[mTotalChannels++] = pbsKids;
 
     ChannelInfoType worldChannel;
@@ -61,7 +61,7 @@ ChefChannelManager::ChefChannelManager()
     worldChannel.name              = MakeOptional(chip::CharSpan::fromCharString("World Channel"));
     worldChannel.majorNumber       = static_cast<uint8_t>(9);
     worldChannel.minorNumber       = static_cast<uint16_t>(3);
-    mChannels[mTotalChannels++] = worldChannel;
+    mChannels[mTotalChannels++]    = worldChannel;
 }
 
 static bool isChannelMatched(const ChannelInfoType & channel, const CharSpan & match)
@@ -180,8 +180,8 @@ bool ChefChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumbe
                 mCurrentChannelIndex = index;
             }
 
-	        // return since we've already found the unique matched channel
-	        return channelChanged;
+            // return since we've already found the unique matched channel
+            return channelChanged;
         }
         index++;
         if (index >= mTotalChannels)
