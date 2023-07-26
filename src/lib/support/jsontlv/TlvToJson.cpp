@@ -92,7 +92,7 @@ static constexpr uint16_t kMaxStringLen = 1280;
  * This templated function inserts a key/value pair into the Json value object.
  * The value is templated to be of type T and accepts any of the following primitive
  * types:
- *      bool, uint*_t, int*_t, char *, float, double.
+ *      bool, uint*_t, int*_t, char *, float, double, std::string, Json::Value
  *
  * This method uses the provided key context to deduce the type of element being added.
  *
