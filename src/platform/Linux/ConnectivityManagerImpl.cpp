@@ -77,6 +77,8 @@ using namespace ::chip::DeviceLayer::NetworkCommissioning;
 
 namespace chip {
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+
 template <>
 struct GAutoPtrDeleter<WpaFiW1Wpa_supplicant1BSS>
 {
@@ -88,6 +90,8 @@ struct GAutoPtrDeleter<WpaFiW1Wpa_supplicant1Network>
 {
     using deleter = GObjectDeleter;
 };
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 namespace DeviceLayer {
 
