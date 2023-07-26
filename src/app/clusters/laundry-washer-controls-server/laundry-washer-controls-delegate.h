@@ -46,9 +46,8 @@ public:
     /**
      * Get the supported rinses value at the given index in the list.
      * @param index The index of the supported rinses with 0 representing the first one.
-     * @param supportedRinse The MutableCharSpan to copy the string data into.  On success, the callee must update
-     *        the length to the length of the copied data.
-     * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the list of spin speeds.
+     * @param supportedRinse The supported rinse at the given index
+     * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the list of supported rinses.
      */
     virtual CHIP_ERROR GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse) = 0;
 };
