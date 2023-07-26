@@ -778,9 +778,9 @@ void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * 
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info)
+void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info)
 {
-    ChipLogProgress(Ble, "New device scanned: %s", bluez_device1_get_address(device));
+    ChipLogProgress(Ble, "New device scanned: %s", bluez_device1_get_address(&device));
 
     if (mBLEScanConfig.mBleScanState == BleScanState::kScanForDiscriminator)
     {
@@ -792,7 +792,7 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::Chi
     }
     else if (mBLEScanConfig.mBleScanState == BleScanState::kScanForAddress)
     {
-        if (strcmp(bluez_device1_get_address(device), mBLEScanConfig.mAddress.c_str()) != 0)
+        if (strcmp(bluez_device1_get_address(&device), mBLEScanConfig.mAddress.c_str()) != 0)
         {
             return;
         }

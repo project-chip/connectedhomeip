@@ -1716,7 +1716,10 @@ CHIP_ERROR BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn)
 
 struct ConnectParams
 {
-    ConnectParams(BluezDevice1 * device, BluezEndpoint * endpoint) : mDevice(device), mEndpoint(endpoint), mNumRetries(0) {}
+    ConnectParams(BluezDevice1 * device, BluezEndpoint * endpoint) :
+        mDevice(g_object_ref(device)), mEndpoint(endpoint), mNumRetries(0)
+    {}
+    ~ConnectParams() { g_object_unref(mDevice); }
     BluezDevice1 * mDevice;
     BluezEndpoint * mEndpoint;
     uint16_t mNumRetries;
@@ -1774,20 +1777,16 @@ static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams)
 
     g_cancellable_reset(endpoint->mpConnectCancellable);
     bluez_device1_call_connect(device, endpoint->mpConnectCancellable, ConnectDeviceDone, apParams);
-    g_object_unref(device);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice, BluezEndpoint * apEndpoint)
+CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice, BluezEndpoint * apEndpoint)
 {
-    auto params = chip::Platform::New<ConnectParams>(apDevice, apEndpoint);
-    g_object_ref(apDevice);
-
+    auto params = chip::Platform::New<ConnectParams>(&aDevice, apEndpoint);
     if (PlatformMgrImpl().GLibMatterContextInvokeSync(ConnectDeviceImpl, params) != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule ConnectDeviceImpl() on CHIPoBluez thread");
-        g_object_unref(apDevice);
         chip::Platform::Delete(params);
         return CHIP_ERROR_INCORRECT_STATE;
     }

@@ -76,7 +76,7 @@ CHIP_ERROR BluezSubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
 /// Unsubscribe from the CHIP TX characteristic on the remote peripheral device
 CHIP_ERROR BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
 
-CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice, BluezEndpoint * apEndpoint);
+CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice, BluezEndpoint * apEndpoint);
 void CancelConnect(BluezEndpoint * apEndpoint);
 
 } // namespace Internal
