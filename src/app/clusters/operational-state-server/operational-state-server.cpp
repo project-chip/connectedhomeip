@@ -366,8 +366,8 @@ void OperationalStateServer::OnOperationalErrorDetected(const Structs::ErrorStat
 }
 
 void OperationalStateServer::OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
-                           const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime,
-                           const Optional<DataModel::Nullable<uint32_t>> & aPausedTime)
+                                                           const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime,
+                                                           const Optional<DataModel::Nullable<uint32_t>> & aPausedTime)
 {
     ChipLogDetail(Zcl, "OperationalStateServer: OnOperationCompletionDetected");
 

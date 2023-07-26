@@ -73,8 +73,8 @@ public:
      * @param aPausedTime PausedTime
      */
     void OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
-                               const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = NullOptional,
-                               const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional);
+                                       const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = NullOptional,
+                                       const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional);
 
     /**
      * Creates an operational state cluster instance. The Init() function needs to be called for this instance to be registered and
