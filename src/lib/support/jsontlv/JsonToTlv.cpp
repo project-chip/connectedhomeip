@@ -348,7 +348,7 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
         }
 
         // Sort Json object elements by Tag number (low to high).
-        // Note that all sorted Context Tags will appear first floowed by all sorted Common Tags.
+        // Note that all sorted Context Tags will appear first followed by all sorted Common Tags.
         std::sort(nestedElementsCtx.begin(), nestedElementsCtx.end(), CompareByTag);
 
         for (auto & ctx : nestedElementsCtx)
