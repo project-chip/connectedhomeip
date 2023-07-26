@@ -98,7 +98,7 @@ public:
         SetProductIdentifierValue(aProductIdentifierValue);
     }
 
-    ReplacementProductStruct & operator=(const ReplacementProductStruct & aReplacementProductStruct) 
+    ReplacementProductStruct & operator=(const ReplacementProductStruct & aReplacementProductStruct)
     {
         SetProductIdentifierType(aReplacementProductStruct.GetProductIdentifierType());
         SetProductIdentifierValue(aReplacementProductStruct.GetProductIdentifierValue());
