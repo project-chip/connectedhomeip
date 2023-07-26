@@ -139,7 +139,7 @@ CHIP_ERROR TlvStructToJson(TLV::TLVReader & reader, Json::Value & jsonObj)
                             CHIP_ERROR_INVALID_TLV_TAG);
         KeyContext context(static_cast<chip::FieldId>(TLV::TagNumFromTag(tag)));
 
-        // Recursively convert to JSON the encompassing item within the struct.
+        // Recursively convert to JSON the item within the struct.
         ReturnErrorOnFailure(TlvToJson(reader, context, jsonObj));
     }
 
