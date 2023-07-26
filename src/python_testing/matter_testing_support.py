@@ -818,6 +818,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.paa_trust_store_path = args.paa_trust_store_path
     config.ble_interface_id = args.ble_interface_id
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
+    config.tests = args.tests
 
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
