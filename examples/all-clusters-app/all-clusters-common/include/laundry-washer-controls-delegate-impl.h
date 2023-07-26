@@ -30,7 +30,7 @@ namespace Clusters {
 namespace LaundryWasherControls {
 
 /**
- * The application delegate to statically defines the options.
+ * The application delegate to statically define the options.
  */
 
 class LaundryWasherControlDelegate : public Delegate
