@@ -172,14 +172,9 @@ For different security use cases, please set the flags in CHIPCryptoPALHsm_confi
     $ export PSOC6_BOARD=CY8CKIT-062S2-43012
   ```
 
-  To enable OPTIGA™ Trust M as HSM:
+  Note: export PSOC6_BOARD=CY8CKIT-062S2-43012 is used to set up the development platform and environment to use CY8CKIT-062S2-43012 board for code compilation.
 
-  ```
-    $ gn gen out/debug --args="chip_enable_trustm=true"
-    $ ninja -C out/debug
-  ```
-
-  To enable OPTIGA™ Trust M for device attestation:
+  To enable OPTIGA™ Trust M for device attestation use case:
 
   ```
     $ gn gen out/debug --args="chip_enable_trustm=true chip_enable_trustm_da=true"
@@ -199,6 +194,8 @@ For different security use cases, please set the flags in CHIPCryptoPALHsm_confi
 
 For the description of OPTIGA™ Trust M Provisioning with test DAC generation and PAI and CD storage, please refer to 
 [Infineon OPTIGA™ Trust M Provisioning](../../../../docs/guides/infineon_trustm_provisioning.md) 
+
+After completing OPTIGA™ Trust M Provisioning, proceed to [Flashing the Application](#flashing-the-application) section to continue with subsequent steps.
 
 ## OTA Software Update
 

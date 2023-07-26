@@ -4,7 +4,7 @@ To use Infineon OPTIGA&trade; Trust M for device attestation, Provisioning for O
 
 ## Hardware setup:
 
-[Raspberry Pi](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/)
+[Raspberry Pi 4](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/)
 
 [OPTIGA™ Trust M S2GO](https://www.infineon.com/cms/en/product/evaluation-boards/s2go-security-optiga-m/)
 
@@ -12,8 +12,9 @@ To use Infineon OPTIGA&trade; Trust M for device attestation, Provisioning for O
 
 ## Provisioning for OPTIGA&trade; Trust M
 
-The [Linux Tools for  OPTIGA&trade; Trust M ](https://github.com/Infineon/linux-optiga-trust-m) can be used to perform provisioning by following the steps mentioned below:
+The [Linux Tools for  OPTIGA&trade; Trust M ](https://github.com/Infineon/linux-optiga-trust-m) can be used to perform provisioning by following the steps mentioned below.
 
+-   Set up chip-tool on Raspberry Pi 4 by following the instruction listed at [Building chip-tool on Raspberry Pi ](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md#installing-prerequisites-on-raspberry-pi-4)
 -   Clone the repo from Infineon Public GitHub
 
 ```
