@@ -73,7 +73,7 @@ public:
      *                 documentation.
      */
     virtual CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, size_t aSize,
-                                 MutableByteSpan & aValue) = 0;
+                                     MutableByteSpan & aValue) = 0;
 
     /**
      * Get the KVS representation of null for the given type.

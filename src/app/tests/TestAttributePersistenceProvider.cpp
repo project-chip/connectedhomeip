@@ -205,12 +205,14 @@ void TestGetNullFunctions(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, SafeAttributePersistenceProvider::GetNullValueForNullableType<uint8_t>() == uint8_t(0xff));
     NL_TEST_ASSERT(inSuite, SafeAttributePersistenceProvider::GetNullValueForNullableType<uint16_t>() == uint16_t(0xffff));
     NL_TEST_ASSERT(inSuite, SafeAttributePersistenceProvider::GetNullValueForNullableType<uint32_t>() == uint32_t(0xffffffff));
-    NL_TEST_ASSERT(inSuite, SafeAttributePersistenceProvider::GetNullValueForNullableType<uint64_t>() == uint64_t(0xffffffffffffffff));
+    NL_TEST_ASSERT(inSuite,
+                   SafeAttributePersistenceProvider::GetNullValueForNullableType<uint64_t>() == uint64_t(0xffffffffffffffff));
 
     NL_TEST_ASSERT(inSuite, SafeAttributePersistenceProvider::GetNullValueForNullableType<int8_t>() == int8_t(0x80));
     NL_TEST_ASSERT(inSuite, SafeAttributePersistenceProvider::GetNullValueForNullableType<int16_t>() == int16_t(0x8000));
     NL_TEST_ASSERT(inSuite, SafeAttributePersistenceProvider::GetNullValueForNullableType<int32_t>() == int32_t(0x80000000));
-    NL_TEST_ASSERT(inSuite, SafeAttributePersistenceProvider::GetNullValueForNullableType<int64_t>() == int64_t(0x8000000000000000));
+    NL_TEST_ASSERT(inSuite,
+                   SafeAttributePersistenceProvider::GetNullValueForNullableType<int64_t>() == int64_t(0x8000000000000000));
 }
 
 /**

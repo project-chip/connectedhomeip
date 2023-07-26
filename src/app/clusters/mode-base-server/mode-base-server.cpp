@@ -17,8 +17,8 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/reporting/reporting.h>
@@ -111,8 +111,8 @@ void Instance::LoadPersistentAttributes()
 
     // Load On Mode
     DataModel::Nullable<uint8_t> tempOnMode;
-    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id),
-                                                             tempOnMode);
+    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id), tempOnMode);
     if (err == CHIP_NO_ERROR)
     {
         Status status = UpdateOnMode(tempOnMode);

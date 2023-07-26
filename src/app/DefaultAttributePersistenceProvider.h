@@ -48,13 +48,13 @@ public:
     }
 
     void Shutdown() {}
+
 private:
-    CHIP_ERROR InternalWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue, const StorageKeyName& key);
+    CHIP_ERROR InternalWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue, const StorageKeyName & key);
     CHIP_ERROR InternalReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, size_t aSize,
-                                 MutableByteSpan & aValue, const StorageKeyName& key);
+                                 MutableByteSpan & aValue, const StorageKeyName & key);
 
 public:
-
     // AttributePersistenceProvider implementation.
     CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
     CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata,
