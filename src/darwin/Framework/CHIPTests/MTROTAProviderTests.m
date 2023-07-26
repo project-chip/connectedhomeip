@@ -891,7 +891,7 @@ static BOOL sNeedsStackShutdown = YES;
     // This test expects a pre-generated raw image at otaRawImagePath.
     NSString * otaRawImagePath = @"/tmp/ota-raw-image-v5";
 
-    // Check if the ota raw image exists at kOtaRawImagePath
+    // Check whether the ota raw image exists at otaRawImagePath
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath]);
 
     __auto_type * device = sConnectedDevice1;
