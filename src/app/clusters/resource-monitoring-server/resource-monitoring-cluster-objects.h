@@ -137,7 +137,10 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    ProductIdentifierTypeEnum GetProductIdentifierType() const { return static_cast<ProductIdentifierTypeEnum>(productIdentifierType); };
+    ProductIdentifierTypeEnum GetProductIdentifierType() const
+    {
+        return static_cast<ProductIdentifierTypeEnum>(productIdentifierType);
+    };
     chip::CharSpan GetProductIdentifierValue() const { return productIdentifierValue; };
 };
 
