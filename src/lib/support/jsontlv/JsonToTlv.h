@@ -21,7 +21,8 @@
 namespace chip {
 
 /*
- * Given a JSON object, this function converts the TLV data into a TLV encoded byte array.
+ * Given a JSON object that represents TLV, this function writes the corresponding TLV bytes into the provided buffer.
+ * The size of tlv will be adjusted to the size of the actual data written to the buffer.
  */
 CHIP_ERROR JsonToTlv(const std::string & jsonString, MutableByteSpan & tlv);
 
