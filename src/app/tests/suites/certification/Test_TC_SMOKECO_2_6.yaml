@@ -13,8 +13,8 @@
 # limitations under the License.
 
 name:
-    4.2.6. [TC-SMOKECO-2.6] ExpressedState Attribute - Multiple Alarms with DUT as
-    Server
+    4.2.6. [TC-SMOKECO-2.6] ExpressedState Attribute - Multiple Alarms with DUT
+    as Server
 
 PICS:
     - SMOKECO.S

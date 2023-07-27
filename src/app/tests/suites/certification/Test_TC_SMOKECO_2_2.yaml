@@ -13,7 +13,8 @@
 # limitations under the License.
 
 name:
-    4.2.2. [TC-SMOKECO-2.2] Primary Functionality - Smoke Alarm with DUT as Server
+    4.2.2. [TC-SMOKECO-2.2] Primary Functionality - Smoke Alarm with DUT as
+    Server
 
 PICS:
     - SMOKECO.S
