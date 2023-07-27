@@ -306,6 +306,8 @@
     ],
     "Scenes": ["Test_TC_S_1_1"],
     "ResourceMonitoring": [
+        "TestActivatedCarbonFilterMonitoring",
+        "TestHepaFilterMonitoring",
         "Test_TC_ACFREMON_1_1",
         "Test_TC_ACFREMON_2_1",
         "Test_TC_HEPAFREMON_1_1",
