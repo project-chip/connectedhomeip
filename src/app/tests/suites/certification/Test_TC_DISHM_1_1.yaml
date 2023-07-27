@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 193.1.1. [TC-DISHM-1.1] Global Attributes with DUT as Server
+name: 194.1.1. [TC-DISHM-1.1] Global Attributes with DUT as Server
 
 PICS:
     - DISHM.S
@@ -58,8 +58,8 @@ tests:
           value: 1
           constraints:
               type: bitmap32
-
-    - label: "TH reads AttributeList from DUT"
+# Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
+    - label: "4. TH reads AttributeList from DUT"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -68,7 +68,7 @@ tests:
               contains: [0, 1, 65528, 65529, 65530, 65531, 65532, 65533]
 
     - label:
-          "TH reads optional attribute (DISHM.S.A0004(StartUpMode)) in
+          "4. TH reads optional attribute (DISHM.S.A0002(StartUpMode)) in
           AttributeList"
       PICS: DISHM.S.A0002
       command: "readAttribute"
@@ -79,7 +79,19 @@ tests:
               contains: [2]
 
     - label:
-          "TH reads optional attribute (DISHM.S.A0003(OnMode)) in AttributeList"
+          "4. TH reads optional attribute (DISHM.S.A0002(StartUpMode)) in
+          AttributeList"
+      PICS: " !DISHM.S.A0002 "
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              excludes: [2]
+
+    - label:
+          "4. TH reads optional attribute (DISHM.S.F00(DEPONOFF)) in
+          AttributeList"
       PICS: DISHM.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
@@ -88,7 +100,30 @@ tests:
               type: list
               contains: [3]
 
-    - label: "TH reads AcceptedCommandList from DUT"
+    - label:
+          "4. TH reads optional attribute (DISHM.S.F00(DEPONOFF)) in
+          AttributeList"
+      PICS: " !DISHM.S.F00 "
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              excludes: [3]
+
+# Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
+    - label:
+          "5. TH reads from the DUT the EventList attribute"
+      PICS: DISHM.S.F00
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+# Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
+    - label: "6. TH reads AcceptedCommandList from DUT"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -96,7 +131,8 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Read the global attribute: GeneratedCommandList"
+# Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
+    - label: "7. TH reads from the DUT the GeneratedCommandList attribute"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
