@@ -1640,9 +1640,6 @@ void TestConverter_TlvToJson_ErrorCases(nlTestSuite * inSuite, void * inContext)
         std::string jsonString;
         err = TlvToJson(testCase.nEncodedTlv, jsonString);
         NL_TEST_ASSERT(inSuite, err == testCase.mExpectedResult);
-        printf("DEBUG 01 err = %d\n", err.AsInteger());
-        printf("DEBUG 02 exp = %d\n", testCase.mExpectedResult.AsInteger());
-        printf("DEBUG 03 str = %s\n", jsonString.c_str());
     }
 }
 
