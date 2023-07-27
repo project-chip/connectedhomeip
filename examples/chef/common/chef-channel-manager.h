@@ -19,19 +19,8 @@
 #pragma once
 
 #include <app/clusters/channel-server/channel-server.h>
-#include <vector>
 
-using chip::CharSpan;
-using chip::app::AttributeValueEncoder;
-using chip::app::CommandResponseHelper;
-using ChannelDelegate           = chip::app::Clusters::Channel::Delegate;
-using ChangeChannelResponseType = chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type;
-using ChannelInfoType           = chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type;
-using LineupInfoType            = chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type;
-
-#define CHEF_CHANNEL_MANAGER_MAX_CHANNELS 10
-
-class ChefChannelManager : public ChannelDelegate
+class ChefChannelManager : public chip::app::Clusters::Channel::Delegate
 {
 
 public:
@@ -41,7 +30,8 @@ public:
     CHIP_ERROR HandleGetLineup(chip::app::AttributeValueEncoder & aEncoder);
     CHIP_ERROR HandleGetCurrentChannel(chip::app::AttributeValueEncoder & aEncoder);
 
-    void HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper, const chip::CharSpan & match);
+    void HandleChangeChannel(chip::app::CommandResponseHelper<chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type> & helper,
+        const chip::CharSpan & match);
     bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber);
     bool HandleSkipChannel(const int16_t & count);
 
@@ -57,7 +47,8 @@ public:
     ~ChefChannelManager() = default;
 
 protected:
+    static constexpr size_t kMaxChannels = 10;
     uint16_t mCurrentChannelIndex{ 0 };
     uint16_t mTotalChannels{ 0 };
-    std::array<ChannelInfoType, CHEF_CHANNEL_MANAGER_MAX_CHANNELS> mChannels;
+    std::array<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type, kMaxChannels> mChannels;
 };

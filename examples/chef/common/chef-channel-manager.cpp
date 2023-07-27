@@ -18,8 +18,10 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app/util/config.h>
-#include <vector>
 
+using ChangeChannelResponseType = chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type;
+using ChannelInfoType           = chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type;
+using LineupInfoType            = chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type;
 // Include Channel Cluster Server callbacks only when the server is enabled
 #ifdef EMBER_AF_PLUGIN_CHANNEL_SERVER
 #include <chef-channel-manager.h>
@@ -120,15 +122,17 @@ CHIP_ERROR ChefChannelManager::HandleGetCurrentChannel(app::AttributeValueEncode
 void ChefChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper,
                                              const chip::CharSpan & match)
 {
-    std::vector<ChannelInfoType> matchedChannels;
+    std::array<ChannelInfoType, kMaxChannels> matchedChannels;
+
     uint16_t index = 0;
+    uint16_t totalMatchedChannels = 0;
     for (auto const & channel : mChannels)
     {
         // verify if CharSpan matches channel name
         // or callSign or affiliateCallSign or majorNumber.minorNumber
         if (isChannelMatched(channel, match))
         {
-            matchedChannels.push_back(channel);
+            matchedChannels[totalMatchedChannels++] = (channel);
         }
         else if (matchedChannels.size() == 0)
         {
