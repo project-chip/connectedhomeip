@@ -70,16 +70,19 @@ private:
     static void _ActivateCb(wifi_manager_error_e wifiErr, void * userData);
     static void _DeactivateCb(wifi_manager_error_e wifiErr, void * userData);
     static void _ScanToConnectFinishedCb(wifi_manager_error_e wifiErr, void * userData);
-    static void _ScanFinishedCb(wifi_manager_error_e wifiErr, void * userData);
+    static void _SpecificScanFinishedCb(wifi_manager_error_e wifiErr, void * userData);
+    static void _FullScanFinishedCb(wifi_manager_error_e wifiErr, void * userData);
     static bool _FoundAPOnScanCb(wifi_manager_ap_h ap, void * userData);
     static bool _FoundAPCb(wifi_manager_ap_h ap, void * userData);
     static void _ConnectedCb(wifi_manager_error_e wifiErr, void * userData);
     static bool _ConfigListCb(const wifi_manager_config_h config, void * userData);
+    static void _UpdateScanCallback(void * scanCbData);
 
     static CHIP_ERROR _WiFiInitialize(gpointer userData);
     static CHIP_ERROR _WiFiActivate(gpointer userData);
     static CHIP_ERROR _WiFiDeactivate(gpointer userData);
-    static CHIP_ERROR _WiFiScan(gpointer userData);
+    static CHIP_ERROR _WiFiSpecificScan(gpointer userData);
+    static CHIP_ERROR _WiFiFullScan(gpointer userData);
     static CHIP_ERROR _WiFiScanToConnect(gpointer userData);
     static CHIP_ERROR _WiFiConnect(wifi_manager_ap_h ap);
 
