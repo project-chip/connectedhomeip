@@ -20,16 +20,20 @@
 
 #include "AppTask.h"
 #include "BoltLockManager.h"
+#include <platform/CHIPDeviceLayer.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/data-model/Nullable.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
+#include <lib/core/DataModelTypes.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
 using namespace ::chip::app::Clusters::DoorLock;
+using ::chip::app::DataModel::Nullable;
 
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
                                             const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pinCode,

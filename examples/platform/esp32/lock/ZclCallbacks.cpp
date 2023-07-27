@@ -27,10 +27,13 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/data-model/Nullable.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip::app::Clusters;
 using namespace ::chip::DeviceLayer::Internal;
+using ::chip::app::DataModel::Nullable;
 
 /** @brief DoorLock Cluster Init
  *
