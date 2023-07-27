@@ -28,6 +28,11 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <stdlib.h>
 
+#ifndef ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
+// Set to 1 to enforce SIT Slow Polling Max value to 15seconds (spec 9.16.1.5)
+#define ICD_ENFORCE_SIT_SLOW_POLL_LIMIT 0
+#endif
+
 namespace chip {
 namespace app {
 
@@ -93,6 +98,13 @@ void ICDManager::UpdateIcdMode()
         }
     }
     mICDMode = tempMode;
+
+    // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
+    if (mICDMode == ICDMode::SIT && GetSlowPollingInterval() > GetSITPollingThreshold())
+    {
+        ChipLogDetail(AppServer, "The Slow Polling Interval of an ICD in SIT mode should be <= %" PRIu32 " seconds",
+                      (GetSITPollingThreshold().count() / 1000));
+    }
 }
 
 void ICDManager::UpdateOperationState(OperationalState state)
@@ -108,14 +120,14 @@ void ICDManager::UpdateOperationState(OperationalState state)
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(idleModeInterval), OnIdleModeDone, this);
 
         System::Clock::Milliseconds32 slowPollInterval = GetSlowPollingInterval();
+
+#if ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
         // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
-        if (mICDMode == ICDMode::SIT && slowPollInterval > GetSITPollingThreshold())
+        if (mICDMode == ICDMode::SIT && GetSlowPollingInterval() > GetSITPollingThreshold())
         {
-            ChipLogDetail(AppServer, "The Slow Polling Interval of an ICD in SIT mode should be <= %" PRIu32,
-                          (GetSITPollingThreshold().count() / 1000));
-            // TODO Spec to define this conformance as a SHALL
-            // slowPollInterval = GetSITPollingThreshold();
+            slowPollInterval = GetSITPollingThreshold();
         }
+#endif
 
         CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(slowPollInterval);
         if (err != CHIP_NO_ERROR)

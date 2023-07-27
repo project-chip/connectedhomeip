@@ -1,6 +1,10 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
+#include <app/data-model/Nullable.h>
 #include <app/util/config.h>
+#include <lib/core/DataModelTypes.h>
+
+using chip::app::DataModel::Nullable;
 
 // Include door lock callbacks only when the server is enabled
 #ifdef EMBER_AF_PLUGIN_DOOR_LOCK_SERVER
@@ -188,14 +192,16 @@ private:
     Endpoint endpoints[kNumEndpoints];
 };
 
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode,
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                            const Nullable<chip::NodeId> & nodeId, const chip::Optional<chip::ByteSpan> & pinCode,
                                             chip::app::Clusters::DoorLock::OperationErrorEnum & err)
 {
     err = OperationErrorEnum::kUnspecified;
     return DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kLocked);
 }
 
-bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode,
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                              const Nullable<chip::NodeId> & nodeId, const chip::Optional<chip::ByteSpan> & pinCode,
                                               chip::app::Clusters::DoorLock::OperationErrorEnum & err)
 {
     err = OperationErrorEnum::kUnspecified;

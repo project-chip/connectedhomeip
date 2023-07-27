@@ -13,8 +13,8 @@
 # limitations under the License.
 
 name:
-    4.2.6. [TC-SMCO-2.6] ExpressedState Attribute - Multiple Alarms with DUT as
-    Server
+    4.2.6. [TC-SMOKECO-2.6] ExpressedState Attribute - Multiple Alarms with DUT
+    as Server
 
 PICS:
     - SMOKECO.S
@@ -60,6 +60,18 @@ config:
     HIEST_PRI_ALARM:
         type: int8u
         defaultValue: 1
+    HIEST_PRI_ALARM_2:
+        type: int8u
+        defaultValue: 2
+    HIEST_PRI_ALARM_3:
+        type: int8u
+        defaultValue: 7
+    HIEST_PRI_ALARM_4:
+        type: int8u
+        defaultValue: 7
+    HIEST_PRI_ALARM_5:
+        type: int8u
+        defaultValue: 3
 
 tests:
     - label: "Commission DUT to TH"
@@ -183,7 +195,7 @@ tests:
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test
           Event"
-      PICS: DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0008 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -212,7 +224,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event"
-      PICS: DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0009 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -334,7 +346,7 @@ tests:
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
-          value: HIEST_PRI_ALARM
+          value: HIEST_PRI_ALARM_2
           constraints:
               type: enum8
 
@@ -371,7 +383,7 @@ tests:
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
-          value: HIEST_PRI_ALARM
+          value: HIEST_PRI_ALARM_3
           constraints:
               type: enum8
 
@@ -381,7 +393,7 @@ tests:
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event
           Clear"
-      PICS: DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0009 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -409,7 +421,7 @@ tests:
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
-          value: HIEST_PRI_ALARM
+          value: HIEST_PRI_ALARM_4
           constraints:
               type: enum8
 
@@ -419,7 +431,7 @@ tests:
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test
           Event Clear"
-      PICS: DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0008 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -447,7 +459,7 @@ tests:
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
-          value: HIEST_PRI_ALARM
+          value: HIEST_PRI_ALARM_5
           constraints:
               type: enum8
 

@@ -34,6 +34,8 @@ namespace Silabs {
  */
 DeviceAttestationCredentialsProvider * GetSilabsDacProvider();
 
+void SilabsDacProviderMigration(void);
+
 } // namespace Silabs
 } // namespace Credentials
 } // namespace chip
