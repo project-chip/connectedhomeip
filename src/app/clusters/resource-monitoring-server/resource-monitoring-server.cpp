@@ -244,10 +244,10 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
 CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err;
-    if (Instance::HasFeature(ResourceMonitoring::Feature::kReplacementProductList))
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (HasFeature(ResourceMonitoring::Feature::kReplacementProductList))
     {
-        ReplacementProductListManager * productListManagerInstance = Instance::GetReplacementProductListManagerInstance();
+        ReplacementProductListManager * productListManagerInstance = GetReplacementProductListManagerInstance();
         if (nullptr == productListManagerInstance)
         {
             aEncoder.EncodeEmptyList();
@@ -256,16 +256,19 @@ CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
 
         productListManagerInstance->Reset();
 
-        err = aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-            Attributes::ReplacementProductStruct::Type replacementProductStruct;
-            while (productListManagerInstance->Next(replacementProductStruct) == CHIP_NO_ERROR)
+        err = aEncoder.EncodeList([productListManagerInstance](const auto & encoder) -> CHIP_ERROR {
+            ReplacementProductStruct replacementProductStruct;
+            CHIP_ERROR iteratorError = productListManagerInstance->Next(replacementProductStruct);
+
+            while (CHIP_NO_ERROR == iteratorError)
             {
                 ReturnErrorOnFailure(encoder.Encode(replacementProductStruct));
+                iteratorError = productListManagerInstance->Next(replacementProductStruct);
             }
-            return CHIP_NO_ERROR;
+            return (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED == iteratorError) ? CHIP_NO_ERROR : iteratorError;
         });
     }
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 // Implements the read functionality for non-standard attributes.
