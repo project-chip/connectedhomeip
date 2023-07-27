@@ -58,7 +58,7 @@ tests:
           value: 1
           constraints:
               type: bitmap32
-# Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
+    # Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
     - label: "4. TH reads AttributeList from DUT"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -111,9 +111,8 @@ tests:
               type: list
               excludes: [3]
 
-# Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
-    - label:
-          "5. TH reads from the DUT the EventList attribute"
+    # Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
+    - label: "5. TH reads from the DUT the EventList attribute"
       PICS: DISHM.S.F00
       command: "readAttribute"
       attribute: "EventList"
@@ -122,7 +121,7 @@ tests:
           constraints:
               type: list
 
-# Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
+    # Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
     - label: "6. TH reads AcceptedCommandList from DUT"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -131,7 +130,7 @@ tests:
               type: list
               contains: [0]
 
-# Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
+    # Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
     - label: "7. TH reads from the DUT the GeneratedCommandList attribute"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
