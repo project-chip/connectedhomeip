@@ -220,19 +220,19 @@ OptionSet *gCmdOptionSets[] =
 };
 // clang-format on
 
-AttCertType gAttCertType                 = kAttCertType_NotSpecified;
-const char * gSubjectCN                  = nullptr;
-uint16_t gSubjectVID                     = VendorId::NotSpecified;
-uint16_t gSubjectPID                     = 0;
-bool gEncodeVIDandPIDasCN                = false;
-const char * gCACertFileNameOrStr        = nullptr;
-const char * gCAKeyFileNameOrStr         = nullptr;
-const char * gInKeyFileNameOrStr         = nullptr;
-const char * gOutCertFileName            = nullptr;
-const char * gOutKeyFileName             = nullptr;
-uint32_t gValidDays                      = kCertValidDays_Undefined;
-const char * gCDPURI                     = nullptr;
-const char * gCRLIssuerCertFileName      = nullptr;
+AttCertType gAttCertType            = kAttCertType_NotSpecified;
+const char * gSubjectCN             = nullptr;
+uint16_t gSubjectVID                = VendorId::NotSpecified;
+uint16_t gSubjectPID                = 0;
+bool gEncodeVIDandPIDasCN           = false;
+const char * gCACertFileNameOrStr   = nullptr;
+const char * gCAKeyFileNameOrStr    = nullptr;
+const char * gInKeyFileNameOrStr    = nullptr;
+const char * gOutCertFileName       = nullptr;
+const char * gOutKeyFileName        = nullptr;
+uint32_t gValidDays                 = kCertValidDays_Undefined;
+const char * gCDPURI                = nullptr;
+const char * gCRLIssuerCertFileName = nullptr;
 struct tm gValidFrom;
 CertStructConfig gCertConfig;
 
@@ -620,7 +620,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
             distPoint->distpoint = DIST_POINT_NAME_new();
             VerifyOrReturnError(distPoint->distpoint != nullptr, false);
 
-            distPoint->distpoint->type = 0; // fullName
+            distPoint->distpoint->type          = 0; // fullName
             distPoint->distpoint->name.fullname = GENERAL_NAMES_new();
             VerifyOrReturnError(distPoint->distpoint->name.fullname != nullptr, false);
 
@@ -633,7 +633,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
             // Set fullName as a URI
             distPointName = GENERAL_NAME_new();
             VerifyOrReturnError(distPointName != nullptr, false);
-            distPointName->type = GEN_URI;
+            distPointName->type                        = GEN_URI;
             distPointName->d.uniformResourceIdentifier = uri;
             sk_GENERAL_NAME_push(distPoint->distpoint->name.fullname, distPointName);
 
@@ -652,9 +652,9 @@ bool Cmd_GenAttCert(int argc, char * argv[])
 
             crlIssuerName = GENERAL_NAME_new();
             VerifyOrReturnError(crlIssuerName != nullptr, false);
-            crlIssuerName->type = GEN_DIRNAME;
+            crlIssuerName->type            = GEN_DIRNAME;
             crlIssuerName->d.directoryName = X509_get_subject_name(cRLIssuerCert.get());
-            distPoint->CRLissuer = GENERAL_NAMES_new();
+            distPoint->CRLissuer           = GENERAL_NAMES_new();
             sk_GENERAL_NAME_push(distPoint->CRLissuer, crlIssuerName);
 
             if (gCertConfig.IsExtensionCDPCRLIssuerDuplicate())

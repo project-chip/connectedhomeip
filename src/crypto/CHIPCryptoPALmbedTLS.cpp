@@ -1994,7 +1994,8 @@ CHIP_ERROR ExtractCDPExtensionCRLIssuerFromX509Cert(const ByteSpan & certificate
             //         uniformResourceIdentifier       [6]     IA5String,
             //         iPAddress                       [7]     OCTET STRING,
             //         registeredID                    [8]     OBJECT IDENTIFIER }
-            result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_X509_SAN_DIRECTORY_NAME);
+            result = mbedtls_asn1_get_tag(
+                &p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_X509_SAN_DIRECTORY_NAME);
             VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
             VerifyOrExit(p + len == end_of_ext, error = CHIP_ERROR_NOT_FOUND);
 
