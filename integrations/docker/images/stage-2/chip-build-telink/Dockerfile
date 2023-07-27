@@ -55,9 +55,9 @@ RUN set -x \
     ccache \
     dfu-util=0.9-1 \
     device-tree-compiler \
-    gcc-multilib=4:9.3.0-1ubuntu2 \
-    g++-multilib=4:9.3.0-1ubuntu2 \
-    libsdl2-dev=2.0.10+dfsg1-3 \
+    gcc-multilib \
+    g++-multilib \
+    libsdl2-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && python3 -m pip install -U --no-cache-dir \
