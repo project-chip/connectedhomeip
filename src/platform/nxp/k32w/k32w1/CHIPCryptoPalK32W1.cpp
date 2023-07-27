@@ -30,7 +30,6 @@
 #include <mbedtls/ecdh.h>
 #include <mbedtls/ecdsa.h>
 #include <mbedtls/ecp.h>
-#include <mbedtls/entropy.h>
 #include <mbedtls/error.h>
 #include <mbedtls/hkdf.h>
 #include <mbedtls/md.h>
@@ -84,10 +83,10 @@ typedef struct
     bool mInitialized;
     bool mDRBGSeeded;
     mbedtls_ctr_drbg_context mDRBGCtxt;
-    mbedtls_entropy_context mEntropy;
-} EntropyContext;
+    entropy_source fn_source;
+} DRBGContext;
 
-static EntropyContext gsEntropyContext;
+static DRBGContext gsDrbgContext;
 
 static void _log_mbedTLS_error(int error_code)
 {
@@ -549,50 +548,47 @@ exit:
     return error;
 }
 
-static EntropyContext * get_entropy_context()
+static int strong_entropy_func(void * data, uint8_t * output, size_t len)
 {
-    if (!gsEntropyContext.mInitialized)
+    int result = -1;
+    size_t olen;
+
+    if (gsDrbgContext.fn_source)
     {
-        mbedtls_entropy_init(&gsEntropyContext.mEntropy);
-        mbedtls_ctr_drbg_init(&gsEntropyContext.mDRBGCtxt);
-
-        gsEntropyContext.mInitialized = true;
+        result = gsDrbgContext.fn_source(data, output, len, &olen);
     }
-
-    return &gsEntropyContext;
+    return result;
 }
 
 static mbedtls_ctr_drbg_context * get_drbg_context()
 {
-    EntropyContext * const context = get_entropy_context();
-
-    mbedtls_ctr_drbg_context * const drbgCtxt = &context->mDRBGCtxt;
-
-    if (!context->mDRBGSeeded)
+    if (!gsDrbgContext.mInitialized)
     {
-        const int status = mbedtls_ctr_drbg_seed(drbgCtxt, mbedtls_entropy_func, &context->mEntropy, nullptr, 0);
+        mbedtls_ctr_drbg_init(&gsDrbgContext.mDRBGCtxt);
+
+        gsDrbgContext.mInitialized = true;
+    }
+
+    if (!gsDrbgContext.mDRBGSeeded)
+    {
+        const int status = mbedtls_ctr_drbg_seed(&gsDrbgContext.mDRBGCtxt, strong_entropy_func, nullptr, nullptr, 0);
         if (status != 0)
         {
             _log_mbedTLS_error(status);
             return nullptr;
         }
 
-        context->mDRBGSeeded = true;
+        gsDrbgContext.mDRBGSeeded = true;
     }
 
-    return drbgCtxt;
+    return &gsDrbgContext.mDRBGCtxt;
 }
 
 CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold)
 {
     VerifyOrReturnError(fn_source != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    gsDrbgContext.fn_source = fn_source;
 
-    EntropyContext * const entropy_ctxt = get_entropy_context();
-    VerifyOrReturnError(entropy_ctxt != nullptr, CHIP_ERROR_INTERNAL);
-
-    const int result =
-        mbedtls_entropy_add_source(&entropy_ctxt->mEntropy, fn_source, p_source, threshold, MBEDTLS_ENTROPY_SOURCE_STRONG);
-    VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
     return CHIP_NO_ERROR;
 }
 
