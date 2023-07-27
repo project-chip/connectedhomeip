@@ -50,7 +50,7 @@ void PrintBytes(const uint8_t * buf, uint32_t len)
     printf("\n");
 }
 
-bool MatcheWriter1and2()
+bool MatchWriter1and2()
 {
     auto matches =
         (gWriter1.GetLengthWritten() == gWriter2.GetLengthWritten()) && (memcmp(gBuf1, gBuf2, gWriter1.GetLengthWritten()) == 0);
@@ -91,7 +91,7 @@ void ConvertJsonToTlvAndValidate(T val, const std::string & jsonString)
     err = JsonToTlv(jsonString, gWriter2);
     NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(gSuite, MatcheWriter1and2());
+    NL_TEST_ASSERT(gSuite, MatchWriter1and2());
 }
 
 void TestConverter(nlTestSuite * inSuite, void * inContext)

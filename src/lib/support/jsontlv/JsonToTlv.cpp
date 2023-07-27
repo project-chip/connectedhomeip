@@ -40,12 +40,6 @@ std::vector<std::string> splitIntoFieldsBySeparator(const std::string & input, c
     return substrings;
 }
 
-struct ElementTypeContext
-{
-    TLV::TLVType tlvType = TLV::kTLVType_NotSpecified;
-    bool isDouble        = false;
-};
-
 CHIP_ERROR JsonTypeStrToTlvType(const char * elementType, ElementTypeContext & type)
 {
     if (strcmp(elementType, kElementTypeInt) == 0)

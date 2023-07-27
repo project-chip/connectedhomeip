@@ -57,6 +57,10 @@ limitations of this format are:
 -   TLV Array cannot contain another TLV Array.
 -   The top-level container MUST be an anonymous STRUCT.
 -   Infinity Float/Double values are not supported.
+-   Elements of the TLV Structure MUST have Context or Common Profile Tags.
+-   Common Profile Tag number MUST be larger or equal to 256 and smaller that 2^32.
+-   TLV Structure element MUST be sorted by tag numbers from low to high, where sorted
+    elements with Context Tags MUST appear first followed by sorted elements with Common Profile Tags.
 
 ## Format Example
 
@@ -82,7 +86,9 @@ elements, arrays, and structures.
     "5:ARRAY-DOUBLE" : [             // array of doubles
         1.1,
         134.2763,
-        -12345.87
+        -12345.87,
+        62534,                       // positive integer-valued double
+        -62534                       // negative integer-valued double
     ],
     "6:ARRAY-BYTES" : [              // array of Octet Strings: [{00 01 02 03 04}, {FF}, {4A EF 88}]
         "AAECAwQ=",                  // base64( {00 01 02 03 04} )

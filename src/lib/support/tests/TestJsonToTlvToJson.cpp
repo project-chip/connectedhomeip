@@ -71,8 +71,8 @@ void CheckValidConversion(const std::string & jsonOriginal, const ByteSpan & tlv
     if (!match)
     {
         printf("ERROR: Json String Doesn't Match!\n");
-        printf("Expected  Json String: %s\n", compactExpectedString.c_str());
-        printf("Generated Json String: %s\n", compactGeneratedString.c_str());
+        printf("Expected  Json String:\n%s\n", compactExpectedString.c_str());
+        printf("Generated Json String:\n%s\n", compactGeneratedString.c_str());
     }
 
     // Verify that Expected Json String Converts to the Same TLV Encoding
@@ -1414,6 +1414,8 @@ void TestConverter_Structure_FromReadme(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(1.1)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(134.2763)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(-12345.87)));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(62534)));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(-62534)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(6), TLV::kTLVType_Array, containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutBytes(TLV::AnonymousTag(), bytes1, static_cast<uint32_t>(sizeof(bytes1))));
@@ -1456,7 +1458,9 @@ void TestConverter_Structure_FromReadme(nlTestSuite * inSuite, void * inContext)
                              "   \"5:ARRAY-DOUBLE\" : [\n"
                              "      1.1000000000000001,\n"
                              "      134.27629999999999,\n"
-                             "      -12345.870000000001\n"
+                             "      -12345.870000000001,\n"
+                             "      62534.0,\n"
+                             "      -62534.0\n"
                              "   ],\n"
                              "   \"6:ARRAY-BYTES\" : [\n"
                              "      \"AAECAwQ=\",\n"
@@ -1495,7 +1499,9 @@ void TestConverter_Structure_FromReadme(nlTestSuite * inSuite, void * inContext)
                                "   \"5:ARRAY-DOUBLE\" : [\n"
                                "      1.1000000000000001,\n"
                                "      134.27629999999999,\n"
-                               "      -12345.870000000001\n"
+                               "      -12345.870000000001,\n"
+                               "      62534.0,\n"
+                               "      -62534.0\n"
                                "   ],\n"
                                "   \"6:ARRAY-BYTES\" : [\n"
                                "      \"AAECAwQ=\",\n"
@@ -1634,6 +1640,9 @@ void TestConverter_TlvToJson_ErrorCases(nlTestSuite * inSuite, void * inContext)
         std::string jsonString;
         err = TlvToJson(testCase.nEncodedTlv, jsonString);
         NL_TEST_ASSERT(inSuite, err == testCase.mExpectedResult);
+        printf("DEBUG 01 err = %d\n", err.AsInteger());
+        printf("DEBUG 02 exp = %d\n", testCase.mExpectedResult.AsInteger());
+        printf("DEBUG 03 str = %s\n", jsonString.c_str());
     }
 }
 

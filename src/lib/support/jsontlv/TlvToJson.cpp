@@ -28,77 +28,77 @@ namespace chip {
 
 namespace {
 
-/*
- * Encapsulates the different types of keys permissible.
- *
- * Root Key = Key with a name of 'value'. This is the top-most key in a given JSON object generated from TLV.
- * Struct Field = Key containing the 32-bit field ID of an item in a struct.
- * Array Item = Key containing the 16-bit list index of an item in a list.
- *
- * In the latter two modes, the actual field ID/list index is encapsulated within the 'key' member.
- *
- */
-struct KeyContext
+const char * GetJsonElementStrFromType(const ElementTypeContext & ctx)
 {
-    enum ContainerType
+    switch (ctx.tlvType)
     {
-        kStruct,
-        kArray
-    };
-
-    KeyContext() = default;
-
-    KeyContext(chip::FieldId fieldId)
-    {
-        containerType = kStruct;
-        tag           = fieldId;
+    case TLV::kTLVType_UnsignedInteger:
+        return kElementTypeUInt;
+    case TLV::kTLVType_SignedInteger:
+        return kElementTypeInt;
+    case TLV::kTLVType_Boolean:
+        return kElementTypeBool;
+    case TLV::kTLVType_FloatingPointNumber:
+        return ctx.isDouble ? kElementTypeDouble : kElementTypeFloat;
+    case TLV::kTLVType_ByteString:
+        return kElementTypeBytes;
+    case TLV::kTLVType_UTF8String:
+        return kElementTypeString;
+    case TLV::kTLVType_Null:
+        return kElementTypeNull;
+    case TLV::kTLVType_Structure:
+        return kElementTypeStruct;
+    case TLV::kTLVType_Array:
+        return kElementTypeArray;
+    default:
+        return kElementTypeEmpty;
     }
-
-    KeyContext(chip::ListIndex listIndex)
-    {
-        containerType = kArray;
-        tag           = listIndex;
-    }
-
-    void SetElementType(const char * elemType) { elementType = elemType; }
-
-    void SetArrayElementType(const char * subType) { subElementType = subType; }
-
-    void GenerateJsonKeyStr(char * buf) const
-    {
-        int len = 0;
-        len     = sprintf(buf, "%u:", tag);
-        len += sprintf(&buf[len], "%s", elementType);
-        if (strcmp(elementType, kElementTypeArray) == 0)
-        {
-            sprintf(&buf[len], "-%s", subElementType);
-        }
-    }
-
-    ContainerType containerType = kStruct;
-    unsigned int tag            = 0;
-    const char * elementType    = nullptr;
-    const char * subElementType = nullptr;
 };
 
 /*
- * For now, let's put a bound of the maximum length of a byte/char string to be the size of an IPv6
- * MTU. While this is smaller than that of the limit defined in the data model specification,
- * strings by virtue of not being chunked are intrinsically limited in size to the size of the encompassing packet.
+ * Encapsulates the element information required to constract Json element name string in a Json object.
+ *
+ * The generated Json element name string is constracted as:
+ *     'TagNumber:ElementType-SubElementType'.
  */
-static constexpr uint16_t kMaxStringLen = 1280;
+struct JsonObjectElementContext
+{
+    JsonObjectElementContext(TLV::TLVReader & reader)
+    {
+        tag          = reader.GetTag();
+        type.tlvType = reader.GetType();
+        if (type.tlvType == TLV::kTLVType_FloatingPointNumber)
+        {
+            type.isDouble = reader.IsElementDouble();
+        }
+    }
+
+    std::string GenerateJsonElementName() const
+    {
+        std::string str = std::to_string(TLV::TagNumFromTag(tag));
+        str = str + ":" + GetJsonElementStrFromType(type);
+        if (type.tlvType == TLV::kTLVType_Array)
+        {
+            str = str + "-" + GetJsonElementStrFromType(subType);
+        }
+        return str;
+    }
+
+    TLV::Tag tag;
+    ElementTypeContext type;
+    ElementTypeContext subType;
+};
 
 /*
- * This templated function inserts a key/value pair into the Json value object.
- * The value is templated to be of type T and accepts any of the following primitive
- * types:
+ * This templated function inserts a name/value pair into the Json object.
+ * The value is templated to be of type T and accepts any of the following types:
+ *
  *      bool, uint*_t, int*_t, char *, float, double, std::string, Json::Value
  *
- * This method uses the provided key context to deduce the type of element being added.
- *
+ * This method uses the provided element context to generate Json name string.
  */
 template <typename T>
-void InsertKeyValue(Json::Value & json, const KeyContext & keyContext, T val)
+void InsertJsonElement(Json::Value & json, const JsonObjectElementContext & ctx, T val)
 {
     if (json.isArray())
     {
@@ -106,17 +106,11 @@ void InsertKeyValue(Json::Value & json, const KeyContext & keyContext, T val)
     }
     else
     {
-        // This needs to accommodate the largest key value 'FieldId:ElementType-SubElementType'.
-        // The largest 32-bit integer FieldId represented as a string is 11 characters long.
-        // The largest ElementType and SubElementType strings are 6 characters long each.
-        // Tack on 3 bytes for the ':' character, '-' character, and null terminator.
-        char keyBuf[26];
-        keyContext.GenerateJsonKeyStr(keyBuf);
-        json[keyBuf] = val;
+        json[ctx.GenerateJsonElementName()] = val;
     }
 }
 
-static CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & jsonObj);
+static CHIP_ERROR TlvToJson(TLV::TLVReader & reader, Json::Value & jsonObj);
 
 /*
  * Given a TLVReader positioned at TLV structure this function:
@@ -134,34 +128,37 @@ CHIP_ERROR TlvStructToJson(TLV::TLVReader & reader, Json::Value & jsonObj)
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
-        VerifyOrReturnError(TLV::IsContextTag(tag) ||
-                                (TLV::IsProfileTag(tag) && (TLV::ProfileIdFromTag(tag) == TLV::kCommonProfileId)),
-                            CHIP_ERROR_INVALID_TLV_TAG);
-        KeyContext context(static_cast<chip::FieldId>(TLV::TagNumFromTag(tag)));
+        VerifyOrReturnError(TLV::IsContextTag(tag) || TLV::IsProfileTag(tag), CHIP_ERROR_INVALID_TLV_TAG);
+        if (TLV::IsProfileTag(tag))
+        {
+            VerifyOrReturnError(TLV::ProfileIdFromTag(tag) == TLV::kCommonProfileId, CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrReturnError(TLV::TagNumFromTag(tag) > UINT8_MAX, CHIP_ERROR_INVALID_TLV_TAG);
+        }
 
         // Recursively convert to JSON the item within the struct.
-        ReturnErrorOnFailure(TlvToJson(reader, context, jsonObj));
+        ReturnErrorOnFailure(TlvToJson(reader, jsonObj));
     }
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     return reader.ExitContainer(containerType);
 }
 
-CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & jsonObj)
+CHIP_ERROR TlvToJson(TLV::TLVReader & reader, Json::Value & jsonObj)
 {
+    JsonObjectElementContext context(reader);
+
     switch (reader.GetType())
     {
     case TLV::kTLVType_UnsignedInteger: {
         uint64_t v;
         ReturnErrorOnFailure(reader.Get(v));
-        context.SetElementType(kElementTypeUInt);
         if (CanCastTo<uint32_t>(v))
         {
-            InsertKeyValue(jsonObj, context, v);
+            InsertJsonElement(jsonObj, context, v);
         }
         else
         {
-            InsertKeyValue(jsonObj, context, std::to_string(v));
+            InsertJsonElement(jsonObj, context, std::to_string(v));
         }
         break;
     }
@@ -169,14 +166,13 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
     case TLV::kTLVType_SignedInteger: {
         int64_t v;
         ReturnErrorOnFailure(reader.Get(v));
-        context.SetElementType(kElementTypeInt);
         if (CanCastTo<int32_t>(v))
         {
-            InsertKeyValue(jsonObj, context, v);
+            InsertJsonElement(jsonObj, context, v);
         }
         else
         {
-            InsertKeyValue(jsonObj, context, std::to_string(v));
+            InsertJsonElement(jsonObj, context, std::to_string(v));
         }
         break;
     }
@@ -184,8 +180,7 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
     case TLV::kTLVType_Boolean: {
         bool v;
         ReturnErrorOnFailure(reader.Get(v));
-        context.SetElementType(kElementTypeBool);
-        InsertKeyValue(jsonObj, context, v);
+        InsertJsonElement(jsonObj, context, v);
         break;
     }
 
@@ -194,23 +189,13 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
         ReturnErrorOnFailure(reader.Get(v));
         VerifyOrReturnError(v != std::numeric_limits<double>::infinity() && v != -std::numeric_limits<double>::infinity(),
                             CHIP_ERROR_INVALID_TLV_ELEMENT);
-        if (reader.IsElementDouble())
-        {
-            context.SetElementType(kElementTypeDouble);
-        }
-        else
-        {
-            context.SetElementType(kElementTypeFloat);
-        }
-        InsertKeyValue(jsonObj, context, v);
+        InsertJsonElement(jsonObj, context, v);
         break;
     }
 
     case TLV::kTLVType_ByteString: {
         ByteSpan span;
         ReturnErrorOnFailure(reader.Get(span));
-        VerifyOrReturnError(span.size() < kMaxStringLen, CHIP_ERROR_INVALID_TLV_ELEMENT);
-        context.SetElementType(kElementTypeBytes);
 
         Platform::ScopedMemoryBuffer<char> byteString;
         byteString.Alloc(BASE64_ENCODED_LEN(span.size()) + 1);
@@ -219,114 +204,70 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
         auto encodedLen              = Base64Encode(span.data(), static_cast<uint16_t>(span.size()), byteString.Get());
         byteString.Get()[encodedLen] = '\0';
 
-        InsertKeyValue(jsonObj, context, byteString.Get());
+        InsertJsonElement(jsonObj, context, byteString.Get());
         break;
     }
 
     case TLV::kTLVType_UTF8String: {
         CharSpan span;
         ReturnErrorOnFailure(reader.Get(span));
-        VerifyOrReturnError(span.size() < kMaxStringLen, CHIP_ERROR_INVALID_TLV_ELEMENT);
-        context.SetElementType(kElementTypeString);
 
         std::string str(span.data(), span.size());
-        InsertKeyValue(jsonObj, context, str);
+        InsertJsonElement(jsonObj, context, str);
         break;
     }
 
     case TLV::kTLVType_Null: {
-        context.SetElementType(kElementTypeNull);
-        InsertKeyValue(jsonObj, context, Json::Value());
+        InsertJsonElement(jsonObj, context, Json::Value());
         break;
     }
 
     case TLV::kTLVType_Structure: {
         Json::Value jsonStruct(Json::objectValue);
         ReturnErrorOnFailure(TlvStructToJson(reader, jsonStruct));
-        context.SetElementType(kElementTypeStruct);
-        InsertKeyValue(jsonObj, context, jsonStruct);
+        InsertJsonElement(jsonObj, context, jsonStruct);
         break;
     }
 
     case TLV::kTLVType_Array: {
         CHIP_ERROR err;
         Json::Value jsonArray(Json::arrayValue);
-        const char * subType     = kElementTypeEmpty;
-        const char * nextSubType = kElementTypeEmpty;
-        size_t listIndex         = 0;
+        ElementTypeContext prevSubType;
+        ElementTypeContext nextSubType;
         TLV::TLVType containerType;
 
         ReturnErrorOnFailure(reader.EnterContainer(containerType));
 
         while ((err = reader.Next()) == CHIP_NO_ERROR)
         {
-            switch (reader.GetType())
+            VerifyOrReturnError(reader.GetTag() == TLV::AnonymousTag(), CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrReturnError(reader.GetType() != TLV::kTLVType_Array, CHIP_ERROR_INVALID_TLV_ELEMENT);
+
+            nextSubType.tlvType = reader.GetType();
+            if (nextSubType.tlvType == TLV::kTLVType_FloatingPointNumber)
             {
-            case TLV::kTLVType_UnsignedInteger: {
-                nextSubType = kElementTypeUInt;
-                break;
-            }
-            case TLV::kTLVType_SignedInteger: {
-                nextSubType = kElementTypeInt;
-                break;
-            }
-            case TLV::kTLVType_Boolean: {
-                nextSubType = kElementTypeBool;
-                break;
-            }
-            case TLV::kTLVType_FloatingPointNumber: {
-                if (reader.IsElementDouble())
-                {
-                    nextSubType = kElementTypeDouble;
-                }
-                else
-                {
-                    nextSubType = kElementTypeFloat;
-                }
-                break;
-            }
-            case TLV::kTLVType_ByteString: {
-                nextSubType = kElementTypeBytes;
-                break;
-            }
-            case TLV::kTLVType_UTF8String: {
-                nextSubType = kElementTypeString;
-                break;
-            }
-            case TLV::kTLVType_Null: {
-                nextSubType = kElementTypeNull;
-                break;
-            }
-            case TLV::kTLVType_Structure: {
-                nextSubType = kElementTypeStruct;
-                break;
-            }
-            case TLV::kTLVType_Array:
-            default:
-                return CHIP_ERROR_INVALID_TLV_ELEMENT;
-                break;
+                nextSubType.isDouble = reader.IsElementDouble();
             }
 
-            if (listIndex == 0)
+            if (jsonArray.empty())
             {
-                subType = nextSubType;
+                prevSubType = nextSubType;
             }
             else
             {
-                VerifyOrReturnError(strcmp(subType, nextSubType) == 0, CHIP_ERROR_INVALID_TLV_ELEMENT);
+                VerifyOrReturnError(prevSubType.tlvType == nextSubType.tlvType &&
+                                    prevSubType.isDouble == nextSubType.isDouble, CHIP_ERROR_INVALID_TLV_ELEMENT);
             }
 
-            KeyContext context2(static_cast<chip::ListIndex>(listIndex++));
-
             // Recursively convert to JSON the encompassing item within the array.
-            ReturnErrorOnFailure(TlvToJson(reader, context2, jsonArray));
+            ReturnErrorOnFailure(TlvToJson(reader, jsonArray));
         }
 
         VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
         ReturnErrorOnFailure(reader.ExitContainer(containerType));
-        context.SetElementType(kElementTypeArray);
-        context.SetArrayElementType(subType);
-        InsertKeyValue(jsonObj, context, jsonArray);
+
+        context.subType = prevSubType;
+        InsertJsonElement(jsonObj, context, jsonArray);
         break;
     }
 
@@ -357,7 +298,8 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, std::string & jsonString)
     Json::Value jsonObject(Json::objectValue);
     ReturnErrorOnFailure(TlvStructToJson(reader, jsonObject));
 
-    jsonString = jsonObject.toStyledString();
+    Json::StyledWriter writer;
+    jsonString = writer.write(jsonObject);
     return CHIP_NO_ERROR;
 }
 
@@ -366,7 +308,15 @@ std::string StylizeJsonString(const std::string & jsonString)
     Json::Reader reader;
     Json::Value jsonObject;
     reader.parse(jsonString, jsonObject);
-    return jsonObject.toStyledString();
+    Json::StyledWriter writer;
+    return writer.write(jsonObject);
+}
+
+std::string StylizeJsonStringSingleLine(const std::string & jsonString)
+{
+    std::string str = StylizeJsonString(jsonString);
+    str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
+    return str;
 }
 
 } // namespace chip

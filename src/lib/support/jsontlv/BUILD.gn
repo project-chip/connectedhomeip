@@ -20,9 +20,16 @@ config("jsontlv_config") {
 
 static_library("jsontlv") {
   sources = [
+    "ElementTypes.h",
     "JsonToTlv.cpp",
     "TlvJson.cpp",
     "TlvToJson.cpp",
+  ]
+
+  public = [
+    "JsonToTlv.h",
+    "TlvJson.h",
+    "TlvToJson.h",
   ]
 
   public_configs = [ ":jsontlv_config" ]

@@ -15,18 +15,26 @@
  *    limitations under the License.
  */
 
+#include <lib/core/TLV.h>
+
 namespace {
 
-extern const char kElementTypeInt[]    = "INT";
-extern const char kElementTypeUInt[]   = "UINT";
-extern const char kElementTypeBool[]   = "BOOL";
-extern const char kElementTypeFloat[]  = "FLOAT";
-extern const char kElementTypeDouble[] = "DOUBLE";
-extern const char kElementTypeBytes[]  = "BYTES";
-extern const char kElementTypeString[] = "STRING";
-extern const char kElementTypeNull[]   = "NULL";
-extern const char kElementTypeStruct[] = "STRUCT";
-extern const char kElementTypeArray[]  = "ARRAY";
-extern const char kElementTypeEmpty[]  = "?";
+const char kElementTypeInt[]    = "INT";
+const char kElementTypeUInt[]   = "UINT";
+const char kElementTypeBool[]   = "BOOL";
+const char kElementTypeFloat[]  = "FLOAT";
+const char kElementTypeDouble[] = "DOUBLE";
+const char kElementTypeBytes[]  = "BYTES";
+const char kElementTypeString[] = "STRING";
+const char kElementTypeNull[]   = "NULL";
+const char kElementTypeStruct[] = "STRUCT";
+const char kElementTypeArray[]  = "ARRAY";
+const char kElementTypeEmpty[]  = "?";
+
+struct ElementTypeContext
+{
+    chip::TLV::TLVType tlvType = chip::TLV::kTLVType_NotSpecified;
+    bool isDouble              = false;
+};
 
 } // namespace
