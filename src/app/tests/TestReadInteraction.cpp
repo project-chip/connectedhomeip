@@ -1939,16 +1939,43 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
 
 #if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        // We have 29 attributes in our mock attribute storage. And we subscribed twice.
-        // And attribute 3/2/4 is a list with 6 elements and list chunking is
-        // applied to it, but the way the packet boundaries fall we get two of
-        // its items as a single list, followed by 4 more single items for one
+        // Mock attribute storage in src/app/util/mock/attribute-storage.cpp
+        // has the following items
+        // - Endpoint 0xFFFE
+        //    - cluster 0xFFF1'FC01 (2 attributes)
+        //    - cluster 0xFFF1'FC02 (3 attributes)
+        // - Endpoint 0xFFFD
+        //    - cluster 0xFFF1'FC01 (2 attributes)
+        //    - cluster 0xFFF1'FC02 (4 attributes)
+        //    - cluster 0xFFF1'FC03 (5 attributes)
+        // - Endpoint 0xFFFC
+        //    - cluster 0xFFF1'FC01 (3 attributes)
+        //    - cluster 0xFFF1'FC02 (6 attributes)
+        //    - cluster 0xFFF1'FC03 (2 attributes)
+        //    - cluster 0xFFF1'FC04 (2 attributes)
+        //
+        // For at total of 29 attributes in a subscription.
+        //
+        // In particular attribute for 0xFFFC::0xFFF1'FC03::4 is a list of
+        // 6 elements of size 256 bytes each, that gets list chunking applied
+        // to it.
+        //
+        // Actual attribute response sizes depends on how list chunking occurs on this
+        // list.
+        //
+        // For event list enabled data, receive two of its items as a single list,
+        // followed by 4 more single items for one
         // of our subscriptions, and 3 as a single list followed by 3 single
         // items for the other.
         //
         // Thus we should receive 29*2 + 4 + 3 = 65 attribute data in total.
         constexpr size_t kExpectedAttributeResponse = 65;
 #else
+        // Without event list enabled, response changes to:
+        //
+        // TODO(andy31415): it is unclear to me why mock data chunking changes when
+        //                  event list enabling changes, as mock attributes are fixed.
+        //
         // Receiving 29*2 + 4 + 6 = 68 when eventlist attribute is not available.
         constexpr size_t kExpectedAttributeResponse = 68;
 #endif
