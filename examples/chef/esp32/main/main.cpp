@@ -150,8 +150,10 @@ void printQRCode()
 }
 #endif // CONFIG_HAVE_DISPLAY
 
+#if EMBER_AF_PLUGIN_NETWORK_COMMISSIONING_SERVER
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+#endif
 
 void InitServer(intptr_t)
 {
@@ -162,7 +164,9 @@ void InitServer(intptr_t)
 
     // Device Attestation & Onboarding codes
     chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+#if EMBER_AF_PLUGIN_NETWORK_COMMISSIONING_SERVER
     sWiFiNetworkCommissioningInstance.Init();
+#endif
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
 
     if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)

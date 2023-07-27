@@ -101,6 +101,7 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::app::Clusters;
 
+#if EMBER_AF_PLUGIN_NETWORK_COMMISSIONING_SERVER
 // Network comissioning implementation
 namespace {
 // If secondaryNetworkCommissioningEndpoint has a value and both Thread and WiFi
@@ -217,6 +218,7 @@ void InitNetworkCommissioning()
     }
 }
 } // anonymous namespace
+#endif // EMBER_AF_PLUGIN_NETWORK_COMMISSIONING_SERVER
 
 #if defined(ENABLE_CHIP_SHELL)
 using chip::Shell::Engine;
@@ -366,7 +368,9 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     err = ParseArguments(argc, argv, customOptions);
     SuccessOrExit(err);
 
+#if EMBER_AF_PLUGIN_NETWORK_COMMISSIONING_SERVER
     sSecondaryNetworkCommissioningEndpoint = secondaryNetworkCommissioningEndpoint;
+#endif
 
 #ifdef CHIP_CONFIG_KVS_PATH
     if (LinuxDeviceOptions::GetInstance().KVS == nullptr)
@@ -557,7 +561,9 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+#if EMBER_AF_PLUGIN_NETWORK_COMMISSIONING_SERVER
     InitNetworkCommissioning();
+#endif
 
     ApplicationInit();
 
