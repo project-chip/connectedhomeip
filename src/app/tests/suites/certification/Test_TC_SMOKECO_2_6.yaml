@@ -13,8 +13,8 @@
 # limitations under the License.
 
 name:
-    4.2.6. [TC-SMCO-2.6] ExpressedState Attribute - Multiple Alarms with DUT as
-    Server
+    4.2.6. [TC-SMOKECO-2.6] ExpressedState Attribute - Multiple Alarms with DUT
+    as Server
 
 PICS:
     - SMOKECO.S
@@ -195,7 +195,7 @@ tests:
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test
           Event"
-      PICS: DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0008 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -224,7 +224,7 @@ tests:
           Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event"
-      PICS: DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0009 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -393,7 +393,7 @@ tests:
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event
           Clear"
-      PICS: DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0009 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
@@ -431,7 +431,7 @@ tests:
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test
           Event Clear"
-      PICS: DGGEN.S.C00.Rsp
+      PICS: SMOKECO.S.A0008 && DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
       command: "TestEventTrigger"
