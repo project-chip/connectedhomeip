@@ -344,7 +344,8 @@ void WiFiManager::_ScanToConnectFinishedCb(wifi_manager_error_e wifiErr, void * 
     }
 }
 
-void WiFiManager::_UpdateScanCallback(void * scanCbData){
+void WiFiManager::_UpdateScanCallback(void * scanCbData)
+{
     auto networkScanned = static_cast<std::vector<WiFiScanResponse> *>(scanCbData);
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -360,26 +361,24 @@ void WiFiManager::_UpdateScanCallback(void * scanCbData){
 void WiFiManager::_SpecificScanFinishedCb(wifi_manager_error_e wifiErr, void * userData)
 {
     VerifyOrReturn(wifiErr == WIFI_MANAGER_ERROR_NONE,
-                  ChipLogError(DeviceLayer, "FAIL: scan WiFi [%s]", get_error_message(wifiErr)));
+                   ChipLogError(DeviceLayer, "FAIL: scan WiFi [%s]", get_error_message(wifiErr)));
 
     std::vector<WiFiScanResponse> networkScanned;
     int err = wifi_manager_foreach_found_specific_ap(sInstance.mWiFiManagerHandle, _FoundAPOnScanCb, &networkScanned);
 
-    VerifyOrReturn(err == WIFI_MANAGER_ERROR_NONE,
-                   ChipLogError(DeviceLayer, "FAIL: get scan list [%s]", get_error_message(err)));
+    VerifyOrReturn(err == WIFI_MANAGER_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: get scan list [%s]", get_error_message(err)));
     _UpdateScanCallback(&networkScanned);
 }
 
 void WiFiManager::_FullScanFinishedCb(wifi_manager_error_e wifiErr, void * userData)
 {
     VerifyOrReturn(wifiErr == WIFI_MANAGER_ERROR_NONE,
-                  ChipLogError(DeviceLayer, "FAIL: scan WiFi [%s]", get_error_message(wifiErr)));
+                   ChipLogError(DeviceLayer, "FAIL: scan WiFi [%s]", get_error_message(wifiErr)));
 
     std::vector<WiFiScanResponse> networkScanned;
     int err = wifi_manager_foreach_found_ap(sInstance.mWiFiManagerHandle, _FoundAPOnScanCb, &networkScanned);
 
-    VerifyOrReturn(err == WIFI_MANAGER_ERROR_NONE,
-                   ChipLogError(DeviceLayer, "FAIL: get scan list [%s]", get_error_message(err)));
+    VerifyOrReturn(err == WIFI_MANAGER_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: get scan list [%s]", get_error_message(err)));
     _UpdateScanCallback(&networkScanned);
 }
 
@@ -593,7 +592,8 @@ CHIP_ERROR WiFiManager::_WiFiScanToConnect(gpointer userData)
 
 CHIP_ERROR WiFiManager::_WiFiSpecificScan(gpointer userData)
 {
-    int wifiErr = wifi_manager_scan_specific_ap(sInstance.mWiFiManagerHandle, sInstance.mInterestedSSID, _SpecificScanFinishedCb, nullptr);
+    int wifiErr =
+        wifi_manager_scan_specific_ap(sInstance.mWiFiManagerHandle, sInstance.mInterestedSSID, _SpecificScanFinishedCb, nullptr);
 
     VerifyOrReturnError(wifiErr == WIFI_MANAGER_ERROR_NONE, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: request WiFi scan [%s]", get_error_message(wifiErr)));
@@ -954,11 +954,11 @@ CHIP_ERROR WiFiManager::StartWiFiScan(ByteSpan ssid, DeviceLayer::NetworkCommiss
     {
         memcpy(sInstance.mInterestedSSID, ssid.data(), ssid.size());
         sInstance.mInterestedSSID[ssid.size()] = '\0';
-        err                  = PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiSpecificScan, static_cast<void *>(nullptr));
+        err = PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiSpecificScan, static_cast<void *>(nullptr));
     }
     else
     {
-        err                  = PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiFullScan, static_cast<void *>(nullptr));
+        err = PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiFullScan, static_cast<void *>(nullptr));
     }
 
     SuccessOrExit(err);
