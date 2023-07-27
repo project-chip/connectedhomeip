@@ -75,7 +75,9 @@ bool emberAfPluginDoorLockSetCredential(EndpointId endpointId, uint16_t credenti
     return BoltLockMgr().SetCredential(credentialIndex, creator, modifier, credentialStatus, credentialType, secret);
 }
 
-bool emberAfPluginDoorLockOnDoorLockCommand(EndpointId endpointId, const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
+bool emberAfPluginDoorLockOnDoorLockCommand(EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                            const Nullable<chip::NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
+                                            OperationErrorEnum & err)
 {
     bool result = BoltLockMgr().ValidatePIN(pinCode, err);
 
@@ -88,7 +90,9 @@ bool emberAfPluginDoorLockOnDoorLockCommand(EndpointId endpointId, const Optiona
     return result;
 }
 
-bool emberAfPluginDoorLockOnDoorUnlockCommand(EndpointId endpointId, const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
+bool emberAfPluginDoorLockOnDoorUnlockCommand(EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                              const Nullable<chip::NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
+                                              OperationErrorEnum & err)
 {
     bool result = BoltLockMgr().ValidatePIN(pinCode, err);
 

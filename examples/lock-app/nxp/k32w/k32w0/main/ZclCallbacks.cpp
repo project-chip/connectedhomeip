@@ -31,13 +31,15 @@ using namespace ::chip;
 using namespace ::chip::app::Clusters;
 using namespace ::chip::app::Clusters::DoorLock;
 
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                            const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pinCode,
                                             OperationErrorEnum & err)
 {
     return BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
 }
 
-bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                              const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pinCode,
                                               OperationErrorEnum & err)
 {
     return BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);

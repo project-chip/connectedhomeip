@@ -188,14 +188,16 @@ private:
     Endpoint endpoints[kNumEndpoints];
 };
 
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode,
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                            const Nullable<chip::NodeId> & nodeId, const chip::Optional<chip::ByteSpan> & pinCode,
                                             chip::app::Clusters::DoorLock::OperationErrorEnum & err)
 {
     err = OperationErrorEnum::kUnspecified;
     return DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kLocked);
 }
 
-bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode,
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                              const Nullable<chip::NodeId> & nodeId, const chip::Optional<chip::ByteSpan> & pinCode,
                                               chip::app::Clusters::DoorLock::OperationErrorEnum & err)
 {
     err = OperationErrorEnum::kUnspecified;
