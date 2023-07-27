@@ -108,9 +108,9 @@ AttributePersistenceProvider * gAttributeSaver = nullptr;
 /**
  * Gets the global attribute saver.
  *
- * Note: When storing cluster attributes that are managed via the AttributeAccessInterface, it is recommended to
- * use the SafeAttributePersistenceProvider. See AttributePersistenceProvider and SafeAttributePersistenceProvider
- * class documentations for more information.
+ * Note: When storing cluster attributes that are managed via AttributeAccessInterface, it is recommended to
+ * use SafeAttributePersistenceProvider. See AttributePersistenceProvider and SafeAttributePersistenceProvider
+ * class documentation for more information.
  */
 AttributePersistenceProvider * GetAttributePersistenceProvider()
 {

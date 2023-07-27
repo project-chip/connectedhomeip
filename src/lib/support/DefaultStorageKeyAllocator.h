@@ -175,7 +175,7 @@ public:
     {
         // Needs at most 26 chars: 6 for "s/a///", 4 for the endpoint id, 8 each
         // for the cluster and attribute ids.
-        return StorageKeyName::Formatted("s/a/%x/%" PRIx32 "/%" PRIx32, endpointId, clusterId, attributeId);
+        return StorageKeyName::Formatted("g/sa/%x/%" PRIx32 "/%" PRIx32, endpointId, clusterId, attributeId);
     }
 
     // TODO: Should store fabric-specific parts of the binding list under keys
