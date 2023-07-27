@@ -39,6 +39,7 @@
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 
 #include "bluez/Helper.h"
