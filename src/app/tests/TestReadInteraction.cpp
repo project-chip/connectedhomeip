@@ -1309,8 +1309,8 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
                     !aPath.IsListItemOperation())
                 {
                     mGotStartOfSecondReport = true;
-                    // Wait for an actual data chunk.
-                    return;
+                    // We always have data chunks, so go ahead to mark things
+                    // dirty as needed.
                 }
 
                 if (!mGotStartOfSecondReport)
