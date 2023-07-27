@@ -54,6 +54,9 @@ CHIP_ERROR CastingServer::Init(AppParams * AppParams)
         return CHIP_NO_ERROR;
     }
 
+    // Set AppDelegate
+    chip::Server::Server::GetInstance().GetCommissioningWindowManager().SetAppDelegate(this);
+
     // Initialize binding handlers
     ReturnErrorOnFailure(InitBindingHandlers());
 
@@ -130,16 +133,53 @@ CHIP_ERROR CastingServer::DiscoverCommissioners(DeviceDiscoveryDelegate * device
         Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, static_cast<uint16_t>(35)));
 }
 
-CHIP_ERROR CastingServer::OpenBasicCommissioningWindow(std::function<void(CHIP_ERROR)> commissioningCompleteCallback,
+CHIP_ERROR CastingServer::OpenBasicCommissioningWindow(CommissioningCallbacks commissioningCallbacks,
                                                        std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                                        std::function<void(CHIP_ERROR)> onConnectionFailure,
                                                        std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint)
 {
-    mCommissioningCompleteCallback     = commissioningCompleteCallback;
+    mCommissioningCallbacks            = commissioningCallbacks;
     mOnConnectionSuccessClientCallback = onConnectionSuccess;
     mOnConnectionFailureClientCallback = onConnectionFailure;
     mOnNewOrUpdatedEndpoint            = onNewOrUpdatedEndpoint;
     return Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(kCommissioningWindowTimeout);
+}
+
+void CastingServer::OnCommissioningSessionStarted()
+{
+    ChipLogProgress(AppServer, "CastingServer::OnCommissioningSessionStarted");
+    if (mCommissioningCallbacks.sessionEstablished)
+    {
+
+        mCommissioningCallbacks.sessionEstablished();
+    }
+}
+
+void CastingServer::OnCommissioningSessionEstablishmentError(CHIP_ERROR err)
+{
+    ChipLogProgress(AppServer, "CastingServer::OnCommissioningSessionEstablishmentError");
+    if (mCommissioningCallbacks.sessionEstablishmentError)
+    {
+        mCommissioningCallbacks.sessionEstablishmentError(err);
+    }
+}
+
+void CastingServer::OnCommissioningSessionStopped()
+{
+    ChipLogProgress(AppServer, "CastingServer::OnCommissioningSessionStopped");
+    if (mCommissioningCallbacks.sessionEstablishmentStopped)
+    {
+        mCommissioningCallbacks.sessionEstablishmentStopped();
+    }
+}
+
+void CastingServer::OnCommissioningSessionEstablishmentStarted()
+{
+    ChipLogProgress(AppServer, "CastingServer::OnCommissioningSessionEstablishmentStarted");
+    if (mCommissioningCallbacks.sessionEstablishmentStarted)
+    {
+        mCommissioningCallbacks.sessionEstablishmentStarted();
+    }
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
@@ -433,7 +473,10 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
             {
                 ChipLogError(AppServer, "CastingServer::DeviceEventCallback accessingFabricIndex: %d did not match bindings",
                              event->BindingsChanged.fabricIndex);
-                CastingServer::GetInstance()->mCommissioningCompleteCallback(CHIP_ERROR_INCORRECT_STATE);
+                if (CastingServer::GetInstance()->mCommissioningCallbacks.commissioningComplete)
+                {
+                    CastingServer::GetInstance()->mCommissioningCallbacks.commissioningComplete(CHIP_ERROR_INCORRECT_STATE);
+                }
                 return;
             }
         }
@@ -472,7 +515,10 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
             ChipLogError(AppServer, "AddVideoPlayer(ToCache) error: %" CHIP_ERROR_FORMAT, err.Format());
         }
 
-        CastingServer::GetInstance()->mCommissioningCompleteCallback(err);
+        if (CastingServer::GetInstance()->mCommissioningCallbacks.commissioningComplete)
+        {
+            CastingServer::GetInstance()->mCommissioningCallbacks.commissioningComplete(err);
+        }
     }
 }
 
