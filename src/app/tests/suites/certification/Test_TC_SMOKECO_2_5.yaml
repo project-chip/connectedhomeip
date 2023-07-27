@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 4.2.5. [TC-SMCO-2.5] Secondary Functionality - Optional with DUT as Server
+name: 4.2.5. [TC-SMOKECO-2.5] Secondary Functionality - Optional with DUT as Server
 
 PICS:
     - SMOKECO.S
