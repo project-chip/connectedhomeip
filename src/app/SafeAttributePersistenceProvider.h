@@ -156,7 +156,6 @@ public:
     }
 
 protected:
-
     /**
      * Write an attribute value from the attribute store (i.e. not a struct or
      * list) to non-volatile memory.
@@ -178,7 +177,6 @@ protected:
     virtual CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) = 0;
 
 private:
-
     /**
      * Get the KVS representation of null for the given type.
      * @tparam T The type for which the null representation should be returned.
@@ -211,7 +209,6 @@ private:
     {
         return 0xff;
     }
-
 };
 
 /**

@@ -22,8 +22,7 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR DefaultAttributePersistenceProvider::InternalWriteValue(const StorageKeyName & aKey,
-                                                                   const ByteSpan & aValue)
+CHIP_ERROR DefaultAttributePersistenceProvider::InternalWriteValue(const StorageKeyName & aKey, const ByteSpan & aValue)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -37,8 +36,7 @@ CHIP_ERROR DefaultAttributePersistenceProvider::InternalWriteValue(const Storage
     return mStorage->SyncSetKeyValue(aKey.KeyName(), aValue.data(), static_cast<uint16_t>(aValue.size()));
 }
 
-CHIP_ERROR DefaultAttributePersistenceProvider::InternalReadValue(const StorageKeyName & aKey,
-                                                                  EmberAfAttributeType aType,
+CHIP_ERROR DefaultAttributePersistenceProvider::InternalReadValue(const StorageKeyName & aKey, EmberAfAttributeType aType,
                                                                   size_t aSize, MutableByteSpan & aValue)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -71,31 +69,28 @@ CHIP_ERROR DefaultAttributePersistenceProvider::InternalReadValue(const StorageK
 
 CHIP_ERROR DefaultAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
 {
-    return InternalWriteValue(
-        DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
-        aValue);
+    return InternalWriteValue(DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
+                              aValue);
 }
 
 CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath,
                                                           const EmberAfAttributeMetadata * aMetadata, MutableByteSpan & aValue)
 {
-    return InternalReadValue(
-        DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
-        aMetadata->attributeType, aMetadata->size, aValue);
+    return InternalReadValue(DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
+                             aMetadata->attributeType, aMetadata->size, aValue);
 }
 
 CHIP_ERROR DefaultAttributePersistenceProvider::SafeWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
 {
     return InternalWriteValue(
-        DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
-        aValue);
+        DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), aValue);
 }
 
 CHIP_ERROR DefaultAttributePersistenceProvider::SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue)
 {
     return InternalReadValue(
-        DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
-        0x20, aValue.size(), aValue);
+        DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), 0x20,
+        aValue.size(), aValue);
 }
 
 namespace {

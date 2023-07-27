@@ -201,7 +201,7 @@ void TestStorageAndRetrivalSignedScalarValues(nlTestSuite * inSuite, void * inCo
 // This test is commented out because the GetNullValueForNullableType methods have been made private.
 // If the contests of these functions changes, to run the tests temporarily make the methods public
 // and enable this test.
-//void TestGetNullFunctions(nlTestSuite * inSuite, void * inContext)
+// void TestGetNullFunctions(nlTestSuite * inSuite, void * inContext)
 //{
 //    NL_TEST_ASSERT(inSuite, SafeAttributePersistenceProvider::GetNullValueForNullableType<bool>() == uint8_t(0xff));
 //
@@ -390,11 +390,10 @@ const nlTest sTests[] = {
     NL_TEST_DEF("Storage and retrival of ByteSpans", TestStorageAndRetrivalByteSpans),
     NL_TEST_DEF("Storage and retrival of unsigned scalar values", TestStorageAndRetrivalScalarValues),
     NL_TEST_DEF("Storage and retrival of signed scalar values", TestStorageAndRetrivalSignedScalarValues),
-//    NL_TEST_DEF("Check GetNullValueForNullableType return values", TestGetNullFunctions),
+    //    NL_TEST_DEF("Check GetNullValueForNullableType return values", TestGetNullFunctions),
     NL_TEST_DEF("Storage and retrival of unsigned nullable scalar values", TestStorageAndRetrivalNullableScalarValues),
     NL_TEST_DEF("Storage and retrival of signed nullable scalar values", TestStorageAndRetrivalSignedNullableScalarValues),
-    NL_TEST_DEF("Small buffer errors", TestBufferTooSmallErrors),
-    NL_TEST_SENTINEL()
+    NL_TEST_DEF("Small buffer errors", TestBufferTooSmallErrors), NL_TEST_SENTINEL()
 };
 }
 
