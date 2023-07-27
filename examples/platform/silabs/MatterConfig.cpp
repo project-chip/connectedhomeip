@@ -253,8 +253,8 @@ void SilabsMatterConfig::InitWiFi(void)
 #ifdef SL_WFX_USE_SECURE_LINK
     wfx_securelink_task_start(); // start securelink key renegotiation task
 #endif                           // SL_WFX_USE_SECURE_LINK
-#elif defined(RS911X_WIFI)
-    SILABS_LOG("Init RSI 911x Platform");
+#elif defined(SIWX_917)
+    SILABS_LOG("Init RSI 917 Platform");
     if (wfx_rsi_platform() != SL_STATUS_OK)
     {
         SILABS_LOG("RSI init failed");
