@@ -11,7 +11,7 @@ RUN set -x \
     git-lfs \
     openjdk-17-jdk \
     python3-sphinx \
-    ccache=3.7.7-1 \
+    ccache \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
