@@ -60,7 +60,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
     struct bflbwifi_ap_record ap_info;
 
-    if(!wifiInterface_getApInfo(&ap_info))
+    if (!wifiInterface_getApInfo(&ap_info))
     {
         ChipLogError(DeviceLayer, "Failed to get ap info.");
         return CHIP_ERROR_INTERNAL;
@@ -74,7 +74,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
     using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
     struct bflbwifi_ap_record ap_info;
 
-    if(!wifiInterface_getApInfo(&ap_info))
+    if (!wifiInterface_getApInfo(&ap_info))
     {
         ChipLogError(DeviceLayer, "Failed to get ap info.");
         return CHIP_ERROR_INTERNAL;
@@ -101,7 +101,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
 {
     struct bflbwifi_ap_record ap_info;
 
-    if(!wifiInterface_getApInfo(&ap_info))
+    if (!wifiInterface_getApInfo(&ap_info))
     {
         ChipLogError(DeviceLayer, "Failed to get ap info.");
         return CHIP_ERROR_INTERNAL;
@@ -116,7 +116,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
     struct bflbwifi_ap_record ap_info;
 
-    if(!wifiInterface_getApInfo(&ap_info))
+    if (!wifiInterface_getApInfo(&ap_info))
     {
         ChipLogError(DeviceLayer, "Failed to get ap info.");
         return CHIP_ERROR_INTERNAL;

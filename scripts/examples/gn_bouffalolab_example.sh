@@ -34,7 +34,6 @@ bl702l_boards=("BL704L-DVK")
 bl702l_modules=("BL702L")
 bl702l_module_type="BL704l"
 
-
 print_help() {
     bl602_boards_help=""
     for board in "${bl602_boards[@]}"; do

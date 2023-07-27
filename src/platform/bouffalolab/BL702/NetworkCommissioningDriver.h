@@ -29,7 +29,6 @@ constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
 constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 } // namespace
 
-
 class BLScanResponseIterator : public Iterator<WiFiScanResponse>
 {
 public:
@@ -54,7 +53,6 @@ private:
     size_t mSize;
     WiFiScanResponse * mpScanResults;
 };
-
 
 class BLWiFiDriver final : public WiFiDriver
 {
@@ -117,7 +115,6 @@ public:
     }
 
 private:
-
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
     CHIP_ERROR StartScanWiFiNetworks(ByteSpan ssid);
 

@@ -62,7 +62,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
-    
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     wifiInterface_init();
 #elif CHIP_DEVICE_CONFIG_ENABLE_THREAD

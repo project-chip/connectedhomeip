@@ -76,9 +76,9 @@ static_library("BL702") {
   if (chip_enable_wifi) {
     sources += [
       "ConfigurationManagerImpl.cpp",
-      "WiFiInterface.c",
       "ConnectivityManagerImpl.cpp",
-      "NetworkCommissioningDriver.cpp"
+      "NetworkCommissioningDriver.cpp",
+      "WiFiInterface.c",
     ]
 
     deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]

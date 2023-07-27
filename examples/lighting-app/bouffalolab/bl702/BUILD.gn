@@ -140,7 +140,6 @@ bouffalolab_executable("lighting_app") {
     defines += [ "BL706_WIFI" ]
   }
 
-
   if (defined(enable_cdc_module) && enable_cdc_module) {
     defines += [ "CFG_USB_CDC_ENABLE" ]
   }
