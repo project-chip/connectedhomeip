@@ -13,39 +13,29 @@ step.
 
 ### Install Prerequisites
 
--   [Linux](https://docs.espressif.com/projects/esp-idf/en/v4.4.4/esp32/get-started/linux-setup.html)
--   [macOS](https://docs.espressif.com/projects/esp-idf/en/v4.4.4/esp32/get-started/macos-setup.html)
+-   [Linux](https://docs.espressif.com/projects/esp-idf/en/v5.1/esp32/get-started/linux-macos-setup.html#for-linux-users)
+-   [macOS](https://docs.espressif.com/projects/esp-idf/en/v5.1/esp32/get-started/linux-macos-setup.html#for-macos-users)
 
-### Get IDF v4.4.4
+### Get IDF v5.1
 
 -   Clone ESP-IDF
-    [v4.4.4 release](https://github.com/espressif/esp-idf/releases/tag/v4.4.4)
+    [v5.1 release](https://github.com/espressif/esp-idf/releases/tag/v5.1)
 
     ```
-    $ git clone -b v4.4.4 --recursive https://github.com/espressif/esp-idf.git
+    $ git clone -b v5.1 --recursive --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git
     $ cd esp-idf
     $ ./install.sh
     ```
 
--   To update an existing esp-idf toolchain to v4.4.4:
+-   To update an existing esp-idf toolchain to v5.1:
 
     ```
     $ cd path/to/esp-idf
     $ git fetch origin
-    $ git checkout v4.4.4
-    $ git reset --hard origin/v4.4.4
+    $ git checkout v5.1
+    $ git reset --hard origin/v5.1
     $ git submodule update --recursive --init
     $ git clean -fdx
-    $ ./install.sh
-    ```
-
--   For ESP32C6 & ESP32H2, please use commit
-    [ea5e0ff](https://github.com/espressif/esp-idf/tree/ea5e0ff).
-
-    ```
-    $ cd esp-idf
-    $ git checkout ea5e0ff
-    $ git submodule update --init
     $ ./install.sh
     ```
 
