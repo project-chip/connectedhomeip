@@ -38,14 +38,14 @@ static constexpr System::Clock::Milliseconds32 kMaxRetryInterval = 3600000_ms32;
 static constexpr size_t kKeyTcpSupportedMaxLength                = 1;
 
 // Commissionable/commissioner node TXT entries
-static constexpr size_t kKeyLongDiscriminatorMaxLength       = 5;
-static constexpr size_t kKeyVendorProductMaxLength           = 11;
-static constexpr size_t kKeyCommissioningModeMaxLength       = 1;
-static constexpr size_t kKeyDeviceTypeMaxLength              = 10;
-static constexpr size_t kKeyDeviceNameMaxLength              = 32;
-static constexpr size_t kKeyRotatingDeviceIdMaxLength        = 100;
-static constexpr size_t kKeyPairingInstructionMaxLength      = 128;
-static constexpr size_t kKeyPairingHintMaxLength             = 10;
+static constexpr size_t kKeyLongDiscriminatorMaxLength  = 5;
+static constexpr size_t kKeyVendorProductMaxLength      = 11;
+static constexpr size_t kKeyCommissioningModeMaxLength  = 1;
+static constexpr size_t kKeyDeviceTypeMaxLength         = 10;
+static constexpr size_t kKeyDeviceNameMaxLength         = 32;
+static constexpr size_t kKeyRotatingDeviceIdMaxLength   = 100;
+static constexpr size_t kKeyPairingInstructionMaxLength = 128;
+static constexpr size_t kKeyPairingHintMaxLength        = 10;
 
 enum class TxtKeyUse : uint8_t
 {

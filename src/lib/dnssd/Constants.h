@@ -35,12 +35,12 @@ constexpr size_t kHostNameMaxLength = 16; // MAC or 802.15.4 Extended Address in
  * Matter DNS service subtypes
  */
 
-constexpr size_t kSubTypeShortDiscriminatorMaxLength      = 4;  // _S<dd>
-constexpr size_t kSubTypeLongDiscriminatorMaxLength       = 6;  // _L<dddd>
-constexpr size_t kSubTypeVendorIdMaxLength                = 7;  // _V<ddddd>
-constexpr size_t kSubTypeDeviceTypeMaxLength              = 12; // _T<dddddddddd>
-constexpr size_t kSubTypeCommissioningModeMaxLength       = 3;  // _CM
-constexpr size_t kSubTypeCompressedFabricIdMaxLength      = 18; // _I<16-hex-digits>
+constexpr size_t kSubTypeShortDiscriminatorMaxLength = 4;  // _S<dd>
+constexpr size_t kSubTypeLongDiscriminatorMaxLength  = 6;  // _L<dddd>
+constexpr size_t kSubTypeVendorIdMaxLength           = 7;  // _V<ddddd>
+constexpr size_t kSubTypeDeviceTypeMaxLength         = 12; // _T<dddddddddd>
+constexpr size_t kSubTypeCommissioningModeMaxLength  = 3;  // _CM
+constexpr size_t kSubTypeCompressedFabricIdMaxLength = 18; // _I<16-hex-digits>
 
 /*
  * Matter operational node service settings
