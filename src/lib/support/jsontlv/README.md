@@ -58,9 +58,11 @@ limitations of this format are:
 -   The top-level container MUST be an anonymous STRUCT.
 -   Infinity Float/Double values are not supported.
 -   Elements of the TLV Structure MUST have Context or Common Profile Tags.
--   Common Profile Tag number MUST be larger or equal to 256 and smaller that 2^32.
--   TLV Structure element MUST be sorted by tag numbers from low to high, where sorted
-    elements with Context Tags MUST appear first followed by sorted elements with Common Profile Tags.
+-   Common Profile Tag number MUST be larger or equal to 256 and smaller that
+    2^32.
+-   TLV Structure element MUST be sorted by tag numbers from low to high, where
+    sorted elements with Context Tags MUST appear first followed by sorted
+    elements with Common Profile Tags.
 
 ## Format Example
 
