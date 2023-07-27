@@ -73,6 +73,20 @@ CHIP_ERROR DeviceInstanceInfoProviderImpl::GetProductLabel(char * buf, size_t bu
     return Internal::AndroidConfig::ReadConfigValueStr(Internal::AndroidConfig::kConfigKey_ProductLabel, buf, bufSize, dateLen);
 }
 
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetDeviceName(char * buf, size_t bufSize)
+{
+    CHIP_ERROR err;
+    size_t deviceNameSize = 0; // without counting null-terminator
+    err = Internal::AndroidConfig::ReadConfigValueStr(Internal::AndroidConfig::kConfigKey_MfrDeviceName, buf, bufSize,
+                                                      deviceNameSize);
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+        strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_NAME);
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DeviceInstanceInfoProviderImpl::GetProductName(char * buf, size_t bufSize)
 {
     CHIP_ERROR err;

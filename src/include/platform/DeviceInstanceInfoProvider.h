@@ -52,6 +52,19 @@ public:
     virtual CHIP_ERROR GetVendorId(uint16_t & vendorId) = 0;
 
     /**
+     * @brief Obtain the Device Name from the device's factory data.
+     *
+     * @param[out] buf Buffer to copy string.
+     *                 On CHIP_NO_ERROR return from this function this buffer will be null-terminated.
+     *                 On error CHIP_ERROR_BUFFER_TOO_SMALL there is no guarantee that buffer will be null-terminated.
+     * @param[in] bufSize Size of data, including the null terminator, that can be written to buf.
+     *                    This size should be +1 higher than maximum possible string.
+     * @returns CHIP_NO_ERROR on success, or another CHIP_ERROR from the underlying implementation
+     *          if access fails.
+     */
+    virtual CHIP_ERROR GetDeviceName(char * buf, size_t bufSize) = 0;
+
+    /**
      * @brief Obtain the Product Name from the device's factory data.
      *
      * @param[in, out] buf Buffer to copy string.
