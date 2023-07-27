@@ -70,9 +70,6 @@ public:
     {
         uint8_t attrData[sizeof(T)];
         MutableByteSpan tempVal(attrData);
-        // **Note** aType in the SafeReadValue function is only used to check if the value is of a string type. Since this template
-        // function is only enabled for integral values, we know that this case will not occur, so we can pass the enum of an
-        // arbitrary integral type. 0x20 is the ZCL enum type for ZCL_INT8U_ATTRIBUTE_TYPE.
         auto err = SafeReadValue(aPath, tempVal);
         if (err != CHIP_NO_ERROR)
         {
@@ -196,7 +193,8 @@ protected:
      *
      * @param [in]     aPath the attribute path for the data being persisted.
      * @param [in,out] aValue where to place the data.  The size of the buffer
-     *                 will be equal to `size`.
+     *                 will be equal to `aValue.size()`.  The callee is expected to adjust
+     *                 aValue's size to the actual number of bytes read.
      */
     virtual CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) = 0;
 };
