@@ -30,7 +30,8 @@ public:
     CHIP_ERROR HandleGetLineup(chip::app::AttributeValueEncoder & aEncoder);
     CHIP_ERROR HandleGetCurrentChannel(chip::app::AttributeValueEncoder & aEncoder);
 
-    void HandleChangeChannel(chip::app::CommandResponseHelper<chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type> & helper,
+    void HandleChangeChannel(
+        chip::app::CommandResponseHelper<chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type> & helper,
         const chip::CharSpan & match);
     bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber);
     bool HandleSkipChannel(const int16_t & count);

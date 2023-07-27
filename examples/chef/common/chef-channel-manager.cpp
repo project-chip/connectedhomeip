@@ -124,7 +124,7 @@ void ChefChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannel
 {
     std::array<ChannelInfoType, kMaxChannels> matchedChannels;
 
-    uint16_t index = 0;
+    uint16_t index                = 0;
     uint16_t totalMatchedChannels = 0;
     for (auto const & channel : mChannels)
     {
