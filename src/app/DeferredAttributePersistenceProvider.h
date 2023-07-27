@@ -16,7 +16,6 @@
 #pragma once
 
 #include <app/AttributePersistenceProvider.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 
