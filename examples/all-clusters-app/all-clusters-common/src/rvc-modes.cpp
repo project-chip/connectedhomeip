@@ -88,6 +88,20 @@ CHIP_ERROR RvcRunModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTa
     return CHIP_NO_ERROR;
 }
 
+void RvcRunMode::Shutdown()
+{
+    if (gRvcRunModeInstance != nullptr)
+    {
+        delete gRvcRunModeInstance;
+        gRvcRunModeInstance = nullptr;
+    }
+    if (gRvcRunModeDelegate != nullptr)
+    {
+        delete gRvcRunModeDelegate;
+        gRvcRunModeDelegate = nullptr;
+    }
+}
+
 void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
@@ -156,6 +170,20 @@ CHIP_ERROR RvcCleanModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<Mode
     tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
 
     return CHIP_NO_ERROR;
+}
+
+void RvcCleanMode::Shutdown()
+{
+    if (gRvcCleanModeInstance != nullptr)
+    {
+        delete gRvcCleanModeInstance;
+        gRvcCleanModeInstance = nullptr;
+    }
+    if (gRvcCleanModeDelegate != nullptr)
+    {
+        delete gRvcCleanModeDelegate;
+        gRvcCleanModeDelegate = nullptr;
+    }
 }
 
 void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)

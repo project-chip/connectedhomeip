@@ -87,7 +87,7 @@ class AppCallbacks : public AppDelegate
 public:
     void OnCommissioningSessionEstablishmentStarted() {}
     void OnCommissioningSessionStarted() override { bluetoothLED.Set(true); }
-    void OnCommissioningSessionStopped(CHIP_ERROR err) override
+    void OnCommissioningSessionStopped() override
     {
         bluetoothLED.Set(false);
         pairingWindowLED.Set(false);

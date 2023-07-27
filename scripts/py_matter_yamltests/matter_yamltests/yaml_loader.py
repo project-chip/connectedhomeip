@@ -103,6 +103,7 @@ class YamlLoader:
             'PICS': str,
             'arguments': dict,
             'response': (dict, list, str),  # Can be a variable
+            'saveResponseAs': str,
             'minInterval': int,
             'maxInterval': int,
             'timeout': int,

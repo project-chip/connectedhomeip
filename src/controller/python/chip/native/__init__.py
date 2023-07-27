@@ -197,5 +197,9 @@ def Init(bluetoothAdapter: int = None):
     _GetLibraryHandle(False).pychip_CommonStackInit(ctypes.c_char_p(params))
 
 
-def GetLibraryHandle():
-    return _GetLibraryHandle(True)
+class HandleFlags(enum.Flag):
+    REQUIRE_INITIALIZATION = enum.auto()
+
+
+def GetLibraryHandle(flags=HandleFlags.REQUIRE_INITIALIZATION):
+    return _GetLibraryHandle(HandleFlags.REQUIRE_INITIALIZATION in flags)

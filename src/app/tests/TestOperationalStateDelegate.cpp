@@ -542,42 +542,6 @@ void TestStructGenericOperationalPhaseCopyAssignment(nlTestSuite * inSuite, void
                    memcmp(const_cast<char *>(phase.mPhaseName.Value().data()), phaseBuffer2, kOperationalPhaseNameMaxSize) == 0);
 }
 
-void TestStructGenericOperationalCompletionConstructor(nlTestSuite * inSuite, void * inContext)
-{
-    using namespace chip::app;
-    using namespace chip::app::Clusters::OperationalState;
-
-    // completion with only CompletionErrorCode
-    GenericOperationCompletion genericOperationCompletion(to_underlying(OperationalStateEnum::kError));
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion.completionErrorCode == to_underlying(OperationalStateEnum::kError));
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion.totalOperationalTime.HasValue() == false);
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion.pausedTime.HasValue() == false);
-
-    // completion with errorCode and TotalOperationalTime
-    uint32_t kTotalOperationalTime = 500;
-    GenericOperationCompletion genericOperationCompletion2(
-        to_underlying(OperationalStateEnum::kError),
-        Optional<DataModel::Nullable<uint32_t>>(DataModel::Nullable<uint32_t>(kTotalOperationalTime)));
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion2.completionErrorCode == to_underlying(OperationalStateEnum::kError));
-
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion2.totalOperationalTime.HasValue() == true);
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion2.totalOperationalTime.Value().Value() == kTotalOperationalTime);
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion2.pausedTime.HasValue() == false);
-
-    // completion with errorCode, TotalOperationalTime and PausedTime
-    uint32_t kPausedTime = 2000;
-    GenericOperationCompletion genericOperationCompletion3(
-        to_underlying(OperationalStateEnum::kError),
-        Optional<DataModel::Nullable<uint32_t>>(DataModel::Nullable<uint32_t>(kTotalOperationalTime)),
-        Optional<DataModel::Nullable<uint32_t>>(DataModel::Nullable<uint32_t>(kPausedTime)));
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion3.completionErrorCode == to_underlying(OperationalStateEnum::kError));
-
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion3.totalOperationalTime.HasValue() == true);
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion3.totalOperationalTime.Value().Value() == kTotalOperationalTime);
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion3.pausedTime.HasValue() == true);
-    NL_TEST_ASSERT(inSuite, genericOperationCompletion3.pausedTime.Value().Value() == kPausedTime);
-}
-
 const nlTest sTests[] = {
     NL_TEST_DEF("Test struct GenericOperationalState: constructor with only StateID",
                 TestStructGenericOperationalStateConstructorWithOnlyStateID),
@@ -598,7 +562,6 @@ const nlTest sTests[] = {
     NL_TEST_DEF("Test struct GenericOperationalPhase: constructor", TestStructGenericOperationalPhaseConstructor),
     NL_TEST_DEF("Test struct GenericOperationalPhase: copy constructor", TestStructGenericOperationalPhaseCopyConstructor),
     NL_TEST_DEF("Test struct GenericOperationalPhase: copy assignment", TestStructGenericOperationalPhaseCopyAssignment),
-    NL_TEST_DEF("Test struct GenericOperationalCompletion: constructor", TestStructGenericOperationalCompletionConstructor),
     NL_TEST_SENTINEL()
 };
 
