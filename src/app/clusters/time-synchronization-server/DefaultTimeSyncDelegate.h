@@ -33,6 +33,11 @@ public:
     bool HandleUpdateDSTOffset(CharSpan name) override;
     bool IsNTPAddressValid(CharSpan ntp) override;
     bool IsNTPAddressDomain(CharSpan ntp) override;
+    bool UpdateTimeUsingGNSS() override;
+    bool UpdateTimeUsingPTP() override;
+    bool UpdateTimeUsingExternalSource() override;
+    bool UpdateTimeUsingNTP(bool & usedFullNTP, bool & usedNTS, bool & allSourcesFromMatterNetwork) override;
+    bool UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP) override;
 };
 
 } // namespace TimeSynchronization

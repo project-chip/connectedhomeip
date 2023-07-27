@@ -45,3 +45,25 @@ bool DefaultTimeSyncDelegate::IsNTPAddressDomain(chip::CharSpan ntp)
     // placeholder implementation
     return false;
 }
+
+bool DefaultTimeSyncDelegate::UpdateTimeUsingGNSS()
+{
+    return false;
+}
+bool DefaultTimeSyncDelegate::UpdateTimeUsingPTP()
+{
+    return false;
+}
+bool DefaultTimeSyncDelegate::UpdateTimeUsingExternalSource()
+{
+    return false;
+}
+bool DefaultTimeSyncDelegate::UpdateTimeUsingNTP(bool & usedFullNTP, bool & usedNTS, bool & allSourcesFromMatterNetwork)
+{
+    // TODO: For some platforms, this is probably already implemented. Ex. Linux. We need an override here.
+    return false;
+}
+bool DefaultTimeSyncDelegate::UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP)
+{
+    return false;
+}

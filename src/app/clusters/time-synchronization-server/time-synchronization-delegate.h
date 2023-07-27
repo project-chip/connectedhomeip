@@ -74,6 +74,42 @@ public:
      */
     virtual bool IsNTPAddressDomain(const CharSpan ntp) = 0;
 
+    // TODO: All of these will need to be async. That's going to be a LOT more code, so leaving that until the end since
+    // none of them return anything useful right now anyway.
+    /**
+     * @brief If the delegate supports GNSS and is able to get a good time, it updates the system time if required (ex using
+     * System::SystemClock().SetClock_RealTime) and returns true. Otherwise, it returns false.
+     */
+    virtual bool UpdateTimeUsingGNSS() = 0;
+    /**
+     * @brief If the delegate supports PTP and is able to get a good time, it updates the system time if required (ex using
+     * System::SystemClock().SetClock_RealTime) and returns true. Otherwise, it returns false.
+     */
+    virtual bool UpdateTimeUsingPTP() = 0;
+    /**
+     * @brief If the delegate supports trusted external time source (ex network NTP, cloud-based) and is able to get a good time, it
+     * updates the system time if required (ex using System::SystemClock().SetClock_RealTime) and returns true. Otherwise, it
+     * returns false.
+     */
+    virtual bool UpdateTimeUsingExternalSource() = 0;
+    /**
+     * @brief This covers delegate-discovered NTP sources. If the delegate supports NTP, it should attempt to update first using
+     * the DHCPv6 defined NTP server option, falling back to the DHCP server option if ipv4 is supported, followed by servers
+     * given by _ntp._udp DNS-SD query, if DNS-SD is supported. If the delegate is successful in updating the time, it updates the
+     * system time as required (ex using System::SystemClock().SetClock_RealTime) and sets the parameters according to selected
+     * source. If the delegate is uncertain of any values, it should set the parameters to false. The delegate returns true if the
+     * time was successfully set using NTP, false otherwise.
+     */
+    virtual bool UpdateTimeUsingNTP(bool & usedFullNTP, bool & usedNTS, bool & allSourcesFromMatterNetwork) = 0;
+
+    /**
+     * @brief If the delegate supports NTP, it should attempt to update its time using the provided fallbackNTP source.
+     * If the delegate is successful in obtaining a time from the fallbackNTP, it updates the system time (ex using
+     * System::SystemClock().SetClock_RealTime). The delegate returns true if it was successful in updating the time, false
+     * otherwise.
+     */
+    virtual bool UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP) = 0;
+
     virtual ~Delegate() = default;
 
 private:

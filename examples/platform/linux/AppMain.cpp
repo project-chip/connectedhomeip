@@ -41,6 +41,7 @@
 
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/RuntimeOptionsProvider.h>
 
 #include <DeviceInfoProviderImpl.h>
 
@@ -532,6 +533,9 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     // We need to set DeviceInfoProvider before Server::Init to setup the storage of DeviceInfoProvider properly.
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+    chip::app::RuntimeOptionsProvider::Instance().SetSimulateNoInternalTime(
+        LinuxDeviceOptions::GetInstance().mSimulateNoInternalTime);
 
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);

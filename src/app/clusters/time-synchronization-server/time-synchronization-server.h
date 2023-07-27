@@ -21,8 +21,16 @@
 
 #pragma once
 
+// TODO: Move this into the build file
+#ifndef TIME_SYNC_ENABLE_TSC_FEATURE
+#define TIME_SYNC_ENABLE_TSC_FEATURE 1
+#endif
+
 #include "TimeSyncDataProvider.h"
 
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+#include <app/ClusterStateCache.h>
+#endif
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
 #include <app/util/config.h>
@@ -62,9 +70,15 @@ enum class TimeSyncEventFlag : uint8_t
 };
 
 class TimeSynchronizationServer : public FabricTable::Delegate
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+    ,
+                                  public ClusterStateCache::Callback
+#endif
 {
 public:
+    TimeSynchronizationServer();
     void Init();
+    void Shutdown();
 
     static TimeSynchronizationServer & Instance(void);
     TimeSyncDataProvider & GetDataProvider(void) { return mTimeSyncDataProvider; }
@@ -96,13 +110,27 @@ public:
     void ClearEventFlag(TimeSyncEventFlag flag);
 
     // Fabric Table delegate functions
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex);
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+    // CASE connection functions
+    void OnDeviceConnectedFn(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+    void OnDeviceConnectionFailureFn();
+
+    // Platform event handler functions
+    void OnPlatformEventFn(const DeviceLayer::ChipDeviceEvent & event);
+
+    // AttributeCache::Callback functions
+    void OnAttributeChanged(ClusterStateCache * cache, const ConcreteAttributePath & path) override {}
+    void OnDone(ReadClient * apReadClient) override;
+#endif
 
 private:
+    static constexpr size_t kMaxDefaultNTPSize = 128;
     DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> mTrustedTimeSource;
     TimeSyncDataProvider::TimeZoneObj mTimeZoneObj{ Span<TimeSyncDataProvider::TimeZoneStore>(mTz), 0 };
     TimeSyncDataProvider::DSTOffsetObj mDstOffsetObj{ DataModel::List<Structs::DSTOffsetStruct::Type>(mDst), 0 };
-    GranularityEnum mGranularity;
+    GranularityEnum mGranularity = GranularityEnum::kNoTimeGranularity;
 
     TimeSyncDataProvider::TimeZoneStore mTz[CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE];
     Structs::DSTOffsetStruct::Type mDst[CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE];
@@ -110,6 +138,22 @@ private:
     TimeSyncDataProvider mTimeSyncDataProvider;
     static TimeSynchronizationServer sTimeSyncInstance;
     TimeSyncEventFlag mEventFlag = TimeSyncEventFlag::kNone;
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+    Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
+    Platform::UniquePtr<app::ReadClient> mReadClient;
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+#endif
+
+    // Called when the platform is set up - attempts to get time using the recommended source list in the spec.
+    void AttemptToGetTime();
+    // Attempts to set time through the delegate using gnss -> ptp -> cloud -> external ntp. Returns
+    // TimeSourceEnum of the method used to set the time. If it is unable to get a time kNone is returned.
+    TimeSourceEnum GetTimeFromDelegate();
+    // Attempts to get fallback NTP from the delegate (last available source)
+    // If successful, the function will set mGranulatiry and the time source
+    // If unsuccessful, it will emit a TimeFailure event.
+    void AttemptToGetFallbackNTPTimeFromDelegate();
 };
 
 } // namespace TimeSynchronization

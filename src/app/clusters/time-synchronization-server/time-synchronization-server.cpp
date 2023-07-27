@@ -18,6 +18,11 @@
 #include "DefaultTimeSyncDelegate.h"
 #include "time-synchronization-delegate.h"
 
+// TODO: Set define in build files, check define against flag using static assert on feature map
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+#include <app/InteractionModelEngine.h>
+#endif
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -31,6 +36,7 @@
 #include <lib/support/SortUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/RuntimeOptionsProvider.h>
 
 #include <app-common/zap-generated/cluster-enums.h>
 
@@ -61,6 +67,27 @@ Delegate * GetDelegate()
     }
     return gDelegate;
 }
+
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+void OnDeviceConnectedWrapper(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
+{
+    TimeSynchronizationServer * server = reinterpret_cast<TimeSynchronizationServer *>(context);
+    server->OnDeviceConnectedFn(exchangeMgr, sessionHandle);
+}
+
+void OnDeviceConnectionFailureWrapper(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
+{
+    TimeSynchronizationServer * server = reinterpret_cast<TimeSynchronizationServer *>(context);
+    server->OnDeviceConnectionFailureFn();
+}
+
+void OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t ptr)
+{
+    TimeSynchronizationServer * server = reinterpret_cast<TimeSynchronizationServer *>(ptr);
+    server->OnPlatformEventFn(*event);
+}
+#endif
+
 } // namespace
 
 namespace chip {
@@ -228,6 +255,213 @@ TimeSynchronizationServer & TimeSynchronizationServer::Instance()
     return sTimeSyncInstance;
 }
 
+TimeSynchronizationServer::TimeSynchronizationServer()
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+    :
+    mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
+    mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this)
+#endif
+{}
+
+TimeSourceEnum TimeSynchronizationServer::GetTimeFromDelegate()
+{
+    if (GetDelegate()->UpdateTimeUsingGNSS())
+    {
+        return TimeSourceEnum::kGnss;
+    }
+    if (GetDelegate()->UpdateTimeUsingPTP())
+    {
+        return TimeSourceEnum::kPtp;
+    }
+    if (GetDelegate()->UpdateTimeUsingExternalSource())
+    {
+        return TimeSourceEnum::kCloudSource;
+    }
+    bool full_ntp = false;
+    bool nts      = false;
+    bool matter   = false;
+    if (GetDelegate()->UpdateTimeUsingNTP(full_ntp, nts, matter))
+    {
+        if (matter)
+        {
+            if (full_ntp)
+            {
+                if (nts)
+                {
+                    return TimeSourceEnum::kMatterNTPNTS;
+                }
+                return TimeSourceEnum::kMatterNTP;
+            }
+            else
+            {
+                if (nts)
+                {
+                    return TimeSourceEnum::kMatterSNTPNTS;
+                }
+                return TimeSourceEnum::kMatterSNTP;
+            }
+            // non-matter
+        }
+        else
+        {
+            if (full_ntp)
+            {
+                if (nts)
+                {
+                    return TimeSourceEnum::kNonMatterNTPNTS;
+                }
+                return TimeSourceEnum::kNonMatterNTP;
+            }
+            else
+            {
+                if (nts)
+                {
+                    return TimeSourceEnum::kNonMatterSNTPNTS;
+                }
+                return TimeSourceEnum::kNonMatterSNTP;
+            }
+        }
+    }
+    return TimeSourceEnum::kNone;
+}
+
+void TimeSynchronizationServer::AttemptToGetFallbackNTPTimeFromDelegate()
+{
+    // Sent as a char-string to the delegate so they can read it easily
+    char defaultNTP[kMaxDefaultNTPSize];
+    MutableCharSpan span(defaultNTP);
+    if (GetDefaultNtp(span) != CHIP_NO_ERROR)
+    {
+        emitTimeFailureEvent(kRootEndpointId);
+        return;
+    }
+    if (span.size() > kMaxDefaultNTPSize)
+    {
+        emitTimeFailureEvent(kRootEndpointId);
+        return;
+    }
+    if (GetDelegate()->UpdateTimeUsingNTPFallback(span))
+    {
+        // This is SNTP equivalent even if the delegate has a full NTP stack since there's a single source
+        mGranularity = GranularityEnum::kSecondsGranularity;
+        TimeSource::Set(kRootEndpointId, TimeSourceEnum::kNonMatterSNTP);
+    }
+    else
+    {
+        emitTimeFailureEvent(kRootEndpointId);
+    }
+}
+
+void TimeSynchronizationServer::OnDeviceConnectedFn(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
+{
+    // Connected to our trusted time source, let's read the time.
+    app::AttributePathParams readPaths[1];
+    // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
+    readPaths[0]                         = app::AttributePathParams(kRootEndpointId, app::Clusters::TimeSynchronization::Id,
+                                                                    app::Clusters::TimeSynchronization::Attributes::UTCTime::Id);
+    app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
+    app::ReadPrepareParams readParams(sessionHandle);
+    readParams.mpAttributePathParamsList    = readPaths;
+    readParams.mAttributePathParamsListSize = 1;
+
+    // TODO: check nulls.
+    auto attributeCache = Platform::MakeUnique<app::ClusterStateCache>(*this);
+    auto readClient     = chip::Platform::MakeUnique<app::ReadClient>(engine, &exchangeMgr, attributeCache->GetBufferedCallback(),
+                                                                  app::ReadClient::InteractionType::Read);
+    CHIP_ERROR err      = readClient->SendRequest(readParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to read UTC time from trusted source");
+        OnDeviceConnectionFailureFn();
+        return;
+    }
+    mAttributeCache = std::move(attributeCache);
+    mReadClient     = std::move(readClient);
+}
+
+void TimeSynchronizationServer::OnDeviceConnectionFailureFn()
+{
+    // No way to read from the TrustedTimeSource, fall back to default NTP
+    AttemptToGetFallbackNTPTimeFromDelegate();
+}
+
+void TimeSynchronizationServer::OnDone(ReadClient * apReadClient)
+{
+    using namespace chip::app::Clusters::TimeSynchronization::Attributes;
+    UTCTime::TypeInfo::Type time;
+    CHIP_ERROR err = mAttributeCache->Get<UTCTime::TypeInfo>(kRootEndpointId, time);
+    if (err == CHIP_NO_ERROR && !time.IsNull())
+    {
+        // Being conservative with the granularity here
+        // TODO: ask for granularity in the read path and set accordingly.
+        // TODO: if we fail to set the time here, maybe we should try the backup?
+        SetUTCTime(kRootEndpointId, time.Value(), GranularityEnum::kMinutesGranularity, TimeSourceEnum::kNodeTimeCluster);
+    }
+    else
+    {
+        AttemptToGetFallbackNTPTimeFromDelegate();
+    }
+}
+
+void TimeSynchronizationServer::AttemptToGetTime()
+{
+    // Let's check the delegate and see if can get us a time. Even if the time is already set, we want to ask the delegate so we can
+    // set the time source as appropriate.
+    bool have_internal_time = false;
+    if (!RuntimeOptionsProvider::Instance().GetSimulateNoInternalTime())
+    {
+        TimeSourceEnum source = GetTimeFromDelegate();
+        if (source != TimeSourceEnum::kNone)
+        {
+            // There's not much we can do if we fail to set this, so I guess just ignore the error.
+            TimeSource::Set(kRootEndpointId, source);
+            // Estimate the granularity based on the source
+            // TODO: Maybe get this from the delegate?
+            switch (source)
+            {
+            case TimeSourceEnum::kGnss:
+            case TimeSourceEnum::kPtp:
+                mGranularity = GranularityEnum::kMicrosecondsGranularity;
+                break;
+            case TimeSourceEnum::kCloudSource:
+            case TimeSourceEnum::kMatterNTP:
+            case TimeSourceEnum::kMatterNTPNTS:
+            case TimeSourceEnum::kNonMatterNTP:
+            case TimeSourceEnum::kNonMatterNTPNTS:
+                mGranularity = GranularityEnum::kMillisecondsGranularity;
+                break;
+            case TimeSourceEnum::kMatterSNTP:
+            case TimeSourceEnum::kMatterSNTPNTS:
+            case TimeSourceEnum::kNonMatterSNTP:
+            case TimeSourceEnum::kNonMatterSNTPNTS:
+                // Let's be a bit more conservative with SNTP
+                mGranularity = GranularityEnum::kSecondsGranularity;
+                break;
+            default:
+                mGranularity = GranularityEnum::kMinutesGranularity;
+            }
+            have_internal_time = true;
+        }
+    }
+    if (!have_internal_time)
+    {
+        // Delegate couldn't get us a time, next up is to check the trusted time source, if we have one.
+        // TODO: ifdef this with a client flag, and check the define flag against the feature map using a static config
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+        if (!mTrustedTimeSource.IsNull())
+        {
+            CASESessionManager * caseSessionManager = Server::GetInstance().GetCASESessionManager();
+            ScopedNodeId nodeId(mTrustedTimeSource.Value().nodeID, mTrustedTimeSource.Value().fabricIndex);
+            caseSessionManager->FindOrEstablishSession(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+        }
+        else
+#endif
+        {
+            AttemptToGetFallbackNTPTimeFromDelegate();
+        }
+    }
+}
+
 void TimeSynchronizationServer::Init()
 {
     mTimeSyncDataProvider.Init(Server::GetInstance().GetPersistentStorage());
@@ -245,25 +479,41 @@ void TimeSynchronizationServer::Init()
     {
         ClearDSTOffset();
     }
-    if (!mTrustedTimeSource.IsNull())
-    {
-        // TODO: trusted time source is available, schedule a time read https://github.com/project-chip/connectedhomeip/issues/27201
-    }
     System::Clock::Microseconds64 utcTime;
-    if (System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR)
+
+    if (System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR &&
+        !RuntimeOptionsProvider::Instance().GetSimulateNoInternalTime())
     {
         mGranularity = GranularityEnum::kMinutesGranularity;
     }
-    else
-    {
-        mGranularity = GranularityEnum::kNoTimeGranularity;
-    }
+
     // This can error, but it's not clear what should happen in this case. For now, just ignore it because we still
     // want time sync even if we can't register the deletgate here.
     CHIP_ERROR err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Unable to register Fabric table delegate for time sync");
+        ChipLogError(Zcl, "Unable to register Fabric table delegate for time sync");
+    }
+    PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
+}
+
+void TimeSynchronizationServer::Shutdown()
+{
+    PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
+}
+
+void TimeSynchronizationServer::OnPlatformEventFn(const DeviceLayer::ChipDeviceEvent & event)
+{
+    switch (event.Type)
+    {
+    case DeviceEventType::kServerReady:
+        if (mGranularity == GranularityEnum::kNoTimeGranularity)
+        {
+            AttemptToGetTime();
+        }
+        break;
+    default:
+        break;
     }
 }
 
@@ -278,6 +528,10 @@ CHIP_ERROR TimeSynchronizationServer::SetTrustedTimeSource(const DataModel::Null
     else
     {
         err = mTimeSyncDataProvider.ClearTrustedTimeSource();
+    }
+    if (mGranularity == GranularityEnum::kNoTimeGranularity)
+    {
+        AttemptToGetTime();
     }
     return err;
 }
@@ -544,7 +798,12 @@ void TimeSynchronizationServer::ScheduleDelayedAction(System::Clock::Seconds32 d
 CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime, GranularityEnum granularity,
                                                  TimeSourceEnum source)
 {
-    ReturnErrorOnFailure(UpdateUTCTime(utcTime));
+    CHIP_ERROR err = UpdateUTCTime(utcTime);
+    if (err != CHIP_NO_ERROR && !RuntimeOptionsProvider::Instance().GetSimulateNoInternalTime())
+    {
+        ChipLogError(Zcl, "Error setting UTC time on the device");
+        return err;
+    }
     mGranularity = granularity;
     if (EMBER_ZCL_STATUS_SUCCESS != TimeSource::Set(ep, source))
     {
@@ -559,6 +818,10 @@ CHIP_ERROR TimeSynchronizationServer::GetLocalTime(EndpointId ep, DataModel::Nul
     int64_t timeZoneOffset = 0, dstOffset = 0;
     System::Clock::Microseconds64 utcTime;
     uint64_t chipEpochTime;
+    if (mGranularity == GranularityEnum::kNoTimeGranularity)
+    {
+        return CHIP_ERROR_INVALID_TIME;
+    }
     VerifyOrReturnError(TimeState::kInvalid != UpdateDSTOffsetState(), CHIP_ERROR_INVALID_TIME);
     ReturnErrorOnFailure(System::SystemClock().GetClock_RealTime(utcTime));
     VerifyOrReturnError(UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
@@ -591,6 +854,13 @@ TimeState TimeSynchronizationServer::UpdateTimeZoneState()
     size_t activeTzIndex = 0;
     uint64_t chipEpochTime;
 
+    // This return allows us to simulate no internal time for testing purposes
+    // This will be set once we receive a good time either from the delegate or via a command
+    if (mGranularity == GranularityEnum::kNoTimeGranularity)
+    {
+        return TimeState::kInvalid;
+    }
+
     VerifyOrReturnValue(System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR, TimeState::kInvalid);
     VerifyOrReturnValue(tzList.size() != 0, TimeState::kInvalid);
     VerifyOrReturnValue(UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime), TimeState::kInvalid);
@@ -622,6 +892,13 @@ TimeState TimeSynchronizationServer::UpdateDSTOffsetState()
     size_t activeDstIndex = 0;
     uint64_t chipEpochTime;
     bool dstStopped = true;
+
+    // This return allows us to simulate no internal time for testing purposes
+    // This will be set once we receive a good time either from the delegate or via a command
+    if (mGranularity == GranularityEnum::kNoTimeGranularity)
+    {
+        return TimeState::kInvalid;
+    }
 
     VerifyOrReturnValue(System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR, TimeState::kInvalid);
     VerifyOrReturnValue(dstList.size() != 0, TimeState::kInvalid);
@@ -778,7 +1055,12 @@ CHIP_ERROR TimeSynchronizationAttrAccess::Read(const ConcreteReadAttributePath &
     case UTCTime::Id: {
         System::Clock::Microseconds64 utcTimeUnix;
         uint64_t chipEpochTime;
-
+        // This return allows us to simulate no internal time for testing purposes
+        // This will be set once we receive a good time either from the delegate or via a command
+        if (TimeSynchronizationServer::Instance().GetGranularity() == GranularityEnum::kNoTimeGranularity)
+        {
+            return aEncoder.EncodeNull();
+        }
         VerifyOrReturnError(System::SystemClock().GetClock_RealTime(utcTimeUnix) == CHIP_NO_ERROR, aEncoder.EncodeNull());
         VerifyOrReturnError(UnixEpochToChipEpochMicro(utcTimeUnix.count(), chipEpochTime), aEncoder.EncodeNull());
         return aEncoder.Encode(chipEpochTime);
