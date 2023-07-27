@@ -300,7 +300,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(mLastChangedTime));
         break;
     }
-    case HepaFilterMonitoring::Attributes::ReplacementProductList::TypeInfo::GetAttributeId(): {
+    case Attributes::ReplacementProductList::Id: {
         return ReadReplacableProductList(aEncoder);
         break;
     }

@@ -211,6 +211,10 @@ struct TypeInfo
 };
 } // namespace LastChangedTime
 
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000005;
+}
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
