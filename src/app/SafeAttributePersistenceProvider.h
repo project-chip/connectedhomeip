@@ -85,17 +85,36 @@ public:
     }
 
     /**
-     * Write an attribute value of type nullable intX, uintX or bool to non-volatile memory.
+     * Write an attribute value of type nullable intX, uintX to non-volatile memory.
      *
      * @param [in] aPath the attribute path for the data being written.
      * @param [in] aValue the data to write.
      */
-    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+    template <typename T, std::enable_if_t<std::is_integral<T>::value && !std::is_same<bool, T>::value, bool> = true>
     CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
         if (aValue.IsNull())
         {
-            auto nullVal = GetNullValueForNullableType<T>();
+            T nullVal;
+            NumericAttributeTraits<T>::SetNull(nullVal);
+            return WriteScalarValue(aPath, nullVal);
+        }
+        return WriteScalarValue(aPath, aValue.Value());
+    }
+
+    /**
+     * Write an attribute value of type nullable bool to non-volatile memory.
+     *
+     * @param [in] aPath the attribute path for the data being written.
+     * @param [in] aValue the data to write.
+     */
+    template <typename T, std::enable_if_t<std::is_same<bool, T>::value, bool> = true>
+    CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
+    {
+        if (aValue.IsNull())
+        {
+            uint8_t nullVal;
+            NumericAttributeTraits<uint8_t>::SetNull(nullVal);
             return WriteScalarValue(aPath, nullVal);
         }
         return WriteScalarValue(aPath, aValue.Value());
@@ -111,6 +130,8 @@ public:
     CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
         T tempIntegral;
+        T nullVal;
+        NumericAttributeTraits<T>::SetNull(nullVal);
 
         CHIP_ERROR err = ReadScalarValue(aPath, tempIntegral);
         if (err != CHIP_NO_ERROR)
@@ -118,7 +139,7 @@ public:
             return err;
         }
 
-        if (tempIntegral == GetNullValueForNullableType<T>())
+        if (tempIntegral == nullVal)
         {
             aValue.SetNull();
             return CHIP_NO_ERROR;
@@ -145,7 +166,10 @@ public:
             return err;
         }
 
-        if (tempIntegral == GetNullValueForNullableType<T>())
+        uint8_t nullVal;
+        NumericAttributeTraits<uint8_t>::SetNull(nullVal);
+
+        if (tempIntegral == nullVal)
         {
             aValue.SetNull();
             return CHIP_NO_ERROR;
@@ -175,40 +199,6 @@ protected:
      *                 will be equal to `size`.
      */
     virtual CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) = 0;
-
-private:
-    /**
-     * Get the KVS representation of null for the given type.
-     * @tparam T The type for which the null representation should be returned.
-     * @return A value of type T that in the KVS represents null.
-     */
-    template <typename T, typename std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
-    static constexpr T GetNullValueForNullableType()
-    {
-        return std::numeric_limits<T>::quiet_NaN();
-    }
-
-    /**
-     * Get the KVS representation of null for the given type.
-     * @tparam T The type for which the null representation should be returned.
-     * @return A value of type T that in the KVS represents null.
-     */
-    template <typename T, typename std::enable_if_t<std::is_integral<T>::value && !std::is_same<bool, T>::value, int> = 0>
-    static constexpr T GetNullValueForNullableType()
-    {
-        return std::is_signed<T>::value ? std::numeric_limits<T>::min() : std::numeric_limits<T>::max();
-    }
-
-    /**
-     * Get the KVS representation of null for the given type.
-     * @tparam T The type for which the null representation should be returned.
-     * @return A value of type T that in the KVS represents null.
-     */
-    template <typename T, std::enable_if_t<std::is_same<bool, T>::value, bool> = true>
-    static uint8_t GetNullValueForNullableType()
-    {
-        return 0xff;
-    }
 };
 
 /**
