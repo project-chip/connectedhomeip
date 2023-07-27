@@ -61,10 +61,16 @@ include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 target_compile_options(app PRIVATE -fpermissive)
 
 target_include_directories(app PRIVATE
-                           include
-                           ${GEN_DIR}/app-common
+                           ${CMAKE_CURRENT_SOURCE_DIR}
+                           ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common
+                           ${GEN_DIR}
+                           ${CHEF}
+                           ${GEN_DIR}/../
+                           ${CHIP_ROOT}/src
+                           ${CHIP_ROOT}/examples/shell/shell_common/include
                            ${TELINK_COMMON}/common/include
-                           ${TELINK_COMMON}/util/include)
+                           ${TELINK_COMMON}/util/include
+)
 
 if (CONFIG_CHIP_LIB_SHELL)
   target_sources(app PRIVATE
@@ -83,14 +89,9 @@ add_definitions(
 )
 
 target_sources(app PRIVATE
-               src/AppTask.cpp
-               ${TELINK_COMMON}/common/src/mainCommon.cpp
-               ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
-               ${TELINK_COMMON}/util/src/LEDWidget.cpp
-               ${TELINK_COMMON}/util/src/ButtonManager.cpp
-               ${TELINK_COMMON}/util/src/ThreadUtil.cpp
-               ${TELINK_COMMON}/util/src/PWMDevice.cpp
-               ${CHEF}/common/stubs.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CHEF}/common/stubs.cpp
+)
 
 message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)
 
