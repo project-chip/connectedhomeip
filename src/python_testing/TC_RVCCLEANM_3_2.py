@@ -20,9 +20,9 @@ import random
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
+from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
-from chip.interaction_model import Status
 
 # This test requires several additional command line arguments
 # run with
