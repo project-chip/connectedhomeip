@@ -49,12 +49,6 @@ public:
 
     void Shutdown() {}
 
-private:
-    CHIP_ERROR InternalWriteValue(const StorageKeyName & aKey, const ByteSpan & aValue);
-    CHIP_ERROR InternalReadValue(const StorageKeyName & aKey, EmberAfAttributeType aType, size_t aSize,
-                                 MutableByteSpan & aValue);
-
-public:
     // AttributePersistenceProvider implementation.
     CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
     CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata,
@@ -62,11 +56,16 @@ public:
 
     // SafeAttributePersistenceProvider implementation.
     CHIP_ERROR SafeWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
-    CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, size_t aSize,
+    CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType,
                              MutableByteSpan & aValue) override;
 
 protected:
     PersistentStorageDelegate * mStorage;
+
+private:
+    CHIP_ERROR InternalWriteValue(const StorageKeyName & aKey, const ByteSpan & aValue);
+    CHIP_ERROR InternalReadValue(const StorageKeyName & aKey, EmberAfAttributeType aType, size_t aSize,
+                                 MutableByteSpan & aValue);
 };
 
 } // namespace app

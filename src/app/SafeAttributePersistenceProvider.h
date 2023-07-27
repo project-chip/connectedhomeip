@@ -39,43 +39,6 @@ public:
     SafeAttributePersistenceProvider()          = default;
 
     /**
-     * Write an attribute value from the attribute store (i.e. not a struct or
-     * list) to non-volatile memory.
-     *
-     * @param [in] aPath the attribute path for the data being written.
-     * @param [in] aValue the data to write.  Integers and floats are
-     *             represented in native endianness.  Strings are represented
-     *             as Pascal-style strings, as in ZCL, with a length prefix
-     *             whose size depends on the actual string type.  The length is
-     *             stored as little-endian.
-     *
-     *             Integer and float values have a size that matches the `size`
-     *             member of aMetadata.
-     *
-     *             String values have a size that corresponds to the actual size
-     *             of the data in the string (including the length prefix),
-     *             which is no larger than the `size` member of aMetadata.
-     */
-    virtual CHIP_ERROR SafeWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) = 0;
-
-    /**
-     * Read an attribute value from non-volatile memory.
-     *
-     * @param [in]     aPath the attribute path for the data being persisted.
-     * @param [in]     aType the attribute type.
-     * @param [in]     aSize the attribute size.
-     * @param [in,out] aValue where to place the data.  The size of the buffer
-     *                 will be equal to `size`.
-     *
-     *                 The data is expected to be in native endianness for
-     *                 integers and floats.  For strings, see the string
-     *                 representation description in the SafeWriteValue
-     *                 documentation.
-     */
-    virtual CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, size_t aSize,
-                                     MutableByteSpan & aValue) = 0;
-
-    /**
      * Get the KVS representation of null for the given type.
      * @tparam T The type for which the null representation should be returned.
      * @return A value of type T that in the KVS represents null.
@@ -146,7 +109,7 @@ public:
         // **Note** aType in the SafeReadValue function is only used to check if the value is of a string type. Since this template
         // function is only enabled for integral values, we know that this case will not occur, so we can pass the enum of an
         // arbitrary integral type. 0x20 is the ZCL enum type for ZCL_INT8U_ATTRIBUTE_TYPE.
-        auto err = SafeReadValue(aPath, 0x20, sizeof(T), tempVal);
+        auto err = SafeReadValue(aPath, 0x20, tempVal);
         if (err != CHIP_NO_ERROR)
         {
             return err;
@@ -227,6 +190,28 @@ public:
         aValue.SetNonNull(tempIntegral);
         return CHIP_NO_ERROR;
     }
+
+protected:
+
+    /**
+     * Write an attribute value from the attribute store (i.e. not a struct or
+     * list) to non-volatile memory.
+     *
+     * @param [in] aPath the attribute path for the data being written.
+     * @param [in] aValue the data to write. The value should be stored as-is.
+     */
+    virtual CHIP_ERROR SafeWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) = 0;
+
+    /**
+     * Read an attribute value from non-volatile memory.
+     *
+     * @param [in]     aPath the attribute path for the data being persisted.
+     * @param [in]     aType the attribute type.
+     * @param [in,out] aValue where to place the data.  The size of the buffer
+     *                 will be equal to `size`.
+     */
+    virtual CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType,
+                                     MutableByteSpan & aValue) = 0;
 };
 
 /**
