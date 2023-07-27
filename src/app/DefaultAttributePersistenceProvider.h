@@ -60,6 +60,7 @@ public:
     CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata,
                          MutableByteSpan & aValue) override;
 
+    // SafeAttributePersistenceProvider implementation.
     CHIP_ERROR SafeWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
     CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, size_t aSize,
                              MutableByteSpan & aValue) override;

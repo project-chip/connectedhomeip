@@ -23,10 +23,10 @@ namespace chip {
 namespace app {
 
 /**
- * Interface for persisting attribute values. This will writes attributes in storage with platform endianness
- * and uses a different key to the SafeAttributePersistenceProvider.
+ * Interface for persisting attribute values. This will write attributes in storage with platform endianness for scalars
+ * and uses a different key space from SafeAttributePersistenceProvider.
  * When storing cluster attributes that are managed via the AttributeAccessInterface, it is recommended to
- * use the SafeAttributePersistenceProvider.
+ * use SafeAttributePersistenceProvider.
  */
 
 class AttributePersistenceProvider

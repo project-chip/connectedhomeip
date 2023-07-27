@@ -29,7 +29,7 @@ namespace app {
 
 /**
  * Interface for persisting attribute values. This will always write attributes in storage as little-endian
- * and uses a different key to the AttributePersistenceProvider.
+ * and uses a different key space from AttributePersistenceProvider.
  */
 
 class SafeAttributePersistenceProvider
