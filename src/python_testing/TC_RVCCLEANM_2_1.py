@@ -52,7 +52,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
                             "the --int-arg flag as PIXIT_MODEFAIL:<mode id>")
         asserts.assert_true('pixit_can_test_mode_failure' in self.matter_test_config.global_test_params,
                             "PIXIT_CAN_TEST_MODE_FAILURE must be included on the command line in "
-                            "the --bool-arg flag as PIXIT_CAN_TEST_MODE_FAILURE:<true/false>")                    
+                            "the --bool-arg flag as PIXIT_CAN_TEST_MODE_FAILURE:<true/false>")
 
         self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
         self.modeok = self.matter_test_config.global_test_params['PIXIT_MODEOK']
