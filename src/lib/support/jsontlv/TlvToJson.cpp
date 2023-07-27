@@ -76,7 +76,7 @@ struct JsonObjectElementContext
     std::string GenerateJsonElementName() const
     {
         std::string str = std::to_string(TLV::TagNumFromTag(tag));
-        str = str + ":" + GetJsonElementStrFromType(type);
+        str             = str + ":" + GetJsonElementStrFromType(type);
         if (type.tlvType == TLV::kTLVType_Array)
         {
             str = str + "-" + GetJsonElementStrFromType(subType);
@@ -255,8 +255,8 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, Json::Value & jsonObj)
             }
             else
             {
-                VerifyOrReturnError(prevSubType.tlvType == nextSubType.tlvType &&
-                                    prevSubType.isDouble == nextSubType.isDouble, CHIP_ERROR_INVALID_TLV_ELEMENT);
+                VerifyOrReturnError(prevSubType.tlvType == nextSubType.tlvType && prevSubType.isDouble == nextSubType.isDouble,
+                                    CHIP_ERROR_INVALID_TLV_ELEMENT);
             }
 
             // Recursively convert to JSON the encompassing item within the array.

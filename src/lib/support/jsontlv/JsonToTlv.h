@@ -27,7 +27,8 @@ namespace chip {
 CHIP_ERROR JsonToTlv(const std::string & jsonString, MutableByteSpan & tlv);
 
 /*
- * Given a JSON object that represents TLV, this function makes encode calls on the given TLVWriter to encode the corresponding TLV bytes.
+ * Given a JSON object that represents TLV, this function makes encode calls on the given TLVWriter to encode the corresponding TLV
+ * bytes.
  */
 CHIP_ERROR JsonToTlv(const std::string & jsonString, TLV::TLVWriter & writer);
 
