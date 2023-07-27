@@ -23,8 +23,12 @@ class MatterApp @Inject constructor() {
           Timber.d("onCommissioningSessionStarted()")
         }
 
-        override fun onCommissioningSessionStopped(errorCode: Int) {
-          Timber.d("onCommissioningSessionStopped():$errorCode")
+        override fun onCommissioningSessionEstablishmentError(errorCode: Int) {
+          Timber.d("onCommissioningSessionEstablishmentError():$errorCode")
+        }
+
+        override fun onCommissioningSessionStopped() {
+          Timber.d("onCommissioningSessionStopped()")
         }
 
         override fun onCommissioningWindowOpened() {

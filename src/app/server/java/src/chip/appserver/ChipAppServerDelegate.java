@@ -22,7 +22,9 @@ public interface ChipAppServerDelegate {
 
   void onCommissioningSessionStarted();
 
-  void onCommissioningSessionStopped(int errorCode);
+  void onCommissioningSessionEstablishmentError(int errorCode);
+
+  void onCommissioningSessionStopped();
 
   void onCommissioningWindowOpened();
 

@@ -32,7 +32,7 @@ void ChipAppServerDelegate::OnCommissioningSessionEstablishmentStarted()
     env->CallVoidMethod(mChipAppServerDelegateObject, mOnCommissioningSessionEstablishmentStartedMethod);
     if (env->ExceptionCheck())
     {
-        ChipLogError(AppServer, "Java exception in OnCommissioningSessionStartedMethod");
+        ChipLogError(AppServer, "Java exception in OnCommissioningSessionEstablishmentStartedMethod");
         env->ExceptionDescribe();
         env->ExceptionClear();
     }
@@ -55,7 +55,25 @@ void ChipAppServerDelegate::OnCommissioningSessionStarted()
     }
 }
 
-void ChipAppServerDelegate::OnCommissioningSessionStopped(CHIP_ERROR err)
+void ChipAppServerDelegate::OnCommissioningSessionEstablishmentError(CHIP_ERROR err)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(AppServer, "JNIEnv is nullptr"));
+    VerifyOrReturn(mOnCommissioningSessionEstablishmentErrorMethod != nullptr,
+                   ChipLogError(AppServer, "mOnCommissioningSessionEstablishmentErrorMethod is nullptr"));
+
+    env->ExceptionClear();
+    env->CallVoidMethod(mChipAppServerDelegateObject, mOnCommissioningSessionEstablishmentErrorMethod,
+                        static_cast<jint>(err.AsInteger()));
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(AppServer, "Java exception in OnCommissioningSessionEstablishmentErrorMethod");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+    }
+}
+
+void ChipAppServerDelegate::OnCommissioningSessionStopped()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(AppServer, "JNIEnv is nullptr"));
@@ -63,7 +81,7 @@ void ChipAppServerDelegate::OnCommissioningSessionStopped(CHIP_ERROR err)
                    ChipLogError(AppServer, "mOnCommissioningSessionStoppedMethod is nullptr"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mChipAppServerDelegateObject, mOnCommissioningSessionStoppedMethod, static_cast<jint>(err.AsInteger()));
+    env->CallVoidMethod(mChipAppServerDelegateObject, mOnCommissioningSessionStoppedMethod);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in OnCommissioningSessionStoppedMethod");
@@ -124,7 +142,11 @@ CHIP_ERROR ChipAppServerDelegate::InitializeWithObjects(jobject appDelegateObjec
     mOnCommissioningSessionStartedMethod = env->GetMethodID(chipAppServerDelegateClass, "onCommissioningSessionStarted", "()V");
     VerifyOrReturnLogError(mOnCommissioningSessionStartedMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    mOnCommissioningSessionStoppedMethod = env->GetMethodID(chipAppServerDelegateClass, "onCommissioningSessionStopped", "(I)V");
+    mOnCommissioningSessionEstablishmentErrorMethod =
+        env->GetMethodID(chipAppServerDelegateClass, "onCommissioningSessionEstablishmentError", "(I)V");
+    VerifyOrReturnLogError(mOnCommissioningSessionEstablishmentErrorMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+
+    mOnCommissioningSessionStoppedMethod = env->GetMethodID(chipAppServerDelegateClass, "onCommissioningSessionStopped", "()V");
     VerifyOrReturnLogError(mOnCommissioningSessionStoppedMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     mOnCommissioningWindowOpenedMethod = env->GetMethodID(chipAppServerDelegateClass, "onCommissioningWindowOpened", "()V");

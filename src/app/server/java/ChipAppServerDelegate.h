@@ -26,7 +26,8 @@ class ChipAppServerDelegate : public AppDelegate
 public:
     void OnCommissioningSessionEstablishmentStarted() override;
     void OnCommissioningSessionStarted() override;
-    void OnCommissioningSessionStopped(CHIP_ERROR err) override;
+    void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override;
+    void OnCommissioningSessionStopped() override;
     void OnCommissioningWindowOpened() override;
     void OnCommissioningWindowClosed() override;
 
@@ -36,6 +37,7 @@ private:
     jobject mChipAppServerDelegateObject                        = nullptr;
     jmethodID mOnCommissioningSessionEstablishmentStartedMethod = nullptr;
     jmethodID mOnCommissioningSessionStartedMethod              = nullptr;
+    jmethodID mOnCommissioningSessionEstablishmentErrorMethod   = nullptr;
     jmethodID mOnCommissioningSessionStoppedMethod              = nullptr;
     jmethodID mOnCommissioningWindowOpenedMethod                = nullptr;
     jmethodID mOnCommissioningWindowClosedMethod                = nullptr;
