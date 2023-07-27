@@ -63,6 +63,7 @@ extern "C" {
 #include <rom_lmac154_ext.h>
 #endif
 
+#include <uart.h>
 #include "board.h"
 #include <uart.h>
 }

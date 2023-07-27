@@ -126,9 +126,3 @@
 #define CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE 128
 
 #define CHIP_BLE_DEVICE_NAME "MatterLight"
-
-/** Please contact Bouffalo Lab for how to use factory data provider */
-// #define CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE 1
-// uncomment out the following macro to use factory test data
-// when CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE sets to 1
-// #define CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST

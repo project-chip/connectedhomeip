@@ -17,6 +17,8 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
+import("${chip_root}/src/platform/bouffalolab/common/args.gni")
+
 assert(chip_device_platform == "bl702")
 assert(false == (chip_enable_wifi && chip_enable_openthread),
        "Not support Wi-Fi and Thread together")
@@ -41,30 +43,46 @@ static_library("BL702") {
     "../common/KeyValueStoreManagerImpl.cpp",
     "../common/Logging.cpp",
     "../common/PlatformManagerImpl.cpp",
-
-    # "${chip_root}/src/credentials/CHIPCert.h",
-    # "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
-
-    # "../common/FactoryDataProvider.cpp",
-    # "../common/FactoryDataProvider.h",
   ]
 
   if (chip_enable_ota_requestor) {
-    sources += [
+    common_sources += [
       "../common/OTAImageProcessorImpl.cpp",
       "../common/OTAImageProcessorImpl.h",
     ]
   }
 
   if (chip_enable_ble) {
-    sources += [
+    common_sources += [
       "../common/BLEManagerImpl.cpp",
       "../common/BLEManagerImpl.h",
     ]
   }
+
+  if (chip_enable_factory_data || chip_enable_factory_data_test) {
+    if (chip_enable_factory_data) {
+      defines = [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE" ]
+    }
+    common_sources += [
+      "${chip_root}/src/credentials/CHIPCert.h",
+      "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+      "../common/FactoryDataProvider.cpp",
+      "../common/FactoryDataProvider.h",
+    ]
+  }
+
   sources += common_sources
 
-  if (chip_enable_openthread) {
+  if (chip_enable_wifi) {
+    sources += [
+      "ConfigurationManagerImpl.cpp",
+      "WiFiInterface.c",
+      "ConnectivityManagerImpl.cpp",
+      "NetworkCommissioningDriver.cpp"
+    ]
+
+    deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
+  } else if (chip_enable_openthread) {
     # needed for MTD/FTD
 
     import("//build_overrides/bouffalolab_iot_sdk.gni")
