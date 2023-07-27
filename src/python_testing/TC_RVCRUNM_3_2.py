@@ -85,11 +85,13 @@ class TC_RVCRUNM_3_2(MatterBaseTest):
             asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
 
             modes = [m.mode for m in supported_modes]
-            startup_mode = random.choice(modes)
+            new_startup_mode = random.choice(modes)
 
-            self.print_step(4, "Write the value %s to StartUpMode" % (startup_mode))
+            self.print_step(4, "Write the value %s to StartUpMode" % (new_startup_mode))
 
-            await self.write_start_up_mode(newMode=startup_mode)
+            await self.write_start_up_mode(newMode=new_startup_mode)
+        else:
+            new_startup_mode = startup_mode
 
         self.print_step(5, "Read CurrentMode attribute")
 
@@ -97,7 +99,7 @@ class TC_RVCRUNM_3_2(MatterBaseTest):
 
         logging.info("CurrentMode: %s" % (old_current_mode))
 
-        if old_current_mode == startup_mode:
+        if old_current_mode == new_startup_mode:
 
             self.print_step(6, "Read SupportedModes attribute")
             supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
@@ -109,7 +111,7 @@ class TC_RVCRUNM_3_2(MatterBaseTest):
             new_mode = None
 
             for m in supported_modes:
-                if m.mode != startup_mode:
+                if m.mode != new_startup_mode:
                     new_mode = m.mode
                     break
 
@@ -123,7 +125,14 @@ class TC_RVCRUNM_3_2(MatterBaseTest):
         self.print_step(8, "Physically power cycle the device")
         input("Press Enter when done.\n")
 
-        self.print_step(9, "Read CurrentMode attribute")
+        self.print_step(9, "Read StartUpMode attribute")
+
+        startup_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.StartUpMode)
+
+        logging.info("StartUpMode: %s" % (startup_mode))
+        asserts.assert_equal(startup_mode, new_startup_mode, "StartUpMode must match the value it was before a power cycle")
+
+        self.print_step(10, "Read CurrentMode attribute")
 
         current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
