@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <app/reporting/ReportScheduler.h>
+#include <app/icd/ICDStateObserver.h>
 #include <credentials/FabricTable.h>
 #include <lib/support/BitFlags.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -52,7 +52,7 @@ public:
     };
 
     ICDManager() {}
-    void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, reporting::ReportScheduler * reportScheduler);
+    void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver);
     void Shutdown();
     void UpdateIcdMode();
     void UpdateOperationState(OperationalState state);
@@ -83,11 +83,11 @@ private:
     bool SupportsCheckInProtocol();
 
     BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };
-    OperationalState mOperationalState            = OperationalState::IdleMode;
-    ICDMode mICDMode                              = ICDMode::SIT;
-    PersistentStorageDelegate * mStorage          = nullptr;
-    FabricTable * mFabricTable                    = nullptr;
-    reporting::ReportScheduler * mReportScheduler = nullptr;
+    OperationalState mOperationalState   = OperationalState::IdleMode;
+    ICDMode mICDMode                     = ICDMode::SIT;
+    PersistentStorageDelegate * mStorage = nullptr;
+    FabricTable * mFabricTable           = nullptr;
+    ICDStateObserver * mStateObserver    = nullptr;
 };
 
 } // namespace app

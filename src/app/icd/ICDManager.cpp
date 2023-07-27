@@ -21,7 +21,6 @@
 #include <app/icd/ICDManager.h>
 #include <app/icd/IcdManagementServer.h>
 #include <app/icd/IcdMonitoringTable.h>
-#include <app/reporting/ReportScheduler.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
@@ -34,23 +33,28 @@
 #define ICD_ENFORCE_SIT_SLOW_POLL_LIMIT 0
 #endif
 
+#ifndef ICD_REPORT_ON_ENTER_ACTIVE_MODE
+// Enabling this makes the devive emmit subscription reports when transitionning from idle to active mode. It gives the device a
+// chance to sleep for the extent of its idle mode interval before getting awakened to emit reports again.
+#define ICD_REPORT_ON_ENTER_ACTIVE_MODE 0
+#endif
+
 namespace chip {
 namespace app {
 
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
-using ReportScheduler = reporting::ReportScheduler;
 
-void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ReportScheduler * reportScheduler)
+void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver)
 {
     VerifyOrDie(storage != nullptr);
     VerifyOrDie(fabricTable != nullptr);
-    VerifyOrDie(reportScheduler != nullptr);
+    VerifyOrDie(stateObserver != nullptr);
 
-    mStorage         = storage;
-    mFabricTable     = fabricTable;
-    mReportScheduler = reportScheduler;
+    mStorage       = storage;
+    mFabricTable   = fabricTable;
+    mStateObserver = stateObserver;
 
     uint32_t activeModeInterval = IcdManagementServer::GetInstance().GetActiveModeInterval();
     VerifyOrDie(kFastPollingInterval.count() < activeModeInterval);
@@ -158,7 +162,9 @@ void ICDManager::UpdateOperationState(OperationalState state)
                 ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
             }
 
-            mReportScheduler->TriggerReportEmission();
+#if ICD_REPORT_ON_ENTER_ACTIVE_MODE
+            mStateObserver->OnEnterActiveMode();
+#endif
         }
         else
         {
