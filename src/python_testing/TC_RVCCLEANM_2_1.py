@@ -116,7 +116,8 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
             st = ret.status
             is_mfg_code = st in range(0x80, 0xC0)
             is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st in rvcCleanCodes) or is_mfg_code
-            asserts.assert_true(is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.modefail))
+            asserts.assert_true(
+                is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.modefail))
             st_text_len = len(ret.statusText)
             asserts.assert_true(st_text_len in range(1, 65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
 
