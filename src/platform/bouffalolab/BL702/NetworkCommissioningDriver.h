@@ -1,6 +1,6 @@
 /*
- *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 
 #pragma once
-#include <bl60x_wifi_driver/wifi_mgmr.h>
+
 #include <platform/NetworkCommissioning.h>
 
 namespace chip {
@@ -29,10 +29,11 @@ constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
 constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 } // namespace
 
+
 class BLScanResponseIterator : public Iterator<WiFiScanResponse>
 {
 public:
-    BLScanResponseIterator(const size_t size, const wifi_mgmr_ap_item_t * scanResults) : mSize(size), mpScanResults(scanResults) {}
+    BLScanResponseIterator(size_t size, WiFiScanResponse * pScanResults) : mSize(size), mpScanResults(pScanResults) {}
     size_t Count() override { return mSize; }
     bool Next(WiFiScanResponse & item) override
     {
@@ -41,15 +42,7 @@ public:
             return false;
         }
 
-        item.security.SetRaw(mpScanResults[mIternum].auth);
-        item.ssidLen = mpScanResults[mIternum].ssid_len < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
-            ? mpScanResults[mIternum].ssid_len
-            : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
-        item.channel  = mpScanResults[mIternum].channel;
-        item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-        item.rssi     = mpScanResults[mIternum].rssi;
-        memcpy(item.ssid, mpScanResults[mIternum].ssid, item.ssidLen);
-        memcpy(item.bssid, mpScanResults[mIternum].bssid, 6);
+        memcpy(&item, mpScanResults + mIternum, sizeof(WiFiScanResponse));
 
         mIternum++;
         return true;
@@ -57,10 +50,11 @@ public:
     void Release() override {}
 
 private:
-    const size_t mSize;
-    const wifi_mgmr_ap_item_t * mpScanResults;
     size_t mIternum = 0;
+    size_t mSize;
+    WiFiScanResponse * mpScanResults;
 };
+
 
 class BLWiFiDriver final : public WiFiDriver
 {
@@ -81,9 +75,9 @@ public:
 
     struct WiFiNetwork
     {
-        char ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
+        char ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength + 1];
         uint8_t ssidLen = 0;
-        char credentials[DeviceLayer::Internal::kMaxWiFiKeyLength];
+        char credentials[DeviceLayer::Internal::kMaxWiFiKeyLength + 1];
         uint8_t credentialsLen = 0;
     };
 
@@ -108,10 +102,9 @@ public:
     Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                               uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
-
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
     void OnConnectWiFiNetwork(bool isConnected);
-    void OnScanWiFiNetworkDone();
+    void OnScanWiFiNetworkDone(void * arg);
     void OnNetworkStatusChange();
 
     CHIP_ERROR SetLastDisconnectReason(const ChipDeviceEvent * event);
@@ -124,6 +117,7 @@ public:
     }
 
 private:
+
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
     CHIP_ERROR StartScanWiFiNetworks(ByteSpan ssid);
 
@@ -133,6 +127,8 @@ private:
     ConnectCallback * mpConnectCallback;
     NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
     int32_t mLastDisconnectedReason;
+    char mScanSSID[chip::DeviceLayer::Internal::kMaxWiFiSSIDLength + 1];
+    bool mScanSpecific = false;
 };
 
 } // namespace NetworkCommissioning
