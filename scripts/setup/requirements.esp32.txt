@@ -1,6 +1,8 @@
 click>=7.0
 future>=0.15.2
-pyparsing==3.0.9
+# pyparsing: Min version was set based on https://github.com/pyparsing/pyparsing/issues/319
+# pyparsing: Max version was set to avoid breaking changes
+pyparsing>=3.0.3,<3.1
 idf-component-manager
 pygdbmi<=0.9.0.2
 reedsolo>=1.5.3,<=1.5.4
