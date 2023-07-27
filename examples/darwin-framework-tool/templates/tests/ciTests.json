@@ -35,17 +35,13 @@
         "Test_TC_BINFO_2_2",
         "Test_TC_ACL_2_5",
         "Test_TC_ACL_2_6",
+        "Test_TC_SMOKECO_2_2",
+        "Test_TC_SMOKECO_2_3",
+        "Test_TC_SMOKECO_2_4",
+        "Test_TC_SMOKECO_2_5",
         "Disabled because the power source configuration cluster is now deprecated and not present in all-clusters",
         "Test_TC_PSCFG_1_1",
         "Test_TC_PSCFG_2_1",
-        "Test_TC_PSCFG_2_2",
-        "Disabled due to SmokeCOAlarm not being enabled in Matter.framework for now:",
-        "Test_TC_SMCO_1_1",
-        "Test_TC_SMCO_2_1",
-        "Test_TC_SMCO_2_2",
-        "Test_TC_SMCO_2_3",
-        "Test_TC_SMCO_2_4",
-        "Test_TC_SMCO_2_5",
-        "Test_TC_SMCO_2_6"
+        "Test_TC_PSCFG_2_2"
     ]
 }
