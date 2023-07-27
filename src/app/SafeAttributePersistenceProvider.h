@@ -38,42 +38,6 @@ public:
     virtual ~SafeAttributePersistenceProvider() = default;
     SafeAttributePersistenceProvider()          = default;
 
-    /**
-     * Get the KVS representation of null for the given type.
-     * @tparam T The type for which the null representation should be returned.
-     * @return A value of type T that in the KVS represents null.
-     */
-    template <typename T, std::enable_if_t<std::is_same<bool, T>::value, bool> = true>
-    static uint8_t GetNullValueForNullableType()
-    {
-        return 0xff;
-    }
-
-    /**
-     * Get the KVS representation of null for the given type.
-     * @tparam T The type for which the null representation should be returned.
-     * @return A value of type T that in the KVS represents null.
-     */
-    template <typename T, std::enable_if_t<std::is_unsigned<T>::value && !std::is_same<bool, T>::value, bool> = true>
-    static T GetNullValueForNullableType()
-    {
-        T nullValue = 0;
-        nullValue   = T(~nullValue);
-        return nullValue;
-    }
-
-    /**
-     * Get the KVS representation of null for the given type.
-     * @tparam T The type for which the null representation should be returned.
-     * @return A value of type T that in the KVS represents null.
-     */
-    template <typename T, std::enable_if_t<std::is_signed<T>::value && !std::is_same<bool, T>::value, bool> = true>
-    static T GetNullValueForNullableType()
-    {
-        T shiftBit = 1;
-        return T(shiftBit << ((sizeof(T) * 8) - 1));
-    }
-
     // The following API provides helper functions to simplify the access of commonly used types.
     // The API may not be complete.
     // Currently implemented write and read types are: uint8_t, uint16_t, uint32_t, unit64_t and
@@ -212,6 +176,42 @@ protected:
      *                 will be equal to `size`.
      */
     virtual CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) = 0;
+
+private:
+
+    /**
+     * Get the KVS representation of null for the given type.
+     * @tparam T The type for which the null representation should be returned.
+     * @return A value of type T that in the KVS represents null.
+     */
+    template <typename T, typename std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
+    static constexpr T GetNullValueForNullableType()
+    {
+        return std::numeric_limits<T>::quiet_NaN();
+    }
+
+    /**
+     * Get the KVS representation of null for the given type.
+     * @tparam T The type for which the null representation should be returned.
+     * @return A value of type T that in the KVS represents null.
+     */
+    template <typename T, typename std::enable_if_t<std::is_integral<T>::value && !std::is_same<bool, T>::value, int> = 0>
+    static constexpr T GetNullValueForNullableType()
+    {
+        return std::is_signed<T>::value ? std::numeric_limits<T>::min() : std::numeric_limits<T>::max();
+    }
+
+    /**
+     * Get the KVS representation of null for the given type.
+     * @tparam T The type for which the null representation should be returned.
+     * @return A value of type T that in the KVS represents null.
+     */
+    template <typename T, std::enable_if_t<std::is_same<bool, T>::value, bool> = true>
+    static uint8_t GetNullValueForNullableType()
+    {
+        return 0xff;
+    }
+
 };
 
 /**
