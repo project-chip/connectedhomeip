@@ -280,7 +280,9 @@
         "TestCommissionerNodeId",
         "TestTimeSynchronization",
         "TestOperationalState",
-        "TestRVCOperationalState"
+        "TestRVCOperationalState",
+        "TestDishwasherAlarm.yaml"
+
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],

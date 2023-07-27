@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 197.1.1. [TC-DISHALM-1.1] Global attributes with server as DUT
+name: 198.1.1. [TC-DISHALM-1.1] Global attributes with server as DUT
 
 PICS:
     - DISHALM.S
@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "1. Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the ClusterRevision attribute from the DUT"
+    - label: "2. TH reads the ClusterRevision attribute from the DUT"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -39,7 +39,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "TH reads the FeatureMap attribute from the DUT"
+    - label: "3. TH reads the FeatureMap attribute from the DUT"
       PICS: " !DISHALM.S.F00 "
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -48,7 +48,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads the FeatureMap attribute from the DUT"
+    - label: "3. TH reads the FeatureMap attribute from the DUT"
       PICS: "DISHALM.S.F00"
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -57,7 +57,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "TH reads the AttributeList attribute from the DUT"
+# Reference issue: https://github.com/project-chip/connectedhomeip/issues/28287
+    - label: "4. TH reads the AttributeList attribute from the DUT"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -74,7 +75,17 @@ tests:
               type: list
               contains: [1]
 
-    - label: "Read the global attribute: EventList"
+    - label: "TH reads the attribute(Latch) in AttributeList from the DUT"
+      PICS: " !DISHALM.S.F00 "
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              excludes: [1]
+
+# Reference issue: https://github.com/project-chip/connectedhomeip/issues/28287
+    - label: "5. Read the global attribute: EventList"
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -82,7 +93,8 @@ tests:
           constraints:
               type: list
 
-    - label: "Read the global attribute: AcceptedCommandList"
+# Reference issue: https://github.com/project-chip/connectedhomeip/issues/28287
+    - label: "6. Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -90,7 +102,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Read the optional attribute (Modify): AcceptedCommandList"
+    - label: "6. Read the optional attribute (Modify): AcceptedCommandList"
       PICS: DISHALM.S.C01.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -99,8 +111,17 @@ tests:
               type: list
               contains: [1]
 
+    - label: "6. Read the optional attribute (Modify): AcceptedCommandList"
+      PICS: " !DISHALM.S.C01.Rsp "
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              excludes: [1]
+
     - label:
-          "Read the attribute (Reset) based on feature support:
+          "6. Read the attribute (Reset) based on feature support:
           AcceptedCommandList"
       PICS: DISHALM.S.C00.Rsp
       command: "readAttribute"
@@ -110,7 +131,19 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Read the global attribute: GeneratedCommandList"
+    - label:
+          "6. Read the attribute (Reset) based on feature support:
+          AcceptedCommandList"
+      PICS: " !DISHALM.S.C00.Rsp "
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              excludes: [0]
+
+# Reference issue: https://github.com/project-chip/connectedhomeip/issues/28287
+    - label: "7. Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

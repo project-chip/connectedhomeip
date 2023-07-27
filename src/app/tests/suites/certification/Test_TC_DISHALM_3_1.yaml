@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 197.2.2. [TC-DISHALM-3.1] Inflow alarm functionality with DUT as Server
+name: 198.2.2. [TC-DISHALM-3.1] Inflow alarm functionality with DUT as Server
 
 PICS:
     - DISHALM.S
@@ -28,7 +28,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "1a. Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -36,7 +36,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Operate device to set State attribute bit 0 (Inflow) to 1"
+    - label: "1b. Set up subscription to Notify event"
+      PICS: DISHALM.S.E00
+      command: "subscribeEvent"
+      event: "notify"
+      minInterval: 0
+      maxInterval: 100
+
+    - label: "2a. Operate device to set the condition to raise the Inflow alarm"
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT
@@ -47,7 +54,15 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads from the DUT the State attribute"
+    - label: "2a. Receive Notify event with State bit 0 set to TRUE."
+      command: "readEvent"
+      event: "notify"
+      response:
+          values:
+              - name: "Notify"
+                value: {Active: 1, Inactive: 0, State: 1, Mask: 47}
+
+    - label: "2b. TH reads from the DUT the State attribute"
       PICS: DISHALM.S.A0002
       command: "readAttribute"
       attribute: "State"
@@ -55,7 +70,7 @@ tests:
           constraints:
               hasMasksSet: [0x1]
 
-    - label: "Operate device to set State attribute bit 0 (Inflow) to 0"
+    - label: "2c. Operate device to set the condition to lower the Inflow alarm"
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT
@@ -66,15 +81,32 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads from the DUT the State attribute"
+    - label: "2c. TH reads from the DUT the Latch attribute"
+      PICS: DISHALM.S.A0001
+      command: "readAttribute"
+      attribute: "Latch"
+      response:
+          value: 0
+          constraints:
+              type: int32u
+
+    - label: "2c. Receive Notify event with State bit 0 set to TRUE."
+      command: "readEvent"
+      event: "notify"
+      response:
+          values:
+              - name: "Notify"
+                value: {Active: 0, Inactive: 0, State: 1, Mask: 47}
+
+    - label: "2d. TH reads from the DUT the State attribute"
       PICS: " !DISHALM.S.A0001 && DISHALM.S.A0002 "
       command: "readAttribute"
       attribute: "State"
       response:
           value: 0
 
-    - label: "TH reads from the DUT the State attribute"
-      PICS: DISHALM.S.A0001 && DISHALM.S.A0002
+    - label: "2d. TH reads from the DUT the State attribute"
+      PICS: DISHALM.S.A0002
       command: "readAttribute"
       attribute: "State"
       response:
@@ -82,7 +114,7 @@ tests:
               hasMasksSet: [0x1]
 
     - label:
-          "TH sends command Reset to DUT with bit 0 (Inflow) of Alarms set to 1"
+          "3a. TH sends command Reset to DUT with bit 0 (Inflow) of Alarms set to 1"
       verification: |
           ./chip-tool dishwasheralarm reset 1 1 1
       cluster: "LogCommands"
@@ -102,12 +134,7 @@ tests:
       response:
           value: 0
 
-    - label: "Set up subscription to Notify event"
-      PICS: DISHALM.S.E00
-      command: "subscribeEvent"
-      event: "notify"
-      minInterval: 0
-      maxInterval: 100
+
 
     - label: "Operate device to set State attribute bit 0 (Inflow) to 1"
       verification: |
