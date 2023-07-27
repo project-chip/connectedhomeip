@@ -29,6 +29,10 @@
 
 #import "MTRBaseDevice.h"
 #import "MTRDeviceController.h"
+#import "MTRDeviceControllerDataStore.h"
+#import "MTRDeviceControllerStorageDelegate.h"
+
+#import <Matter/MTRDeviceControllerStartupParams.h>
 
 @class MTRDeviceControllerStartupParamsInternal;
 @class MTRDeviceControllerFactory;
@@ -74,11 +78,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) NSNumber * compressedFabricID;
 
 /**
+ * The per-controller data store this controller was initialized with, if any.
+ */
+@property (nonatomic, nullable) MTRDeviceControllerDataStore * controllerDataStore;
+
+/**
  * Init a newly created controller.
  *
  * Only MTRDeviceControllerFactory should be calling this.
  */
-- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory queue:(dispatch_queue_t)queue;
+- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
+                          queue:(dispatch_queue_t)queue
+                storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+                           UUID:(NSUUID *)UUID;
 
 /**
  * Check whether this controller is running on the given fabric, as represented

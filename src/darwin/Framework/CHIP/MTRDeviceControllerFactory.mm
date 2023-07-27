@@ -20,6 +20,7 @@
 #import "MTRAttestationTrustStoreBridge.h"
 #import "MTRCertificates.h"
 #import "MTRControllerAccessControl.h"
+#import "MTRDemuxingStorage.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
@@ -32,6 +33,7 @@
 #import "MTROperationalBrowser.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
+#import "MTRSessionResumptionStorageBridge.h"
 #import "NSDataSpanConversion.h"
 
 #import <os/lock.h>
@@ -55,6 +57,7 @@ using namespace chip;
 using namespace chip::Controller;
 
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
+static NSString * const kErrorSessionResumptionStorageInit = @"Init failure while creating a session resumption storage delegate";
 static NSString * const kErrorAttestationTrustStoreInit = @"Init failure while creating the attestation trust store";
 static NSString * const kErrorDACVerifierInit = @"Init failure while creating the device attestation verifier";
 static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
@@ -90,21 +93,36 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 @property () chip::Credentials::DeviceAttestationVerifier * deviceAttestationVerifier;
 @property (readonly) BOOL advertiseOperational;
 @property (nonatomic, readonly) Credentials::IgnoreCertificateValidityPeriodPolicy * certificateValidityPolicy;
-// Lock used to serialize access to the "controllers" array, since it needs to
-// be touched from both whatever queue is starting controllers and from the
-// Matter queue.  The way this lock is used assumes that:
+@property (readonly) MTRSessionResumptionStorageBridge * sessionResumptionStorage;
+// Lock used to serialize access to the "controllers" array and the
+// "_controllerBeingStarted" and "_controllerBeingShutDown" ivars, since those
+// need to be touched from both whatever queue is starting controllers and from
+// the Matter queue.  The way this lock is used assumes that:
 //
-// 1) The only mutating accesses to the controllers array happen when the
-//    current queue is not the Matter queue.  This is a good assumption, because
-//    the implementation of the functions that mutate the array do sync dispatch
-//    to the Matter queue, which would deadlock if they were called when that
-//    queue was the current queue.
+// 1) The only mutating accesses to the controllers array and the ivars happen
+//    when the current queue is not the Matter queue or when in a block that was
+//    sync-dispatched to the Matter queue.  This is a good assumption, because
+//    the implementations of the functions that mutate these do sync dispatch to
+//    the Matter queue, which would deadlock if they were called when that queue
+//    was the current queue.
+//
 // 2) It's our API consumer's responsibility to serialize access to us from
 //    outside.
 //
-// This means that we only take the lock around mutations of the array and
-// accesses to the array that are from code running on the Matter queue.
-
+// These assumptions mean that if we are in a block that was sync-dispatched to
+// the Matter queue, that block cannot race with either the MAtter queue nor the
+// non-Matter queue.  Similarly, if we are in a situation where the Matter queue
+// has been shut down, any accesses to the variables cannot race anything else.
+//
+// This means that:
+//
+// A. In a sync-dispatched block, or if the Matter queue has been shut down, we
+//    do not need to lock and can do read or write access.
+// B. Apart from item A, mutations of the array and ivars must happen outside the
+//    Matter queue and must lock.
+// C. Apart from item A, accesses on the Matter queue must be reads only and
+//    must lock.
+// D. Locking around reads not from the Matter queue is OK but not required.
 @property (nonatomic, readonly) os_unfair_lock controllersLock;
 
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
@@ -114,7 +132,34 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 - (MTRDeviceController * _Nullable)maybeInitializeOTAProvider:(MTRDeviceController * _Nonnull)controller;
 @end
 
-@implementation MTRDeviceControllerFactory
+@interface MTRDeviceControllerFactoryParams ()
+
+// Flag to keep track of whether our .storage is real consumer-provided storage
+// or just the fake thing we made up.
+@property (nonatomic, assign) BOOL hasStorage;
+
+@end
+
+@implementation MTRDeviceControllerFactory {
+    // _usingPerControllerStorage is only written once, during controller
+    // factory start.  After that it is only read, and can be read from
+    // arbitrary threads.
+    BOOL _usingPerControllerStorage;
+
+    // See documentation for controllersLock above for the rules for accessing
+    // _controllerBeingStarted.
+    MTRDeviceController * _controllerBeingStarted;
+
+    // See documentation for controllersLock above for the rules for access
+    // _controllerBeingShutDown.
+    MTRDeviceController * _controllerBeingShutDown;
+
+    // Next available fabric index.  Only valid when _controllerBeingStarted is
+    // non-nil, and then it corresponds to the controller being started.  This
+    // is only accessed on the Matter queue or after the Matter queue has shut
+    // down.
+    FabricIndex _nextAvailableFabricIndex;
+}
 
 + (void)initialize
 {
@@ -273,10 +318,21 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         _opCertStore = nullptr;
     }
 
+    if (_sessionResumptionStorage) {
+        delete _sessionResumptionStorage;
+        _sessionResumptionStorage = nullptr;
+    }
+
     if (_persistentStorageDelegate) {
         delete _persistentStorageDelegate;
         _persistentStorageDelegate = nullptr;
     }
+}
+
+- (CHIP_ERROR)_initFabricTable:(FabricTable &)fabricTable
+{
+    return fabricTable.Init(
+        { .storage = _persistentStorageDelegate, .operationalKeystore = _keystore, .opCertStore = _opCertStore });
 }
 
 - (nullable NSArray<MTRFabricInfo *> *)knownFabrics
@@ -291,9 +347,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     __block BOOL listFilled = NO;
     auto fillListBlock = ^{
         FabricTable fabricTable;
-        CHIP_ERROR err = fabricTable.Init({ .storage = self->_persistentStorageDelegate,
-            .operationalKeystore = self->_keystore,
-            .opCertStore = self->_opCertStore });
+        CHIP_ERROR err = [self _initFabricTable:fabricTable];
         if (err != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Can't initialize fabric table when getting known fabrics: %s", err.AsString());
             return;
@@ -348,7 +402,22 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
         [MTRControllerAccessControl init];
 
-        _persistentStorageDelegate = new MTRPersistentStorageDelegateBridge(startupParams.storage);
+        if (startupParams.hasStorage) {
+            _persistentStorageDelegate = new (std::nothrow) MTRPersistentStorageDelegateBridge(startupParams.storage);
+            _sessionResumptionStorage = nullptr;
+            _usingPerControllerStorage = NO;
+        } else {
+            _persistentStorageDelegate = new (std::nothrow) MTRDemuxingStorage(self);
+            _sessionResumptionStorage = new (std::nothrow) MTRSessionResumptionStorageBridge(self);
+            _usingPerControllerStorage = YES;
+
+            if (_sessionResumptionStorage == nil) {
+                MTR_LOG_ERROR("Error: %@", kErrorSessionResumptionStorageInit);
+                errorCode = CHIP_ERROR_NO_MEMORY;
+                return;
+            }
+        }
+
         if (_persistentStorageDelegate == nil) {
             MTR_LOG_ERROR("Error: %@", kErrorPersistentStorageInit);
             errorCode = CHIP_ERROR_NO_MEMORY;
@@ -486,6 +555,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         params.operationalKeystore = _keystore;
         params.opCertStore = _opCertStore;
         params.certificateValidityPolicy = _certificateValidityPolicy;
+        params.sessionResumptionStorage = _sessionResumptionStorage;
         errorCode = _controllerFactory->Init(params);
         if (errorCode != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Error: %@", kErrorControllerFactoryInit);
@@ -559,7 +629,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
  * return nil if pre-startup fabric table checks fail, and set fabricError to
  * the right error value in that situation.
  */
-- (MTRDeviceController * _Nullable)_startDeviceController:(MTRDeviceControllerStartupParams *)startupParams
+- (MTRDeviceController * _Nullable)_startDeviceController:(id)startupParams
                                             fabricChecker:(MTRDeviceControllerStartupParamsInternal * (^)(FabricTable * fabricTable,
                                                               MTRDeviceController * controller,
                                                               CHIP_ERROR & fabricError))fabricChecker
@@ -572,9 +642,37 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         return nil;
     }
 
+    id<MTRDeviceControllerStorageDelegate> storageDelegate;
+    NSUUID * uuid;
+    if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParameters class]]) {
+        MTRDeviceControllerStartupParameters * params = startupParams;
+        storageDelegate = params.storageDelegate;
+        uuid = params.UUID;
+    } else {
+        MTRDeviceControllerStartupParams * params = startupParams;
+        storageDelegate = nil;
+        uuid = params.UUID;
+    }
+
+    if (_usingPerControllerStorage && storageDelegate == nil) {
+        MTR_LOG_ERROR("Must have a controller storage delegate when we do not have storage for the controller factory");
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
+        }
+        return nil;
+    }
+
+    if (!_usingPerControllerStorage && storageDelegate != nil) {
+        MTR_LOG_ERROR("Must not have a controller storage delegate when we have storage for the controller factory");
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
+        }
+        return nil;
+    }
+
     // Create the controller, so we start the event loop, since we plan to do
     // our fabric table operations there.
-    auto * controller = [self createController];
+    auto * controller = [self _createController:storageDelegate UUID:uuid];
     if (controller == nil) {
         if (error != nil) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY];
@@ -591,7 +689,39 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     FabricTable * fabricTable = &fabricTableInstance;
 
     dispatch_sync(_chipWorkQueue, ^{
+        fabricError = [self _initFabricTable:*fabricTable];
+        if (fabricError != CHIP_NO_ERROR) {
+            MTR_LOG_ERROR("Can't initialize fabric table: %s", fabricError.AsString());
+            return;
+        }
+
         params = fabricChecker(fabricTable, controller, fabricError);
+
+        if (params == nil) {
+            return;
+        }
+
+        // Check that we are not trying to start a controller with a UUID that
+        // matches a running controller.
+        auto * controllersCopy = [self getRunningControllers];
+        for (MTRDeviceController * existing in controllersCopy) {
+            if (existing != controller && [existing.UUID compare:params.UUID] == NSOrderedSame) {
+                MTR_LOG_ERROR("Already have running controller with UUID %@", existing.UUID);
+                fabricError = CHIP_ERROR_INVALID_ARGUMENT;
+                params = nil;
+                return;
+            }
+        }
+
+        // Save off the next available fabric index, in case we are starting a
+        // controller with a new fabric index.  This just needs to happen before
+        // we set _controllerBeingStarted below.
+        fabricError = fabricTable->PeekFabricIndexForNextAddition(self->_nextAvailableFabricIndex);
+        if (fabricError != CHIP_NO_ERROR) {
+            MTR_LOG_ERROR("Out of space in the fabric table");
+            params = nil;
+            return;
+        }
     });
 
     if (params == nil) {
@@ -602,7 +732,16 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         return nil;
     }
 
+    os_unfair_lock_lock(&_controllersLock);
+    _controllerBeingStarted = controller;
+    os_unfair_lock_unlock(&_controllersLock);
+
     BOOL ok = [controller startup:params];
+
+    os_unfair_lock_lock(&_controllersLock);
+    _controllerBeingStarted = nil;
+    os_unfair_lock_unlock(&_controllersLock);
+
     if (ok == NO) {
         // TODO: get error from controller's startup.
         if (error != nil) {
@@ -624,6 +763,16 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
                                                               error:(NSError * __autoreleasing *)error
 {
     [self _assertCurrentQueueIsNotMatterQueue];
+
+    if (_usingPerControllerStorage) {
+        // We can never have an "existing fabric" for a new controller to be
+        // created on, in the sense of createControllerOnExistingFabric.
+        MTR_LOG_ERROR("Can't createControllerOnExistingFabric when using per-controller data store");
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+        return nil;
+    }
 
     return [self _startDeviceController:startupParams
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
@@ -728,11 +877,34 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
                                   error:error];
 }
 
-- (MTRDeviceController * _Nullable)createController
+- (MTRDeviceController * _Nullable)createController:(MTRDeviceControllerStartupParameters *)startupParameters
+                                              error:(NSError * __autoreleasing *)error
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
-    MTRDeviceController * controller = [[MTRDeviceController alloc] initWithFactory:self queue:_chipWorkQueue];
+    return [self _startDeviceController:startupParameters
+                          fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
+                              FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
+                              return
+                                  [[MTRDeviceControllerStartupParamsInternal alloc] initForNewController:controller
+                                                                                             fabricTable:fabricTable
+                                                                                                keystore:self->_keystore
+                                                                                    advertiseOperational:self.advertiseOperational
+                                                                                                  params:startupParameters
+                                                                                                   error:fabricError];
+                          }
+                                  error:error];
+}
+
+- (MTRDeviceController * _Nullable)_createController:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+                                                UUID:(NSUUID *)UUID
+{
+    [self _assertCurrentQueueIsNotMatterQueue];
+
+    MTRDeviceController * controller = [[MTRDeviceController alloc] initWithFactory:self
+                                                                              queue:_chipWorkQueue
+                                                                    storageDelegate:storageDelegate
+                                                                               UUID:UUID];
     if (controller == nil) {
         MTR_LOG_ERROR("Failed to init controller");
         return nil;
@@ -761,7 +933,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 // Returns NO on failure, YES on success.  If YES is returned, the
 // outparam will be written to, but possibly with a null value.
 //
-// fabricTable should be an un-initialized fabric table.  It needs to
+// fabricTable should be an initialized fabric table.  It needs to
 // outlive the consumer's use of the FabricInfo we return, which is
 // why it's provided by the caller.
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
@@ -770,16 +942,9 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 {
     assertChipStackLockedByCurrentThread();
 
-    CHIP_ERROR err = fabricTable.Init(
-        { .storage = _persistentStorageDelegate, .operationalKeystore = _keystore, .opCertStore = _opCertStore });
-    if (err != CHIP_NO_ERROR) {
-        MTR_LOG_ERROR("Can't initialize fabric table: %s", ErrorStr(err));
-        return NO;
-    }
-
     Crypto::P256PublicKey pubKey;
     if (params.rootCertificate != nil) {
-        err = ExtractPubkeyFromX509Cert(AsByteSpan(params.rootCertificate), pubKey);
+        CHIP_ERROR err = ExtractPubkeyFromX509Cert(AsByteSpan(params.rootCertificate), pubKey);
         if (err != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Can't extract public key from root certificate: %s", ErrorStr(err));
             return NO;
@@ -787,7 +952,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     } else {
         // No root certificate means the nocSigner is using the root keys, because
         // consumers must provide a root certificate whenever an ICA is used.
-        err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(params.nocSigner.publicKey, &pubKey);
+        CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(params.nocSigner.publicKey, &pubKey);
         if (err != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Can't extract public key from MTRKeypair: %s", ErrorStr(err));
             return NO;
@@ -850,8 +1015,32 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     }
 
     os_unfair_lock_lock(&_controllersLock);
+    // Make sure to set _controllerBeingShutDown and do the remove in the same
+    // locked section, so there is never a time when the controller is gone from
+    // both places as viewed from the Matter thread, as long as it's locking
+    // around its reads.
+    _controllerBeingShutDown = controller;
     [_controllers removeObject:controller];
     os_unfair_lock_unlock(&_controllersLock);
+
+    // Snapshot the controller's fabric index, if any, before it clears it
+    // out in shutDownCppController.
+    __block FabricIndex controllerFabricIndex = controller.fabricIndex;
+
+    // This block runs either during sync dispatch to the Matter queue or after
+    // Matter queue shutdown, so it can touch any of our members without
+    // worrying about locking, since nothing else will race it.
+    auto sharedCleanupBlock = ^{
+        assertChipStackLockedByCurrentThread();
+
+        [controller shutDownCppController];
+
+        self->_controllerBeingShutDown = nil;
+        if (self->_controllerBeingStarted == controller) {
+            controllerFabricIndex = self->_nextAvailableFabricIndex;
+            self->_controllerBeingStarted = nil;
+        }
+    };
 
     if ([_controllers count] == 0) {
         dispatch_sync(_chipWorkQueue, ^{
@@ -867,7 +1056,23 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
             _otaProviderDelegateBridge->Shutdown();
         }
 
-        [controller shutDownCppController];
+        sharedCleanupBlock();
+
+        // Now that our per-controller storage for the controller being shut
+        // down is guaranteed to be disconnected, go ahead and clean up the
+        // fabric table entry for the controller if we're in per-controller
+        // storage mode.
+        if (self->_usingPerControllerStorage) {
+            // We have to use a new fabric table to do this cleanup, because
+            // our system state is gone now.
+            FabricTable fabricTable;
+            CHIP_ERROR err = [self _initFabricTable:fabricTable];
+            if (err != CHIP_NO_ERROR) {
+                MTR_LOG_ERROR("Failed to clean up fabric entries.  Expect things to act oddly: %" CHIP_ERROR_FORMAT, err.Format());
+            } else {
+                fabricTable.Delete(controllerFabricIndex);
+            }
+        }
     } else {
         // Do the controller shutdown on the Matter work queue.
         dispatch_sync(_chipWorkQueue, ^{
@@ -875,7 +1080,19 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
                 _otaProviderDelegateBridge->ControllerShuttingDown(controller);
             }
 
-            [controller shutDownCppController];
+            sharedCleanupBlock();
+
+            // Now that our per-controller storage for the controller being shut
+            // down is guaranteed to be disconnected, go ahead and clean up the
+            // fabric table entry for the controller if we're in per-controller
+            // storage mode.
+            if (self->_usingPerControllerStorage) {
+                // Make sure to delete controllerFabricIndex from the system state's
+                // fabric table.  We know there's a system state here, because we
+                // still have a running controller.
+                auto * systemState = _controllerFactory->GetSystemState();
+                systemState->Fabrics()->Delete(controllerFabricIndex);
+            }
         });
     }
 
@@ -890,19 +1107,40 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     return controllersCopy;
 }
 
-- (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
+- (nullable MTRDeviceController *)runningControllerForFabricIndex:(FabricIndex)fabricIndex
+                                      includeControllerStartingUp:(BOOL)includeControllerStartingUp
+                                    includeControllerShuttingDown:(BOOL)includeControllerShuttingDown
 {
     assertChipStackLockedByCurrentThread();
 
     auto * controllersCopy = [self getRunningControllers];
 
+    os_unfair_lock_lock(&_controllersLock);
+    MTRDeviceController * controllerBeingStarted = _controllerBeingStarted;
+    MTRDeviceController * controllerBeingShutDown = _controllerBeingShutDown;
+    os_unfair_lock_unlock(&_controllersLock);
+
     for (MTRDeviceController * existing in controllersCopy) {
-        if ([existing fabricIndex] == fabricIndex) {
+        if (existing.fabricIndex == fabricIndex) {
             return existing;
         }
     }
 
+    if (includeControllerStartingUp == YES && controllerBeingStarted != nil && fabricIndex == _nextAvailableFabricIndex) {
+        return controllerBeingStarted;
+    }
+
+    if (includeControllerShuttingDown == YES && controllerBeingShutDown != nil
+        && controllerBeingShutDown.fabricIndex == fabricIndex) {
+        return controllerBeingShutDown;
+    }
+
     return nil;
+}
+
+- (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
+{
+    return [self runningControllerForFabricIndex:fabricIndex includeControllerStartingUp:YES includeControllerShuttingDown:YES];
 }
 
 - (void)operationalInstanceAdded:(chip::PeerId &)operationalID
@@ -936,6 +1174,25 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 @end
 
+MTR_HIDDEN
+@interface MTRDummyStorage : NSObject <MTRStorage>
+@end
+
+@implementation MTRDummyStorage
+- (nullable NSData *)storageDataForKey:(NSString *)key
+{
+    return nil;
+}
+- (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key
+{
+    return NO;
+}
+- (BOOL)removeStorageDataForKey:(NSString *)key
+{
+    return NO;
+}
+@end
+
 @implementation MTRDeviceControllerFactoryParams
 
 - (instancetype)initWithStorage:(id<MTRStorage>)storage
@@ -945,6 +1202,27 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     }
 
     _storage = storage;
+    _hasStorage = YES;
+    _otaProviderDelegate = nil;
+    _productAttestationAuthorityCertificates = nil;
+    _certificationDeclarationCertificates = nil;
+    _port = nil;
+    _shouldStartServer = NO;
+
+    return self;
+}
+
+- (instancetype)init
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    // We promise to have a non-null storage for purposes of our attribute, but
+    // now we're allowing initialization without storage.  Make up a dummy
+    // storage just so we don't have nil there.
+    _storage = [[MTRDummyStorage alloc] init];
+    _hasStorage = NO;
     _otaProviderDelegate = nil;
     _productAttestationAuthorityCertificates = nil;
     _certificationDeclarationCertificates = nil;

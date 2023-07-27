@@ -1,0 +1,64 @@
+/**
+ *    Copyright (c) 2023 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
+#import <Matter/MTRDeviceController.h>
+#import <Matter/MTRDeviceControllerStorageDelegate.h>
+
+#include <lib/core/CHIPError.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+/**
+ * Interface that represents a single CASE session resumption entry.
+ */
+MTR_HIDDEN
+@interface MTRCASESessionResumptionInfo : NSObject <NSSecureCoding>
+@property (nonatomic) NSNumber * nodeID;
+@property (nonatomic) NSData * resumptionID;
+@property (nonatomic) NSData * sharedSecret;
+@property (nonatomic) NSSet<NSNumber *> * caseAuthenticatedTags;
+@end
+
+/**
+ * Interface that wraps a type-safe API around
+ * MTRDeviceControllerStorageDelegate.
+ */
+MTR_HIDDEN
+@interface MTRDeviceControllerDataStore : NSObject
+
+- (instancetype)initWithController:(MTRDeviceController *)controller
+                   storageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate;
+
+/**
+ * Resumption info APIs.
+ */
+- (nullable MTRCASESessionResumptionInfo *)findResumptionInfoByNodeID:(NSNumber *)nodeID;
+- (nullable MTRCASESessionResumptionInfo *)findResumptionInfoByResumptionID:(NSData *)resumptionID;
+- (void)storeResumptionInfo:(MTRCASESessionResumptionInfo *)resumptionInfo;
+- (void)clearAllResumptionInfo;
+
+/**
+ * APIs for storing/retrieving last-used fabric state.  These are used at
+ * startup to make sure the new state and the old state are merged properly.
+ */
+- (CHIP_ERROR)storeLastUsedNOC:(MTRCertificateTLVBytes)noc;
+- (MTRCertificateTLVBytes _Nullable)fetchLastUsedNOC;
+
+@end
+
+NS_ASSUME_NONNULL_END
