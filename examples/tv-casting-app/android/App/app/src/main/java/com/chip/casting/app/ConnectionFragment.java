@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.chip.casting.CommissioningCallbacks;
 import com.chip.casting.ContentApp;
 import com.chip.casting.DiscoveredNodeData;
 import com.chip.casting.FailureCallback;
@@ -120,15 +121,57 @@ public class ConnectionFragment extends Fragment {
       FailureCallback onConnectionFailure,
       SuccessCallback<ContentApp> onNewOrUpdatedEndpoints) {
     Log.d(TAG, "Running commissioning");
+    Object commissioningComplete =
+        new MatterCallbackHandler() {
+          @Override
+          public void handle(MatterError error) {
+            Log.d(TAG, "handle() called on CommissioningComplete event with " + error);
+          }
+        };
+
+    SuccessCallback<Void> sessionEstablishmentStartedCallback =
+        new SuccessCallback<Void>() {
+          @Override
+          public void handle(Void response) {
+            Log.d(TAG, "handle() called on SessionEstablishmentStartedCallback");
+          }
+        };
+
+    SuccessCallback<Void> sessionEstablishedCallback =
+        new SuccessCallback<Void>() {
+          @Override
+          public void handle(Void response) {
+            Log.d(TAG, "handle() called on SessionEstablishedCallback");
+          }
+        };
+
+    FailureCallback sessionEstablishmentErrorCallback =
+        new FailureCallback() {
+          @Override
+          public void handle(MatterError error) {
+            Log.d(TAG, "handle() called on SessionEstablishmentError event with " + error);
+          }
+        };
+
+    FailureCallback sessionEstablishmentStoppedCallback =
+        new FailureCallback() {
+          @Override
+          public void handle(MatterError error) {
+            Log.d(TAG, "handle() called on SessionEstablishmentStopped event with " + error);
+          }
+        };
+
+    CommissioningCallbacks commissioningCallbacks = new CommissioningCallbacks();
+    commissioningCallbacks.setCommissioningComplete(commissioningComplete);
+    commissioningCallbacks.setSessionEstablishmentStarted(sessionEstablishmentStartedCallback);
+    commissioningCallbacks.setSessionEstablished(sessionEstablishedCallback);
+    commissioningCallbacks.setSessionEstablishmentError(sessionEstablishmentErrorCallback);
+    commissioningCallbacks.setSessionEstablishmentStopped(sessionEstablishmentStoppedCallback);
+
     this.openCommissioningWindowSuccess =
         tvCastingApp.openBasicCommissioningWindow(
             GlobalCastingConstants.CommissioningWindowDurationSecs,
-            new MatterCallbackHandler() {
-              @Override
-              public void handle(MatterError error) {
-                Log.d(TAG, "handle() called on CommissioningComplete event with " + error);
-              }
-            },
+            commissioningCallbacks,
             onConnectionSuccess,
             onConnectionFailure,
             onNewOrUpdatedEndpoints);
