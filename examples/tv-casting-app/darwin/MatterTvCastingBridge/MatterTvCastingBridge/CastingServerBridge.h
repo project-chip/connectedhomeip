@@ -110,14 +110,14 @@
 
  @param clientQueue Queue to dispatch the call to the commissioningWindowRequestedHandler on
 
+ @param commissioningCallbackHandlers Optional parameter to specific handlers for callbacks during commissioning
+
  @param onConnectionSuccessCallback Handles a VideoPlayer * once connection is successfully established
 
  @param onConnectionFailureCallback Handles MatterError if there is a failure in establishing connection
 
  @param onNewOrUpdatedEndpointCallback Handles a ContentApp * for each new ContentApp is found. May be called multiple times based
  on the number of ContentApp
-
- @param commissioningCallbackHandlers Optional parameter to specific handlers for callbacks during commissioning
  */
 - (void)openBasicCommissioningWindow:(dispatch_queue_t _Nonnull)clientQueue
        commissioningCallbackHandlers:(CommissioningCallbackHandlers * _Nullable)commissioningCallbackHandlers

@@ -46,43 +46,68 @@ public class CommissioningCallbacks {
   /** This is called when the commissioning has been completed */
   private Object commissioningComplete;
 
-  public SuccessCallback<Void> getSessionEstablishmentStarted() {
-    return sessionEstablishmentStarted;
+  private CommissioningCallbacks(Builder builder) {
+    this.sessionEstablishmentStarted = builder.sessionEstablishmentStarted;
+    this.sessionEstablished = builder.sessionEstablished;
+    this.sessionEstablishmentError = builder.sessionEstablishmentError;
+    this.sessionEstablishmentStopped = builder.sessionEstablishmentStopped;
+    this.commissioningComplete = builder.commissioningComplete;
   }
 
-  public void setSessionEstablishmentStarted(SuccessCallback<Void> sessionEstablishmentStarted) {
-    this.sessionEstablishmentStarted = sessionEstablishmentStarted;
+  public SuccessCallback<Void> getSessionEstablishmentStarted() {
+    return sessionEstablishmentStarted;
   }
 
   public SuccessCallback<Void> getSessionEstablished() {
     return sessionEstablished;
   }
 
-  public void setSessionEstablished(SuccessCallback<Void> sessionEstablished) {
-    this.sessionEstablished = sessionEstablished;
-  }
-
   public FailureCallback getSessionEstablishmentError() {
     return sessionEstablishmentError;
-  }
-
-  public void setSessionEstablishmentError(FailureCallback sessionEstablishmentStopped) {
-    this.sessionEstablishmentError = sessionEstablishmentError;
   }
 
   public FailureCallback getSessionEstablishmentStopped() {
     return sessionEstablishmentStopped;
   }
 
-  public void setSessionEstablishmentStopped(FailureCallback sessionEstablishmentStopped) {
-    this.sessionEstablishmentStopped = sessionEstablishmentStopped;
-  }
-
   public Object getCommissioningComplete() {
     return commissioningComplete;
   }
 
-  public void setCommissioningComplete(Object commissioningComplete) {
-    this.commissioningComplete = commissioningComplete;
+  public static class Builder {
+    private SuccessCallback<Void> sessionEstablishmentStarted;
+    private SuccessCallback<Void> sessionEstablished;
+    private FailureCallback sessionEstablishmentError;
+    private FailureCallback sessionEstablishmentStopped;
+    private Object commissioningComplete;
+
+    public Builder sessionEstablishmentStarted(SuccessCallback<Void> sessionEstablishmentStarted) {
+      this.sessionEstablishmentStarted = sessionEstablishmentStarted;
+      return this;
+    }
+
+    public Builder sessionEstablished(SuccessCallback<Void> sessionEstablished) {
+      this.sessionEstablished = sessionEstablished;
+      return this;
+    }
+
+    public Builder sessionEstablishmentError(FailureCallback sessionEstablishmentError) {
+      this.sessionEstablishmentError = sessionEstablishmentError;
+      return this;
+    }
+
+    public Builder sessionEstablishmentStopped(FailureCallback sessionEstablishmentStopped) {
+      this.sessionEstablishmentStopped = sessionEstablishmentStopped;
+      return this;
+    }
+
+    public Builder commissioningComplete(Object commissioningComplete) {
+      this.commissioningComplete = commissioningComplete;
+      return this;
+    }
+
+    public CommissioningCallbacks build() {
+      return new CommissioningCallbacks(this);
+    }
   }
 }

@@ -121,7 +121,7 @@ public class ConnectionFragment extends Fragment {
       FailureCallback onConnectionFailure,
       SuccessCallback<ContentApp> onNewOrUpdatedEndpoints) {
     Log.d(TAG, "Running commissioning");
-    Object commissioningComplete =
+    MatterCallbackHandler commissioningCompleteCallback =
         new MatterCallbackHandler() {
           @Override
           public void handle(MatterError error) {
@@ -161,12 +161,14 @@ public class ConnectionFragment extends Fragment {
           }
         };
 
-    CommissioningCallbacks commissioningCallbacks = new CommissioningCallbacks();
-    commissioningCallbacks.setCommissioningComplete(commissioningComplete);
-    commissioningCallbacks.setSessionEstablishmentStarted(sessionEstablishmentStartedCallback);
-    commissioningCallbacks.setSessionEstablished(sessionEstablishedCallback);
-    commissioningCallbacks.setSessionEstablishmentError(sessionEstablishmentErrorCallback);
-    commissioningCallbacks.setSessionEstablishmentStopped(sessionEstablishmentStoppedCallback);
+    CommissioningCallbacks commissioningCallbacks =
+        new CommissioningCallbacks.Builder()
+            .commissioningComplete(commissioningCompleteCallback)
+            .sessionEstablishmentStarted(sessionEstablishmentStartedCallback)
+            .sessionEstablished(sessionEstablishedCallback)
+            .sessionEstablishmentError(sessionEstablishmentErrorCallback)
+            .sessionEstablishmentStopped(sessionEstablishmentStoppedCallback)
+            .build();
 
     this.openCommissioningWindowSuccess =
         tvCastingApp.openBasicCommissioningWindow(
