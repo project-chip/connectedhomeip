@@ -40,7 +40,6 @@ static constexpr size_t kKeyTcpSupportedMaxLength                = 1;
 // Commissionable/commissioner node TXT entries
 static constexpr size_t kKeyLongDiscriminatorMaxLength       = 5;
 static constexpr size_t kKeyVendorProductMaxLength           = 11;
-static constexpr size_t kKeyAdditionalCommissioningMaxLength = 1;
 static constexpr size_t kKeyCommissioningModeMaxLength       = 1;
 static constexpr size_t kKeyDeviceTypeMaxLength              = 10;
 static constexpr size_t kKeyDeviceNameMaxLength              = 32;
@@ -60,7 +59,6 @@ enum class TxtFieldKey : uint8_t
     kUnknown,
     kLongDiscriminator,
     kVendorProduct,
-    kAdditionalPairing,
     kCommissioningMode,
     kDeviceType,
     kDeviceName,
@@ -87,7 +85,6 @@ constexpr const TxtFieldInfo txtFieldInfo[static_cast<size_t>(TxtFieldKey::kCoun
     { TxtFieldKey::kUnknown, 0, "", TxtKeyUse::kNone },
     { TxtFieldKey::kLongDiscriminator, kKeyLongDiscriminatorMaxLength, "D", TxtKeyUse::kCommission },
     { TxtFieldKey::kVendorProduct, kKeyVendorProductMaxLength, "VP", TxtKeyUse::kCommission },
-    { TxtFieldKey::kAdditionalPairing, kKeyAdditionalCommissioningMaxLength, "AP", TxtKeyUse::kCommission },
     { TxtFieldKey::kCommissioningMode, kKeyCommissioningModeMaxLength, "CM", TxtKeyUse::kCommission },
     { TxtFieldKey::kDeviceType, kKeyDeviceTypeMaxLength, "DT", TxtKeyUse::kCommission },
     { TxtFieldKey::kDeviceName, kKeyDeviceNameMaxLength, "DN", TxtKeyUse::kCommission },
