@@ -56,8 +56,7 @@ public:
 
     // SafeAttributePersistenceProvider implementation.
     CHIP_ERROR SafeWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
-    CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType,
-                             MutableByteSpan & aValue) override;
+    CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) override;
 
 protected:
     PersistentStorageDelegate * mStorage;

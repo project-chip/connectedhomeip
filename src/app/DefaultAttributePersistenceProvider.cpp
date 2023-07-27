@@ -91,11 +91,11 @@ CHIP_ERROR DefaultAttributePersistenceProvider::SafeWriteValue(const ConcreteAtt
         aValue);
 }
 
-CHIP_ERROR DefaultAttributePersistenceProvider::SafeReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType, MutableByteSpan & aValue)
+CHIP_ERROR DefaultAttributePersistenceProvider::SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue)
 {
     return InternalReadValue(
         DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
-        aType, aValue.size(), aValue);
+        0x20, aValue.size(), aValue);
 }
 
 namespace {

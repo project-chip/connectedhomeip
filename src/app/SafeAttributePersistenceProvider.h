@@ -109,7 +109,7 @@ public:
         // **Note** aType in the SafeReadValue function is only used to check if the value is of a string type. Since this template
         // function is only enabled for integral values, we know that this case will not occur, so we can pass the enum of an
         // arbitrary integral type. 0x20 is the ZCL enum type for ZCL_INT8U_ATTRIBUTE_TYPE.
-        auto err = SafeReadValue(aPath, 0x20, tempVal);
+        auto err = SafeReadValue(aPath, tempVal);
         if (err != CHIP_NO_ERROR)
         {
             return err;
@@ -204,14 +204,14 @@ protected:
 
     /**
      * Read an attribute value from non-volatile memory.
+     * It can be assumed that this method will never be called upon to read
+     * an attribute of type string or long-string.
      *
      * @param [in]     aPath the attribute path for the data being persisted.
-     * @param [in]     aType the attribute type.
      * @param [in,out] aValue where to place the data.  The size of the buffer
      *                 will be equal to `size`.
      */
-    virtual CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType,
-                                     MutableByteSpan & aValue) = 0;
+    virtual CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) = 0;
 };
 
 /**

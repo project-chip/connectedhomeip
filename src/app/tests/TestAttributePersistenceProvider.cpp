@@ -75,7 +75,7 @@ void TestStorageAndRetrivalByteSpans(nlTestSuite * inSuite, void * inContext)
 
     uint8_t getArray[1];
     MutableByteSpan valueReadBack(getArray);
-    err = persistenceProvider.SafeReadValue(TestConcretePath, 0x20, valueReadBack);
+    err = persistenceProvider.SafeReadValue(TestConcretePath, valueReadBack);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, std::equal(valueReadBack.begin(), valueReadBack.end(), value.begin(), value.end()));
 
@@ -340,20 +340,20 @@ void TestBufferTooSmallErrors(nlTestSuite * inSuite, void * inContext)
     // Confirm the daya is there
     uint8_t getArray[9];
     MutableByteSpan valueReadBack(getArray);
-    err = persistenceProvider.SafeReadValue(TestConcretePath, 0x20, valueReadBack);
+    err = persistenceProvider.SafeReadValue(TestConcretePath, valueReadBack);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, std::equal(valueReadBack.begin(), valueReadBack.end(), value.begin(), value.end()));
 
     // Fail to get data as ByteSpace of size 0
     uint8_t getArray0[0];
     MutableByteSpan valueReadBackByteSpan0(getArray0, 0);
-    err = persistenceProvider.SafeReadValue(TestConcretePath, 0x20, valueReadBackByteSpan0);
+    err = persistenceProvider.SafeReadValue(TestConcretePath, valueReadBackByteSpan0);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Fail to get data as ByteSpace of size > 0 but < required
     uint8_t getArray8[8];
     MutableByteSpan valueReadBackByteSpan8(getArray8, sizeof(getArray8));
-    err = persistenceProvider.SafeReadValue(TestConcretePath, 0x20, valueReadBackByteSpan8);
+    err = persistenceProvider.SafeReadValue(TestConcretePath, valueReadBackByteSpan8);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Fail to get value as uint8_t
