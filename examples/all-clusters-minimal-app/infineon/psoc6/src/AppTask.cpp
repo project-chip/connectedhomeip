@@ -23,8 +23,12 @@
 #include "AppEvent.h"
 #include "ButtonHandler.h"
 #include "LEDWidget.h"
+#include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/TimerDelegates.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -34,12 +38,9 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <cy_wcm.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/Infineon/PSOC6/NetworkCommissioningDriver.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-
-#include <DeviceInfoProviderImpl.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
-#include <platform/Infineon/PSOC6/NetworkCommissioningDriver.h>
 
 /* OTA related includes */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -123,6 +124,10 @@ static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model
     static chip::CommonCaseDeviceServerInitParams initParams;
+    // Report scheduler and timer delegate instance
+    static chip::app::DefaultTimerDelegate sTimerDelegate;
+    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+    initParams.reportScheduler = &sReportScheduler;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 

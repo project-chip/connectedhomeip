@@ -32,6 +32,8 @@
 #endif
 
 #include <DeviceInfoProviderImpl.h>
+#include <app/TimerDelegates.h>
+#include <app/reporting/ReportSchedulerImpl.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/openiotsdk/Logging.h>
@@ -266,7 +268,11 @@ int openiotsdk_chip_run(void)
 #ifdef USE_CHIP_DATA_MODEL
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
-    CHIP_ERROR err = initParams.InitializeStaticResourcesBeforeServerInit();
+    // Report scheduler and timer delegate instance
+    static chip::app::DefaultTimerDelegate sTimerDelegate;
+    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+    initParams.reportScheduler = &sReportScheduler;
+    CHIP_ERROR err             = initParams.InitializeStaticResourcesBeforeServerInit();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Initialize static resources before server init failed: %s", err.AsString());

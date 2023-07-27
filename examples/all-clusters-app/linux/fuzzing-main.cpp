@@ -16,6 +16,8 @@
  */
 
 #include "AppMain.h"
+#include <app/TimerDelegates.h>
+#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/Server.h>
 
 #include <CommissionableInit.h>
@@ -54,6 +56,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
 
         // ChipLinuxAppMainLoop blocks, and we don't want that here.
         static chip::CommonCaseDeviceServerInitParams initParams;
+        // Report scheduler and timer delegate instance
+        static chip::app::DefaultTimerDelegate sTimerDelegate;
+        static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+        initParams.reportScheduler = &sReportScheduler;
         (void) initParams.InitializeStaticResourcesBeforeServerInit();
         VerifyOrDie(Server::GetInstance().Init(initParams) == CHIP_NO_ERROR);
 

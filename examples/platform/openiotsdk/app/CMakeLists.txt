@@ -22,6 +22,10 @@ add_library(openiotsdk-startup
         openiotsdk_startup_gcc.cpp
 )
 
+add_definitions(
+    "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
+)
+
 target_link_libraries(openiotsdk-startup
     PUBLIC
         # iotsdk-serial-retarget contains the UART but we don't need the retarget part

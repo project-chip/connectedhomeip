@@ -25,9 +25,11 @@
 #include "qrcodegen.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/TimerDelegates.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -50,7 +52,7 @@
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
-//#define EXAMPLE_VENDOR_ID                   0xcafe
+// #define EXAMPLE_VENDOR_ID                   0xcafe
 
 #ifdef portYIELD_FROM_ISR
 #define OS_YIELD_FROM_ISR(yield) portYIELD_FROM_ISR(yield)
@@ -138,6 +140,10 @@ CHIP_ERROR AppTask::Init()
 #endif
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
+    // Report scheduler and timer delegate instance
+    static chip::app::DefaultTimerDelegate sTimerDelegate;
+    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+    initParams.reportScheduler = &sReportScheduler;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 

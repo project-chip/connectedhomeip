@@ -21,6 +21,8 @@
 #include <DFUManager.h>
 #include <app/server/OnboardingCodesUtil.h>
 
+#include <app/TimerDelegates.h>
+#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -69,6 +71,10 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
+    // Report scheduler and timer delegate instance
+    static chip::app::DefaultTimerDelegate sTimerDelegate;
+    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+    initParams.reportScheduler = &sReportScheduler;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     error = Server::GetInstance().Init(initParams);
     if (error != CHIP_NO_ERROR)

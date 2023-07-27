@@ -56,6 +56,8 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include "SilabsDeviceDataProvider.h"
 #include "SilabsTestEventTriggerDelegate.h"
 #include <app/InteractionModelEngine.h>
+#include <app/TimerDelegates.h>
+#include <app/reporting/ReportSchedulerImpl.h>
 #include <lib/support/BytesToHex.h>
 
 #ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
@@ -187,6 +189,11 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     // Create initParams with SDK example defaults here
     static chip::CommonCaseDeviceServerInitParams initParams;
+
+    // Report scheduler and timer delegate instance
+    static chip::app::DefaultTimerDelegate sTimerDelegate;
+    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+    initParams.reportScheduler = &sReportScheduler;
 
 #if SILABS_TEST_EVENT_TRIGGER_ENABLED
     if (Encoding::HexToBytes(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY, strlen(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY),

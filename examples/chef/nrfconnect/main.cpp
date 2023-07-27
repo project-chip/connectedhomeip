@@ -27,6 +27,8 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <app/TimerDelegates.h>
+#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
@@ -110,6 +112,10 @@ int main()
 
     // Start IM server
     static chip::CommonCaseDeviceServerInitParams initParams;
+    // Report scheduler and timer delegate instance
+    static chip::app::DefaultTimerDelegate sTimerDelegate;
+    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+    initParams.reportScheduler = &sReportScheduler;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     err = chip::Server::GetInstance().Init(initParams);
     if (err != CHIP_NO_ERROR)

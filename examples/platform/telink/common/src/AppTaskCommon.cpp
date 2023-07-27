@@ -25,7 +25,9 @@
 #include "ThreadUtil.h"
 
 #include <DeviceInfoProviderImpl.h>
+#include <app/TimerDelegates.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -292,6 +294,10 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 
     // Init ZCL Data Model and start server
     static CommonCaseDeviceServerInitParams initParams;
+    // Report scheduler and timer delegate instance
+    static chip::app::DefaultTimerDelegate sTimerDelegate;
+    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+    initParams.reportScheduler = &sReportScheduler;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.appDelegate = &sCallbacks;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));

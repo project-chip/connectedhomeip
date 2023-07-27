@@ -191,6 +191,8 @@ static_library("app") {
     "TimedHandler.h",
     "TimedRequest.cpp",
     "TimedRequest.h",
+    "TimerDelegates.cpp",
+    "TimerDelegates.h",
     "WriteClient.cpp",
     "WriteHandler.cpp",
     "reporting/Engine.cpp",

@@ -100,7 +100,7 @@ struct ServerInitParams
     ServerInitParams() = default;
 
     // Not copyable
-    ServerInitParams(const ServerInitParams &) = delete;
+    ServerInitParams(const ServerInitParams &)             = delete;
     ServerInitParams & operator=(const ServerInitParams &) = delete;
 
     // Application delegate to handle some commissioning lifecycle events
@@ -146,6 +146,8 @@ struct ServerInitParams
     // Operational certificate store with access to the operational certs in persisted storage:
     // must not be null at timne of Server::Init().
     Credentials::OperationalCertificateStore * opCertStore = nullptr;
+    // Report Scheduler Must be injected. If none injected the IM engine will throw an error on Init()
+    app::reporting::ReportScheduler * reportScheduler = nullptr;
 };
 
 /**
@@ -180,7 +182,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     CommonCaseDeviceServerInitParams() = default;
 
     // Not copyable
-    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &) = delete;
+    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &)             = delete;
     CommonCaseDeviceServerInitParams & operator=(const CommonCaseDeviceServerInitParams &) = delete;
 
     /**
@@ -340,7 +342,7 @@ public:
 
     app::DefaultAttributePersistenceProvider & GetDefaultAttributePersister() { return mAttributePersister; }
 
-    app::reporting::ReportScheduler & GetReportScheduler() { return mReportScheduler; }
+    app::reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
     /**
      * This function causes the ShutDown event to be generated async on the
@@ -360,7 +362,7 @@ public:
     static Server & GetInstance() { return sServer; }
 
 private:
-    Server() : mTimerDelegate(), mReportScheduler(&mTimerDelegate) {}
+    Server() {}
 
     static Server sServer;
 
@@ -594,12 +596,7 @@ private:
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;
     ServerFabricDelegate mFabricDelegate;
-    app::DefaultTimerDelegate mTimerDelegate;
-#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
-    app::reporting::SynchronizedReportSchedulerImpl mReportScheduler;
-#else
-    app::reporting::ReportSchedulerImpl mReportScheduler;
-#endif
+    app::reporting::ReportScheduler * mReportScheduler;
 
     Access::AccessControl mAccessControl;
     app::AclStorage * mAclStorage;
