@@ -13,64 +13,50 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 193.3.1. [TC-DISHM-3.1] OnMode Verification with DUT as Server
+name: 194.3.1. [TC-DISHM-3.1] OnMode verification with DUT as Server
 
 PICS:
     - DISHM.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Dishwasher Mode"
-    endpoint: 1
+    cluster: "Basic Information"
+    endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
 
-    - label: "TH reads from the OnMode attribute from DUT"
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the OnMode attribute."
+      PICS: DISHM.S.A0003 && DISHM.S.F00
       verification: |
           ./chip-tool dishwashermode read on-mode 1 1
 
-          On TH(chip-tool), Verify OnMode attribute value is an integer. Save the value as on_mode_dut and below is the sample log provided for the raspi platform:
+          On TH(chip-tool), Verify OnMode attribute value is an integer. save the value as on_mode_dut and below is the sample log provided for the raspi platform:
 
           [1649678983.679893][10871:10876] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065073
           [1649678983.680002][10871:10876] CHIP:TOO: OnMode: 0
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      disabled: true
 
-    - label: "TH reads the CurrentMode attribute from the DUT"
+    - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
+      PICS: DISHM.S.A0001 && DISHM.S.F00
       verification: |
           ./chip-tool dishwashermode read current-mode 1 1
 
-          On TH(chip-tool), Verify CurrentMode attribute is an integer. Save the value as old_current_mode_dut and below is the sample log provided for the raspi platform:
+          On TH(chip-tool), Verify CurrentMode attribute is an integer. save the value as old_current_mode_dut and below is the sample log provided for the raspi platform:
 
-          NOTE: If on_mode_dut is equal to old_current_mode_dut proceed to step 4. Else proceed to step 6.
+          NOTE: If startup_mode_dut is equal to old_current_mode_dut proceed to step 4. Else proceed to step 6.
 
           [1649679034.895848][10879:10884] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
           [1649679034.895972][10879:10884] CHIP:TOO: CurrentMode: 0
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      disabled: true
 
-    - label: "TH reads the SupportedModes attribute from DUT"
+    - label: "Step 4: TH reads from the DUT the SupportedModes attribute."
+      PICS: DISHM.S.A0000 && DISHM.S.F00
       verification: |
           ./chip-tool dishwashermode read supported-modes 1 1
 
@@ -119,19 +105,12 @@ tests:
           [1687687925.445365][18054:18056] CHIP:TOO: Value: 2
           [1687687925.445385][18054:18056] CHIP:TOO: }
           [1687687925.445405][18054:18056] CHIP:TOO: }
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      disabled: true
 
     - label:
-          "TH sends a ChangeToMode command to the DUT with NewMode set to
-          new_mode_th"
+          "Step 5: TH sends a ChangeToMode command to the DUT with NewMode set
+          to new_mode_th"
+      PICS: DISHM.S.C00.Rsp && DISHM.S.F00
       verification: |
           ./chip-tool dishwashermode change-to-mode 2 1 1
 
@@ -143,17 +122,10 @@ tests:
           [1684931013.571027][20667:20669] CHIP:DMG: status = 0x00 (SUCCESS),
           [1684931013.571030][20667:20669] CHIP:DMG: },
           [1684931013.571034][20667:20669] CHIP:DMG:
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      disabled: true
 
-    - label: "TH sends Off Command to DUT"
+    - label: "Step 6: TH sends a Off command to the DUT"
+      PICS: OO.S.C00.Rsp && DISHM.S.F00
       verification: |
           ./chip-tool onoff off 1 1
 
@@ -163,17 +135,10 @@ tests:
           [1684931101.118659][20709:20711] CHIP:DMG: {
           [1684931101.118663][20709:20711] CHIP:DMG: status = 0x00 (SUCCESS),
           [1684931101.118665][20709:20711] CHIP:DMG: },
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      disabled: true
 
-    - label: "TH sends On Command to DUT"
+    - label: "Step 7: TH sends a On command to the DUT"
+      PICS: OO.S.C01.Rsp && DISHM.S.F00
       verification: |
           ./chip-tool onoff on 1 1
 
@@ -183,30 +148,15 @@ tests:
           [1684931217.055517][20729:20731] CHIP:DMG: {
           [1684931217.055520][20729:20731] CHIP:DMG: status = 0x00 (SUCCESS),
           [1684931217.055523][20729:20731] CHIP:DMG: },
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      disabled: true
 
-    - label: "TH reads the CurrentMode attribute from the DUT"
+    - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
+      PICS: DISHM.S.A0001 && DISHM.S.F00
       verification: |
           ./chip-tool dishwashermode read current-mode 1 1
 
-          On TH(chip-tool), Verify that CurrentMode attribute value is an integer and value is equal to on_mode_dut. Below is the sample log provided for the raspi platform:
+          On TH(chip-tool), Verify that CurrentMode attribute value is an integer and value is equal to on_mode_dut. below is the sample log provided for the raspi platform:
 
           [1649679202.069163][10899:10904] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
-          [1649679202.069278][10899:10904] CHIP:TOO: CurrentMode: 0
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+          [1649679202.069278][10899:10904] CHIP:TOO: CurrentMode: 2
+      disabled: true
