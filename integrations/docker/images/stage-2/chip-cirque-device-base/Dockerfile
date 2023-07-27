@@ -1,6 +1,6 @@
 FROM ubuntu:focal
 
-ARG OT_BR_POSIX_CHECKOUT=master
+ARG OT_BR_POSIX_CHECKOUT=main
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV PLATFORM ubuntu
@@ -38,11 +38,15 @@ RUN apt-get update \
   wireless-tools \
   wpasupplicant \
   && ln -fs /usr/share/zoneinfo/UTC /etc/localtime \
-  && git clone https://github.com/openthread/ot-br-posix . \
-  && git checkout $OT_BR_POSIX_CHECKOUT \
-  && git submodule update --init --depth=1 \
-  && ./script/bootstrap \
-  && ./script/setup \
+  && (mkdir ot-br-posix \
+      && cd ot-br-posix \
+      && git init \
+      && git remote add origin https://github.com/openthread/ot-br-posix \
+      && git fetch origin $OT_BR_POSIX_CHECKOUT --depth=1 \
+      && git reset --hard FETCH_HEAD \
+      && git submodule update --init --depth=1 \
+      && ./script/bootstrap \
+      && ./script/setup)\
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   git psmisc ninja-build cmake wget libreadline-dev libncurses-dev libcpputest-dev \
   libavahi-common-dev libavahi-client-dev libboost-dev libboost-filesystem-dev \

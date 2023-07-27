@@ -1,16 +1,34 @@
 {
     "device0": {
         "type": "CHIP-00",
-        "base_image": "project-chip/chip-cirque-device-base",
-        "capability": ["Thread", "Interactive", "Mount"],
-        "mount_pairs": [["{chip_repo}", "{chip_repo}"]],
+        "base_image": "@default",
+        "capability": [
+            "Thread",
+            "Interactive",
+            "Mount"
+        ],
+        "mount_pairs": [
+            [
+                "{chip_repo}",
+                "{chip_repo}"
+            ]
+        ],
         "rcp_mode": true
     },
     "device1": {
         "type": "CHIP-01",
-        "base_image": "project-chip/chip-cirque-device-base",
-        "capability": ["Thread", "Interactive", "Mount"],
-        "mount_pairs": [["{chip_repo}", "{chip_repo}"]],
+        "base_image": "@default",
+        "capability": [
+            "Thread",
+            "Interactive",
+            "Mount"
+        ],
+        "mount_pairs": [
+            [
+                "{chip_repo}",
+                "{chip_repo}"
+            ]
+        ],
         "rcp_mode": true
     }
 }
