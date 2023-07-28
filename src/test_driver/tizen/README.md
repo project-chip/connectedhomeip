@@ -68,7 +68,7 @@ output to a file as follows:
 ninja -C out/tizen-check check > ninja-tizen-check.log 2>&1
 ```
 
-Then, use the run command and add the "rootshell" keyword to kernel arguments
+Then, use the run command and add the `rootshell` keyword to kernel arguments
 passed to QEMU (the string after the `-append` option). This will run QEMU, but
 instead of running the test, it will drop you to the shell. From there, you can
 run the test manually by typing `/mnt/chip/runner.sh`.

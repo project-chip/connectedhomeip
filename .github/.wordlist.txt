@@ -1156,7 +1156,6 @@ rmw
 rodata
 Rollershade
 rootfs
-rootshell
 RPC
 RPCs
 RPi
