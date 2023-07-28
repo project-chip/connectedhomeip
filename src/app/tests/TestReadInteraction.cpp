@@ -1954,7 +1954,8 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
         //    - cluster 0xFFF1'FC03 (2 attributes)
         //    - cluster 0xFFF1'FC04 (2 attributes)
         //
-        // For at total of 29 attributes in a subscription.
+        // For at total of 29 attributes. There are two wildcard subscription
+        // paths, for a total of 58 attributes.
         //
         // In particular attribute for 0xFFFC::0xFFF1'FC03::4 is a list of
         // 6 elements of size 256 bytes each, that gets list chunking applied
