@@ -2532,7 +2532,6 @@ endpoint 0 {
     ram      attribute supportsDNSResolve default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0B;
     ram      attribute clusterRevision default = 1;
