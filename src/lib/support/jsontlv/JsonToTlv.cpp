@@ -26,7 +26,7 @@ namespace chip {
 
 namespace {
 
-std::vector<std::string> splitIntoFieldsBySeparator(const std::string & input, char separator)
+std::vector<std::string> SplitIntoFieldsBySeparator(const std::string & input, char separator)
 {
     std::vector<std::string> substrings;
     std::stringstream ss(input);
