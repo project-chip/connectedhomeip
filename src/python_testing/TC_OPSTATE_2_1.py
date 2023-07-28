@@ -125,26 +125,22 @@ class TC_OPSTATE_2_1(MatterBaseTest):
             in_range = (0x80 <= operational_state and operational_state <= 0xBF)
             asserts.assert_true(operational_state in defined_states or in_range, "OperationalState has an invalid ID value!")
 
-            if 'PIXIT_OPSTATE_ST_STOPPED' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ST_STOPPED'] == 1:
-                    self.print_step("6a", "Manually put the device in the stopped state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_opstate(step="6b", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kStopped)
-            if 'PIXIT_OPSTATE_ST_RUNNING' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ST_RUNNING'] == 1:
-                    self.print_step("6c", "Manually put the device in the running state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_opstate(step="6d", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kRunning)
-            if 'PIXIT_OPSTATE_ST_PAUSED' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ST_PAUSED'] == 1:
-                    self.print_step("6e", "Manually put the device in the paused state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_opstate(step="6f", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kPaused)
-            if 'PIXIT_OPSTATE_ST_ERROR' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ST_ERROR'] == 1:
-                    self.print_step("6g", "Manually put the device in the error state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_opstate(step="6h", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kError)
+            if self.check_pics("OPSTATE.M.ST_STOPPED"):
+                self.print_step("6a", "Manually put the device in the stopped state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_opstate(step="6b", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kStopped)
+            if self.check_pics("OPSTATE.M.ST_RUNNING"):
+                self.print_step("6c", "Manually put the device in the running state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_opstate(step="6d", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kRunning)
+            if self.check_pics("OPSTATE.M.ST_PAUSED"):
+                self.print_step("6e", "Manually put the device in the paused state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_opstate(step="6f", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kPaused)
+            if self.check_pics("OPSTATE.M.ST_ERROR"):
+                self.print_step("6g", "Manually put the device in the error state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_opstate(step="6h", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kError)
 
         if self.check_pics("OPSTATE.S.A0005"):
             self.print_step(7, "Read OperationalError attribute")
@@ -163,26 +159,22 @@ class TC_OPSTATE_2_1(MatterBaseTest):
             if in_range:
                 asserts.assert_true(operational_error.errorStateLabel is not None, "ErrorStateLabel should be populated")
 
-            if 'PIXIT_OPSTATE_ERR_NO_ERROR' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ERR_NO_ERROR'] == 1:
-                    self.print_step("7a", "Manually put the device in the no error state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_operror(step="7b", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kNoError)
-            if 'PIXIT_OPSTATE_ERR_UNABLE_TO_START_OR_RESUME' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ERR_UNABLE_TO_START_OR_RESUME'] == 1:
-                    self.print_step("7c", "Manually put the device in the unable to start or resume state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_operror(step="7d", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToStartOrResume)
-            if 'PIXIT_OPSTATE_ERR_UNABLE_TO_COMPLETE_OPERATION' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ERR_UNABLE_TO_COMPLETE_OPERATION'] == 1:
-                    self.print_step("7e", "Manually put the device in the unable to complete operation state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_operror(step="7f", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToCompleteOperation)
-            if 'PIXIT_OPSTATE_ERR_COMMAND_INVALID_STATE' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ERR_COMMAND_INVALID_STATE'] == 1:
-                    self.print_step("7g", "Manually put the device in the command invalid state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_operror(step="7h", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState)
+            if self.check_pics("OPSTATE.M.ERR_NO_ERROR"):
+                self.print_step("7a", "Manually put the device in the no error state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_operror(step="7b", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kNoError)
+            if self.check_pics("OPSTATE.M.ERR_UNABLE_TO_START_OR_RESUME"):
+                self.print_step("7c", "Manually put the device in the unable to start or resume state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_operror(step="7d", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToStartOrResume)
+            if self.check_pics("OPSTATE.M.ERR_UNABLE_TO_COMPLETE_OPERATION"):
+                self.print_step("7e", "Manually put the device in the unable to complete operation state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_operror(step="7f", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToCompleteOperation)
+            if self.check_pics("OPSTATE.M.ERR_COMMAND_INVALID_STATE"):
+                self.print_step("7g", "Manually put the device in the command invalid state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_operror(step="7h", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState)
 
 
 if __name__ == "__main__":
