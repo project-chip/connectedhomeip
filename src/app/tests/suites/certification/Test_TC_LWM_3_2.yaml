@@ -36,7 +36,7 @@ tests:
       verification: |
           ./chip-tool laundrywashermode read start-up-mode 1 1
 
-          On TH(chip-tool), Verify StartUpMode attribute value is an integer. 
+          On TH(chip-tool), Verify StartUpMode attribute value is an integer.
           - save the value as startup_mode_dut and below is the sample log provided for the raspi platform:
 
           [1690185689.626227][15652:15654] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_0002 DataVersion: 869931348

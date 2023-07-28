@@ -57,7 +57,7 @@ tests:
 
           Verify the "AttributeList " should include the mandatory attributes (values 0, 1),
           - global attributes  (value 65533, 65532, 65531, 65530, 65529 and 65528) and
-          - list may include optional attribute(value 0x0002), if MOD.S.A0004(StartUpMode) supports, 
+          - list may include optional attribute(value 0x0002), if MOD.S.A0004(StartUpMode) supports,
           - list contains feature dependent attribute (values 0x0003), if MOD.S.F00(DEPONOFF) is true  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
 
           [1690184549.210762][15408:15410] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_FFFB DataVersion: 3075628268

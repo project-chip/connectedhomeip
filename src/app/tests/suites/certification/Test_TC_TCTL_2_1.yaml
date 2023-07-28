@@ -40,7 +40,7 @@ tests:
           and (TCTL.S.A0002(MaxTemperature) - TCTL.S.A0001(MinTemperature)) % TCTL.S.A0003(Step) == 0
 
 
-          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true, 
+          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
           [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
           [1689770673.417851][9280:9282] CHIP:DMG: }
           [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0003 DataVersion: 2844459846

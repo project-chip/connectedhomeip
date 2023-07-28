@@ -117,7 +117,7 @@ tests:
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read on-mode 1 1
 
-          On TH(chip-tool),  Verify that OnMode attribute value is an integer 
+          On TH(chip-tool),  Verify that OnMode attribute value is an integer
           -Save the value as new_on_mode_dut
           - The value is equal to new_mode_th and below is the sample log provided for the raspi platform, here OnMode attribute value is 1
 
