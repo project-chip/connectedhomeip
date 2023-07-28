@@ -423,6 +423,52 @@ void TestConverter_Float_17_9(nlTestSuite * inSuite, void * inContext)
     CheckValidConversion(jsonString, tlvSpan, jsonExpected);
 }
 
+// Single precision floating point positive infinity
+void TestConverter_Float_PositiveInfinity(nlTestSuite * inSuite, void * inContext)
+{
+    gSuite = inSuite;
+
+    uint8_t buf[256];
+    TLV::TLVWriter writer;
+    TLV::TLVType containerType;
+
+    writer.Init(buf);
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(101), std::numeric_limits<float>::infinity()));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+
+    std::string jsonString = "{\n"
+                             "   \"101:FLOAT\" : \"Infinity\"\n"
+                             "}\n";
+
+    ByteSpan tlvSpan(buf, writer.GetLengthWritten());
+    CheckValidConversion(jsonString, tlvSpan, jsonString);
+}
+
+// Single precision floating point negative infinity
+void TestConverter_Float_NegativeInfinity(nlTestSuite * inSuite, void * inContext)
+{
+    gSuite = inSuite;
+
+    uint8_t buf[256];
+    TLV::TLVWriter writer;
+    TLV::TLVType containerType;
+
+    writer.Init(buf);
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(101), -std::numeric_limits<float>::infinity()));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+
+    std::string jsonString = "{\n"
+                             "   \"101:FLOAT\" : \"-Infinity\"\n"
+                             "}\n";
+
+    ByteSpan tlvSpan(buf, writer.GetLengthWritten());
+    CheckValidConversion(jsonString, tlvSpan, jsonString);
+}
+
 // Double precision floating point 0.0
 void TestConverter_Double_0(nlTestSuite * inSuite, void * inContext)
 {
@@ -486,6 +532,52 @@ void TestConverter_Double_17_9(nlTestSuite * inSuite, void * inContext)
 
     std::string jsonString = "{\n"
                              "   \"101:DOUBLE\" : 17.899999999999999\n"
+                             "}\n";
+
+    ByteSpan tlvSpan(buf, writer.GetLengthWritten());
+    CheckValidConversion(jsonString, tlvSpan, jsonString);
+}
+
+// Double precision floating point positive infinity
+void TestConverter_Double_PositiveInfinity(nlTestSuite * inSuite, void * inContext)
+{
+    gSuite = inSuite;
+
+    uint8_t buf[256];
+    TLV::TLVWriter writer;
+    TLV::TLVType containerType;
+
+    writer.Init(buf);
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(101), std::numeric_limits<double>::infinity()));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+
+    std::string jsonString = "{\n"
+                             "   \"101:DOUBLE\" : \"Infinity\"\n"
+                             "}\n";
+
+    ByteSpan tlvSpan(buf, writer.GetLengthWritten());
+    CheckValidConversion(jsonString, tlvSpan, jsonString);
+}
+
+// Double precision floating point negative infinity
+void TestConverter_Double_NegativeInfinity(nlTestSuite * inSuite, void * inContext)
+{
+    gSuite = inSuite;
+
+    uint8_t buf[256];
+    TLV::TLVWriter writer;
+    TLV::TLVType containerType;
+
+    writer.Init(buf);
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(101), -std::numeric_limits<double>::infinity()));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+
+    std::string jsonString = "{\n"
+                             "   \"101:DOUBLE\" : \"-Infinity\"\n"
                              "}\n";
 
     ByteSpan tlvSpan(buf, writer.GetLengthWritten());
@@ -1414,6 +1506,7 @@ void TestConverter_Structure_FromReadme(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(1.1)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(134.2763)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(-12345.87)));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), std::numeric_limits<double>::infinity()));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(62534)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(-62534)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
@@ -1428,7 +1521,8 @@ void TestConverter_Structure_FromReadme(nlTestSuite * inSuite, void * inContext)
             writer.PutBytes(TLV::ContextTag(7), reinterpret_cast<uint8_t *>(bytes4), static_cast<uint32_t>(strlen(bytes4))));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(8), static_cast<double>(17.9)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(9), static_cast<float>(17.9)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(10), TLV::kTLVType_Structure, containerType2));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(10), -std::numeric_limits<float>::infinity()));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(11), TLV::kTLVType_Structure, containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::ContextTag(1), "John"));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(2), static_cast<uint32_t>(34)));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(3), true));
@@ -1453,12 +1547,13 @@ void TestConverter_Structure_FromReadme(nlTestSuite * inSuite, void * inContext)
                              "       \"2:STRING\" : \"example\"\n"
                              "   },\n"
                              "   \"2:INT\" : \"40000000000\",\n"
-                             "   \"3:BOOL\" : true,\n"
+                             "   \"isQualified:3:BOOL\" : true,\n"
                              "   \"4:ARRAY-?\" : [],\n"
                              "   \"5:ARRAY-DOUBLE\" : [\n"
                              "      1.1000000000000001,\n"
                              "      134.27629999999999,\n"
                              "      -12345.870000000001,\n"
+                             "      \"Infinity\",\n"
                              "      62534.0,\n"
                              "      -62534.0\n"
                              "   ],\n"
@@ -1470,7 +1565,8 @@ void TestConverter_Structure_FromReadme(nlTestSuite * inSuite, void * inContext)
                              "   \"7:BYTES\" : \"VGVzdCBCeXRlcw==\",\n"
                              "   \"8:DOUBLE\" : 17.899999999999999,\n"
                              "   \"9:FLOAT\" : 17.899999618530273,\n"
-                             "   \"contact:10:STRUCT\" : {\n"
+                             "   \"10:FLOAT\" : \"-Infinity\",\n"
+                             "   \"contact:11:STRUCT\" : {\n"
                              "      \"name:1:STRING\" : \"John\",\n"
                              "      \"age:2:UINT\" : 34,\n"
                              "      \"approved:3:BOOL\" : true,\n"
@@ -1500,6 +1596,7 @@ void TestConverter_Structure_FromReadme(nlTestSuite * inSuite, void * inContext)
                                "      1.1000000000000001,\n"
                                "      134.27629999999999,\n"
                                "      -12345.870000000001,\n"
+                               "      \"Infinity\",\n"
                                "      62534.0,\n"
                                "      -62534.0\n"
                                "   ],\n"
@@ -1511,7 +1608,8 @@ void TestConverter_Structure_FromReadme(nlTestSuite * inSuite, void * inContext)
                                "   \"7:BYTES\" : \"VGVzdCBCeXRlcw==\",\n"
                                "   \"8:DOUBLE\" : 17.899999999999999,\n"
                                "   \"9:FLOAT\" : 17.899999618530273,\n"
-                               "   \"10:STRUCT\" : {\n"
+                               "   \"10:FLOAT\" : \"-Infinity\",\n"
+                               "   \"11:STRUCT\" : {\n"
                                "      \"1:STRING\" : \"John\",\n"
                                "      \"2:UINT\" : 34,\n"
                                "      \"3:BOOL\" : true,\n"
@@ -1567,38 +1665,6 @@ void TestConverter_TlvToJson_ErrorCases(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Finalize());
     ByteSpan usingList(buf3, writer.GetLengthWritten());
 
-    uint8_t buf4[32];
-    writer.Init(buf4);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), std::numeric_limits<float>::infinity()));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Finalize());
-    ByteSpan floatPosInfinity(buf4, writer.GetLengthWritten());
-
-    uint8_t buf5[32];
-    writer.Init(buf5);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), -std::numeric_limits<float>::infinity()));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Finalize());
-    ByteSpan floatNegInfinity(buf5, writer.GetLengthWritten());
-
-    uint8_t buf6[32];
-    writer.Init(buf6);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), std::numeric_limits<double>::infinity()));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Finalize());
-    ByteSpan doublePosInfinity(buf6, writer.GetLengthWritten());
-
-    uint8_t buf7[32];
-    writer.Init(buf7);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), -std::numeric_limits<double>::infinity()));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Finalize());
-    ByteSpan doubleNegInfinity(buf7, writer.GetLengthWritten());
-
     uint8_t buf8[32];
     writer.Init(buf8);
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
@@ -1626,10 +1692,6 @@ void TestConverter_TlvToJson_ErrorCases(nlTestSuite * inSuite, void * inContext)
         {  topLevelStructWithTag,  CHIP_ERROR_INVALID_TLV_TAG,     "Top-Level Struct is Not Anonymous"     },
         {  topLevelIsArray,        CHIP_ERROR_WRONG_TLV_TYPE,      "Top-Level is an Array"                 },
         {  usingList,              CHIP_ERROR_INVALID_TLV_ELEMENT, "Using Unsupported List Type"           },
-        {  floatPosInfinity,       CHIP_ERROR_INVALID_TLV_ELEMENT, "Float Positive Infinity"               },
-        {  floatNegInfinity,       CHIP_ERROR_INVALID_TLV_ELEMENT, "Float Negative Infinity"               },
-        {  doublePosInfinity,      CHIP_ERROR_INVALID_TLV_ELEMENT, "Double Positive Infinity"              },
-        {  doubleNegInfinity,      CHIP_ERROR_INVALID_TLV_ELEMENT, "Double Negative Infinity"              },
         {  arrayWithMixedElements, CHIP_ERROR_INVALID_TLV_ELEMENT, "Array with Mixed Elements"             },
         {  useFullyQualifiedTag,   CHIP_ERROR_INVALID_TLV_TAG,     "Using Unsupported Fully Qualified Tag" },
     };
@@ -1709,6 +1771,14 @@ void TestConverter_JsonToTlv_ErrorCases(nlTestSuite * inSuite, void * inContext)
                                            "   \"1:BYTES\" : \"AAECwQ=\"\n"
                                            "}\n";
 
+    std::string invalidPositiveInfinityValue = "{\n"
+                                               "   \"1:DOUBLE\" : \"+Infinity\"\n"
+                                               "}\n";
+
+    std::string invalidFloatValueAsString = "{\n"
+                                            "   \"1:FLOAT\" : \"1.1\"\n"
+                                            "}\n";
+
     // clang-format off
     static const TestCase sTestCases[] = {
         // Json String                      Expected Error                Test Case String
@@ -1724,6 +1794,8 @@ void TestConverter_JsonToTlv_ErrorCases(nlTestSuite * inSuite, void * inContext)
         {  invalidBytesBase64Value1,        CHIP_ERROR_INVALID_ARGUMENT,  "Invalid Base64 Encoding: Invalid Character"              },
         {  invalidBytesBase64Value2,        CHIP_ERROR_INVALID_ARGUMENT,  "Invalid Base64 Encoding: Invalid Character"              },
         {  invalidBytesBase64Value3,        CHIP_ERROR_INVALID_ARGUMENT,  "Invalid Base64 Encoding: Invalid length"                 },
+        {  invalidPositiveInfinityValue,    CHIP_ERROR_INVALID_ARGUMENT,  "Invalid Double Positive Infinity Encoding"               },
+        {  invalidFloatValueAsString,       CHIP_ERROR_INVALID_ARGUMENT,  "Invalid Float Value Encoding as a String"                },
     };
     // clang-format on
 
@@ -1763,9 +1835,13 @@ const nlTest sTests[] = {
     NL_TEST_DEF("Test Json Tlv Converter - Floating Point Single Precision 0.0", TestConverter_Float_0),
     NL_TEST_DEF("Test Json Tlv Converter - Floating Point Single Precision 1/3", TestConverter_Float_1third),
     NL_TEST_DEF("Test Json Tlv Converter - Floating Point Single Precision 17.9", TestConverter_Float_17_9),
+    NL_TEST_DEF("Test Json Tlv Converter - Floating Point Single Precision Positive Infinity", TestConverter_Float_PositiveInfinity),
+    NL_TEST_DEF("Test Json Tlv Converter - Floating Point Single Precision Negative Infinity", TestConverter_Float_NegativeInfinity),
     NL_TEST_DEF("Test Json Tlv Converter - Floating Point Double Precision 0.0", TestConverter_Double_0),
     NL_TEST_DEF("Test Json Tlv Converter - Floating Point Double Precision 1/3", TestConverter_Double_1third),
     NL_TEST_DEF("Test Json Tlv Converter - Floating Point Double Precision 17.9", TestConverter_Double_17_9),
+    NL_TEST_DEF("Test Json Tlv Converter - Floating Point Double Precision Positive Infinity", TestConverter_Double_PositiveInfinity),
+    NL_TEST_DEF("Test Json Tlv Converter - Floating Point Double Precision Negative Infinity", TestConverter_Double_NegativeInfinity),
     NL_TEST_DEF("Test Json Tlv Converter - Structure Top-Level Empty", TestConverter_Structure_TopLevelEmpty),
     NL_TEST_DEF("Test Json Tlv Converter - Structure Nested Empty", TestConverter_Structure_NestedEmpty),
     NL_TEST_DEF("Test Json Tlv Converter - Array Empty", TestConverter_Array_Empty),

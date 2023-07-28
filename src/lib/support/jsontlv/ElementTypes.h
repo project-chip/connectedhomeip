@@ -31,6 +31,9 @@ const char kElementTypeStruct[] = "STRUCT";
 const char kElementTypeArray[]  = "ARRAY";
 const char kElementTypeEmpty[]  = "?";
 
+const char kFloatingPointPositiveInfinity[] = "Infinity";
+const char kFloatingPointNegativeInfinity[] = "-Infinity";
+
 struct ElementTypeContext
 {
     chip::TLV::TLVType tlvType = chip::TLV::kTLVType_NotSpecified;

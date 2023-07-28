@@ -5,10 +5,10 @@
 Helper functions for converting TLV-encoded data to Json format and vice versa.
 
 In order for the Json format to represent the TLV format without loss of
-information, the Json key of each element should contain the TLV element tag and
+information, the Json name of each element should contain the TLV element tag and
 type information.
 
-The Json key schema is as follows:
+The Json name schema is as follows:
 
 ```
 { [field_name:]field_id:element_type[-sub_element_type] }
@@ -30,23 +30,25 @@ Specific rules:
     events, attributes).
 
 The table below summarizes all element types and their corresponding encoding in
-the Json key:
+the Json element name:
 
-| TLV Type                               | element_type           | JSON Type               |
-| -------------------------------------- | ---------------------- | ----------------------- |
-| Unsigned Integer ( < 2^32 )            | UINT                   | Number                  |
-| Unsigned Integer ( >= 2^32 )           | UINT                   | String                  |
-| Signed Integer ( >= -2^31 and < 2^31 ) | INT                    | Number                  |
-| Signed Integer ( < -2^31 or >= 2^31 )  | INT                    | String                  |
-| Boolean                                | BOOL                   | Boolean                 |
-| Float (32-bit)                         | FLOAT                  | Number                  |
-| Float/Double (64-bit)                  | DOUBLE                 | Number                  |
-| Octet String                           | BYTES                  | String (Base64 encoded) |
-| UTF-8 String                           | STRING                 | String                  |
-| Null Value                             | NULL                   | null                    |
-| Struct                                 | STRUCT                 | Dict                    |
-| Array                                  | ARRAY-sub_element_type | Array                   |
-| Unknown                                | ?                      | Empty Array             |
+| TLV Type                               | element_type           | JSON Type                       |
+| -------------------------------------- | ---------------------- | ------------------------------- |
+| Unsigned Integer ( < 2^32 )            | UINT                   | Number                          |
+| Unsigned Integer ( >= 2^32 )           | UINT                   | String                          |
+| Signed Integer ( >= -2^31 and < 2^31 ) | INT                    | Number                          |
+| Signed Integer ( < -2^31 or >= 2^31 )  | INT                    | String                          |
+| Boolean                                | BOOL                   | Boolean                         |
+| Float (positive/negative infinity)     | FLOAT                  | String ("Infinity"/"-Infinity") |
+| Double (positive/negative infinity)    | DOUBLE                 | String ("Infinity"/"-Infinity") |
+| Float (not infinity)                   | FLOAT                  | Number                          |
+| Double (not infinity)                  | DOUBLE                 | Number                          |
+| Octet String                           | BYTES                  | String (Base64 encoded)         |
+| UTF-8 String                           | STRING                 | String                          |
+| Null Value                             | NULL                   | null                            |
+| Struct                                 | STRUCT                 | Dict                            |
+| Array                                  | ARRAY-sub_element_type | Array                           |
+| Unknown                                | ?                      | Empty Array                     |
 
 Note that this is NOT a generalized JSON representation of TLV and does not
 support arbitrary TLV conversions. The main goal of this Json format is to
@@ -56,7 +58,6 @@ limitations of this format are:
 -   TLV List types are not supported.
 -   TLV Array cannot contain another TLV Array.
 -   The top-level container MUST be an anonymous STRUCT.
--   Infinity Float/Double values are not supported.
 -   Elements of the TLV Structure MUST have Context or Common Profile Tags.
 -   Common Profile Tag number MUST be larger or equal to 256 and smaller that
     2^32.
@@ -83,12 +84,13 @@ elements, arrays, and structures.
         "2:STRING" : "example"       // Struct.elem2
     },
     "2:INT" : "40000000000",         // int as string
-    "3:BOOL" : true,                 // boolean
+    "isQualified:3:BOOL" : true,     // boolean with field_name in the Json name
     "4:ARRAY-?" : [],                // empty array
     "5:ARRAY-DOUBLE" : [             // array of doubles
         1.1,
         134.2763,
         -12345.87,
+        "Infinity",                  // positive infinity
         62534,                       // positive integer-valued double
         -62534                       // negative integer-valued double
     ],
@@ -100,7 +102,8 @@ elements, arrays, and structures.
     "7:BYTES" : "VGVzdCBCeXRlcw==",  // base64( "Test Bytes" )
     "8:DOUBLE" : 17.9,               // 17.9 as double
     "9:FLOAT" : 17.9,                // 17.9 as float
-    "contact:10:STRUCT" : {          // structure example with field_name in the Json keys
+    "10:FLOAT" : "-Infinity",        // Negative infinity float
+    "contact:11:STRUCT" : {          // structure example with field_name in the Json name
         "name:1:STRING" : "John",
         "age:2:UINT" : 34,
         "approved:3:BOOL" : true,

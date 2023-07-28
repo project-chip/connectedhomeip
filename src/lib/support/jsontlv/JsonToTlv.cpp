@@ -285,14 +285,49 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
     }
 
     case TLV::kTLVType_FloatingPointNumber: {
-        VerifyOrReturnError(val.isNumeric(), CHIP_ERROR_INVALID_ARGUMENT);
-        if (elementCtx.type.isDouble)
+        if (val.isNumeric())
         {
-            ReturnErrorOnFailure(writer.Put(tag, val.asDouble()));
+            if (elementCtx.type.isDouble)
+            {
+                ReturnErrorOnFailure(writer.Put(tag, val.asDouble()));
+            }
+            else
+            {
+                ReturnErrorOnFailure(writer.Put(tag, val.asFloat()));
+            }
+        }
+        else if (val.isString())
+        {
+            const std::string valAsString = val.asString();
+            bool isPositiveInfinity       = (valAsString == kFloatingPointPositiveInfinity);
+            bool isNegativeInfinity       = (valAsString == kFloatingPointNegativeInfinity);
+            VerifyOrReturnError(isPositiveInfinity || isNegativeInfinity, CHIP_ERROR_INVALID_ARGUMENT);
+            if (elementCtx.type.isDouble)
+            {
+                if (isPositiveInfinity)
+                {
+                    ReturnErrorOnFailure(writer.Put(tag, std::numeric_limits<double>::infinity()));
+                }
+                else
+                {
+                    ReturnErrorOnFailure(writer.Put(tag, -std::numeric_limits<double>::infinity()));
+                }
+            }
+            else
+            {
+                if (isPositiveInfinity)
+                {
+                    ReturnErrorOnFailure(writer.Put(tag, std::numeric_limits<float>::infinity()));
+                }
+                else
+                {
+                    ReturnErrorOnFailure(writer.Put(tag, -std::numeric_limits<float>::infinity()));
+                }
+            }
         }
         else
         {
-            ReturnErrorOnFailure(writer.Put(tag, val.asFloat()));
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
         break;
     }

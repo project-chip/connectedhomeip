@@ -187,9 +187,18 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, Json::Value & jsonObj)
     case TLV::kTLVType_FloatingPointNumber: {
         double v;
         ReturnErrorOnFailure(reader.Get(v));
-        VerifyOrReturnError(v != std::numeric_limits<double>::infinity() && v != -std::numeric_limits<double>::infinity(),
-                            CHIP_ERROR_INVALID_TLV_ELEMENT);
-        InsertJsonElement(jsonObj, context, v);
+        if (v == std::numeric_limits<double>::infinity())
+        {
+            InsertJsonElement(jsonObj, context, kFloatingPointPositiveInfinity);
+        }
+        else if (v == -std::numeric_limits<double>::infinity())
+        {
+            InsertJsonElement(jsonObj, context, kFloatingPointNegativeInfinity);
+        }
+        else
+        {
+            InsertJsonElement(jsonObj, context, v);
+        }
         break;
     }
 
