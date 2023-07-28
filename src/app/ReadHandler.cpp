@@ -718,6 +718,12 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     // defined in the ICD Management Cluster.
     // Behavior can be changed with the OnSubscriptionRequested function defined in the application callbacks
 
+    // Default Behavior Steps :
+    // If MinInterval > IdleModeInterval, try to set the MaxInterval to the first interval of IdleModeIntervals above the
+    // MinInterval.
+    // If the next interval is greater than the MaxIntervalCeiling, use the MaxIntervalCeiling.
+    // Otherwise, use IdleModeInterval as MaxInterval
+
     // GetPublisherSelectedIntervalLimit() returns the IdleModeInterval if the device is an ICD
     uint32_t decidedMaxInterval = GetPublisherSelectedIntervalLimit();
 
