@@ -54,8 +54,8 @@ CHIP_ERROR CastingServer::Init(AppParams * AppParams)
         return CHIP_NO_ERROR;
     }
 
-    // Set AppDelegate
-    chip::Server::Server::GetInstance().GetCommissioningWindowManager().SetAppDelegate(this);
+    // Set CastingServer as AppDelegate
+    InitAppDelegation();
 
     // Initialize binding handlers
     ReturnErrorOnFailure(InitBindingHandlers());
@@ -68,6 +68,12 @@ CHIP_ERROR CastingServer::Init(AppParams * AppParams)
 
     mInited = true;
     return CHIP_NO_ERROR;
+}
+
+void CastingServer::InitAppDelegation()
+{
+    ChipLogProgress(AppServer, "CastingServer::InitAppDelegation called");
+    chip::Server::Server::GetInstance().GetCommissioningWindowManager().SetAppDelegate(this);
 }
 
 CHIP_ERROR CastingServer::SetRotatingDeviceIdUniqueId(chip::Optional<chip::ByteSpan> rotatingDeviceIdUniqueIdOptional)

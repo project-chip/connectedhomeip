@@ -818,6 +818,9 @@
                                      return;
                                  }
 
+                                 // Initialize AppDelegation
+                                 CastingServer::GetInstance()->InitAppDelegation();
+
                                  // Initialize binding handlers
                                  err = CastingServer::GetInstance()->InitBindingHandlers();
                                  if (err != CHIP_NO_ERROR) {
