@@ -1961,8 +1961,11 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
         // 6 elements of size 256 bytes each, that gets list chunking applied
         // to it.
         //
-        // Actual attribute response sizes depends on how list chunking occurs on this
-        // list.
+        // Because delegate.mNumAttributeResponse counts AttributeDataIB instances, not attributes,
+        // the count will depend on exactly how the list for attribute
+        // 0xFFFC::0xFFF1'FC02::0xFFF1'0004 is chunked.  For each of the two instances of that attribute 
+        // in the response, there will be one AttributeDataIB for the start of the list (which will include
+        // some number of 256-byte elements), then one AttributeDataIB for each of the remaining elements.
         //
         // For event list enabled data, receive two of its items as a single list,
         // followed by 4 more single items for one
