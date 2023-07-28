@@ -1064,6 +1064,7 @@ static BOOL sNeedsStackShutdown = YES;
         NSError * endSeekError;
         XCTAssertTrue([readHandle seekToEndReturningOffset:&imageSize error:&endSeekError]);
         XCTAssertNil(endSeekError);
+        sOTAProviderDelegate.transferBeginHandler = nil;
 
         // Don't actually respond until the second requestor has queried us for
         // an image to ensure BDX for device1 starts only after device2 has queried us once.
@@ -1080,15 +1081,14 @@ static BOOL sNeedsStackShutdown = YES;
                                             softwareVersion:kUpdatedSoftwareVersion_5
                                       softwareVersionString:kUpdatedSoftwareVersionString_5
                                                  completion:innerCompletion];
-            if (!isQueryImageHandlerForDevice2Called) {
+            if (!firstQueryImageForDevice2Received) {
                 [queryExpectation2 fulfill];
-                sOTAProviderDelegate.transferBeginHandler = nil;
 
                 // Respond with success for the tranfer begin completion for device1
                 [sOTAProviderDelegate respondSuccess:outerCompletion];
                 [bdxBeginExpectation1 fulfill];
             }
-            isQueryImageHandlerForDevice2Called = true;
+            firstQueryImageForDevice2Received = true;
         };
 
         // Announce ourselves to device2
@@ -1218,6 +1218,10 @@ static BOOL sNeedsStackShutdown = YES;
               };
     };
 
+    // Flags to track if the applyUpdateRequest from both device1 and device2 has been handled.
+    __block bool device1HasHandledApplyUpdateRequest = false;
+    __block bool device2HasHandledApplyUpdateRequest = false;
+
     // Flags to track if device1 and device have notified that the update has been applied.
     __block bool device1HasNotifiedUpdateApplied = false;
     __block bool device2HasNotifiedUpdateApplied = false;
@@ -1246,9 +1250,17 @@ static BOOL sNeedsStackShutdown = YES;
                                                          completion:completion];
 
         if (isDeviceID1) {
+            device1HasHandledApplyUpdateRequest = true;
             [applyUpdateRequestExpectation1 fulfill];
         } else {
+            device2HasHandledApplyUpdateRequest = true;
             [applyUpdateRequestExpectation2 fulfill];
+        }
+
+        // If the applyUpdateRequest from both device1 and device2 has been handled, reset the
+        // applyUpdateRequestHandler to nil
+        if (device1HasHandledApplyUpdateRequest && device2HasHandledApplyUpdateRequest) {
+            sOTAProviderDelegate.applyUpdateRequestHandler = nil;
         }
     };
 
@@ -1269,17 +1281,16 @@ static BOOL sNeedsStackShutdown = YES;
         [sOTAProviderDelegate respondSuccess:completion];
 
         if (isDeviceID1) {
-            hasDevice1NotifiedUpdateApplied = true;
+            device1HasNotifiedUpdateApplied = true;
             [notifyUpdateAppliedExpectation1 fulfill];
         } else {
-            hasDevice2NotifiedUpdateApplied = true;
+            device2HasNotifiedUpdateApplied = true;
             [notifyUpdateAppliedExpectation2 fulfill];
         }
 
-        // If both device1 and device have notified that the update has been applied, reset the
-        // applyUpdateRequestHandler and notifyUpdateAppliedHandler to nil
-        if (hasDevice1NotifiedUpdateApplied && hasDevice2NotifiedUpdateApplied) {
-            sOTAProviderDelegate.applyUpdateRequestHandler = nil;
+        // If both device1 and device2 have notified that the update has been applied, reset the
+        // notifyUpdateAppliedHandler to nil
+        if (device1HasNotifiedUpdateApplied && device2HasNotifiedUpdateApplied) {
             sOTAProviderDelegate.notifyUpdateAppliedHandler = nil;
         }
     };
@@ -1290,7 +1301,7 @@ static BOOL sNeedsStackShutdown = YES;
     // Make sure we get our callbacks in order for both device1 and device2.  Since we do not
     // send image available to device2 until BDX for device1 has ended, queryExpectation3 must follow
     // bdxEndExpectation1.
-    // 
+    //
     // Give it a bit more time, because we want to allow time for the BDX downloads.
     [self waitForExpectations:@[
         queryExpectation1, bdxBeginExpectation1, bdxQueryExpectation1, bdxEndExpectation1, queryExpectation3, bdxBeginExpectation2,
