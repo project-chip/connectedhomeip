@@ -562,6 +562,11 @@ bool InterfaceIterator::IsUp()
     return (GetFlags() & IFF_UP) != 0;
 }
 
+bool InterfaceIterator::IsLoopback()
+{
+    return (GetFlags() & IFF_LOOPBACK) != 0;
+}
+
 bool InterfaceIterator::SupportsMulticast()
 {
     return (GetFlags() & IFF_MULTICAST) != 0;
@@ -704,6 +709,11 @@ CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nam
 bool InterfaceAddressIterator::IsUp()
 {
     return HasCurrent() && (mCurAddr->ifa_flags & IFF_UP) != 0;
+}
+
+bool InterfaceAddressIterator::IsLoopback()
+{
+    return HasCurrent() && (mCurAddr->ifa_flags & IFF_LOOPBACK) != 0;
 }
 
 bool InterfaceAddressIterator::SupportsMulticast()

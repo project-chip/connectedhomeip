@@ -74,6 +74,10 @@ void PairingCommandBridge::SetUpDeviceControllerDelegate()
         }
     }
 
+    if (mCountryCode.HasValue()) {
+        params.countryCode = [NSString stringWithUTF8String:mCountryCode.Value()];
+    }
+
     [deviceControllerDelegate setCommandBridge:this];
     [deviceControllerDelegate setParams:params];
     [deviceControllerDelegate setCommissioner:commissioner];
