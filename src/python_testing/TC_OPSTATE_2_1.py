@@ -164,15 +164,15 @@ class TC_OPSTATE_2_1(MatterBaseTest):
                 input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7b", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kNoError)
             if self.check_pics("OPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME"):
-                self.print_step("7c", "Manually put the device in the unable to start or resume state")
+                self.print_step("7c", "Manually put the device in the unable to start or resume error state")
                 input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7d", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToStartOrResume)
             if self.check_pics("OPSTATE.S.M.ERR_UNABLE_TO_COMPLETE_OPERATION"):
-                self.print_step("7e", "Manually put the device in the unable to complete operation state")
+                self.print_step("7e", "Manually put the device in the unable to complete operation error state")
                 input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7f", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToCompleteOperation)
             if self.check_pics("OPSTATE.S.M.ERR_COMMAND_INVALID_STATE"):
-                self.print_step("7g", "Manually put the device in the command invalid state")
+                self.print_step("7g", "Manually put the device in the command invalid error state")
                 input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7h", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState)
 
