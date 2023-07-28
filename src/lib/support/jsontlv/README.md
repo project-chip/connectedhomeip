@@ -5,8 +5,8 @@
 Helper functions for converting TLV-encoded data to Json format and vice versa.
 
 In order for the Json format to represent the TLV format without loss of
-information, the Json name of each element should contain the TLV element tag and
-type information.
+information, the Json name of each element should contain the TLV element tag
+and type information.
 
 The Json name schema is as follows:
 
