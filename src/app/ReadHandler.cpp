@@ -712,7 +712,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     ReturnErrorOnFailure(subscribeRequestParser.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
     ReturnErrorOnFailure(subscribeRequestParser.GetMaxIntervalCeilingSeconds(&mMaxInterval));
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // Default behavior for ICDs where the wanted MaxInterval for a subscription is the IdleModeInterval
     // defined in the ICD Management Cluster.
