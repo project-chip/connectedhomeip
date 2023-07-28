@@ -72,7 +72,6 @@ CHIP_ERROR CastingServer::Init(AppParams * AppParams)
 
 void CastingServer::InitAppDelegation()
 {
-    ChipLogProgress(AppServer, "CastingServer::InitAppDelegation called");
     chip::Server::Server::GetInstance().GetCommissioningWindowManager().SetAppDelegate(this);
 }
 
