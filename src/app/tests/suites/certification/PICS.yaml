@@ -1890,27 +1890,6 @@ PICS:
     - label: "Does the device implement the Descriptor cluster as a client?"
       id: DESC.C
 
-    #DESC -- Global Attributes
-    - label: "Does the device implement the ClusterRevision(DESC) attribute?"
-      id: DESC.S.Afffd
-
-    - label: "Does the device implement the FeatureMap(DESC) attribute?"
-      id: DESC.S.Afffc
-
-    - label: "Does the device implement the AttributeList(DESC) attribute?"
-      id: DESC.S.Afffb
-
-    - label: "Does the device implement the EventList(DESC) attribute?"
-      id: DESC.S.Afffa
-
-    - label:
-          "Does the device implement the AcceptedCommandList(DESC) attribute?"
-      id: DESC.S.Afff9
-
-    - label:
-          "Does the device implement the GeneratedCommandList(DESC) attribute?"
-      id: DESC.S.Afff8
-
     #
     # server / attributes
     #
@@ -1925,6 +1904,9 @@ PICS:
 
     - label: "Does the DUT(server) support the PARTSLIST attribute?"
       id: DESC.S.A0003
+
+    - label: "Does the DUT(server) support the TAGLIST attribute?"
+      id: DESC.S.A0004
 
     #
     # client / attributes
@@ -5946,6 +5928,15 @@ PICS:
     - label: "Does the device implement the Scene Names feature?"
       id: S.S.F00
 
+    - label: "Does the device implement the Scene Explicit feature?"
+      id: S.S.F01
+
+    - label: "Does the device implement the Scene TableSize feature?"
+      id: S.S.F02
+
+    - label: "Does the device implement the Scene FabricScenes feature?"
+      id: S.S.F03
+
     #
     # server / manually
     #
@@ -5987,6 +5978,11 @@ PICS:
 
     - label: "Does the device implement sending the CopyScene command?"
       id: S.C.C42.Tx
+
+    - label:
+          "Does the device process the TransitionTime parameter of the
+          RecallScene command?"
+      id: PICS_SC_RECALL_SCENE_TRANSITION_TIME
 
     #
     # client / manually
@@ -6562,6 +6558,9 @@ PICS:
 
     - label: "Supports a System Mode of Auto"
       id: TSTAT.S.F05
+
+    - label: "Supports a local temperature not exposed"
+      id: TSTAT.S.F06
 
     #
     # server / manually
@@ -8243,28 +8242,6 @@ PICS:
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: CDOCONC.S.A000a
 
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: CDOCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: CDOCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: CDOCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: CDOCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: CDOCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: CDOCONC.S.Afffd
-
     # Carbon Monoxide Concentration Measurement Cluster Test Plan
     - label:
           "Does the device implement the Carbon Monoxide Concentration
@@ -8338,28 +8315,6 @@ PICS:
 
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: CMOCONC.S.A000a
-
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: CMOCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: CMOCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: CMOCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: CMOCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: CMOCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: CMOCONC.S.Afffd
 
     # Nitrogen Dioxide Concentration Measurement Cluster Test Plan
     - label:
@@ -8435,28 +8390,6 @@ PICS:
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: NDOCONC.S.A000a
 
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: NDOCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: NDOCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: NDOCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: NDOCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: NDOCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: NDOCONC.S.Afffd
-
     # Ozone Concentration Measurement Cluster Test Plan
     - label:
           "Does the device implement the Ozone Concentration Measurement Cluster
@@ -8530,28 +8463,6 @@ PICS:
 
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: OZCONC.S.A000a
-
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: OZCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: OZCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: OZCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: OZCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: OZCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: OZCONC.S.Afffd
 
     # PM2.5 Concentration Measurement Cluster Test Plan
     - label:
@@ -8627,28 +8538,6 @@ PICS:
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: PMICONC.S.A000a
 
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: PMICONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: PMICONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: PMICONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: PMICONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: PMICONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: PMICONC.S.Afffd
-
     # Formaldehyde Concentration Measurement Cluster Test Plan
     - label:
           "Does the device implement the Formaldehyde Concentration Measurement
@@ -8722,28 +8611,6 @@ PICS:
 
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: FLDCONC.S.A000a
-
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: FLDCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: FLDCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: FLDCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: FLDCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: FLDCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: FLDCONC.S.Afffd
 
     # PM1 Concentration Measurement Cluster Test Plan
     - label:
@@ -8819,28 +8686,6 @@ PICS:
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: PMHCONC.S.A000a
 
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: PMHCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: PMHCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: PMHCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: PMHCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: PMHCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: PMHCONC.S.Afffd
-
     # PM10 Concentration Measurement Cluster Test Plan
     - label:
           "Does the device implement the PM10 Concentration Measurement Cluster
@@ -8914,28 +8759,6 @@ PICS:
 
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: PMKCONC.S.A000a
-
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: PMKCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: PMKCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: PMKCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: PMKCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: PMKCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: PMKCONC.S.Afffd
 
     # Total Volatile Organic Compounds Concentration Measurement Cluster Test Plan
     - label:
@@ -9011,28 +8834,6 @@ PICS:
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: TVOCCONC.S.A000a
 
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: TVOCCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: TVOCCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: TVOCCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: TVOCCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: TVOCCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: TVOCCONC.S.Afffd
-
     # Radon Concentration Measurement Cluster Test Plan
     - label:
           "Does the device implement the Radon Concentration Measurement Cluster
@@ -9106,28 +8907,6 @@ PICS:
 
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: RNCONC.S.A000a
-
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList
-          attribute?"
-      id: RNCONC.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
-      id: RNCONC.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: RNCONC.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: RNCONC.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: RNCONC.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: RNCONC.S.Afffd
 
     ##  Fan control
 

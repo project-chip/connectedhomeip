@@ -31,31 +31,66 @@ tests:
     - label: "Step 2: TH reads from the DUT the OnMode attribute."
       PICS: TCCM.S.A0003 && TCCM.S.F00
       verification: |
-          Verify that the DUT response contains an integer value
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read on-mode 1 1
 
-          Save the value as on_mode_dut
+          On TH(chip-tool), Verify that OnMode attribute value is an integer or Null
+          Save the value as on_mode_dut and below is the sample log provided for the raspi platform, here OnMode value is 0
+
+          [1690190167.005388][16387:16389] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0003 DataVersion: 473867556
+          [1690190167.005447][16387:16389] CHIP:TOO:   OnMode: 0
       disabled: true
 
     - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
       PICS: TCCM.S.A0001 && TCCM.S.F00
       verification: |
-          Verify that the DUT response contains an integer value
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
 
-          Save the value as old_current_mode_dut
+          On TH(chip-tool), Verify that CurrentMode attribute is an integer. 
+          Save the value as old_current_mode_dut and below is the sample log provided for the raspi platform, Here CurrentMode value is 0
 
-          If on_mode_dut is equal to old_current_mode_dut proceed to step 4. Else proceed to step 6.
+          NOTE: If on_mode_dut is equal to old_current_mode_dut proceed to step 4. Else proceed to step 6.
+
+          [1690190333.843046][16430:16432] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0001 DataVersion: 2612443001
+          [1690190333.843064][16430:16432] CHIP:TOO:   CurrentMode: 0
       disabled: true
 
     - label: "Step 4: TH reads from the DUT the SupportedModes attribute."
       PICS: TCCM.S.A0000 && TCCM.S.F00
       verification: |
-          Verify that the DUT response contains a list of ModeOptionsStruct entries
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read supported-modes 1 1
 
-          Verify that the list has two or more entries
+          On TH(chip-tool) log, Verify DUT response contains a list of ModeOptionsStruct entries
+          - Verify that the list has two or more entries
+          - Save the Mode field values as supported_modes_dut
+          - Select a value from supported_modes_dut different from on_mode_dut. Save the value as new_mode_th, below is the sample log provided for the raspi platform:
 
-          Save the Mode field values as supported_modes_dut
-
-          Select a value from supported_modes_dut different from on_mode_dut. Save the value as new_mode_th.
+          [1690190348.956716][16435:16437] CHIP:DMG: }
+          [1690190348.956853][16435:16437] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0000 DataVersion: 2612443001
+          [1690190348.956895][16435:16437] CHIP:TOO:   SupportedModes: 3 entries
+          [1690190348.956919][16435:16437] CHIP:TOO:     [1]: {
+          [1690190348.956924][16435:16437] CHIP:TOO:       Label: Normal
+          [1690190348.956929][16435:16437] CHIP:TOO:       Mode: 0
+          [1690190348.956935][16435:16437] CHIP:TOO:       ModeTags: 1 entries
+          [1690190348.956952][16435:16437] CHIP:TOO:         [1]: {
+          [1690190348.956955][16435:16437] CHIP:TOO:           Value: 0
+          [1690190348.956958][16435:16437] CHIP:TOO:          }
+          [1690190348.956961][16435:16437] CHIP:TOO:      }
+          [1690190348.956967][16435:16437] CHIP:TOO:     [2]: {
+          [1690190348.956970][16435:16437] CHIP:TOO:       Label: Rapid Cool
+          [1690190348.956972][16435:16437] CHIP:TOO:       Mode: 1
+          [1690190348.956976][16435:16437] CHIP:TOO:       ModeTags: 1 entries
+          [1690190348.956980][16435:16437] CHIP:TOO:         [1]: {
+          [1690190348.956982][16435:16437] CHIP:TOO:           Value: 16384
+          [1690190348.956984][16435:16437] CHIP:TOO:          }
+          [1690190348.956987][16435:16437] CHIP:TOO:      }
+          [1690190348.956992][16435:16437] CHIP:TOO:     [3]: {
+          [1690190348.956994][16435:16437] CHIP:TOO:       Label: Rapid Freeze
+          [1690190348.956997][16435:16437] CHIP:TOO:       Mode: 2
+          [1690190348.957000][16435:16437] CHIP:TOO:       ModeTags: 1 entries
+          [1690190348.957003][16435:16437] CHIP:TOO:         [1]: {
+          [1690190348.957006][16435:16437] CHIP:TOO:           Value: 16385
+          [1690190348.957008][16435:16437] CHIP:TOO:          }
+          [1690190348.957010][16435:16437] CHIP:TOO:      }
       disabled: true
 
     - label:
@@ -63,25 +98,50 @@ tests:
           to new_mode_th"
       PICS: TCCM.S.C00.Rsp && TCCM.S.F00
       verification: |
-          Verify that the DUT response contains a ChangeToModeResponse command w/ data fields: * Status, set to Success(0x00).
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode change-to-mode 2 1 1
+
+          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with a SUCCESS (value 0x00) status response and below is the sample log provided for the raspi platform:
+
+          [1690190379.801241][16449:16451] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Command 0x0000_0001
+          [1690190379.801256][16449:16451] CHIP:TOO:   ChangeToModeResponse: {
+          [1690190379.801260][16449:16451] CHIP:TOO:     status: 0
+          [1690190379.801263][16449:16451] CHIP:TOO:    }
       disabled: true
 
     - label: "Step 6: TH sends a Off command to the DUT"
       PICS: OO.S.C00.Rsp && TCCM.S.F00
       verification: |
-          Verify DUT responds w/ status SUCCESS(0x00)
+          ./chip-tool onoff off 1 1
+
+          On TH(chip-tool) log,  Verify that DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
+
+          [1684931101.118656][20709:20711] CHIP:DMG:                                 StatusIB =
+          [1684931101.118659][20709:20711] CHIP:DMG:                                 {
+          [1684931101.118663][20709:20711] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1684931101.118665][20709:20711] CHIP:DMG:                                 },
       disabled: true
 
     - label: "Step 7: TH sends a On command to the DUT"
       PICS: OO.S.C01.Rsp && TCCM.S.F00
       verification: |
-          Verify DUT responds w/ status SUCCESS(0x00)
+          ./chip-tool onoff on 1 1
+
+          On TH(chip-tool) log, Verify that DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
+
+          [1684931217.055514][20729:20731] CHIP:DMG:                                 StatusIB =
+          [1684931217.055517][20729:20731] CHIP:DMG:                                 {
+          [1684931217.055520][20729:20731] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1684931217.055523][20729:20731] CHIP:DMG:                                 },
       disabled: true
 
     - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
       PICS: TCCM.S.A0001 && TCCM.S.F00
       verification: |
-          Verify that the DUT response contains an integer value
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
 
-          The value is equal to on_mode_dut
+          On TH(chip-tool), Verify that CurrentMode attribute value is an integer value and equal to  on_mode_dut,  below is the sample log provided for the raspi platform, here CurrentMode attribute value is 0
+
+
+          [1690190401.931156][16461:16463] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0001 DataVersion: 2612443003
+          [1690190401.931176][16461:16463] CHIP:TOO:   CurrentMode: 0
       disabled: true

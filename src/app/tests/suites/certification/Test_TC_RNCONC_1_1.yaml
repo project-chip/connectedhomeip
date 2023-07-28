@@ -34,7 +34,6 @@ tests:
     - label: "Step 2: Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
-      PICS: RNCONC.S.Afffd
       response:
           value: 3
           constraints:
@@ -46,7 +45,6 @@ tests:
           bit 0 or 1 set"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: RNCONC.S.Afffc
       response:
           constraints:
               type: bitmap32
@@ -58,7 +56,7 @@ tests:
           bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: RNCONC.S.Afffc && RNCONC.S.F00
+      PICS: RNCONC.S.F00
       response:
           constraints:
               type: bitmap32
@@ -69,7 +67,7 @@ tests:
           the correct bit clear"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: RNCONC.S.Afffc && !RNCONC.S.F00
+      PICS: " !RNCONC.S.F00 "
       response:
           constraints:
               type: bitmap32
@@ -80,7 +78,7 @@ tests:
           bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: RNCONC.S.Afffc && RNCONC.S.F01
+      PICS: RNCONC.S.F01
       response:
           constraints:
               type: bitmap32
@@ -91,7 +89,7 @@ tests:
           the correct bit clear"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: RNCONC.S.Afffc && !RNCONC.S.F01
+      PICS: " !RNCONC.S.F01 "
       response:
           constraints:
               type: bitmap32
@@ -102,7 +100,7 @@ tests:
           bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: RNCONC.S.Afffc && RNCONC.S.F02
+      PICS: RNCONC.S.F02
       response:
           constraints:
               type: bitmap32
@@ -113,7 +111,7 @@ tests:
           the correct bit clear"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: RNCONC.S.Afffc && !RNCONC.S.F02
+      PICS: " !RNCONC.S.F02 "
       response:
           constraints:
               type: bitmap32
@@ -124,7 +122,7 @@ tests:
           bits set"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: RNCONC.S.Afffc && RNCONC.S.F03
+      PICS: RNCONC.S.F03
       response:
           constraints:
               type: bitmap32
@@ -135,7 +133,7 @@ tests:
           the correct bit clear"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: RNCONC.S.Afffc && !RNCONC.S.F03
+      PICS: " !RNCONC.S.F03 "
       response:
           constraints:
               type: bitmap32
@@ -146,7 +144,7 @@ tests:
           bits set"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: RNCONC.S.Afffc && RNCONC.S.F04
+      PICS: RNCONC.S.F04
       response:
           constraints:
               type: bitmap32
@@ -157,7 +155,7 @@ tests:
           the correct bit clear"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: RNCONC.S.Afffc && !RNCONC.S.F04
+      PICS: " !RNCONC.S.F04 "
       response:
           constraints:
               type: bitmap32
@@ -168,7 +166,7 @@ tests:
           bits set"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: RNCONC.S.Afffc && RNCONC.S.F05
+      PICS: RNCONC.S.F05
       response:
           constraints:
               type: bitmap32
@@ -179,7 +177,7 @@ tests:
           the correct bit clear"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: RNCONC.S.Afffc && !RNCONC.S.F05
+      PICS: " !RNCONC.S.F05 "
       response:
           constraints:
               type: bitmap32
@@ -206,7 +204,7 @@ tests:
     - label: "Step 4b: Read the optional attribute Uncertainty in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: RNCONC.S.Afffb && RNCONC.S.A0007 && RNCONC.S.F00
+      PICS: RNCONC.S.A0007 && RNCONC.S.F00
       response:
           constraints:
               type: list
@@ -217,7 +215,7 @@ tests:
           AttributeList when RNCONC.S.A0007 is not set"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: RNCONC.S.Afffb && !RNCONC.S.A0007
+      PICS: " !RNCONC.S.A0007 "
       response:
           constraints:
               type: list
@@ -229,7 +227,7 @@ tests:
           in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: RNCONC.S.Afffb && RNCONC.S.F00
+      PICS: RNCONC.S.F00
       response:
           constraints:
               type: list
@@ -241,7 +239,7 @@ tests:
           AttributeList when RNCONC.S.F00 (MEA) is not set"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: RNCONC.S.Afffb && !RNCONC.S.F00
+      PICS: " !RNCONC.S.F00 "
       response:
           constraints:
               type: list
@@ -252,7 +250,7 @@ tests:
           PeakMeasuredValue & PeakMeasuredValueWindow in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: RNCONC.S.Afffb && RNCONC.S.F04
+      PICS: RNCONC.S.F04
       response:
           constraints:
               type: list
@@ -263,7 +261,7 @@ tests:
           excluded from AttributeList when RNCONC.S.F04 (PEA) is not set"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: RNCONC.S.Afffb && !RNCONC.S.F04
+      PICS: " !RNCONC.S.F04 "
       response:
           constraints:
               type: list
@@ -274,7 +272,7 @@ tests:
           AverageMeasuredValue AverageMeasuredValueWindow in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: RNCONC.S.Afffb && RNCONC.S.F05
+      PICS: RNCONC.S.F05
       response:
           constraints:
               type: list
@@ -286,7 +284,7 @@ tests:
           RNCONC.S.F05 (AVG) is not set"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: RNCONC.S.Afffb && !RNCONC.S.F05
+      PICS: " !RNCONC.S.F05 "
       response:
           constraints:
               type: list
@@ -297,7 +295,7 @@ tests:
           AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: RNCONC.S.Afffb && RNCONC.S.F01
+      PICS: RNCONC.S.F01
       response:
           constraints:
               type: list
@@ -308,7 +306,7 @@ tests:
           RNCONC.S.F01 (LEV) is not set"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: RNCONC.S.Afffb && !RNCONC.S.F01
+      PICS: " !RNCONC.S.F01 "
       response:
           constraints:
               type: list
@@ -326,7 +324,6 @@ tests:
     - label: "Step 6: Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
-      PICS: RNCONC.S.Afff9
       response:
           value: []
           constraints:
@@ -335,7 +332,6 @@ tests:
     - label: "Step 7: Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
-      PICS: RNCONC.S.Afff8
       response:
           value: []
           constraints:
