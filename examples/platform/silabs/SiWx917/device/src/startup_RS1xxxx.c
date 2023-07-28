@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#include "rsi_ps_ram_func.h"
-#include "system_RS1xxxx.h"
+#include "sli_siwx917_soc.h"
 #include "system_si917.h"
 
 /*----------Stack Configuration-----------------------------------------------*/

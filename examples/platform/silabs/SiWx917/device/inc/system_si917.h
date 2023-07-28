@@ -21,9 +21,10 @@
 extern "C" {
 #endif
 
+#include "si91x_device.h"
 #include "core_cm4.h" /* Cortex-M4 processor and core peripherals */
 #include <stdint.h>
-//#include "cmsis_gcc.h"
+#include "cmsis_gcc.h"
 
 /*******************************************************************************
  * @addtogroup Parts

@@ -1,67 +1,54 @@
-/*
+/***************************************************************************//**
+ * GCC Linker script for Silicon Labs devices
+ *******************************************************************************
+ * # License
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ * SPDX-License-Identifier: Zlib
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ * The licensor of this software is Silicon Laboratories Inc.
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ *
+ * 1. The origin of this software must not be misrepresented; you must not
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
+ * 2. Altered source versions must be plainly marked as such, and must not be
+ *    misrepresented as being the original software.
+ * 3. This notice may not be removed or altered from any source distribution.
+ *
+ ******************************************************************************/
+ MEMORY
+ {
+   FLASH   (rx)  : ORIGIN = 0x8012000, LENGTH = 0x400000
+   RAM     (rwx) : ORIGIN = 0x400, LENGTH = 0x3e800
+ }
 
-
-MEMORY
-{
-	FLASH (rx)  : ORIGIN = 0x08012000, LENGTH = 0x400000
-	RAM (rwx) : ORIGIN = 0xC, LENGTH = 0x4FC00
-}
-
-/* Linker script to place sections and symbol values. Should be used together
- * with other linker script that defines memory regions FLASH and RAM.
- * It references following symbols, which must be defined in code:
- *   Reset_Handler : Entry of reset handler
- *
- * It defines following symbols, which code can use without definition:
- *   __exidx_start
- *   __exidx_end
- *   __copy_table_start__
- *   __copy_table_end__
- *   __zero_table_start__
- *   __zero_table_end__
- *   __etext
- *   __data_start__
- *   __preinit_array_start
- *   __preinit_array_end
- *   __init_array_start
- *   __init_array_end
- *   __fini_array_start
- *   __fini_array_end
- *   __data_end__
- *   __bss_start__
- *   __bss_end__
- *   __end__
- *   end
- *   __HeapBase
- *   __HeapLimit
- *   __StackLimit
- *   __StackTop
- *   __stack
- */
 ENTRY(Reset_Handler)
 
 SECTIONS
 {
+
   .text :
   {
+    linker_vectors_begin = .;
     KEEP(*(.vectors))
+    linker_vectors_end = .;
 
-    *(.text*)
+    __Vectors_End = .;
+    __Vectors_Size = __Vectors_End - __Vectors;
+
+    linker_code_begin = .;
+    *(SORT_BY_ALIGNMENT(.text*))
+    linker_code_end = .;
 
     KEEP(*(.init))
     KEEP(*(.fini))
@@ -81,8 +68,7 @@ SECTIONS
     *(.dtors)
 
     *(.rodata*)
-
-    KEEP(*(.eh_frame*))
+    *(.eh_frame*)
   } > FLASH
 
   .ARM.extab :
@@ -97,7 +83,7 @@ SECTIONS
   } > FLASH
   __exidx_end = .;
 
-  .copy.table :
+    .copy.table :
   {
     . = ALIGN(4);
     __copy_table_start__ = .;
@@ -106,30 +92,58 @@ SECTIONS
     LONG (__data_start__)
     LONG ((__data_end__ - __data_start__) / 4)
 
+    /* Add each additional data section here */
+/*
+    LONG (__etext2)
+    LONG (__data2_start__)
+    LONG ((__data2_end__ - __data2_start__) / 4)
+*/
     __copy_table_end__ = .;
   } > FLASH
 
-  .zero.table :
+    .zero.table :
   {
     . = ALIGN(4);
     __zero_table_start__ = .;
+    /* Add each additional bss section here */
+/*
+    LONG (__bss2_start__)
+    LONG ((__bss2_end__ - __bss2_start__) / 4)
+*/
     __zero_table_end__ = .;
   } > FLASH
 
-  __etext = ALIGN (4);
-  _sidata = __etext;
+  __etext = .;
 
-  .data : AT (__etext)
+  /* Start placing output sections which are loaded into RAM */
+  . = ORIGIN(RAM);
+
+  .stack ALIGN(8) (NOLOAD):
   {
-    __data_start__ = .;
-    _sdata = __data_start__;
+    __StackLimit = .;
+    KEEP(*(.stack*))
+    . = ALIGN(4);
+    __StackTop = .;
+    PROVIDE(__stack = __StackTop);
+  } > RAM
 
+
+  .noinit . (NOLOAD):
+  {
+    *(.noinit*);
+  } > RAM
+
+  .data . : AT (__etext)
+  {
+    . = ALIGN(4);
+    __data_start__ = .;
     *(vtable)
-    *(.data*)
+    *(SORT_BY_ALIGNMENT(.data*))
     . = ALIGN (4);
-    PROVIDE (__ram_func_section_start = .);
+
+    PROVIDE(__ram_func_section_start = .);
     *(.ram)
-    PROVIDE (__ram_func_section_end = .);
+    PROVIDE(__ram_func_section_end = .);
 
     . = ALIGN(4);
     /* preinit data */
@@ -151,69 +165,58 @@ SECTIONS
     KEEP(*(.fini_array))
     PROVIDE_HIDDEN (__fini_array_end = .);
 
-    KEEP(*(.jcr*))
     . = ALIGN(4);
     /* All data end */
     __data_end__ = .;
-    _edata = __data_end__;
 
   } > RAM
 
-  .bss :
+  .bss . :
   {
     . = ALIGN(4);
     __bss_start__ = .;
-    _sbss = __bss_start__;
-    *(.bss)
-    *(.bss.*)
+    *(SORT_BY_ALIGNMENT(.bss*))
     *(COMMON)
     . = ALIGN(4);
     __bss_end__ = .;
-    _ebss = __bss_end__;
   } > RAM
 
-  .heap (COPY) :
+  .heap (COPY):
   {
     __HeapBase = .;
     __end__ = .;
     end = __end__;
     _end = __end__;
     KEEP(*(.heap*))
-    __HeapLimit = .;
-  } > RAM
- 
-  __main_flash_end__ = ORIGIN(FLASH) + LENGTH(FLASH);
-
-  /* .stack_dummy section doesn't contains any symbols. It is only
-   * used for linker to calculate size of stack sections, and assign
-   * values to stack symbols later */
-   .stack_dummy (COPY):
-  {
-    KEEP(*(.stack*))
+    __HeapLimit = ORIGIN(RAM) + LENGTH(RAM);
   } > RAM
 
-  /* Set stack top to end of RAM, and stack limit move down by
-   * size of stack_dummy section */
-  __StackTop = ORIGIN(RAM) + LENGTH(RAM);
-  __StackLimit = __StackTop - SIZEOF(.stack_dummy);
-  PROVIDE(__stack = __StackTop);
+  __heap_size = __HeapLimit - __HeapBase;
+  __ram_end__ = 0x400 + 0x3e800;
+  __main_flash_end__ = 0x8012000 + 0x400000;
+
+   /* This is where we handle flash storage blocks. We use dummy sections for finding the configured
+   * block sizes and then "place" them at the end of flash when the size is known. */
+  .internal_storage (DSECT) : {
+    KEEP(*(.internal_storage*))
+  } > FLASH
+
 
   .nvm (DSECT) : {
     KEEP(*(.simee*))
   } > FLASH
 
-  /* Last page of flash is reserved for the manufacturing token space */
-  linker_nvm_end = __main_flash_end__ - 4096;
+  linker_nvm_end = __main_flash_end__;
   linker_nvm_begin = linker_nvm_end - SIZEOF(.nvm);
   linker_nvm_size = SIZEOF(.nvm);
+  linker_storage_end = linker_nvm_begin;
   __nvm3Base = linker_nvm_begin;
-  __attestation_credentials_base = linker_nvm_end;
 
-  /* Check if data + heap + stack exceeds RAM limit */
-  /*ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")*/
-  ASSERT( (linker_nvm_begin + SIZEOF(.nvm)) <= __main_flash_end__, "NVM3 is excessing the flash size !")
+  linker_storage_begin = linker_storage_end - SIZEOF(.internal_storage);
+  linker_storage_size = SIZEOF(.internal_storage);
+  ASSERT((linker_storage_begin >= (__etext + SIZEOF(.data))), "FLASH memory overflowed !")
 
-  /* Check if FLASH usage exceeds FLASH size */
-/*  ASSERT( LENGTH(FLASH) >= (__etext), "FLASH memory overflowed !") */ /* Build error need to be checked for CCP */
-  ASSERT((__etext + SIZEOF(.data)) <= __nvm3Base, "FLASH memory overlapped with NVM section.")
+
+  app_flash_end = 0x8012000 + 0x400000;
+  ASSERT( (linker_nvm_begin + SIZEOF(.nvm)) <= app_flash_end, "NVM3 is excessing the flash size !")
 }
