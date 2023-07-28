@@ -242,7 +242,12 @@ CHIP_ERROR BaseApplication::Init()
     }
 
     PlatformMgr().AddEventHandler(OnPlatformEvent, 0);
+#ifdef SL_WIFI
+    sIsProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+#endif /* SL_WIFI */
+#if CHIP_ENABLE_OPENTHREAD
     sIsProvisioned = ConnectivityMgr().IsThreadProvisioned();
+#endif
 
     return err;
 }

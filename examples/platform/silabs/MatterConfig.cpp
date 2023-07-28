@@ -19,7 +19,7 @@
 
 #include "AppConfig.h"
 #include "OTAConfig.h"
-#include <matter_config.h>
+#include <MatterConfig.h>
 
 #include <FreeRTOS.h>
 
@@ -165,6 +165,12 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     SILABS_LOG("Init CHIP Stack");
     // Init Chip memory management before the stack
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
+
+// WiFi needs to be initialized after Memory Init for some reason
+#ifdef SL_WIFI
+    InitWiFi();
+#endif
+
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
     SetDeviceInstanceInfoProvider(&Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
@@ -231,10 +237,6 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     SILABS_LOG("Starting Platform Manager Event Loop");
     ReturnErrorOnFailure(PlatformMgr().StartEventLoopTask());
 
-#ifdef SL_WIFI
-    InitWiFi();
-#endif
-
 #ifdef ENABLE_CHIP_SHELL
     chip::startShellTask();
 #endif
@@ -251,15 +253,14 @@ void SilabsMatterConfig::InitWiFi(void)
 #ifdef SL_WFX_USE_SECURE_LINK
     wfx_securelink_task_start(); // start securelink key renegotiation task
 #endif                           // SL_WFX_USE_SECURE_LINK
-#endif                           /* WF200_WIFI */
-
-#ifdef RS911X_WIFI
-    /*
-     * Start up any RSI interface stuff
-     * (Not required) - Note that wfx_wifi_start will deal with
-     * starting up a rsi task - which will initialize the SPI interface.
-     */
-#endif
+#elif defined(SIWX_917)
+    SILABS_LOG("Init RSI 917 Platform");
+    if (wfx_rsi_platform() != SL_STATUS_OK)
+    {
+        SILABS_LOG("RSI init failed");
+        return CHIP_ERROR_INTERNAL;
+    }
+#endif /* WF200_WIFI */
 }
 #endif // SL_WIFI
 
