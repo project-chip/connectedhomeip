@@ -553,16 +553,21 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     _running = NO;
 }
 
-- (MTRDeviceController * _Nullable)createControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
-                                                              error:(NSError * __autoreleasing *)error
+/**
+ * Helper function to start a device controller with the given startup params.
+ * The fabricChecker block will run on the Matter queue, and is expected to
+ * return nil if pre-startup fabric table checks fail, and set fabricError to
+ * the right error value in that situation.
+ */
+- (MTRDeviceController * _Nullable)_startDeviceController:(MTRDeviceControllerStartupParams *)startupParams
+                                            fabricChecker:(MTRDeviceControllerStartupParamsInternal * (^)(
+                                                              FabricTable * fabricTable, CHIP_ERROR & fabricError))fabricChecker
+                                                    error:(NSError * __autoreleasing *)error
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
     if (![self checkIsRunning:error]) {
         MTR_LOG_ERROR("Trying to start controller while Matter controller factory is not running");
-        if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
         return nil;
     }
 
@@ -578,53 +583,14 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
     __block MTRDeviceControllerStartupParamsInternal * params = nil;
     __block CHIP_ERROR fabricError = CHIP_NO_ERROR;
+
     // We want the block to end up with just a pointer to the fabric table,
     // since we know our on-stack instance will outlive the block.
     FabricTable fabricTableInstance;
     FabricTable * fabricTable = &fabricTableInstance;
+
     dispatch_sync(_chipWorkQueue, ^{
-        const FabricInfo * fabric = nullptr;
-        BOOL ok = [self findMatchingFabric:*fabricTable params:startupParams fabric:&fabric];
-        if (!ok) {
-            MTR_LOG_ERROR("Can't start on existing fabric: fabric matching failed");
-            fabricError = CHIP_ERROR_INTERNAL;
-            return;
-        }
-
-        if (fabric == nullptr) {
-            MTR_LOG_ERROR("Can't start on existing fabric: fabric not found");
-            fabricError = CHIP_ERROR_NOT_FOUND;
-            return;
-        }
-
-        os_unfair_lock_lock(&_controllersLock);
-        NSArray<MTRDeviceController *> * controllersCopy = [_controllers copy];
-        os_unfair_lock_unlock(&_controllersLock);
-
-        for (MTRDeviceController * existing in controllersCopy) {
-            BOOL isRunning = YES; // assume the worst
-            if ([existing isRunningOnFabric:fabricTable fabricIndex:fabric->GetFabricIndex() isRunning:&isRunning]
-                != CHIP_NO_ERROR) {
-                MTR_LOG_ERROR("Can't tell what fabric a controller is running on.  Not safe to start.");
-                fabricError = CHIP_ERROR_INTERNAL;
-                return;
-            }
-
-            if (isRunning) {
-                MTR_LOG_ERROR("Can't start on existing fabric: another controller is running on it");
-                fabricError = CHIP_ERROR_INCORRECT_STATE;
-                return;
-            }
-        }
-
-        params = [[MTRDeviceControllerStartupParamsInternal alloc] initForExistingFabric:fabricTable
-                                                                             fabricIndex:fabric->GetFabricIndex()
-                                                                                keystore:_keystore
-                                                                    advertiseOperational:self.advertiseOperational
-                                                                                  params:startupParams];
-        if (params == nil) {
-            fabricError = CHIP_ERROR_NO_MEMORY;
-        }
+        params = fabricChecker(fabricTable, fabricError);
     });
 
     if (params == nil) {
@@ -653,18 +619,67 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     return controller;
 }
 
+- (MTRDeviceController * _Nullable)createControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
+                                                              error:(NSError * __autoreleasing *)error
+{
+    [self _assertCurrentQueueIsNotMatterQueue];
+
+    return [self
+        _startDeviceController:startupParams
+                 fabricChecker:^MTRDeviceControllerStartupParamsInternal *(FabricTable * fabricTable, CHIP_ERROR & fabricError) {
+                     const FabricInfo * fabric = nullptr;
+                     BOOL ok = [self findMatchingFabric:*fabricTable params:startupParams fabric:&fabric];
+                     if (!ok) {
+                         MTR_LOG_ERROR("Can't start on existing fabric: fabric matching failed");
+                         fabricError = CHIP_ERROR_INTERNAL;
+                         return nil;
+                     }
+
+                     if (fabric == nullptr) {
+                         MTR_LOG_ERROR("Can't start on existing fabric: fabric not found");
+                         fabricError = CHIP_ERROR_NOT_FOUND;
+                         return nil;
+                     }
+
+                     os_unfair_lock_lock(&self->_controllersLock);
+                     NSArray<MTRDeviceController *> * controllersCopy = [self->_controllers copy];
+                     os_unfair_lock_unlock(&self->_controllersLock);
+
+                     for (MTRDeviceController * existing in controllersCopy) {
+                         BOOL isRunning = YES; // assume the worst
+                         if ([existing isRunningOnFabric:fabricTable fabricIndex:fabric->GetFabricIndex() isRunning:&isRunning]
+                             != CHIP_NO_ERROR) {
+                             MTR_LOG_ERROR("Can't tell what fabric a controller is running on.  Not safe to start.");
+                             fabricError = CHIP_ERROR_INTERNAL;
+                             return nil;
+                         }
+
+                         if (isRunning) {
+                             MTR_LOG_ERROR("Can't start on existing fabric: another controller is running on it");
+                             fabricError = CHIP_ERROR_INCORRECT_STATE;
+                             return nil;
+                         }
+                     }
+
+                     auto * params =
+                         [[MTRDeviceControllerStartupParamsInternal alloc] initForExistingFabric:fabricTable
+                                                                                     fabricIndex:fabric->GetFabricIndex()
+                                                                                        keystore:self->_keystore
+                                                                            advertiseOperational:self.advertiseOperational
+                                                                                          params:startupParams];
+                     if (params == nil) {
+                         fabricError = CHIP_ERROR_NO_MEMORY;
+                     }
+
+                     return params;
+                 }
+                         error:error];
+}
+
 - (MTRDeviceController * _Nullable)createControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
                                                          error:(NSError * __autoreleasing *)error
 {
     [self _assertCurrentQueueIsNotMatterQueue];
-
-    if (![self isRunning]) {
-        MTR_LOG_ERROR("Trying to start controller while Matter controller factory is not running");
-        if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-        return nil;
-    }
 
     if (startupParams.vendorID == nil) {
         MTR_LOG_ERROR("Must provide vendor id when starting controller on new fabric");
@@ -682,71 +697,33 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         return nil;
     }
 
-    // Create the controller, so we start the event loop, since we plan to do
-    // our fabric table operations there.
-    auto * controller = [self createController];
-    if (controller == nil) {
-        if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY];
-        }
-        return nil;
-    }
+    return [self
+        _startDeviceController:startupParams
+                 fabricChecker:^MTRDeviceControllerStartupParamsInternal *(FabricTable * fabricTable, CHIP_ERROR & fabricError) {
+                     const FabricInfo * fabric = nullptr;
+                     BOOL ok = [self findMatchingFabric:*fabricTable params:startupParams fabric:&fabric];
+                     if (!ok) {
+                         MTR_LOG_ERROR("Can't start on new fabric: fabric matching failed");
+                         fabricError = CHIP_ERROR_INTERNAL;
+                         return nil;
+                     }
 
-    __block MTRDeviceControllerStartupParamsInternal * params = nil;
-    __block CHIP_ERROR fabricError = CHIP_NO_ERROR;
-    // We want the block to end up with just a pointer to the fabric table,
-    // since we know our on-stack instance will outlive the block.
-    FabricTable fabricTableInstance;
-    FabricTable * fabricTable = &fabricTableInstance;
-    dispatch_sync(_chipWorkQueue, ^{
-        const FabricInfo * fabric = nullptr;
-        BOOL ok = [self findMatchingFabric:*fabricTable params:startupParams fabric:&fabric];
-        if (!ok) {
-            MTR_LOG_ERROR("Can't start on new fabric: fabric matching failed");
-            fabricError = CHIP_ERROR_INTERNAL;
-            return;
-        }
+                     if (fabric != nullptr) {
+                         MTR_LOG_ERROR("Can't start on new fabric that matches existing fabric");
+                         fabricError = CHIP_ERROR_INCORRECT_STATE;
+                         return nil;
+                     }
 
-        if (fabric != nullptr) {
-            MTR_LOG_ERROR("Can't start on new fabric that matches existing fabric");
-            fabricError = CHIP_ERROR_INCORRECT_STATE;
-            return;
-        }
-
-        params = [[MTRDeviceControllerStartupParamsInternal alloc] initForNewFabric:fabricTable
-                                                                           keystore:_keystore
-                                                               advertiseOperational:self.advertiseOperational
-                                                                             params:startupParams];
-        if (params == nil) {
-            fabricError = CHIP_ERROR_NO_MEMORY;
-        }
-    });
-
-    if (params == nil) {
-        [self controllerShuttingDown:controller];
-        if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:fabricError];
-        }
-        return nil;
-    }
-
-    BOOL ok = [controller startup:params];
-    if (ok == NO) {
-        // TODO: get error from controller's startup.
-        if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL];
-        }
-        return nil;
-    }
-
-    // TODO: Need better error propagation.
-    controller = [self maybeInitializeOTAProvider:controller];
-    if (controller == nil) {
-        if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL];
-        }
-    }
-    return controller;
+                     auto * params = [[MTRDeviceControllerStartupParamsInternal alloc] initForNewFabric:fabricTable
+                                                                                               keystore:self->_keystore
+                                                                                   advertiseOperational:self.advertiseOperational
+                                                                                                 params:startupParams];
+                     if (params == nil) {
+                         fabricError = CHIP_ERROR_NO_MEMORY;
+                     }
+                     return params;
+                 }
+                         error:error];
 }
 
 - (MTRDeviceController * _Nullable)createController
