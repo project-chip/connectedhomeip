@@ -24,6 +24,7 @@ static_library("helpers") {
   output_dir = "${root_out_dir}/lib"
 
   sources = [
+    "${chip_root}/src/app/reporting/tests/MockReportScheduler.cpp",
     "AppTestContext.cpp",
     "AppTestContext.h",
     "integration/RequiredPrivilegeStubs.cpp",
@@ -50,18 +51,6 @@ source_set("binding-test-srcs") {
 
   public_deps = [
     "${chip_root}/src/app/util/mock:mock_ember",
-    "${chip_root}/src/lib/core",
-  ]
-}
-
-source_set("icd-management-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/util/IcdMonitoringTable.cpp",
-    "${chip_root}/src/app/util/IcdMonitoringTable.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
   ]
 }
@@ -144,7 +133,6 @@ chip_test_suite("tests") {
     "TestOperationalStateDelegate.cpp",
     "TestPendingNotificationMap.cpp",
     "TestReadInteraction.cpp",
-    "TestReportScheduler.cpp",
     "TestReportingEngine.cpp",
     "TestSceneTable.cpp",
     "TestStatusIB.cpp",
@@ -178,17 +166,27 @@ chip_test_suite("tests") {
     test_sources += [ "TestEventLogging.cpp" ]
   }
 
+  # The platform manager is not properly clearing queues in test teardown, which results in
+  # DrainIO calls not being able to run in expected time (5seconds) if unprocessed reported engine
+  # runs are remaining, causing tests to crash in Open IoT SDK and Zephyr tests since they are
+  # running all tests in one file. We need to figure out how to properly clean the event queues
+  # before enabling this test for these platforms.
+  if (chip_device_platform != "nrfconnect" &&
+      chip_device_platform != "openiotsdk") {
+    test_sources += [ "TestReportScheduler.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     ":binding-test-srcs",
-    ":icd-management-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
     ":scenes-table-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/icd:cluster-srcs",
     "${chip_root}/src/app/icd:manager-srcs",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_ember",

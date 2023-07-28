@@ -249,7 +249,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    mICDManager.Init();
+    mICDManager.Init(mDeviceStorage, &GetFabricTable());
     mICDEventManager.Init(&mICDManager);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
@@ -316,8 +316,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                     &mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), &mCASESessionManager,
-                                                                 mSubscriptionResumptionStorage);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), &mReportScheduler,
+                                                                 &mCASESessionManager, mSubscriptionResumptionStorage);
     SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot

@@ -38,8 +38,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT receives Onboarding Payload from the TH with Custom Flow field
-          set to value 2"
+          "Step 1: DUT receives Onboarding Payload from the TH with Custom Flow
+          field set to value 2"
       verification: |
           1. Run TH. Example all-clusters app
           ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 2 --capabilities 4 --discriminator 3840 --passcode 20202021
@@ -59,8 +59,8 @@ tests:
       disabled: true
 
     - label:
-          "User follows any TH-specific steps to place the TH Commissionee into
-          commissioning mode."
+          "Step 2: User follows any TH-specific steps to place the TH
+          Commissionee into commissioning mode."
       verification: |
           1. Launch the TH commissionee all-clusters-app:
           ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 2 --capabilities 4 --discriminator 3840 --passcode 20202021
@@ -72,7 +72,7 @@ tests:
           [1660152729.426123][648909:648909] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J029Q00KA0648G00
       disabled: true
 
-    - label: "DUT commissions TH"
+    - label: "Step 3: DUT commissions TH"
       verification: |
           ./chip-tool pairing code 1 MT:-24J029Q00KA0648G00
 

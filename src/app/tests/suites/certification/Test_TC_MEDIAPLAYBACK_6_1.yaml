@@ -41,14 +41,14 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label: "Reads the CurrentState attribute"
+    - label: "Step 1: Reads the CurrentState attribute"
       PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
-    - label: "Sends a Play command"
+    - label: "Step 2: Sends a Play command"
       PICS: MEDIAPLAYBACK.S.C00.Rsp
       command: "Play"
       response:
@@ -67,14 +67,14 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the CurrentState attribute"
+    - label: "Step 3: Reads the CurrentState attribute"
       PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 0
 
-    - label: "sends a Pause command"
+    - label: "Step 4: sends a Pause command"
       PICS: MEDIAPLAYBACK.S.C01.Rsp
       command: "Pause"
       response:
@@ -93,14 +93,14 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the CurrentState attribute"
+    - label: "Step 5: Reads the CurrentState attribute"
       PICS: MEDIAPLAYBACK.S.C01.Rsp && MEDIAPLAYBACK.S.A0000
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
-    - label: "Sends a Stop command"
+    - label: "Step 6: Sends a Stop command"
       PICS: MEDIAPLAYBACK.S.C02.Rsp
       command: "Stop"
       response:
@@ -119,7 +119,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the CurrentState attribute"
+    - label: "Step 7: Reads the CurrentState attribute"
       PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C02.Rsp
       command: "readAttribute"
       attribute: "CurrentState"

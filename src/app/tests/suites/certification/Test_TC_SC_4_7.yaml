@@ -26,13 +26,13 @@ config:
 
 tests:
     - label:
-          "TH is instructed to start advertising its presence as a commissioner
-          in the network"
+          "Step 1: TH is instructed to start advertising its presence as a
+          commissioner in the network"
       verification: |
           To verify this test case use TV Reference app
       disabled: true
 
-    - label: "Scan for DNS-SD commissioner advertisements from TH"
+    - label: "Step 2: Scan for DNS-SD commissioner advertisements from TH"
       PICS:
           MCORE.SC.DEVTYPE_SUBTYPE && MCORE.SC.VP_KEY && MCORE.SC.DT_KEY &&
           MCORE.SC.DN_KEY
@@ -61,7 +61,7 @@ tests:
           +;eth0;IPv6;_matterd;_udp;local
       disabled: true
 
-    - label: "Scan for DNS-SD commissioner advertisements from TH"
+    - label: "Step 3: Scan for DNS-SD commissioner advertisements from TH"
       verification: |
           Verify the DUT is able to discover the TH.
 

@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    12.4.15. [TC-CNET-4.17] [Wi-Fi] Verification for attributes check
+    12.4.15. [TC-CNET-4.17] [WiFi] Verification for attributes check
     [DUT-Client]
 
 PICS:
@@ -36,12 +36,12 @@ tests:
 
       disabled: true
 
-    - label: "DUT reads the MaxNetworks attribute from the TH"
+    - label: "Step 1: DUT reads the MaxNetworks attribute from the TH"
       PICS: CNET.C.A0000
       verification: |
-          ./chip-tool networkcommissioning read max-networks 1 0
+          ./chip-tool networkcommissioning read max-networks 1 0 --trace_decode 1
 
-          Verify "MaxNetworks attribute response" on the TH(All-cluster-app) Log:
+          Verify MaxNetworks attribute response on TH(all-clusters-app) log:
 
           [1667208272.085200][14293:14293] CHIP:EM: Handling via exchange: 31335r, Delegate: 0xaaaaaff382d8
           [1667208272.085299][14293:14293] CHIP:IM: Received Read request
@@ -113,13 +113,12 @@ tests:
           [1667208272.092558][14293:14293] CHIP:DMG:                 },
       disabled: true
 
-    - label: "DUT reads the Networks attribute from the TH"
+    - label: "Step 2: DUT reads the Networks attribute from the TH"
       PICS: CNET.C.A0001
       verification: |
-          ./chip-tool networkcommissioning read networks 1 0
+          ./chip-tool networkcommissioning read networks 1 0 --trace_decode 1
 
-
-          Verify "Networks response" on the TH(All-cluster-app) Log:
+          Verify Networks attribute response on TH(all-clusters-app) log:
 
           [1667208308.741069][14293:14293] CHIP:EM: Handling via exchange: 43353r, Delegate: 0xaaaaaff382d8
           [1667208308.741175][14293:14293] CHIP:IM: Received Read request
@@ -216,12 +215,12 @@ tests:
           [1667208308.753658][14293:14293] CHIP:DMG:
       disabled: true
 
-    - label: "DUT reads ScanMaxTimeSeconds attribute from the TH"
+    - label: "Step 3: DUT reads ScanMaxTimeSeconds attribute from the TH"
       PICS: CNET.C.A0002
       verification: |
-          ./chip-tool networkcommissioning read scan-max-time-seconds 1 0
+          ./chip-tool networkcommissioning read scan-max-time-seconds 1 0 --trace_decode 1
 
-          Verify  "ScanMaxTimeSeconds response" on the TH(All-cluster-app) Log:
+          Verify ScanMaxTimeSeconds attribute response on TH(all-clusters-app) log:
 
           [1667208358.868821][14293:14293] CHIP:EM: Handling via exchange: 17173r, Delegate: 0xaaaaaff382d8
           [1667208358.868931][14293:14293] CHIP:IM: Received Read request
@@ -287,19 +286,18 @@ tests:
           [1667208358.875926][14293:14293] CHIP:DMG:                                         Attribute = 0x0000_0002,
           [1667208358.876076][14293:14293] CHIP:DMG:                                 }
           [1667208358.876180][14293:14293] CHIP:DMG:
-          [1667208358.876270][14293:14293] CHIP:DMG:                                 Data = 0,
+          [1667208358.876270][14293:14293] CHIP:DMG:                                 Data = 10,
           [1667208358.876349][14293:14293] CHIP:DMG:                         },
           [1667208358.876442][14293:14293] CHIP:DMG:
           [1667208358.876513][14293:14293] CHIP:DMG:                 },
       disabled: true
 
-    - label: "DUT reads ConnectMaxTimeSeconds attribute from the TH"
+    - label: "Step 4: DUT reads ConnectMaxTimeSeconds attribute from the TH"
       PICS: CNET.C.A0003
       verification: |
-          ./chip-tool networkcommissioning read connect-max-time-seconds 1 0
+          ./chip-tool networkcommissioning read connect-max-time-seconds 1 0 --trace_decode 1
 
-
-          Verify "ConnectMaxTimeSeconds response" on the TH(All-cluster-app) Log:
+          Verify ConnectMaxTimeSeconds attribute response on TH(all-clusters-app) log:
 
           [1667208410.708719][14293:14293] CHIP:EM: Handling via exchange: 52668r, Delegate: 0xaaaaaff382d8
           [1667208410.708835][14293:14293] CHIP:IM: Received Read request
@@ -365,19 +363,18 @@ tests:
           [1667208410.715262][14293:14293] CHIP:DMG:                                         Attribute = 0x0000_0003,
           [1667208410.715349][14293:14293] CHIP:DMG:                                 }
           [1667208410.715460][14293:14293] CHIP:DMG:
-          [1667208410.715558][14293:14293] CHIP:DMG:                                 Data = 0,
+          [1667208410.715558][14293:14293] CHIP:DMG:                                 Data = 20,
           [1667208410.715820][14293:14293] CHIP:DMG:                         },
           [1667208410.715914][14293:14293] CHIP:DMG:
           [1667208410.715987][14293:14293] CHIP:DMG:                 },
       disabled: true
 
-    - label: "DUT reads InterfaceEnabled attribute from the TH"
+    - label: "Step 5: DUT reads InterfaceEnabled attribute from the TH"
       PICS: CNET.C.A0004
       verification: |
-          ./chip-tool networkcommissioning read interface-enabled 1 0
+          ./chip-tool networkcommissioning read interface-enabled 1 0 --trace_decode 1
 
-
-          Verify "InterfaceEnabled response" on the TH(All-cluster-app) Log:
+          Verify InterfaceEnabled attribute response on TH(all-clusters-app) log:
 
           [1667208443.008116][14293:14293] CHIP:EM: Handling via exchange: 58556r, Delegate: 0xaaaaaff382d8
           [1667208443.008243][14293:14293] CHIP:IM: Received Read request
@@ -447,31 +444,30 @@ tests:
           [1667208443.015327][14293:14293] CHIP:DMG:                         },
       disabled: true
 
-    - label: "DUT reads LastNetworkingStatus attribute from the TH"
+    - label: "Step 6: DUT reads LastNetworkingStatus attribute from the TH"
       PICS: CNET.C.A0005
       verification: |
-          ./chip-tool networkcommissioning read last-networking-status 1 0
+          ./chip-tool networkcommissioning read last-networking-status 1 0 --trace_decode 1
 
-
-          Verify "LastNetworkingStatus response" on the TH(All-cluster-app) Log:
+          Verify LastNetworkingStatus attribute response on TH(all-clusters-app) log:
 
           [1667208469.154755][14293:14293] CHIP:EM: Handling via exchange: 45977r, Delegate: 0xaaaaaff382d8
           [1667208469.154875][14293:14293] CHIP:IM: Received Read request
           [1667208469.155241][14293:14293] CHIP:DMG: ReadRequestMessage =
           [1667208469.155315][14293:14293] CHIP:DMG: {
-          [1667208469.155395][14293:14293] CHIP:DMG: 	AttributePathIBs =
-          [1667208469.155461][14293:14293] CHIP:DMG: 	[
-          [1667208469.155514][14293:14293] CHIP:DMG: 		AttributePathIB =
-          [1667208469.155586][14293:14293] CHIP:DMG: 		{
-          [1667208469.155664][14293:14293] CHIP:DMG: 			Endpoint = 0x0,
-          [1667208469.155777][14293:14293] CHIP:DMG: 			Cluster = 0x31,
-          [1667208469.155868][14293:14293] CHIP:DMG: 			Attribute = 0x0000_0005,
-          [1667208469.155968][14293:14293] CHIP:DMG: 		}
+          [1667208469.155395][14293:14293] CHIP:DMG:         AttributePathIBs =
+          [1667208469.155461][14293:14293] CHIP:DMG:         [
+          [1667208469.155514][14293:14293] CHIP:DMG:                 AttributePathIB =
+          [1667208469.155586][14293:14293] CHIP:DMG:                 {
+          [1667208469.155664][14293:14293] CHIP:DMG:                         Endpoint = 0x0,
+          [1667208469.155777][14293:14293] CHIP:DMG:                         Cluster = 0x31,
+          [1667208469.155868][14293:14293] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1667208469.155968][14293:14293] CHIP:DMG:                 }
           [1667208469.156047][14293:14293] CHIP:DMG:
-          [1667208469.156136][14293:14293] CHIP:DMG: 	],
+          [1667208469.156136][14293:14293] CHIP:DMG:         ],
           [1667208469.156210][14293:14293] CHIP:DMG:
-          [1667208469.156277][14293:14293] CHIP:DMG: 	isFabricFiltered = true,
-          [1667208469.156361][14293:14293] CHIP:DMG: 	InteractionModelRevision = 1
+          [1667208469.156277][14293:14293] CHIP:DMG:         isFabricFiltered = true,
+          [1667208469.156361][14293:14293] CHIP:DMG:         InteractionModelRevision = 1
           [1667208469.156422][14293:14293] CHIP:DMG: },
           [1667208469.156602][14293:14293] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1667208469.156848][14293:14293] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
@@ -505,48 +501,48 @@ tests:
           [1667208469.160136][14293:14293] CHIP:DMG:
           [1667208469.160282][14293:14293] CHIP:DMG: ReportDataMessage =
           [1667208469.160369][14293:14293] CHIP:DMG: {
-          [1667208469.160423][14293:14293] CHIP:DMG: 	AttributeReportIBs =
-          [1667208469.160528][14293:14293] CHIP:DMG: 	[
-          [1667208469.160593][14293:14293] CHIP:DMG: 		AttributeReportIB =
-          [1667208469.160702][14293:14293] CHIP:DMG: 		{
-          [1667208469.160785][14293:14293] CHIP:DMG: 			AttributeDataIB =
-          [1667208469.160900][14293:14293] CHIP:DMG: 			{
-          [1667208469.160994][14293:14293] CHIP:DMG: 				DataVersion = 0x84a0a683,
-          [1667208469.161104][14293:14293] CHIP:DMG: 				AttributePathIB =
-          [1667208469.161196][14293:14293] CHIP:DMG: 				{
-          [1667208469.161310][14293:14293] CHIP:DMG: 					Endpoint = 0x0,
-          [1667208469.161424][14293:14293] CHIP:DMG: 					Cluster = 0x31,
-          [1667208469.161517][14293:14293] CHIP:DMG: 					Attribute = 0x0000_0005,
-          [1667208469.161634][14293:14293] CHIP:DMG: 				}
+          [1667208469.160423][14293:14293] CHIP:DMG:         AttributeReportIBs =
+          [1667208469.160528][14293:14293] CHIP:DMG:         [
+          [1667208469.160593][14293:14293] CHIP:DMG:                 AttributeReportIB =
+          [1667208469.160702][14293:14293] CHIP:DMG:                 {
+          [1667208469.160785][14293:14293] CHIP:DMG:                         AttributeDataIB =
+          [1667208469.160900][14293:14293] CHIP:DMG:                         {
+          [1667208469.160994][14293:14293] CHIP:DMG:                                 DataVersion = 0x84a0a683,
+          [1667208469.161104][14293:14293] CHIP:DMG:                                 AttributePathIB =
+          [1667208469.161196][14293:14293] CHIP:DMG:                                 {
+          [1667208469.161310][14293:14293] CHIP:DMG:                                         Endpoint = 0x0,
+          [1667208469.161424][14293:14293] CHIP:DMG:                                         Cluster = 0x31,
+          [1667208469.161517][14293:14293] CHIP:DMG:                                         Attribute = 0x0000_0005,
+          [1667208469.161634][14293:14293] CHIP:DMG:                                 }
           [1667208469.161732][14293:14293] CHIP:DMG:
-          [1667208469.161834][14293:14293] CHIP:DMG: 				Data = NULL
-          [1667208469.161919][14293:14293] CHIP:DMG: 			},
+          [1667208469.161834][14293:14293] CHIP:DMG:                                 Data = 0,
+          [1667208469.161919][14293:14293] CHIP:DMG:                         },
       disabled: true
 
-    - label: "DUT reads LastNetworkID attribute from the TH"
+    - label: "Step 7: DUT reads LastNetworkID attribute from the TH"
       PICS: CNET.C.A0006
       verification: |
-          ./chip-tool networkcommissioning read last-network-id 1 0
+          ./chip-tool networkcommissioning read last-network-id 1 0 --trace_decode 1
 
-          Verify "LastNetworkID response" on the TH(All-cluster-app) Log:
+          Verify LastNetworkID attribute response on TH(all-clusters-app) log:
 
           [1667208560.669590][14293:14293] CHIP:EM: Handling via exchange: 8923r, Delegate: 0xaaaaaff382d8
           [1667208560.669685][14293:14293] CHIP:IM: Received Read request
           [1667208560.669852][14293:14293] CHIP:DMG: ReadRequestMessage =
           [1667208560.669918][14293:14293] CHIP:DMG: {
-          [1667208560.669971][14293:14293] CHIP:DMG: 	AttributePathIBs =
-          [1667208560.670037][14293:14293] CHIP:DMG: 	[
-          [1667208560.670098][14293:14293] CHIP:DMG: 		AttributePathIB =
-          [1667208560.670181][14293:14293] CHIP:DMG: 		{
-          [1667208560.670254][14293:14293] CHIP:DMG: 			Endpoint = 0x0,
-          [1667208560.670337][14293:14293] CHIP:DMG: 			Cluster = 0x31,
-          [1667208560.670411][14293:14293] CHIP:DMG: 			Attribute = 0x0000_0006,
-          [1667208560.670531][14293:14293] CHIP:DMG: 		}
+          [1667208560.669971][14293:14293] CHIP:DMG:         AttributePathIBs =
+          [1667208560.670037][14293:14293] CHIP:DMG:         [
+          [1667208560.670098][14293:14293] CHIP:DMG:                 AttributePathIB =
+          [1667208560.670181][14293:14293] CHIP:DMG:                 {
+          [1667208560.670254][14293:14293] CHIP:DMG:                         Endpoint = 0x0,
+          [1667208560.670337][14293:14293] CHIP:DMG:                         Cluster = 0x31,
+          [1667208560.670411][14293:14293] CHIP:DMG:                         Attribute = 0x0000_0006,
+          [1667208560.670531][14293:14293] CHIP:DMG:                 }
           [1667208560.670600][14293:14293] CHIP:DMG:
-          [1667208560.670656][14293:14293] CHIP:DMG: 	],
+          [1667208560.670656][14293:14293] CHIP:DMG:         ],
           [1667208560.670717][14293:14293] CHIP:DMG:
-          [1667208560.670813][14293:14293] CHIP:DMG: 	isFabricFiltered = true,
-          [1667208560.670879][14293:14293] CHIP:DMG: 	InteractionModelRevision = 1
+          [1667208560.670813][14293:14293] CHIP:DMG:         isFabricFiltered = true,
+          [1667208560.670879][14293:14293] CHIP:DMG:         InteractionModelRevision = 1
           [1667208560.670938][14293:14293] CHIP:DMG: },
           [1667208560.671124][14293:14293] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1667208560.671497][14293:14293] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
@@ -578,50 +574,60 @@ tests:
           [1667208560.674622][14293:14293] CHIP:DMG:     data = 153601153501260083a6a0843701240200240331240406183402181818290424ff0118
           [1667208560.674679][14293:14293] CHIP:DMG: }
           [1667208560.674730][14293:14293] CHIP:DMG:
-          [1667208560.674900][14293:14293] CHIP:DMG: ReportDataMessage =
-          [1667208560.674967][14293:14293] CHIP:DMG: {
-          [1667208560.675021][14293:14293] CHIP:DMG: 	AttributeReportIBs =
-          [1667208560.675129][14293:14293] CHIP:DMG: 	[
-          [1667208560.675193][14293:14293] CHIP:DMG: 		AttributeReportIB =
-          [1667208560.675302][14293:14293] CHIP:DMG: 		{
-          [1667208560.675383][14293:14293] CHIP:DMG: 			AttributeDataIB =
-          [1667208560.675488][14293:14293] CHIP:DMG: 			{
-          [1667208560.675595][14293:14293] CHIP:DMG: 				DataVersion = 0x84a0a683,
-          [1667208560.675681][14293:14293] CHIP:DMG: 				AttributePathIB =
-          [1667208560.675788][14293:14293] CHIP:DMG: 				{
-          [1667208560.675884][14293:14293] CHIP:DMG: 					Endpoint = 0x0,
-          [1667208560.676000][14293:14293] CHIP:DMG: 					Cluster = 0x31,
-          [1667208560.676102][14293:14293] CHIP:DMG: 					Attribute = 0x0000_0006,
-          [1667208560.676211][14293:14293] CHIP:DMG: 				}
-          [1667208560.676303][14293:14293] CHIP:DMG:
-          [1667208560.676413][14293:14293] CHIP:DMG: 				Data = NULL
-          [1667208560.676494][14293:14293] CHIP:DMG: 			},
+          [1686200885.068762][2221:2223] CHIP:DMG: ReportDataMessage =
+          [1686200885.068823][2221:2223] CHIP:DMG: {
+          [1686200885.068872][2221:2223] CHIP:DMG:         AttributeReportIBs =
+          [1686200885.068944][2221:2223] CHIP:DMG:         [
+          [1686200885.069000][2221:2223] CHIP:DMG:                 AttributeReportIB =
+          [1686200885.069077][2221:2223] CHIP:DMG:                 {
+          [1686200885.069138][2221:2223] CHIP:DMG:                         AttributeDataIB =
+          [1686200885.069209][2221:2223] CHIP:DMG:                         {
+          [1686200885.069283][2221:2223] CHIP:DMG:                                 DataVersion = 0xe8e1d5c0,
+          [1686200885.069354][2221:2223] CHIP:DMG:                                 AttributePathIB =
+          [1686200885.069429][2221:2223] CHIP:DMG:                                 {
+          [1686200885.069504][2221:2223] CHIP:DMG:                                         Endpoint = 0x0,
+          [1686200885.069621][2221:2223] CHIP:DMG:                                         Cluster = 0x31,
+          [1686200885.069710][2221:2223] CHIP:DMG:                                         Attribute = 0x0000_0006,
+          [1686200885.069785][2221:2223] CHIP:DMG:                                 }
+          [1686200885.069860][2221:2223] CHIP:DMG:
+          [1686200885.069933][2221:2223] CHIP:DMG:                                 Data = [
+          [1686200885.070011][2221:2223] CHIP:DMG:                                                 0x47, 0x52, 0x4c, 0x50, 0x72, 0x69, 0x76, 0x61, 0x74, 0x65,
+          [1686200885.070094][2221:2223] CHIP:DMG:                                 ] (10 bytes)
+          [1686200885.070161][2221:2223] CHIP:DMG:                         },
+          [1686200885.070236][2221:2223] CHIP:DMG:
+          [1686200885.070296][2221:2223] CHIP:DMG:                 },
+          [1686200885.070369][2221:2223] CHIP:DMG:
+          [1686200885.070424][2221:2223] CHIP:DMG:         ],
+          [1686200885.070494][2221:2223] CHIP:DMG:
+          [1686200885.070550][2221:2223] CHIP:DMG:         SuppressResponse = true,
+          [1686200885.070608][2221:2223] CHIP:DMG:         InteractionModelRevision = 1
+          [1686200885.070662][2221:2223] CHIP:DMG: }
       disabled: true
 
-    - label: "DUT reads LastConnectErrorValue attribute from the TH"
+    - label: "Step 8: DUT reads LastConnectErrorValue attribute from the TH"
       PICS: CNET.C.A0007
       verification: |
-          ./chip-tool networkcommissioning read last-connect-error-value 1 0
+          ./chip-tool networkcommissioning read last-connect-error-value 1 0 --trace_decode 1
 
-          Verify "LastConnectErrorValue response" on the TH(All-cluster-app) Log:
+          Verify LastConnectErrorValue attribute response on TH(all-clusters-app) log:
 
           [1667208660.521154][14293:14293] CHIP:EM: Handling via exchange: 50685r, Delegate: 0xaaaaaff382d8
           [1667208660.521272][14293:14293] CHIP:IM: Received Read request
           [1667208660.521464][14293:14293] CHIP:DMG: ReadRequestMessage =
           [1667208660.521530][14293:14293] CHIP:DMG: {
-          [1667208660.521585][14293:14293] CHIP:DMG: 	AttributePathIBs =
-          [1667208660.521649][14293:14293] CHIP:DMG: 	[
-          [1667208660.521732][14293:14293] CHIP:DMG: 		AttributePathIB =
-          [1667208660.521810][14293:14293] CHIP:DMG: 		{
-          [1667208660.521889][14293:14293] CHIP:DMG: 			Endpoint = 0x0,
-          [1667208660.522001][14293:14293] CHIP:DMG: 			Cluster = 0x31,
-          [1667208660.522112][14293:14293] CHIP:DMG: 			Attribute = 0x0000_0007,
-          [1667208660.522195][14293:14293] CHIP:DMG: 		}
+          [1667208660.521585][14293:14293] CHIP:DMG:         AttributePathIBs =
+          [1667208660.521649][14293:14293] CHIP:DMG:         [
+          [1667208660.521732][14293:14293] CHIP:DMG:                 AttributePathIB =
+          [1667208660.521810][14293:14293] CHIP:DMG:                 {
+          [1667208660.521889][14293:14293] CHIP:DMG:                         Endpoint = 0x0,
+          [1667208660.522001][14293:14293] CHIP:DMG:                         Cluster = 0x31,
+          [1667208660.522112][14293:14293] CHIP:DMG:                         Attribute = 0x0000_0007,
+          [1667208660.522195][14293:14293] CHIP:DMG:                 }
           [1667208660.522294][14293:14293] CHIP:DMG:
-          [1667208660.522366][14293:14293] CHIP:DMG: 	],
+          [1667208660.522366][14293:14293] CHIP:DMG:         ],
           [1667208660.522437][14293:14293] CHIP:DMG:
-          [1667208660.522624][14293:14293] CHIP:DMG: 	isFabricFiltered = true,
-          [1667208660.522716][14293:14293] CHIP:DMG: 	InteractionModelRevision = 1
+          [1667208660.522624][14293:14293] CHIP:DMG:         isFabricFiltered = true,
+          [1667208660.522716][14293:14293] CHIP:DMG:         InteractionModelRevision = 1
           [1667208660.522777][14293:14293] CHIP:DMG: },
           [1667208660.522959][14293:14293] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1667208660.523199][14293:14293] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
@@ -655,21 +661,21 @@ tests:
           [1667208660.526357][14293:14293] CHIP:DMG:
           [1667208660.526570][14293:14293] CHIP:DMG: ReportDataMessage =
           [1667208660.526666][14293:14293] CHIP:DMG: {
-          [1667208660.526721][14293:14293] CHIP:DMG: 	AttributeReportIBs =
-          [1667208660.526820][14293:14293] CHIP:DMG: 	[
-          [1667208660.526885][14293:14293] CHIP:DMG: 		AttributeReportIB =
-          [1667208660.526972][14293:14293] CHIP:DMG: 		{
-          [1667208660.527061][14293:14293] CHIP:DMG: 			AttributeDataIB =
-          [1667208660.527142][14293:14293] CHIP:DMG: 			{
-          [1667208660.527245][14293:14293] CHIP:DMG: 				DataVersion = 0x84a0a683,
-          [1667208660.527329][14293:14293] CHIP:DMG: 				AttributePathIB =
-          [1667208660.527432][14293:14293] CHIP:DMG: 				{
-          [1667208660.527527][14293:14293] CHIP:DMG: 					Endpoint = 0x0,
-          [1667208660.527633][14293:14293] CHIP:DMG: 					Cluster = 0x31,
-          [1667208660.527733][14293:14293] CHIP:DMG: 					Attribute = 0x0000_0007,
-          [1667208660.527840][14293:14293] CHIP:DMG: 				}
+          [1667208660.526721][14293:14293] CHIP:DMG:         AttributeReportIBs =
+          [1667208660.526820][14293:14293] CHIP:DMG:         [
+          [1667208660.526885][14293:14293] CHIP:DMG:                 AttributeReportIB =
+          [1667208660.526972][14293:14293] CHIP:DMG:                 {
+          [1667208660.527061][14293:14293] CHIP:DMG:                         AttributeDataIB =
+          [1667208660.527142][14293:14293] CHIP:DMG:                         {
+          [1667208660.527245][14293:14293] CHIP:DMG:                                 DataVersion = 0x84a0a683,
+          [1667208660.527329][14293:14293] CHIP:DMG:                                 AttributePathIB =
+          [1667208660.527432][14293:14293] CHIP:DMG:                                 {
+          [1667208660.527527][14293:14293] CHIP:DMG:                                         Endpoint = 0x0,
+          [1667208660.527633][14293:14293] CHIP:DMG:                                         Cluster = 0x31,
+          [1667208660.527733][14293:14293] CHIP:DMG:                                         Attribute = 0x0000_0007,
+          [1667208660.527840][14293:14293] CHIP:DMG:                                 }
           [1667208660.527951][14293:14293] CHIP:DMG:
-          [1667208660.528048][14293:14293] CHIP:DMG: 				Data = NULL
-          [1667208660.528152][14293:14293] CHIP:DMG: 			},
+          [1667208660.528048][14293:14293] CHIP:DMG:                                 Data = NULL
+          [1667208660.528152][14293:14293] CHIP:DMG:                         },
           [1667208660.528240][14293:14293] CHIP:DMG:
       disabled: true

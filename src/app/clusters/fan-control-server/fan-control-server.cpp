@@ -30,6 +30,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/error-mapping.h>
 #include <lib/support/CodeUtils.h>
@@ -40,6 +41,45 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::FanControl;
 using namespace chip::app::Clusters::FanControl::Attributes;
+
+namespace {
+
+constexpr size_t kFanControlDelegateTableSize =
+    EMBER_AF_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
+static_assert(kFanControlDelegateTableSize <= kEmberInvalidEndpointIndex, "FanControl Delegate table size error");
+
+Delegate * gDelegateTable[kFanControlDelegateTableSize] = { nullptr };
+
+} // anonymous namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace FanControl {
+
+Delegate * GetDelegate(EndpointId aEndpoint)
+{
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(aEndpoint, FanControl::Id, EMBER_AF_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kFanControlDelegateTableSize ? nullptr : gDelegateTable[ep]);
+}
+
+void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate)
+{
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(aEndpoint, FanControl::Id, EMBER_AF_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    // if endpoint is found
+    if (ep < kFanControlDelegateTableSize)
+    {
+        gDelegateTable[ep] = aDelegate;
+    }
+}
+
+} // namespace FanControl
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 namespace {
 
@@ -403,21 +443,38 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
     }
 }
 
-bool emberAfFanControlClusterStepCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+bool emberAfFanControlClusterStepCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                           const Commands::Step::DecodableType & commandData)
 {
-    /*
-     * TODO: Clarification needed in spec issue #6496 - if this is tied to the SpeedSetting attribute, then
-     * the attribute can be updated here, if it is supposed to be implementation specific, then the command
-     * will have to be handed off to an application specific callback which will require some sort of delegate.
-     */
-
     Protocols::InteractionModel::Status status = Status::Success;
+
+    ChipLogProgress(Zcl, "FanControl emberAfFanControlClusterStepCallback: Endpoint %u", commandPath.mEndpointId);
 
     if (!SupportsStep(commandPath.mEndpointId))
     {
+        ChipLogProgress(Zcl, "FanControl does not support Step:%u", commandPath.mEndpointId);
         status = Status::UnsupportedCommand;
     }
+    else
+    {
+        EndpointId endpoint         = commandPath.mEndpointId;
+        StepDirectionEnum direction = commandData.direction;
+
+        bool wrapValue      = commandData.wrap.ValueOr(false);
+        bool lowestOffValue = commandData.lowestOff.ValueOr(false);
+
+        Delegate * delegate = GetDelegate(endpoint);
+        if (delegate)
+        {
+            status = delegate->HandleStep(direction, wrapValue, lowestOffValue);
+        }
+        else
+        {
+            ChipLogProgress(Zcl, "FanControl has no delegate set for endpoint:%u", endpoint);
+            status = Status::Failure;
+        }
+    }
+
     commandObj->AddStatus(commandPath, status);
     return true;
 }

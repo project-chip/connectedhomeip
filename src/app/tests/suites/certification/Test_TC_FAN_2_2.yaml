@@ -24,7 +24,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -32,7 +32,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads from the DUT the the SpeedMax attribute"
+    - label: "Step 2: TH reads from the DUT the the SpeedMax attribute"
       PICS: FAN.S.A0004
       command: "readAttribute"
       attribute: "SpeedMax"
@@ -43,7 +43,7 @@ tests:
               minValue: 0
               maxValue: 100
 
-    - label: "TH reads from the DUT the the SpeedSetting attribute"
+    - label: "Step 3: TH reads from the DUT the the SpeedSetting attribute"
       PICS: FAN.S.A0005 && FAN.S.A0004
       command: "readAttribute"
       attribute: "SpeedSetting"
@@ -53,7 +53,7 @@ tests:
               minValue: 0
               maxValue: SpeedMaxValue
 
-    - label: "TH reads from the DUT the the SpeedCurrent attribute"
+    - label: "Step 4: TH reads from the DUT the the SpeedCurrent attribute"
       PICS: FAN.S.A0006 && FAN.S.A0004
       command: "readAttribute"
       attribute: "SpeedCurrent"

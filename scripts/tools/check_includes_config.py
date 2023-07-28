@@ -157,5 +157,5 @@ ALLOW: Dict[str, Set[str]] = {
 
     # Library meant for non-embedded
     'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
-    'src/tracing/json/json_tracing.h': {'fstream'}
+    'src/tracing/json/json_tracing.h': {'fstream'},
 }

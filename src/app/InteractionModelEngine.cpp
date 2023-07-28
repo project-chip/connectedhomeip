@@ -34,6 +34,7 @@
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/FibonacciUtils.h>
 
 namespace chip {
 namespace app {
@@ -50,16 +51,18 @@ InteractionModelEngine * InteractionModelEngine::GetInstance()
 }
 
 CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
-                                        CASESessionManager * apCASESessionMgr,
+                                        reporting::ReportScheduler * reportScheduler, CASESessionManager * apCASESessionMgr,
                                         SubscriptionResumptionStorage * subscriptionResumptionStorage)
 {
     VerifyOrReturnError(apFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(apExchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(reportScheduler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mpExchangeMgr                   = apExchangeMgr;
     mpFabricTable                   = apFabricTable;
     mpCASESessionMgr                = apCASESessionMgr;
     mpSubscriptionResumptionStorage = subscriptionResumptionStorage;
+    mReportScheduler                = reportScheduler;
 
     ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
@@ -324,6 +327,17 @@ void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
     mReportingEngine.ResetReadHandlerTracker(&apReadObj);
 
     mReadHandlers.ReleaseObject(&apReadObj);
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    if (!mSubscriptionResumptionScheduled && HasSubscriptionsToResume())
+    {
+        mSubscriptionResumptionScheduled    = true;
+        auto timeTillNextResubscriptionSecs = ComputeTimeSecondsTillNextSubscriptionResumption();
+        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(System::Clock::Seconds32(timeTillNextResubscriptionSecs),
+                                                                      ResumeSubscriptionsTimerCallback, this);
+        mNumSubscriptionResumptionRetries++;
+    }
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 }
 
 Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
@@ -729,7 +743,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
 
     // We have already reserved enough resources for read requests, and have granted enough resources for current subscriptions, so
     // we should be able to allocate resources requested by this request.
-    ReadHandler * handler = mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType);
+    ReadHandler * handler = mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType, mReportScheduler);
     if (handler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for %s interaction",
@@ -1752,6 +1766,9 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     ReturnErrorCodeIf(!mpSubscriptionResumptionStorage, CHIP_NO_ERROR);
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    ReturnErrorCodeIf(mSubscriptionResumptionScheduled, CHIP_NO_ERROR);
+#endif
 
     // To avoid the case of a reboot loop causing rapid traffic generation / power consumption, subscription resumption should make
     // use of the persisted min-interval values, and wait before resumption. Ideally, each persisted subscription should wait their
@@ -1776,6 +1793,9 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
 
     if (subscriptionsToResume)
     {
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+        mSubscriptionResumptionScheduled = true;
+#endif
         ChipLogProgress(InteractionModel, "Resuming %d subscriptions in %u seconds", subscriptionsToResume, minInterval);
         ReturnErrorOnFailure(mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(System::Clock::Seconds16(minInterval),
                                                                                            ResumeSubscriptionsTimerCallback, this));
@@ -1794,6 +1814,10 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     VerifyOrReturn(apAppState != nullptr);
     InteractionModelEngine * imEngine = static_cast<InteractionModelEngine *>(apAppState);
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    imEngine->mSubscriptionResumptionScheduled = false;
+    bool resumedSubscriptions                  = false;
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
     auto * iterator = imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions();
     while (iterator->Next(subscriptionInfo))
@@ -1823,7 +1847,7 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
             return;
         }
 
-        ReadHandler * handler = imEngine->mReadHandlers.CreateObject(*imEngine);
+        ReadHandler * handler = imEngine->mReadHandlers.CreateObject(*imEngine, imEngine->GetReportScheduler());
         if (handler == nullptr)
         {
             ChipLogProgress(InteractionModel, "no resource for ReadHandler creation");
@@ -1833,10 +1857,67 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
 
         ChipLogProgress(InteractionModel, "Resuming subscriptionId %" PRIu32, subscriptionInfo.mSubscriptionId);
         handler->ResumeSubscription(*imEngine->mpCASESessionMgr, subscriptionInfo);
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+        resumedSubscriptions = true;
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     }
     iterator->Release();
+
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    // If no persisted subscriptions needed resumption then all resumption retries are done
+    if (!resumedSubscriptions)
+    {
+        imEngine->mNumSubscriptionResumptionRetries = 0;
+    }
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 }
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+uint32_t InteractionModelEngine::ComputeTimeSecondsTillNextSubscriptionResumption()
+{
+    if (mNumSubscriptionResumptionRetries > CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX)
+    {
+        return CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS;
+    }
+
+    return CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MIN_RETRY_INTERVAL_SECS +
+        GetFibonacciForIndex(mNumSubscriptionResumptionRetries) *
+        CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_WAIT_TIME_MULTIPLIER_SECS;
+}
+
+bool InteractionModelEngine::HasSubscriptionsToResume()
+{
+    VerifyOrReturnValue(mpSubscriptionResumptionStorage != nullptr, false);
+
+    // Look through persisted subscriptions and see if any aren't already in mReadHandlers pool
+    SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
+    auto * iterator                = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    bool foundSubscriptionToResume = false;
+    while (iterator->Next(subscriptionInfo))
+    {
+        if (Loop::Break == mReadHandlers.ForEachActiveObject([&](ReadHandler * handler) {
+                SubscriptionId subscriptionId;
+                handler->GetSubscriptionId(subscriptionId);
+                if (subscriptionId == subscriptionInfo.mSubscriptionId)
+                {
+                    return Loop::Break;
+                }
+                return Loop::Continue;
+            }))
+        {
+            continue;
+        }
+
+        foundSubscriptionToResume = true;
+        break;
+    }
+    iterator->Release();
+
+    return foundSubscriptionToResume;
+}
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
 } // namespace app
 } // namespace chip

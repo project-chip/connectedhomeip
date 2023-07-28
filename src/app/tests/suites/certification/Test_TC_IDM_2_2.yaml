@@ -25,15 +25,15 @@ config:
 
 tests:
     - label:
-          "TH sends the Read Request Message to the DUT to read one attribute on
-          a given cluster and endpoint. AttributePath = [[Endpoint = Specific
-          Endpoint, Cluster = Specific ClusterID, Attribute = Specific
-          Attribute]] On receipt of this message, DUT should send a report data
-          action with the attribute value to the DUT."
+          "Step 1: TH sends the Read Request Message to the DUT to read one
+          attribute on a given cluster and endpoint. AttributePath = [[Endpoint
+          = Specific Endpoint, Cluster = Specific ClusterID, Attribute =
+          Specific Attribute]] On receipt of this message, DUT should send a
+          report data action with the attribute value to the DUT."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-           ./chip-tool identify read identify-time 1 1
+          ./chip-tool identify read identify-time 1 1
 
           On the TH(chip-tool) verify the received report data message has the right attribute value for above command
 
@@ -69,11 +69,11 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read all attributes
-          on a given cluster and Endpoint AttributePath = [[Endpoint = Specific
-          Endpoint, Cluster = Specific ClusterID]] On receipt of this message,
-          DUT should send a report data action with the attribute value to the
-          DUT."
+          "Step 2: TH sends the Read Request Message to the DUT to read all
+          attributes on a given cluster and Endpoint AttributePath = [[Endpoint
+          = Specific Endpoint, Cluster = Specific ClusterID]] On receipt of this
+          message, DUT should send a report data action with the attribute value
+          to the DUT."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
@@ -111,11 +111,11 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read an attribute
-          from a cluster at all Endpoints AttributePath = [[Cluster = Specific
-          ClusterID, Attribute = Specific Attribute]] On receipt of this
-          message, DUT should send a report data action with the attribute value
-          from all the Endpoints to the DUT."
+          "Step 3: TH sends the Read Request Message to the DUT to read an
+          attribute from a cluster at all Endpoints AttributePath = [[Cluster =
+          Specific ClusterID, Attribute = Specific Attribute]] On receipt of
+          this message, DUT should send a report data action with the attribute
+          value from all the Endpoints to the DUT."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
@@ -175,7 +175,7 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read a global
+          "Step 4: TH sends the Read Request Message to the DUT to read a global
           attribute from all clusters at that Endpoint AttributePath =
           [[Endpoint = Specific Endpoint, Attribute = Specific Global
           Attribute]] On receipt of this message, DUT should send a report data
@@ -247,17 +247,17 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read all attributes
-          from all clusters on all Endpoints AttributePath = [[]] On receipt of
-          this message, DUT should send a report data action with the attribute
-          value from all the clusters to the DUT."
+          "Step 5: TH sends the Read Request Message to the DUT to read all
+          attributes from all clusters on all Endpoints AttributePath = [[]] On
+          receipt of this message, DUT should send a report data action with the
+          attribute value from all the clusters to the DUT."
       verification: |
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF --timeout 40
           On the TH(chip-tool) verify the received report data message has all the right attribute values.
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read a global
+          "Step 6: TH sends the Read Request Message to the DUT to read a global
           attribute from all clusters at all Endpoints AttributePath =
           [[Attribute = Specific Global Attribute]] On receipt of this message,
           DUT should send a report data action with the attribute value from all
@@ -272,10 +272,11 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read all attributes
-          from a cluster at all Endpoints AttributePath = [[Cluster = Specific
-          ClusterID]] On receipt of this message, DUT should send a report data
-          action with the attribute value from all the Endpoints to the DUT."
+          "Step 7: TH sends the Read Request Message to the DUT to read all
+          attributes from a cluster at all Endpoints AttributePath = [[Cluster =
+          Specific ClusterID]] On receipt of this message, DUT should send a
+          report data action with the attribute value from all the Endpoints to
+          the DUT."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
@@ -332,11 +333,11 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read all attributes
-          from all clusters at one Endpoint AttributePath = [[Endpoint =
-          Specific Endpoint]] On receipt of this message, DUT should send a
-          report data action with the attribute value from all the Endpoints to
-          the DUT."
+          "Step 8: TH sends the Read Request Message to the DUT to read all
+          attributes from all clusters at one Endpoint AttributePath =
+          [[Endpoint = Specific Endpoint]] On receipt of this message, DUT
+          should send a report data action with the attribute value from all the
+          Endpoints to the DUT."
       verification: |
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 1
 
@@ -345,9 +346,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read an attribute of
-          data type bool. DUT responds with the report data action with the
-          right attribute value."
+          "Step 9: TH sends the Read Request Message to the DUT to read an
+          attribute of data type bool. DUT responds with the report data action
+          with the right attribute value."
       PICS: MCORE.IDM.S.Attribute.DataType_Bool
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
@@ -362,9 +363,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read an attribute of
-          data type string. DUT responds with the report data action with the
-          right attribute value."
+          "Step 10: TH sends the Read Request Message to the DUT to read an
+          attribute of data type string. DUT responds with the report data
+          action with the right attribute value."
       PICS: MCORE.IDM.S.Attribute.DataType_String
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
@@ -379,9 +380,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read an attribute of
-          data type unsigned integer. DUT responds with the report data action
-          with the right attribute value."
+          "Step 11: TH sends the Read Request Message to the DUT to read an
+          attribute of data type unsigned integer. DUT responds with the report
+          data action with the right attribute value."
       PICS: MCORE.IDM.S.Attribute.DataType_UnsignedInteger
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
@@ -396,9 +397,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read an attribute of
-          data type signed integer. DUT responds with the report data action
-          with the right attribute value."
+          "Step 12: TH sends the Read Request Message to the DUT to read an
+          attribute of data type signed integer. DUT responds with the report
+          data action with the right attribute value."
       PICS: MCORE.IDM.S.Attribute.DataType_SignedInteger
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
@@ -412,9 +413,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read an attribute of
-          data type floating point. DUT responds with the report data action
-          with the right attribute value."
+          "Step 13: TH sends the Read Request Message to the DUT to read an
+          attribute of data type floating point. DUT responds with the report
+          data action with the right attribute value."
       PICS: MCORE.IDM.S.Attribute.DataType_FloatingPoint
       verification: |
           DUT implementation required to verify read an attribute of data type Float
@@ -423,9 +424,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read an attribute of
-          data type Octet String. DUT responds with the report data action with
-          the right attribute value."
+          "Step 14: TH sends the Read Request Message to the DUT to read an
+          attribute of data type Octet String. DUT responds with the report data
+          action with the right attribute value."
       PICS: MCORE.IDM.S.Attribute.DataType_OctetString
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
@@ -442,9 +443,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read an attribute of
-          data type Struct. DUT responds with the report data action with the
-          right attribute value."
+          "Step 15: TH sends the Read Request Message to the DUT to read an
+          attribute of data type Struct. DUT responds with the report data
+          action with the right attribute value."
       PICS: MCORE.IDM.S.Attribute.DataType_Struct
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
@@ -458,9 +459,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read an attribute of
-          data type List. DUT responds with the report data action with the
-          right attribute value."
+          "Step 16: TH sends the Read Request Message to the DUT to read an
+          attribute of data type List. DUT responds with the report data action
+          with the right attribute value."
       PICS: MCORE.IDM.S.Attribute.DataType_List
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
@@ -487,9 +488,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read an attribute of
-          data type enum. DUT responds with the report data action with the
-          right attribute value."
+          "Step 17: TH sends the Read Request Message to the DUT to read an
+          attribute of data type enum. DUT responds with the report data action
+          with the right attribute value."
       PICS: MCORE.IDM.S.Attribute.DataType_Enum
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
@@ -503,9 +504,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read an attribute of
-          data type bitmap. DUT responds with the report data action with the
-          right attribute value."
+          "Step 18: TH sends the Read Request Message to the DUT to read an
+          attribute of data type bitmap. DUT responds with the report data
+          action with the right attribute value."
       PICS: MCORE.IDM.S.Attribute.DataType_Bitmap
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
@@ -519,15 +520,17 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read any attribute to
-          an unsupported node. DUT responds with the report data action."
+          "Step 19: TH sends the Read Request Message to the DUT to read any
+          attribute to an unsupported node. DUT responds with the report data
+          action."
       verification: |
-          Out of Scope for V1.0
+          Out of Scope
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read any attribute to
-          an unsupported Endpoint. DUT responds with the report data action."
+          "Step 20: TH sends the Read Request Message to the DUT to read any
+          attribute to an unsupported Endpoint. DUT responds with the report
+          data action."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
@@ -543,8 +546,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read any attribute to
-          an unsupported cluster. DUT responds with the report data action."
+          "Step 21: TH sends the Read Request Message to the DUT to read any
+          attribute to an unsupported cluster. DUT responds with the report data
+          action."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
@@ -560,8 +564,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read an unsupported
-          attribute DUT responds with the report data action."
+          "Step 22: TH sends the Read Request Message to the DUT to read an
+          unsupported attribute DUT responds with the report data action."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
@@ -577,24 +581,25 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read an attribute
-          which is not readable. DUT responds with the report data action."
+          "Step 23: TH sends the Read Request Message to the DUT to read an
+          attribute which is not readable. DUT responds with the report data
+          action."
       verification: |
           DUT implementation required to verify read an attribute which is not having a read access
           If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read an attribute in
-          the path that requires a privilege that is not granted for the cluster
-          in the path. DUT responds with the report data action."
+          "Step 24: TH sends the Read Request Message to the DUT to read an
+          attribute in the path that requires a privilege that is not granted
+          for the cluster in the path. DUT responds with the report data action."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
           To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command. Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except ACL cluster command if try to send any other command will get status as unsupported access
 
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]' 1 0
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]' 1 0
 
           [1659419722.669629][1915:1920] CHIP:DMG: WriteResponseMessage =
           [1659419722.669657][1915:1920] CHIP:DMG: {
@@ -660,8 +665,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Read Request Message to the DUT to read an attribute
-          Repeat the above steps 3 times."
+          "Step 25: TH sends the Read Request Message to the DUT to read an
+          attribute Repeat the above steps 3 times."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
@@ -684,11 +689,12 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a Read Request Message to the DUT to read a particular
-          attribute with the DataVersionFilter Field not set. DUT sends back the
-          attribute value with the DataVersion of the cluster. TH sends a second
-          read request to the same cluster with the DataVersionFilter Field set
-          with the dataversion value received before."
+          "Step 26: TH sends a Read Request Message to the DUT to read a
+          particular attribute with the DataVersionFilter Field not set. DUT
+          sends back the attribute value with the DataVersion of the cluster. TH
+          sends a second read request to the same cluster with the
+          DataVersionFilter Field set with the dataversion value received
+          before."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
@@ -739,13 +745,13 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a Read Request Message to the DUT to read a particular
-          attribute with the DataVersionFilter Field not set. DUT sends back the
-          attribute value with the DataVersion of the cluster. TH sends a write
-          request to the same cluster to write to any attribute. TH sends a
-          second read request to read an attribute from the same cluster with
-          the DataVersionFilter Field set with the dataversion value received
-          before."
+          "Step 27: TH sends a Read Request Message to the DUT to read a
+          particular attribute with the DataVersionFilter Field not set. DUT
+          sends back the attribute value with the DataVersion of the cluster. TH
+          sends a write request to the same cluster to write to any attribute.
+          TH sends a second read request to read an attribute from the same
+          cluster with the DataVersionFilter Field set with the dataversion
+          value received before."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
@@ -804,13 +810,13 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a Read Request Message to the DUT to read all attributes on
-          a cluster with the DataVersionFilter Field not set. DUT sends back the
-          all the attribute values with the DataVersion of the cluster. TH sends
-          a write request to the same cluster to write to any attribute. TH
-          sends a second read request to read all the attributes from the same
-          cluster with the DataVersionFilter Field set with the dataversion
-          value received before."
+          "Step 28: TH sends a Read Request Message to the DUT to read all
+          attributes on a cluster with the DataVersionFilter Field not set. DUT
+          sends back the all the attribute values with the DataVersion of the
+          cluster. TH sends a write request to the same cluster to write to any
+          attribute. TH sends a second read request to read all the attributes
+          from the same cluster with the DataVersionFilter Field set with the
+          dataversion value received before."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
@@ -904,13 +910,13 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a Read Request Message to the DUT to read a particular
-          attribute on a particular cluster with the DataVersionFilter Field not
-          set. DUT sends back the attribute value with the DataVersion of the
-          cluster. TH sends a read request to the same cluster to read any
-          attribute with the right DataVersion(received in the previous step)
-          and also an older DataVersion. The Read Request Message should have 2
-          DataVersionIB filters."
+          "Step 29: TH sends a Read Request Message to the DUT to read a
+          particular attribute on a particular cluster with the
+          DataVersionFilter Field not set. DUT sends back the attribute value
+          with the DataVersion of the cluster. TH sends a read request to the
+          same cluster to read any attribute with the right DataVersion(received
+          in the previous step) and also an older DataVersion. The Read Request
+          Message should have 2 DataVersionIB filters."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
@@ -979,8 +985,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a Read Request Message to the DUT to read any supported
-          attribute/wildcard on a particular cluster say A with the
+          "Step 30: TH sends a Read Request Message to the DUT to read any
+          supported attribute/wildcard on a particular cluster say A with the
           DataVersionFilter Field not set. DUT sends back the attribute value
           with the DataVersion of the cluster A. TH sends a Read Request Message
           to read any supported attribute/wildcard on cluster A and any
@@ -1046,7 +1052,7 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a Read Request Message to the DUT to read
+          "Step 31: TH sends a Read Request Message to the DUT to read
           something(Attribute) which is larger than 1 MTU(1280 bytes) and per
           spec can be chunked +"
       PICS: MCORE.IDM.S.LargeData
@@ -1056,8 +1062,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a Read Request Message to the DUT to read a non global
-          attribute from all clusters at that Endpoint AttributePath =
+          "Step 32: TH sends a Read Request Message to the DUT to read a non
+          global attribute from all clusters at that Endpoint AttributePath =
           [[Endpoint = Specific Endpoint, Attribute = Specific Non Global
           Attribute]]"
       verification: |
@@ -1078,8 +1084,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a Read Request Message to the DUT to read a non global
-          attribute from all clusters at all Endpoints AttributePath =
+          "Step 33: TH sends a Read Request Message to the DUT to read a non
+          global attribute from all clusters at all Endpoints AttributePath =
           [[Attribute = Specific Non Global Attribute]]"
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
@@ -1098,10 +1104,10 @@ tests:
       disabled: true
 
     - label:
-          "TH should have access to only a single cluster at one Endpoint1. TH
-          sends a Read Request Message to the DUT to read all attributes from
-          all clusters at Endpoint1 AttributePath = [[Endpoint = Specific
-          Endpoint]]"
+          "Step 34: TH should have access to only a single cluster at one
+          Endpoint1. TH sends a Read Request Message to the DUT to read all
+          attributes from all clusters at Endpoint1 AttributePath = [[Endpoint =
+          Specific Endpoint]]"
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
@@ -1109,7 +1115,7 @@ tests:
           To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except ACL cluster command if try to send any other command will get status as unsupported access
 
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]' 1 0
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]' 1 0
 
           [1659419722.669629][1915:1920] CHIP:DMG: WriteResponseMessage =
           [1659419722.669657][1915:1920] CHIP:DMG: {
@@ -1215,8 +1221,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a Read Request Message to read all events and attributes
-          from the DUT."
+          "Step 35: TH sends a Read Request Message to read all events and
+          attributes from the DUT."
       verification: |
           In case of chip tool, here is an example command to use
 

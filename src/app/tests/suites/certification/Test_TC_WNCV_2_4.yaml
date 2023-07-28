@@ -32,8 +32,8 @@ tests:
                 value: nodeId
 
     - label:
-          "Reads Type attribute from DUT, If (WNCV.S.F00(LF) & !WNCV.S.F01(TL))
-          value must be between [min=0, max=5] or equals to 9"
+          "Step 1a: Reads Type attribute from DUT, If (WNCV.S.F00(LF) &
+          !WNCV.S.F01(TL)) value must be between [min=0, max=5] or equals to 9"
       command: "readAttribute"
       attribute: "Type"
       PICS: WNCV.S.A0000 && WNCV.S.F00 && !WNCV.S.F01
@@ -44,8 +44,8 @@ tests:
               maxValue: 9
 
     - label:
-          "Reads Type attribute from DUT, If (!WNCV.S.F00(LF) & WNCV.S.F01(TL))
-          value must be only equal to 7"
+          "Step 1b: Reads Type attribute from DUT, If (!WNCV.S.F00(LF) &
+          WNCV.S.F01(TL)) value must be only equal to 7"
       command: "readAttribute"
       attribute: "Type"
       PICS: WNCV.S.A0000 && !WNCV.S.F00 && WNCV.S.F01
@@ -55,8 +55,8 @@ tests:
               type: enum8
 
     - label:
-          "Reads Type attribute from DUT, If (WNCV.S.F00(LF) & WNCV.S.F01(TL))
-          value is either 6 or 8"
+          "Step 1c: Reads Type attribute from DUT, If (WNCV.S.F00(LF) &
+          WNCV.S.F01(TL)) value is either 6 or 8"
       command: "readAttribute"
       attribute: "Type"
       PICS: WNCV.S.A0000 && WNCV.S.F00 && WNCV.S.F01

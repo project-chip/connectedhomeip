@@ -298,6 +298,11 @@ bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteS
     return setLockState(endpointId, DlLockState::kUnlocked, pin, err);
 }
 
+bool LockManager::Unbolt(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
+{
+    return setLockState(endpointId, DlLockState::kUnlocked, pin, err);
+}
+
 bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
 {
     VerifyOrReturnValue(userIndex > 0, false); // indices are one-indexed

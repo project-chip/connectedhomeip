@@ -68,14 +68,18 @@ mw320_executable("shell_mw320") {
   include_dirs = [
     "${chip_root}/src/platform/nxp/mw320",
     "${examples_plat_dir}/app/project_include",
+    "${chip_root}/src",
     "${chip_root}/src/app/util",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
     "${chip_root}/examples/all-clusters-app/nxp/mw320/include",
   ]
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-instances.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
     "${chip_root}/src/lib/shell/streamer_mw320.cpp",
     "binding-handler.cpp",
     "include/CHIPProjectConfig.h",

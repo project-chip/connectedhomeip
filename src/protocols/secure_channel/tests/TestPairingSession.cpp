@@ -60,7 +60,7 @@ void PairingSessionEncodeDecodeMRPParams(nlTestSuite * inSuite, void * inContext
 {
     TestPairingSession session;
 
-    ReliableMessageProtocolConfig config(Milliseconds32(100), Milliseconds32(200));
+    ReliableMessageProtocolConfig config(Milliseconds32(100), Milliseconds32(200), Milliseconds16(4000));
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(64, 0);
     System::PacketBufferTLVWriter writer;

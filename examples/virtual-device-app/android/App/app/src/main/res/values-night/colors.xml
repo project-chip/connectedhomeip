@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="textColor">@android:color/white</color>
+    <color name="color_background_secondary">#010101</color>
+</resources>

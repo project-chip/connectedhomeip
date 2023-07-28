@@ -31,8 +31,9 @@ namespace Dnssd {
 using namespace System::Clock::Literals;
 
 // Operational node TXT entries
-static constexpr size_t kKeySleepyIdleIntervalMaxLength          = 7; // [SII] 0-3600000
-static constexpr size_t kKeySleepyActiveIntervalMaxLength        = 7; // [SAI] 0-3600000
+static constexpr size_t kKeySessionIdleIntervalMaxLength         = 7; // [SII] 0-3600000
+static constexpr size_t kKeySessionActiveIntervalMaxLength       = 7; // [SAI] 0-3600000
+static constexpr size_t kKeySessionActiveThresholdMaxLength      = 5; // [SAT] 0-65535
 static constexpr System::Clock::Milliseconds32 kMaxRetryInterval = 3600000_ms32;
 static constexpr size_t kKeyTcpSupportedMaxLength                = 1;
 
@@ -66,8 +67,9 @@ enum class TxtFieldKey : uint8_t
     kRotatingDeviceId,
     kPairingInstruction,
     kPairingHint,
-    kSleepyIdleInterval,
-    kSleepyActiveInterval,
+    kSessionIdleInterval,
+    kSessionActiveInterval,
+    kSessionActiveThreshold,
     kTcpSupported,
     kCount,
 };
@@ -92,8 +94,9 @@ constexpr const TxtFieldInfo txtFieldInfo[static_cast<size_t>(TxtFieldKey::kCoun
     { TxtFieldKey::kRotatingDeviceId, kKeyRotatingDeviceIdMaxLength, "RI", TxtKeyUse::kCommission },
     { TxtFieldKey::kPairingInstruction, kKeyPairingInstructionMaxLength, "PI", TxtKeyUse::kCommission },
     { TxtFieldKey::kPairingHint, kKeyPairingHintMaxLength, "PH", TxtKeyUse::kCommission },
-    { TxtFieldKey::kSleepyIdleInterval, kKeySleepyIdleIntervalMaxLength, "SII", TxtKeyUse::kCommon },
-    { TxtFieldKey::kSleepyActiveInterval, kKeySleepyActiveIntervalMaxLength, "SAI", TxtKeyUse::kCommon },
+    { TxtFieldKey::kSessionIdleInterval, kKeySessionIdleIntervalMaxLength, "SII", TxtKeyUse::kCommon },
+    { TxtFieldKey::kSessionActiveInterval, kKeySessionActiveIntervalMaxLength, "SAI", TxtKeyUse::kCommon },
+    { TxtFieldKey::kSessionActiveThreshold, kKeySessionActiveThresholdMaxLength, "SAT", TxtKeyUse::kCommon },
     { TxtFieldKey::kTcpSupported, kKeyTcpSupportedMaxLength, "T", TxtKeyUse::kCommon },
 };
 #ifdef CHIP_CONFIG_TEST

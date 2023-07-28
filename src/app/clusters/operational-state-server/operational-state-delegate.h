@@ -188,21 +188,6 @@ private:
 };
 
 /**
- * A class which represents the operational completion of an Operational State cluster derivation instance.
- */
-struct GenericOperationCompletion : public app::Clusters::OperationalState::Events::OperationCompletion::Type
-{
-    GenericOperationCompletion(uint8_t aCompletionErrorCode,
-                               const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = NullOptional,
-                               const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional)
-    {
-        completionErrorCode  = aCompletionErrorCode;
-        totalOperationalTime = aTotalOperationalTime;
-        pausedTime           = aPausedTime;
-    }
-};
-
-/**
  * A delegate to handle application logic of the Operational State aliased Cluster.
  * The delegate API assumes there will be separate delegate objects for each cluster instance.
  * (i.e. each separate operational state cluster derivation, on each separate endpoint),
@@ -213,10 +198,9 @@ class Delegate
 public:
     /**
      * Get the current operational state.
-     * @param op The GenericOperationalState to fill with the current operational state value.
-     * @return void.
+     * @return The current operational state value
      */
-    virtual void GetCurrentOperationalState(GenericOperationalState & op) = 0;
+    virtual uint8_t GetCurrentOperationalState() = 0;
 
     /**
      * Get the list of supported operational states.
@@ -258,7 +242,7 @@ public:
      * Set current operational state.
      * @param opState The operational state that should now be the current one.
      */
-    virtual CHIP_ERROR SetOperationalState(const GenericOperationalState & opState) = 0;
+    virtual CHIP_ERROR SetOperationalState(uint8_t opState) = 0;
 
     /**
      * Set operational error.

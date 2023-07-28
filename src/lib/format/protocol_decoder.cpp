@@ -45,7 +45,7 @@ private:
     const Tag mTag;
 };
 
-CHIP_ERROR FormatCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
+CHIP_ERROR FormatCurrentValue(const TLVReader & reader, chip::StringBuilderBase & out)
 {
     switch (reader.GetType())
     {
@@ -105,7 +105,7 @@ CHIP_ERROR FormatCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
 }
 
 // Returns a null terminated string containing the current reader value
-void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out, PayloadDecoderBase::DecodePosition & position)
+void PrettyPrintCurrentValue(const TLVReader & reader, chip::StringBuilderBase & out, PayloadDecoderBase::DecodePosition & position)
 {
     CHIP_ERROR err = FormatCurrentValue(reader, out);
 
@@ -292,7 +292,15 @@ void PayloadDecoderBase::ExitContainer(PayloadEntry & entry)
         {
             mPayloadPosition.Exit();
         }
-        mReader.ExitContainer(mNestingEnters[--mCurrentNesting]);
+        CHIP_ERROR err = mReader.ExitContainer(mNestingEnters[--mCurrentNesting]);
+        if (err != CHIP_NO_ERROR)
+        {
+            mValueBuilder.Reset().AddFormat("ERROR: %" CHIP_ERROR_FORMAT, err.Format());
+            mNameBuilder.Reset().AddFormat("END CONTAINER");
+            entry  = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
+            mState = State::kDone;
+            return;
+        }
     }
 
     if (mCurrentNesting == 0)

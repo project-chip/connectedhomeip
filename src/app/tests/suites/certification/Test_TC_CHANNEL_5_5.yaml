@@ -31,7 +31,7 @@ tests:
           Commission TH to DUT, if not done so already. In some cases, such as with a Casting Video Player, the TH commissions the DUT.
       disabled: true
 
-    - label: "DUT sends ChangeChannelByNumber command to TH"
+    - label: "Step 1: DUT sends ChangeChannelByNumber command to TH"
       PICS: CHANNEL.C.C02.Tx
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):

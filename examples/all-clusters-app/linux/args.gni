@@ -25,6 +25,5 @@ chip_project_config_include_dirs =
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
 matter_enable_tracing_support = true
-
-# Perfetto requires C++17
-cpp_standard = "gnu++17"
+matter_log_json_payload_decode_full = true
+matter_log_json_payload_hex = true

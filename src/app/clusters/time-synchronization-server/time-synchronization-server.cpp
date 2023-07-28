@@ -258,6 +258,13 @@ void TimeSynchronizationServer::Init()
     {
         mGranularity = GranularityEnum::kNoTimeGranularity;
     }
+    // This can error, but it's not clear what should happen in this case. For now, just ignore it because we still
+    // want time sync even if we can't register the deletgate here.
+    CHIP_ERROR err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Unable to register Fabric table delegate for time sync");
+    }
 }
 
 CHIP_ERROR TimeSynchronizationServer::SetTrustedTimeSource(const DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> & tts)
@@ -564,7 +571,10 @@ CHIP_ERROR TimeSynchronizationServer::GetLocalTime(EndpointId ep, DataModel::Nul
     timeZoneOffset       = static_cast<int64_t>(tzStore.timeZone.offset);
     VerifyOrReturnError(GetDSTOffset().size() != 0, CHIP_ERROR_INVALID_TIME);
     const auto & dst = GetDSTOffset()[0];
-    dstOffset        = static_cast<int64_t>(dst.offset);
+    if (dst.validStarting <= chipEpochTime)
+    {
+        dstOffset = static_cast<int64_t>(dst.offset);
+    }
 
     uint64_t usRemainder = chipEpochTime % chip::kMicrosecondsPerSecond;   // microseconds part of chipEpochTime
     chipEpochTime        = (chipEpochTime / chip::kMicrosecondsPerSecond); // make it safe to cast to int64 by converting to seconds
@@ -661,6 +671,16 @@ void TimeSynchronizationServer::ClearEventFlag(TimeSyncEventFlag flag)
 {
     uint8_t eventFlag = to_underlying(mEventFlag) ^ to_underlying(flag);
     mEventFlag        = static_cast<TimeSyncEventFlag>(eventFlag);
+}
+
+void TimeSynchronizationServer::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    if (!mTrustedTimeSource.IsNull() && mTrustedTimeSource.Value().fabricIndex == fabricIndex)
+    {
+        DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> tts;
+        TimeSynchronizationServer::Instance().SetTrustedTimeSource(tts);
+        emitMissingTrustedTimeSourceEvent(0);
+    }
 }
 
 namespace {

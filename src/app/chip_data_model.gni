@@ -165,8 +165,6 @@ template("chip_data_model") {
       "${_app_root}/clusters/scenes-server/SceneTableImpl.h",
       "${_app_root}/clusters/scenes-server/scenes-server.h",
       "${_app_root}/util/DataModelHandler.cpp",
-      "${_app_root}/util/IcdMonitoringTable.cpp",
-      "${_app_root}/util/IcdMonitoringTable.h",
       "${_app_root}/util/attribute-size-util.cpp",
       "${_app_root}/util/attribute-storage.cpp",
       "${_app_root}/util/attribute-table.cpp",
@@ -197,6 +195,10 @@ template("chip_data_model") {
                                      [ invoker.zap_file ])
     }
 
+    if (!defined(deps)) {
+      deps = []
+    }
+
     foreach(cluster, _cluster_sources) {
       if (cluster == "door-lock-server") {
         sources += [
@@ -207,6 +209,18 @@ template("chip_data_model") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/supported-modes-manager.h",
+        ]
+      } else if (cluster == "temperature-control-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/supported-temperature-levels-manager.h",
+        ]
+      } else if (cluster == "mode-base-server") {
+        sources += [
+          "${_app_root}/clusters/mode-base-server/mode-base-cluster-objects.cpp",
+          "${_app_root}/clusters/mode-base-server/mode-base-cluster-objects.h",
+          "${_app_root}/clusters/mode-base-server/mode-base-server.cpp",
+          "${_app_root}/clusters/mode-base-server/mode-base-server.h",
         ]
       } else if (cluster == "application-launcher-server") {
         sources += [
@@ -255,6 +269,24 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
           "${_app_root}/clusters/${cluster}/operational-state-delegate.h",
+        ]
+      } else if (cluster == "dishwasher-alarm-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/dishwasher-alarm-delegate.h",
+        ]
+      } else if (cluster == "icd-management-server") {
+        sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
+
+        deps += [ "${chip_root}/src/app/icd:cluster-srcs" ]
+      } else if (cluster == "resource-monitoring-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/replacement-product-list-manager.h",
+          "${_app_root}/clusters/${cluster}/resource-monitoring-cluster-objects.cpp",
+          "${_app_root}/clusters/${cluster}/resource-monitoring-cluster-objects.h",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]

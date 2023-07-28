@@ -49,6 +49,7 @@ declare_args() {
   config_cache_size = 8192
 
   enable_heap_monitoring = false
+  enable_reset_counter = false
 
   setupPinCode = 20202021
   setupDiscriminator = 3840
@@ -97,6 +98,7 @@ chip_data_model("bouffalolab-lighting") {
   zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
   is_server = true
 }
+
 bouffalolab_executable("lighting_app") {
   output_name = "chip-bl702l-lighting-example.out"
   bl_plat_name = "bl702l"
@@ -108,9 +110,11 @@ bouffalolab_executable("lighting_app") {
     "START_ENTRY=bl702_main",
   ]
 
-  defines += [ "CFG_USE_PSRAM=1" ]
+  if (false == enable_reset_counter) {
+    defines += [ "BOOT_PIN_RESET=16" ]
+  }
 
-  defines += [ "BOARD_BTN_BOOT_PIN" ]
+  defines += [ "CFG_USE_PSRAM=1" ]
 
   if ("BL704L" == board) {
     defines += [ "XT_ZB6_DevKit" ]
@@ -124,6 +128,7 @@ bouffalolab_executable("lighting_app") {
     "${example_common_dir}/AppTask.cpp",
     "${example_common_dir}/ZclCallbacks.cpp",
     "${examples_plat_common_dir}/plat/LEDWidget.cpp",
+    "${examples_plat_common_dir}/plat/OTAConfig.cpp",
     "${examples_plat_common_dir}/plat/demo_pwm.c",
     "${examples_plat_common_dir}/plat/main.cpp",
     "${examples_plat_common_dir}/plat/platform.cpp",
@@ -220,11 +225,6 @@ bouffalolab_executable("lighting_app") {
   if (enable_heap_monitoring) {
     sources += [ "${examples_plat_common_dir}/plat/MemMonitoring.cpp" ]
     defines += [ "HEAP_MONITORING=1" ]
-  }
-
-  if (chip_enable_ota_requestor) {
-    defines += [ "OTA_ENABLED" ]
-    sources += [ "${examples_plat_common_dir}/plat/OTAConfig.cpp" ]
   }
 
   if (enable_psram) {

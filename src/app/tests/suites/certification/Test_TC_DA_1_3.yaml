@@ -38,7 +38,7 @@ tests:
           3. TH1 should be known about Commissioner based error condition/warning
       disabled: true
 
-    - label: "Start the commissioning process of TH1 on DUT"
+    - label: "Step 1: Start the commissioning process of TH1 on DUT"
       verification: |
           sudo ./chip-all-clusters-app --wifi  --trace_decode 1
 
@@ -46,7 +46,7 @@ tests:
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3840  --trace_decode 1
       disabled: true
 
-    - label: "DUT generates 32-byte AttestationNonce"
+    - label: "Step 2: DUT generates 32-byte AttestationNonce"
       verification: |
           During provision, DUT sends AttestationRequest Command with AttestationNonce
 
@@ -56,8 +56,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends AttestationRequest Command with AttestationNonce as field
-          to the TH1."
+          "Step 3: DUT sends AttestationRequest Command with AttestationNonce as
+          field to the TH1."
       verification: |
           During provision, DUT sends AttestationRequest Command with AttestationNonce as field to the TH. verify the below log in TH(all-clusters-app). As the current TH ref app (all-clusters-app) doesnot decode the received request message, nonce value has been shown from the TH ref app response message , as TH ref app use the same nonce value in the response message
 
@@ -136,8 +136,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 records the AttestationNonce received in AttestationRequest as
-          Nonce_1"
+          "Step 4: TH1 records the AttestationNonce received in
+          AttestationRequest as Nonce_1"
       verification: |
           During provision, TH1(all-clusters-app) records the AttestationNonce received in AttestationRequest as Nonce_1  for usage in later steps.
 
@@ -147,7 +147,8 @@ tests:
           [1659763321.702332][2548:2548] CHIP:DMG:     Timestamp = 0
       disabled: true
 
-    - label: "TH1 responds with a well-formed AttestationResponse Command"
+    - label:
+          "Step 5: TH1 responds with a well-formed AttestationResponse Command"
       verification: |
           During provision,  On TH(all-clusters-app) Verify that DUT responds with a well-formed AttestationResponse Command.
 
@@ -205,20 +206,20 @@ tests:
           [1655979694.072547][22876:22881] CHIP:TOO: Device commissioning completed with success
       disabled: true
 
-    - label: "Factory Reset TH1 so that it is commissionable again"
+    - label: "Step 7: Factory Reset TH1 so that it is commissionable again"
       verification: |
           On Raspi platform below commands are used to perform factory_reset operation.
           sudo rm -rf /tmp/chip_*
       disabled: true
 
-    - label: "Start the commissioning process of TH1 on DUT again"
+    - label: "Step 8: Start the commissioning process of TH1 on DUT again"
       verification: |
           sudo ./chip-all-clusters-app --wifi   --trace_decode 1 --discriminator 3841
 
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
       disabled: true
 
-    - label: "DUT generates 32-byte AttestationNonce"
+    - label: "Step 9: DUT generates 32-byte AttestationNonce"
       verification: |
           During provision, DUT sends AttestationRequest Command with AttestationNonce To TH1(all-clusters-app)
 
@@ -232,8 +233,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends AttestationRequest Command with AttestationNonce as field
-          to the TH1."
+          "Step 10: DUT sends AttestationRequest Command with AttestationNonce
+          as field to the TH1."
       verification: |
           During provision, DUT(chip-tool) sends AttestationRequest Command with AttestationNonce as field to the TH1(all-clusters-app) verify the below log in TH1(all-clusters-app). As the current TH1 ref app (all-clusters-app) doesnot decode the received request message, nonce value has been shown from the TH1 ref app response message , as TH1 ref app use the same nonce value in the response message
 
@@ -295,8 +296,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 records the AttestationNonce received in AttestationRequest as
-          Nonce_2"
+          "Step 11: TH1 records the AttestationNonce received in
+          AttestationRequest as Nonce_2"
       verification: |
           During provision, TH1(all-clusters-app) records the AttestationNonce received in AttestationRequest as Nonce_2
           [1663223294.633013][55752:55752] CHIP:DMG:         Certification Type = 0

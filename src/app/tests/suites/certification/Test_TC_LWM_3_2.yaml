@@ -1,0 +1,83 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 183.3.2. [TC-LWM-3.2] Startup Mode functionality with DUT as Server
+
+PICS:
+    - LWM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the StartUpMode attribute."
+      PICS: LWM.S.A0002
+      verification: |
+          Verify that the DUT response contains an integer value
+
+          Save the value as startup_mode_dut
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
+      PICS: LWM.S.A0001
+      verification: |
+          Verify that the DUT response contains an integer value
+
+          Save the value as old_current_mode_dut
+
+          If startup_mode_dut is equal to old_current_mode_dut proceed to step 4. Else proceed to step 6.
+      disabled: true
+
+    - label: "Step 4: TH reads from the DUT the SupportedModes attribute."
+      PICS: LWM.S.A0000
+      verification: |
+          Verify that the DUT response contains a list of ModeOptionsStruct entries
+
+          Verify that the list has two or more entries
+
+          Save the Mode field values as supported_modes_dut
+
+          Select a value from supported_modes_dut different from startup_mode_dut. Save the value as new_mode_th.
+      disabled: true
+
+    - label:
+          "Step 5: TH sends a ChangeToMode command to the DUT with NewMode set
+          to new_mode_th"
+      PICS: LWM.S.C00.Rsp
+      verification: |
+          Verify that the DUT response contains a ChangeToModeResponse command w/ data fields: * Status, set to Success(0x00).
+      disabled: true
+
+    - label: "Step 6: Physically power cycle the device"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 7: TH reads from the DUT the CurrentMode attribute."
+      PICS: LWM.S.A0001
+      verification: |
+          Verify that the DUT response contains an integer value
+
+          The value is equal to startup_mode_dut
+      disabled: true

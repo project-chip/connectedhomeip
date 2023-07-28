@@ -23,168 +23,6 @@
 
 #include <lib/support/CHIPListUtils.h>
 
-class Test_TC_BINFO_2_3_SimulatedSuite : public TestCommand
-{
-public:
-    Test_TC_BINFO_2_3_SimulatedSuite() : TestCommand("Test_TC_BINFO_2_3_Simulated", 21)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_BINFO_2_3_SimulatedSuite() {}
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        case 0:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "Log OnOff Test Startup");
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message = chip::Span<const char>("*** Basic Cluster Tests Readygarbage: not in length on purpose", 29);
-            return Log(kIdentityAlpha, value);
-        }
-        case 1: {
-            LogStep(1, "DUT reads DataModelRevision from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::DataModelRevision::Id);
-        }
-        case 2: {
-            LogStep(2, "DUT reads VendorName from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::VendorName::Id);
-        }
-        case 3: {
-            LogStep(3, "DUT reads VendorID from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::VendorID::Id);
-        }
-        case 4: {
-            LogStep(4, "DUT reads ProductName from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ProductName::Id);
-        }
-        case 5: {
-            LogStep(5, "DUT reads ProductID from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ProductID::Id);
-        }
-        case 6: {
-            LogStep(6, "DUT reads NodeLabel from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::NodeLabel::Id);
-        }
-        case 7: {
-            LogStep(7, "DUT reads Location from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::Location::Id);
-        }
-        case 8: {
-            LogStep(8, "DUT reads HardwareVersion from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::HardwareVersion::Id);
-        }
-        case 9: {
-            LogStep(9, "DUT reads HardwareVersionString from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0008"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::HardwareVersionString::Id);
-        }
-        case 10: {
-            LogStep(10, "DUT reads SoftwareVersion from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0009"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::SoftwareVersion::Id);
-        }
-        case 11: {
-            LogStep(11, "DUT reads SoftwareVersionString from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A000a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::SoftwareVersionString::Id);
-        }
-        case 12: {
-            LogStep(12, "DUT reads ManufacturingDate from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A000b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ManufacturingDate::Id);
-        }
-        case 13: {
-            LogStep(13, "DUT reads PartNumber from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A000c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::PartNumber::Id);
-        }
-        case 14: {
-            LogStep(14, "DUT reads ProductURL from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A000d"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ProductURL::Id);
-        }
-        case 15: {
-            LogStep(15, "DUT reads ProductLabel from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A000e"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ProductLabel::Id);
-        }
-        case 16: {
-            LogStep(16, "DUT reads SerialNumber from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A000f"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::SerialNumber::Id);
-        }
-        case 17: {
-            LogStep(17, "DUT reads LocalConfigDisabled from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::LocalConfigDisabled::Id);
-        }
-        case 18: {
-            LogStep(18, "DUT reads Reachable from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::Reachable::Id);
-        }
-        case 19: {
-            LogStep(19, "DUT reads UniqueID from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::UniqueID::Id);
-        }
-        case 20: {
-            LogStep(20, "DUT reads CapabilityMinima from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::CapabilityMinima::Id);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
 class Test_TC_ACT_3_1_SimulatedSuite : public TestCommand
 {
 public:
@@ -404,7 +242,7 @@ private:
 class Test_TC_DESC_2_2_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_DESC_2_2_SimulatedSuite() : TestCommand("Test_TC_DESC_2_2_Simulated", 4)
+    Test_TC_DESC_2_2_SimulatedSuite() : TestCommand("Test_TC_DESC_2_2_Simulated", 5)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -432,6 +270,10 @@ private:
 
         switch (mTestIndex - 1)
         {
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -466,6 +308,16 @@ private:
             LogStep(3, "DUT reads PartsList attribute from the TH");
             VerifyOrDo(!ShouldSkip("DESC.C.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), Descriptor::Id, Descriptor::Attributes::PartsList::Id);
+        }
+        case 4: {
+            LogStep(4, "DUT reads TagList from the TH");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -2049,12 +1901,12 @@ private:
         switch (testIndex)
         {
         case 0: {
-            LogStep(0, "Read attribute: LabelList");
+            LogStep(0, "Step 1: Read attribute: LabelList");
             VerifyOrDo(!ShouldSkip("ULABEL.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(1), UserLabel::Id, UserLabel::Attributes::LabelList::Id);
         }
         case 1: {
-            LogStep(1, "write attribute: LabelList");
+            LogStep(1, "Step 2: write attribute: LabelList");
             VerifyOrDo(!ShouldSkip("ULABEL.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(1), UserLabel::Id, UserLabel::Attributes::LabelList::Id);
         }
@@ -5781,10 +5633,6 @@ private:
 
 std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
 {
-    if (testName == "Test_TC_BINFO_2_3_Simulated")
-    {
-        return std::unique_ptr<Test_TC_BINFO_2_3_SimulatedSuite>(new Test_TC_BINFO_2_3_SimulatedSuite());
-    }
     if (testName == "Test_TC_ACT_3_1_Simulated")
     {
         return std::unique_ptr<Test_TC_ACT_3_1_SimulatedSuite>(new Test_TC_ACT_3_1_SimulatedSuite());
@@ -5976,7 +5824,6 @@ std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
 void PrintTestCommands()
 {
     ChipLogError(chipTool, "Supported commands:");
-    ChipLogError(chipTool, "\t* Test_TC_BINFO_2_3_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_ACT_3_1_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_BOOL_3_1_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_DESC_2_2_Simulated");

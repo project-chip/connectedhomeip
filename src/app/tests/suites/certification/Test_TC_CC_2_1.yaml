@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads CurrentHue attribute from DUT"
+    - label: "Step 2: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -41,7 +41,7 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "TH reads CurrentSaturation attribute from DUT"
+    - label: "Step 3: TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
@@ -51,7 +51,7 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "TH reads RemainingTime attribute from DUT"
+    - label: "Step 4: TH reads RemainingTime attribute from DUT"
       PICS: CC.S.A0002
       command: "readAttribute"
       attribute: "RemainingTime"
@@ -61,7 +61,7 @@ tests:
               minValue: 0
               maxValue: 65534
 
-    - label: "TH reads CurrentX attribute from DUT"
+    - label: "Step 5: TH reads CurrentX attribute from DUT"
       PICS: CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
@@ -71,7 +71,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads CurrentY attribute from DUT"
+    - label: "Step 6: TH reads CurrentY attribute from DUT"
       PICS: CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
@@ -81,7 +81,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads DriftCompensation attribute from DUT"
+    - label: "Step 7: TH reads DriftCompensation attribute from DUT"
       PICS: CC.S.A0005
       command: "readAttribute"
       attribute: "DriftCompensation"
@@ -91,7 +91,7 @@ tests:
               minValue: 0
               maxValue: 4
 
-    - label: "TH reads CompensationText attribute from DUT"
+    - label: "Step 8: TH reads CompensationText attribute from DUT"
       PICS: CC.S.A0006
       command: "readAttribute"
       attribute: "CompensationText"
@@ -100,7 +100,7 @@ tests:
               type: char_string
               maxLength: 254
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT"
+    - label: "Step 9: TH reads ColorTemperatureMireds attribute from DUT"
       PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
@@ -110,7 +110,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads ColorMode attribute from DUT"
+    - label: "Step 10: TH reads ColorMode attribute from DUT"
       PICS: CC.S.A0008
       command: "readAttribute"
       attribute: "ColorMode"
@@ -120,7 +120,7 @@ tests:
               minValue: 0
               maxValue: 2
 
-    - label: "TH reads Options attribute from DUT"
+    - label: "Step 11: TH reads Options attribute from DUT"
       PICS: CC.S.A000f
       command: "readAttribute"
       attribute: "Options"
@@ -130,7 +130,7 @@ tests:
               minValue: 0
               maxValue: 4
 
-    - label: "TH reads EnhancedCurrentHue attribute from DUT"
+    - label: "Step 12: TH reads EnhancedCurrentHue attribute from DUT"
       PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
@@ -140,7 +140,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "TH reads EnhancedColorMode attribute from DUT"
+    - label: "Step 13: TH reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.A4001
       command: "readAttribute"
       attribute: "EnhancedColorMode"
@@ -150,7 +150,7 @@ tests:
               minValue: 0
               maxValue: 3
 
-    - label: "TH reads ColorLoopActive attribute from DUT"
+    - label: "Step 14: TH reads ColorLoopActive attribute from DUT"
       PICS: CC.S.A4002
       command: "readAttribute"
       attribute: "ColorLoopActive"
@@ -160,7 +160,7 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "TH reads ColorLoopDirection attribute from DUT"
+    - label: "Step 15: TH reads ColorLoopDirection attribute from DUT"
       PICS: CC.S.A4003
       command: "readAttribute"
       attribute: "ColorLoopDirection"
@@ -170,7 +170,7 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "TH reads ColorLoopTime attribute from DUT"
+    - label: "Step 16: TH reads ColorLoopTime attribute from DUT"
       PICS: CC.S.A4004
       command: "readAttribute"
       attribute: "ColorLoopTime"
@@ -180,7 +180,7 @@ tests:
               minValue: 0
               maxValue: 65534
 
-    - label: "TH reads ColorLoopStartEnhancedHue attribute from DUT"
+    - label: "Step 17: TH reads ColorLoopStartEnhancedHue attribute from DUT"
       PICS: CC.S.A4005
       command: "readAttribute"
       attribute: "ColorLoopStartEnhancedHue"
@@ -190,7 +190,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "TH reads ColorLoopStoredEnhancedHue attribute from DUT"
+    - label: "Step 18: TH reads ColorLoopStoredEnhancedHue attribute from DUT"
       PICS: CC.S.A4006
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
@@ -201,13 +201,14 @@ tests:
               maxValue: 65535
 
     - label:
-          "Saving for comparision in step 19 reads FeatureMap attribute from DUT"
+          "Step 18a: Saving for comparision in step 19 reads FeatureMap
+          attribute from DUT"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           saveAs: FeatureMapValue
 
-    - label: "TH reads ColorCapabilities attribute from DUT"
+    - label: "Step 19: TH reads ColorCapabilities attribute from DUT"
       PICS: CC.S.A400a
       command: "readAttribute"
       attribute: "ColorCapabilities"
@@ -218,7 +219,7 @@ tests:
               minValue: 0
               maxValue: 31
 
-    - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
+    - label: "Step 20: TH reads ColorTempPhysicalMinMireds attribute from DUT"
       PICS: CC.S.A400b
       command: "readAttribute"
       attribute: "ColorTempPhysicalMinMireds"
@@ -228,7 +229,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads ColorTempPhysicalMaxMireds attribute from DUT"
+    - label: "Step 21: TH reads ColorTempPhysicalMaxMireds attribute from DUT"
       PICS: CC.S.A400c
       command: "readAttribute"
       attribute: "ColorTempPhysicalMaxMireds"
@@ -238,7 +239,8 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads CoupleColorTempToLevelMinMireds attribute from DUT"
+    - label:
+          "Step 22: TH reads CoupleColorTempToLevelMinMireds attribute from DUT"
       PICS: CC.S.A400d
       command: "readAttribute"
       attribute: "CoupleColorTempToLevelMinMireds"
@@ -248,7 +250,8 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads StartUpColorTemperatureMireds attribute from DUT"
+    - label:
+          "Step 23: TH reads StartUpColorTemperatureMireds attribute from DUT"
       PICS: CC.S.A4010
       command: "readAttribute"
       attribute: "StartUpColorTemperatureMireds"
@@ -259,7 +262,7 @@ tests:
               maxValue: 65279
 
     #Defined Primaries Information Attribute Set
-    - label: "TH reads NumberOfPrimaries attribute from DUT"
+    - label: "Step 24: TH reads NumberOfPrimaries attribute from DUT"
       PICS: CC.S.A0010
       command: "readAttribute"
       attribute: "NumberOfPrimaries"
@@ -270,13 +273,13 @@ tests:
               maxValue: 6
 
     - label:
-          "TH reads Primary1X attribute from DUT and Verify that the DUT
-          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
-          1 or more"
+          "Step 25: TH reads Primary1X attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 1 or more"
       verification: |
           ./chip-tool colorcontrol read  primary1x 1 1
 
-          Verify  that Primary1X value is an uint16 [Min:0 Max:0xfeff]  if NumberOfPrimaries is 1 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify that "Primary1X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary1X" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0011 DataVersion: 540305990
           [1651483665.109697][3245:3250] CHIP:TOO:    Primary1X: 0
@@ -292,13 +295,14 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads Primary1Y attribute from DUT and Verify that the DUT
-          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
-          1 or more"
+          "Step 26: TH reads Primary1Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 1 or more"
       verification: |
           ./chip-tool colorcontrol read  primary1y 1 1
 
-          Verify  that Primary1Y value is an uint16 [Min:0 Max:0xfeff]  if NumberOfPrimaries is 1 or more On TH(chip-tool)  Logs:
+
+          On TH(chip-tool)  Logs, Verify  that "Primary1Y" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary1Y" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0012 DataVersion: 540305990
           [1651483698.733322][3253:3259] CHIP:TOO:    Primary1Y: 0
@@ -314,12 +318,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads Primary1Intensity attribute from DUT and Verify that the DUT
-          response contains an uint8 if NumberOfPrimaries is 1 or more"
+          "Step 27: TH reads Primary1Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 1 or
+          more"
       verification: |
           ./chip-tool colorcontrol read primary1intensity 1 1
 
-          Verify  that Primary1Intensity value is an uint8   if NumberOfPrimaries is 1 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify that "Primary1Intensity" attribute value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary1Intensity" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0013 DataVersion: 540305990
           [1651483742.297459][3263:3268] CHIP:TOO:   Primary1Intensity: 0
@@ -335,13 +340,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads Primary2X attribute from DUT and Verify that the DUT
-          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
-          2 or more"
+          "Step 28: TH reads Primary2X attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 2 or more"
       verification: |
           ./chip-tool colorcontrol read primary2x 1 1
 
-          Verify  that Primary2X value is an uint16 [Min:0 Max:0xfeff]  if NumberOfPrimaries is 2 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify that "Primary2X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary2X" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0015 DataVersion: 540305990
           [1651483777.233498][3270:3275] CHIP:TOO:   Primary2X: 0
@@ -357,13 +362,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads Primary2Y attribute from DUT and Verify that the DUT
-          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
-          2 or more"
+          "Step 29: TH reads Primary2Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 2 or more"
       verification: |
           ./chip-tool colorcontrol read primary2y 1 1
 
-          Verify  that Primary2Y value is an uint16 [Min:0 Max:0xfeff]  if NumberOfPrimaries is 2 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary2Y" value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary2Y" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0016 DataVersion: 540305990
           [1651483805.650796][3279:3284] CHIP:TOO:  Primary2Y: 0
@@ -379,12 +384,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads Primary2Intensity attribute from DUT and Verify that the DUT
-          response contains an uint8 if NumberOfPrimaries is 2 or more"
+          "Step 30: TH reads Primary2Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 2 or
+          more"
       verification: |
           ./chip-tool colorcontrol read primary2intensity 1 1
 
-          Verify  that Primary2Intensity value is an uint8  if NumberOfPrimaries is 2 or more  On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary2Intensity" attribute value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary2Intensity" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0017 DataVersion: 540305990
           [1651483834.596380][3285:3290] CHIP:TOO:  Primary2Intensity: 0
@@ -400,13 +406,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads Primary3X attribute from DUT and Verify that the DUT
-          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
-          3 or more"
+          "Step 31: TH reads Primary3X attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 3 or more"
       verification: |
           ./chip-tool colorcontrol read primary3x 1 1
 
-          Verify  that Primary3X value is an uint16 [Min:0 Max:0xfeff]  if NumberOfPrimaries is 3 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary3X" value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary3X" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0019 DataVersion: 540305990
           [1651483937.072323][3298:3303] CHIP:TOO:   Primary3X: 0
@@ -422,13 +428,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads Primary3Y attribute from DUT and Verify that the DUT
-          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
-          3 or more"
+          "Step 32: TH reads Primary3Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 3 or more"
       verification: |
           ./chip-tool colorcontrol read primary3y 1 1
 
-          Verify  that Primary3Y value is an uint16 [Min:0 Max:0xfeff]  if NumberOfPrimaries is 3 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary3Y" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary3Y" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_001A DataVersion: 540305990
           [1651483967.386334][3305:3310] CHIP:TOO:   Primary3Y: 0
@@ -444,12 +450,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads Primary3Intensity attribute from DUT and Verify that the DUT
-          response contains an uint8 if NumberOfPrimaries is 3 or more"
+          "Step 33: TH reads Primary3Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 3 or
+          more"
       verification: |
           ./chip-tool colorcontrol read primary3intensity 1 1
 
-          Verify  that Primary3Intensity value is an uint8  if NumberOfPrimaries is 3 or more  On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary3Intensity" attribute value is an uint8  and below is the sample log provided for the raspi platform, In RPI "Primary3Intensity" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_001B DataVersion: 540305990
           [1651484113.812178][3316:3321] CHIP:TOO:   Primary3Intensity: 0
@@ -466,13 +473,13 @@ tests:
 
     #Additional Defined Primaries Information Attribute Set
     - label:
-          "TH reads Primary4X attribute from DUT Verify that the DUT response
-          contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is 4 or
-          more"
+          "Step 34: TH reads Primary4X attribute from DUT Verify that the DUT
+          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
+          4 or more"
       verification: |
           ./chip-tool colorcontrol read primary4x 1 1
 
-          Verify  that Primary4X value is an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is 4 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary4X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary4X" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0020 DataVersion: 540305990
           [1651484143.778301][3324:3329] CHIP:TOO:   Primary4X: 0
@@ -488,13 +495,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads Primary4Y attribute from DUT and Verify that the DUT
-          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
-          4 or more"
+          "Step 35: TH reads Primary4Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 4 or more"
       verification: |
           ./chip-tool colorcontrol read primary4y 1 1
 
-          Verify  that Primary4Y value is an uint16 [Min:0 Max:0xfeff] On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary4Y" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary4Y" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0021 DataVersion: 540305990
           [1651484171.921901][3334:3339] CHIP:TOO:   Primary4Y: 0
@@ -510,12 +517,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads Primary4Intensity attribute from DUT and Verify that the DUT
-          response contains an uint8 if NumberOfPrimaries is 4 or more"
+          "Step 36: TH reads Primary4Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 4 or
+          more"
       verification: |
           ./chip-tool colorcontrol read primary4intensity 1 1
 
-          Verify  that Primary4Intensity value is an uint8  On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify that "Primary4Intensity" attribute value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary4Intensity" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0022 DataVersion: 540305990
           [1651484198.443415][3341:3346] CHIP:TOO:   Primary4Intensity: 0
@@ -531,13 +539,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads Primary5X attribute from DUT and Verify that the DUT
-          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
-          5 or more"
+          "Step 37: TH reads Primary5X attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 5 or more"
       verification: |
           ./chip-tool colorcontrol read primary5x 1 1
 
-          Verify  that Primary5X value is an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is 5 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify that "Primary5X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary5X" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0024 DataVersion: 540305990
           [1651484241.467661][3350:3355] CHIP:TOO:   Primary5X: 0
@@ -553,13 +561,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads Primary5Y attribute from DUT and Verify that the DUT
-          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
-          5 or more"
+          "Step 38: TH reads Primary5Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 5 or more"
       verification: |
           ./chip-tool colorcontrol read primary5y 1 1
 
-          Verify  that Primary5Y value is an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is 5 or more On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify that "Primary5Y" attribute value is an uint16 and below is the sample log provided for the raspi platform, In RPI "Primary5Y" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0025 DataVersion: 540305990
           [1651484286.709863][3358:3363] CHIP:TOO:  Primary5Y: 0
@@ -575,12 +583,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads Primary5Intensity attribute from DUT and Verify that the DUT
-          response contains an uint8 if NumberOfPrimaries is 5 or more"
+          "Step 39: TH reads Primary5Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 5 or
+          more"
       verification: |
           ./chip-tool colorcontrol read primary5intensity 1 1
 
-          Verify  that Primary5Intensity value is an uint8 if NumberOfPrimaries is 5 or more  On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify that "Primary5Intensity" attribute value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary5Intensity" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0026 DataVersion: 540305990
           [1651484304.715731][3365:3370] CHIP:TOO:  Primary5Intensity: 0
@@ -596,13 +605,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads Primary6X attribute from DUT and Verify that the DUT
-          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
-          6 or more"
+          "Step 40: TH reads Primary6X attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 6 or more"
       verification: |
           ./chip-tool colorcontrol read primary6x 1 1
 
-          Verify  that Primary6X value is an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is 6 On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary6X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary6X" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0028 DataVersion: 540305990
           [1651484349.601181][3372:3377] CHIP:TOO:  Primary6X: 0
@@ -618,13 +627,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads Primary6Y attribute from DUT and Verify that the DUT
-          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
-          6 or more"
+          "Step 41: TH reads Primary6Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 6 or more"
       verification: |
           ./chip-tool colorcontrol read primary6y 1 1
 
-          Verify  that Primary6Y value is an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is 6 On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary6Y" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary6Y" value is 0.
 
           [1663318323.234522][132277:132282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0029 DataVersion: 3053940635
           [1663318323.234951][132277:132282] CHIP:TOO:   Primary6Y: 0
@@ -640,12 +649,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads Primary6Intensity attribute from DUT and Verify that the DUT
-          response contains an uint8 if NumberOfPrimaries is 6 or more"
+          "Step 42: TH reads Primary6Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 6 or
+          more"
       verification: |
           ./chip-tool colorcontrol read primary6intensity 1 1
 
-          Verify  that Primary6Intensity value is an uint8 if NumberOfPrimaries is 6 On TH(chip-tool)  Logs:
+          On TH(chip-tool)  Logs, Verify  that "Primary6Intensity" value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary6Intensity" value is 0.
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_002A DataVersion: 540305990
           [1651484392.490974][3378:3383] CHIP:TOO:  Primary6Intensity: 0
@@ -661,7 +671,7 @@ tests:
                 value: "y"
 
     #Defined Color Points Settings Attribute Set
-    - label: "TH reads WhitePointX attribute from DUT"
+    - label: "Step 43: TH reads WhitePointX attribute from DUT"
       PICS: CC.S.A0030
       command: "readAttribute"
       attribute: "WhitePointX"
@@ -671,7 +681,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads WhitePointY attribute from DUT"
+    - label: "Step 44: TH reads WhitePointY attribute from DUT"
       PICS: CC.S.A0031
       command: "readAttribute"
       attribute: "WhitePointY"
@@ -681,7 +691,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads ColorPointRX attribute from DUT"
+    - label: "Step 45: TH reads ColorPointRX attribute from DUT"
       PICS: CC.S.A0032
       command: "readAttribute"
       attribute: "ColorPointRX"
@@ -691,7 +701,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads ColorPointRY attribute from DUT"
+    - label: "Step 46: TH reads ColorPointRY attribute from DUT"
       PICS: CC.S.A0033
       command: "readAttribute"
       attribute: "ColorPointRY"
@@ -701,7 +711,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads ColorPointRIntensity attribute from DUT"
+    - label: "Step 47: TH reads ColorPointRIntensity attribute from DUT"
       PICS: CC.S.A0034
       command: "readAttribute"
       attribute: "ColorPointRIntensity"
@@ -711,7 +721,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "TH reads ColorPointGX attribute from DUT"
+    - label: "Step 48: TH reads ColorPointGX attribute from DUT"
       PICS: CC.S.A0036
       command: "readAttribute"
       attribute: "ColorPointGX"
@@ -721,7 +731,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads ColorPointGY attribute from DUT"
+    - label: "Step 49: TH reads ColorPointGY attribute from DUT"
       PICS: CC.S.A0037
       command: "readAttribute"
       attribute: "ColorPointGY"
@@ -731,7 +741,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads ColorPointGIntensity attribute from DUT"
+    - label: "Step 50: TH reads ColorPointGIntensity attribute from DUT"
       PICS: CC.S.A0038
       command: "readAttribute"
       attribute: "ColorPointGIntensity"
@@ -741,7 +751,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "TH reads ColorPointBX attribute from DUT"
+    - label: "Step 51: TH reads ColorPointBX attribute from DUT"
       PICS: CC.S.A003a
       command: "readAttribute"
       attribute: "ColorPointBX"
@@ -751,7 +761,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads ColorPointBY attribute from DUT"
+    - label: "Step 52: TH reads ColorPointBY attribute from DUT"
       PICS: CC.S.A003b
       command: "readAttribute"
       attribute: "ColorPointBY"
@@ -761,7 +771,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads ColorPointBIntensity attribute from DUT"
+    - label: "Step 53: TH reads ColorPointBIntensity attribute from DUT"
       PICS: CC.S.A003c
       command: "readAttribute"
       attribute: "ColorPointBIntensity"

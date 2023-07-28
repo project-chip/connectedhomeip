@@ -61,8 +61,8 @@ tests:
                 value: 0
 
     - label:
-          "TH sends a GetSetupPIN command to the DUT with test values provided
-          by the product maker."
+          "Step 1: TH sends a GetSetupPIN command to the DUT with test values
+          provided by the product maker."
       PICS: ALOGIN.S.C00.Rsp
       command: "GetSetupPIN"
       timedInteractionTimeoutMs: 10000
@@ -76,8 +76,8 @@ tests:
                 saveAs: setupPIN
 
     - label:
-          "TH sends a Login command to the DUT with test values provided by the
-          product maker."
+          "Step 2: TH sends a Login command to the DUT with test values provided
+          by the product maker."
       PICS: ALOGIN.S.C02.Rsp
       command: "Login"
       timedInteractionTimeoutMs: 10000
@@ -89,8 +89,8 @@ tests:
                 value: setupPIN
 
     - label:
-          "TH sends a Logout command to the DUT with test values provided by the
-          product maker."
+          "Step 3: TH sends a Logout command to the DUT with test values
+          provided by the product maker."
       PICS: ALOGIN.S.C03.Rsp
       command: "Logout"
       timedInteractionTimeoutMs: 10000
