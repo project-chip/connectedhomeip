@@ -1967,10 +1967,9 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
         // in the response, there will be one AttributeDataIB for the start of the list (which will include
         // some number of 256-byte elements), then one AttributeDataIB for each of the remaining elements.
         //
-        // For event list enabled data, receive two of its items as a single list,
-        // followed by 4 more single items for one
-        // of our subscriptions, and 3 as a single list followed by 3 single
-        // items for the other.
+        // When EventList is enabled, for the first report for the list attribute we receive two
+        // of its items in the initial list, then 4 additional items.  For the second report we
+        // receive 3 items in the initial list followed by 3 additional items.
         //
         // Thus we should receive 29*2 + 4 + 3 = 65 attribute data in total.
         constexpr size_t kExpectedAttributeResponse = 65;
