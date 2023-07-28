@@ -2355,10 +2355,6 @@ endpoint 0 {
 
   server cluster Switch {
     emits event SwitchLatched;
-    emits event InitialPress;
-    emits event LongPress;
-    emits event ShortRelease;
-    emits event LongRelease;
     ram      attribute numberOfPositions default = 2;
     ram      attribute currentPosition;
     ram      attribute featureMap default = 0;
