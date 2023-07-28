@@ -183,6 +183,7 @@ static_library("app") {
     "ReadHandler.cpp",
     "RequiredPrivilege.cpp",
     "RequiredPrivilege.h",
+    "SafeAttributePersistenceProvider.h",
     "StatusResponse.cpp",
     "StatusResponse.h",
     "SubscriptionResumptionStorage.h",
