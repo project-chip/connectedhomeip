@@ -2354,6 +2354,7 @@ endpoint 0 {
   }
 
   server cluster Switch {
+    emits event SwitchLatched;
     ram      attribute numberOfPositions default = 2;
     ram      attribute currentPosition;
     ram      attribute featureMap default = 0;
