@@ -129,7 +129,7 @@ tests:
               hasMasksSet: [0x40]
 
     - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
-      PICS: PCC.S.Afffb
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -151,6 +151,16 @@ tests:
                       65532,
                       65533,
                   ]
+
+    - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED && PCC.S.Afffb"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [0, 1, 2, 17, 18, 19, 32, 65528, 65529, 65531, 65532, 65533]
 
     - label:
           "Step 4b: TH reads optional attribute(MinConstPressure) attribute in
@@ -389,10 +399,10 @@ tests:
 
     - label: "Step 5a: TH reads EventList from DUT"
       PICS:
-          " PCC.S.Afffa && !PCC.S.E00 && !PCC.S.E01 && !PCC.S.E02 && !PCC.S.E03
-          && !PCC.S.E04 && !PCC.S.E05 && !PCC.S.E06 && !PCC.S.E07 && !PCC.S.E08
-          && !PCC.S.E09 && !PCC.S.E0a && !PCC.S.E0b && !PCC.S.E0c && !PCC.S.E0d
-          && !PCC.S.E0e && !PCC.S.E0f && !PCC.S.E10 "
+          "PICS_EVENT_LIST_ENABLED &&  PCC.S.Afffa && !PCC.S.E00 && !PCC.S.E01
+          && !PCC.S.E02 && !PCC.S.E03 && !PCC.S.E04 && !PCC.S.E05 && !PCC.S.E06
+          && !PCC.S.E07 && !PCC.S.E08 && !PCC.S.E09 && !PCC.S.E0a && !PCC.S.E0b
+          && !PCC.S.E0c && !PCC.S.E0d && !PCC.S.E0e && !PCC.S.E0f && !PCC.S.E10 "
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -403,7 +413,7 @@ tests:
     - label:
           "Step 5b: TH reads from the DUT the EventList optional
           (SupplyVoltageLow)attribute."
-      PICS: PCC.S.E00 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E00 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -414,7 +424,7 @@ tests:
     - label:
           "Step 5c: TH reads from the DUT the EventList optional
           (SupplyVoltageHigh)attribute."
-      PICS: PCC.S.E01 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E01 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -425,7 +435,7 @@ tests:
     - label:
           "Step 5d: TH reads from the DUT the EventList optional
           (PowerMissingPhase)attribute."
-      PICS: PCC.S.E02 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E02 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -436,7 +446,7 @@ tests:
     - label:
           "Step 5e: TH reads from the DUT the EventList optional
           (SystemPressureLow)attribute."
-      PICS: PCC.S.E03 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E03 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -447,7 +457,7 @@ tests:
     - label:
           "Step 5f: TH reads from the DUT the EventList optional
           (SystemPressureHigh)attribute."
-      PICS: PCC.S.E04 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E04 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -458,7 +468,7 @@ tests:
     - label:
           "Step 5g: TH reads from the DUT the EventList optional
           (DryRunning)attribute."
-      PICS: PCC.S.E05 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E05 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -469,7 +479,7 @@ tests:
     - label:
           "Step 5h: TH reads from the DUT the EventList optional
           (MotorTemperatureHigh)attribute."
-      PICS: PCC.S.E06 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E06 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -480,7 +490,7 @@ tests:
     - label:
           "Step 5i: TH reads from the DUT the EventList optional
           (PumpMotorFatalFailure)attribute."
-      PICS: PCC.S.E07 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E07 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -491,7 +501,7 @@ tests:
     - label:
           "Step 5j: TH reads from the DUT the EventList optional
           (ElectronicTemperatureHigh)attribute."
-      PICS: PCC.S.E08 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E08 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -502,7 +512,7 @@ tests:
     - label:
           "Step 5k: TH reads from the DUT the EventList optional
           (PumpBlocked)attribute."
-      PICS: PCC.S.E09 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E09 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -513,7 +523,7 @@ tests:
     - label:
           "Step 5l: TH reads from the DUT the EventList optional
           (SensorFailure)attribute."
-      PICS: PCC.S.E0a && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0a && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -524,7 +534,7 @@ tests:
     - label:
           "Step 5m: TH reads from the DUT the EventList optional
           (ElectronicNonFatalFailure)attribute."
-      PICS: PCC.S.E0b && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0b && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -535,7 +545,7 @@ tests:
     - label:
           "Step 5n: TH reads from the DUT the EventList optional
           (ElectronicFatalFailure)attribute."
-      PICS: PCC.S.E0c && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0c && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -546,7 +556,7 @@ tests:
     - label:
           "Step 5o: TH reads from the DUT the EventList optional
           (GeneralFault)attribute."
-      PICS: PCC.S.E0d && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0d && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -557,7 +567,7 @@ tests:
     - label:
           "Step 5p: TH reads from the DUT the EventList optional
           (Leakage)attribute."
-      PICS: PCC.S.E0e && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0e && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -568,7 +578,7 @@ tests:
     - label:
           "Step 5q: TH reads from the DUT the EventList optional
           (AirDetection)attribute."
-      PICS: PCC.S.E0f && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0f && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -579,7 +589,7 @@ tests:
     - label:
           "Step 5r: TH reads from the DUT the EventList optional
           (TurbineOperation)attribute."
-      PICS: PCC.S.E10 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E10 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:

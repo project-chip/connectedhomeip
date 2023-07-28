@@ -100,6 +100,7 @@ tests:
               hasMasksSet: [0x10]
 
     - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -118,6 +119,15 @@ tests:
                       65532,
                       65533,
                   ]
+
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [8, 15, 16385, 16394, 65528, 65529, 65531, 65532, 65533]
 
     - label: "Step 4b: Read the optional attribute(CurrentHue) in AttributeList"
       PICS: CC.S.A0000
@@ -609,6 +619,7 @@ tests:
               contains: [16400]
 
     - label: "Step 5: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:

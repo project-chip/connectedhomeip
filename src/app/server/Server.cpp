@@ -150,6 +150,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // handler.
     SuccessOrExit(err = mAttributePersister.Init(mDeviceStorage));
     SetAttributePersistenceProvider(&mAttributePersister);
+    SetSafeAttributePersistenceProvider(&mAttributePersister);
 
     {
         FabricTable::InitParams fabricTableInitParams;

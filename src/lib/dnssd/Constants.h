@@ -35,13 +35,12 @@ constexpr size_t kHostNameMaxLength = 16; // MAC or 802.15.4 Extended Address in
  * Matter DNS service subtypes
  */
 
-constexpr size_t kSubTypeShortDiscriminatorMaxLength      = 4;  // _S<dd>
-constexpr size_t kSubTypeLongDiscriminatorMaxLength       = 6;  // _L<dddd>
-constexpr size_t kSubTypeVendorIdMaxLength                = 7;  // _V<ddddd>
-constexpr size_t kSubTypeDeviceTypeMaxLength              = 12; // _T<dddddddddd>
-constexpr size_t kSubTypeCommissioningModeMaxLength       = 3;  // _C<d>
-constexpr size_t kSubTypeAdditionalCommissioningMaxLength = 3;  // _A<d>
-constexpr size_t kSubTypeCompressedFabricIdMaxLength      = 18; // _I<16-hex-digits>
+constexpr size_t kSubTypeShortDiscriminatorMaxLength = 4;  // _S<dd>
+constexpr size_t kSubTypeLongDiscriminatorMaxLength  = 6;  // _L<dddd>
+constexpr size_t kSubTypeVendorIdMaxLength           = 7;  // _V<ddddd>
+constexpr size_t kSubTypeDeviceTypeMaxLength         = 12; // _T<dddddddddd>
+constexpr size_t kSubTypeCommissioningModeMaxLength  = 3;  // _CM
+constexpr size_t kSubTypeCompressedFabricIdMaxLength = 18; // _I<16-hex-digits>
 
 /*
  * Matter operational node service settings
@@ -68,8 +67,7 @@ namespace Commission {
 
 #define SUBTYPES                                                                                                                   \
     (std::initializer_list<size_t>{ kSubTypeShortDiscriminatorMaxLength, kSubTypeLongDiscriminatorMaxLength,                       \
-                                    kSubTypeVendorIdMaxLength, kSubTypeDeviceTypeMaxLength, kSubTypeCommissioningModeMaxLength,    \
-                                    kSubTypeAdditionalCommissioningMaxLength })
+                                    kSubTypeVendorIdMaxLength, kSubTypeDeviceTypeMaxLength, kSubTypeCommissioningModeMaxLength })
 
 constexpr size_t kInstanceNameMaxLength = 16; // 64-bit random number in hex
 constexpr size_t kSubTypeMaxNumber      = SUBTYPES.size();

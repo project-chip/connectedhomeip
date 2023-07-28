@@ -53,7 +53,7 @@ tests:
               type: bitmap32
 
     - label: "Step 4a: TH reads AttributeList from DUT"
-      PICS: OPCREDS.S.Afffb
+      PICS: PICS_EVENT_LIST_ENABLED && OPCREDS.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -65,6 +65,30 @@ tests:
                       0xFFFC,
                       0xFFFB,
                       0xFFFA,
+                      0xFFF9,
+                      0xFFF8,
+                      0x00,
+                      0x01,
+                      0x02,
+                      0x03,
+                      0x04,
+                      0x05,
+                  ]
+
+    #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED && OPCREDS.S.Afffb"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0xFFFD,
+                      0xFFFC,
+                      0xFFFB,
+
                       0xFFF9,
                       0xFFF8,
                       0x00,

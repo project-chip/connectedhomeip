@@ -53,7 +53,7 @@ tests:
               type: bitmap32
 
     - label: "Step 4a: TH reads AttributeList from DUT"
-      PICS: BINFO.S.Afffb
+      PICS: PICS_EVENT_LIST_ENABLED && BINFO.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -76,6 +76,35 @@ tests:
                       65528,
                       65529,
                       65530,
+                      65531,
+                      65532,
+                      65533,
+                  ]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED && BINFO.S.Afffb"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0,
+                      1,
+                      2,
+                      3,
+                      4,
+                      5,
+                      6,
+                      7,
+                      8,
+                      9,
+                      10,
+                      19,
+                      65528,
+                      65529,
+
                       65531,
                       65532,
                       65533,
@@ -217,8 +246,8 @@ tests:
 
     - label: "Step 5a: TH1 reads EventList from DUT"
       PICS:
-          " BINFO.S.Afffa && !BINFO.S.E00 && !BINFO.S.E01 && !BINFO.S.E02 &&
-          !BINFO.S.A0011 "
+          "PICS_EVENT_LIST_ENABLED &&  BINFO.S.Afffa && !BINFO.S.E00 &&
+          !BINFO.S.E01 && !BINFO.S.E02 && !BINFO.S.A0011 "
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -227,7 +256,7 @@ tests:
               type: list
 
     - label: "Step 5b: Read BINFO.S.E00(StartUp) event in EventList"
-      PICS: BINFO.S.E00 && BINFO.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && BINFO.S.E00 && BINFO.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -236,7 +265,7 @@ tests:
               contains: [0]
 
     - label: "Step 5c: Read BINFO.S.E01(ShutDown) event in EventList"
-      PICS: BINFO.S.E01 && BINFO.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && BINFO.S.E01 && BINFO.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -245,7 +274,7 @@ tests:
               contains: [1]
 
     - label: "Step 5d: Read BINFO.S.E02(Leave) event in EventList"
-      PICS: BINFO.S.E02 && BINFO.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && BINFO.S.E02 && BINFO.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -254,7 +283,7 @@ tests:
               contains: [2]
 
     - label: "Step 5e: Read (ReachableChanged) event in EventList"
-      PICS: BINFO.S.A0011 && BINFO.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && BINFO.S.A0011 && BINFO.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
