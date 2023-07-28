@@ -1447,8 +1447,8 @@ In this command:
     user index to `0` will cause an error.
 -   _<user-name\>_ is the name of the user, which can have maximum 10 bytes of
     size. Can be set to `null`.
--   _<user-unique-id\>_ is a 4-byte number that describes the unique user ID. Can
-    be set to `null`.
+-   _<user-unique-id\>_ is a 4-byte number that describes the unique user ID.
+    Can be set to `null`.
 -   _<user-status\>_ can be set to `null` or to one of the following values:
 
     -   `0` (`Available`) - This status indicates that the given user slot is
@@ -1456,12 +1456,12 @@ In this command:
         set `null` for the variable.
     -   `1` (`OccupiedEnabled`) - This status indicates that the given user slot
         is used and active.
-    -   `3` (`OccupiedDisabled`) - This status indicates that the given user slot
-        is used, but disabled. Unlike `0` and `1`, supporting this status is
-        optional.
+    -   `3` (`OccupiedDisabled`) - This status indicates that the given user
+        slot is used, but disabled. Unlike `0` and `1`, supporting this status
+        is optional.
 
--   _<credential-rule\>_ is the number of credentials that must be used to unlock
-    the door lock. This parameter can be set to `null` or to one of the
+-   _<credential-rule\>_ is the number of credentials that must be used to
+    unlock the door lock. This parameter can be set to `null` or to one of the
     following values:
 
     -   `0` (Single) - One credential type is required to unlock. This value is
@@ -1518,8 +1518,8 @@ In this command:
         -   `3` - Fingerprint
         -   `4` - Finger vein
 
-    -   _<credential-index\>_ is the index of the credential, between `1` and the
-        maximum value you set in the `NumberOfCredentialsSupportedPerUser`
+    -   _<credential-index\>_ is the index of the credential, between `1` and
+        the maximum value you set in the `NumberOfCredentialsSupportedPerUser`
         attribute (see the section 5.2.3.20 of the Matter Application Clusters
         specification for details). Setting the credential index to `0` will
         cause an error.
