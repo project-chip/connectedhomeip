@@ -82,6 +82,7 @@ tests:
                         EpochStartTime1: 2220001,
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: 2220002,
+                        GroupKeyMulticastPolicy: 0,
                     }
 
     - label: "Step 3: TH binds GroupId to GroupKeySet"

@@ -68,6 +68,7 @@ tests:
                         EpochStartTime1: 0,
                         EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
                         EpochStartTime2: 0,
+                        GroupKeyMulticastPolicy: 0,
                     }
 
     - label:

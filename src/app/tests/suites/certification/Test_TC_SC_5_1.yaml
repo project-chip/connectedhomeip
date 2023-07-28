@@ -84,6 +84,7 @@ tests:
                         EpochStartTime1: 222,
                         EpochKey2: "hex:00000000000000000000000000000003",
                         EpochStartTime2: 333,
+                        GroupKeyMulticastPolicy: 0,
                     }
 
     - label: "Step 2b: TH sends KeySetWrite command with TH key"
@@ -102,6 +103,7 @@ tests:
                         EpochStartTime1: 2220001,
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: 2220002,
+                        GroupKeyMulticastPolicy: 0,
                     }
 
     - label: "Step 3: TH binds GroupId to GroupKeySet"
@@ -181,6 +183,7 @@ tests:
                         EpochStartTime1: 2220001,
                         EpochKey2: null,
                         EpochStartTime2: 2220002,
+                        GroupKeyMulticastPolicy: 0,
                     }
 
     - label:
