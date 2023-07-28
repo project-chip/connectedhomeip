@@ -50,14 +50,14 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         asserts.assert_true('PIXIT_MODEFAIL' in self.matter_test_config.global_test_params,
                             "PIXIT_MODEFAIL must be included on the command line in "
                             "the --int-arg flag as PIXIT_MODEFAIL:<mode id>")
-        asserts.assert_true('pixit_can_test_mode_failure' in self.matter_test_config.global_test_params,
+        asserts.assert_true('PIXIT_CAN_TEST_MODE_FAILURE' in self.matter_test_config.global_test_params,
                             "PIXIT_CAN_TEST_MODE_FAILURE must be included on the command line in "
-                            "the --bool-arg flag as PIXIT_CAN_TEST_MODE_FAILURE:<true/false>")
+                            "the --int-arg flag as PIXIT_CAN_TEST_MODE_FAILURE:<0/1>")
 
         self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
         self.modeok = self.matter_test_config.global_test_params['PIXIT_MODEOK']
         self.modefail = self.matter_test_config.global_test_params['PIXIT_MODEFAIL']
-        self.can_test_mode_failure = self.matter_test_config.global_test_params['pixit_can_test_mode_failure']
+        self.can_test_mode_failure = self.matter_test_config.global_test_params['PIXIT_CAN_TEST_MODE_FAILURE']
 
         asserts.assert_true(self.check_pics("RVCCLEANM.S.A0000"), "RVCCLEANM.S.A0000 must be supported")
         asserts.assert_true(self.check_pics("RVCCLEANM.S.A0001"), "RVCCLEANM.S.A0001 must be supported")
@@ -101,7 +101,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         ret = await self.send_change_to_mode_cmd(newMode=old_current_mode)
         asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to the current mode should be a no-op")
 
-        if self.can_test_mode_failure is True:
+        if self.can_test_mode_failure == 1:
             self.print_step(5, "Manually put the device in a state from which it will FAIL to transition to mode %d" % (self.modefail))
             input("Press Enter when done.\n")
 
