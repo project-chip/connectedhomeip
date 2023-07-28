@@ -353,44 +353,101 @@ cert_lifetime=4294967295
     dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Key"
     dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Cert"
 
-    cdp_example="URI:http://example.com/crl.pem"
+    cdp_uri="http://example.com/crl.pem"
 
-    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac CDP (HTTP)" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cpd-ext "$cdp_example" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac CDP (HTTP)" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cdp-uri "$cdp_uri" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
 
     dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-HTTPS-Key"
     dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-HTTPS-Cert"
 
-    cdp_example="URI:https://example.com/crl.pem"
+    cdp_uri="https://example.com/crl.pem"
 
-    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac CDP (HTTPS)" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cpd-ext "$cdp_example" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
-
-    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-2CDPs-Key"
-    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-2CDPs-Cert"
-
-    cdp_example2="URI:http://example.com/crl2.pem"
-
-    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac Two CDPs" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cpd-ext "$cdp_example" --cpd-ext "$cdp_example2" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac CDP (HTTPS)" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cdp-uri "$cdp_uri" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
 
     dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-2URIs-Key"
     dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-2URIs-Cert"
 
-    cdp_example2in1="URI:http://example.com/crl.pem,URI:http://example.com/crl2.pem"
+    cdp_error_inject="ext-cdp-uri-duplicate"
 
-    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac CDP (Two URIs)" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cpd-ext "$cdp_example2in1" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac CDP (Two URIs)" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cdp-uri "$cdp_uri" -I -E "$cdp_error_inject" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-2DPs-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-2DPs-Cert"
+
+    cdp_error_inject="ext-cdp-dist-point-duplicate"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac Two CDP (Two DPs)" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cdp-uri "$cdp_uri" -I -E "$cdp_error_inject" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-2CDPs-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-2CDPs-Cert"
+
+    cdp_error_inject="ext-cdp-add"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac Two CDPs" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cdp-uri "$cdp_uri" -I -E "$cdp_error_inject" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
 
     dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Long-Key"
     dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Long-Cert"
 
-    cdp_example="URI:https://example.com/this-is-an-example-of-crl-distribution-point-extension-which-is-101-chars/crl.pem"
+    cdp_uri="https://example.com/this-is-an-example-of-crl-distribution-point-extension-which-is-101-chars/crl.pem"
 
-    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Long" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cpd-ext "$cdp_example" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Long" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cdp-uri "$cdp_uri" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
 
     dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Wrong-Prefix-Key"
     dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Wrong-Prefix-Cert"
 
-    cdp_example="URI:www.example.com/crl.pem"
+    cdp_uri="www.example.com/crl.pem"
 
-    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Long" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cpd-ext "$cdp_example" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac CDP Wrong Prefix" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cdp-uri "$cdp_uri" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Issuer-PAA-FFF1-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Issuer-PAA-FFF1-Cert"
+    issuer_cert_file="$dest_dir/Chip-Test-PAA-$vid-Cert"
+
+    cdp_uri="https://example.com/crl.pem"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac CDP Issuer PAA FFF1" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cdp-uri "$cdp_uri" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem --crl-issuer-cert "$issuer_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-2CRLIssuers-PAA-FFF1-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-2CRLIssuers-PAA-FFF1-Cert"
+    cdp_error_inject="ext-cdp-crl-issuer-duplicate"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac CDP 2 Issuers PAA FFF1" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cdp-uri "$cdp_uri" -I -E "$cdp_error_inject" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem --crl-issuer-cert "$issuer_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-CRL-Issuer-PAA-FFF1-2DPs-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-CRL-Issuer-PAA-FFF1-2DPs-Cert"
+    cdp_error_inject="ext-cdp-dist-point-duplicate"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac CDP Issuer PAA FFF1 (Two DPs)" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cdp-uri "$cdp_uri" -I -E "$cdp_error_inject" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem --crl-issuer-cert "$issuer_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-2CDPs-Issuer-PAA-FFF1-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-2CDPs-Issuer-PAA-FFF1-Cert"
+    cdp_error_inject="ext-cdp-add"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac 2CDPs Issuer PAA FFF1" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cdp-uri "$cdp_uri" -I -E "$cdp_error_inject" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem --crl-issuer-cert "$issuer_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Issuer-PAA-NoVID-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Issuer-PAA-NoVID-Cert"
+    issuer_cert_file="$dest_dir/Chip-Test-PAA-NoVID-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac CDP Issuer PAA NoVID" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cdp-uri "$cdp_uri" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem --crl-issuer-cert "$issuer_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Issuer-PAI-FFF2-8004-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Issuer-PAI-FFF2-8004-Cert"
+    issuer_cert_file="$dest_dir/Chip-Test-PAI-FFF2-8004-FB-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac CDP Issuer PAI FFF2 8004" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cdp-uri "$cdp_uri" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem --crl-issuer-cert "$issuer_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-2CDPs-Issuer-PAI-FFF2-8004-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-2CDPs-Issuer-PAI-FFF2-8004-Cert"
+    cdp_error_inject="ext-cdp-dist-point-duplicate"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac CDP Issuer PAI FFF2 8004 Two CDPs" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cdp-uri "$cdp_uri" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem --crl-issuer-cert "$issuer_cert_file".pem -I -E "$cdp_error_inject"
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Issuer-PAI-FFF2-8004-Long-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-CDP-Issuer-PAI-FFF2-8004-Long-Cert"
+    cdp_uri="https://example.com/this-is-an-example-of-crl-distribution-point-extension-which-is-101-chars/crl.pem"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Long" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --cdp-uri "$cdp_uri" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem --crl-issuer-cert "$issuer_cert_file".pem
 }
 
 # In addition to PEM format also create certificates in DER form.
