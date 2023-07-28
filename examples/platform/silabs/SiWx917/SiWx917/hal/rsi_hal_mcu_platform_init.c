@@ -22,7 +22,7 @@
 #include "rsi_pll.h"
 #include "rsi_rom_clks.h"
 #include "silabs_utils.h"
-#include "system_RS1xxxx.h"
+#include "sli_siwx917_soc.h"
 
 #define SOC_PLL_REF_FREQUENCY 32000000 /* PLL input REFERENCE clock 32MHZ */
 
@@ -195,7 +195,7 @@ void rsi_hal_board_init(void)
 
     /* configure clock for SiWx917 SoC */
     soc_pll_config();
-    SILABS_LOG("%s, soc_pll_config, SystemCoreClock=%d\n", __func__, SystemCoreClock);
+    // SILABS_LOG("%s, soc_pll_config, SystemCoreClock=%d\n", __func__, SystemCoreClock);
 
 #ifdef COMMON_FLASH_EN
     /* Before TA going to power save mode ,set m4ss_ref_clk_mux_ctrl ,tass_ref_clk_mux_ctrl,

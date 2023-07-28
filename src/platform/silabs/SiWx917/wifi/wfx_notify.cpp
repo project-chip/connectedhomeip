@@ -24,7 +24,7 @@
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "task.h"
-
+#include "silabs_utils.h"
 #include "wfx_host_events.h"
 
 #ifdef RS911X_WIFI
@@ -39,6 +39,7 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
+extern uint32_t retryInterval;
 /*
  * Notifications to the upper-layer
  * All done in the context of the RSI/WiFi task (rsi_if.c)
@@ -178,5 +179,46 @@ void wfx_ip_changed_notify(int got_ip)
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         chip::app::DnssdServer::Instance().StartServer(/*Dnssd::CommissioningMode::kEnabledBasic*/);
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    }
+}
+
+/**************************************************************************************
+ * @fn  void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin)
+ * @brief
+ *      Based on condition will delay for a certain period of time.
+ * @param[in]  is_wifi_disconnection_event, retryJoin
+ * @return None
+ ********************************************************************************************/
+void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin)
+{
+    if (!is_wifi_disconnection_event)
+    {
+        /* After the reboot or a commissioning time device failed to connect with AP.
+         * Device will retry to connect with AP upto WFX_RSI_CONFIG_MAX_JOIN retries.
+         */
+        if (retryJoin < MAX_JOIN_RETRIES_COUNT)
+        {
+            SILABS_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
+            vTaskDelay(pdMS_TO_TICKS(WLAN_RETRY_TIMER_MS));
+        }
+        else
+        {
+            SILABS_LOG("Connect failed after max %d tries", retryJoin);
+        }
+    }
+    else
+    {
+        /* After disconnection
+         * At the telescopic time interval device try to reconnect with AP, upto WLAN_MAX_RETRY_TIMER_MS intervals
+         * are telescopic. If interval exceed WLAN_MAX_RETRY_TIMER_MS then it will try to reconnect at
+         * WLAN_MAX_RETRY_TIMER_MS intervals.
+         */
+        if (retryInterval > WLAN_MAX_RETRY_TIMER_MS)
+        {
+            retryInterval = WLAN_MAX_RETRY_TIMER_MS;
+        }
+        SILABS_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(retryInterval));
+        vTaskDelay(pdMS_TO_TICKS(retryInterval));
+        retryInterval += retryInterval;
     }
 }

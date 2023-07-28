@@ -1,0 +1,41 @@
+import("//build_overrides/chip.gni")
+
+examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+wifi_sdk_dir = "${chip_root}/src/platform/silabs/efr32/wifi"
+wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
+#sl_wifi_sdk_root = "${chip_root}/third_party/silabs/sl_net/components"
+sl_wifi_sdk_root = "${chip_root}/third_party/silabs/wifi_sdk-v3.0.3/components"
+rs911x_src_plat = [
+  "${examples_plat_dir}/rs911x/sl_wifi_if.c",
+  "${examples_plat_dir}/rs911x/wfx_rsi_host.c",
+  "${examples_plat_dir}/rs911x/hal/sl_wifisdk_hal_mcu_interrupt.c",
+# "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_ioports.c",
+#  "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_timer.c",
+  "${examples_plat_dir}/rs911x/hal/efx_spi_wifisdk.c",
+  "${examples_plat_dir}/rs911x/hal/efx32_ncp_host.c",
+  "${wifi_sdk_dir}/wfx_notify.cpp",
+]
+
+#
+# All the stuff from wiseconnect
+#
+rs911x_src_sapi = [
+
+]
+
+rs911x_cflags = [ "-Wno-empty-body" ]
+
+rs911x_inc_plat = [
+  "${examples_plat_dir}/rs911x",
+  "${examples_plat_dir}/rs911x/hal",
+  "${sl_wifi_sdk_root}/si91x/inc",
+  "${sl_wifi_sdk_root}/si91x/memory",
+  "${sl_wifi_sdk_root}/si91x/sl_net/inc",
+  "${sl_wifi_sdk_root}/service/network_manager/inc",
+  "${sl_wifi_sdk_root}/wifi_support/inc",
+  "${sl_wifi_sdk_root}/wifi_support/efr32mg12",
+  "${sl_wifi_sdk_root}/sl_peripheral/inc",
+  "${sl_wifi_sdk_root}/protocol/wifi/inc",
+  "${examples_plat_dir}/rs911x",
+  "${examples_plat_dir}/rs911x/hal",
+]

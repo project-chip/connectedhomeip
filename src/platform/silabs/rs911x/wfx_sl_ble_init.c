@@ -21,13 +21,16 @@
  *    limitations under the License.
  */
 #include "wfx_sl_ble_init.h"
-#include "rsi_ble_config.h"
-
+#include "ble_config.h"
+#include "silabs_utils.h"
 // Global Variables
-rsi_ble_event_conn_status_t conn_event_to_app;
 rsi_ble_t att_list;
 sl_wfx_msg_t event_msg;
+#ifndef SI917
 extern rsi_semaphore_handle_t sl_ble_event_sem;
+#else
+extern osSemaphoreId_t sl_ble_event_sem;
+#endif
 
 // Memory to initialize driver
 uint8_t bt_global_buf[BT_GLOBAL_BUFF_LEN];
@@ -184,8 +187,13 @@ int32_t rsi_ble_app_get_event(void)
  */
 void rsi_ble_app_set_event(uint32_t event_num)
 {
+    SILABS_LOG("%s: starting", __func__);
     event_msg.ble_app_event_map |= BIT(event_num);
+#ifndef SI917	
     rsi_semaphore_post(&sl_ble_event_sem);
+#else
+    osSemaphoreRelease(sl_ble_event_sem);
+#endif		
     return;
 }
 
@@ -207,7 +215,7 @@ void rsi_gatt_add_attribute_to_list(rsi_ble_t * p_val, uint16_t handle, uint16_t
 {
     if ((p_val->DATA_ix + data_len) >= BLE_ATT_REC_SIZE)
     { //! Check for max data length for the characteristic value
-        LOG_PRINT("\r\n no data memory for att rec values \r\n");
+        SILABS_LOG("\r\n no data memory for att rec values \r\n");
         return;
     }
 

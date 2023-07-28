@@ -59,7 +59,7 @@ static_library("SiWx917") {
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
     "../rs911x/BLEManagerImpl.cpp",
-    "../rs911x/rsi_ble_config.h",
+    "../rs911x/ble_config.h",
     "../rs911x/wfx_sl_ble_init.c",
     "../rs911x/wfx_sl_ble_init.h",
     "ConfigurationManagerImpl.cpp",

@@ -17,7 +17,9 @@
 
 #pragma once
 
+#include "sl_si91x_types.h"
 #include "stdbool.h"
+
 #include "wfx_msgs.h"
 
 /* LwIP includes. */
@@ -26,9 +28,11 @@
 #include "lwip/netif.h"
 #include "lwip/netifapi.h"
 #include "lwip/tcpip.h"
+#include "sl_wifi_constants.h"
 
 #include "sl_status.h"
 
+#define SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME 1000
 /* Wi-Fi events*/
 #define SL_WFX_STARTUP_IND_ID (1)
 #define SL_WFX_CONNECT_IND_ID (2)
@@ -55,6 +59,7 @@
 #define WLAN_MIN_RETRY_TIMER_MS 1000
 #define WLAN_RETRY_TIMER_MS 5000
 #define CONVERT_MS_TO_SEC(TimeInMS) (TimeInMS / 1000)
+
 
 // WLAN related Macros
 #define ETH_FRAME (0)
@@ -206,7 +211,7 @@ bool wfx_is_sta_mode_enabled(void);
 int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap);
 int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_reset_counts();
-int32_t wfx_rsi_platform();
+// int32_t wfx_rsi_platform();
 
 void wfx_clear_wifi_provision(void);
 sl_status_t wfx_connect_to_ap(void);
@@ -240,12 +245,20 @@ void wfx_dhcp_got_ipv4(uint32_t);
 void wfx_ip_changed_notify(int got_ip);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
+sl_status_t sl_si91x_host_process_data_frame(sl_wifi_interface_t interface, sl_wifi_buffer_t * buffer);
+void * sl_si91x_host_get_buffer_data(sl_wifi_buffer_t * buffer, uint16_t offset, uint16_t * data_length);
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+sl_status_t wfx_power_save();
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
 void wfx_ipv6_notify(int got_ip);
 
 /* RSI for LWIP */
-void * wfx_rsi_alloc_pkt(void);
+// void * wfx_rsi_alloc_pkt(void);
 void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off);
 int32_t wfx_rsi_send_data(void * p, uint16_t len);
+sl_status_t sl_si91x_driver_send_data_packet(sl_si91x_queue_type_t queue_type, sl_wifi_buffer_t * buffer, uint32_t wait_time);
+sl_status_t sl_si91x_allocate_command_buffer(sl_wifi_buffer_t ** host_buffer, void ** buffer, uint32_t requested_buffer_size,
+                                             uint32_t wait_duration_ms);
 
 void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin);
 

@@ -21,29 +21,30 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef WF200_WIFI
-#include "FreeRTOS.h"
-#include "event_groups.h"
-#include "task.h"
-#endif
 
 #include "wfx_host_events.h"
 #include "wifi_config.h"
-#ifdef WF200_WIFI
-#include "sl_wfx.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "cmsis_os2.h"
+#include "sl_board_configuration.h"
+#include "sl_net.h"
+#include "sl_si91x_driver.h"
+#include "sl_si91x_host_interface.h"
+#include "sl_si91x_types.h"
+#include "sl_wifi_callback_framework.h"
+#include "sl_wifi_constants.h"
+#include "sl_wifi_types.h"
+#ifdef __cplusplus
+}
 #endif
 /* LwIP includes. */
 #include "ethernetif.h"
 #include "lwip/ethip6.h"
 #include "lwip/timeouts.h"
 #include "netif/etharp.h"
-
-#ifndef SILABS_LOG
-extern "C" {
-void silabsLog(const char * aFormat, ...);
-#define SILABS_LOG(...) silabsLog(__VA_ARGS__);
-}
-#endif
+#include "silabs_utils.h"
 
 StaticSemaphore_t xEthernetIfSemaBuffer;
 
@@ -165,14 +166,12 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
         if (netif->input(p, netif) != ERR_OK)
         {
             gOverrunCount++;
-            SILABS_LOG("overrun count entering when fail to alloc value %d", gOverrunCount);
             pbuf_free(p);
         }
     }
     else
     {
         gOverrunCount++;
-        SILABS_LOG("overrun count entering when fail to alloc value %d", gOverrunCount);
     }
 }
 
@@ -192,10 +191,13 @@ static SemaphoreHandle_t ethout_sem;
  ******************************************************************************/
 static err_t low_level_output(struct netif * netif, struct pbuf * p)
 {
+    sl_wifi_buffer_t * buffer;
+    sl_si91x_packet_t * packet;
+    sl_status_t status = SL_STATUS_OK;
     void * rsipkt;
     struct pbuf * q;
     uint16_t framelength;
-
+    SILABS_LOG("LWIP : low_level_output");
     if (xSemaphoreTake(ethout_sem, portMAX_DELAY) != pdTRUE)
     {
         return ERR_IF;
@@ -210,14 +212,17 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
         return ERR_IF;
     }
     /* Confirm if packet is allocated */
-    rsipkt = wfx_rsi_alloc_pkt();
-    if (!rsipkt)
+
+    status = sl_si91x_allocate_command_buffer(&buffer, (void **) &packet, sizeof(sl_si91x_packet_t) + p->len,
+                                              SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME);
+    VERIFY_STATUS_AND_RETURN(status);
+    if (packet == NULL)
     {
         SILABS_LOG("EN-RSI:No buf");
         xSemaphoreGive(ethout_sem);
-        return ERR_IF;
+        return SL_STATUS_ALLOCATION_FAILED;
     }
-
+    memset(packet->desc, 0, sizeof(packet->desc));
 #ifdef WIFI_DEBUG_ENABLED
     uint8_t * b = (uint8_t *) p->payload;
     SILABS_LOG("EN-RSI: Out [%02x:%02x:%02x:%02x:%02x:%02x][%02x:%02x:%02x:%02x:%02x:%02x]type=%02x%02x", b[0], b[1], b[2], b[3],
@@ -226,38 +231,34 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     /* Generate the packet */
     for (q = p, framelength = 0; q != NULL; q = q->next)
     {
-        wfx_rsi_pkt_add_data(rsipkt, (uint8_t *) (q->payload), (uint16_t) q->len, framelength);
+        wfx_rsi_pkt_add_data(packet, (uint8_t *) (q->payload), (uint16_t) q->len, framelength);
         framelength += q->len;
     }
     if (framelength < LWIP_FRAME_ALIGNMENT)
     {
         /* Add junk data to the end for frame alignment if framelength is less than 60 */
-        wfx_rsi_pkt_add_data(rsipkt, (uint8_t *) (p->payload), LWIP_FRAME_ALIGNMENT - framelength, framelength);
+        wfx_rsi_pkt_add_data(packet, (uint8_t *) (p->payload), LWIP_FRAME_ALIGNMENT - framelength, framelength);
     }
 #ifdef WIFI_DEBUG_ENABLED
     SILABS_LOG("EN-RSI: Sending %d", framelength);
 #endif
 
-    /* forward the generated packet to RSI to
-     * send the data over wifi network
-     */
-    if (wfx_rsi_send_data(rsipkt, framelength))
+    packet->length  = p->len & 0xFFF;
+    packet->command = RSI_SEND_RAW_DATA;
+    if (sl_si91x_driver_send_data_packet(SI91X_WLAN_CMD_QUEUE, buffer, 1000))
     {
         SILABS_LOG("*ERR*EN-RSI:Send fail");
         xSemaphoreGive(ethout_sem);
         return ERR_IF;
     }
 
-#ifdef WIFI_DEBUG_ENABLED
-    SILABS_LOG("EN-RSI:Xmit %d", framelength);
-#endif
     xSemaphoreGive(ethout_sem);
 
     return ERR_OK;
 }
 
 /*****************************************************************************
- *  @fn  void wfx_host_received_sta_frame_cb(uint8_t *buf, int len)
+ *  @fn  void sl_si91x_host_process_data_frame(uint8_t *buf, int len)
  *  @brief
  *    host received frame cb
  *
@@ -268,17 +269,23 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
  * @return
  *    None
  ******************************************************************************/
-void wfx_host_received_sta_frame_cb(uint8_t * buf, int len)
+sl_status_t sl_si91x_host_process_data_frame(sl_wifi_interface_t interface, sl_wifi_buffer_t * buffer)
 {
+    struct pbuf * pbuf_packet;
+    void * packet;
     struct netif * ifp;
+    sl_si91x_packet_t * rsi_pkt;
+    packet  = sl_si91x_host_get_buffer_data(buffer, 0, NULL);
+    rsi_pkt = (sl_si91x_packet_t *) packet;
 
     /* get the network interface for STATION interface,
      * and forward the received frame buffer to LWIP
      */
     if ((ifp = wfx_get_netif(SL_WFX_STA_INTERFACE)) != (struct netif *) 0)
     {
-        low_level_input(ifp, buf, len);
+        low_level_input(ifp, rsi_pkt->data, rsi_pkt->length);
     }
+    return SL_STATUS_OK;
 }
 
 /*****************************************************************************
