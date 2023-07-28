@@ -172,6 +172,9 @@ public:
                                 System::PacketBufferHandle && payload, bool isTimedInvoke);
     CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus);
 
+    // Same as AddStatus, but logs that `aCommandName` failed with the given error status, on error.
+    CHIP_ERROR AddStatusAndLogIfFailure(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus, const char* aCommandName);
+
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
 
     CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
