@@ -18,9 +18,9 @@
 
 #include "Esp32AppServer.h"
 #include "CHIPDeviceManager.h"
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
-#include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>

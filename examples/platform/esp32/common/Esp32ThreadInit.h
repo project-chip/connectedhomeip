@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include <sdkconfig.h>
+
+#if CONFIG_OPENTHREAD_ENABLED
 #include "esp_openthread_types.h"
 
 #define ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG()                                                                                      \
@@ -35,3 +38,4 @@
     }
 
 void ESPOpenThreadInit();
+#endif // CONFIG_OPENTHREAD_ENABLED
