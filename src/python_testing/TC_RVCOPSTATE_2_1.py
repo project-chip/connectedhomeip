@@ -127,41 +127,34 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
             in_range = (0x80 <= operational_state and operational_state <= 0xBF)
             asserts.assert_true(operational_state in defined_states or in_range, "OperationalState has an invalid ID value!")
 
-            if 'PIXIT_OPSTATE_ST_STOPPED' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ST_STOPPED'] == 1:
-                    self.print_step("6a", "Manually put the device in the stopped state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_opstate(step="6b", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kStopped)
-            if 'PIXIT_OPSTATE_ST_RUNNING' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ST_RUNNING'] == 1:
-                    self.print_step("6c", "Manually put the device in the running state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_opstate(step="6d", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kRunning)
-            if 'PIXIT_OPSTATE_ST_PAUSED' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ST_PAUSED'] == 1:
-                    self.print_step("6e", "Manually put the device in the paused state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_opstate(step="6f", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kPaused)
-            if 'PIXIT_OPSTATE_ST_ERROR' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ST_ERROR'] == 1:
-                    self.print_step("6g", "Manually put the device in the error state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_opstate(step="6h", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kError)
-            if 'PIXIT_OPSTATE_ST_SEEKING_CHARGER' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ST_SEEKING_CHARGER'] == 1:
-                    self.print_step("6i", "Manually put the device in the seeking charger state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_opstate(step="6j", expected_state=Clusters.RvcOperationalState.Enums.OperationalStateEnum.kSeekingCharger)
-            if 'PIXIT_OPSTATE_ST_CHARGING' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ST_CHARGING'] == 1:
-                    self.print_step("6k", "Manually put the device in the charging state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_opstate(step="6l", expected_state=Clusters.RvcOperationalState.Enums.OperationalStateEnum.kCharging)
-            if 'PIXIT_OPSTATE_ST_DOCKED' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ST_DOCKED'] == 1:
-                    self.print_step("6m", "Manually put the device in the docked state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_opstate(step="6n", expected_state=Clusters.RvcOperationalState.Enums.OperationalStateEnum.kDocked)
+            if self.check_pics("RVCOPSTATE.M.ST_STOPPED"):
+                self.print_step("6a", "Manually put the device in the stopped state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_opstate(step="6b", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kStopped)
+            if self.check_pics("RVCOPSTATE.M.ST_RUNNING"):
+                self.print_step("6c", "Manually put the device in the running state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_opstate(step="6d", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kRunning)
+            if self.check_pics("RVCOPSTATE.M.ST_PAUSED"):
+                self.print_step("6e", "Manually put the device in the paused state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_opstate(step="6f", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kPaused)
+            if self.check_pics("RVCOPSTATE.M.ST_ERROR"):
+                self.print_step("6g", "Manually put the device in the error state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_opstate(step="6h", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kError)
+            if self.check_pics("RVCOPSTATE.M.ST_SEEKING_CHARGER"):
+                self.print_step("6i", "Manually put the device in the seeking charger state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_opstate(step="6j", expected_state=Clusters.RvcOperationalState.Enums.OperationalStateEnum.kSeekingCharger)
+            if self.check_pics("RVCOPSTATE.M.ST_CHARGING"):
+                self.print_step("6k", "Manually put the device in the charging state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_opstate(step="6l", expected_state=Clusters.RvcOperationalState.Enums.OperationalStateEnum.kCharging)
+            if self.check_pics("RVCOPSTATE.M.ST_DOCKED"):
+                self.print_step("6m", "Manually put the device in the docked state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_opstate(step="6n", expected_state=Clusters.RvcOperationalState.Enums.OperationalStateEnum.kDocked)
 
         if self.check_pics("RVCOPSTATE.S.A0005"):
             self.print_step(7, "Read OperationalError attribute")
@@ -182,66 +175,54 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
             if in_range:
                 asserts.assert_true(operational_error.errorStateLabel is not None, "ErrorStateLabel should be populated")
 
-            if 'PIXIT_OPSTATE_ERR_NO_ERROR' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ERR_NO_ERROR'] == 1:
-                    self.print_step("7a", "Manually put the device in the no error state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_operror(step="7b", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kNoError)
-            if 'PIXIT_OPSTATE_ERR_UNABLE_TO_START_OR_RESUME' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ERR_UNABLE_TO_START_OR_RESUME'] == 1:
-                    self.print_step("7c", "Manually put the device in the unable to start or resume state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_operror(step="7d", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToStartOrResume)
-            if 'PIXIT_OPSTATE_ERR_UNABLE_TO_COMPLETE_OPERATION' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ERR_UNABLE_TO_COMPLETE_OPERATION'] == 1:
-                    self.print_step("7e", "Manually put the device in the unable to complete operation state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_operror(step="7f", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToCompleteOperation)
-            if 'PIXIT_OPSTATE_ERR_COMMAND_INVALID_STATE' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ERR_COMMAND_INVALID_STATE'] == 1:
-                    self.print_step("7g", "Manually put the device in the command invalid state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_operror(step="7h", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState)
-            if 'PIXIT_OPSTATE_ERR_FAILED_FIND_DOCK' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ERR_FAILED_FIND_DOCK'] == 1:
-                    self.print_step("7i", "Manually put the device in the failed to find dock state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_operror(step="7j", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kFailedToFindChargingDock)
-            if 'PIXIT_OPSTATE_ERR_STUCK' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ERR_STUCK'] == 1:
-                    self.print_step("7k", "Manually put the device in the stuck state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_operror(step="7l", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kStuck)
-            if 'PIXIT_OPSTATE_ERR_DUSTBIN_MISSING' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ERR_DUSTBIN_MISSING'] == 1:
-                    self.print_step("7m", "Manually put the device in the dustbin missing state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_operror(step="7n", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDustBinMissing)
-            if 'PIXIT_OPSTATE_ERR_DUSTBIN_FULL' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ERR_DUSTBIN_FULL'] == 1:
-                    self.print_step("7o", "Manually put the device in the dustbin full state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_operror(step="7p", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDustBinFull)
-            if 'PIXIT_OPSTATE_ERR_WATER_TANK_EMPTY' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ERR_WATER_TANK_EMPTY'] == 1:
-                    self.print_step("7q", "Manually put the device in the water tank empty state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_operror(step="7r", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankEmpty)
-            if 'PIXIT_OPSTATE_ERR_WATER_TANK_MISSING' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ERR_WATER_TANK_MISSING'] == 1:
-                    self.print_step("7s", "Manually put the device in the water tank missing state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_operror(step="7t", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankMissing)
-            if 'PIXIT_OPSTATE_ERR_WATER_TANK_LID_OPEN' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ERR_WATER_TANK_LID_OPEN'] == 1:
-                    self.print_step("7u", "Manually put the device in the water tank lid open state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_operror(step="7v", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankLidOpen)
-            if 'PIXIT_OPSTATE_ERR_MOP_CLEANING_PAD_MISSING' in self.matter_test_config.global_test_params:
-                if self.matter_test_config.global_test_params['PIXIT_OPSTATE_ERR_MOP_CLEANING_PAD_MISSING'] == 1:
-                    self.print_step("7w", "Manually put the device in the mop cleaning pad missing state")
-                    input("Press Enter when done.\n")
-                    await self.read_and_validate_operror(step="7x", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kMopCleaningPadMissing)
+            if self.check_pics("RVCOPSTATE.M.ERR_NO_ERROR"):
+                self.print_step("7a", "Manually put the device in the no error state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_operror(step="7b", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kNoError)
+            if self.check_pics("RVCOPSTATE.M.ERR_UNABLE_TO_START_OR_RESUME"):
+                self.print_step("7c", "Manually put the device in the unable to start or resume state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_operror(step="7d", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToStartOrResume)
+            if self.check_pics("RVCOPSTATE.M.ERR_UNABLE_TO_COMPLETE_OPERATION"):
+                self.print_step("7e", "Manually put the device in the unable to complete operation state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_operror(step="7f", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToCompleteOperation)
+            if self.check_pics("RVCOPSTATE.M.ERR_COMMAND_INVALID_STATE"):
+                self.print_step("7g", "Manually put the device in the command invalid state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_operror(step="7h", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState)
+            if self.check_pics("RVCOPSTATE.M.ERR_FAILED_FIND_DOCK"):
+                self.print_step("7i", "Manually put the device in the failed to find dock state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_operror(step="7j", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kFailedToFindChargingDock)
+            if self.check_pics("RVCOPSTATE.M.ERR_STUCK"):
+                self.print_step("7k", "Manually put the device in the stuck state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_operror(step="7l", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kStuck)
+            if self.check_pics("RVCOPSTATE.M.ERR_DUSTBIN_MISSING"):
+                self.print_step("7m", "Manually put the device in the dustbin missing state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_operror(step="7n", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDustBinMissing)
+            if self.check_pics("RVCOPSTATE.M.ERR_DUSTBIN_FULL"):
+                self.print_step("7o", "Manually put the device in the dustbin full state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_operror(step="7p", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDustBinFull)
+            if self.check_pics("RVCOPSTATE.M.ERR_WATER_TANK_EMPTY"):
+                self.print_step("7q", "Manually put the device in the water tank empty state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_operror(step="7r", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankEmpty)
+            if self.check_pics("RVCOPSTATE.M.ERR_WATER_TANK_MISSING"):
+                self.print_step("7s", "Manually put the device in the water tank missing state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_operror(step="7t", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankMissing)
+            if self.check_pics("RVCOPSTATE.M.ERR_WATER_TANK_LID_OPEN"):
+                self.print_step("7u", "Manually put the device in the water tank lid open state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_operror(step="7v", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankLidOpen)
+            if self.check_pics("RVCOPSTATE.M.ERR_MOP_CLEANING_PAD_MISSING"):
+                self.print_step("7w", "Manually put the device in the mop cleaning pad missing state")
+                input("Press Enter when done.\n")
+                await self.read_and_validate_operror(step="7x", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kMopCleaningPadMissing)
 
 
 if __name__ == "__main__":
