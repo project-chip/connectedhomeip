@@ -1957,9 +1957,9 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
         // For at total of 29 attributes. There are two wildcard subscription
         // paths, for a total of 58 attributes.
         //
-        // In particular attribute for 0xFFFC::0xFFF1'FC03::4 is a list of
-        // 6 elements of size 256 bytes each, that gets list chunking applied
-        // to it.
+        // Attribute 0xFFFC::0xFFF1'FC02::0xFFF1'0004 (kMockEndpoint3::MockClusterId(2)::MockAttributeId(4))
+        // is a list of 6 elements of size 256 bytes each, which cannot fit in a single
+        // packet, so gets list chunking applied to it.
         //
         // Because delegate.mNumAttributeResponse counts AttributeDataIB instances, not attributes,
         // the count will depend on exactly how the list for attribute
