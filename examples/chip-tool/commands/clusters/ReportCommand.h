@@ -415,6 +415,33 @@ private:
     std::vector<chip::EventId> mEventIds;
 };
 
+class ReadNone : public ReadCommand
+{
+public:
+    ReadNone(CredentialIssuerCommands * credsIssuerConfig) : ReadCommand("read-none", credsIssuerConfig)
+    {
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered,
+                    "Boolean indicating whether to do a fabric-filtered read. Defaults to true.");
+        AddArgument("data-versions", 0, UINT32_MAX, &mDataVersions,
+                    "Comma-separated list of data versions for the clusters being read.");
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
+        ReadCommand::AddArguments(true /* skipEndpoints */);
+    }
+
+    ~ReadNone() {}
+
+    void OnDone(chip::app::ReadClient * aReadClient) override
+    {
+        InteractionModelReports::CleanupReadClient(aReadClient);
+        SetCommandExitStatus(mError);
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return ReadCommand::ReadNone(device);
+    }
+};
+
 class ReadAll : public ReadCommand
 {
 public:
@@ -454,6 +481,31 @@ private:
     std::vector<chip::ClusterId> mClusterIds;
     std::vector<chip::AttributeId> mAttributeIds;
     std::vector<chip::EventId> mEventIds;
+};
+
+class SubscribeNone : public SubscribeCommand
+{
+public:
+    SubscribeNone(CredentialIssuerCommands * credsIssuerConfig) : SubscribeCommand("subscribe-none", credsIssuerConfig)
+    {
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval,
+                    "The requested minimum interval between reports. Sets MinIntervalFloor in the Subscribe Request.");
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval,
+                    "The requested maximum interval between reports. Sets MaxIntervalCeiling in the Subscribe Request.");
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered,
+                    "Boolean indicating whether to do a fabric-filtered read. Defaults to true.");
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions,
+                    "false - Terminate existing subscriptions from initiator.\n  true - Leave existing subscriptions in place.");
+        SubscribeCommand::AddArguments(true /* skipEndpoints */);
+    }
+
+    ~SubscribeNone() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return SubscribeCommand::SubscribeNone(device);
+    }
 };
 
 class SubscribeAll : public SubscribeCommand

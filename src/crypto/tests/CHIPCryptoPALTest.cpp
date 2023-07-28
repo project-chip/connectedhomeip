@@ -2122,21 +2122,32 @@ static void TestCDPExtension_x509Extraction(nlTestSuite * inSuite, void * inCont
 
     constexpr const char * exampleHttpURI  = "http://example.com/crl.pem";
     constexpr const char * exampleHttpsURI = "https://example.com/crl.pem";
+    CharSpan httpSpan                      = CharSpan::fromCharString(exampleHttpURI);
+    CharSpan httpsSpan                     = CharSpan::fromCharString(exampleHttpsURI);
 
     // clang-format off
     static CDPTestCase sCDPTestCases[] = {
-        // Cert                                                Expected Error               Expected Output
-        // ===============================================================================================
-        {  ByteSpan(),                                         CHIP_ERROR_INVALID_ARGUMENT, CharSpan() },
-        {  sTestCert_PAA_FFF1_Cert,                            CHIP_ERROR_NOT_FOUND,        CharSpan() },
-        {  sTestCert_PAI_FFF2_8001_Cert,                       CHIP_ERROR_NOT_FOUND,        CharSpan() },
-        {  sTestCert_DAC_FFF2_8003_0019_FB_Cert,               CHIP_ERROR_NOT_FOUND,        CharSpan() },
-        {  sTestCert_DAC_FFF1_8000_0000_CDP_Cert,              CHIP_NO_ERROR,               CharSpan::fromCharString(exampleHttpURI) },
-        {  sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert,        CHIP_NO_ERROR,               CharSpan::fromCharString(exampleHttpsURI) },
-        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert,            CHIP_ERROR_NOT_FOUND,        CharSpan() },
-        {  sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert,        CHIP_ERROR_NOT_FOUND,        CharSpan() },
-        {  sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert, CHIP_ERROR_NOT_FOUND,        CharSpan() },
-        {  sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert,         CHIP_ERROR_BUFFER_TOO_SMALL, CharSpan() },
+        // Cert                                                             Expected Error               Expected Output
+        // ==============================================================================================================
+        {  ByteSpan(),                                                      CHIP_ERROR_INVALID_ARGUMENT, CharSpan() },
+        {  sTestCert_PAA_FFF1_Cert,                                         CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_PAI_FFF2_8001_Cert,                                    CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF2_8003_0019_FB_Cert,                            CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Cert,                           CHIP_NO_ERROR,               httpSpan   },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert,                     CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert,                     CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_Cert,                      CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert,                         CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert,              CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert,                      CHIP_ERROR_BUFFER_TOO_SMALL, CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_Cert,         CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Cert,    CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Cert,  CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_Cert,      CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_Cert,           CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_Cert,          CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Cert,      CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Cert, CHIP_ERROR_BUFFER_TOO_SMALL, CharSpan() },
     };
     // clang-format on
 
@@ -2146,10 +2157,69 @@ static void TestCDPExtension_x509Extraction(nlTestSuite * inSuite, void * inCont
         MutableCharSpan cdp(cdpBuf);
         err = ExtractCRLDistributionPointURIFromX509Cert(testCase.Cert, cdp);
         NL_TEST_ASSERT(inSuite, err == testCase.mExpectedError);
-        if (err == CHIP_NO_ERROR)
+        if (testCase.mExpectedError == CHIP_NO_ERROR)
         {
             NL_TEST_ASSERT(inSuite, cdp.size() == testCase.mExpectedResult.size());
             NL_TEST_ASSERT(inSuite, cdp.data_equal(testCase.mExpectedResult));
+        }
+    }
+}
+
+static void TestCDPCRLIssuerExtension_x509Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    struct CDPTestCase
+    {
+        ByteSpan Cert;
+        CHIP_ERROR mExpectedError;
+        ByteSpan mCRLIssuerCert;
+    };
+
+    // clang-format off
+    static CDPTestCase sCDPTestCases[] = {
+        // Cert                                                             Expected Error               Expected CRL Issuer Cert
+        // =======================================================================================================================
+        {  ByteSpan(),                                                      CHIP_ERROR_INVALID_ARGUMENT, ByteSpan() },
+        {  sTestCert_PAA_FFF1_Cert,                                         CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_PAI_FFF2_8001_Cert,                                    CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF2_8003_0019_FB_Cert,                            CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Cert,                           CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert,                     CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert,                     CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_Cert,                      CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert,                         CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert,              CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert,                      CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_Cert,         CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Cert,    CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Cert,  CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_Cert,      CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_Cert,           CHIP_NO_ERROR,               sTestCert_PAA_FFF1_Cert },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_Cert,          CHIP_NO_ERROR,               sTestCert_PAA_NoVID_Cert },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Cert,      CHIP_NO_ERROR,               sTestCert_PAI_FFF2_8004_FB_Cert },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Cert, CHIP_NO_ERROR,               sTestCert_PAI_FFF2_8004_FB_Cert },
+    };
+    // clang-format on
+
+    for (auto & testCase : sCDPTestCases)
+    {
+        uint8_t crlIssuerBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+        MutableByteSpan crlIssuer(crlIssuerBuf);
+        err = ExtractCDPExtensionCRLIssuerFromX509Cert(testCase.Cert, crlIssuer);
+        NL_TEST_ASSERT(inSuite, err == testCase.mExpectedError);
+        if (testCase.mExpectedError == CHIP_NO_ERROR)
+        {
+            uint8_t crlIssuerSubjectBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+            MutableByteSpan crlIssuerSubject(crlIssuerSubjectBuf);
+
+            err = ExtractSubjectFromX509Cert(testCase.mCRLIssuerCert, crlIssuerSubject);
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+            NL_TEST_ASSERT(inSuite, crlIssuer.data_equal(crlIssuerSubject));
         }
     }
 }
@@ -2752,6 +2822,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Subject Key Id Extraction from x509 Certificate", TestSKID_x509Extraction),
     NL_TEST_DEF("Test Authority Key Id Extraction from x509 Certificate", TestAKID_x509Extraction),
     NL_TEST_DEF("Test CRL Distribution Point Extension Extraction from x509 Certificate", TestCDPExtension_x509Extraction),
+    NL_TEST_DEF("Test CDP Extension CRL Issuer Extraction from x509 Certificate", TestCDPCRLIssuerExtension_x509Extraction),
     NL_TEST_DEF("Test Serial Number Extraction from x509 Certificate", TestSerialNumber_x509Extraction),
     NL_TEST_DEF("Test Subject Extraction from x509 Certificate", TestSubject_x509Extraction),
     NL_TEST_DEF("Test Issuer Extraction from x509 Certificate", TestIssuer_x509Extraction),

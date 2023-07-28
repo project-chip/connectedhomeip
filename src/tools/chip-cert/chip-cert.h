@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -185,6 +185,10 @@ public:
     void SetExtensionExtendedKeyUsagePresent() { mFlags.Set(CertErrorFlags::kExtExtendedKeyUsage); }
     void SetExtensionAuthorityInfoAccessPresent() { mFlags.Set(CertErrorFlags::kExtAuthorityInfoAccess); }
     void SetExtensionSubjectAltNamePresent() { mFlags.Set(CertErrorFlags::kExtSubjectAltName); }
+    void SetExtensionCDPPresent() { mFlags.Set(CertErrorFlags::kExtCRLDistributionPoints); }
+    void SetExtensionCDPURIDuplicate() { mFlags.Set(CertErrorFlags::kExtCDPURIDuplicate); }
+    void SetExtensionCDPCRLIssuerDuplicate() { mFlags.Set(CertErrorFlags::kExtCDPCRLIssuerDuplicate); }
+    void SetExtensionCDPDistPointDuplicate() { mFlags.Set(CertErrorFlags::kExtCDPDistPointDuplicate); }
     void SetSignatureError() { mFlags.Set(CertErrorFlags::kSignature); }
 
     void SetCertOversized() { mFlags.Set(CertErrorFlags::kCertOversized); }
@@ -314,6 +318,10 @@ public:
     bool IsExtensionExtendedKeyUsagePresent() { return (mEnabled && mFlags.Has(CertErrorFlags::kExtExtendedKeyUsage)); }
     bool IsExtensionAuthorityInfoAccessPresent() { return (mEnabled && mFlags.Has(CertErrorFlags::kExtAuthorityInfoAccess)); }
     bool IsExtensionSubjectAltNamePresent() { return (mEnabled && mFlags.Has(CertErrorFlags::kExtSubjectAltName)); }
+    bool IsExtensionCDPPresent() { return (mEnabled && mFlags.Has(CertErrorFlags::kExtCRLDistributionPoints)); }
+    bool IsExtensionCDPURIDuplicate() { return (mEnabled && mFlags.Has(CertErrorFlags::kExtCDPURIDuplicate)); }
+    bool IsExtensionCDPCRLIssuerDuplicate() { return (mEnabled && mFlags.Has(CertErrorFlags::kExtCDPCRLIssuerDuplicate)); }
+    bool IsExtensionCDPDistPointDuplicate() { return (mEnabled && mFlags.Has(CertErrorFlags::kExtCDPDistPointDuplicate)); }
     bool IsSignatureError() { return (mEnabled && mFlags.Has(CertErrorFlags::kSignature)); }
 
     bool IsCertOversized() { return (mEnabled && mFlags.Has(CertErrorFlags::kCertOversized)); }
@@ -368,26 +376,30 @@ private:
         kExtExtendedKeyUsage        = 0x0000000002000000, // DA specific
         kExtAuthorityInfoAccess     = 0x0000000004000000, // DA specific
         kExtSubjectAltName          = 0x0000000008000000, // DA specific
-        kSignature                  = 0x0000000010000000,
+        kExtCRLDistributionPoints   = 0x0000000010000000, // DA specific
+        kExtCDPURIDuplicate         = 0x0000000020000000, // DA specific
+        kExtCDPCRLIssuerDuplicate   = 0x0000000040000000, // DA specific
+        kExtCDPDistPointDuplicate   = 0x0000000080000000, // DA specific
+        kSignature                  = 0x0000000100000000,
 
         // Op Cert Specific Flags:
-        kCertOversized              = 0x0000000100000000,
-        kSerialNumberMissing        = 0x0000000200000000,
-        kIssuerMissing              = 0x0000000400000000,
-        kValidityNotBeforeMissing   = 0x0000000800000000,
-        kValidityNotAfterMissing    = 0x0000001000000000,
-        kValidityWrong              = 0x0000002000000000,
-        kSubjectMissing             = 0x0000004000000000,
-        kSubjectMatterIdMissing     = 0x0000008000000000,
-        kSubjectNodeIdInvalid       = 0x0000010000000000,
-        kSubjectMatterIdTwice       = 0x0000020000000000,
-        kSubjectFabricIdMissing     = 0x0000040000000000,
-        kSubjectFabricIdInvalid     = 0x0000080000000000,
-        kSubjectFabricIdTwice       = 0x0000100000000000,
-        kSubjectFabricIdMismatch    = 0x0000200000000000,
-        kSubjectCATInvalid          = 0x0000400000000000,
-        kSubjectCATTwice            = 0x0000800000000000,
-        kExtExtendedKeyUsageMissing = 0x0001000000000000,
+        kCertOversized              = 0x0000001000000000,
+        kSerialNumberMissing        = 0x0000002000000000,
+        kIssuerMissing              = 0x0000004000000000,
+        kValidityNotBeforeMissing   = 0x0000008000000000,
+        kValidityNotAfterMissing    = 0x0000010000000000,
+        kValidityWrong              = 0x0000020000000000,
+        kSubjectMissing             = 0x0000040000000000,
+        kSubjectMatterIdMissing     = 0x0000080000000000,
+        kSubjectNodeIdInvalid       = 0x0000100000000000,
+        kSubjectMatterIdTwice       = 0x0000200000000000,
+        kSubjectFabricIdMissing     = 0x0000400000000000,
+        kSubjectFabricIdInvalid     = 0x0000800000000000,
+        kSubjectFabricIdTwice       = 0x0001000000000000,
+        kSubjectFabricIdMismatch    = 0x0002000000000000,
+        kSubjectCATInvalid          = 0x0004000000000000,
+        kSubjectCATTwice            = 0x0008000000000000,
+        kExtExtendedKeyUsageMissing = 0x0010000000000000,
     };
 
     static constexpr uint32_t kExtraBufferLengthForOvesizedCert = 300;
@@ -437,8 +449,7 @@ extern bool ResignCert(X509 * cert, X509 * caCert, EVP_PKEY * caKey);
 
 extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subjectVID, uint16_t subjectPID,
                         bool encodeVIDandPIDasCN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom, uint32_t validDays,
-                        X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig, const FutureExtensionWithNID * exts,
-                        uint8_t extsCount);
+                        X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig, X509_EXTENSION * cdpExt);
 extern bool GenerateKeyPair(EVP_PKEY * key);
 extern bool GenerateKeyPair_Secp256k1(EVP_PKEY * key);
 extern bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key,

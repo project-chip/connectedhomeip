@@ -50,13 +50,22 @@ tests:
               type: bitmap32
 
     - label: "Step 4a: TH reads AttributeList attribute from DUT"
-      PICS: ACL.S.Afffb
+      PICS: PICS_EVENT_LIST_ENABLED && ACL.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [0, 2, 3, 4, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads AttributeList attribute from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED && ACL.S.Afffb"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 2, 3, 4, 65528, 65529, 65531, 65532, 65533]
 
     - label: "Step 4b: TH reads optional attribute (Extension) in AttributeList"
       PICS: ACL.S.A0001 && ACL.S.Afffb
@@ -108,7 +117,7 @@ tests:
                 value: "y"
 
     - label: "Step 5a: TH reads EventList attribute from DUT"
-      PICS: ACL.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && ACL.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:

@@ -285,14 +285,13 @@ source_set("efr32-common") {
   include_dirs = [ "." ]
 
   sources = [
+    "${silabs_common_plat_dir}/BaseApplication.cpp",
     "${silabs_common_plat_dir}/LEDWidget.cpp",
+    "${silabs_common_plat_dir}/MatterConfig.cpp",
     "${silabs_common_plat_dir}/SoftwareFaultReports.cpp",
     "${silabs_common_plat_dir}/heap_4_silabs.c",
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
-    "BaseApplication.cpp",
-    "init_efrPlatform.cpp",
-    "matter_config.cpp",
   ]
 
   if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {

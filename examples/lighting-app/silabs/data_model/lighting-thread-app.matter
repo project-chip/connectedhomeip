@@ -2469,7 +2469,6 @@ endpoint 0 {
     callback attribute clientsSupportedPerFabric default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
@@ -2502,7 +2501,6 @@ endpoint 1 {
     callback attribute remainingCapacity default = 8;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 5;
@@ -2561,7 +2559,6 @@ endpoint 1 {
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
