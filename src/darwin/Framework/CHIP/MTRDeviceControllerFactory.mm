@@ -74,7 +74,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 @property (readonly) DeviceControllerFactory * controllerFactory;
-@property (readonly) MTRPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
+@property (readonly) PersistentStorageDelegate * persistentStorageDelegate;
 @property (readonly) MTRAttestationTrustStoreBridge * attestationTrustStoreBridge;
 @property (readonly) MTROTAProviderDelegateBridge * otaProviderDelegateBridge;
 @property (readonly) Crypto::RawKeySessionKeystore * sessionKeystore;
@@ -273,9 +273,9 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         _opCertStore = nullptr;
     }
 
-    if (_persistentStorageDelegateBridge) {
-        delete _persistentStorageDelegateBridge;
-        _persistentStorageDelegateBridge = nullptr;
+    if (_persistentStorageDelegate) {
+        delete _persistentStorageDelegate;
+        _persistentStorageDelegate = nullptr;
     }
 }
 
@@ -291,7 +291,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     __block BOOL listFilled = NO;
     auto fillListBlock = ^{
         FabricTable fabricTable;
-        CHIP_ERROR err = fabricTable.Init({ .storage = self->_persistentStorageDelegateBridge,
+        CHIP_ERROR err = fabricTable.Init({ .storage = self->_persistentStorageDelegate,
             .operationalKeystore = self->_keystore,
             .opCertStore = self->_opCertStore });
         if (err != CHIP_NO_ERROR) {
@@ -348,8 +348,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
         [MTRControllerAccessControl init];
 
-        _persistentStorageDelegateBridge = new MTRPersistentStorageDelegateBridge(startupParams.storage);
-        if (_persistentStorageDelegateBridge == nil) {
+        _persistentStorageDelegate = new MTRPersistentStorageDelegateBridge(startupParams.storage);
+        if (_persistentStorageDelegate == nil) {
             MTR_LOG_ERROR("Error: %@", kErrorPersistentStorageInit);
             errorCode = CHIP_ERROR_NO_MEMORY;
             return;
@@ -415,7 +415,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
             return;
         }
 
-        errorCode = _keystore->Init(_persistentStorageDelegateBridge);
+        errorCode = _keystore->Init(_persistentStorageDelegate);
         if (errorCode != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Error: %@", kErrorKeystoreInit);
             return;
@@ -429,7 +429,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
             return;
         }
 
-        errorCode = _opCertStore->Init(_persistentStorageDelegateBridge);
+        errorCode = _opCertStore->Init(_persistentStorageDelegate);
         if (errorCode != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Error: %@", kErrorCertStoreInit);
             return;
@@ -482,7 +482,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
         params.groupDataProvider = _groupDataProvider;
         params.sessionKeystore = _sessionKeystore;
-        params.fabricIndependentStorage = _persistentStorageDelegateBridge;
+        params.fabricIndependentStorage = _persistentStorageDelegate;
         params.operationalKeystore = _keystore;
         params.opCertStore = _opCertStore;
         params.certificateValidityPolicy = _certificateValidityPolicy;
@@ -788,7 +788,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     assertChipStackLockedByCurrentThread();
 
     CHIP_ERROR err = fabricTable.Init(
-        { .storage = _persistentStorageDelegateBridge, .operationalKeystore = _keystore, .opCertStore = _opCertStore });
+        { .storage = _persistentStorageDelegate, .operationalKeystore = _keystore, .opCertStore = _opCertStore });
     if (err != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("Can't initialize fabric table: %s", ErrorStr(err));
         return NO;
@@ -937,9 +937,9 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     }
 }
 
-- (MTRPersistentStorageDelegateBridge *)storageDelegateBridge
+- (PersistentStorageDelegate *)storageDelegate
 {
-    return _persistentStorageDelegateBridge;
+    return _persistentStorageDelegate;
 }
 
 - (Credentials::GroupDataProvider *)groupData
