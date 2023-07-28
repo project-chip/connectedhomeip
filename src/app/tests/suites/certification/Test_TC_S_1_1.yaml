@@ -61,7 +61,7 @@ tests:
               type: bitmap32
 
     - label: "Step 4a: Read AttributeList (global attribute 65531)"
-      PICS: S.S.A0005
+      PICS: PICS_EVENT_LIST_ENABLED && S.S.A0005
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -85,8 +85,18 @@ tests:
                       65533,
                   ]
 
+    - label: "Step 4a: Read AttributeList (global attribute 65531)"
+      PICS: "!PICS_EVENT_LIST_ENABLED && S.S.A0005"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [0, 1, 2, 3, 4, 5, 6, 7, 65528, 65529, 65531, 65532, 65533]
+
     - label: "Step 4b: Read AttributeList (global attribute 65531)"
-      PICS: (!S.S.A0005)
+      PICS: PICS_EVENT_LIST_ENABLED && (!S.S.A0005)
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -109,7 +119,17 @@ tests:
                       65533,
                   ]
 
+    - label: "Step 4b: Read AttributeList (global attribute 65531)"
+      PICS: "!PICS_EVENT_LIST_ENABLED && (!S.S.A0005)"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 3, 4, 6, 7, 65528, 65529, 65531, 65532, 65533]
+
     - label: "Step 5: Read EventList (global attribute 65530)"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
