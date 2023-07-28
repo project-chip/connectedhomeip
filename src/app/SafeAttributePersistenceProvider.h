@@ -95,7 +95,7 @@ public:
         {
             NumericAttributeTraits<T>::SetNull(storageValue);
         }
-        else 
+        else
         {
             NumericAttributeTraits<T>::WorkingToStorage(aValue.Value(), storageValue);
         }
