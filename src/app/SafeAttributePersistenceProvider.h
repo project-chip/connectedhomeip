@@ -90,7 +90,7 @@ public:
     template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
     CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
-        NumericAttributeTraits<T>::StorageType storageValue;
+        typename NumericAttributeTraits<T>::StorageType storageValue;
         if (aValue.IsNull())
         {
             NumericAttributeTraits<T>::SetNull(storageValue);
@@ -111,7 +111,7 @@ public:
     template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
     CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
-        NumericAttributeTraits<T>::StorageType storageValue;
+        typename NumericAttributeTraits<T>::StorageType storageValue;
         CHIP_ERROR err = ReadScalarValue(aPath, storageValue);
         if (err != CHIP_NO_ERROR)
         {
