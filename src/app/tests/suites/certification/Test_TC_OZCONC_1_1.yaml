@@ -187,7 +187,7 @@ tests:
     - label: "Step 4a: Read the global attribute: AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: PICS_EVENT_LIST_ENABLED && OZCONC.S.Afffb
+      PICS: PICS_EVENT_LIST_ENABLED
       response:
           constraints:
               type: list
@@ -196,7 +196,7 @@ tests:
     - label: "Step 4a: Read the global attribute: AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: "!PICS_EVENT_LIST_ENABLED && OZCONC.S.Afffb"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
       response:
           constraints:
               type: list
@@ -316,7 +316,7 @@ tests:
     - label: "Step 5: Read the global attribute: EventList"
       command: "readAttribute"
       attribute: "EventList"
-      PICS: PICS_EVENT_LIST_ENABLED && OZCONC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED
       response:
           value: []
           constraints:
