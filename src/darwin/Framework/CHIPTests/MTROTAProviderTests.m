@@ -1031,8 +1031,8 @@ static BOOL sNeedsStackShutdown = YES;
     __auto_type * device2 = sConnectedDevice2;
 
     // This to keep track of whether queryImageHandler for device 2 was called or not. The first time it's called we will
-    // fulfill queryExpectation2 and start BDX for device 1.
-    static bool isQueryImageHandlerForDevice2Called = false;
+    // fulfill queryExpectation2 and proceed with BDX for device 1.
+    __block bool firstQueryImageForDevice2Received = false;
 
     // Set up the query handler for device 1 to return image available at imagePath1
     sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
@@ -1219,11 +1219,11 @@ static BOOL sNeedsStackShutdown = YES;
     };
 
     // Flags to track if device1 and device have notified that the update has been applied.
-    static bool hasDevice1NotifiedUpdateApplied = false;
-    static bool hasDevice2NotifiedUpdateApplied = false;
+    __block bool device1HasNotifiedUpdateApplied = false;
+    __block bool device2HasNotifiedUpdateApplied = false;
 
     // Set up the apply update request and update applied handlers for device1 and device2. Use the nodeID to verify which
-    // device send the applyUpdateRequest and subsequent notifyUpdateApplied methods.
+    // device sent the applyUpdateRequest and subsequent notifyUpdateApplied commands.
     sOTAProviderDelegate.applyUpdateRequestHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
         MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams * params, ApplyUpdateRequestCompletion completion) {
         XCTAssertTrue([nodeID isEqualToNumber:@(kDeviceId1)] || [nodeID isEqualToNumber:@(kDeviceId2)]);
@@ -1287,9 +1287,11 @@ static BOOL sNeedsStackShutdown = YES;
     // Advertise ourselves as an OTA provider.
     XCTestExpectation * announceResponseExpectation1 = [self announceProviderToDevice:device1];
 
-    // Make sure we get our callbacks in order for both device1 and device2 since we do not
-    // send image available to device2 until BDX for device1 has ended so queryExpectation3 can follow
-    // bdxEndExpectation1. Give it a bit more time, because we want to allow time for the BDX download.
+    // Make sure we get our callbacks in order for both device1 and device2.  Since we do not
+    // send image available to device2 until BDX for device1 has ended, queryExpectation3 must follow
+    // bdxEndExpectation1.
+    // 
+    // Give it a bit more time, because we want to allow time for the BDX downloads.
     [self waitForExpectations:@[
         queryExpectation1, bdxBeginExpectation1, bdxQueryExpectation1, bdxEndExpectation1, queryExpectation3, bdxBeginExpectation2,
         bdxQueryExpectation2, bdxEndExpectation2
