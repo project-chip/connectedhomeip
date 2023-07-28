@@ -136,7 +136,9 @@
         "Test_TC_IDM_6_3",
         "Test_TC_IDM_6_4",
         "Test_TC_IDM_7_1",
-        "Test_TC_IDM_8_1"
+        "Test_TC_IDM_8_1",
+        "Test_TC_IDM_10_1",
+        "Test_TC_IDM_11_1"
     ],
     "MediaControl": [
         "Test_TC_LOWPOWER_2_2",
@@ -185,7 +187,9 @@
         "Test_TC_CADMIN_1_10",
         "Test_TC_CADMIN_1_13",
         "Test_TC_CADMIN_1_23",
-        "Test_TC_CADMIN_1_24"
+        "Test_TC_CADMIN_1_24",
+        "Test_TC_CADMIN_1_25",
+        "Test_TC_CADMIN_1_26"
     ],
     "ModeSelect": [
         "Test_TC_MOD_1_2",

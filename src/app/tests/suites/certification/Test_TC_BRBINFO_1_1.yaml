@@ -34,13 +34,26 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26602
     - label: "Step 2: TH reads the ClusterRevision from DUT"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
-          value: 1
-          constraints:
-              type: int16u
+      verification: |
+          ./chip-tool bridgeddevicebasicinformation read cluster-revision 1 3
+
+          Via the TH (chip-tool), verify: 
+          -that the ClusterRevision attribute contains value as 2. 
+          -that value is in the type of uint16.
+
+          [1657695910.794487][15411:15416] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_FFFD DataVersion: 2577979325
+          [1657695910.794568][15411:15416] CHIP:TOO:   ClusterRevision: 2
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 3: TH reads the FeatureMap from DUT"
       command: "readAttribute"
