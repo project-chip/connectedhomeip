@@ -6455,6 +6455,8 @@ NS_ASSUME_NONNULL_BEGIN
             self.groupKeySet.epochStartTime2 =
                 [NSNumber numberWithUnsignedLongLong:decodableStruct.groupKeySet.epochStartTime2.Value()];
         }
+        self.groupKeySet.groupKeyMulticastPolicy =
+            [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.groupKeySet.groupKeyMulticastPolicy)];
     }
     return CHIP_NO_ERROR;
 }

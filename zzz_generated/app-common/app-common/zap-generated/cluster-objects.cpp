@@ -10585,6 +10585,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEpochStartTime1), epochStartTime1));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEpochKey2), epochKey2));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEpochStartTime2), epochStartTime2));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kGroupKeyMulticastPolicy), groupKeyMulticastPolicy));
     ReturnErrorOnFailure(aWriter.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10627,6 +10628,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kEpochStartTime2):
             ReturnErrorOnFailure(DataModel::Decode(reader, epochStartTime2));
+            break;
+        case to_underlying(Fields::kGroupKeyMulticastPolicy):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeyMulticastPolicy));
             break;
         default:
             break;

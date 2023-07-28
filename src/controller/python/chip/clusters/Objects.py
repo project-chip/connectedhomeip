@@ -13442,6 +13442,15 @@ class GroupKeyManagement(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
+        class GroupKeyMulticastPolicyEnum(MatterIntEnum):
+            kPerGroupID = 0x00
+            kAllNodes = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 2,
+
         class GroupKeySecurityPolicyEnum(MatterIntEnum):
             kTrustFirst = 0x00
             kCacheAndSync = 0x01
@@ -13450,6 +13459,10 @@ class GroupKeyManagement(Cluster):
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kCacheAndSync = 0x1
 
     class Structs:
         @dataclass
@@ -13498,6 +13511,7 @@ class GroupKeyManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="epochStartTime1", Tag=5, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="epochKey2", Tag=6, Type=typing.Union[Nullable, bytes]),
                         ClusterObjectFieldDescriptor(Label="epochStartTime2", Tag=7, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="groupKeyMulticastPolicy", Tag=8, Type=GroupKeyManagement.Enums.GroupKeyMulticastPolicyEnum),
                     ])
 
             groupKeySetID: 'uint' = 0
@@ -13508,6 +13522,7 @@ class GroupKeyManagement(Cluster):
             epochStartTime1: 'typing.Union[Nullable, uint]' = NullValue
             epochKey2: 'typing.Union[Nullable, bytes]' = NullValue
             epochStartTime2: 'typing.Union[Nullable, uint]' = NullValue
+            groupKeyMulticastPolicy: 'GroupKeyManagement.Enums.GroupKeyMulticastPolicyEnum' = 0
 
     class Commands:
         @dataclass

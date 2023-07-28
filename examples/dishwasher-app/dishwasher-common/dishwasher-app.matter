@@ -971,9 +971,18 @@ server cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 server cluster GroupKeyManagement = 63 {
+  enum GroupKeyMulticastPolicyEnum : ENUM8 {
+    kPerGroupID = 0;
+    kAllNodes = 1;
+  }
+
   enum GroupKeySecurityPolicyEnum : ENUM8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCacheAndSync = 0x1;
   }
 
   fabric_scoped struct GroupInfoMapStruct {
@@ -998,6 +1007,7 @@ server cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
+    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
   attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;

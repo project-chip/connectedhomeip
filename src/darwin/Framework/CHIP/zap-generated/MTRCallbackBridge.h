@@ -404,6 +404,10 @@ typedef void (*OperationalCredentialsClusterNodeOperationalCertStatusEnumAttribu
     void *, chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum);
 typedef void (*NullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum> &);
+typedef void (*GroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallback)(
+    void *, chip::app::Clusters::GroupKeyManagement::GroupKeyMulticastPolicyEnum);
+typedef void (*NullableGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeyMulticastPolicyEnum> &);
 typedef void (*GroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallback)(
     void *, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum);
 typedef void (*NullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallback)(
@@ -24367,6 +24371,80 @@ public:
     void OnSubscriptionEstablished();
     using MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<GroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallback>
+{
+public:
+    MTRGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<GroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<GroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::GroupKeyManagement::GroupKeyMulticastPolicyEnum value);
+};
+
+class MTRGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackSubscriptionBridge
+    : public MTRGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackBridge
+{
+public:
+    MTRGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallback>
+{
+public:
+    MTRNullableGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler) :
+        MTRCallbackBridge<NullableGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallback>(queue, handler,
+                                                                                                         OnSuccessFn){};
+
+    MTRNullableGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler,
+                                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullableGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallback>(queue, handler, action,
+                                                                                                         OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeyMulticastPolicyEnum> & value);
+};
+
+class MTRNullableGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableGroupKeyManagementClusterGroupKeyMulticastPolicyEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

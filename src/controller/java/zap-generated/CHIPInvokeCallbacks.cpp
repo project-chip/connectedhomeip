@@ -2631,6 +2631,12 @@ void CHIPGroupKeyManagementClusterKeySetReadResponseCallback::CallbackFn(
             GroupKeySet_epochStartTime2ClassName.c_str(), GroupKeySet_epochStartTime2CtorSignature.c_str(),
             dataResponse.groupKeySet.epochStartTime2.Value(), GroupKeySet_epochStartTime2);
     }
+    jobject GroupKeySet_groupKeyMulticastPolicy;
+    std::string GroupKeySet_groupKeyMulticastPolicyClassName     = "java/lang/Integer";
+    std::string GroupKeySet_groupKeyMulticastPolicyCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+        GroupKeySet_groupKeyMulticastPolicyClassName.c_str(), GroupKeySet_groupKeyMulticastPolicyCtorSignature.c_str(),
+        static_cast<uint8_t>(dataResponse.groupKeySet.groupKeyMulticastPolicy), GroupKeySet_groupKeyMulticastPolicy);
 
     jclass groupKeySetStructStructClass_0;
     err = chip::JniReferences::GetInstance().GetClassRef(
@@ -2640,19 +2646,19 @@ void CHIPGroupKeyManagementClusterKeySetReadResponseCallback::CallbackFn(
         ChipLogError(Zcl, "Could not find class ChipStructs$GroupKeyManagementClusterGroupKeySetStruct");
         return;
     }
-    jmethodID groupKeySetStructStructCtor_0 =
-        env->GetMethodID(groupKeySetStructStructClass_0, "<init>",
-                         "(Ljava/lang/Integer;Ljava/lang/Integer;[BLjava/lang/Long;[BLjava/lang/Long;[BLjava/lang/Long;)V");
+    jmethodID groupKeySetStructStructCtor_0 = env->GetMethodID(
+        groupKeySetStructStructClass_0, "<init>",
+        "(Ljava/lang/Integer;Ljava/lang/Integer;[BLjava/lang/Long;[BLjava/lang/Long;[BLjava/lang/Long;Ljava/lang/Integer;)V");
     if (groupKeySetStructStructCtor_0 == nullptr)
     {
         ChipLogError(Zcl, "Could not find ChipStructs$GroupKeyManagementClusterGroupKeySetStruct constructor");
         return;
     }
 
-    GroupKeySet =
-        env->NewObject(groupKeySetStructStructClass_0, groupKeySetStructStructCtor_0, GroupKeySet_groupKeySetID,
-                       GroupKeySet_groupKeySecurityPolicy, GroupKeySet_epochKey0, GroupKeySet_epochStartTime0,
-                       GroupKeySet_epochKey1, GroupKeySet_epochStartTime1, GroupKeySet_epochKey2, GroupKeySet_epochStartTime2);
+    GroupKeySet = env->NewObject(groupKeySetStructStructClass_0, groupKeySetStructStructCtor_0, GroupKeySet_groupKeySetID,
+                                 GroupKeySet_groupKeySecurityPolicy, GroupKeySet_epochKey0, GroupKeySet_epochStartTime0,
+                                 GroupKeySet_epochKey1, GroupKeySet_epochStartTime1, GroupKeySet_epochKey2,
+                                 GroupKeySet_epochStartTime2, GroupKeySet_groupKeyMulticastPolicy);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, GroupKeySet);
 }

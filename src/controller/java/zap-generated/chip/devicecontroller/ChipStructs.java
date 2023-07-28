@@ -1434,6 +1434,7 @@ public @Nullable byte[] epochKey1;
 public @Nullable Long epochStartTime1;
 public @Nullable byte[] epochKey2;
 public @Nullable Long epochStartTime2;
+public Integer groupKeyMulticastPolicy;
 
   public GroupKeyManagementClusterGroupKeySetStruct(
     Integer groupKeySetID
@@ -1444,6 +1445,7 @@ public @Nullable Long epochStartTime2;
       , @Nullable Long epochStartTime1
       , @Nullable byte[] epochKey2
       , @Nullable Long epochStartTime2
+      , Integer groupKeyMulticastPolicy
   ) {
     this.groupKeySetID = groupKeySetID;
     this.groupKeySecurityPolicy = groupKeySecurityPolicy;
@@ -1453,6 +1455,7 @@ public @Nullable Long epochStartTime2;
     this.epochStartTime1 = epochStartTime1;
     this.epochKey2 = epochKey2;
     this.epochStartTime2 = epochStartTime2;
+    this.groupKeyMulticastPolicy = groupKeyMulticastPolicy;
   }
 
   @Override
@@ -1482,6 +1485,9 @@ public @Nullable Long epochStartTime2;
     output.append("\n");
     output.append("\tepochStartTime2: ");
     output.append(epochStartTime2);
+        output.append("\n");
+    output.append("\tgroupKeyMulticastPolicy: ");
+    output.append(groupKeyMulticastPolicy);
         output.append("\n");
     output.append("}\n");
     return output.toString();

@@ -12651,6 +12651,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                     auto & nonNullValue_1 = request.groupKeySet.epochStartTime2.SetNonNull();
                     nonNullValue_1 = params.groupKeySet.epochStartTime2.unsignedLongLongValue;
                 }
+                request.groupKeySet.groupKeyMulticastPolicy
+                    = static_cast<std::remove_reference_t<decltype(request.groupKeySet.groupKeyMulticastPolicy)>>(
+                        params.groupKeySet.groupKeyMulticastPolicy.unsignedCharValue);
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);

@@ -12977,14 +12977,15 @@ using DecodableType = Type;
 namespace GroupKeySetStruct {
 enum class Fields : uint8_t
 {
-    kGroupKeySetID          = 0,
-    kGroupKeySecurityPolicy = 1,
-    kEpochKey0              = 2,
-    kEpochStartTime0        = 3,
-    kEpochKey1              = 4,
-    kEpochStartTime1        = 5,
-    kEpochKey2              = 6,
-    kEpochStartTime2        = 7,
+    kGroupKeySetID           = 0,
+    kGroupKeySecurityPolicy  = 1,
+    kEpochKey0               = 2,
+    kEpochStartTime0         = 3,
+    kEpochKey1               = 4,
+    kEpochStartTime1         = 5,
+    kEpochKey2               = 6,
+    kEpochStartTime2         = 7,
+    kGroupKeyMulticastPolicy = 8,
 };
 
 struct Type
@@ -12998,6 +12999,7 @@ public:
     DataModel::Nullable<uint64_t> epochStartTime1;
     DataModel::Nullable<chip::ByteSpan> epochKey2;
     DataModel::Nullable<uint64_t> epochStartTime2;
+    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = static_cast<GroupKeyMulticastPolicyEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
