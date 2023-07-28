@@ -111,6 +111,7 @@ public:
 
     // TODO: Once there is MCSP support, this may need to change.
     static constexpr bool IsMCSPSupported() { return false; }
+    static constexpr uint16_t kImplementedClusterRevision = 2;
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
     {
@@ -119,7 +120,8 @@ public:
         switch (aPath.mAttributeId)
         {
         case GroupKeyManagement::Attributes::ClusterRevision::Id:
-            return ReadClusterRevision(aPath.mEndpointId, aEncoder);
+            return aEncoder
+            ReadClusterRevision(aPath.mEndpointId, aEncoder.encode(kImplementedClusterRevision));
         case Attributes::FeatureMap::Id: {
             uint32_t features = 0;
             if (IsMCSPSupported())

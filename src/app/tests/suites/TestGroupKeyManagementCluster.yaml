@@ -74,6 +74,31 @@ tests:
           constraints:
               minValue: 3
 
+    # TODO: Re-enabled when CI wouldn't break on this syntax
+    #
+    #   command: "readAttribute"
+    #   attribute: "ClusterRevision"
+    #   response:
+    #       saveAs: ClusterRevisionValue
+    #       constraints:
+    #           minValue: 1
+    #           maxValue: 2
+    #           type: int16u
+
+    # - label: "Creates a new variable to hold if the cluster revision is == 2"
+    #   cluster: EqualityCommands
+    #   command: UnsignedNumberEquals
+    #   arguments:
+    #       values:
+    #           - name: Value1
+    #             value: ClusterRevisionValue
+    #           - name: Value2
+    #             value: 2
+    #   response:
+    #       - values:
+    #             - name: Equals
+    #               saveAs: ClusterIsRevision2
+
     ########### KeySetWrite Epoch0 field validations
     - label: "KeySetWrite with EpochKey0 null fails INVALID_COMMAND"
       command: "KeySetWrite"
@@ -136,6 +161,7 @@ tests:
     - label:
           "KeySetWrite with EpochKey0 with length 1 != 16 fails with
           CONSTRAINT_ERROR"
+      # runIf: ClusterIsRevision2
       command: "KeySetWrite"
       arguments:
           values:
@@ -157,6 +183,7 @@ tests:
     - label:
           "KeySetWrite with EpochKey0 with length 0 != 16 fails with
           CONSTRAINT_ERROR"
+      # runIf: ClusterIsRevision2
       command: "KeySetWrite"
       arguments:
           values:
@@ -177,6 +204,7 @@ tests:
 
     ########### KeySetWrite Epoch1 field validations
     - label: "KeySetWrite with EpochStartTime1 null fails INVALID_COMMAND"
+      # runIf: ClusterIsRevision2
       command: "KeySetWrite"
       arguments:
           values:
@@ -217,6 +245,7 @@ tests:
     - label:
           "KeySetWrite with EpochKey1 with length 1 != 16 fails with
           CONSTRAINT_ERROR"
+      # runIf: ClusterIsRevision2
       command: "KeySetWrite"
       arguments:
           values:
@@ -238,6 +267,7 @@ tests:
     - label:
           "KeySetWrite with EpochKey1 with length 0 != 16 fails with
           CONSTRAINT_ERROR"
+      # runIf: ClusterIsRevision2
       command: "KeySetWrite"
       arguments:
           values:
@@ -280,6 +310,7 @@ tests:
     ########### KeySetWrite Epoch2 field validations
     - label: "KeySetWrite with EpochStartTime2 null fails INVALID_COMMAND"
       command: "KeySetWrite"
+      # runIf: ClusterIsRevision2
       arguments:
           values:
               - name: "GroupKeySet"
@@ -319,6 +350,7 @@ tests:
     - label:
           "KeySetWrite with EpochKey2 with length 1 != 16 fails with
           CONSTRAINT_ERROR"
+      # runIf: ClusterIsRevision2
       command: "KeySetWrite"
       arguments:
           values:
@@ -340,6 +372,7 @@ tests:
     - label:
           "KeySetWrite with EpochKey2 with length 0 != 16 fails with
           CONSTRAINT_ERROR"
+      # runIf: ClusterIsRevision2
       command: "KeySetWrite"
       arguments:
           values:
