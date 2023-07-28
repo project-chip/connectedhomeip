@@ -41,16 +41,16 @@ tests:
           FeatureMap, AttributeList, AcceptedCommandList, GeneratedCommandList,
           EventList"
       verification: |
-          The following log is an example of the output obtained for Identify Cluster on Endpoint 0. Descriptor cluster on Endpoint 1 and  Occupancy cluster on Endpoint 2. 
+          The following log is an example of the output obtained for Identify Cluster on Endpoint 0. Descriptor cluster on Endpoint 1 and  Occupancy cluster on Endpoint 2.
           Pls repeat this for every cluster on every endpoint. The log represents the attributes of clusters found on different endpoints.
 
-          Verify the presence of all mandatory global attributes for every cluster on every endpoint: 
+          Verify the presence of all mandatory global attributes for every cluster on every endpoint:
           1. ClusterRevision
-          2. FeatureMap 
+          2. FeatureMap
           3. EventList
           4. AttributeList
-          5. AcceptedCommandList 
-          6. GeneratedCommandList 
+          5. AcceptedCommandList
+          6. GeneratedCommandList
 
           Verification Instructions:
           Please use the provided example log as a guide to verify the attributes for other clusters and endpoints in a similar manner.

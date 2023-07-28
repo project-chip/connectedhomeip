@@ -189,7 +189,7 @@ tests:
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read start-up-mode 1 1
 
-          On TH(chip-tool),  Verify that StartUpMode attribute value is an integer 
+          On TH(chip-tool),  Verify that StartUpMode attribute value is an integer
           - Save the value as new_start_up_mode_dut
           - The value is equal to new_start_up_mode_th and below is the sample log provided for the raspi platform, Here StartUpMode value is 0
 

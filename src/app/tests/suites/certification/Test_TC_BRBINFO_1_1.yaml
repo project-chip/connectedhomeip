@@ -39,8 +39,8 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasicinformation read cluster-revision 1 3
 
-          Via the TH (chip-tool), verify: 
-          -that the ClusterRevision attribute contains value as 2. 
+          Via the TH (chip-tool), verify:
+          -that the ClusterRevision attribute contains value as 2.
           -that value is in the type of uint16.
 
           [1657695910.794487][15411:15416] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_FFFD DataVersion: 2577979325

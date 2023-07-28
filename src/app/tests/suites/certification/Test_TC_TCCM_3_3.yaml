@@ -114,7 +114,7 @@ tests:
 
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read on-mode 1 1
 
-          On TH(chip-tool),  Verify that OnMode attribute value is an integer 
+          On TH(chip-tool),  Verify that OnMode attribute value is an integer
           -Save the value as old_on_mode_du, t below is the sample log provided for the raspi platform, here OnMode attribute value is 0
 
           [1690190846.367481][16585:16587] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0003 DataVersion: 978521150
@@ -181,7 +181,7 @@ tests:
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read on-mode 1 1
 
-          On TH(chip-tool),  Verify that OnMode attribute value is an integer 
+          On TH(chip-tool),  Verify that OnMode attribute value is an integer
           - Save the value as new_on_mode_dut and  value is equal to new_mode_th,  below is the sample log provided for the raspi platform, here OnMode attribute value is 1
 
           [1690190846.367481][16585:16587] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0003 DataVersion: 978521150
