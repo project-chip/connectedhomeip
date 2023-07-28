@@ -20,8 +20,10 @@ import asyncio
 import builtins
 import json
 import logging
+import math
 import os
 import pathlib
+import queue
 import re
 import sys
 import typing
@@ -46,8 +48,10 @@ import chip.clusters as Clusters
 import chip.logging
 import chip.native
 from chip.ChipStack import ChipStack
+from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.interaction_model import InteractionModelError, Status
 from chip.storage import PersistentStorage
+from chip.tracing import TracingContext
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
@@ -195,6 +199,28 @@ def compare_time(received: int, offset: timedelta = timedelta(), utc: int = None
     asserts.assert_less_equal(delta, tolerance, "Received time is out of tolerance")
 
 
+def get_wait_seconds_from_set_time(set_time_matter_us: int, wait_seconds: int):
+    seconds_passed = math.floor((utc_time_in_matter_epoch() - set_time_matter_us)/1000000)
+    return wait_seconds - seconds_passed
+
+
+class SimpleEventCallback:
+    def __init__(self, name: str, expected_cluster_id: int, expected_event_id: int, output_queue: queue.SimpleQueue):
+        self._name = name
+        self._expected_cluster_id = expected_cluster_id
+        self._expected_event_id = expected_event_id
+        self._output_queue = output_queue
+
+    def __call__(self, event_result: EventReadResult, transaction: SubscriptionTransaction):
+        if (self._expected_cluster_id == event_result.Header.ClusterId and
+                self._expected_event_id == event_result.Header.EventId):
+            self._output_queue.put(event_result)
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+
 @dataclass
 class MatterTestConfig:
     storage_path: pathlib.Path = pathlib.Path(".")
@@ -239,6 +265,8 @@ class MatterTestConfig:
 
     # If this is set, we will reuse root of trust keys at that location
     chip_tool_credentials_path: Optional[pathlib.Path] = None
+
+    trace_to: List[str] = field(default_factory=list)
 
 
 class ClusterMapper:
@@ -790,8 +818,10 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.paa_trust_store_path = args.paa_trust_store_path
     config.ble_interface_id = args.ble_interface_id
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
+    config.tests = [] if args.tests is None else args.tests
 
     config.controller_node_id = args.controller_node_id
+    config.trace_to = args.trace_to
 
     # Accumulate all command-line-passed named args
     all_global_args = []
@@ -822,7 +852,8 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
                              type=str,
                              metavar='test_a test_b...',
                              help='A list of tests in the test class to execute.')
-
+    basic_group.add_argument('--trace-to', nargs="*", default=[],
+                             help="Where to trace (e.g perfetto, perfetto:path, json:log, json:path)")
     basic_group.add_argument('--storage-path', action="store", type=pathlib.Path,
                              metavar="PATH", help="Location for persisted storage of instance")
     basic_group.add_argument('--logs-path', action="store", type=pathlib.Path, metavar="PATH", help="Location for test logs")
@@ -1026,44 +1057,49 @@ def default_matter_test_main(argv=None, **kwargs):
         matter_test_config.maximize_cert_chains = kwargs["maximize_cert_chains"]
 
     stack = MatterStackState(matter_test_config)
-    test_config.user_params["matter_stack"] = stash_globally(stack)
 
-    # TODO: Steer to right FabricAdmin!
-    # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
+    with TracingContext() as tracing_ctx:
+        for destination in matter_test_config.trace_to:
+            tracing_ctx.StartFromString(destination)
 
-    default_controller = stack.certificate_authorities[0].adminList[0].NewController(
-        nodeId=matter_test_config.controller_node_id,
-        paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
-        catTags=matter_test_config.controller_cat_tags
-    )
-    test_config.user_params["default_controller"] = stash_globally(default_controller)
+        test_config.user_params["matter_stack"] = stash_globally(stack)
 
-    test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
+        # TODO: Steer to right FabricAdmin!
+        # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
 
-    test_config.user_params["certificate_authority_manager"] = stash_globally(stack.certificate_authority_manager)
+        default_controller = stack.certificate_authorities[0].adminList[0].NewController(
+            nodeId=matter_test_config.controller_node_id,
+            paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
+            catTags=matter_test_config.controller_cat_tags
+        )
+        test_config.user_params["default_controller"] = stash_globally(default_controller)
 
-    # Execute the test class with the config
-    ok = True
+        test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
 
-    runner = TestRunner(log_dir=test_config.log_path,
-                        testbed_name=test_config.testbed_name)
+        test_config.user_params["certificate_authority_manager"] = stash_globally(stack.certificate_authority_manager)
 
-    with runner.mobly_logger():
-        if matter_test_config.commissioning_method is not None:
-            runner.add_test_class(test_config, CommissionDeviceTest, None)
+        # Execute the test class with the config
+        ok = True
 
-        # Add the tests selected unless we have a commission-only request
-        if not matter_test_config.commission_only:
-            runner.add_test_class(test_config, test_class, tests)
+        runner = TestRunner(log_dir=test_config.log_path,
+                            testbed_name=test_config.testbed_name)
 
-        try:
-            runner.run()
-            ok = runner.results.is_all_pass and ok
-        except signals.TestAbortAll:
-            ok = False
-        except Exception:
-            logging.exception('Exception when executing %s.', test_config.testbed_name)
-            ok = False
+        with runner.mobly_logger():
+            if matter_test_config.commissioning_method is not None:
+                runner.add_test_class(test_config, CommissionDeviceTest, None)
+
+            # Add the tests selected unless we have a commission-only request
+            if not matter_test_config.commission_only:
+                runner.add_test_class(test_config, test_class, tests)
+
+            try:
+                runner.run()
+                ok = runner.results.is_all_pass and ok
+            except signals.TestAbortAll:
+                ok = False
+            except Exception:
+                logging.exception('Exception when executing %s.', test_config.testbed_name)
+                ok = False
 
     # Shutdown the stack when all done
     stack.Shutdown()

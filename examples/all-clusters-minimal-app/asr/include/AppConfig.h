@@ -28,12 +28,6 @@
 
 #define MATTER_DEVICE_NAME "ASR-Clusters-m"
 
-#define APP_LIGHT_BUTTON_IDX 0
-#define APP_BUTTON_DEBOUNCE_PERIOD_MS 50
-
-#define APP_BUTTON_PRESSED 0
-#define APP_BUTTON_RELEASED 1
-
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.
 #define ACTUATOR_MOVEMENT_PERIOS_MS 2000

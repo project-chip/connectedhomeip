@@ -111,11 +111,17 @@ declare_args() {
   }
 }
 
-if ((chip_device_platform == "bl702" || chip_device_platform == "bl702l") &&
-    chip_enable_openthread) {
-  chip_mdns = "platform"
-} else if (chip_device_platform == "bl702" && chip_enable_wifi) {
-  chip_mdns = "minimal"
+declare_args() {
+  # Enable subscription resumption after timeout - separate configuration for power use measurement
+  chip_subscription_timeout_resumption = chip_persist_subscriptions
+}
+
+if (chip_device_platform == "bl702" || chip_device_platform == "bl702l") {
+  if (chip_enable_openthread) {
+    chip_mdns = "platform"
+  } else {
+    chip_mdns = "minimal"
+  }
 }
 
 _chip_device_layer = "none"

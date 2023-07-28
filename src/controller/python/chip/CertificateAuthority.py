@@ -20,8 +20,8 @@ from __future__ import annotations
 
 import ctypes
 import logging
-from ctypes import *
-from typing import *
+from ctypes import c_void_p
+from typing import List
 
 import chip.exceptions
 from chip import ChipStack, FabricAdmin
@@ -30,18 +30,20 @@ from chip.storage import PersistentStorage
 
 
 class CertificateAuthority:
-    '''  This represents an operational Root Certificate Authority (CA) with a root key key pair with associated public key (i.e "Root PK") . This manages
-         a set of FabricAdmin objects, each administering a fabric identified by a unique FabricId scoped to it.
+    '''  This represents an operational Root Certificate Authority (CA) with a root key key pair with associated
+         public key (i.e "Root PK") . This manages a set of FabricAdmin objects, each administering a fabric identified
+         by a unique FabricId scoped to it.
 
-         Each CertificateAuthority instance is tied to a 'CA index' that is used to look-up the list of fabrics already setup previously
-         in the provided PersistentStorage object.
+         Each CertificateAuthority instance is tied to a 'CA index' that is used to look-up the list of fabrics already setup
+         previously in the provided PersistentStorage object.
 
          >> C++ Binding Details
 
-         Each CertificateAuthority instance is associated with a single instance of the OperationalCredentialsAdapter. This adapter instance implements
-         the OperationalCredentialsDelegate and is meant to provide a Python adapter to the functions in that delegate. It relies on the in-built
-         ExampleOperationalCredentialsIssuer to then generate certificate material for the CA.  This instance also uses the 'CA index' to
-         store/look-up the associated credential material from the provided PersistentStorage object.
+         Each CertificateAuthority instance is associated with a single instance of the OperationalCredentialsAdapter.
+         This adapter instance implements the OperationalCredentialsDelegate and is meant to provide a Python adapter to the
+         functions in that delegate. It relies on the in-built ExampleOperationalCredentialsIssuer to then generate certificate
+         material for the CA.  This instance also uses the 'CA index' to store/look-up the associated credential material from
+         the provided PersistentStorage object.
     '''
     @classmethod
     def _Handle(cls):
@@ -57,7 +59,8 @@ class CertificateAuthority:
 
              Arguments:
                 chipStack:          A reference to a chip.ChipStack object.
-                caIndex:            An index used to look-up details about stored credential material and fabrics from persistent storage.
+                caIndex:            An index used to look-up details about stored credential material and fabrics
+                                    from persistent storage.
                 persistentStorage:  An optional reference to a PersistentStorage object. If one is provided, it will pick that over
                                     the default PersistentStorage object retrieved from the chipStack.
         '''
@@ -121,10 +124,10 @@ class CertificateAuthority:
         '''
         if (not (self._isActive)):
             raise RuntimeError(
-                f"CertificateAuthority object was previously shutdown and is no longer valid!")
+                "CertificateAuthority object was previously shutdown and is no longer valid!")
 
         if (vendorId is None or fabricId is None):
-            raise ValueError(f"Invalid values for fabricId and vendorId")
+            raise ValueError("Invalid values for fabricId and vendorId")
 
         for existingAdmin in self._activeAdmins:
             if (existingAdmin.fabricId == fabricId):

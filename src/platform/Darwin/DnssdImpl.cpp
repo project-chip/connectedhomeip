@@ -250,7 +250,7 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
                       void * context)
 {
     ChipLogProgress(Discovery, "Mdns: %s flags: %d, interface: %u, fullname: %s, hostname: %s, port: %u", __func__, flags,
-                    (unsigned) interfaceId, StringOrNullMarker(fullname), StringOrNullMarker(hostname), port);
+                    (unsigned) interfaceId, StringOrNullMarker(fullname), StringOrNullMarker(hostname), ntohs(port));
     auto sdCtx = reinterpret_cast<ResolveContext *>(context);
     ReturnOnFailure(MdnsContexts::GetInstance().Has(sdCtx));
     LogOnFailure(__func__, err);

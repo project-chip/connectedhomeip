@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- 
+
 package chip.onboardingpayload
 
 // See section 5.1.2. QR Code in the Matter specification
@@ -23,49 +23,50 @@ const val kDiscriminatorShortBits = 4
 const val kDiscriminatorLongMask = (1 shl kDiscriminatorLongBits) - 1
 const val kDiscriminatorShortMask = (1 shl kDiscriminatorShortBits) - 1
 
-const val kVersionFieldLengthInBits              = 3
-const val kVendorIDFieldLengthInBits             = 16
-const val kProductIDFieldLengthInBits            = 16
-const val kCommissioningFlowFieldLengthInBits    = 2
-const val kRendezvousInfoFieldLengthInBits       = 8
+const val kVersionFieldLengthInBits = 3
+const val kVendorIDFieldLengthInBits = 16
+const val kProductIDFieldLengthInBits = 16
+const val kCommissioningFlowFieldLengthInBits = 2
+const val kRendezvousInfoFieldLengthInBits = 8
 const val kPayloadDiscriminatorFieldLengthInBits = kDiscriminatorLongBits
-const val kSetupPINCodeFieldLengthInBits         = 27
-const val kPaddingFieldLengthInBits              = 4
-const val kRawVendorTagLengthInBits              = 7
+const val kSetupPINCodeFieldLengthInBits = 27
+const val kPaddingFieldLengthInBits = 4
+const val kRawVendorTagLengthInBits = 7
 
 // See section 5.1.3. Manual Pairing Code in the Matter specification
-const val kManualSetupDiscriminatorFieldLengthInBits  = kDiscriminatorShortBits
-const val kManualSetupChunk1DiscriminatorMsbitsPos    = 0
+const val kManualSetupDiscriminatorFieldLengthInBits = kDiscriminatorShortBits
+const val kManualSetupChunk1DiscriminatorMsbitsPos = 0
 const val kManualSetupChunk1DiscriminatorMsbitsLength = 2
 const val kManualSetupChunk1VidPidPresentBitPos =
-    (kManualSetupChunk1DiscriminatorMsbitsPos + kManualSetupChunk1DiscriminatorMsbitsLength)
-const val kManualSetupChunk2PINCodeLsbitsPos       = 0
-const val kManualSetupChunk2PINCodeLsbitsLength    = 14
-const val kManualSetupChunk2DiscriminatorLsbitsPos = (kManualSetupChunk2PINCodeLsbitsPos + kManualSetupChunk2PINCodeLsbitsLength)
+  (kManualSetupChunk1DiscriminatorMsbitsPos + kManualSetupChunk1DiscriminatorMsbitsLength)
+const val kManualSetupChunk2PINCodeLsbitsPos = 0
+const val kManualSetupChunk2PINCodeLsbitsLength = 14
+const val kManualSetupChunk2DiscriminatorLsbitsPos =
+  (kManualSetupChunk2PINCodeLsbitsPos + kManualSetupChunk2PINCodeLsbitsLength)
 const val kManualSetupChunk2DiscriminatorLsbitsLength = 2
-const val kManualSetupChunk3PINCodeMsbitsPos          = 0
-const val kManualSetupChunk3PINCodeMsbitsLength       = 13
+const val kManualSetupChunk3PINCodeMsbitsPos = 0
+const val kManualSetupChunk3PINCodeMsbitsLength = 13
 
-const val kManualSetupShortCodeCharLength  = 10
-const val kManualSetupLongCodeCharLength   = 20
+const val kManualSetupShortCodeCharLength = 10
+const val kManualSetupLongCodeCharLength = 20
 const val kManualSetupCodeChunk1CharLength = 1
 const val kManualSetupCodeChunk2CharLength = 5
 const val kManualSetupCodeChunk3CharLength = 4
-const val kManualSetupVendorIdCharLength   = 5
-const val kManualSetupProductIdCharLength  = 5
+const val kManualSetupVendorIdCharLength = 5
+const val kManualSetupProductIdCharLength = 5
 
 // Spec 5.1.4.2 CHIP-Common Reserved Tags
-const val kSerialNumberTag         = 0x00
-const val kPBKDFIterationsTag      = 0x01
-const val kBPKFSaltTag             = 0x02
-const val kNumberOFDevicesTag      = 0x03
+const val kSerialNumberTag = 0x00
+const val kPBKDFIterationsTag = 0x01
+const val kBPKFSaltTag = 0x02
+const val kNumberOFDevicesTag = 0x03
 const val kCommissioningTimeoutTag = 0x04
 
-const val kSetupPINCodeMaximumValue   = 99999998L
+const val kSetupPINCodeMaximumValue = 99999998L
 const val kSetupPINCodeUndefinedValue = 0L
 
 const val kTotalPayloadDataSizeInBits: Int =
-    kVersionFieldLengthInBits +
+  kVersionFieldLengthInBits +
     kVendorIDFieldLengthInBits +
     kProductIDFieldLengthInBits +
     kCommissioningFlowFieldLengthInBits +
@@ -78,35 +79,35 @@ const val kTotalPayloadDataSizeInBytes: Int = kTotalPayloadDataSizeInBits / 8
 
 const val kQRCodePrefix = "MT:"
 
-/** Class to hold the data from the scanned QR code or Manual Pairing Code.  */
+/** Class to hold the data from the scanned QR code or Manual Pairing Code. */
 class OnboardingPayload(
   /** Version info of the OnboardingPayload: version SHALL be 0 */
   var version: Int = 0,
-  
+
   /** The CHIP device vendor ID: Vendor ID SHALL be between 1 and 0xFFF4. */
   var vendorId: Int = 0,
-  
+
   /** The CHIP device product ID: Product ID SHALL BE greater than 0. */
   var productId: Int = 0,
-  
+
   /** Commissioning flow: 0 = standard, 1 = requires user action, 2 = custom */
   var commissioningFlow: Int = 0,
-  
+
   /**
    * The CHIP device supported rendezvous flags: At least one DiscoveryCapability must be included.
    */
   var discoveryCapabilities: MutableSet<DiscoveryCapability> = mutableSetOf(),
-  
+
   /** The CHIP device discriminator: */
   var discriminator: Int = 0,
-  
+
   /**
    * If hasShortDiscriminator is true, the discriminator value contains just the high 4 bits of the
    * full discriminator. For example, if hasShortDiscriminator is true and discriminator is 0xA,
    * then the full discriminator can be anything in the range 0xA00 to 0xAFF.
    */
   var hasShortDiscriminator: Boolean = false,
-  
+
   /**
    * The CHIP device setup PIN code: setupPINCode SHALL be greater than 0. Also invalid setupPINCode
    * is {000000000, 11111111, 22222222, 33333333, 44444444, 55555555, 66666666, 77777777, 88888888,
@@ -143,6 +144,20 @@ class OnboardingPayload(
     setupPinCode
   )
 
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is OnboardingPayload) return false
+
+    return version == other.version &&
+      vendorId == other.vendorId &&
+      productId == other.productId &&
+      commissioningFlow == other.commissioningFlow &&
+      discoveryCapabilities == other.discoveryCapabilities &&
+      discriminator == other.discriminator &&
+      hasShortDiscriminator == other.hasShortDiscriminator &&
+      setupPinCode == other.setupPinCode
+  }
+
   fun addOptionalQRCodeInfo(info: OptionalQRCodeInfo) {
     optionalQRCodeInfo[info.tag] = info
   }
@@ -166,24 +181,27 @@ class OnboardingPayload(
     }
 
     // Device Commissioning Flow
-    // 0: Standard commissioning flow: such a device, when uncommissioned, always enters commissioning mode upon power-up, subject
-    // to the rules in [ref_Announcement_Commencement]. 1: User-intent commissioning flow: user action required to enter
-    // commissioning mode. 2: Custom commissioning flow: interaction with a vendor-specified means is needed before commissioning.
+    // 0: Standard commissioning flow: such a device, when uncommissioned, always enters
+    // commissioning mode upon power-up, subject
+    // to the rules in [ref_Announcement_Commencement]. 1: User-intent commissioning flow: user
+    // action required to enter
+    // commissioning mode. 2: Custom commissioning flow: interaction with a vendor-specified
+    // means is needed before commissioning.
     // 3: Reserved
-    if (commissioningFlow != CommissioningFlow.STANDARD.value &&
+    if (
+      commissioningFlow != CommissioningFlow.STANDARD.value &&
         commissioningFlow != CommissioningFlow.USER_ACTION_REQUIRED.value &&
-        commissioningFlow != CommissioningFlow.CUSTOM.value) {
+        commissioningFlow != CommissioningFlow.CUSTOM.value
+    ) {
       return false
     }
 
-    val allValid = setOf(
-      DiscoveryCapability.BLE,
-      DiscoveryCapability.ON_NETWORK,
-      DiscoveryCapability.SOFT_AP
-    )
+    val allValid =
+      setOf(DiscoveryCapability.BLE, DiscoveryCapability.ON_NETWORK, DiscoveryCapability.SOFT_AP)
 
-    // If discoveryCapabilities is empty or discoveryCapabilities contains values outside of allValid
-    if (discoveryCapabilities.isEmpty() || discoveryCapabilities.any { it !in allValid }) {
+    // If discoveryCapabilities is not empty and discoveryCapabilities contains values outside
+    // of allValid
+    if (!discoveryCapabilities.isEmpty() && discoveryCapabilities.any { it !in allValid }) {
       return false
     }
 
@@ -208,9 +226,9 @@ class OnboardingPayload(
     if (discriminator != (discriminator and kDiscriminatorLongMask)) {
       throw OnboardingPayloadException("Invalid argument")
     }
-        
+
     this.discriminator = (discriminator and kDiscriminatorLongMask)
-    this.hasShortDiscriminator = false;
+    this.hasShortDiscriminator = false
   }
 
   fun getShortDiscriminatorValue(): Int {
@@ -229,22 +247,22 @@ class OnboardingPayload(
 
   fun getRendezvousInformation(): Long {
     var rendezvousInfo: Long = 0
-    
+
     if (discoveryCapabilities.contains(DiscoveryCapability.SOFT_AP)) {
-        // set bit 0
-        rendezvousInfo = rendezvousInfo or (1L shl 0)
+      // set bit 0
+      rendezvousInfo = rendezvousInfo or (1L shl 0)
     }
-    
+
     if (discoveryCapabilities.contains(DiscoveryCapability.BLE)) {
-        // set bit 1
-        rendezvousInfo = rendezvousInfo or (1L shl 1)
+      // set bit 1
+      rendezvousInfo = rendezvousInfo or (1L shl 1)
     }
-    
+
     if (discoveryCapabilities.contains(DiscoveryCapability.ON_NETWORK)) {
-        // set bit 2
-        rendezvousInfo = rendezvousInfo or (1L shl 2)
+      // set bit 2
+      rendezvousInfo = rendezvousInfo or (1L shl 2)
     }
-    
+
     return rendezvousInfo
   }
 
@@ -254,19 +272,19 @@ class OnboardingPayload(
 
     // bit 0 is set
     if (rendezvousInfo and (1L shl 0) != 0L) {
-      discoveryCapabilities.add(DiscoveryCapability.SOFT_AP) 
+      discoveryCapabilities.add(DiscoveryCapability.SOFT_AP)
     }
 
     // bit 1 is set
     if (rendezvousInfo and (1L shl 1) != 0L) {
-      discoveryCapabilities.add(DiscoveryCapability.BLE) 
+      discoveryCapabilities.add(DiscoveryCapability.BLE)
     }
 
     // bit 2 is set
     if (rendezvousInfo and (1L shl 2) != 0L) {
-      discoveryCapabilities.add(DiscoveryCapability.ON_NETWORK) 
-    }        
-  }  
+      discoveryCapabilities.add(DiscoveryCapability.ON_NETWORK)
+    }
+  }
 
   /**
    * A function to add a String serial number
@@ -278,9 +296,9 @@ class OnboardingPayload(
     info.tag = kSerialNumberTag
     info.type = OptionalQRCodeInfoType.TYPE_STRING
     info.data = serialNumber
-    
+
     addOptionalExtensionData(info)
-  }    
+  }
 
   /**
    * A function to add a Int serial number
@@ -304,19 +322,17 @@ class OnboardingPayload(
   fun getSerialNumber(): String {
     val outSerialNumber = StringBuilder()
     val info = getOptionalExtensionData(kSerialNumberTag)
-  
+
     when (info.type) {
-        OptionalQRCodeInfoType.TYPE_STRING -> outSerialNumber.append(info.data)
-        OptionalQRCodeInfoType.TYPE_UINT32 -> outSerialNumber.append(info.uint32)
-        else -> throw OnboardingPayloadException("Invalid argument")
+      OptionalQRCodeInfoType.TYPE_STRING -> outSerialNumber.append(info.data)
+      OptionalQRCodeInfoType.TYPE_UINT32 -> outSerialNumber.append(info.uint32)
+      else -> throw OnboardingPayloadException("Invalid argument")
     }
-  
+
     return outSerialNumber.toString()
   }
 
-  /**
-   * A function to remove the serial number from the payload
-   */
+  /** A function to remove the serial number from the payload */
   fun removeSerialNumber() {
     if (optionalExtensionData.containsKey(kSerialNumberTag)) {
       optionalExtensionData.remove(kSerialNumberTag)
@@ -327,9 +343,9 @@ class OnboardingPayload(
   }
 
   /**
-   * Checks if the tag is CHIP Common type
-   * Spec 5.1.4.2 CHIPCommon tag numbers are in the range [0x00, 0x7F]
-   * 
+   * Checks if the tag is CHIP Common type Spec 5.1.4.2 CHIPCommon tag numbers are in the range
+   * [0x00, 0x7F]
+   *
    * @param tag Tag to be checked
    * @return True if the tag is of Common type, False otherwise
    */
@@ -338,8 +354,8 @@ class OnboardingPayload(
   }
 
   /**
-   * Checks if the tag is vendor-specific
-   * Spec 5.1.4.1 Manufacture-specific tag numbers are in the range [0x80, 0xFF]
+   * Checks if the tag is vendor-specific Spec 5.1.4.1 Manufacture-specific tag numbers are in the
+   * range [0x80, 0xFF]
    *
    * @param tag Tag to be checked
    * @return True if the tag is Vendor-specific, False otherwise
@@ -351,7 +367,7 @@ class OnboardingPayload(
   /**
    * A function to add an optional vendor data
    *
-   * @param tag  tag number in the [0x80-0xFF] range
+   * @param tag tag number in the [0x80-0xFF] range
    * @param data String representation of data to add
    */
   fun addOptionalVendorData(tag: Int, data: String) {
@@ -361,7 +377,7 @@ class OnboardingPayload(
     info.data = data
 
     addOptionalVendorData(info)
-  }    
+  }
 
   /**
    * A function to add an optional vendor data
@@ -376,7 +392,7 @@ class OnboardingPayload(
     info.int32 = data
 
     addOptionalVendorData(info)
-  }    
+  }
 
   /**
    * A function to add an optional QR Code info vendor object
@@ -404,7 +420,7 @@ class OnboardingPayload(
     } else {
       throw OnboardingPayloadException("Key not found")
     }
-  }    
+  }
 
   /**
    * A function to retrieve the vector of OptionalQRCodeInfo infos
@@ -417,7 +433,7 @@ class OnboardingPayload(
     for (entry in optionalVendorData) {
       returnedOptionalInfo.add(entry.value)
     }
-    
+
     return returnedOptionalInfo
   }
 
@@ -445,7 +461,7 @@ class OnboardingPayload(
     for (entry in optionalExtensionData) {
       returnedOptionalInfo.add(entry.value)
     }
-    
+
     return returnedOptionalInfo
   }
 
@@ -466,7 +482,7 @@ class OnboardingPayload(
    * @return retrieved OptionalQRCodeInfoExtension object
    */
   private fun getOptionalExtensionData(tag: Int): OptionalQRCodeInfoExtension {
-    return optionalExtensionData[tag] ?: throw OnboardingPayloadException("Key not found")    
+    return optionalExtensionData[tag] ?: throw OnboardingPayloadException("Key not found")
   }
 
   /**
@@ -485,7 +501,7 @@ class OnboardingPayload(
     }
 
     return elemType
-  }      
+  }
 
   private fun checkPayloadCommonConstraints(): Boolean {
     if (version != 0) {
@@ -509,17 +525,25 @@ class OnboardingPayload(
 
   private fun isVendorIdValidOperationally(vendorId: Int): Boolean {
     return vendorId != VendorId.UNSPECIFIED.value && vendorId <= VendorId.TESTVENDOR4.value
-  }     
+  }
 
   companion object {
     private fun isValidSetupPIN(setupPIN: Long): Boolean {
-    // SHALL be restricted to the values 0x0000001 to 0x5F5E0FE (00000001 to 99999998 in decimal),
-    // excluding the invalid Passcode values.    
-    return (setupPIN != kSetupPINCodeUndefinedValue && setupPIN <= kSetupPINCodeMaximumValue &&
-            setupPIN != 11111111L && setupPIN != 22222222L && setupPIN != 33333333L &&
-            setupPIN != 44444444L && setupPIN != 55555555L && setupPIN != 66666666L &&
-            setupPIN != 77777777L && setupPIN != 88888888L && setupPIN != 12345678L &&
-            setupPIN != 87654321L)              
+      // SHALL be restricted to the values 0x0000001 to 0x5F5E0FE (00000001 to 99999998 in
+      // decimal),
+      // excluding the invalid Passcode values.
+      return (setupPIN != kSetupPINCodeUndefinedValue &&
+        setupPIN <= kSetupPINCodeMaximumValue &&
+        setupPIN != 11111111L &&
+        setupPIN != 22222222L &&
+        setupPIN != 33333333L &&
+        setupPIN != 44444444L &&
+        setupPIN != 55555555L &&
+        setupPIN != 66666666L &&
+        setupPIN != 77777777L &&
+        setupPIN != 88888888L &&
+        setupPIN != 12345678L &&
+        setupPIN != 87654321L)
     }
 
     private fun longToShortValue(longValue: Int): Int {
@@ -529,7 +553,7 @@ class OnboardingPayload(
     private fun shortToLongValue(shortValue: Int): Int {
       return (shortValue shl (kDiscriminatorLongBits - kDiscriminatorShortBits))
     }
-  }  
+  }
 }
 
 class UnrecognizedQrCodeException(qrCode: String) :

@@ -28,7 +28,6 @@ import json
 import os
 import platform
 import shutil
-from datetime import datetime
 
 from setuptools import setup
 from wheel.bdist_wheel import bdist_wheel

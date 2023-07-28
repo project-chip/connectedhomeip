@@ -30,5 +30,5 @@ void registerCommandsDelay(Commands & commands, CredentialIssuerCommands * creds
         make_unique<WaitForCommissioneeCommand>(credsIssuerConfig), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for waiting for something to happen.");
 }

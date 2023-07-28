@@ -47,10 +47,11 @@ EmberAfStatus RefrigeratorAlarmServer::GetMaskValue(EndpointId endpoint, BitMask
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading  mask, err:0x%x", status);
-        return status;
     }
-
-    ChipLogProgress(Zcl, "Refrigerator Alarm: Mask ep%d value: %" PRIu32 "", endpoint, mask->Raw());
+    else
+    {
+        ChipLogDetail(Zcl, "Refrigerator Alarm: Mask ep%d value: %" PRIx32 "", endpoint, mask->Raw());
+    }
 
     return status;
 }
@@ -61,10 +62,26 @@ EmberAfStatus RefrigeratorAlarmServer::GetStateValue(EndpointId endpoint, BitMas
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading state, err:0x%x", status);
-        return status;
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "Refrigerator Alarm: State ep%d value: %" PRIx32 "", endpoint, state->Raw());
     }
 
-    ChipLogProgress(Zcl, "Refrigerator Alarm: State ep%d value: %" PRIu32 "", endpoint, state->Raw());
+    return status;
+}
+
+EmberAfStatus RefrigeratorAlarmServer::GetSupportedValue(EndpointId endpoint, BitMask<AlarmMap> * supported)
+{
+    EmberAfStatus status = Attributes::Supported::Get(endpoint, supported);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading  supported, err:0x%x", status);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "Refrigerator Alarm: Supported ep%d value: %" PRIx32 "", endpoint, supported->Raw());
+    }
 
     return status;
 }
@@ -79,7 +96,7 @@ EmberAfStatus RefrigeratorAlarmServer::SetMaskValue(EndpointId endpoint, const B
         return status;
     }
 
-    ChipLogProgress(Zcl, "Refrigerator Alarm: Mask ep%d value: %" PRIu32 "", endpoint, mask.Raw());
+    ChipLogProgress(Zcl, "Refrigerator Alarm: Mask ep%d value: %" PRIx32 "", endpoint, mask.Raw());
 
     // Whenever there is change in Mask, State should change accordingly.
     BitMask<AlarmMap> state;
@@ -116,7 +133,7 @@ EmberAfStatus RefrigeratorAlarmServer::SetStateValue(EndpointId endpoint, BitMas
         return status;
     }
 
-    ChipLogProgress(Zcl, "Refrigerator Alarm: State ep%d value: %" PRIu32 "", endpoint, newState.Raw());
+    ChipLogProgress(Zcl, "Refrigerator Alarm: State ep%d value: %" PRIx32 "", endpoint, newState.Raw());
 
     // Generate Notify event.
     BitMask<AlarmMap> becameActive;
@@ -136,6 +153,34 @@ EmberAfStatus RefrigeratorAlarmServer::SetStateValue(EndpointId endpoint, BitMas
     return status;
 }
 
+EmberAfStatus RefrigeratorAlarmServer::SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    status               = Attributes::Supported::Set(endpoint, supported);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: writing supported, err:0x%x", status);
+        return status;
+    }
+
+    ChipLogProgress(Zcl, "Refrigerator Alarm: Supported ep%d value: %" PRIx32 "", endpoint, supported.Raw());
+
+    // Whenever there is change in Supported attribute, Mask, State should change accordingly.
+    BitMask<AlarmMap> mask;
+    status = GetMaskValue(endpoint, &mask);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (!supported.HasAll(mask))
+    {
+        mask   = supported & mask;
+        status = SetMaskValue(endpoint, mask);
+    }
+    return status;
+}
+
 void RefrigeratorAlarmServer::SendNotifyEvent(EndpointId endpointId, BitMask<AlarmMap> becameActive,
                                               BitMask<AlarmMap> becameInactive, BitMask<AlarmMap> newState, BitMask<AlarmMap> mask)
 {
@@ -151,7 +196,5 @@ void RefrigeratorAlarmServer::SendNotifyEvent(EndpointId endpointId, BitMask<Ala
 /**********************************************************
  * Callbacks Implementation
  *********************************************************/
-
-void emberAfRefrigeratorAlarmClusterServerInitCallback(EndpointId endpoint) {}
 
 void MatterRefrigeratorAlarmPluginServerInitCallback() {}

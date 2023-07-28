@@ -85,5 +85,5 @@ void registerCommandsDiscover(Commands & commands, CredentialIssuerCommands * cr
         make_unique<DiscoverCommissionersCommand>(credsIssuerConfig),
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for device discovery.");
 }

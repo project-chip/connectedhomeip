@@ -80,7 +80,12 @@ class Argument {
   }
 
   constructor(
-    name: String, min: Int, max: Int, value: AtomicInteger, desc: String?, optional: Boolean
+    name: String,
+    min: Int,
+    max: Int,
+    value: AtomicInteger,
+    desc: String?,
+    optional: Boolean
   ) {
     this.name = name
     type = ArgumentType.NUMBER_INT32
@@ -92,7 +97,12 @@ class Argument {
   }
 
   constructor(
-    name: String, min: Short, max: Short, value: AtomicLong, desc: String?, optional: Boolean
+    name: String,
+    min: Short,
+    max: Short,
+    value: AtomicLong,
+    desc: String?,
+    optional: Boolean
   ) {
     this.name = name
     type = ArgumentType.NUMBER_INT32
@@ -104,7 +114,12 @@ class Argument {
   }
 
   constructor(
-    name: String, min: Long, max: Long, value: AtomicLong, desc: String?, optional: Boolean
+    name: String,
+    min: Long,
+    max: Long,
+    value: AtomicLong,
+    desc: String?,
+    optional: Boolean
   ) {
     this.name = name
     type = ArgumentType.NUMBER_INT64
@@ -122,32 +137,27 @@ class Argument {
         val str = this.value as String
         isValidArgument = value == str
       }
-
       ArgumentType.NUMBER_INT16 -> {
         val numShort = this.value as AtomicInteger
         numShort.set(value.toInt())
         isValidArgument = numShort.toInt() >= minValue && numShort.toInt() <= maxValue
       }
-
       ArgumentType.NUMBER_INT32 -> {
         val num = this.value as AtomicInteger
         num.set(value.toInt())
         isValidArgument = num.toInt() >= minValue && num.toInt() <= maxValue
       }
-
       ArgumentType.NUMBER_INT64 -> {
         val numLong = this.value as AtomicLong
         numLong.set(value.toLong())
         isValidArgument = numLong.toInt() >= minValue && numLong.toInt() <= maxValue
       }
-
       ArgumentType.STRING -> {
         val stringBuffer = this.value as StringBuffer
         stringBuffer.append(value)
         val str = stringBuffer.toString()
         isValidArgument = value == str
       }
-
       ArgumentType.BOOL -> {
         val atomicBoolean = this.value as AtomicBoolean
         try {
@@ -157,17 +167,16 @@ class Argument {
           isValidArgument = false
         }
       }
-
-      ArgumentType.ADDRESS -> isValidArgument = try {
-        val ipAddress = this.value as IPAddress
-        ipAddress.setAddress(InetAddress.getByName(value))
-        true
-      } catch (e: UnknownHostException) {
-        false
-      }
-
-      else -> {
-      }
+      ArgumentType.ADDRESS ->
+        isValidArgument =
+          try {
+            val ipAddress = this.value as IPAddress
+            ipAddress.setAddress(InetAddress.getByName(value))
+            true
+          } catch (e: UnknownHostException) {
+            false
+          }
+      else -> {}
     }
     require(isValidArgument) { "Invalid argument " + name + ": " + value }
   }

@@ -184,7 +184,7 @@ int32_t wfx_rsi_disconnect()
     return status;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
 /******************************************************************
  * @fn   wfx_rsi_power_save()
  * @brief
@@ -215,7 +215,7 @@ int32_t wfx_rsi_power_save()
     SILABS_LOG("Powersave Config Success");
     return status;
 }
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
+#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
 /******************************************************************
  * @fn   wfx_rsi_join_cb(uint16_t status, const uint8_t *buf, const uint16_t len)

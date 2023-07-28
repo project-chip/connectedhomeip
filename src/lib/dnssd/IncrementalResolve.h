@@ -84,7 +84,16 @@ public:
     };
     using RequiredInformationFlags = BitFlags<RequiredInformationBitFlags>;
 
-    IncrementalResolver() {}
+    // Type of service name that is contained in this resolver
+    enum class ServiceNameType
+    {
+        kInvalid, // not a matter service name
+        kOperational,
+        kCommissioner,
+        kCommissionable,
+    };
+
+    IncrementalResolver() = default;
 
     /// Checks if object has been initialized using the `InitializeParsing`
     /// method.
@@ -92,6 +101,8 @@ public:
 
     bool IsActiveCommissionParse() const { return mSpecificResolutionData.Is<CommissionNodeData>(); }
     bool IsActiveOperationalParse() const { return mSpecificResolutionData.Is<OperationalNodeData>(); }
+
+    ServiceNameType GetCurrentType() const { return mServiceNameType; }
 
     /// Start parsing a new record. SRV records are the records we are mainly
     /// interested on, after which TXT and A/AAAA are looked for.
@@ -171,6 +182,7 @@ private:
 
     StoredServerName mRecordName;     // Record name for what is parsed (SRV/PTR/TXT)
     StoredServerName mTargetHostName; // `Target` for the SRV record
+    ServiceNameType mServiceNameType = ServiceNameType::kInvalid;
     CommonResolutionData mCommonResolutionData;
     ParsedRecordSpecificData mSpecificResolutionData;
 };

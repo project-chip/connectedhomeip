@@ -34,21 +34,13 @@ enum class IpScore : unsigned
     // "Other" IPv6 include:
     //   - invalid addresses (have seen router bugs during interop testing)
     //   - embedded IPv4 (::/80)
-    kOtherIpv6 = 1,
-    kIpv4      = 2, // Not Matter SPEC, so low priority
-#ifdef __APPLE__
+    kOtherIpv6                     = 1,
+    kIpv4                          = 2, // Not Matter SPEC, so low priority
     kUniqueLocal                   = 3, // ULA. Thread devices use this
     kGlobalUnicast                 = 4, // Maybe routable, not local subnet
     kUniqueLocalWithSharedPrefix   = 5, // Prefix seems to match a local interface
     kGlobalUnicastWithSharedPrefix = 6, // Prefix seems to match a local interface
     kLinkLocal                     = 7, // Valid only on an interface
-#else
-    kLinkLocal                     = 3, // Valid only on an interface
-    kUniqueLocal                   = 4, // ULA. Thread devices use this
-    kGlobalUnicast                 = 5, // Maybe routable, not local subnet
-    kUniqueLocalWithSharedPrefix   = 6, // Prefix seems to match a local interface
-    kGlobalUnicastWithSharedPrefix = 7, // Prefix seems to match a local interface
-#endif // __APPLE__
 };
 
 void Sort(Inet::IPAddress * addresses, size_t count, Inet::InterfaceId interfaceId);

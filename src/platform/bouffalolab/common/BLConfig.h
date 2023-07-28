@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <string.h>
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -70,15 +66,15 @@ public:
     static constexpr const char * kConfigKey_ActiveLocale                = ("active-locale");
     static constexpr const char * kConfigKey_Breadcrumb                  = ("breadcrumb");
     static constexpr const char * kConfigKey_GroupKeyIndex               = ("group-key-index");
-    static constexpr const char * kBLConfigKey_wifissid                  = ("blConfig_wifi-ssid");
-    static constexpr const char * kBLConfigKey_wifipassword              = ("blConfig_wifi-pwd");
+    static constexpr const char * kConfigKey_LifeTimeCounter             = ("life-time-counter");
+
+    static constexpr const char * kBLConfigKey_wifissid     = ("blConfig_wifi-ssid");
+    static constexpr const char * kBLConfigKey_wifipassword = ("blConfig_wifi-pwd");
 
     /** Counter Keys, diagnostic information  */
     static constexpr const char * kCounterKey_RebootCount           = ("reboot-count");
     static constexpr const char * kCounterKey_TotalOperationalHours = ("total-hours");
     static constexpr const char * kCounterKey_UpTime                = ("up-time");
-
-    static CHIP_ERROR Init(void);
 
     // Config value accessors.
     static CHIP_ERROR ReadConfigValue(const char * key, uint8_t * val, size_t size, size_t & readsize);

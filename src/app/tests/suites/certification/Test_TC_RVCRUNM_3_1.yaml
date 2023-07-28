@@ -1,0 +1,148 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 87.4.1. [TC-RVCRUNM-3.1] On Mode functionality with DUT as Server
+
+PICS:
+    - RVCRUNM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the OnMode attribute."
+      PICS: RVCRUNM.S.A0003 && RVCRUNM.S.F00
+      verification: |
+          ./chip-tool rvcrunm read on-mode 1 1
+
+          On TH(chip-tool), Verify OnMode attribute value is an integer. save the value as on_mode_dut and below is the sample log provided for the raspi platform:
+
+          [1649678983.679893][10871:10876] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065073
+          [1649678983.680002][10871:10876] CHIP:TOO:   OnMode: 0
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
+      PICS: RVCRUNM.S.A0001 && RVCRUNM.S.F00
+      verification: |
+          ./chip-tool rvcrunm read current-mode 1 1
+
+          On TH(chip-tool), Verify CurrentMode attribute is an integer. save the value as old_current_mode_dut and below is the sample log provided for the raspi platform:
+
+          [1649679034.895848][10879:10884] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
+          [1649679034.895972][10879:10884] CHIP:TOO:   CurrentMode: 0
+      disabled: true
+
+    - label: "Step 4: TH reads from the DUT the SupportedModes attribute."
+      PICS: RVCRUNM.S.A0000 && RVCRUNM.S.F00
+      verification: |
+          ./chip-tool rvcrunm read supported-modes 1 1
+
+          On TH(chip-tool) log, Verify SupportedModes attribute contains two or more ModeOptionsStruct entries. save the Mode field values as supported_modes_dut.Select a value from supported_modes_dut different from startup_mode_dut and save the value as new_mode_th, below is the sample log provided for the raspi platform:
+
+          [1654595268.854568][14400:14405] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
+          [1654595268.854678][14400:14405] CHIP:TOO:   SupportedModes: 3 entries
+          [1654595268.854743][14400:14405] CHIP:TOO:     [1]: {
+          [1654595268.854772][14400:14405] CHIP:TOO:       Label: Black
+          [1654595268.854811][14400:14405] CHIP:TOO:       Mode: 0
+          [1654595268.854843][14400:14405] CHIP:TOO:       SemanticTags: 1 entries
+          [1654595268.854891][14400:14405] CHIP:TOO:         [1]: {
+          [1654595268.854918][14400:14405] CHIP:TOO:           MfgCode: 0
+          [1654595268.854945][14400:14405] CHIP:TOO:           Value: 0
+          [1654595268.854971][14400:14405] CHIP:TOO:          }
+          [1654595268.855000][14400:14405] CHIP:TOO:      }
+          [1654595268.855038][14400:14405] CHIP:TOO:     [2]: {
+          [1654595268.855064][14400:14405] CHIP:TOO:       Label: Cappuccino
+          [1654595268.855089][14400:14405] CHIP:TOO:       Mode: 4
+          [1654595268.855117][14400:14405] CHIP:TOO:       SemanticTags: 1 entries
+          [1654595268.855149][14400:14405] CHIP:TOO:         [1]: {
+          [1654595268.855175][14400:14405] CHIP:TOO:           MfgCode: 0
+          [1654595268.855199][14400:14405] CHIP:TOO:           Value: 0
+          [1654595268.855223][14400:14405] CHIP:TOO:          }
+          [1654595268.855249][14400:14405] CHIP:TOO:      }
+          [1654595268.855284][14400:14405] CHIP:TOO:     [3]: {
+          [1654595268.855310][14400:14405] CHIP:TOO:       Label: Espresso
+          [1654595268.855332][14400:14405] CHIP:TOO:       Mode: 7
+          [1654595268.855360][14400:14405] CHIP:TOO:       SemanticTags: 1 entries
+          [1654595268.855390][14400:14405] CHIP:TOO:         [1]: {
+          [1654595268.855416][14400:14405] CHIP:TOO:           MfgCode: 0
+          [1654595268.855440][14400:14405] CHIP:TOO:           Value: 0
+          [1654595268.855464][14400:14405] CHIP:TOO:          }
+          [1654595268.855490][14400:14405] CHIP:TOO:      }
+          [1649677252.376226][10804:10809] CHIP:TOO:       SemanticTag: 0
+          [1649677252.376252][10804:10809] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 5: TH sends a ChangeToMode command to the DUT with NewMode set
+          to new_mode_th"
+      PICS: RVCRUNM.S.C00.Rsp && RVCRUNM.S.F00
+      verification: |
+          ./chip-tool rvcrunm change-to-mode 7 1 1
+
+          On TH(chip-tool) log, verify DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
+
+          [1684931013.571019][20667:20669] CHIP:DMG:
+          [1684931013.571021][20667:20669] CHIP:DMG:                                 StatusIB =
+          [1684931013.571024][20667:20669] CHIP:DMG:                                 {
+          [1684931013.571027][20667:20669] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1684931013.571030][20667:20669] CHIP:DMG:                                 },
+          [1684931013.571034][20667:20669] CHIP:DMG:
+      disabled: true
+
+    - label: "Step 6: TH sends a Off command to the DUT"
+      PICS: OO.S.C00.Rsp && RVCRUNM.S.F00
+      verification: |
+          ./chip-tool onoff off 1 1
+
+          On TH(chip-tool) log,  Verify DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
+
+          [1684931101.118656][20709:20711] CHIP:DMG:                                 StatusIB =
+          [1684931101.118659][20709:20711] CHIP:DMG:                                 {
+          [1684931101.118663][20709:20711] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1684931101.118665][20709:20711] CHIP:DMG:                                 },
+      disabled: true
+
+    - label: "Step 7: TH sends a On command to the DUT"
+      PICS: OO.S.C01.Rsp && RVCRUNM.S.F00
+      verification: |
+          ./chip-tool onoff on 1 1
+
+          On TH(chip-tool) log, Verify DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
+
+          [1684931217.055514][20729:20731] CHIP:DMG:                                 StatusIB =
+          [1684931217.055517][20729:20731] CHIP:DMG:                                 {
+          [1684931217.055520][20729:20731] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1684931217.055523][20729:20731] CHIP:DMG:                                 },
+      disabled: true
+
+    - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
+      PICS: RVCRUNM.S.A0001 && RVCRUNM.S.F00
+      verification: |
+          ./chip-tool rvcrunm read current-mode 1 1
+
+          On TH(chip-tool),verify that CurrentMode attribute value is an integer and  value is equal to on_mode_dut. below is the sample log provided for the raspi platform:
+
+          [1649679202.069163][10899:10904] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
+          [1649679202.069278][10899:10904] CHIP:TOO:   CurrentMode: 0
+      disabled: true

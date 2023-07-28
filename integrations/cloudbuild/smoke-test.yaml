@@ -1,5 +1,5 @@
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.7.18"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       entrypoint: "bash"
       args:
           - "-c"
@@ -7,7 +7,7 @@ steps:
               git config --global --add safe.directory "*"
               git submodule update --init --recursive
       id: Submodules
-    - name: "connectedhomeip/chip-build-vscode:0.7.18"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -22,16 +22,17 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.18"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       id: ESP32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
+              perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt &&
               ./scripts/build/build_examples.py --enable-flashbundle --target
               esp32-devkitc-light-rpc --target
               esp32-m5stack-all-clusters-ipv6only --target
-              esp32-m5stack-all-clusters-rpc --target
+              esp32-m5stack-all-clusters-rpc-ipv6only --target
               esp32-m5stack-light --target
               esp32-m5stack-light-ipv6only --target
               esp32-m5stack-ota-requestor build --create-archives
@@ -42,7 +43,7 @@ steps:
       volumes:
           - name: pwenv
             path: /pwenv
-    - name: "connectedhomeip/chip-build-vscode:0.7.18"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -63,7 +64,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.18"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       id: EFR32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -85,7 +86,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.18"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       id: Linux
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -138,7 +139,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.18"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv

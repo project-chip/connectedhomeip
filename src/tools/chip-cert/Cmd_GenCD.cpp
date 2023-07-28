@@ -626,6 +626,11 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
             gCDConfig.SetDACOriginPIDPresent();
             gCDConfig.SetDACOriginPIDWrong();
         }
+        else if (strcmp(arg, "different-origin") == 0)
+        {
+            gCDConfig.SetDACOriginVIDPresent();
+            gCDConfig.SetDACOriginPIDPresent();
+        }
         else if (strcmp(arg, "authorized-paa-list-count0") == 0)
         {
             gCDConfig.SetAuthPAAListPresent();

@@ -22,12 +22,15 @@ using namespace chip::DeviceLayer;
 namespace chip {
 namespace app {
 
+uint8_t ICDEventManager::expectedMsgCount = 0;
+static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
+              "ICDEventManager::expectedMsgCount cannot hold count for the max exchange count");
+
 CHIP_ERROR ICDEventManager::Init(ICDManager * icdManager)
 {
     VerifyOrReturnError(icdManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mICDManager = icdManager;
-
-    PlatformMgr().AddEventHandler(ICDEventHandler, reinterpret_cast<intptr_t>(nullptr));
+    PlatformMgr().AddEventHandler(ICDEventHandler, reinterpret_cast<intptr_t>(mICDManager));
 
     return CHIP_NO_ERROR;
 }
@@ -42,8 +45,66 @@ CHIP_ERROR ICDEventManager::Shutdown()
 
 void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
-    // TODO
-}
+    ICDManager * icdManager = reinterpret_cast<ICDManager *>(arg);
 
+    if (icdManager == nullptr)
+    {
+        return;
+    }
+
+    switch (event->Type)
+    {
+    case DeviceEventType::kCommissioningWindowStatusChanged:
+        icdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kCommissioningWindowOpen,
+                                                  event->CommissioningWindowStatus.open);
+        break;
+    case DeviceEventType::kFailSafeStateChanged:
+        icdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kFailSafeArmed, event->FailSafeState.armed);
+        break;
+    case DeviceEventType::kChipMsgSentEvent:
+
+        // When we expect a response to a message sent, We keep the ICD in active mode until it is received
+        // Otherwise, just a kick off an active mode interval/active mode threshold
+        if (event->MessageSent.ExpectResponse)
+        {
+            expectedMsgCount++;
+            icdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kExpectingMsgResponse, true);
+        }
+        else
+        {
+            icdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+        }
+        break;
+    case DeviceEventType::kChipMsgRxEventHandled:
+        if (event->RxEventContext.clearsExpectedResponse)
+        {
+            if (expectedMsgCount > 0)
+            {
+                expectedMsgCount--;
+            }
+            else
+            {
+                // Should we assert?
+                ChipLogError(DeviceLayer, "No response was expected by the ICD Manager");
+            }
+
+            if (expectedMsgCount == 0)
+            {
+                icdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kExpectingMsgResponse, false);
+            }
+        }
+        else if (event->RxEventContext.wasReceived)
+        {
+            icdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+        }
+
+        break;
+    case DeviceEventType::kAppWakeUpEvent:
+        icdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+        break;
+    default:
+        break;
+    }
+}
 } // namespace app
 } // namespace chip

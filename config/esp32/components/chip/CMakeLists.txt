@@ -309,11 +309,21 @@ if(CONFIG_ENABLE_PW_RPC)
     list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPwRpc.a")
 endif()
 
+# When using the pregenerated files, there is a edge case where an error appears for
+# undeclared argument chip_code_pre_generated_directory. To get around with it we are
+# disabling the --fail-on-unused-args flag.
+# For more, see: https://github.com/project-chip/connectedhomeip/issues/27636
+if (CHIP_CODEGEN_PREGEN_DIR)
+    set(GN_CONFIGURE_COMMAND ${GN_EXECUTABLE} --root=${GN_ROOT_TARGET} gen --check ${CMAKE_CURRENT_BINARY_DIR})
+else ()
+    set(GN_CONFIGURE_COMMAND ${GN_EXECUTABLE} --root=${GN_ROOT_TARGET} gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR})
+endif ()
+
 externalproject_add(
     chip_gn
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
-    CONFIGURE_COMMAND       ${GN_EXECUTABLE} --root=${GN_ROOT_TARGET} gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
+    CONFIGURE_COMMAND       ${GN_CONFIGURE_COMMAND}
     BUILD_COMMAND           ninja "esp32"
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${chip_libraries}

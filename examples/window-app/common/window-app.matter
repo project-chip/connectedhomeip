@@ -272,6 +272,13 @@ server cluster Descriptor = 29 {
     int16u revision = 1;
   }
 
+  struct SemanticTagStruct {
+    nullable vendor_id mfgCode = 0;
+    enum8 namespaceID = 1;
+    enum8 tag = 2;
+    optional nullable char_string label = 3;
+  }
+
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;
@@ -895,6 +902,7 @@ server cluster PowerSource = 47 {
   readonly attribute BatChargeLevelEnum batChargeLevel = 14;
   readonly attribute BatFaultEnum activeBatFaults[] = 18;
   readonly attribute BatChargeStateEnum batChargeState = 26;
+  readonly attribute endpoint_no endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2034,8 +2042,9 @@ endpoint 0 {
     ram      attribute batChargeLevel;
     callback attribute activeBatFaults;
     ram      attribute batChargeState;
+    callback attribute endpointList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster GeneralCommissioning {

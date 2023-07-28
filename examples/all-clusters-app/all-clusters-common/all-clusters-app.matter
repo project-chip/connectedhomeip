@@ -293,6 +293,7 @@ client cluster OnOff = 6 {
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
   bitmap OnOffControl : BITMAP8 {
@@ -361,6 +362,7 @@ server cluster OnOff = 6 {
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
   bitmap OnOffControl : BITMAP8 {
@@ -536,6 +538,13 @@ server cluster Descriptor = 29 {
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
+  }
+
+  struct SemanticTagStruct {
+    nullable vendor_id mfgCode = 0;
+    enum8 namespaceID = 1;
+    enum8 tag = 2;
+    optional nullable char_string label = 3;
   }
 
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
@@ -1041,17 +1050,6 @@ server cluster UnitLocalization = 45 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** This cluster is used to describe the configuration and capabilities of a Device's power system. */
-server cluster PowerSourceConfiguration = 46 {
-  readonly attribute INT8U sources[] = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 server cluster PowerSource = 47 {
   enum BatApprovedChemistryEnum : ENUM16 {
@@ -1275,6 +1273,7 @@ server cluster PowerSource = 47 {
   readonly attribute BatChargeLevelEnum batChargeLevel = 14;
   readonly attribute boolean batReplacementNeeded = 15;
   readonly attribute BatReplaceabilityEnum batReplaceability = 16;
+  readonly attribute endpoint_no endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1939,6 +1938,146 @@ server cluster EthernetNetworkDiagnostics = 55 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
+/** Accurate time is required for a number of reasons, including scheduling, display and validating security materials. */
+server cluster TimeSynchronization = 56 {
+  enum GranularityEnum : ENUM8 {
+    kNoTimeGranularity = 0;
+    kMinutesGranularity = 1;
+    kSecondsGranularity = 2;
+    kMillisecondsGranularity = 3;
+    kMicrosecondsGranularity = 4;
+  }
+
+  enum StatusCode : ENUM8 {
+    kTimeNotAccepted = 2;
+  }
+
+  enum TimeSourceEnum : ENUM8 {
+    kNone = 0;
+    kUnknown = 1;
+    kAdmin = 2;
+    kNodeTimeCluster = 3;
+    kNonMatterSNTP = 4;
+    kNonMatterNTP = 5;
+    kMatterSNTP = 6;
+    kMatterNTP = 7;
+    kMixedNTP = 8;
+    kNonMatterSNTPNTS = 9;
+    kNonMatterNTPNTS = 10;
+    kMatterSNTPNTS = 11;
+    kMatterNTPNTS = 12;
+    kMixedNTPNTS = 13;
+    kCloudSource = 14;
+    kPTP = 15;
+    kGNSS = 16;
+  }
+
+  enum TimeZoneDatabaseEnum : ENUM8 {
+    kFull = 0;
+    kPartial = 1;
+    kNone = 2;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kTimeZone = 0x1;
+    kNTPClient = 0x2;
+    kNTPServer = 0x4;
+    kTimeSyncClient = 0x8;
+  }
+
+  struct DSTOffsetStruct {
+    int32s offset = 0;
+    epoch_us validStarting = 1;
+    nullable epoch_us validUntil = 2;
+  }
+
+  struct FabricScopedTrustedTimeSourceStruct {
+    node_id nodeID = 0;
+    endpoint_no endpoint = 1;
+  }
+
+  struct TimeZoneStruct {
+    int32s offset = 0;
+    epoch_us validAt = 1;
+    optional char_string<64> name = 2;
+  }
+
+  struct TrustedTimeSourceStruct {
+    fabric_idx fabricIndex = 0;
+    node_id nodeID = 1;
+    endpoint_no endpoint = 2;
+  }
+
+  info event DSTTableEmpty = 0 {
+  }
+
+  info event DSTStatus = 1 {
+    boolean DSTOffsetActive = 0;
+  }
+
+  info event TimeZoneStatus = 2 {
+    INT32S offset = 0;
+    optional CHAR_STRING name = 1;
+  }
+
+  info event TimeFailure = 3 {
+  }
+
+  info event MissingTrustedTimeSource = 4 {
+  }
+
+  readonly attribute nullable epoch_us UTCTime = 0;
+  readonly attribute GranularityEnum granularity = 1;
+  readonly attribute TimeSourceEnum timeSource = 2;
+  readonly attribute nullable TrustedTimeSourceStruct trustedTimeSource = 3;
+  readonly attribute nullable char_string<128> defaultNTP = 4;
+  readonly attribute TimeZoneStruct timeZone[] = 5;
+  readonly attribute DSTOffsetStruct DSTOffset[] = 6;
+  readonly attribute nullable epoch_us localTime = 7;
+  readonly attribute TimeZoneDatabaseEnum timeZoneDatabase = 8;
+  readonly attribute int8u timeZoneListMaxSize = 10;
+  readonly attribute int8u DSTOffsetListMaxSize = 11;
+  readonly attribute boolean supportsDNSResolve = 12;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetUTCTimeRequest {
+    epoch_us UTCTime = 0;
+    GranularityEnum granularity = 1;
+    optional TimeSourceEnum timeSource = 2;
+  }
+
+  request struct SetTrustedTimeSourceRequest {
+    nullable FabricScopedTrustedTimeSourceStruct trustedTimeSource = 0;
+  }
+
+  request struct SetTimeZoneRequest {
+    TimeZoneStruct timeZone[] = 0;
+  }
+
+  request struct SetDSTOffsetRequest {
+    DSTOffsetStruct DSTOffset[] = 0;
+  }
+
+  request struct SetDefaultNTPRequest {
+    nullable CHAR_STRING<128> defaultNTP = 0;
+  }
+
+  response struct SetTimeZoneResponse = 3 {
+    boolean DSTOffsetRequired = 0;
+  }
+
+  command access(invoke: administer) SetUTCTime(SetUTCTimeRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) SetTrustedTimeSource(SetTrustedTimeSourceRequest): DefaultSuccess = 1;
+  command access(invoke: manage) SetTimeZone(SetTimeZoneRequest): SetTimeZoneResponse = 2;
+  command access(invoke: manage) SetDSTOffset(SetDSTOffsetRequest): DefaultSuccess = 4;
+  command access(invoke: administer) SetDefaultNTP(SetDefaultNTPRequest): DefaultSuccess = 5;
+}
+
 /** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
@@ -2300,7 +2439,7 @@ server cluster IcdManagement = 70 {
 
   request struct UnregisterClientRequest {
     node_id checkInNodeID = 0;
-    optional OCTET_STRING<16> key = 1;
+    optional OCTET_STRING<16> verificationKey = 1;
   }
 
   response struct RegisterClientResponse = 1 {
@@ -2350,6 +2489,229 @@ server cluster ModeSelect = 80 {
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
+/** Attributes and commands for selecting a mode from a list of supported options. */
+server cluster LaundryWasherMode = 81 {
+  enum ModeTag : ENUM16 {
+    kNormal = 16384;
+    kDelicate = 16385;
+    kHeavy = 16386;
+    kWhites = 16387;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute nullable int8u startUpMode = 2;
+  attribute nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
+/** Attributes and commands for selecting a mode from a list of supported options. */
+server cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
+  enum ModeTag : ENUM16 {
+    kRapidCool = 16384;
+    kRapidFreeze = 16385;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute nullable int8u startUpMode = 2;
+  attribute nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
+/** Attributes and commands for selecting a mode from a list of supported options. */
+server cluster RvcRunMode = 84 {
+  enum ModeTag : ENUM16 {
+    kIdle = 16384;
+    kCleaning = 16385;
+  }
+
+  enum StatusCode : ENUM8 {
+    kStuck = 65;
+    kDustBinMissing = 66;
+    kDustBinFull = 67;
+    kWaterTankEmpty = 68;
+    kWaterTankMissing = 69;
+    kWaterTankLidOpen = 70;
+    kMopCleaningPadMissing = 71;
+    kBatteryLow = 72;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute nullable int8u startUpMode = 2;
+  attribute nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
+/** Attributes and commands for selecting a mode from a list of supported options. */
+server cluster RvcCleanMode = 85 {
+  enum ModeTag : ENUM16 {
+    kDeepClean = 16384;
+    kVacuum = 16385;
+    kMop = 16386;
+  }
+
+  enum StatusCode : ENUM8 {
+    kCleaningInProgress = 64;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute nullable int8u startUpMode = 2;
+  attribute nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
+/** Attributes and commands for configuring the temperature control, and reporting temperature. */
+server cluster TemperatureControl = 86 {
+  bitmap Feature : BITMAP32 {
+    kTemperatureNumber = 0x1;
+    kTemperatureLevel = 0x2;
+    kTemperatureStep = 0x4;
+  }
+
+  readonly attribute int8u selectedTemperatureLevel = 4;
+  readonly attribute char_string supportedTemperatureLevels[] = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetTemperatureRequest {
+    optional temperature targetTemperature = 0;
+    optional INT8U targetTemperatureLevel = 1;
+  }
+
+  command SetTemperature(SetTemperatureRequest): DefaultSuccess = 0;
+}
+
 /** Attributes and commands for configuring the Refrigerator alarm. */
 server cluster RefrigeratorAlarm = 87 {
   bitmap AlarmMap : BITMAP32 {
@@ -2365,12 +2727,59 @@ server cluster RefrigeratorAlarm = 87 {
 
   readonly attribute AlarmMap mask = 0;
   readonly attribute AlarmMap state = 2;
+  readonly attribute AlarmMap supported = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes and commands for selecting a mode from a list of supported options. */
+server cluster DishwasherMode = 89 {
+  enum ModeTag : ENUM16 {
+    kNormal = 16384;
+    kHeavy = 16385;
+    kLight = 16386;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute nullable int8u startUpMode = 2;
+  attribute nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
 /** Attributes for reporting air quality classification */
@@ -2401,6 +2810,277 @@ server cluster AirQuality = 91 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface for observing and managing the state of smoke and CO alarms. */
+server cluster SmokeCoAlarm = 92 {
+  enum AlarmStateEnum : ENUM8 {
+    kNormal = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum ContaminationStateEnum : ENUM8 {
+    kNormal = 0;
+    kLow = 1;
+    kWarning = 2;
+    kCritical = 3;
+  }
+
+  enum EndOfServiceEnum : ENUM8 {
+    kNormal = 0;
+    kExpired = 1;
+  }
+
+  enum ExpressedStateEnum : ENUM8 {
+    kNormal = 0;
+    kSmokeAlarm = 1;
+    kCOAlarm = 2;
+    kBatteryAlert = 3;
+    kTesting = 4;
+    kHardwareFault = 5;
+    kEndOfService = 6;
+    kInterconnectSmoke = 7;
+    kInterconnectCO = 8;
+  }
+
+  enum MuteStateEnum : ENUM8 {
+    kNotMuted = 0;
+    kMuted = 1;
+  }
+
+  enum SensitivityEnum : ENUM8 {
+    kHigh = 0;
+    kStandard = 1;
+    kLow = 2;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kSmokeAlarm = 0x1;
+    kCOAlarm = 0x2;
+  }
+
+  critical event SmokeAlarm = 0 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  critical event COAlarm = 1 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  info event LowBattery = 2 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  info event HardwareFault = 3 {
+  }
+
+  info event EndOfService = 4 {
+  }
+
+  info event SelfTestComplete = 5 {
+  }
+
+  info event AlarmMuted = 6 {
+  }
+
+  info event MuteEnded = 7 {
+  }
+
+  critical event InterconnectSmokeAlarm = 8 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  critical event InterconnectCOAlarm = 9 {
+    AlarmStateEnum alarmSeverityLevel = 0;
+  }
+
+  info event AllClear = 10 {
+  }
+
+  readonly attribute ExpressedStateEnum expressedState = 0;
+  readonly attribute AlarmStateEnum smokeState = 1;
+  readonly attribute AlarmStateEnum COState = 2;
+  readonly attribute AlarmStateEnum batteryAlert = 3;
+  readonly attribute MuteStateEnum deviceMuted = 4;
+  readonly attribute boolean testInProgress = 5;
+  readonly attribute boolean hardwareFaultAlert = 6;
+  readonly attribute EndOfServiceEnum endOfServiceAlert = 7;
+  readonly attribute AlarmStateEnum interconnectSmokeAlarm = 8;
+  readonly attribute AlarmStateEnum interconnectCOAlarm = 9;
+  readonly attribute ContaminationStateEnum contaminationState = 10;
+  attribute SensitivityEnum smokeSensitivityLevel = 11;
+  readonly attribute epoch_s expiryDate = 12;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  command SelfTestRequest(): DefaultSuccess = 0;
+}
+
+/** Attributes and commands for configuring the Dishwasher alarm. */
+server cluster DishwasherAlarm = 93 {
+  bitmap AlarmMap : BITMAP32 {
+    kInflowError = 0x1;
+    kDrainError = 0x2;
+    kDoorError = 0x4;
+    kTempTooLow = 0x8;
+    kTempTooHigh = 0x10;
+    kWaterLevelError = 0x20;
+  }
+
+  info event Notify = 0 {
+    AlarmMap active = 0;
+    AlarmMap inactive = 1;
+    AlarmMap state = 2;
+    AlarmMap mask = 3;
+  }
+
+  readonly attribute AlarmMap mask = 0;
+  readonly attribute AlarmMap latch = 1;
+  readonly attribute AlarmMap state = 2;
+  readonly attribute AlarmMap supported = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ResetRequest {
+    AlarmMap alarms = 0;
+  }
+
+  request struct ModifyEnabledAlarmsRequest {
+    AlarmMap mask = 0;
+  }
+
+  command Reset(ResetRequest): DefaultSuccess = 0;
+  command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
+}
+
+/** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
+server cluster OperationalState = 96 {
+  enum ErrorStateEnum : ENUM8 {
+    kNoError = 0;
+    kUnableToStartOrResume = 1;
+    kUnableToCompleteOperation = 2;
+    kCommandInvalidInState = 3;
+  }
+
+  enum OperationalStateEnum : ENUM8 {
+    kStopped = 0;
+    kRunning = 1;
+    kPaused = 2;
+    kError = 3;
+  }
+
+  struct ErrorStateStruct {
+    enum8 errorStateID = 0;
+    optional char_string<64> errorStateLabel = 1;
+    optional char_string<64> errorStateDetails = 2;
+  }
+
+  struct OperationalStateStruct {
+    enum8 operationalStateID = 0;
+    optional char_string<64> operationalStateLabel = 1;
+  }
+
+  critical event OperationalError = 0 {
+    ErrorStateStruct errorState = 0;
+  }
+
+  info event OperationCompletion = 1 {
+    ENUM8 completionErrorCode = 0;
+    optional nullable elapsed_s totalOperationalTime = 1;
+    optional nullable elapsed_s pausedTime = 2;
+  }
+
+  readonly attribute nullable CHAR_STRING phaseList[] = 0;
+  readonly attribute nullable int8u currentPhase = 1;
+  readonly attribute nullable elapsed_s countdownTime = 2;
+  readonly attribute OperationalStateStruct operationalStateList[] = 3;
+  readonly attribute OperationalStateEnum operationalState = 4;
+  readonly attribute ErrorStateStruct operationalError = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct OperationalCommandResponse = 4 {
+    ErrorStateStruct commandResponseState = 0;
+  }
+
+  command Pause(): OperationalCommandResponse = 0;
+  command Stop(): OperationalCommandResponse = 1;
+  command Start(): OperationalCommandResponse = 2;
+  command Resume(): OperationalCommandResponse = 3;
+}
+
+/** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
+server cluster RvcOperationalState = 97 {
+  enum ErrorStateEnum : ENUM8 {
+    kFailedToFindChargingDock = 64;
+    kStuck = 65;
+    kDustBinMissing = 66;
+    kDustBinFull = 67;
+    kWaterTankEmpty = 68;
+    kWaterTankMissing = 69;
+    kWaterTankLidOpen = 70;
+    kMopCleaningPadMissing = 71;
+  }
+
+  enum OperationalStateEnum : ENUM8 {
+    kSeekingCharger = 64;
+    kCharging = 65;
+    kDocked = 66;
+  }
+
+  struct ErrorStateStruct {
+    enum8 errorStateID = 0;
+    optional char_string<64> errorStateLabel = 1;
+    optional char_string<64> errorStateDetails = 2;
+  }
+
+  struct OperationalStateStruct {
+    enum8 operationalStateID = 0;
+    optional char_string<64> operationalStateLabel = 1;
+  }
+
+  critical event OperationalError = 0 {
+    ErrorStateStruct errorState = 0;
+  }
+
+  info event OperationCompletion = 1 {
+    ENUM8 completionErrorCode = 0;
+    optional nullable elapsed_s totalOperationalTime = 1;
+    optional nullable elapsed_s pausedTime = 2;
+  }
+
+  readonly attribute nullable CHAR_STRING phaseList[] = 0;
+  readonly attribute nullable int8u currentPhase = 1;
+  readonly attribute nullable elapsed_s countdownTime = 2;
+  readonly attribute OperationalStateStruct operationalStateList[] = 3;
+  readonly attribute enum8 operationalState = 4;
+  readonly attribute ErrorStateStruct operationalError = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct OperationalCommandResponse = 4 {
+    ErrorStateStruct commandResponseState = 0;
+  }
+
+  command Pause(): OperationalCommandResponse = 0;
+  command Resume(): OperationalCommandResponse = 3;
+}
+
 /** Attributes and commands for monitoring HEPA filters in a device */
 server cluster HepaFilterMonitoring = 113 {
   enum ChangeIndicationEnum : ENUM8 {
@@ -2414,21 +3094,39 @@ server cluster HepaFilterMonitoring = 113 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+    kReplacementProductList = 0x3;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
   readonly attribute DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute boolean inPlaceIndicator = 3;
+  attribute nullable epoch_s lastChangedTime = 4;
+  readonly attribute ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  command ResetCondition(): DefaultSuccess = 0;
 }
 
 /** Attributes and commands for monitoring activated carbon filters in a device */
@@ -2444,321 +3142,39 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
     kDown = 1;
   }
 
+  enum ProductIdentifierTypeEnum : ENUM8 {
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
+  }
+
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
+    kReplacementProductList = 0x3;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute percent condition = 0;
   readonly attribute DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute boolean inPlaceIndicator = 3;
+  attribute nullable epoch_s lastChangedTime = 4;
+  readonly attribute ReplacementProductStruct replacementProductList[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-}
 
-/** Attributes and commands for monitoring ceramic filters in a device */
-server cluster CeramicFilterMonitoring = 115 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes and commands for monitoring electrostatic filters in a device */
-server cluster ElectrostaticFilterMonitoring = 116 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes and commands for monitoring UV filters in a device */
-server cluster UvFilterMonitoring = 117 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes and commands for monitoring ionizing filters in a device */
-server cluster IonizingFilterMonitoring = 118 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes and commands for monitoring zeolite filters in a device */
-server cluster ZeoliteFilterMonitoring = 119 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes and commands for monitoring ozone filters in a device */
-server cluster OzoneFilterMonitoring = 120 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes and commands for monitoring water tanks in a device */
-server cluster WaterTankMonitoring = 121 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes and commands for monitoring fuel tanks in a device */
-server cluster FuelTankMonitoring = 122 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes and commands for monitoring ink cartridges in a device */
-server cluster InkCartridgeMonitoring = 123 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Attributes and commands for monitoring toner cartridges in a device */
-server cluster TonerCartridgeMonitoring = 124 {
-  enum ChangeIndicationEnum : ENUM8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum DegradationDirectionEnum : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kCondition = 0x1;
-    kWarning = 0x2;
-  }
-
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
-  readonly attribute ChangeIndicationEnum changeIndication = 2;
-  readonly attribute boolean inPlaceIndicator = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
+  command ResetCondition(): DefaultSuccess = 0;
 }
 
 /** An interface to a generic way to secure a door */
@@ -4224,8 +4640,8 @@ server cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4279,8 +4695,8 @@ server cluster CarbonDioxideConcentrationMeasurement = 1037 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4334,8 +4750,8 @@ server cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4389,8 +4805,8 @@ server cluster OzoneConcentrationMeasurement = 1045 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4444,8 +4860,8 @@ server cluster Pm25ConcentrationMeasurement = 1066 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4499,8 +4915,8 @@ server cluster FormaldehydeConcentrationMeasurement = 1067 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4554,8 +4970,8 @@ server cluster Pm1ConcentrationMeasurement = 1068 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4609,8 +5025,8 @@ server cluster Pm10ConcentrationMeasurement = 1069 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4664,8 +5080,8 @@ server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -4719,8 +5135,8 @@ server cluster RadonConcentrationMeasurement = 1071 {
   }
 
   enum MeasurementMediumEnum : ENUM8 {
-    kGas = 0;
-    kLiquid = 1;
+    kAir = 0;
+    kWater = 1;
     kSoil = 2;
   }
 
@@ -5750,12 +6166,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster PowerSourceConfiguration {
-    callback attribute sources;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster PowerSource {
     ram      attribute status default = 0;
     ram      attribute order default = 3;
@@ -5763,8 +6173,9 @@ endpoint 0 {
     ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
+    callback attribute endpointList;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster GeneralCommissioning {
@@ -5929,6 +6340,32 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
+  server cluster TimeSynchronization {
+    emits event DSTTableEmpty;
+    emits event DSTStatus;
+    emits event TimeZoneStatus;
+    emits event TimeFailure;
+    emits event MissingTrustedTimeSource;
+    callback attribute UTCTime;
+    callback attribute granularity default = 0x00;
+    ram      attribute timeSource default = 0x00;
+    callback attribute trustedTimeSource;
+    callback attribute defaultNTP;
+    callback attribute timeZone default = 1;
+    callback attribute DSTOffset;
+    callback attribute localTime default = 1;
+    ram      attribute timeZoneDatabase default = 0;
+    callback attribute timeZoneListMaxSize default = 3;
+    callback attribute DSTOffsetListMaxSize;
+    ram      attribute supportsDNSResolve default = false;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x0B;
+    ram      attribute clusterRevision default = 2;
+  }
+
   server cluster AdministratorCommissioning {
     callback attribute windowStatus default = 0;
     callback attribute adminFabricIndex default = 1;
@@ -5970,12 +6407,12 @@ endpoint 0 {
   }
 
   server cluster IcdManagement {
-    ram      attribute idleModeInterval default = 500;
-    ram      attribute activeModeInterval default = 300;
-    ram      attribute activeModeThreshold default = 300;
+    callback attribute idleModeInterval default = 500;
+    callback attribute activeModeInterval default = 300;
+    callback attribute activeModeThreshold default = 300;
     callback attribute registeredClients;
-    ram      attribute ICDCounter default = 0;
-    ram      attribute clientsSupportedPerFabric default = 2;
+    callback attribute ICDCounter default = 0;
+    callback attribute clientsSupportedPerFabric default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6037,7 +6474,7 @@ endpoint 1 {
     ram      attribute offWaitTime default = 0x0000;
     persist  attribute startUpOnOff default = 0xFF;
     ram      attribute featureMap default = 0x0001;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster OnOffSwitchConfiguration {
@@ -6105,8 +6542,9 @@ endpoint 1 {
     ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
+    callback attribute endpointList;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster Switch {
@@ -6151,10 +6589,87 @@ endpoint 1 {
     ram      attribute manufacturerExtension default = 255;
   }
 
+  server cluster LaundryWasherMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    callback attribute startUpMode;
+    callback attribute onMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster RefrigeratorAndTemperatureControlledCabinetMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    callback attribute startUpMode;
+    callback attribute onMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster RvcRunMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    callback attribute startUpMode;
+    callback attribute onMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster RvcCleanMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    callback attribute startUpMode;
+    callback attribute onMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TemperatureControl {
+    ram      attribute selectedTemperatureLevel default = 0;
+    callback attribute supportedTemperatureLevels;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 1;
+  }
+
   server cluster RefrigeratorAlarm {
     emits event Notify;
     ram      attribute mask default = 1;
     ram      attribute state default = 0;
+    ram      attribute supported default = 1;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster DishwasherMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    callback attribute startUpMode;
+    callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6173,11 +6688,90 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 
+  server cluster SmokeCoAlarm {
+    emits event SmokeAlarm;
+    emits event COAlarm;
+    emits event LowBattery;
+    emits event HardwareFault;
+    emits event EndOfService;
+    emits event SelfTestComplete;
+    emits event AlarmMuted;
+    emits event MuteEnded;
+    emits event InterconnectSmokeAlarm;
+    emits event InterconnectCOAlarm;
+    emits event AllClear;
+    persist  attribute expressedState default = 0;
+    persist  attribute smokeState default = 0;
+    persist  attribute COState default = 0;
+    persist  attribute batteryAlert default = 0;
+    persist  attribute deviceMuted default = 0;
+    ram      attribute testInProgress default = 0;
+    persist  attribute hardwareFaultAlert default = 0;
+    persist  attribute endOfServiceAlert default = 0;
+    ram      attribute interconnectSmokeAlarm default = 0;
+    ram      attribute interconnectCOAlarm default = 0;
+    ram      attribute contaminationState default = 0;
+    ram      attribute smokeSensitivityLevel default = 1;
+    ram      attribute expiryDate default = 0;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster DishwasherAlarm {
+    emits event Notify;
+    ram      attribute mask default = 1;
+    ram      attribute latch default = 1;
+    ram      attribute state default = 0;
+    ram      attribute supported default = 15;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OperationalState {
+    emits event OperationalError;
+    emits event OperationCompletion;
+    callback attribute phaseList;
+    callback attribute currentPhase;
+    callback attribute countdownTime;
+    callback attribute operationalStateList;
+    callback attribute operationalState;
+    callback attribute operationalError;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster RvcOperationalState {
+    emits event OperationalError;
+    emits event OperationCompletion;
+    callback attribute phaseList;
+    callback attribute currentPhase default = 0;
+    callback attribute countdownTime default = 0;
+    callback attribute operationalStateList default = 0;
+    callback attribute operationalState default = 0;
+    callback attribute operationalError default = 0;
+    callback attribute generatedCommandList default = 0;
+    callback attribute acceptedCommandList default = 0;
+    callback attribute eventList default = 0;
+    callback attribute attributeList default = 0;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
   server cluster HepaFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication default = 0;
+    callback attribute inPlaceIndicator;
+    callback attribute lastChangedTime;
+    callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6187,140 +6781,12 @@ endpoint 1 {
   }
 
   server cluster ActivatedCarbonFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster CeramicFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster ElectrostaticFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster UvFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster IonizingFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster ZeoliteFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster OzoneFilterMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster WaterTankMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster FuelTankMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster InkCartridgeMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster TonerCartridgeMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication default = 0;
-    ram      attribute inPlaceIndicator;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication default = 0;
+    callback attribute inPlaceIndicator;
+    callback attribute lastChangedTime;
+    callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -7019,7 +7485,7 @@ endpoint 2 {
     ram      attribute offWaitTime default = 0;
     ram      attribute startUpOnOff;
     ram      attribute featureMap default = 0x0000;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster Descriptor {
@@ -7038,8 +7504,9 @@ endpoint 2 {
     ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
+    callback attribute endpointList;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster OccupancySensing {
@@ -7052,6 +7519,15 @@ endpoint 2 {
 }
 endpoint 65534 {
   device type anonymousEndpointType = 61442, version 1;
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    ram      attribute featureMap default = 0;
+    callback attribute clusterRevision default = 1;
+  }
 
   server cluster NetworkCommissioning {
     callback attribute maxNetworks;

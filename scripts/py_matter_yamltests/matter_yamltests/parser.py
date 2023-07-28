@@ -201,12 +201,14 @@ class _TestStepWithPlaceholders:
         self.max_interval = _value_or_none(test, 'maxInterval')
         self.timed_interaction_timeout_ms = _value_or_none(
             test, 'timedInteractionTimeoutMs')
+        self.timeout = _value_or_none(test, 'timeout')
         self.data_version = _value_or_none(
             test, 'dataVersion')
         self.busy_wait_ms = _value_or_none(test, 'busyWaitMs')
         self.wait_for = _value_or_none(test, 'wait')
         self.event_number = _value_or_none(test, 'eventNumber')
         self.run_if = _value_or_none(test, 'runIf')
+        self.save_response_as = _value_or_none(test, 'saveResponseAs')
 
         self.is_attribute = self.__is_attribute_command()
         self.is_event = self.__is_event_command()
@@ -662,6 +664,10 @@ class TestStep:
         return self._test.timed_interaction_timeout_ms
 
     @property
+    def timeout(self):
+        return self._test.timeout
+
+    @property
     def data_version(self):
         return self._test.data_version
 
@@ -689,6 +695,9 @@ class TestStep:
         # TODO It should be removed once all decoders returns a list.
         if not isinstance(received_responses, list):
             received_responses = [received_responses]
+
+        if self._test.save_response_as:
+            self._runtime_config_variable_storage[self._test.save_response_as] = received_responses
 
         if self.wait_for is not None:
             self._response_cluster_wait_validation(received_responses, result)
@@ -1107,6 +1116,7 @@ class TestParser:
             tests
         )
         self.timeout = config['timeout']
+        self.definitions = parser_config.definitions
 
     def __apply_config_override(self, config, config_override):
         for key, value in config_override.items():

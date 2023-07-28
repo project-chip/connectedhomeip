@@ -49,7 +49,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads the OnOffTransitionTime attribute from the DUT"
+    - label: "Step 1a: Reads the OnOffTransitionTime attribute from the DUT"
       PICS: LVL.S.A0010
       command: "readAttribute"
       attribute: "OnOffTransitionTime"
@@ -60,14 +60,14 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "writes the OnOffTransitionTime attribute on the DUT"
+    - label: "Step 1b: writes the OnOffTransitionTime attribute on the DUT"
       PICS: LVL.S.A0010
       command: "writeAttribute"
       attribute: "OnOffTransitionTime"
       arguments:
           value: OnOffTransitionTimeConfigValue
 
-    - label: "Reads the OnOffTransitionTime attribute from the DUT"
+    - label: "Step 1c: Reads the OnOffTransitionTime attribute from the DUT"
       PICS: LVL.S.A0010
       command: "readAttribute"
       attribute: "OnOffTransitionTime"
@@ -77,7 +77,7 @@ tests:
               type: int16u
               notValue: OnOffTransitionTimeValue
 
-    - label: "Reads the OnLevel attribute from the DUT"
+    - label: "Step 2a: Reads the OnLevel attribute from the DUT"
       PICS: LVL.S.A0011
       command: "readAttribute"
       attribute: "OnLevel"
@@ -88,14 +88,14 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "writes the OnLevel attribute on the DUT"
+    - label: "Step 2b: writes the OnLevel attribute on the DUT"
       PICS: LVL.S.A0011
       command: "writeAttribute"
       attribute: "OnLevel"
       arguments:
           value: OnLevelConfigValue
 
-    - label: "Reads the OnLevel attribute from the DUT"
+    - label: "Step 2c: Reads the OnLevel attribute from the DUT"
       PICS: LVL.S.A0011
       command: "readAttribute"
       attribute: "OnLevel"
@@ -105,7 +105,7 @@ tests:
               type: int8u
               notValue: OnLevelValue
 
-    - label: "Reads the OnTransitionTime attribute from the DUT"
+    - label: "Step 3a: Reads the OnTransitionTime attribute from the DUT"
       PICS: LVL.S.A0012
       command: "readAttribute"
       attribute: "OnTransitionTime"
@@ -116,14 +116,14 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Writes the OnTransitionTime attribute on the DUT"
+    - label: "Step 3b: Writes the OnTransitionTime attribute on the DUT"
       PICS: LVL.S.A0012
       command: "writeAttribute"
       attribute: "OnTransitionTime"
       arguments:
           value: OnTransitionTimeConfigValue
 
-    - label: "Reads the OnTransitionTime attribute from the DUT"
+    - label: "Step 3c: Reads the OnTransitionTime attribute from the DUT"
       PICS: LVL.S.A0012
       command: "readAttribute"
       attribute: "OnTransitionTime"
@@ -133,7 +133,7 @@ tests:
               type: int16u
               notValue: OnTransitionTimeValue
 
-    - label: "Reads the OffTransitionTime attribute from the DUT"
+    - label: "Step 4a: Reads the OffTransitionTime attribute from the DUT"
       PICS: LVL.S.A0013
       command: "readAttribute"
       attribute: "OffTransitionTime"
@@ -144,14 +144,14 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Writes the OffTransitionTime attribute on the DUT"
+    - label: "Step 4b: Writes the OffTransitionTime attribute on the DUT"
       PICS: LVL.S.A0013
       command: "writeAttribute"
       attribute: "OffTransitionTime"
       arguments:
           value: OffTransitionTimeConfigValue
 
-    - label: "Reads the OffTransitionTime attribute from the DUT"
+    - label: "Step 4c: Reads the OffTransitionTime attribute from the DUT"
       PICS: LVL.S.A0013
       command: "readAttribute"
       attribute: "OffTransitionTime"
@@ -161,7 +161,7 @@ tests:
               type: int16u
               notValue: OffTransitionTimeValue
 
-    - label: "Reads the DefaultMoveRate attribute from the DUT"
+    - label: "Step 5a: Reads the DefaultMoveRate attribute from the DUT"
       PICS: LVL.S.A0014
       command: "readAttribute"
       attribute: "DefaultMoveRate"
@@ -172,14 +172,14 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "Writes the DefaultMoveRate attribute on the DUT"
+    - label: "Step 5b: Writes the DefaultMoveRate attribute on the DUT"
       PICS: LVL.S.A0014
       command: "writeAttribute"
       attribute: "DefaultMoveRate"
       arguments:
           value: DefaultMoveRateConfigValue
 
-    - label: "Reads the DefaultMoveRate attribute from the DUT"
+    - label: "Step 5c: Reads the DefaultMoveRate attribute from the DUT"
       PICS: LVL.S.A0014
       command: "readAttribute"
       attribute: "DefaultMoveRate"
@@ -189,7 +189,7 @@ tests:
               type: int8u
               notValue: DefaultMoveRatevalue
 
-    - label: "Reads the StartUpCurrentLevel attribute from the DUT"
+    - label: "Step 6a: Reads the StartUpCurrentLevel attribute from the DUT"
       PICS: LVL.S.A4000
       command: "readAttribute"
       attribute: "StartUpCurrentLevel"
@@ -200,14 +200,14 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "writes the StartUpCurrentLevel attribute on the DUT"
+    - label: "Step 6b: Rwrites the StartUpCurrentLevel attribute on the DUT"
       PICS: LVL.S.A4000
       command: "writeAttribute"
       attribute: "StartUpCurrentLevel"
       arguments:
           value: StartUpCurrentLevelConfigValue
 
-    - label: "reads the StartUpCurrentLevel attribute from the DUT"
+    - label: "Step 6c: Rreads the StartUpCurrentLevel attribute from the DUT"
       PICS: LVL.S.A4000
       command: "readAttribute"
       attribute: "StartUpCurrentLevel"

@@ -34,12 +34,25 @@
 #include <app/ReadHandler.h>
 #include <app/reporting/Engine.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/IcdManagementServer.h> // nogncheck
+#endif
+
 namespace chip {
 namespace app {
 using Status = Protocols::InteractionModel::Status;
 
+uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
+{
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    return static_cast<uint16_t>(IcdManagementServer::GetInstance().GetIdleModeInterval() / 1000);
+#else
+    return kSubscriptionMaxIntervalPublisherLimit;
+#endif
+}
+
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
-                         InteractionType aInteractionType) :
+                         InteractionType aInteractionType, Observer * observer) :
     mExchangeCtx(*this),
     mManagementCallback(apCallback)
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
@@ -63,15 +76,23 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
     SetStateFlag(ReadHandlerFlags::PrimingReports);
 
     mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
+
+    VerifyOrDie(observer != nullptr);
+    mObserver = observer;
+    mObserver->OnReadHandlerCreated(this);
 }
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-ReadHandler::ReadHandler(ManagementCallback & apCallback) :
+ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer) :
     mExchangeCtx(*this), mManagementCallback(apCallback), mOnConnectedCallback(HandleDeviceConnected, this),
     mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {
     mInteractionType = InteractionType::Subscribe;
     mFlags.ClearAll();
+
+    VerifyOrDie(observer != nullptr);
+    mObserver = observer;
+    mObserver->OnReadHandlerCreated(this);
 }
 
 void ReadHandler::ResumeSubscription(CASESessionManager & caseSessionManager,
@@ -115,19 +136,12 @@ void ReadHandler::ResumeSubscription(CASESessionManager & caseSessionManager,
 
 ReadHandler::~ReadHandler()
 {
+    mObserver->OnReadHandlerDestroyed(this);
+
     auto * appCallback = mManagementCallback.GetAppCallback();
     if (mFlags.Has(ReadHandlerFlags::ActiveSubscription) && appCallback)
     {
         appCallback->OnSubscriptionTerminated(*this);
-    }
-
-    if (IsType(InteractionType::Subscribe))
-    {
-        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-            MinIntervalExpiredCallback, this);
-
-        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-            MaxIntervalExpiredCallback, this);
     }
 
     if (IsAwaitingReportResponse())
@@ -248,7 +262,7 @@ exit:
 
 CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aStatus)
 {
-    VerifyOrReturnLogError(IsReportableNow(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mState == HandlerState::GeneratingReports, CHIP_ERROR_INCORRECT_STATE);
     if (IsPriming() || IsChunkedReport())
     {
         mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
@@ -272,7 +286,7 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
 
 CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks)
 {
-    VerifyOrReturnLogError(IsReportableNow(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mState == HandlerState::GeneratingReports, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrDie(!IsAwaitingReportResponse()); // Should not be reportable!
     if (IsPriming() || IsChunkedReport())
     {
@@ -317,12 +331,11 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
             InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
         }
 
-        if (IsType(InteractionType::Subscribe) && !IsPriming())
+        // If we just finished a non-priming subscription report, notify our observers.
+        // Priming reports are handled when we send a SubscribeResponse.
+        if (IsType(InteractionType::Subscribe) && !IsPriming() && !IsChunkedReport())
         {
-            // Ignore the error from UpdateReportTimer.  If we've
-            // successfully sent the message, we need to return success from
-            // this method.
-            UpdateReportTimer();
+            mObserver->OnSubscriptionAction(this);
         }
     }
     if (!aMoreChunks)
@@ -374,7 +387,6 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
     ChipLogError(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
                  ChipLogValueExchange(apExchangeContext));
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    // TODO: Have a retry mechanism tied to wake interval for IC devices
     Close(CloseOptions::kKeepPersistedSubscription);
 #else
     Close();
@@ -591,9 +603,10 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
     // If we just unblocked sending reports, let's go ahead and schedule the reporting
     // engine to run to kick that off.
     //
-    if (aTargetState == HandlerState::GeneratingReports && IsReportableNow())
+    if (aTargetState == HandlerState::GeneratingReports)
     {
-        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+        // mObserver will take care of scheduling the report as soon as allowed
+        mObserver->OnBecameReportable(this);
     }
 }
 
@@ -634,7 +647,7 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
     ReturnErrorOnFailure(writer.Finalize(&packet));
     VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(UpdateReportTimer());
+    mObserver->OnSubscriptionAction(this);
 
     ClearStateFlag(ReadHandlerFlags::PrimingReports);
     return mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeResponse, std::move(packet));
@@ -753,47 +766,6 @@ void ReadHandler::PersistSubscription()
     }
 }
 
-void ReadHandler::MinIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState)
-{
-    VerifyOrReturn(apAppState != nullptr);
-    ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
-    ChipLogDetail(DataManagement, "Unblock report hold after min %d seconds", readHandler->mMinIntervalFloorSeconds);
-    readHandler->ClearStateFlag(ReadHandlerFlags::WaitingUntilMinInterval);
-    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        System::Clock::Seconds16(readHandler->mMaxInterval - readHandler->mMinIntervalFloorSeconds), MaxIntervalExpiredCallback,
-        readHandler);
-}
-
-void ReadHandler::MaxIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState)
-{
-    VerifyOrReturn(apAppState != nullptr);
-    ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
-    readHandler->ClearStateFlag(ReadHandlerFlags::WaitingUntilMaxInterval);
-    ChipLogProgress(DataManagement, "Refresh subscribe timer sync after %d seconds",
-                    readHandler->mMaxInterval - readHandler->mMinIntervalFloorSeconds);
-}
-
-CHIP_ERROR ReadHandler::UpdateReportTimer()
-{
-    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-        MinIntervalExpiredCallback, this);
-    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-        MaxIntervalExpiredCallback, this);
-
-    if (!IsChunkedReport())
-    {
-        ChipLogProgress(DataManagement, "Refresh Subscribe Sync Timer with min %d seconds and max %d seconds",
-                        mMinIntervalFloorSeconds, mMaxInterval);
-        SetStateFlag(ReadHandlerFlags::WaitingUntilMinInterval);
-        SetStateFlag(ReadHandlerFlags::WaitingUntilMaxInterval);
-        ReturnErrorOnFailure(
-            InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-                System::Clock::Seconds16(mMinIntervalFloorSeconds), MinIntervalExpiredCallback, this));
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 void ReadHandler::ResetPathIterator()
 {
     mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
@@ -812,7 +784,7 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
     // Here we just reset the iterator to the beginning of the current cluster, if the dirty path affects it.
     // This will ensure the reports are consistent within a single cluster generated from a single path in the request.
 
-    // TODO (#16699): Currently we can only gurentee the reports generated from a single path in the request are consistent. The
+    // TODO (#16699): Currently we can only guarantee the reports generated from a single path in the request are consistent. The
     // data might be inconsistent if the user send a request with two paths from the same cluster. We need to clearify the behavior
     // or make it consistent.
     if (mAttributePathExpandIterator.Get(path) &&
@@ -829,10 +801,8 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
         mAttributeEncoderState = AttributeValueEncoder::AttributeEncodeState();
     }
 
-    if (IsReportableNow())
-    {
-        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
-    }
+    // ReportScheduler will take care of verifying the reportability of the handler and schedule the run
+    mObserver->OnBecameReportable(this);
 }
 
 Transport::SecureSession * ReadHandler::GetSession() const
@@ -851,12 +821,14 @@ void ReadHandler::ForceDirtyState()
 
 void ReadHandler::SetStateFlag(ReadHandlerFlags aFlag, bool aValue)
 {
-    bool oldReportable = IsReportableNow();
+    bool oldReportable = IsReportable();
     mFlags.Set(aFlag, aValue);
+
     // If we became reportable, schedule a reporting run.
-    if (!oldReportable && IsReportableNow())
+    if (!oldReportable && IsReportable())
     {
-        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+        // If we became reportable, the scheduler will schedule a run as soon as allowed
+        mObserver->OnBecameReportable(this);
     }
 }
 

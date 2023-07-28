@@ -118,7 +118,42 @@ DataVersion fixedEndpointDataVersions[ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT];
 #define endpointTypeMacro(x) (&(generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[x]]))
 #endif
 
-app::AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
+AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
+
+// shouldUnregister returns true if the given AttributeAccessInterface should be
+// unregistered.
+template <typename F>
+void UnregisterMatchingAttributeAccessInterfaces(F shouldUnregister)
+{
+    AttributeAccessInterface * prev = nullptr;
+    AttributeAccessInterface * cur  = gAttributeAccessOverrides;
+    while (cur)
+    {
+        AttributeAccessInterface * next = cur->GetNext();
+        if (shouldUnregister(cur))
+        {
+            // Remove it from the list
+            if (prev)
+            {
+                prev->SetNext(next);
+            }
+            else
+            {
+                gAttributeAccessOverrides = next;
+            }
+
+            cur->SetNext(nullptr);
+
+            // Do not change prev in this case.
+        }
+        else
+        {
+            prev = cur;
+        }
+        cur = next;
+    }
+}
+
 } // anonymous namespace
 
 // Initial configuration
@@ -383,33 +418,8 @@ static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
 
     // Clear out any attribute access overrides registered for this
     // endpoint.
-    app::AttributeAccessInterface * prev = nullptr;
-    app::AttributeAccessInterface * cur  = gAttributeAccessOverrides;
-    while (cur)
-    {
-        app::AttributeAccessInterface * next = cur->GetNext();
-        if (cur->MatchesEndpoint(definedEndpoint->endpoint))
-        {
-            // Remove it from the list
-            if (prev)
-            {
-                prev->SetNext(next);
-            }
-            else
-            {
-                gAttributeAccessOverrides = next;
-            }
-
-            cur->SetNext(nullptr);
-
-            // Do not change prev in this case.
-        }
-        else
-        {
-            prev = cur;
-        }
-        cur = next;
-    }
+    UnregisterMatchingAttributeAccessInterfaces(
+        [endpoint = definedEndpoint->endpoint](AttributeAccessInterface * entry) { return entry->MatchesEndpoint(endpoint); });
 }
 
 // Calls the init functions.
@@ -1215,8 +1225,9 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                 {
                     VerifyOrDie(attrStorage && "Attribute persistence needs a persistence provider");
                     MutableByteSpan bytes(attrData);
-                    CHIP_ERROR err = attrStorage->ReadValue(
-                        app::ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId), am, bytes);
+                    CHIP_ERROR err =
+                        attrStorage->ReadValue(app::ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId),
+                                               am->attributeType, am->size, bytes);
                     if (err == CHIP_NO_ERROR)
                     {
                         ptr = attrData;
@@ -1377,7 +1388,7 @@ EmberAfGenericClusterFunction emberAfFindClusterFunction(const EmberAfCluster * 
     return cluster->functions[functionIndex];
 }
 
-bool registerAttributeAccessOverride(app::AttributeAccessInterface * attrOverride)
+bool registerAttributeAccessOverride(AttributeAccessInterface * attrOverride)
 {
     for (auto * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
     {
@@ -1390,6 +1401,11 @@ bool registerAttributeAccessOverride(app::AttributeAccessInterface * attrOverrid
     attrOverride->SetNext(gAttributeAccessOverrides);
     gAttributeAccessOverrides = attrOverride;
     return true;
+}
+
+void unregisterAttributeAccessOverride(AttributeAccessInterface * attrOverride)
+{
+    UnregisterMatchingAttributeAccessInterfaces([attrOverride](AttributeAccessInterface * entry) { return entry == attrOverride; });
 }
 
 namespace chip {

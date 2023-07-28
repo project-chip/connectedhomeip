@@ -22,7 +22,7 @@
 #include "ButtonHandler.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
-#include "LEDManager.h"
+#include "LEDWidget.h"
 #include "qrcodegen.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -51,8 +51,8 @@ TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-LEDManager sStatusLED;
-LEDManager sLockLED;
+LEDWidget sStatusLED;
+LEDWidget sLockLED;
 
 bool sIsWiFiStationEnabled   = false;
 bool sIsWiFiStationConnected = false;
@@ -147,16 +147,20 @@ CHIP_ERROR AppTask::Init()
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Initialize LEDs
-    sStatusLED.Init(SYSTEM_STATE_LED);
+    sStatusLED.Init(LIGHT_LED);
     sStatusLED.Set(0);
 
-    sLockLED.Init(LOCK_STATE_LED);
+    sLockLED.Init(STATE_LED);
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
 
     ConfigurationMgr().LogDeviceConfig();
 
     // Print setup info
+#if CONFIG_NETWORK_LAYER_BLE
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+#else
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
+#endif /* CONFIG_NETWORK_LAYER_BLE */
 
     return err;
 }
@@ -254,7 +258,7 @@ void AppTask::LockActionEventHandler(AppEvent * event)
 
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
 {
-    if (btnIdx != APP_LOCK_BUTTON_IDX && btnIdx != APP_FUNCTION_BUTTON_IDX)
+    if (btnIdx != SWITCH1_BUTTON && btnIdx != SWITCH2_BUTTON)
     {
         return;
     }
@@ -264,12 +268,12 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
     button_event.ButtonEvent.ButtonIdx = btnIdx;
     button_event.ButtonEvent.Action    = btnAction;
 
-    if (btnIdx == APP_LOCK_BUTTON_IDX)
+    if (btnIdx == SWITCH1_BUTTON)
     {
         button_event.Handler = LockActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
-    else if (btnIdx == APP_FUNCTION_BUTTON_IDX)
+    else if (btnIdx == SWITCH2_BUTTON)
     {
         button_event.Handler = FunctionHandler;
         sAppTask.PostEvent(&button_event);
@@ -322,18 +326,11 @@ void AppTask::FunctionTimerEventHandler(AppEvent * event)
 
 void AppTask::FunctionHandler(AppEvent * event)
 {
-    if (event->ButtonEvent.ButtonIdx != APP_FUNCTION_BUTTON_IDX)
+    if (event->ButtonEvent.ButtonIdx != SWITCH2_BUTTON)
     {
         return;
     }
-    // To trigger software update: press the APP_FUNCTION_BUTTON button briefly (<
-    // FACTORY_RESET_TRIGGER_TIMEOUT) To initiate factory reset: press the
-    // APP_FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT +
-    // FACTORY_RESET_CANCEL_WINDOW_TIMEOUT All LEDs start blinking after
-    // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
-    // To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs
-    // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    if (event->ButtonEvent.Action == APP_BUTTON_RELEASED)
+    if (event->ButtonEvent.Action == BUTTON_RELEASED)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kNoneSelected)
         {

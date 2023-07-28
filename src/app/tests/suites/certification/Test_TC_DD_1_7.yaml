@@ -30,8 +30,10 @@ tests:
           Manual Pairing Code is printed on the Commissionee device or in additional provided materials (ex: manual, companion app, web service).
       disabled: true
 
-    - label: "Verify using instruments"
+    - label: "Step 1: Verify using instruments"
       verification: |
+          Vendor specific field testcase that should be manually verified using the requirements in the Expected Outcome.
+
           The Manual Pairing Code shall meet the following requirements:
 
           - Printed using a minimum font size of 6 points, typically producing a typeface height of 2.1 mm (6/72 inches)

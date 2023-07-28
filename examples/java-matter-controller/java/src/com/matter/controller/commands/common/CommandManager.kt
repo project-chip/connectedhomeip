@@ -25,6 +25,7 @@ import kotlin.collections.MutableMap
 
 class CommandManager {
   private val clusters: MutableMap<String, List<Command>> = HashMap()
+
   fun register(clusterName: String, commandsList: List<Command>) {
     clusters[clusterName] = commandsList
   }
@@ -115,7 +116,9 @@ class CommandManager {
   }
 
   private fun getGlobalCommand(
-    commands: List<Command>, commandName: String, attributeName: String
+    commands: List<Command>,
+    commandName: String,
+    attributeName: String
   ): Command? {
     for (command in commands) {
       if (commandName == command.getName() && attributeName == command.getAttribute()) {
@@ -127,9 +130,7 @@ class CommandManager {
 
   private fun showClusters() {
     logger.log(Level.INFO, "Usage:")
-    logger.log(
-      Level.INFO, "  java-matter-controller cluster_name command_name [param1 param2 ...]"
-    )
+    logger.log(Level.INFO, "  java-matter-controller cluster_name command_name [param1 param2 ...]")
     logger.log(Level.INFO, "\n")
     logger.log(
       Level.INFO,
@@ -154,10 +155,7 @@ class CommandManager {
 
   private fun showCluster(clusterName: String, commands: List<Command>) {
     logger.log(Level.INFO, "Usage:")
-    logger.log(
-      Level.INFO,
-      "  java-matter-controller $clusterName command_name [param1 param2 ...]"
-    )
+    logger.log(Level.INFO, "  java-matter-controller $clusterName command_name [param1 param2 ...]")
     logger.log(Level.INFO, "\n")
     logger.log(
       Level.INFO,
@@ -205,12 +203,15 @@ class CommandManager {
   }
 
   private fun showClusterAttributes(
-    clusterName: String, commandName: String, commands: List<Command>
+    clusterName: String,
+    commandName: String,
+    commands: List<Command>
   ) {
     logger.log(Level.INFO, "Usage:")
     System.out.printf(
       "  java-matter-controller %s %s attribute-name [param1 param2 ...]\n",
-      clusterName, commandName
+      clusterName,
+      commandName
     )
     logger.log(Level.INFO, "\n")
     logger.log(
@@ -236,13 +237,12 @@ class CommandManager {
     )
   }
 
-  private fun showClusterEvents(
-    clusterName: String, commandName: String, commands: List<Command>
-  ) {
+  private fun showClusterEvents(clusterName: String, commandName: String, commands: List<Command>) {
     logger.log(Level.INFO, "Usage:")
     System.out.printf(
       "  java-matter-controller %s %s event-name [param1 param2 ...]\n",
-      clusterName, commandName
+      clusterName,
+      commandName
     )
     logger.log(Level.INFO, "\n")
     logger.log(

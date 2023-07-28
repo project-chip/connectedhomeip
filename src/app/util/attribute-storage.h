@@ -248,13 +248,20 @@ chip::Optional<chip::AttributeId> emberAfGetServerAttributeIdByIndex(chip::Endpo
                                                                      uint16_t attributeIndex);
 
 /**
- * Register an attribute access override.  It will remain registered until
- * the endpoint it's registered for is disabled (or until shutdown if it's
- * registered for all endpoints).  Registration will fail if there is an
- * already-registered override for the same set of attributes.
+ * Register an attribute access override.  It will remain registered until the
+ * endpoint it's registered for is disabled (or until shutdown if it's
+ * registered for all endpoints) or until it is explicitly unregistered.
+ * Registration will fail if there is an already-registered override for the
+ * same set of attributes.
  *
  * @return false if there is an existing override that the new one would
  *               conflict with.  In this case the override is not registered.
  * @return true if registration was successful.
  */
 bool registerAttributeAccessOverride(chip::app::AttributeAccessInterface * attrOverride);
+
+/**
+ * Unregister an attribute access override (for example if the object
+ * implementing AttributeAccessInterface is being destroyed).
+ */
+void unregisterAttributeAccessOverride(chip::app::AttributeAccessInterface * attrOverride);

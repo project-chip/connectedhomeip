@@ -42,6 +42,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <examples/platform/esp32/mode-support/static-supported-modes-manager.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <static-supported-temperature-levels.h>
 
 #if CONFIG_HAVE_DISPLAY
 #include "DeviceWithDisplay.h"
@@ -84,6 +85,7 @@ namespace {
 class AppCallbacks : public AppDelegate
 {
 public:
+    void OnCommissioningSessionEstablishmentStarted() {}
     void OnCommissioningSessionStarted() override { bluetoothLED.Set(true); }
     void OnCommissioningSessionStopped() override
     {
@@ -95,6 +97,8 @@ public:
 };
 
 AppCallbacks sCallbacks;
+
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
@@ -134,6 +138,8 @@ static void InitServer(intptr_t context)
     {
         ESP_LOGE(TAG, "Failed to initialize endpoint array for supported-modes, err:%" CHIP_ERROR_FORMAT, err.Format());
     }
+
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 extern "C" void app_main()

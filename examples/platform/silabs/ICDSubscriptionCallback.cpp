@@ -24,7 +24,7 @@ CHIP_ERROR ICDSubscriptionCallback::OnSubscriptionRequested(chip::app::ReadHandl
 {
     using namespace chip::System::Clock;
 
-    Seconds32 interval_s32 = std::chrono::duration_cast<Seconds32>(CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL);
+    Seconds32 interval_s32 = std::chrono::duration_cast<Seconds32>(CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL);
 
     if (interval_s32 > Seconds16::max())
     {
@@ -61,5 +61,5 @@ CHIP_ERROR ICDSubscriptionCallback::OnSubscriptionRequested(chip::app::ReadHandl
         decidedMaxInterval = maximumMaxInterval;
     }
 
-    return aReadHandler.SetReportingIntervals(decidedMaxInterval);
+    return aReadHandler.SetMaxReportingInterval(decidedMaxInterval);
 }
