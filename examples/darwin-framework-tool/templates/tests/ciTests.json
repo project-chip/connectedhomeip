@@ -7,7 +7,6 @@
         "TestEvents",
         "TestDiscovery",
         "TestGroupMessaging",
-        "Test_TC_GRPKEY_1_1",
         "Test_TC_BRBINFO_2_1",
         "Test_TC_DGTHREAD_2_1",
         "Test_TC_DGTHREAD_2_2",
