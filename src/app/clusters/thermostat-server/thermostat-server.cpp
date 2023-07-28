@@ -297,7 +297,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             return imcode::InvalidValue;
         if (AutoSupported)
         {
-            if (requested < OccupiedHeatingSetpoint + DeadBandTemp)
+            if (requested > OccupiedHeatingSetpoint + DeadBandTemp)
                 return imcode::InvalidValue;
         }
         return imcode::Success;
@@ -349,11 +349,11 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
         if (!HeatSupported)
             return imcode::UnsupportedAttribute;
-        if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit)
+        if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested < AbsMaxHeatSetpointLimit)
             return imcode::InvalidValue;
         if (AutoSupported)
         {
-            if (requested > MaxCoolSetpointLimit - DeadBandTemp)
+            if (requested < MaxCoolSetpointLimit - DeadBandTemp)
                 return imcode::InvalidValue;
         }
         return imcode::Success;
