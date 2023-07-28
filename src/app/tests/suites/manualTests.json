@@ -115,10 +115,7 @@
     "Descriptor": ["Test_TC_DESC_2_1"],
     "FanControl": [],
     "GeneralCommissioning": ["Test_TC_CGEN_2_2"],
-    "GeneralDiagnostics": [
-        "Test_TC_DGGEN_2_2",
-        "Test_TC_DGGEN_2_3"
-    ],
+    "GeneralDiagnostics": ["Test_TC_DGGEN_2_2", "Test_TC_DGGEN_2_3"],
     "Identify": ["Test_TC_I_3_2"],
     "IcdManagement": ["Test_TC_ICDM_2_2", "Test_TC_ICDM_2_3"],
     "IlluminanceMeasurement": [],
