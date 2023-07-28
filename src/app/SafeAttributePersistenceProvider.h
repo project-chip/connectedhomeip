@@ -87,34 +87,19 @@ public:
      * @param [in] aPath the attribute path for the data being written.
      * @param [in] aValue the data to write.
      */
-    template <typename T, std::enable_if_t<std::is_integral<T>::value && !std::is_same<bool, T>::value, bool> = true>
+    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
     CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
+        NumericAttributeTraits<T>::StorageType storageValue;
         if (aValue.IsNull())
         {
-            T nullVal;
-            NumericAttributeTraits<T>::SetNull(nullVal);
-            return WriteScalarValue(aPath, nullVal);
+            NumericAttributeTraits<T>::SetNull(storageValue);
         }
-        return WriteScalarValue(aPath, aValue.Value());
-    }
-
-    /**
-     * Write an attribute value of type nullable bool to non-volatile memory.
-     *
-     * @param [in] aPath the attribute path for the data being written.
-     * @param [in] aValue the data to write.
-     */
-    template <typename T, std::enable_if_t<std::is_same<bool, T>::value, bool> = true>
-    CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
-    {
-        if (aValue.IsNull())
+        else 
         {
-            uint8_t nullVal;
-            NumericAttributeTraits<uint8_t>::SetNull(nullVal);
-            return WriteScalarValue(aPath, nullVal);
+            NumericAttributeTraits<T>::WorkingToStorage(aValue.Value(), storageValue);
         }
-        return WriteScalarValue(aPath, aValue.Value());
+        return WriteScalarValue(aPath, storageValue);
     }
 
     /**
@@ -123,56 +108,25 @@ public:
      * @param [in]     aPath the attribute path for the data being persisted.
      * @param [in,out] aValue where to place the data.
      */
-    template <typename T, std::enable_if_t<std::is_integral<T>::value && !std::is_same<bool, T>::value, bool> = true>
+    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
     CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
-        T tempIntegral;
-        T nullVal;
-        NumericAttributeTraits<T>::SetNull(nullVal);
-
-        CHIP_ERROR err = ReadScalarValue(aPath, tempIntegral);
+        NumericAttributeTraits<T>::StorageType storageValue;
+        CHIP_ERROR err = ReadScalarValue(aPath, storageValue);
         if (err != CHIP_NO_ERROR)
         {
             return err;
         }
 
-        if (tempIntegral == nullVal)
+        if (NumericAttributeTraits<T>::IsNullValue(storageValue))
         {
             aValue.SetNull();
             return CHIP_NO_ERROR;
         }
 
-        aValue.SetNonNull(tempIntegral);
-        return CHIP_NO_ERROR;
-    }
-
-    /**
-     * Read an attribute of type nullable bool from non-volatile memory.
-     *
-     * @param [in]     aPath the attribute path for the data being persisted.
-     * @param [in,out] aValue where to place the data.
-     */
-    template <typename T, std::enable_if_t<std::is_same<bool, T>::value, bool> = true>
-    CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
-    {
-        uint8_t tempIntegral;
-
-        CHIP_ERROR err = ReadScalarValue(aPath, tempIntegral);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-
-        uint8_t nullVal;
-        NumericAttributeTraits<uint8_t>::SetNull(nullVal);
-
-        if (tempIntegral == nullVal)
-        {
-            aValue.SetNull();
-            return CHIP_NO_ERROR;
-        }
-
-        aValue.SetNonNull(tempIntegral);
+        // Consider checking CanRepresentValue here, so we don't produce invalid data
+        // if the storage hands us invalid values.
+        aValue.SetNonNull(NumericAttributeTraits<T>::StorageToWorking(storageValue));
         return CHIP_NO_ERROR;
     }
 
