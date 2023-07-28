@@ -13,7 +13,8 @@
 # limitations under the License.
 
 name:
-    4.2.4. [TC-SMCO-2.4] Secondary Functionality - Mandatory with DUT as Server
+    4.2.4. [TC-SMOKECO-2.4] Secondary Functionality - Mandatory with DUT as
+    Server
 
 PICS:
     - SMOKECO.S

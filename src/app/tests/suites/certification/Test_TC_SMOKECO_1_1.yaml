@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 4.1.1. [TC-SMCO-1.1] Global Attributes with DUT as Server
+name: 4.1.1. [TC-SMOKECO-1.1] Global Attributes with DUT as Server
 
 PICS:
     - SMOKECO.S

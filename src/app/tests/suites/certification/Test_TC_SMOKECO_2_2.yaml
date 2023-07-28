@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 4.2.3. [TC-SMCO-2.3] Primary Functionality - CO Alarm with DUT as Server
+name:
+    4.2.2. [TC-SMOKECO-2.2] Primary Functionality - Smoke Alarm with DUT as
+    Server
 
 PICS:
     - SMOKECO.S
@@ -25,15 +27,15 @@ config:
     TEST_EVENT_TRIGGER_KEY:
         type: octet_string
         defaultValue: "hex:00112233445566778899aabbccddeeff"
-    TEST_EVENT_TRIGGER_WARNING_CO_ALARM:
+    TEST_EVENT_TRIGGER_WARNING_SMOKE_ALARM:
         type: int64u
-        defaultValue: "0xffffffff00000091"
-    TEST_EVENT_TRIGGER_CRITICAL_CO_ALARM:
+        defaultValue: "0xffffffff00000090"
+    TEST_EVENT_TRIGGER_CRITICAL_SMOKE_ALARM:
         type: int64u
-        defaultValue: "0xffffffff0000009d"
-    TEST_EVENT_TRIGGER_CO_ALARM_CLEAR:
+        defaultValue: "0xffffffff0000009c"
+    TEST_EVENT_TRIGGER_SMOKE_ALARM_CLEAR:
         type: int64u
-        defaultValue: "0xffffffff000000a1"
+        defaultValue: "0xffffffff000000a0"
     EVENT_NUMBER:
         type: int64u
         defaultValue: 0
@@ -47,14 +49,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH subscribes to COState attribute from DUT"
-      PICS: SMOKECO.S.A0002
+    - label: "TH subscribes to SmokeState attribute from DUT"
+      PICS: SMOKECO.S.A0001
       command: "subscribeAttribute"
-      attribute: "COState"
+      attribute: "SmokeState"
       minInterval: 3
       maxInterval: 30
       response:
-          Value: 0
+          value: 0
           constraints:
               type: enum8
 
@@ -82,7 +84,7 @@ tests:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning CO Alarm Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning Smoke Alarm Test Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -92,14 +94,14 @@ tests:
               - name: "EnableKey"
                 value: TEST_EVENT_TRIGGER_KEY
               - name: "EventTrigger"
-                value: TEST_EVENT_TRIGGER_WARNING_CO_ALARM
+                value: TEST_EVENT_TRIGGER_WARNING_SMOKE_ALARM
 
     - label:
-          "TH waits for a report of COState attribute from DUT with a timeout of
-          300 seconds"
-      PICS: SMOKECO.S.A0002
+          "TH waits for a report of SmokeState attribute from DUT with a timeout
+          of 300 seconds"
+      PICS: SMOKECO.S.A0001
       command: "waitForReport"
-      attribute: "COState"
+      attribute: "SmokeState"
       timeout: 300
       response:
           value: 1
@@ -111,14 +113,14 @@ tests:
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
-          value: 2
+          value: 1
           constraints:
               type: enum8
 
-    - label: "TH reads COAlarm event from DUT"
-      PICS: SMOKECO.S.E01
+    - label: "TH reads SmokeAlarm event from DUT"
+      PICS: SMOKECO.S.E00
       command: "readEvent"
-      event: "COAlarm"
+      event: "SmokeAlarm"
       EVENT_NUMBER: EVENT_NUMBER + 1
       response:
           value: { AlarmSeverityLevel: 1 }
@@ -162,7 +164,7 @@ tests:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Critical CO Alarm Test Event"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Critical Smoke Alarm Test Event"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -172,14 +174,14 @@ tests:
               - name: "EnableKey"
                 value: TEST_EVENT_TRIGGER_KEY
               - name: "EventTrigger"
-                value: TEST_EVENT_TRIGGER_CRITICAL_CO_ALARM
+                value: TEST_EVENT_TRIGGER_CRITICAL_SMOKE_ALARM
 
     - label:
-          "TH waits for a report of COState attribute from DUT with a timeout of
-          300 seconds"
-      PICS: SMOKECO.S.A0002
+          "TH waits for a report of SmokeState attribute from DUT with a timeout
+          of 300 seconds"
+      PICS: SMOKECO.S.A0001
       command: "waitForReport"
-      attribute: "COState"
+      attribute: "SmokeState"
       timeout: 300
       response:
           value: 2
@@ -191,14 +193,14 @@ tests:
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
-          value: 2
+          value: 1
           constraints:
               type: enum8
 
-    - label: "TH reads COAlarm event from DUT"
-      PICS: SMOKECO.S.E01
+    - label: "TH reads SmokeAlarm event from DUT"
+      PICS: SMOKECO.S.E00
       command: "readEvent"
-      event: "COAlarm"
+      event: "SmokeAlarm"
       EVENT_NUMBER: EVENT_NUMBER + 2
       response:
           value: { AlarmSeverityLevel: 2 }
@@ -207,7 +209,7 @@ tests:
           "TH sends TestEventTrigger command to General Diagnostics Cluster on
           Endpoint 0 with EnableKey field set to
           PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for CO Alarm Test Event Clear"
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Smoke Alarm Test Event Clear"
       PICS: DGGEN.S.C00.Rsp
       cluster: "General Diagnostics"
       endpoint: 0
@@ -217,14 +219,14 @@ tests:
               - name: "EnableKey"
                 value: TEST_EVENT_TRIGGER_KEY
               - name: "EventTrigger"
-                value: TEST_EVENT_TRIGGER_CO_ALARM_CLEAR
+                value: TEST_EVENT_TRIGGER_SMOKE_ALARM_CLEAR
 
     - label:
-          "TH waits for a report of COState attribute from DUT with a timeout of
-          300 seconds"
-      PICS: SMOKECO.S.A0002
+          "TH waits for a report of SmokeState attribute from DUT with a timeout
+          of 300 seconds"
+      PICS: SMOKECO.S.A0001
       command: "waitForReport"
-      attribute: "COState"
+      attribute: "SmokeState"
       timeout: 300
       response:
           value: 0

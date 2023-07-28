@@ -22,6 +22,7 @@
  *
  */
 #include "AndroidAppServerWrapper.h"
+#include "ChipAppServerDelegate.h"
 #include "ChipFabricProvider-JNI.h"
 #include "ChipThreadWork.h"
 #include <jni.h>
@@ -53,6 +54,7 @@ namespace {
 JavaVM * sJVM;
 pthread_t sIOThread               = PTHREAD_NULL;
 jclass sChipAppServerExceptionCls = NULL;
+ChipAppServerDelegate sChipAppServerDelegate;
 } // namespace
 
 jint AndroidAppServerJNI_OnLoad(JavaVM * jvm, void * reserved)
@@ -119,6 +121,29 @@ JNI_METHOD(jboolean, startApp)(JNIEnv * env, jobject self)
     chip::DeviceLayer::StackLock lock;
 
     CHIP_ERROR err = ChipAndroidAppInit();
+    SuccessOrExit(err);
+
+    if (sIOThread == PTHREAD_NULL)
+    {
+        pthread_create(&sIOThread, NULL, IOThreadAppMain, NULL);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        return JNI_FALSE;
+    }
+    return JNI_TRUE;
+}
+
+JNI_METHOD(jboolean, startAppWithDelegate)(JNIEnv * env, jobject self, jobject appDelegate)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    CHIP_ERROR err = sChipAppServerDelegate.InitializeWithObjects(appDelegate);
+    SuccessOrExit(err);
+
+    err = ChipAndroidAppInit(&sChipAppServerDelegate);
     SuccessOrExit(err);
 
     if (sIOThread == PTHREAD_NULL)
