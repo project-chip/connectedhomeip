@@ -180,47 +180,47 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7b", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kNoError)
             if self.check_pics("RVCOPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME"):
-                self.print_step("7c", "Manually put the device in the unable to start or resume state")
+                self.print_step("7c", "Manually put the device in the unable to start or resume error state")
                 input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7d", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToStartOrResume)
             if self.check_pics("RVCOPSTATE.S.M.ERR_UNABLE_TO_COMPLETE_OPERATION"):
-                self.print_step("7e", "Manually put the device in the unable to complete operation state")
+                self.print_step("7e", "Manually put the device in the unable to complete operation error state")
                 input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7f", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToCompleteOperation)
             if self.check_pics("RVCOPSTATE.S.M.ERR_COMMAND_INVALID_STATE"):
-                self.print_step("7g", "Manually put the device in the command invalid state")
+                self.print_step("7g", "Manually put the device in the command invalid error state")
                 input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7h", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState)
             if self.check_pics("RVCOPSTATE.S.M.ERR_FAILED_FIND_DOCK"):
-                self.print_step("7i", "Manually put the device in the failed to find dock state")
+                self.print_step("7i", "Manually put the device in the failed to find dock error state")
                 input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7j", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kFailedToFindChargingDock)
             if self.check_pics("RVCOPSTATE.S.M.ERR_STUCK"):
-                self.print_step("7k", "Manually put the device in the stuck state")
+                self.print_step("7k", "Manually put the device in the stuck error state")
                 input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7l", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kStuck)
-            if self.check_pics("RVCOPSTATE.S.M.ERR_DUSTBIN_MISSING"):
-                self.print_step("7m", "Manually put the device in the dustbin missing state")
+            if self.check_pics("RVCOPSTATE.S.M.ERR_DUST_BIN_MISSING"):
+                self.print_step("7m", "Manually put the device in the dust bin missing error state")
                 input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7n", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDustBinMissing)
-            if self.check_pics("RVCOPSTATE.S.M.ERR_DUSTBIN_FULL"):
-                self.print_step("7o", "Manually put the device in the dustbin full state")
+            if self.check_pics("RVCOPSTATE.S.M.ERR_DUST_BIN_FULL"):
+                self.print_step("7o", "Manually put the device in the dust bin full error state")
                 input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7p", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDustBinFull)
             if self.check_pics("RVCOPSTATE.S.M.ERR_WATER_TANK_EMPTY"):
-                self.print_step("7q", "Manually put the device in the water tank empty state")
+                self.print_step("7q", "Manually put the device in the water tank empty error state")
                 input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7r", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankEmpty)
             if self.check_pics("RVCOPSTATE.S.M.ERR_WATER_TANK_MISSING"):
-                self.print_step("7s", "Manually put the device in the water tank missing state")
+                self.print_step("7s", "Manually put the device in the water tank missing error state")
                 input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7t", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankMissing)
             if self.check_pics("RVCOPSTATE.S.M.ERR_WATER_TANK_LID_OPEN"):
-                self.print_step("7u", "Manually put the device in the water tank lid open state")
+                self.print_step("7u", "Manually put the device in the water tank lid open error state")
                 input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7v", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankLidOpen)
             if self.check_pics("RVCOPSTATE.S.M.ERR_MOP_CLEANING_PAD_MISSING"):
-                self.print_step("7w", "Manually put the device in the mop cleaning pad missing state")
+                self.print_step("7w", "Manually put the device in the mop cleaning pad missing error state")
                 input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7x", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kMopCleaningPadMissing)
 
