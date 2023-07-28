@@ -152,16 +152,6 @@ For different security use cases, please set the flags in CHIPCryptoPALHsm_confi
 
   [MY IOT ADAPTER](https://www.infineon.com/cms/en/product/evaluation-boards/my-iot-adapter/)
 
-* Applying the patch for OPTIGA™ Trust M host Library:
-
-  The example uses the optiga-trust-m host lib which is located at */third_party/infineon/trustm/* as a submodule.
-
-  Apply the patch which is located at */third_party/infineon/trustm* by running the shell script
-  *apply_patch.sh*:
-
-        $ cd third_party/infineon/trustm
-        $ ./apply_patch.sh
-
 - Building
 
   Follow the steps to build: 
