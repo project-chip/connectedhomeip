@@ -285,39 +285,45 @@ private:
     }
 };
 
-Status ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData)
+Status
+ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData)
 {
-    // SPEC: If the EpochKey0 field is null or its associated EpochStartTime0 field is null, then this command SHALL fail with an INVALID_COMMAND status code responded to the client.
+    // SPEC: If the EpochKey0 field is null or its associated EpochStartTime0 field is null, then this command SHALL fail with an
+    // INVALID_COMMAND status code responded to the client.
     if (commandData.groupKeySet.epochKey0.IsNull() || commandData.groupKeySet.epochStartTime0.IsNull())
     {
         return Status::InvalidCommand;
     }
 
-    // SPEC: If the EpochStartTime0 is set to 0, then this command SHALL fail with an INVALID_COMMAND status code responded to the client.
+    // SPEC: If the EpochStartTime0 is set to 0, then this command SHALL fail with an INVALID_COMMAND status code responded to the
+    // client.
     if (0 == commandData.groupKeySet.epochStartTime0.Value())
     {
         return Status::InvalidCommand;
     }
 
     // By now we at least have epochKey0.
-    static_assert(GroupDataProvider::EpochKey::kLengthBytes == 16, "Expect EpochKey internal data structure to have a length of 16 bytes.");
+    static_assert(GroupDataProvider::EpochKey::kLengthBytes == 16,
+                  "Expect EpochKey internal data structure to have a length of 16 bytes.");
 
-    // SPEC: If the EpochKey0 field's length is not exactly 16 bytes, then this command SHALL fail with a CONSTRAINT_ERROR status code responded to the client.
+    // SPEC: If the EpochKey0 field's length is not exactly 16 bytes, then this command SHALL fail with a CONSTRAINT_ERROR status
+    // code responded to the client.
     if (commandData.groupKeySet.epochKey0.Value().size() != GroupDataProvider::EpochKey::kLengthBytes)
     {
         return Status::ConstraintError;
     }
 
     // Already known to be false by now
-    bool epoch_key0_is_null = false;
+    bool epoch_key0_is_null    = false;
     uint64_t epoch_start_time0 = commandData.groupKeySet.epochStartTime0.Value();
 
-    bool epoch_key1_is_null = commandData.groupKeySet.epochKey1.IsNull();
+    bool epoch_key1_is_null        = commandData.groupKeySet.epochKey1.IsNull();
     bool epoch_start_time1_is_null = commandData.groupKeySet.epochStartTime1.IsNull();
 
-    uint64_t epoch_start_time1 = 0;  // Will be overridden when known to be present.
+    uint64_t epoch_start_time1 = 0; // Will be overridden when known to be present.
 
-    // SPEC: If exactly one of the EpochKey1 or EpochStartTime1 is null, rather than both being null, or neither being null, then this command SHALL fail with an INVALID_COMMAND status code responded to the client.
+    // SPEC: If exactly one of the EpochKey1 or EpochStartTime1 is null, rather than both being null, or neither being null, then
+    // this command SHALL fail with an INVALID_COMMAND status code responded to the client.
     if (epoch_key1_is_null ^ epoch_start_time1_is_null)
     {
         return Status::InvalidCommand;
@@ -325,13 +331,15 @@ Status ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagemen
 
     if (!epoch_key1_is_null)
     {
-        // SPEC: If the EpochKey1 field is not null, then the EpochKey0 field SHALL NOT be null. Otherwise this command SHALL fail with an INVALID_COMMAND status code responded to the client.
+        // SPEC: If the EpochKey1 field is not null, then the EpochKey0 field SHALL NOT be null. Otherwise this command SHALL fail
+        // with an INVALID_COMMAND status code responded to the client.
         if (epoch_key0_is_null)
         {
-          return Status::InvalidCommand;
+            return Status::InvalidCommand;
         }
 
-        // SPEC: If the EpochKey1 field is not null, and the field's length is not exactly 16 bytes, then this command SHALL fail with a CONSTRAINT_ERROR status code responded to the client.
+        // SPEC: If the EpochKey1 field is not null, and the field's length is not exactly 16 bytes, then this command SHALL fail
+        // with a CONSTRAINT_ERROR status code responded to the client.
         if (commandData.groupKeySet.epochKey1.Value().size() != GroupDataProvider::EpochKey::kLengthBytes)
         {
             return Status::ConstraintError;
@@ -340,18 +348,21 @@ Status ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagemen
         // By now, if EpochKey1 was present, we know EpochStartTime1 was also present.
         epoch_start_time1 = commandData.groupKeySet.epochStartTime1.Value();
 
-        // SPEC: If the EpochKey1 field is not null, its associated EpochStartTime1 field SHALL NOT be null and SHALL contain a later epoch start time than the epoch start time found in the EpochStartTime0 field. Otherwise this command SHALL fail with an INVALID_COMMAND status code responded to the client.
+        // SPEC: If the EpochKey1 field is not null, its associated EpochStartTime1 field SHALL NOT be null and SHALL contain a
+        // later epoch start time than the epoch start time found in the EpochStartTime0 field. Otherwise this command SHALL fail
+        // with an INVALID_COMMAND status code responded to the client.
         bool epoch1_later_than_epoch0 = epoch_start_time1 > epoch_start_time0;
         if (!epoch1_later_than_epoch0)
         {
-          return Status::InvalidCommand;
+            return Status::InvalidCommand;
         }
     }
 
-    bool epoch_key2_is_null = commandData.groupKeySet.epochKey2.IsNull();
+    bool epoch_key2_is_null        = commandData.groupKeySet.epochKey2.IsNull();
     bool epoch_start_time2_is_null = commandData.groupKeySet.epochStartTime2.IsNull();
 
-    // SPEC: If exactly one of the EpochKey2 or EpochStartTime2 is null, rather than both being null, or neither being null, then this command SHALL fail with an INVALID_COMMAND status code responded to the client.
+    // SPEC: If exactly one of the EpochKey2 or EpochStartTime2 is null, rather than both being null, or neither being null, then
+    // this command SHALL fail with an INVALID_COMMAND status code responded to the client.
     if (epoch_key2_is_null ^ epoch_start_time2_is_null)
     {
         return Status::InvalidCommand;
@@ -359,13 +370,15 @@ Status ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagemen
 
     if (!epoch_key2_is_null)
     {
-        // SPEC: If the EpochKey2 field is not null, then the EpochKey1 and EpochKey0 fields SHALL NOT be null. Otherwise this command SHALL fail with an INVALID_COMMAND status code responded to the client.
+        // SPEC: If the EpochKey2 field is not null, then the EpochKey1 and EpochKey0 fields SHALL NOT be null. Otherwise this
+        // command SHALL fail with an INVALID_COMMAND status code responded to the client.
         if (epoch_key0_is_null || epoch_key1_is_null)
         {
-          return Status::InvalidCommand;
+            return Status::InvalidCommand;
         }
 
-        // SPEC: If the EpochKey2 field is not null, and the field's length is not exactly 16 bytes, then this command SHALL fail with a CONSTRAINT_ERROR status code responded to the client.
+        // SPEC: If the EpochKey2 field is not null, and the field's length is not exactly 16 bytes, then this command SHALL fail
+        // with a CONSTRAINT_ERROR status code responded to the client.
         if (commandData.groupKeySet.epochKey2.Value().size() != GroupDataProvider::EpochKey::kLengthBytes)
         {
             return Status::ConstraintError;
@@ -374,11 +387,13 @@ Status ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagemen
         // By now, if EpochKey2 was present, we know EpochStartTime2 was also present.
         uint64_t epoch_start_time2 = commandData.groupKeySet.epochStartTime2.Value();
 
-        // SPEC: If the EpochKey2 field is not null, its associated EpochStartTime2 field SHALL NOT be null and SHALL contain a later epoch start time than the epoch start time found in the EpochStartTime1 field. Otherwise this command SHALL fail with an INVALID_COMMAND status code responded to the client.
+        // SPEC: If the EpochKey2 field is not null, its associated EpochStartTime2 field SHALL NOT be null and SHALL contain a
+        // later epoch start time than the epoch start time found in the EpochStartTime1 field. Otherwise this command SHALL fail
+        // with an INVALID_COMMAND status code responded to the client.
         bool epoch2_later_than_epoch1 = epoch_start_time2 > epoch_start_time1;
         if (!epoch2_later_than_epoch1)
         {
-          return Status::InvalidCommand;
+            return Status::InvalidCommand;
         }
     }
 
@@ -427,7 +442,8 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
         // supported by the server, because it is ... a new value unrecognized
         // by a legacy server, then the server SHALL generate a general
         // constraint error
-        commandObj->AddStatusAndLogIfFailure(commandPath, Status::ConstraintError, "Received unknown GroupKeySecurityPolicyEnum value");
+        commandObj->AddStatusAndLogIfFailure(commandPath, Status::ConstraintError,
+                                             "Received unknown GroupKeySecurityPolicyEnum value");
         return true;
     }
 
@@ -438,7 +454,8 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
         // any action attempting to set CacheAndSync in the
         // GroupKeySecurityPolicy field SHALL fail with an INVALID_COMMAND
         // error.
-        commandObj->AddStatusAndLogIfFailure(commandPath, Status::InvalidCommand, "Received a CacheAndSync GroupKeySecurityPolicyEnum when MCSP not supported");
+        commandObj->AddStatusAndLogIfFailure(commandPath, Status::InvalidCommand,
+                                             "Received a CacheAndSync GroupKeySecurityPolicyEnum when MCSP not supported");
         return true;
     }
 
