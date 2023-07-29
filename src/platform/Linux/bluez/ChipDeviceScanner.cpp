@@ -20,9 +20,9 @@
 #include <errno.h>
 #include <pthread.h>
 
-#include <lib/support/GLibTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/GLibTypeDeleter.h>
 
 #include "BluezObjectList.h"
 #include "Types.h"

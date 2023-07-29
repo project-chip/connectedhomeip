@@ -58,7 +58,7 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-#include <lib/support/GLibTypes.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 #endif
 

@@ -21,8 +21,8 @@
 #include <vector>
 
 #include <app/AttributeAccessInterface.h>
-#include <lib/support/GLibTypes.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>

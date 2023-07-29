@@ -20,8 +20,8 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/GLibTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
