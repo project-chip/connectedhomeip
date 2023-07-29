@@ -71,8 +71,8 @@ asr_executable("refrigerator_app") {
   output_name = "chip-asr-refrigerator-example.out"
 
   sources = [
-    "${chip_root}/examples/refrigerator-app/refrigerator-common/src/tcc-mode.cpp",
     "${chip_root}/examples/refrigerator-app/refrigerator-common/src/static-supported-temperature-levels.cpp",
+    "${chip_root}/examples/refrigerator-app/refrigerator-common/src/tcc-mode.cpp",
     "${examples_plat_dir}/CHIPDeviceManager.cpp",
     "${examples_plat_dir}/init_Matter.cpp",
     "${examples_plat_dir}/init_asrPlatform.cpp",
@@ -89,8 +89,8 @@ asr_executable("refrigerator_app") {
   deps = [
     ":refrigerator_app_sdk_sources",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/refrigerator-app/refrigerator-common",
     "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/examples/refrigerator-app/refrigerator-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]
