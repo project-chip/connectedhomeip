@@ -96,7 +96,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 //
 // 1) The only mutating accesses to the controllers array happen when the
 //    current queue is not the Matter queue.  This is a good assumption, because
-//    the implementation of the fucntions that mutate the array do sync dispatch
+//    the implementation of the functions that mutate the array do sync dispatch
 //    to the Matter queue, which would deadlock if they were called when that
 //    queue was the current queue.
 // 2) It's our API consumer's responsibility to serialize access to us from
@@ -597,7 +597,11 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
             return;
         }
 
-        for (MTRDeviceController * existing in _controllers) {
+        os_unfair_lock_lock(&_controllersLock);
+        NSArray<MTRDeviceController *> * controllersCopy = [_controllers copy];
+        os_unfair_lock_unlock(&_controllersLock);
+
+        for (MTRDeviceController * existing in controllersCopy) {
             BOOL isRunning = YES; // assume the worst
             if ([existing isRunningOnFabric:fabricTable fabricIndex:fabric->GetFabricIndex() isRunning:&isRunning]
                 != CHIP_NO_ERROR) {
