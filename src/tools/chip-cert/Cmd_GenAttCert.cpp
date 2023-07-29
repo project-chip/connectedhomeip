@@ -31,6 +31,8 @@
 
 #include <lib/support/SafeInt.h>
 
+#include <openssl/x509.h>
+
 namespace {
 
 using namespace chip;
@@ -45,22 +47,23 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 // clang-format off
 OptionDef gCmdOptionDefs[] =
 {
-    { "type",             kArgumentRequired, 't' },
-    { "subject-cn",       kArgumentRequired, 'c' },
-    { "subject-vid",      kArgumentRequired, 'V' },
-    { "subject-pid",      kArgumentRequired, 'P' },
-    { "vid-pid-as-cn",    kNoArgument,       'a' },
-    { "key",              kArgumentRequired, 'k' },
-    { "ca-cert",          kArgumentRequired, 'C' },
-    { "ca-key",           kArgumentRequired, 'K' },
-    { "out",              kArgumentRequired, 'o' },
-    { "out-key",          kArgumentRequired, 'O' },
-    { "valid-from",       kArgumentRequired, 'f' },
-    { "lifetime",         kArgumentRequired, 'l' },
-    { "cpd-ext",          kArgumentRequired, 'x' },
-#if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
-    { "ignore-error",     kNoArgument,       'I' },
-    { "error-type",       kArgumentRequired, 'E' },
+    { "type",               kArgumentRequired, 't' },
+    { "subject-cn",         kArgumentRequired, 'c' },
+    { "subject-vid",        kArgumentRequired, 'V' },
+    { "subject-pid",        kArgumentRequired, 'P' },
+    { "vid-pid-as-cn",      kNoArgument,       'a' },
+    { "key",                kArgumentRequired, 'k' },
+    { "ca-cert",            kArgumentRequired, 'C' },
+    { "ca-key",             kArgumentRequired, 'K' },
+    { "out",                kArgumentRequired, 'o' },
+    { "out-key",            kArgumentRequired, 'O' },
+    { "valid-from",         kArgumentRequired, 'f' },
+    { "lifetime",           kArgumentRequired, 'l' },
+    { "cdp-uri",            kArgumentRequired, 'x' },
+    { "crl-issuer-cert",    kArgumentRequired, 'L' },
+ #if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
+    { "ignore-error",       kNoArgument,       'I' },
+    { "error-type",         kArgumentRequired, 'E' },
 #endif
     { }
 };
@@ -126,10 +129,16 @@ const char * const gCmdOptionHelp =
     "       4294967295 to indicate that certificate doesn't have well defined\n"
     "       expiration date\n"
     "\n"
-    "   -x, --cpd-ext <string>\n"
+    "   -x, --cdp-uri <string>\n"
     "\n"
     "       CRL Distribution Points (CDP) extension (NID_crl_distribution_points) extension to be added to the list\n"
     "       of certificate extensions.\n"
+    "\n"
+    "   -L, --crl-issuer-cert <file/str>\n"
+    "\n"
+    "       File or string containing the CRL Issuer certificate (in an X.509 PEM format).\n"
+    "       The Subject name will be extracted from this certificate to be included in the\n"
+    "       cRLIssuer field of the CRL Distribution Point (CDP) extension.\n"
     "\n"
 #if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
     "   -I, --ignore-error\n"
@@ -180,6 +189,10 @@ const char * const gCmdOptionHelp =
     "           ext-extended-key-usage           - Certificate will include optional Extended Key Usage extension.\n"
     "           ext-authority-info-access        - Certificate will include optional Authority Information Access extension.\n"
     "           ext-subject-alt-name             - Certificate will include optional Subject Alternative Name extension.\n"
+    "           ext-cdp-uri-duplicate            - Certificate will include additional URI Field in the CDP extension.\n"
+    "           ext-cdp-crl-issuer-duplicate     - Certificate will include additional CRL Issuer Field in the CDP extension.\n"
+    "           ext-cdp-dist-point-duplicate     - Certificate will include additional CRL Distribution Point Field in the CDP extension.\n"
+    "           ext-cdp-add                      - Certificate will include additional CDP extension.\n"
     "\n"
 #endif // CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
     ;
@@ -207,19 +220,19 @@ OptionSet *gCmdOptionSets[] =
 };
 // clang-format on
 
-AttCertType gAttCertType                 = kAttCertType_NotSpecified;
-const char * gSubjectCN                  = nullptr;
-uint16_t gSubjectVID                     = VendorId::NotSpecified;
-uint16_t gSubjectPID                     = 0;
-bool gEncodeVIDandPIDasCN                = false;
-const char * gCACertFileNameOrStr        = nullptr;
-const char * gCAKeyFileNameOrStr         = nullptr;
-const char * gInKeyFileNameOrStr         = nullptr;
-const char * gOutCertFileName            = nullptr;
-const char * gOutKeyFileName             = nullptr;
-uint32_t gValidDays                      = kCertValidDays_Undefined;
-FutureExtensionWithNID gCPDExtensions[3] = { { 0, nullptr } };
-uint8_t gCPDExtensionsCount              = 0;
+AttCertType gAttCertType            = kAttCertType_NotSpecified;
+const char * gSubjectCN             = nullptr;
+uint16_t gSubjectVID                = VendorId::NotSpecified;
+uint16_t gSubjectPID                = 0;
+bool gEncodeVIDandPIDasCN           = false;
+const char * gCACertFileNameOrStr   = nullptr;
+const char * gCAKeyFileNameOrStr    = nullptr;
+const char * gInKeyFileNameOrStr    = nullptr;
+const char * gOutCertFileName       = nullptr;
+const char * gOutKeyFileName        = nullptr;
+uint32_t gValidDays                 = kCertValidDays_Undefined;
+const char * gCDPURI                = nullptr;
+const char * gCRLIssuerCertFileName = nullptr;
 struct tm gValidFrom;
 CertStructConfig gCertConfig;
 
@@ -300,9 +313,10 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         }
         break;
     case 'x':
-        gCPDExtensions[gCPDExtensionsCount].nid  = NID_crl_distribution_points;
-        gCPDExtensions[gCPDExtensionsCount].info = arg;
-        gCPDExtensionsCount++;
+        gCDPURI = arg;
+        break;
+    case 'L':
+        gCRLIssuerCertFileName = arg;
         break;
 #if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
     case 'I':
@@ -409,6 +423,22 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         {
             gCertConfig.SetExtensionSubjectAltNamePresent();
         }
+        else if (strcmp(arg, "ext-cdp-uri-duplicate") == 0)
+        {
+            gCertConfig.SetExtensionCDPURIDuplicate();
+        }
+        else if (strcmp(arg, "ext-cdp-crl-issuer-duplicate") == 0)
+        {
+            gCertConfig.SetExtensionCDPCRLIssuerDuplicate();
+        }
+        else if (strcmp(arg, "ext-cdp-dist-point-duplicate") == 0)
+        {
+            gCertConfig.SetExtensionCDPDistPointDuplicate();
+        }
+        else if (strcmp(arg, "ext-cdp-add") == 0)
+        {
+            gCertConfig.SetExtensionCDPPresent();
+        }
         else if (strcmp(arg, "no-error") != 0)
         {
             PrintArgError("%s: Invalid value specified for the error type: %s\n", progName, arg);
@@ -431,6 +461,17 @@ bool Cmd_GenAttCert(int argc, char * argv[])
     bool res = true;
     std::unique_ptr<X509, void (*)(X509 *)> newCert(X509_new(), &X509_free);
     std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> newKey(EVP_PKEY_new(), &EVP_PKEY_free);
+
+    // Declarations related to the CRL Distribution Points (CDP) Extention
+    std::unique_ptr<X509, void (*)(X509 *)> cRLIssuerCert(nullptr, &X509_free);
+    std::unique_ptr<X509_EXTENSION, void (*)(X509_EXTENSION *)> cdpExtension(nullptr, &X509_EXTENSION_free);
+    STACK_OF(DIST_POINT) * distPoints = nullptr;
+    DIST_POINT * distPoint            = nullptr;
+    ASN1_IA5STRING * uri              = nullptr;
+    GENERAL_NAME * distPointName      = nullptr;
+    GENERAL_NAME * crlIssuerName      = nullptr;
+
+    std::unique_ptr<X509_EXTENSION, void (*)(X509_EXTENSION *)> cdpExtension2(nullptr, &X509_EXTENSION_free);
 
     {
         time_t now         = time(nullptr);
@@ -565,10 +606,82 @@ bool Cmd_GenAttCert(int argc, char * argv[])
         }
     }
 
+    if (gCRLIssuerCertFileName != nullptr || gCDPURI != nullptr)
+    {
+        int result;
+
+        // Create a DIST_POINT object
+        distPoint = DIST_POINT_new();
+        VerifyOrReturnError(distPoint != nullptr, false);
+
+        if (gCDPURI != nullptr)
+        {
+            // Set the distribution point name
+            distPoint->distpoint = DIST_POINT_NAME_new();
+            VerifyOrReturnError(distPoint->distpoint != nullptr, false);
+
+            distPoint->distpoint->type          = 0; // fullName
+            distPoint->distpoint->name.fullname = GENERAL_NAMES_new();
+            VerifyOrReturnError(distPoint->distpoint->name.fullname != nullptr, false);
+
+            // Create and set URI string
+            uri = ASN1_IA5STRING_new();
+            VerifyOrReturnError(uri != nullptr, false);
+            result = ASN1_STRING_set(uri, gCDPURI, -1);
+            VerifyOrReturnError(result != 0, false);
+
+            // Set fullName as a URI
+            distPointName = GENERAL_NAME_new();
+            VerifyOrReturnError(distPointName != nullptr, false);
+            distPointName->type                        = GEN_URI;
+            distPointName->d.uniformResourceIdentifier = uri;
+            sk_GENERAL_NAME_push(distPoint->distpoint->name.fullname, distPointName);
+
+            if (gCertConfig.IsExtensionCDPURIDuplicate())
+            {
+                // Add second instance of CDP URI - invalid configuration
+                sk_GENERAL_NAME_push(distPoint->distpoint->name.fullname, distPointName);
+            }
+        }
+
+        if (gCRLIssuerCertFileName != nullptr)
+        {
+            // Extract Subject from the CRL Issuer Certificate
+            res = ReadCert(gCRLIssuerCertFileName, cRLIssuerCert);
+            VerifyTrueOrExit(res);
+
+            crlIssuerName = GENERAL_NAME_new();
+            VerifyOrReturnError(crlIssuerName != nullptr, false);
+            crlIssuerName->type            = GEN_DIRNAME;
+            crlIssuerName->d.directoryName = X509_get_subject_name(cRLIssuerCert.get());
+            distPoint->CRLissuer           = GENERAL_NAMES_new();
+            sk_GENERAL_NAME_push(distPoint->CRLissuer, crlIssuerName);
+
+            if (gCertConfig.IsExtensionCDPCRLIssuerDuplicate())
+            {
+                // Add second instance of CDP CRL Issuer - invalid configuration
+                sk_GENERAL_NAME_push(distPoint->CRLissuer, crlIssuerName);
+            }
+        }
+
+        // Push single DIST_POINT into array of CRL Distribution Points
+        distPoints = sk_DIST_POINT_new_null();
+        sk_DIST_POINT_push(distPoints, distPoint);
+
+        if (gCertConfig.IsExtensionCDPDistPointDuplicate())
+        {
+            // Add second instance of CDP URI - invalid configuration
+            sk_DIST_POINT_push(distPoints, distPoint);
+        }
+
+        cdpExtension.reset(X509V3_EXT_i2d(NID_crl_distribution_points, 0, distPoints));
+        VerifyOrReturnError(cdpExtension.get() != nullptr, false);
+    }
+
     if (gAttCertType == kAttCertType_PAA)
     {
         res = MakeAttCert(gAttCertType, gSubjectCN, gSubjectVID, gSubjectPID, gEncodeVIDandPIDasCN, newCert.get(), newKey.get(),
-                          gValidFrom, gValidDays, newCert.get(), newKey.get(), gCertConfig, gCPDExtensions, gCPDExtensionsCount);
+                          gValidFrom, gValidDays, newCert.get(), newKey.get(), gCertConfig, cdpExtension.get());
         VerifyTrueOrExit(res);
     }
     else
@@ -583,7 +696,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
         VerifyTrueOrExit(res);
 
         res = MakeAttCert(gAttCertType, gSubjectCN, gSubjectVID, gSubjectPID, gEncodeVIDandPIDasCN, caCert.get(), caKey.get(),
-                          gValidFrom, gValidDays, newCert.get(), newKey.get(), gCertConfig, gCPDExtensions, gCPDExtensionsCount);
+                          gValidFrom, gValidDays, newCert.get(), newKey.get(), gCertConfig, cdpExtension.get());
         VerifyTrueOrExit(res);
     }
 

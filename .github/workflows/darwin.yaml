@@ -95,10 +95,12 @@ jobs:
             - name: Build example OTA Provider
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
-            - name: Build OTA image files with software version number 5
+            - name: Build OTA image files with software version number 5 and 10
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0 chip_device_config_device_software_version=5 chip_device_config_device_software_version_string='"5.0"'
-                  cp out/debug/chip-ota-requestor-app /tmp/ota-test005-raw-image
+                  cp out/debug/chip-ota-requestor-app /tmp/ota-raw-image-v5
+                  scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0 chip_device_config_device_software_version=10 chip_device_config_device_software_version_string='"10.0"'
+                  cp out/debug/chip-ota-requestor-app /tmp/ota-raw-image-v10
             - name: Build example OTA Requestor
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0
@@ -120,6 +122,7 @@ jobs:
                   # And a different port from the test harness too; the test harness uses port 5541.
                   ../../../out/debug/chip-ota-requestor-app --interface-id -1 --secured-device-port 5542 --discriminator 1111 --KVS /tmp/chip-ota-requestor-kvs1 --otaDownloadPath /tmp/chip-ota-requestor-downloaded-image1 --autoApplyImage > >(tee /tmp/darwin/framework-tests/ota-requestor-app-1.log) 2> >(tee /tmp/darwin/framework-tests/ota-requestor-app-err-1.log >&2) &
                   ../../../out/debug/chip-ota-requestor-app --interface-id -1 --secured-device-port 5543 --discriminator 1112 --KVS /tmp/chip-ota-requestor-kvs2 --otaDownloadPath /tmp/chip-ota-requestor-downloaded-image2 --autoApplyImage > >(tee /tmp/darwin/framework-tests/ota-requestor-app-2.log) 2> >(tee /tmp/darwin/framework-tests/ota-requestor-app-err-2.log >&2) &
+                  ../../../out/debug/chip-ota-requestor-app --interface-id -1 --secured-device-port 5544 --discriminator 1113 --KVS /tmp/chip-ota-requestor-kvs3 --otaDownloadPath /tmp/chip-ota-requestor-downloaded-image3 --autoApplyImage > >(tee /tmp/darwin/framework-tests/ota-requestor-app-3.log) 2> >(tee /tmp/darwin/framework-tests/ota-requestor-app-err-3.log >&2) &
                   # Disable BLE because the app does not have the permission to use
                   # it and that may crash the CI.
                   #

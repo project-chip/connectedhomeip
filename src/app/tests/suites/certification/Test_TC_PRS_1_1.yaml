@@ -61,13 +61,22 @@ tests:
               hasMasksSet: [0x1]
 
     - label: "Step 4a: Read the global mandatory attribute: AttributeList"
-      PICS: PRS.S.Afffb
+      PICS: PICS_EVENT_LIST_ENABLED && PRS.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [0, 1, 2, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: Read the global mandatory attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED && PRS.S.Afffb"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
 
     - label:
           "Step 4b: Read the optional attribute(ScaledValue) in AttributeList"
