@@ -47,7 +47,7 @@
 #endif
 
 // define Device type based on the application
-#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 112 // 0x0070 Refrigerator 
+#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 112 // 0x0070 Refrigerator
 
 // For convenience, Chip Security Test Mode can be enabled and the
 // requirement for authentication in various protocols can be disabled.
