@@ -56,6 +56,30 @@
 #else
 #define PBUF_STRUCT_DATA_CONTIGUOUS(pbuf) (pbuf)->type_internal & PBUF_TYPE_FLAG_STRUCT_DATA_CONTIGUOUS
 #endif
+
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_RAM_HEAP
+
+struct mem {
+  mem_size_t next;
+  mem_size_t prev;
+  u8_t used;
+#if MEM_OVERFLOW_CHECK
+  mem_size_t user_size;
+#endif
+};
+
+#if MEM_OVERFLOW_CHECK
+#define MEM_SANITY_OFFSET   MEM_SANITY_REGION_BEFORE_ALIGNED
+#define MEM_SANITY_OVERHEAD (MEM_SANITY_REGION_BEFORE_ALIGNED + MEM_SANITY_REGION_AFTER_ALIGNED)
+#else
+#define MEM_SANITY_OFFSET   0
+#define MEM_SANITY_OVERHEAD 0
+#endif
+#define SIZEOF_STRUCT_MEM    LWIP_MEM_ALIGN_SIZE(sizeof(struct mem))
+
+extern "C" uint8_t ram_heap[];
+#endif
+
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
@@ -167,7 +191,7 @@ void PacketBufferHandle::InternalRightSize()
     mBuffer = newBuffer;
 }
 
-#elif CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_CUSTOM_POOL
+#elif CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_CUSTOM_POOL && !CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_RAM_HEAP
 
 void PacketBufferHandle::InternalRightSize()
 {
@@ -457,6 +481,20 @@ bool PacketBuffer::AlignPayload(uint16_t aAlignBytes)
 
     return (this->EnsureReservedSize(static_cast<uint16_t>(this->ReservedSize() + kPayloadShift)));
 }
+
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_RAM_HEAP
+/**
+ * Get the size of memory allocated from LWIP RAM Heap.
+ */
+uint32_t PacketBuffer::MemorySize() const
+{
+    struct mem * lMem = reinterpret_cast<struct mem*>(reinterpret_cast<uintptr_t>(&(this->next)) - (SIZEOF_STRUCT_MEM + MEM_SANITY_OFFSET));
+
+    mem_size_t lSize = lMem->next - (reinterpret_cast<uint32_t>(lMem) - reinterpret_cast<uint32_t>(ram_heap));
+
+    return static_cast<uint32_t>(lSize - (SIZEOF_STRUCT_MEM + MEM_SANITY_OFFSET));
+}
+#endif
 
 /**
  * Increment the reference count of the current buffer.
