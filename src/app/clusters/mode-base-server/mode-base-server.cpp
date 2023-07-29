@@ -193,7 +193,7 @@ CHIP_ERROR Instance::Init()
             }
         }
     }
-
+#ifdef EMBER_AF_PLUGIN_ON_OFF_SERVER
     // OnMode with Power Up
     // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
     // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
@@ -227,7 +227,7 @@ CHIP_ERROR Instance::Init()
             }
         }
     }
-
+#endif // EMBER_AF_PLUGIN_ON_OFF_SERVER
     return CHIP_NO_ERROR;
 }
 
