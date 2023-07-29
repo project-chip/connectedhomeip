@@ -191,6 +191,7 @@ pump-app/cc13x2x7_26x2x7/doc/programming*
 pump-controller-app/**/README
 pump-controller-app/cc13x2x7_26x2x7/doc/programming*
 ```
+
 ## Refrigerator example
 
 ```{toctree}
