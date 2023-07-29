@@ -64,8 +64,8 @@ void CheckValidConversion(const std::string & jsonOriginal, const ByteSpan & tlv
     err = TlvToJson(tlvEncoding, generatedJsonString);
     NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
 
-    auto compactExpectedString  = StylizeJsonString(jsonExpected);
-    auto compactGeneratedString = StylizeJsonString(generatedJsonString);
+    auto compactExpectedString  = PrettyPrintJsonString(jsonExpected);
+    auto compactGeneratedString = PrettyPrintJsonString(generatedJsonString);
     match                       = (compactGeneratedString == compactExpectedString);
     NL_TEST_ASSERT(gSuite, match);
     if (!match)

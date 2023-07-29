@@ -27,7 +27,7 @@ Specific rules:
     element type).
 -   The unknown element type “?” MUST never occur outside of "ARRAY-?".
 -   'field_id' is equivalent to the Field ID for all cluster payloads (commands,
-    events, attributes).
+    events, attributes), encoded as a decimal number.
 
 The table below summarizes all element types and their corresponding encoding in
 the Json element name:

@@ -312,7 +312,7 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, std::string & jsonString)
     return CHIP_NO_ERROR;
 }
 
-std::string StylizeJsonString(const std::string & jsonString)
+std::string PrettyPrintJsonString(const std::string & jsonString)
 {
     Json::Reader reader;
     Json::Value jsonObject;
@@ -321,9 +321,9 @@ std::string StylizeJsonString(const std::string & jsonString)
     return writer.write(jsonObject);
 }
 
-std::string StylizeJsonStringSingleLine(const std::string & jsonString)
+std::string MakeJsonSingleLine(const std::string & jsonString)
 {
-    std::string str = StylizeJsonString(jsonString);
+    std::string str = PrettyPrintJsonString(jsonString);
     str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
     return str;
 }

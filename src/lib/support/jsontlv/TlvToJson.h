@@ -35,17 +35,17 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, std::string & jsonString);
 CHIP_ERROR TlvToJson(const ByteSpan & tlv, std::string & jsonString);
 
 /*
- * Stylizes the input Json string using standard library stylizer.
- * This stylizer generates Json string in a human friendly format with 3 space indentation
+ * Pretty-prints the input Json string using standard library pretty-printer.
+ * This pretty-printer generates a Json string in a human friendly format with 3 space indentation
  * and nice representation of arrays and objects.
- * The input can be any unstylized string, but should be a valid Json string.
+ * The input can be any string, as long as it's valid Json.
  */
-std::string StylizeJsonString(const std::string & jsonString);
+std::string PrettyPrintJsonString(const std::string & jsonString);
 
 /*
- * Stylizes the input Json string as a single-line string with no spaces or newlines.
- * The input can be any unstylized string, but should be a valid Json string.
+ * Reformats the input Json string as a single-line string with no spaces or newlines.
+ * The input can be any string, as long as it's valid Json.
  */
-std::string StylizeJsonStringSignleLine(const std::string & jsonString);
+std::string MakeJsonSingleLine(const std::string & jsonString);
 
 } // namespace chip

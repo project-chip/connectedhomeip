@@ -34,7 +34,7 @@ std::vector<std::string> SplitIntoFieldsBySeparator(const std::string & input, c
 
     while (std::getline(ss, substring, separator))
     {
-        substrings.push_back(substring);
+        substrings.push_back(std::move(substring));
     }
 
     return substrings;
@@ -92,7 +92,7 @@ CHIP_ERROR JsonTypeStrToTlvType(const char * elementType, ElementTypeContext & t
     return CHIP_NO_ERROR;
 }
 
-bool isUnsignedInteger(const std::string & s)
+bool IsUnsignedInteger(const std::string & s)
 {
     size_t len = s.length();
     if (len == 0)
@@ -109,7 +109,7 @@ bool isUnsignedInteger(const std::string & s)
     return true;
 }
 
-bool isSignedInteger(const std::string & s)
+bool IsSignedInteger(const std::string & s)
 {
     if (s.length() == 0)
     {
@@ -117,12 +117,12 @@ bool isSignedInteger(const std::string & s)
     }
     if (s[0] == '-')
     {
-        return isUnsignedInteger(s.substr(1));
+        return IsUnsignedInteger(s.substr(1));
     }
-    return isUnsignedInteger(s);
+    return IsUnsignedInteger(s);
 }
 
-bool isValidBase64String(const std::string & s)
+bool IsValidBase64String(const std::string & s)
 {
     const std::string base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     size_t len                    = s.length();
@@ -165,28 +165,34 @@ struct ElementContext
 
 bool CompareByTag(const ElementContext & a, const ElementContext & b)
 {
-    return TLV::TagNumFromTag(a.tag) < TLV::TagNumFromTag(b.tag);
+    // If tags are of the same type compare by tag number
+    if (IsContextTag(a.tag) == IsContextTag(b.tag))
+    {
+        return TLV::TagNumFromTag(a.tag) < TLV::TagNumFromTag(b.tag);
+    }
+    // Otherwise, compare by tag type: context tags first followed by common profile tags
+    return IsContextTag(a.tag);
 }
 
 CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx)
 {
     uint64_t tagNumber                  = 0;
     const char * elementType            = nullptr;
-    std::vector<std::string> nameFields = splitIntoFieldsBySeparator(name, ':');
+    std::vector<std::string> nameFields = SplitIntoFieldsBySeparator(name, ':');
     TLV::Tag tag                        = TLV::AnonymousTag();
     ElementTypeContext type;
     ElementTypeContext subType;
 
     if (nameFields.size() == 2)
     {
-        VerifyOrReturnError(isUnsignedInteger(nameFields[0]), CHIP_ERROR_INVALID_ARGUMENT);
-        tagNumber   = std::strtoull(nameFields[0].c_str(), nullptr, 0);
+        VerifyOrReturnError(IsUnsignedInteger(nameFields[0]), CHIP_ERROR_INVALID_ARGUMENT);
+        tagNumber   = std::strtoull(nameFields[0].c_str(), nullptr, 10);
         elementType = nameFields[1].c_str();
     }
     else if (nameFields.size() == 3)
     {
-        VerifyOrReturnError(isUnsignedInteger(nameFields[1]), CHIP_ERROR_INVALID_ARGUMENT);
-        tagNumber   = std::strtoull(nameFields[1].c_str(), nullptr, 0);
+        VerifyOrReturnError(IsUnsignedInteger(nameFields[1]), CHIP_ERROR_INVALID_ARGUMENT);
+        tagNumber   = std::strtoull(nameFields[1].c_str(), nullptr, 10);
         elementType = nameFields[2].c_str();
     }
     else
@@ -211,7 +217,7 @@ CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx)
 
     if (type.tlvType == TLV::kTLVType_Array)
     {
-        std::vector<std::string> arrayFields = splitIntoFieldsBySeparator(elementType, '-');
+        std::vector<std::string> arrayFields = SplitIntoFieldsBySeparator(elementType, '-');
         VerifyOrReturnError(arrayFields.size() == 2, CHIP_ERROR_INVALID_ARGUMENT);
 
         if (strcmp(arrayFields[1].c_str(), kElementTypeEmpty) == 0)
@@ -247,8 +253,8 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
         else if (val.isString())
         {
             const std::string valAsString = val.asString();
-            VerifyOrReturnError(isUnsignedInteger(valAsString), CHIP_ERROR_INVALID_ARGUMENT);
-            v = std::strtoull(valAsString.c_str(), nullptr, 0);
+            VerifyOrReturnError(IsUnsignedInteger(valAsString), CHIP_ERROR_INVALID_ARGUMENT);
+            v = std::strtoull(valAsString.c_str(), nullptr, 10);
         }
         else
         {
@@ -267,8 +273,8 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
         else if (val.isString())
         {
             const std::string valAsString = val.asString();
-            VerifyOrReturnError(isSignedInteger(valAsString), CHIP_ERROR_INVALID_ARGUMENT);
-            v = std::strtoll(valAsString.c_str(), nullptr, 0);
+            VerifyOrReturnError(IsSignedInteger(valAsString), CHIP_ERROR_INVALID_ARGUMENT);
+            v = std::strtoll(valAsString.c_str(), nullptr, 10);
         }
         else
         {
@@ -338,7 +344,7 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
         size_t encodedLen             = valAsString.length();
         VerifyOrReturnError(CanCastTo<uint16_t>(encodedLen), CHIP_ERROR_INVALID_ARGUMENT);
 
-        VerifyOrReturnError(isValidBase64String(valAsString), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(IsValidBase64String(valAsString), CHIP_ERROR_INVALID_ARGUMENT);
 
         Platform::ScopedMemoryBuffer<uint8_t> byteString;
         byteString.Alloc(BASE64_MAX_DECODED_LEN(static_cast<uint16_t>(encodedLen)));
@@ -401,6 +407,7 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
         else
         {
             ElementContext nestedElementCtx;
+            nestedElementCtx.tag  = TLV::AnonymousTag();
             nestedElementCtx.type = elementCtx.subType;
             for (Json::ArrayIndex i = 0; i < val.size(); i++)
             {

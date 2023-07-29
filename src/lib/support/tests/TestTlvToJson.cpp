@@ -54,8 +54,8 @@ CHIP_ERROR SetupReader()
 
 bool Matches(const std::string & referenceString, const std::string & generatedString)
 {
-    auto compactReferenceString = StylizeJsonString(referenceString);
-    auto compactGeneratedString = StylizeJsonString(generatedString);
+    auto compactReferenceString = PrettyPrintJsonString(referenceString);
+    auto compactGeneratedString = PrettyPrintJsonString(generatedString);
 
     auto matches = (compactGeneratedString == compactReferenceString);
 
