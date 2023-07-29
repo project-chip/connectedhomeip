@@ -39,6 +39,14 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
           $ cd ~/connectedhomeip/examples/refrigerator-app/linux
           $ rm -rf out/
 
+-   Build the example with pigweed RPC
+
+          $ cd ~/connectedhomeip/examples/refrigerator-app/linux
+          $ git submodule update --init
+          $ source third_party/connectedhomeip/scripts/activate.sh
+          $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
+          $ ninja -C out/debug
+
 ## Commandline arguments
 
 -   `--wifi`
@@ -107,3 +115,31 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.
+
+## Running RPC Console
+
+-   As part of building the example with RPCs enabled the chip_rpc python
+    interactive console is installed into your venv. The python wheel files are
+    also created in the output folder: out/debug/chip_rpc_console_wheels. To
+    install the wheel files without rebuilding:
+    `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
+
+-   To use the chip-rpc console after it has been installed run:
+    `chip-console -s localhost:33000 -o /<YourFolder>/pw_log.out`
+
+-   Then you can Get and Set the light using the RPCs:
+    `rpcs.chip.rpc.Lighting.Get()`
+
+    `rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))`
+
+## Device Tracing
+
+Device tracing is available to analyze the device performance. To turn on
+tracing, build with RPC enabled. See [Building with RPC enabled](#building).
+
+Obtain tracing json file.
+
+```
+    $ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -s localhost:33000 \
+     -o {OUTPUT_FILE} -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
+```
