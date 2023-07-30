@@ -248,7 +248,7 @@ pykwalify==1.8.0
     # via west
 pylink-square==0.5.0
     # via bflb-iot-tool
-pyparsing==2.3.1
+pyparsing==3.0.9
     # via -r requirements.esp32.txt
 pypng==0.0.21
     # via -r requirements.telink.txt
