@@ -54,7 +54,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:1
+            image: ghcr.io/project-chip/chip-build-esp32:2
             options: --user root
 
         steps:
