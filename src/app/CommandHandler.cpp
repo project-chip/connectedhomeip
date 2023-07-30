@@ -471,7 +471,7 @@ CHIP_ERROR CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, c
 }
 
 CHIP_ERROR CommandHandler::AddStatusAndLogIfFailure(const ConcreteCommandPath & aCommandPath, const Status aStatus,
-                                                    const char * message)
+                                                    const char * aMessage)
 {
     if (aStatus != Status::Success)
     {
@@ -479,7 +479,7 @@ CHIP_ERROR CommandHandler::AddStatusAndLogIfFailure(const ConcreteCommandPath & 
                      "Failed to handle on Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI
                      " with " ChipLogFormatIMStatus ": %s",
                      aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId),
-                     ChipLogValueIMStatus(aStatus), message);
+                     ChipLogValueIMStatus(aStatus), aMessage);
     }
 
     return AddStatus(aCommandPath, aStatus);
