@@ -37,7 +37,6 @@ public class ClusterReadMapping {
           readFirstSomeIntegerCommandParams
         );
         result.put("readSomeIntegerAttribute", readFirstSomeIntegerAttributeInteractionInfo);
-      
      
        return result;
     }
@@ -53,7 +52,6 @@ public class ClusterReadMapping {
           readSecondSomeBytesCommandParams
         );
         result.put("readSomeBytesAttribute", readSecondSomeBytesAttributeInteractionInfo);
-      
      
        return result;
     }
@@ -69,7 +67,6 @@ public class ClusterReadMapping {
           readThirdSomeEnumCommandParams
         );
         result.put("readSomeEnumAttribute", readThirdSomeEnumAttributeInteractionInfo);
-      
      Map<String, CommandParameterInfo> readThirdOptionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThirdOptionsAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -81,7 +78,6 @@ public class ClusterReadMapping {
           readThirdOptionsCommandParams
         );
         result.put("readOptionsAttribute", readThirdOptionsAttributeInteractionInfo);
-      
      
        return result;
     }
