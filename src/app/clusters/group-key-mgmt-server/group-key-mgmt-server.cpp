@@ -120,8 +120,7 @@ public:
         switch (aPath.mAttributeId)
         {
         case GroupKeyManagement::Attributes::ClusterRevision::Id:
-            return aEncoder
-            ReadClusterRevision(aPath.mEndpointId, aEncoder.encode(kImplementedClusterRevision));
+            return aEncoder.Encode(kImplementedClusterRevision);
         case Attributes::FeatureMap::Id: {
             uint32_t features = 0;
             if (IsMCSPSupported())
@@ -326,7 +325,7 @@ ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagement::Comm
 
     // SPEC: If exactly one of the EpochKey1 or EpochStartTime1 is null, rather than both being null, or neither being null, then
     // this command SHALL fail with an INVALID_COMMAND status code responded to the client.
-    if (epoch_key1_is_null ^ epoch_start_time1_is_null)
+    if (epoch_key1_is_null != epoch_start_time1_is_null)
     {
         return Status::InvalidCommand;
     }
@@ -365,7 +364,7 @@ ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagement::Comm
 
     // SPEC: If exactly one of the EpochKey2 or EpochStartTime2 is null, rather than both being null, or neither being null, then
     // this command SHALL fail with an INVALID_COMMAND status code responded to the client.
-    if (epoch_key2_is_null ^ epoch_start_time2_is_null)
+    if (epoch_key2_is_null != epoch_start_time2_is_null)
     {
         return Status::InvalidCommand;
     }

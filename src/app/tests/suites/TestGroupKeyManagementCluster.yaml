@@ -74,7 +74,7 @@ tests:
           constraints:
               minValue: 3
 
-    # TODO: Re-enabled when CI wouldn't break on this syntax
+    # TODO(#28396): Re-enabled when CI wouldn't break on this syntax
     #
     #   command: "readAttribute"
     #   attribute: "ClusterRevision"
