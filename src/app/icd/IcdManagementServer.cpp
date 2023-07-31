@@ -12,24 +12,26 @@ Status IcdManagementServer::RegisterClient(PersistentStorageDelegate & storage, 
                                            uint64_t monitored_subject, chip::ByteSpan key,
                                            Optional<chip::ByteSpan> verification_key, bool is_admin)
 {
-    IcdMonitoringTable table(storage, fabric_index, GetClientsSupportedPerFabric());
+    IcdMonitoringTable table(storage, fabric_index);
 
     // Get current entry, if exists
     IcdMonitoringEntry entry;
     CHIP_ERROR err = table.Find(node_id, entry);
+
     if (CHIP_NO_ERROR == err)
     {
         // Existing entry: Validate Key if, and only if, the ISD has NOT administrator permissions
         if (!is_admin)
         {
+            ByteSpan current_key(entry.key);
             VerifyOrReturnError(verification_key.HasValue(), InteractionModel::Status::Failure);
-            VerifyOrReturnError(verification_key.Value().data_equal(entry.key), InteractionModel::Status::Failure);
+            VerifyOrReturnError(verification_key.Value().data_equal(current_key), InteractionModel::Status::Failure);
         }
     }
     else if (CHIP_ERROR_NOT_FOUND == err)
     {
         // New entry
-        VerifyOrReturnError(entry.index < table.Limit(), InteractionModel::Status::ResourceExhausted);
+        VerifyOrReturnError(table.Count() < table.Limit(), InteractionModel::Status::ResourceExhausted);
     }
     else
     {
@@ -38,10 +40,12 @@ Status IcdManagementServer::RegisterClient(PersistentStorageDelegate & storage, 
     }
 
     // Save
+    VerifyOrReturnError(IcdMonitoringEntry::kKeyMaxSize == key.size(), InteractionModel::Status::ConstraintError);
+
     entry.checkInNodeID    = node_id;
     entry.monitoredSubject = monitored_subject;
-    entry.key              = key;
-    err                    = table.Set(entry.index, entry);
+    memcpy(entry.key, key.data(), IcdMonitoringEntry::kKeyMaxSize);
+    err = table.Set(entry);
     VerifyOrReturnError(CHIP_ERROR_INVALID_ARGUMENT != err, InteractionModel::Status::ConstraintError);
     VerifyOrReturnError(CHIP_NO_ERROR == err, InteractionModel::Status::Failure);
 
@@ -51,7 +55,7 @@ Status IcdManagementServer::RegisterClient(PersistentStorageDelegate & storage, 
 Status IcdManagementServer::UnregisterClient(PersistentStorageDelegate & storage, FabricIndex fabric_index, chip::NodeId node_id,
                                              Optional<chip::ByteSpan> verificationKey, bool is_admin)
 {
-    IcdMonitoringTable table(storage, fabric_index, GetClientsSupportedPerFabric());
+    IcdMonitoringTable table(storage, fabric_index);
 
     // Get current entry, if exists
     IcdMonitoringEntry entry;
@@ -62,11 +66,12 @@ Status IcdManagementServer::UnregisterClient(PersistentStorageDelegate & storage
     // Existing entry: Validate Key if, and only if, the ISD has NOT administrator permissions
     if (!is_admin)
     {
+        ByteSpan current_key(entry.key);
         VerifyOrReturnError(verificationKey.HasValue(), InteractionModel::Status::Failure);
-        VerifyOrReturnError(verificationKey.Value().data_equal(entry.key), InteractionModel::Status::Failure);
+        VerifyOrReturnError(verificationKey.Value().data_equal(current_key), InteractionModel::Status::Failure);
     }
 
-    err = table.Remove(entry.index);
+    err = table.Remove(entry);
     VerifyOrReturnError(CHIP_NO_ERROR == err, InteractionModel::Status::Failure);
 
     return InteractionModel::Status::Success;

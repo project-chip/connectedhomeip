@@ -72,7 +72,7 @@ public:
                 Platform::CopyString(name, groupName);
             }
         }
-        bool operator==(const GroupInfo & other)
+        bool operator==(const GroupInfo & other) const
         {
             return (this->group_id == other.group_id) && !strncmp(this->name, other.name, kGroupNameMax);
         }

@@ -104,30 +104,23 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeThreshold(EndpointId endp
 
 CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
-    uint16_t supported_clients = IcdManagementServer::GetInstance().GetClientsSupportedPerFabric();
-
-    return encoder.EncodeList([supported_clients](const auto & subEncoder) -> CHIP_ERROR {
+    return encoder.EncodeList([](const auto & subEncoder) -> CHIP_ERROR {
         IcdMonitoringEntry e;
 
         const auto & fabricTable = Server::GetInstance().GetFabricTable();
         for (const auto & fabricInfo : fabricTable)
         {
             PersistentStorageDelegate & storage = chip::Server::GetInstance().GetPersistentStorage();
-            IcdMonitoringTable table(storage, fabricInfo.GetFabricIndex(), supported_clients);
-            for (uint16_t i = 0; i < table.Limit(); ++i)
+            IcdMonitoringTable table(storage, fabricInfo.GetFabricIndex());
+            CHIP_ERROR err = table.Load();
+            VerifyOrReturnError(CHIP_ERROR_NOT_FOUND == err || CHIP_NO_ERROR == err, err);
+            for (uint16_t i = 0; i < table.Count(); ++i)
             {
-                CHIP_ERROR err = table.Get(i, e);
-                if (CHIP_ERROR_NOT_FOUND == err)
-                {
-                    // No more entries in the table
-                    break;
-                }
-                ReturnErrorOnFailure(err);
-
+                ReturnErrorOnFailure(table.Get(i, e));
                 Structs::MonitoringRegistrationStruct::Type s{ .checkInNodeID    = e.checkInNodeID,
                                                                .monitoredSubject = e.monitoredSubject,
-                                                               .key              = e.key,
-                                                               .fabricIndex      = e.fabricIndex };
+                                                               .key              = ByteSpan(e.key),
+                                                               .fabricIndex      = fabricInfo.GetFabricIndex() };
                 ReturnErrorOnFailure(subEncoder.Encode(s));
             }
         }
@@ -165,8 +158,7 @@ class IcdManagementFabricDelegate : public chip::FabricTable::Delegate
 {
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
-        uint16_t supported_clients = IcdManagementServer::GetInstance().GetClientsSupportedPerFabric();
-        IcdMonitoringTable table(chip::Server::GetInstance().GetPersistentStorage(), fabricIndex, supported_clients);
+        IcdMonitoringTable table(chip::Server::GetInstance().GetPersistentStorage(), fabricIndex);
         table.RemoveAll();
     }
 };

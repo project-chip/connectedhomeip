@@ -97,7 +97,7 @@ void ICDManager::UpdateIcdMode()
         for (const auto & fabricInfo : *mFabricTable)
         {
             // We only need 1 valid entry to ensure LIT compliance
-            IcdMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), 1 /*Table entry limit*/);
+            IcdMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex());
             if (!table.IsEmpty())
             {
                 tempMode = ICDMode::LIT;

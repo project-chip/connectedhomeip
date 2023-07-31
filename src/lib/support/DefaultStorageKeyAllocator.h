@@ -185,9 +185,9 @@ public:
 
     // ICD Management
 
-    static StorageKeyName IcdManagementTableEntry(chip::FabricIndex fabric, uint16_t index)
+    static StorageKeyName IcdManagementTableEntries(chip::FabricIndex fabric)
     {
-        return StorageKeyName::Formatted("f/%x/icd/%x", fabric, index);
+        return StorageKeyName::Formatted("f/%x/icd", fabric);
     }
 
     static StorageKeyName OTADefaultProviders() { return StorageKeyName::FromConst("g/o/dp"); }
