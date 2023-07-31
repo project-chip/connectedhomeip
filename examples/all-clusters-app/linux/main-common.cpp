@@ -113,6 +113,7 @@ class ExampleDeviceInstanceInfoProvider : public DeviceInstanceInfoProvider
 public:
     void Init(DeviceInstanceInfoProvider * defaultProvider) { mDefaultProvider = defaultProvider; }
 
+    CHIP_ERROR GetDeviceName(char * buf, size_t bufSize) override { return mDefaultProvider->GetDeviceName(buf, bufSize); }
     CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override { return mDefaultProvider->GetVendorName(buf, bufSize); }
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override { return mDefaultProvider->GetVendorId(vendorId); }
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductName(buf, bufSize); }

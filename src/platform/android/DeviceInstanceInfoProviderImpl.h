@@ -27,6 +27,7 @@ namespace DeviceLayer {
 class DeviceInstanceInfoProviderImpl : public Internal::GenericDeviceInstanceInfoProvider<Internal::AndroidConfig>
 {
 public:
+    CHIP_ERROR GetDeviceName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetProductId(uint16_t & productId) override;
     CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override;
