@@ -35,10 +35,6 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
-#ifdef DIC_ENABLE
-#include "DIC_EventHandler.h"
-#endif // DIC_ENABLE
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -106,10 +102,6 @@ CHIP_ERROR AppTask::Init()
         SILABS_LOG("TempMgr::Init() failed");
         appError(err);
     }
-
-#ifdef DIC_ENABLE
-    chip::DICManager::Init();
-#endif // DIC_ENABLE
 
     return err;
 }

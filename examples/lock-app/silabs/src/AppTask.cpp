@@ -50,10 +50,6 @@
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
-#ifdef DIC_ENABLE
-#include "DIC_EventHandler.h"
-#endif
-
 #include <platform/CHIPDeviceLayer.h>
 #define SYSTEM_STATE_LED 0
 #define LOCK_STATE_LED 1
@@ -183,10 +179,6 @@ CHIP_ERROR AppTask::Init()
 
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(state.Value() == DlLockState::kUnlocked);
-
-#ifdef DIC_ENABLE
-    chip::DICManager::Init();
-#endif
 
     // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED

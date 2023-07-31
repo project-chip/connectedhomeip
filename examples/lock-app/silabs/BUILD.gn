@@ -121,11 +121,7 @@ silabs_executable("lock_app") {
     "src/LockManager.cpp",
     "src/ZclCallbacks.cpp",
   ]
-  if (enable_dic) {
-    sources += [ "${examples_common_plat_dir}/DIC/matter_abs_interface/src/DIC_EventHandler.cpp" ]
-    include_dirs +=
-        [ "${examples_common_plat_dir}/DIC/matter_abs_interface/include" ]
-  }
+
   if (chip_build_libshell) {
     sources += [ "src/EventHandlerLibShell.cpp" ]
   }

@@ -120,12 +120,6 @@ silabs_executable("window_app") {
     "src/ZclCallbacks.cpp",
   ]
 
-  if (enable_dic) {
-    sources += [ "${examples_common_plat_dir}/DIC/matter_abs_interface/src/DIC_EventHandler.cpp" ]
-    include_dirs +=
-        [ "${examples_common_plat_dir}/DIC/matter_abs_interface/include" ]
-  }
-
   if (!disable_lcd) {
     sources += [ "src/LcdPainter.cpp" ]
   }
@@ -161,9 +155,6 @@ silabs_executable("window_app") {
     ]
   }
 
-  if (enable_dic) {
-    deps += [ "${examples_plat_dir}:efr32-dic" ]
-  }
 }
 
 group("silabs") {

@@ -27,12 +27,6 @@
 #include "AppTask.h"
 #include "semphr.h"
 
-#ifdef DIC_ENABLE
-#define DECIMAL 10
-#define BYTE 5
-#include "dic.h"
-#endif // DIC_ENABLE
-
 /**********************************************************
  * Defines and Constants
  *********************************************************/
@@ -98,11 +92,6 @@ void TemperatureManager::AttributeChangeHandler(EndpointId endpointId, Attribute
         int8_t Temp = ConvertToPrintableTemp(*((int16_t *) value));
         SILABS_LOG("Local temp %d", Temp);
         mCurrentTempCelsius = Temp;
-#ifdef DIC_ENABLE
-        char buffer[BYTE];
-        itoa(Temp, buffer, DECIMAL);
-        DIC_SendMsg("thermostat/Local_Temp", (const char *) (buffer));
-#endif // DIC_ENABLE
     }
     break;
 
@@ -110,11 +99,6 @@ void TemperatureManager::AttributeChangeHandler(EndpointId endpointId, Attribute
         int8_t coolingTemp = ConvertToPrintableTemp(*((int16_t *) value));
         SILABS_LOG("CoolingSetpoint %d", coolingTemp);
         mCoolingCelsiusSetPoint = coolingTemp;
-#ifdef DIC_ENABLE
-        char buffer[BYTE];
-        itoa(coolingTemp, buffer, DECIMAL);
-        DIC_SendMsg("thermostat/CoolingSetpoint", (const char *) (buffer));
-#endif
     }
     break;
 
@@ -122,43 +106,12 @@ void TemperatureManager::AttributeChangeHandler(EndpointId endpointId, Attribute
         int8_t heatingTemp = ConvertToPrintableTemp(*((int16_t *) value));
         SILABS_LOG("HeatingSetpoint %d", heatingTemp);
         mHeatingCelsiusSetPoint = heatingTemp;
-#ifdef DIC_ENABLE
-        char buffer[BYTE];
-        itoa(heatingTemp, buffer, DECIMAL);
-        DIC_SendMsg("thermostat/HeatingSetpoint", (const char *) (buffer));
-#endif
     }
     break;
 
     case ThermAttr::SystemMode::Id: {
         SILABS_LOG("SystemMode %d", static_cast<uint8_t>(*value));
         uint8_t mode = static_cast<uint8_t>(*value);
-#ifdef DIC_ENABLE
-        const char * Mode;
-        char buffer[BYTE];
-        switch (*value)
-        {
-        case 0:
-            Mode = "OFF";
-            break;
-        case 1:
-            Mode = "HEAT&COOL";
-            break;
-        case 3:
-            Mode = "COOL";
-            break;
-        case 4:
-            Mode = "HEAT";
-            break;
-        default:
-            Mode = "INVALID MODE";
-            break;
-        }
-        uint16_t current_temp = TempMgr().GetCurrentTemp();
-        itoa(current_temp, buffer, DECIMAL);
-        DIC_SendMsg("thermostat/systemMode", Mode);
-        DIC_SendMsg("thermostat/currentTemp", (const char *) (buffer));
-#endif
         if (mThermMode != mode)
         {
             mThermMode = mode;

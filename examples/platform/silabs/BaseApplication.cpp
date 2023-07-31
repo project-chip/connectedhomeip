@@ -61,6 +61,11 @@
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #endif // SL_WIFI
 
+#ifdef DIC_ENABLE
+#include "dic.h"
+#include "dic_control.h"
+#endif // DIC_ENABLE
+
 /**********************************************************
  * Defines and Constants
  *********************************************************/
@@ -139,6 +144,22 @@ Identify gIdentify = {
 
 #endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
 } // namespace
+
+#ifdef DIC_ENABLE
+namespace {
+void AppSpecificConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg)
+{
+    SILABS_LOG("AppSpecificConnectivityEventCallback: call back for IPV4");
+    if ((event->Type == DeviceEventType::kInternetConnectivityChange) &&
+        (event->InternetConnectivityChange.IPv4 == kConnectivity_Established))
+    {
+        SILABS_LOG("Got IPv4 Address! Starting DIC module\n");
+        if (DIC_OK != DIC_Init(dic::control::subscribeCB))
+            SILABS_LOG("Failed to initialize DIC module\n");
+    }
+}
+}
+#endif // DIC_ENABLE
 
 /**********************************************************
  * AppTask Definitions
@@ -219,6 +240,10 @@ CHIP_ERROR BaseApplication::Init()
     LEDWidget::InitGpio();
     sStatusLED.Init(SYSTEM_STATE_LED);
 #endif // ENABLE_WSTK_LEDS
+
+#ifdef DIC_ENABLE
+    chip::DeviceLayer::PlatformMgr().AddEventHandler(AppSpecificConnectivityEventCallback, reinterpret_cast<intptr_t>(nullptr));
+#endif // DIC_ENABLE
 
     ConfigurationMgr().LogDeviceConfig();
 
