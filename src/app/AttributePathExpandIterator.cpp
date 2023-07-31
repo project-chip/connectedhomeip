@@ -65,8 +65,7 @@ AttributePathExpandIterator::AttributePathExpandIterator(ObjectList<AttributePat
                   "Our index won't be able to hold the value we need to hold.");
     static_assert(std::is_same<decltype(mGlobalAttributeIndex), uint8_t>::value,
                   "If this changes audit all uses where we set to UINT8_MAX");
-    mGlobalAttributeIndex    = UINT8_MAX;
-    mGlobalAttributeEndIndex = 0;
+    mGlobalAttributeIndex = UINT8_MAX;
 
     // Make the iterator ready to emit the first valid path in the list.
     Next();
@@ -141,6 +140,11 @@ void AttributePathExpandIterator::PrepareAttributeIndexRange(const AttributePath
                 }
             }
             mGlobalAttributeEndIndex = static_cast<uint8_t>(mGlobalAttributeIndex + 1);
+        }
+        else
+        {
+            mGlobalAttributeIndex    = UINT8_MAX;
+            mGlobalAttributeEndIndex = 0;
         }
     }
 }
