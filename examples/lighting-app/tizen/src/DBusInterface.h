@@ -36,6 +36,7 @@ public:
 
     CHIP_ERROR Init();
 
+    void Identify(uint16_t time);
     void SetOnOff(bool on);
     void SetLevel(uint8_t value);
     void SetColorMode(chip::app::Clusters::ColorControl::ColorMode colorMode);
@@ -67,6 +68,7 @@ private:
     GDBusObjectManagerServer * mManager = nullptr;
     bool mNameAcquired                  = false;
 
+    LightAppIdentify * mIfaceIdentify         = nullptr;
     LightAppOnOff * mIfaceOnOff               = nullptr;
     LightAppLevelControl * mIfaceLevelControl = nullptr;
     LightAppColorControl * mIfaceColorControl = nullptr;

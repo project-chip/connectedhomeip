@@ -49,6 +49,7 @@ public:
 DBusInterface::DBusInterface(chip::EndpointId endpointId) : mEndpointId(endpointId)
 {
     mManager           = g_dbus_object_manager_server_new("/");
+    mIfaceIdentify     = light_app_identify_skeleton_new();
     mIfaceOnOff        = light_app_on_off_skeleton_new();
     mIfaceLevelControl = light_app_level_control_skeleton_new();
     mIfaceColorControl = light_app_color_control_skeleton_new();
@@ -56,6 +57,7 @@ DBusInterface::DBusInterface(chip::EndpointId endpointId) : mEndpointId(endpoint
 
 DBusInterface::~DBusInterface()
 {
+    g_object_unref(mIfaceIdentify);
     g_object_unref(mIfaceOnOff);
     g_object_unref(mIfaceLevelControl);
     g_object_unref(mIfaceColorControl);
@@ -68,6 +70,11 @@ CHIP_ERROR DBusInterface::Init()
     // on the GLib Matter context. Otherwise, signals will be emitted on the glib default
     // main context.
     return chip::DeviceLayer::PlatformMgrImpl().GLibMatterContextInvokeSync(InitOnGLibMatterContext, this);
+}
+
+void DBusInterface::Identify(uint16_t time)
+{
+    light_app_identify_emit_identify(mIfaceIdentify, time);
 }
 
 void DBusInterface::SetOnOff(bool on)
@@ -112,6 +119,7 @@ CHIP_ERROR DBusInterface::InitOnGLibMatterContext(DBusInterface * self)
     LightAppObjectSkeleton * object = light_app_object_skeleton_new("/app");
     g_dbus_object_manager_server_export(self->mManager, G_DBUS_OBJECT_SKELETON(object));
 
+    light_app_object_skeleton_set_identify(object, self->mIfaceIdentify);
     light_app_object_skeleton_set_on_off(object, self->mIfaceOnOff);
     light_app_object_skeleton_set_level_control(object, self->mIfaceLevelControl);
     light_app_object_skeleton_set_color_control(object, self->mIfaceColorControl);

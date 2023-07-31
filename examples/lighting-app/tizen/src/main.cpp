@@ -70,6 +70,18 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         }
         break;
 #if ENABLE_DBUS_UI
+    case Clusters::Identify::Id:
+        switch (attributePath.mAttributeId)
+        {
+        case Clusters::Identify::Attributes::IdentifyTime::Id:
+            VerifyOrDie(size == sizeof(uint16_t));
+            sDBusInterface.Identify(*reinterpret_cast<uint16_t *>(value));
+            break;
+        default:
+            ChipLogDetail(NotSpecified, "Not handled Identify cluster attribute ID: " ChipLogFormatMEI,
+                          ChipLogValueMEI(attributePath.mAttributeId));
+        }
+        break;
     case Clusters::LevelControl::Id:
         switch (attributePath.mAttributeId)
         {
