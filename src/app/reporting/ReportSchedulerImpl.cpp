@@ -41,8 +41,8 @@ ReportSchedulerImpl::ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : Repor
 ///        Each read handler that is not blocked is immediately marked dirty so that it will report as soon as possible.
 void ReportSchedulerImpl::OnEnterActiveMode()
 {
-    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
 #if ICD_REPORT_ON_ENTER_ACTIVE_MODE
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
     mNodesPool.ForEachActiveObject([now, this](ReadHandlerNode * node) {
         if (now >= node->GetMinTimestamp())
         {
