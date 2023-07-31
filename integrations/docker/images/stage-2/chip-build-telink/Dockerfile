@@ -52,12 +52,12 @@ ENV ZEPHYR_SDK_INSTALL_DIR=/opt/telink/zephyr-sdk-0.16.1
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
-    ccache=3.7.7-1 \
+    ccache \
     dfu-util=0.9-1 \
-    device-tree-compiler=1.5.1-1 \
-    gcc-multilib=4:9.3.0-1ubuntu2 \
-    g++-multilib=4:9.3.0-1ubuntu2 \
-    libsdl2-dev=2.0.10+dfsg1-3 \
+    device-tree-compiler \
+    gcc-multilib \
+    g++-multilib \
+    libsdl2-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && python3 -m pip install -U --no-cache-dir \

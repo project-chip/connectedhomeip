@@ -1225,9 +1225,8 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                 {
                     VerifyOrDie(attrStorage && "Attribute persistence needs a persistence provider");
                     MutableByteSpan bytes(attrData);
-                    CHIP_ERROR err =
-                        attrStorage->ReadValue(app::ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId),
-                                               am->attributeType, am->size, bytes);
+                    CHIP_ERROR err = attrStorage->ReadValue(
+                        app::ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId), am, bytes);
                     if (err == CHIP_NO_ERROR)
                     {
                         ptr = attrData;

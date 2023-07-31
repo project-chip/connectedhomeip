@@ -1631,7 +1631,7 @@ CHIP_ERROR ExtractCRLDistributionPointURIFromX509Cert(const ByteSpan & certifica
             cdpExtCount++;
             VerifyOrExit(cdpExtCount <= 1, error = CHIP_ERROR_NOT_FOUND);
 
-            // CRL Distribution Point Extension is encoded as a secuense of DistributionPoint:
+            // CRL Distribution Point Extension is encoded as a sequence of DistributionPoint:
             //     CRLDistributionPoints ::= SEQUENCE SIZE (1..MAX) OF DistributionPoint
             //
             // This implementation only supports a single DistributionPoint (sequence of size 1),
@@ -1662,6 +1662,8 @@ CHIP_ERROR ExtractCRLDistributionPointURIFromX509Cert(const ByteSpan & certifica
             result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED);
             VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
 
+            unsigned char * end_of_general_names = p + len;
+
             // The CDP URI is encoded as a uniformResourceIdentifier field of the GeneralName:
             //     GeneralName ::= CHOICE {
             //         otherName                       [0]     OtherName,
@@ -1676,6 +1678,9 @@ CHIP_ERROR ExtractCRLDistributionPointURIFromX509Cert(const ByteSpan & certifica
             result =
                 mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_X509_SAN_UNIFORM_RESOURCE_IDENTIFIER);
             VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
+
+            // Only single URI instance in the GeneralNames is supported
+            VerifyOrExit(p + len == end_of_general_names, error = CHIP_ERROR_NOT_FOUND);
 
             const char * urlptr = reinterpret_cast<const char *>(p);
             VerifyOrExit((len > strlen(kValidCDPURIHttpPrefix) &&
@@ -1698,6 +1703,122 @@ exit:
 #else
     (void) certificate;
     (void) cdpurl;
+    CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
+
+    return error;
+}
+
+CHIP_ERROR ExtractCDPExtensionCRLIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSpan & crlIssuer)
+{
+#if defined(MBEDTLS_X509_CRT_PARSE_C)
+    CHIP_ERROR error = CHIP_ERROR_NOT_FOUND;
+    mbedtls_x509_crt mbed_cert;
+    unsigned char * p         = nullptr;
+    const unsigned char * end = nullptr;
+    size_t len                = 0;
+    size_t cdpExtCount        = 0;
+
+    VerifyOrReturnError(!certificate.empty() && CanCastTo<long>(certificate.size()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    mbedtls_x509_crt_init(&mbed_cert);
+
+    int result = mbedtls_x509_crt_parse(&mbed_cert, Uint8::to_const_uchar(certificate.data()), certificate.size());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    p   = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(v3_ext).CHIP_CRYPTO_PAL_PRIVATE_X509(p);
+    end = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(v3_ext).CHIP_CRYPTO_PAL_PRIVATE_X509(p) +
+        mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(v3_ext).CHIP_CRYPTO_PAL_PRIVATE_X509(len);
+    result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_WRONG_CERT_TYPE);
+
+    while (p < end)
+    {
+        result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
+        VerifyOrExit(result == 0, error = CHIP_ERROR_WRONG_CERT_TYPE);
+        result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_OID);
+        VerifyOrExit(result == 0, error = CHIP_ERROR_WRONG_CERT_TYPE);
+
+        mbedtls_x509_buf extOID = { MBEDTLS_ASN1_OID, len, p };
+        bool isCurrentExtCDP    = OID_CMP(sOID_Extension_CRLDistributionPoint, extOID);
+        p += len;
+
+        int is_critical = 0;
+        result          = mbedtls_asn1_get_bool(&p, end, &is_critical);
+        VerifyOrExit(result == 0 || result == MBEDTLS_ERR_ASN1_UNEXPECTED_TAG, error = CHIP_ERROR_WRONG_CERT_TYPE);
+
+        result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_OCTET_STRING);
+        VerifyOrExit(result == 0, error = CHIP_ERROR_WRONG_CERT_TYPE);
+
+        unsigned char * end_of_ext = p + len;
+
+        if (isCurrentExtCDP)
+        {
+            // Only one CRL Distribution Point Extension is allowed.
+            cdpExtCount++;
+            VerifyOrExit(cdpExtCount <= 1, error = CHIP_ERROR_NOT_FOUND);
+
+            // CRL Distribution Point Extension is encoded as a sequence of DistributionPoint:
+            //     CRLDistributionPoints ::= SEQUENCE SIZE (1..MAX) OF DistributionPoint
+            //
+            // This implementation only supports a single DistributionPoint (sequence of size 1),
+            // which is verified by comparing (p + len == end_of_ext)
+            result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
+            VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
+            VerifyOrExit(p + len == end_of_ext, error = CHIP_ERROR_NOT_FOUND);
+
+            // The DistributionPoint is a sequence of three optional elements:
+            //     DistributionPoint ::= SEQUENCE {
+            //         distributionPoint       [0]     DistributionPointName OPTIONAL,
+            //         reasons                 [1]     ReasonFlags OPTIONAL,
+            //         cRLIssuer               [2]     GeneralNames OPTIONAL }
+            result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
+            VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
+            VerifyOrExit(p + len == end_of_ext, error = CHIP_ERROR_NOT_FOUND);
+
+            // If distributionPoint element presents, ignore it
+            result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED | 0);
+            if (result == 0)
+            {
+                p += len;
+                VerifyOrExit(p < end_of_ext, error = CHIP_ERROR_NOT_FOUND);
+            }
+
+            // Check if cRLIssuer element present
+            result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED | 2);
+            VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
+
+            // The CRL Issuer is encoded as a directoryName field of the GeneralName:
+            //     GeneralName ::= CHOICE {
+            //         otherName                       [0]     OtherName,
+            //         rfc822Name                      [1]     IA5String,
+            //         dNSName                         [2]     IA5String,
+            //         x400Address                     [3]     ORAddress,
+            //         directoryName                   [4]     Name,
+            //         ediPartyName                    [5]     EDIPartyName,
+            //         uniformResourceIdentifier       [6]     IA5String,
+            //         iPAddress                       [7]     OCTET STRING,
+            //         registeredID                    [8]     OBJECT IDENTIFIER }
+            result = mbedtls_asn1_get_tag(
+                &p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_X509_SAN_DIRECTORY_NAME);
+            VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
+            VerifyOrExit(p + len == end_of_ext, error = CHIP_ERROR_NOT_FOUND);
+
+            error = CopySpanToMutableSpan(ByteSpan(p, len), crlIssuer);
+            SuccessOrExit(error);
+        }
+        p = end_of_ext;
+    }
+
+    VerifyOrExit(cdpExtCount == 1, error = CHIP_ERROR_NOT_FOUND);
+
+exit:
+    _log_mbedTLS_error(result);
+    mbedtls_x509_crt_free(&mbed_cert);
+
+#else
+    (void) certificate;
+    (void) crlIssuer;
     CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 
