@@ -23,7 +23,6 @@ config:
     cluster: "Dishwasher Mode"
     endpoint: 0
 
-
 tests:
     - label:
           "Step 1: Commission DUT to TH (can be skipped if done in a preceding
@@ -32,7 +31,7 @@ tests:
 
       disabled: true
 
-# Reference Issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3204
+    # Reference Issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3204
     - label: "Step 2: TH reads from the DUT the SupportedModes attribute."
       PICS: DISHM.S.A0000
       verification: |

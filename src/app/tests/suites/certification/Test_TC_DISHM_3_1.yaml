@@ -55,7 +55,7 @@ tests:
           [1649679034.895972][10879:10884] CHIP:TOO: CurrentMode: 0
       disabled: true
 
-# Reference Issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3204
+    # Reference Issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3204
     - label: "Step 4: TH reads from the DUT the SupportedModes attribute."
       PICS: DISHM.S.A0000 && DISHM.S.F00
       verification: |
