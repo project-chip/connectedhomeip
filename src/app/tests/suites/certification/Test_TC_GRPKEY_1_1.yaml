@@ -60,12 +60,22 @@ tests:
               hasMasksSet: [0x1]
 
     - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [0, 1, 2, 3, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: " !PICS_EVENT_LIST_ENABLED "
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 3, 65528, 65529, 65531, 65532, 65533]
 
     - label:
           "Step 4b: The list SHALL NOT contain any additional values in the
@@ -106,6 +116,7 @@ tests:
                 value: "y"
 
     - label: "Step 5a: TH1 reads EventList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
