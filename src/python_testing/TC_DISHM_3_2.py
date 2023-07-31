@@ -97,7 +97,7 @@ class TC_DISHM_3_2(MatterBaseTest):
 
         old_current_mode_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info("CurrentMode: %s" % (old_current_mode))
+        logging.info("CurrentMode: %s" % (old_current_mode_dut))
 
         if old_current_mode_dut == new_startup_mode:
 
