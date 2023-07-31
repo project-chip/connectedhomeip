@@ -191,6 +191,16 @@ enum
   EMBER_AF_ENDPOINT_ENABLED  = 0x01,
 };
 
+#ifdef DOXYGEN_SHOULD_SKIP_THIS
+enum EmberAfEndpointCompositionType;
+#else
+typedef uint8_t EmberAfEndpointCompositionType;
+enum
+#endif
+{ EMBER_AF_ENDPOINT_COMPOSITION_FLAT = 0x00,
+  EMBER_AF_ENDPOINT_COMPOSITION_TREE = 0x01,
+};
+
 /**
  * @brief Struct that maps actual endpoint type, onto a specific endpoint.
  */
@@ -224,6 +234,11 @@ struct EmberAfDefinedEndpoint
      * Root endpoint id for composed device type.
      */
     chip::EndpointId parentEndpointId = chip::kInvalidEndpointId;
+
+    /**
+     * Endpoint's composition type
+     */
+    EmberAfEndpointCompositionType endpointCompositionType = EMBER_AF_ENDPOINT_COMPOSITION_FLAT;
 };
 
 // Cluster specific types
