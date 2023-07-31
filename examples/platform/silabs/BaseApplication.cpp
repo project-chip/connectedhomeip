@@ -158,7 +158,7 @@ void AppSpecificConnectivityEventCallback(const ChipDeviceEvent * event, intptr_
             SILABS_LOG("Failed to initialize DIC module\n");
     }
 }
-}
+} // namespace
 #endif // DIC_ENABLE
 
 /**********************************************************
