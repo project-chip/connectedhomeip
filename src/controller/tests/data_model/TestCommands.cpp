@@ -120,8 +120,8 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
             // test is not really testing what it should.
             for (size_t i = 0; i < 4; ++i)
             {
-                apCommandObj->AddStatusAndLogIfError(aCommandPath, Protocols::InteractionModel::Status::Success,
-                                                     "No error but testing AddStatusAndLogIfError in success case");
+                apCommandObj->AddStatusAndLogIfFailure(aCommandPath, Protocols::InteractionModel::Status::Success,
+                                                     "No error but testing AddStatusAndLogIfFailure in success case");
             }
             // And one failure on the end.
             apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
