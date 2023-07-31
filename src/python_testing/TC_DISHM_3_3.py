@@ -152,7 +152,8 @@ class TC_DISHM_3_2(MatterBaseTest):
         self.print_step(7, "Write to the StartUpOnOff attribute of OnOff cluster with a value of 1")
 
         ret = await self.write_startup_onoff()
-        asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Writing to the StartUpOnOff attribute of OnOff should succeed")
+        asserts.assert_true(ret.status == CommonCodes.SUCCESS.value,
+                            "Writing to the StartUpOnOff attribute of OnOff should succeed")
 
         self.default_controller.ExpireSessions(self.dut_node_id)
 

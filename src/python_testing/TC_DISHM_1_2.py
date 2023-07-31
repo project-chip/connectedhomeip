@@ -111,7 +111,8 @@ class TC_DISHM_1_2(MatterBaseTest):
             startup_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.StartUpMode)
 
             logging.info("StartUpMode: %s" % (startup_mode))
-            asserts.assert_true(startup_mode in supported_modes_dut or startup_mode == NullValue, "StartUpMode is not a supported mode!")
+            asserts.assert_true(startup_mode in supported_modes_dut or startup_mode ==
+                                NullValue, "StartUpMode is not a supported mode!")
 
 
 if __name__ == "__main__":
