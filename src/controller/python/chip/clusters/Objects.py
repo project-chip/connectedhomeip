@@ -13451,6 +13451,10 @@ class GroupKeyManagement(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+    class Bitmaps:
+        class Feature(IntFlag):
+            kCacheAndSync = 0x1
+
     class Structs:
         @dataclass
         class GroupInfoMapStruct(ClusterObject):
