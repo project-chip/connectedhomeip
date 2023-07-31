@@ -159,10 +159,12 @@ void UnregisterMatchingAttributeAccessInterfaces(F shouldUnregister)
 // Initial configuration
 void emberAfEndpointConfigure()
 {
+    ChipLogProgress(DataManagement, "MHDEBUG: emberAfEndpointConfigure");
     uint16_t ep;
 
     static_assert(FIXED_ENDPOINT_COUNT <= std::numeric_limits<decltype(ep)>::max(),
                   "FIXED_ENDPOINT_COUNT must not exceed the size of the endpoint data type");
+    ChipLogProgress(DataManagement, "MHDEBUG: FIXED_ENDPOINT_COUNT: %d", FIXED_ENDPOINT_COUNT);
 
 #if !defined(EMBER_SCRIPTED_TEST)
     uint16_t fixedEndpoints[]             = FIXED_ENDPOINT_ARRAY;
@@ -197,6 +199,8 @@ void emberAfEndpointConfigure()
         // Increment currentDataVersions by 1 (slot) for every server cluster
         // this endpoint has.
         currentDataVersions += emberAfClusterCountByIndex(ep, /* server = */ true);
+
+        ChipLogProgress(DataManagement, "MHDEBUG: emAfEndpoints[%d].endpoint: %d", ep, emAfEndpoints[ep].endpoint);
     }
 
 #if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
@@ -371,8 +375,8 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     // Casting and calling a function pointer on the same line results in ignoring the return
     // of the call on gcc-arm-none-eabi-9-2019-q4-major
-    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback)(
-        emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
+    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback) (emberAfFindClusterFunction(
+        cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
     if (f != nullptr)
     {
         status = f(attributePath, attributeType, size, value);
@@ -990,6 +994,37 @@ EndpointId emberAfEndpointFromIndex(uint16_t index)
 EndpointId emberAfParentEndpointFromIndex(uint16_t index)
 {
     return emAfEndpoints[index].parentEndpointId;
+}
+
+EmberAfStatus emberAfSetParentEndpointForEndpoint(chip::EndpointId childEndpoint, chip::EndpointId parentEndpoint)
+{
+    uint16_t childIndex  = emberAfIndexFromEndpoint(childEndpoint);
+    uint16_t parentIndex = emberAfIndexFromEndpoint(parentEndpoint);
+
+    if (childIndex == kEmberInvalidEndpointIndex || parentIndex == kEmberInvalidEndpointIndex)
+    {
+        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
+    }
+    ChipLogProgress(Zcl, "MHDEBUG: Setting parent endpoint for endpoint %d to %d", childEndpoint, parentEndpoint);
+    emAfEndpoints[childIndex].parentEndpointId = parentEndpoint;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus emberAfSetEndpointComposition(chip::EndpointId endpoint, EmberAfEndpointCompositionType aEndpointCompositionType)
+{
+    uint16_t index = emberAfIndexFromEndpoint(endpoint);
+    if (index == kEmberInvalidEndpointIndex)
+    {
+        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
+    }
+    emAfEndpoints[index].endpointCompositionType = aEndpointCompositionType;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EndpointId emberAfEndpointCompositionTypeForEndpoint(chip::EndpointId endpoint)
+{
+    uint16_t index = emberAfIndexFromEndpoint(endpoint);
+    return emAfEndpoints[index].endpointCompositionType;
 }
 
 // If server == true, returns the number of server clusters,

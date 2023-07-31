@@ -130,10 +130,24 @@ extern EmberAfDefinedEndpoint emAfEndpoints[];
 #endif
 
 /**
- * @brief Returns root endpoint of a composed bridged device
+ * @brief Returns parent endpoint for a given endpoint index
  */
 chip::EndpointId emberAfParentEndpointFromIndex(uint16_t index);
 
+/**
+ * @brief Sets the parent endpoint for a given endpoint
+ */
+EmberAfStatus emberAfSetParentEndpointForEndpoint(chip::EndpointId childEndpoint, chip::EndpointId parentEndpoint);
+
+/**
+ * @brief Sets the composition type for a given endpoint
+ */
+EmberAfStatus emberAfSetEndpointComposition(chip::EndpointId endpoint, EmberAfEndpointCompositionType aEndpointCompositionType);
+
+/**
+ * @brief Returns the composition type for a given endpoint
+ */
+chip::EndpointId emberAfEndpointCompositionTypeForEndpoint(chip::EndpointId endpoint);
 /**
  * Returns the index of a given endpoint.  Will return 0xFFFF if this is not a
  * valid endpoint id or if the endpoint is disabled.
