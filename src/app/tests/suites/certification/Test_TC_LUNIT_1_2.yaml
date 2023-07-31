@@ -61,13 +61,22 @@ tests:
               hasMasksSet: [0x1]
 
     - label: "Step 4a: TH reads AttributeList from DUT"
-      PICS: LUNIT.S.Afffb
+      PICS: PICS_EVENT_LIST_ENABLED && LUNIT.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED && LUNIT.S.Afffb"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65531, 65532, 65533]
 
     - label:
           "Step 4b: TH reads Feature dependent(LUNIT.S.F00) attribute in
@@ -81,7 +90,7 @@ tests:
               contains: [0]
 
     - label: "Step 5: TH reads EventList from DUT"
-      PICS: LUNIT.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && LUNIT.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:

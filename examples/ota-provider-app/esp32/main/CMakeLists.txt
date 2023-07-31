@@ -62,7 +62,7 @@ chip_app_component_codegen("${CHIP_ROOT}/examples/ota-provider-app/ota-provider-
 chip_app_component_zapgen("${CHIP_ROOT}/examples/ota-provider-app/ota-provider-common/ota-provider-app.zap")
 
 spiffs_create_partition_image(img_storage ${CMAKE_SOURCE_DIR}/spiffs_image FLASH_IN_PROJECT)
-set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 14)
+set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
