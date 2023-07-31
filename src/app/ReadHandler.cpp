@@ -711,6 +711,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
 
     ReturnErrorOnFailure(subscribeRequestParser.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
     ReturnErrorOnFailure(subscribeRequestParser.GetMaxIntervalCeilingSeconds(&mMaxInterval));
+    VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 
@@ -756,8 +757,6 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     mMaxInterval = static_cast<uint16_t>(decidedMaxInterval);
 
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-
-    VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
 
     //
     // Notify the application (if requested) of the impending subscription and check whether we should still proceed to set it up.
