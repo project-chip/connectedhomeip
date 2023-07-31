@@ -126,7 +126,6 @@ k32w1_executable("contact_sensor_app") {
   ldflags = [
     "-Wl,--defsym=__heap_size__=0",
     "-Wl,--defsym=__stack_size__=0x480",
-    "-Wl,--defsym=gNvmSectors=8",
     "-Wl,--defsym=lp_ram_lower_limit=0x04000000",
     "-Wl,--defsym=lp_ram_upper_limit=0x2001C000",
     "-Wl,-print-memory-usage",
