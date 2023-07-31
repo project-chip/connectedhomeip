@@ -121,7 +121,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
             for (size_t i = 0; i < 4; ++i)
             {
                 apCommandObj->AddStatusAndLogIfFailure(aCommandPath, Protocols::InteractionModel::Status::Success,
-                                                     "No error but testing AddStatusAndLogIfFailure in success case");
+                                                       "No error but testing AddStatusAndLogIfFailure in success case");
             }
             // And one failure on the end.
             apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
