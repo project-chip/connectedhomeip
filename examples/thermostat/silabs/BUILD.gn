@@ -141,12 +141,6 @@ silabs_executable("thermostat_app") {
     "src/ZclCallbacks.cpp",
   ]
 
-  if (enable_dic) {
-    sources += [ "${examples_common_plat_dir}/DIC/matter_abs_interface/src/DIC_EventHandler.cpp" ]
-    include_dirs +=
-        [ "${examples_common_plat_dir}/DIC/matter_abs_interface/include" ]
-  }
-
   if (use_temp_sensor) {
     sources += [
       "${efr32_sdk_root}/hardware/driver/si70xx/src/sl_si70xx.c",
@@ -234,10 +228,6 @@ silabs_executable("thermostat_app") {
       "-Wl,--defsym",
       "-Wl,SILABS_WIFI=1",
     ]
-  }
-
-  if (enable_dic) {
-    deps += [ "${examples_plat_dir}:efr32-dic" ]
   }
 
   output_dir = root_out_dir
