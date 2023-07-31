@@ -468,7 +468,6 @@ private:
     chip::Controller::CommissionableNodeController mCommissionableNodeController;
 
     CommissioningCallbacks mCommissioningCallbacks;
-    std::function<void(CHIP_ERROR)> mCommissioningCompleteCallback;
 
     std::function<void(TargetEndpointInfo *)> mOnNewOrUpdatedEndpoint;
     std::function<void(TargetVideoPlayerInfo *)> mOnConnectionSuccessClientCallback;
