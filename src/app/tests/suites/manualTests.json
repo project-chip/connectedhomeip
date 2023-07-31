@@ -372,6 +372,7 @@
         "DeviceManagement",
         "DiagnosticsLogs",
         "DishwasherAlarm",
+        "DishwasherMode",
         "Descriptor",
         "FanControl",
         "EthernetNetworkDiagnostics",
