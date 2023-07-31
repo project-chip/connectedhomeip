@@ -69,7 +69,7 @@ tests:
       verification: |
           ./chip-tool  rvcrunmode read current-mode 1 1
 
-          On TH(chip-tool), Verify that CurrentMode attribute is an integer. 
+          On TH(chip-tool), Verify that CurrentMode attribute is an integer.
           Save the value as old_current_mode_dut and below is the sample log provided for the raspi platform, Here CurrentMode value is 0
 
           NOTE: If startup_mode_dut is equal to old_current_mode_dut proceed to step 4. Else proceed to step 6.

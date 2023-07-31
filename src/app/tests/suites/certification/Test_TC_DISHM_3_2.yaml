@@ -125,7 +125,7 @@ tests:
       verification: |
           ./chip-tool dishwashermode read current-mode 1 1
 
-          On TH(chip-tool), Verify that CurrentMode attribute value is an integer value 
+          On TH(chip-tool), Verify that CurrentMode attribute value is an integer value
           - Save the value as old_current_mode_dut, below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
 
           NOTE: If startup_mode_dut is equal to old_current_mode_dut proceed to step 6. Else proceed to step 8.
@@ -206,7 +206,7 @@ tests:
       verification: |
           ./chip-tool dishwashermode read start-up-mode 1 1
 
-          On TH(chip-tool), Verify StartUpMode attribute value is an integer. 
+          On TH(chip-tool), Verify StartUpMode attribute value is an integer.
           - Save the value as new_start_up_mode_dut and is equal to new_start_up_mode_th, below is the sample log provided for the raspi platform, Here  StartUpMode value is 0
 
           [1690188941.380388][16015:16017] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0002 DataVersion: 74242738

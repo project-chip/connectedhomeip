@@ -213,7 +213,7 @@ tests:
       verification: |
           ./chip-tool dishwashermode read on-mode 1 1
 
-          On TH(chip-tool),  Verify that OnMode attribute value is an integer 
+          On TH(chip-tool),  Verify that OnMode attribute value is an integer
           - Save the value as new_on_mode_dut and  is equal to new_mode_th and below is the sample log provided for the raspi platform, here OnMode attribute value is 2
 
           [1690189501.554415][16104:16106] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0003 DataVersion: 1012425329

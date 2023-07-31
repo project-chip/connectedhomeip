@@ -135,11 +135,11 @@ tests:
           [1690184081.114874][15327:15329] CHIP:DMG:                         {
           [1690184081.114877][15327:15329] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1690184081.114879][15327:15329] CHIP:DMG:                         },
-          [1690184081.114883][15327:15329] CHIP:DMG:                         
+          [1690184081.114883][15327:15329] CHIP:DMG:
 
           ./chip-tool  rvccleanmode read on-mode 1 1
 
-          On TH(chip-tool),  Verify that OnMode attribute value is an integer 
+          On TH(chip-tool),  Verify that OnMode attribute value is an integer
           - Save the value as old_on_mode_dut,  below is the sample log provided for the raspi platform, here OnMode attribute value is 0
 
           NOTE: If startup_mode_dut is equal to old_on_mode_dut proceed to step 6. Else proceed to step 8.

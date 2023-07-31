@@ -126,7 +126,7 @@ tests:
       verification: |
           ./chip-tool laundrywashermode read current-mode 1 1
 
-          Verify on TH(chip-tool), Current modes attribute value is an integer value. 
+          Verify on TH(chip-tool), Current modes attribute value is an integer value.
           - Save the mode values for usage in steps 3 and below is the sample log provided for the raspi platform
 
           [1690184717.887506][15442:15444] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_0001 DataVersion: 3075628268

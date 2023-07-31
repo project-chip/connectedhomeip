@@ -135,7 +135,7 @@ tests:
 
           ./chip-tool  rvcrunmode read on-mode 1 1
 
-          On TH(chip-tool),  Verify that OnMode attribute value is an integer 
+          On TH(chip-tool),  Verify that OnMode attribute value is an integer
           - Save the value as old_on_mode_dut , below is the sample log provided for the raspi platform,  OnMode attribute value is 0
 
           NOTE: If startup_mode_dut is equal to old_on_mode_dut proceed to step 4. Else proceed to step 6.
@@ -202,7 +202,7 @@ tests:
       verification: |
           ./chip-tool  rvcrunmode read on-mode 1 1
 
-          On TH(chip-tool),  Verify that OnMode attribute value is an integer 
+          On TH(chip-tool),  Verify that OnMode attribute value is an integer
           - Save the value as new_on_mode_dut and is equal to new_mode_th, below is the sample log provided for the raspi platform,  OnMode attribute value is 1
 
           [1690544833.540939][2984:2986] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0054 Attribute 0x0000_0003 DataVersion: 3877802512
