@@ -38,6 +38,8 @@ gdbus_library("chip-lighting-app-manager") {
 executable("chip-lighting-app") {
   sources = [
     "include/CHIPProjectAppConfig.h",
+    "include/LedManager.h",
+    "src/LedManager.cpp",
     "src/main.cpp",
   ]
 

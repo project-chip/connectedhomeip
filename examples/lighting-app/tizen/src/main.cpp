@@ -16,14 +16,13 @@
  *    limitations under the License.
  */
 
-#include <peripheral_io.h>
-
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/Tizen/NetworkCommissioningDriver.h>
 
+#include <LedManager.h>
 #include <LightingManager.h>
 #include <TizenServiceAppMain.h>
 
@@ -36,9 +35,13 @@ using namespace chip::app;
 
 namespace {
 
+static constexpr chip::EndpointId chipEndpoint(1);
+
 #if ENABLE_DBUS_UI
-example::DBusInterface sDBusInterface(chip::EndpointId(1));
+example::DBusInterface sDBusInterface(chipEndpoint);
 #endif
+
+static example::LedManager ledManager(chipEndpoint);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 DeviceLayer::NetworkCommissioning::TizenWiFiDriver sTizenWiFiDriver;
@@ -60,6 +63,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         {
         case Clusters::OnOff::Attributes::OnOff::Id:
             LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
+            ledManager.SetOnOff(*value);
 #if ENABLE_DBUS_UI
             sDBusInterface.SetOnOff(*value);
 #endif
@@ -114,34 +118,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
 }
 
-constexpr int blue_pin  = 18;
-constexpr int green_pin = 19;
-constexpr int red_pin   = 20;
-
-static peripheral_gpio_h blue_gpio;
-static peripheral_gpio_h green_gpio;
-static peripheral_gpio_h red_gpio;
-
-static int gpio_init()
-{
-    peripheral_gpio_open(blue_pin, &blue_gpio);
-    peripheral_gpio_set_direction(blue_gpio, PERIPHERAL_GPIO_DIRECTION_OUT_INITIALLY_LOW);
-
-    peripheral_gpio_open(green_pin, &green_gpio);
-    peripheral_gpio_set_direction(green_gpio, PERIPHERAL_GPIO_DIRECTION_OUT_INITIALLY_LOW);
-
-    peripheral_gpio_open(red_pin, &red_gpio);
-    peripheral_gpio_set_direction(red_gpio, PERIPHERAL_GPIO_DIRECTION_OUT_INITIALLY_LOW);
-    return 0;
-}
-
-static void gpio_on_off(bool on)
-{
-    peripheral_gpio_write(green_gpio, on ? 1 : 0);
-    peripheral_gpio_write(blue_gpio, on ? 1 : 0);
-    peripheral_gpio_write(red_gpio, on ? 1 : 0);
-}
-
 void ApplicationInit()
 {
 #if ENABLE_DBUS_UI
@@ -150,6 +126,7 @@ void ApplicationInit()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     sWiFiNetworkCommissioningInstance.Init();
 #endif
+    ledManager.Init();
 }
 
 void ApplicationShutdown() {}
@@ -158,14 +135,7 @@ int main(int argc, char * argv[])
 {
     TizenServiceAppMain app;
     VerifyOrDie(app.Init(argc, argv) == 0);
-
-    VerifyOrDie(gpio_init() == 0);
     VerifyOrDie(LightingMgr().Init() == CHIP_NO_ERROR);
-
-    LightingMgr().SetCallbacks([](LightingManager::Action_t action) { gpio_on_off(action == LightingManager::ON_ACTION); },
-                               [](LightingManager::Action_t action) {});
-
-    app.SetInitializedCb([]() { gpio_on_off(LightingMgr().IsTurnedOn()); });
 
     return app.RunMainLoop();
 }
