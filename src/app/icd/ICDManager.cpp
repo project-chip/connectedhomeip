@@ -34,7 +34,7 @@
 #endif
 
 #ifndef ICD_REPORT_ON_ENTER_ACTIVE_MODE
-// Enabling this makes the devive emmit subscription reports when transitionning from idle to active mode. It gives the device a
+// Enabling this makes the device emit subscription reports when transitioning from idle to active mode. It gives the device a
 // chance to sleep for the extent of its idle mode interval before getting awakened to emit reports again.
 #define ICD_REPORT_ON_ENTER_ACTIVE_MODE 0
 #endif
