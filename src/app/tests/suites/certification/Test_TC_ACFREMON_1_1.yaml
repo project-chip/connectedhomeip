@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read the global attribute: ClusterRevision"
+    - label: "Step 2: Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -39,18 +39,18 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Read the global attribute: FeatureMap"
+    - label: "Step 3a: Read the global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: "!ACFREMON.S.F00 && !ACFREMON.S.F01"
+      PICS: "!ACFREMON.S.F00 && !ACFREMON.S.F01 && !ACFREMON.S.F02"
       response:
           value: 0
           constraints:
               type: bitmap32
 
     - label:
-          "Given ACFREMON.S.F00(Condition) ensure featuremap has the correct bit
-          set"
+          "Step 3b: Given ACFREMON.S.F00(Condition) ensure featuremap has the
+          correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: ACFREMON.S.F00
@@ -60,8 +60,8 @@ tests:
               hasMasksSet: [0x1]
 
     - label:
-          "Given ACFREMON.S.F01(Warning) ensure featuremap has the correct bit
-          set"
+          "Step 3c: Given ACFREMON.S.F01(Warning) ensure featuremap has the
+          correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: ACFREMON.S.F01
@@ -70,7 +70,19 @@ tests:
               type: bitmap32
               hasMasksSet: [0x2]
 
-    - label: "Read the global attribute: AttributeList"
+    - label:
+          "Step 3d: Given ACFREMON.S.F01(ReplacementProductList) ensure
+          featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: ACFREMON.S.F02
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x3]
+
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -78,19 +90,29 @@ tests:
               type: list
               contains: [2, 65528, 65529, 65530, 65531, 65532, 65533]
 
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2, 65528, 65529, 65531, 65532, 65533]
+
     - label:
-          "Read the feature dependent(ACFREMON.S.F00) attribute in AttributeList"
+          "Step 4b: Read the feature dependent(ACFREMON.S.F00) attribute in
+          AttributeList"
       PICS: ACFREMON.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
-              contains: [0, 1]
+              contains: [0, 1, 2]
 
     - label:
-          "Read the optional attribute InPlaceIndicator (ACFREMON.S.A0002) in
-          AttributeList"
+          "Step 4c: Read the optional attribute InPlaceIndicator
+          (ACFREMON.S.A0002) in AttributeList"
       PICS: ACFREMON.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
@@ -99,7 +121,16 @@ tests:
               type: list
               contains: [3]
 
-    - label: "Read the global attribute: AcceptedCommandList"
+    - label: "Step 5: TH reads EventList attribute from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 6a: Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -107,7 +138,9 @@ tests:
               type: list
               contains: []
 
-    - label: "Read the optional command (ResetCondition) in AcceptedCommandList"
+    - label:
+          "Step 6b: Read the optional command (ResetCondition) in
+          AcceptedCommandList"
       PICS: ACFREMON.S.C00.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -116,17 +149,9 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Read the global attribute: GeneratedCommandList"
+    - label: "Step 7: Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
-      response:
-          value: []
-          constraints:
-              type: list
-
-    - label: "TH reads EventList attribute from DUT"
-      command: "readAttribute"
-      attribute: "EventList"
       response:
           value: []
           constraints:

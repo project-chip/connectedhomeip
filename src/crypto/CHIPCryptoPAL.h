@@ -52,6 +52,10 @@ constexpr size_t kSubjectKeyIdentifierLength            = kSHA1_Hash_Length;
 constexpr size_t kAuthorityKeyIdentifierLength          = kSHA1_Hash_Length;
 constexpr size_t kMaxCertificateSerialNumberLength      = 20;
 constexpr size_t kMaxCertificateDistinguishedNameLength = 200;
+constexpr size_t kMaxCRLDistributionPointURLLength      = 100;
+
+constexpr const char * kValidCDPURIHttpPrefix  = "http://";
+constexpr const char * kValidCDPURIHttpsPrefix = "https://";
 
 constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
 constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
@@ -1567,6 +1571,26 @@ CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
  * @brief Extracts the Authority Key Identifier from an X509 Certificate.
  **/
 CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid);
+
+/**
+ * @brief Extracts the CRL Distribution Point (CDP) extension from an X509 ASN.1 Encoded Certificate.
+ *        The returned value only covers the URI of the CDP. Only a single URI distribution point
+ *        GeneralName is supported, and only those that start with "http://" and "https://".
+ *
+ * @returns CHIP_ERROR_NOT_FOUND if not found or wrong format.
+ *          CHIP_NO_ERROR otherwise.
+ **/
+CHIP_ERROR ExtractCRLDistributionPointURIFromX509Cert(const ByteSpan & certificate, MutableCharSpan & cdpurl);
+
+/**
+ * @brief Extracts the CRL Distribution Point (CDP) extension's cRLIssuer Name from an X509 ASN.1 Encoded Certificate.
+ *        The value is copied into buffer in a raw ASN.1 X.509 format. This format should be directly comparable
+ *        with the result of ExtractSubjectFromX509Cert().
+ *
+ * @returns CHIP_ERROR_NOT_FOUND if not found or wrong format.
+ *          CHIP_NO_ERROR otherwise.
+ **/
+CHIP_ERROR ExtractCDPExtensionCRLIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSpan & crlIssuer);
 
 /**
  * @brief Extracts Serial Number from X509 Certificate.

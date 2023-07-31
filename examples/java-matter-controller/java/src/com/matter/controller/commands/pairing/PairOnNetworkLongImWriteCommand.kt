@@ -22,23 +22,24 @@ import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCal
 import chip.devicecontroller.WriteAttributesCallback
 import chip.devicecontroller.model.AttributeWriteRequest
 import chip.devicecontroller.model.ChipAttributePath
+import chip.tlv.AnonymousTag
+import chip.tlv.TlvWriter
 import com.matter.controller.commands.common.CredentialsIssuer
 import java.util.logging.Level
 import java.util.logging.Logger
-import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
-import chip.tlv.TlvWriter
 
 class PairOnNetworkLongImWriteCommand(
-  controller: ChipDeviceController, credsIssue: CredentialsIssuer?
-) : PairingCommand(
-  controller,
-  "onnetwork-long-im-write",
-  credsIssue,
-  PairingModeType.ON_NETWORK,
-  PairingNetworkType.NONE,
-  DiscoveryFilterType.LONG_DISCRIMINATOR
-) {
+  controller: ChipDeviceController,
+  credsIssue: CredentialsIssuer?
+) :
+  PairingCommand(
+    controller,
+    "onnetwork-long-im-write",
+    credsIssue,
+    PairingModeType.ON_NETWORK,
+    PairingNetworkType.NONE,
+    DiscoveryFilterType.LONG_DISCRIMINATOR
+  ) {
   private var devicePointer: Long = 0
 
   private inner class InternalWriteAttributesCallback : WriteAttributesCallback {
@@ -73,14 +74,15 @@ class PairOnNetworkLongImWriteCommand(
   override fun runCommand() {
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, true)
-    val attributeList = listOf(
-      AttributeWriteRequest.newInstance(
-        /* endpointId= */ 0,
-        CLUSTER_ID_BASIC,
-        ATTR_ID_LOCAL_CONFIG_DISABLED,
-        tlvWriter.getEncoded(),
+    val attributeList =
+      listOf(
+        AttributeWriteRequest.newInstance(
+          /* endpointId= */ 0,
+          CLUSTER_ID_BASIC,
+          ATTR_ID_LOCAL_CONFIG_DISABLED,
+          tlvWriter.getEncoded(),
+        )
       )
-    )
 
     currentCommissioner()
       .pairDeviceWithAddress(
@@ -102,9 +104,7 @@ class PairOnNetworkLongImWriteCommand(
   }
 
   companion object {
-    private val logger = Logger.getLogger(
-      PairOnNetworkLongImWriteCommand::class.java.name
-    )
+    private val logger = Logger.getLogger(PairOnNetworkLongImWriteCommand::class.java.name)
 
     private const val MATTER_PORT = 5540
     private const val CLUSTER_ID_BASIC = 0x0028L

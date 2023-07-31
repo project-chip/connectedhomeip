@@ -58,8 +58,15 @@ class {{filename}}: public TestCommandBridge
               return;
           }
           {{/if}}
+          {{! EventList marked provisional for now }}
+          {{#if (and isReadAttribute
+                     (isStrEqual (asUpperCamelCase (or attribute "") preserveAcronyms=true) "EventList"))}}
+          NextTest();
+          return;
+          {{else}}
           err = Test{{asUpperCamelCase label}}_{{index}}();
           break;
+          {{/if}}
         {{/chip_tests_items}}
       }
 
@@ -105,6 +112,9 @@ class {{filename}}: public TestCommandBridge
     {{/chip_tests_config}}
 
     {{#chip_tests_items}}
+    {{! EventList marked provisional for now }}
+    {{#unless (and isReadAttribute
+                   (isStrEqual (asUpperCamelCase (or attribute "") preserveAcronyms=true) "EventList"))}}
     {{#if async}}
     bool testSendCluster{{parent.filename}}_{{index}}_{{asUpperCamelCase command}}_Fulfilled = false;
     {{/if}}
@@ -257,7 +267,8 @@ class {{filename}}: public TestCommandBridge
     return CHIP_NO_ERROR;
     {{/if}}
   }
-{{/chip_tests_items}}
+  {{/unless}}
+  {{/chip_tests_items}}
 
 };
 

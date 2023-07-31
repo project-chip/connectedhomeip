@@ -33,6 +33,14 @@
 #include <app/clusters/level-control/level-control.h>
 #endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
 
+#ifdef EMBER_AF_PLUGIN_MODE_BASE
+// nogncheck because the gn dependency checker does not understand
+// conditional includes, so will fail in an application that has an On/Off
+// cluster but no ModeBase-derived cluster.
+#include <app/clusters/mode-base-server/mode-base-cluster-objects.h> // nogncheck
+#include <app/clusters/mode-base-server/mode-base-server.h>          // nogncheck
+#endif                                                               // EMBER_AF_PLUGIN_MODE_BASE
+
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
@@ -40,6 +48,45 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OnOff;
 using chip::Protocols::InteractionModel::Status;
+
+namespace {
+
+#ifdef EMBER_AF_PLUGIN_MODE_BASE
+
+/**
+ * For all ModeBase alias clusters on the given endpoint, if the OnOff feature is supported and
+ * the OnMode attribute is set, update the CurrentMode attribute value to the OnMode value.
+ * @param endpoint
+ */
+void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
+{
+    for (auto & modeBaseInstance : ModeBase::GetModeBaseInstanceList())
+    {
+        if (modeBaseInstance.GetEndpointId() == endpoint)
+        {
+            if (modeBaseInstance.HasFeature(ModeBase::Feature::kOnOff))
+            {
+                ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance.GetOnMode();
+                if (!onMode.IsNull())
+                {
+                    Status status = modeBaseInstance.UpdateCurrentMode(onMode.Value());
+                    if (status == Status::Success)
+                    {
+                        ChipLogProgress(Zcl, "Changed the Current Mode to %x", onMode.Value());
+                    }
+                    else
+                    {
+                        ChipLogError(Zcl, "Failed to Changed the Current Mode to %x: %u", onMode.Value(), to_underlying(status));
+                    }
+                }
+            }
+        }
+    }
+}
+
+#endif // EMBER_AF_PLUGIN_MODE_BASE
+
+} // namespace
 
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
 static bool LevelControlWithOnOffFeaturePresent(EndpointId endpoint)
@@ -466,6 +513,10 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
             }
         }
 #endif
+#ifdef EMBER_AF_PLUGIN_MODE_BASE
+        // If OnMode is not a null value, then change the current mode to it.
+        UpdateModeBaseCurrentModeToOnMode(endpoint);
+#endif
     }
     else // Set Off
     {
@@ -729,19 +780,19 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
 uint32_t OnOffServer::calculateNextWaitTimeMS()
 {
     const chip::System::Clock::Timestamp currentTime = chip::System::SystemClock().GetMonotonicTimestamp();
-    chip::System::Clock::Timestamp waitTime          = UPDATE_TIME_MS;
+    chip::System::Clock::Timestamp waitTime          = ON_OFF_UPDATE_TIME_MS;
     chip::System::Clock::Timestamp latency;
 
     if (currentTime > nextDesiredOnWithTimedOffTimestamp)
     {
         latency = currentTime - nextDesiredOnWithTimedOffTimestamp;
-        if (latency >= UPDATE_TIME_MS)
+        if (latency >= ON_OFF_UPDATE_TIME_MS)
             waitTime = chip::System::Clock::Milliseconds32(1);
         else
             waitTime -= latency;
     }
 
-    nextDesiredOnWithTimedOffTimestamp += UPDATE_TIME_MS;
+    nextDesiredOnWithTimedOffTimestamp += ON_OFF_UPDATE_TIME_MS;
 
     return (uint32_t) waitTime.count();
 }
@@ -755,7 +806,7 @@ bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const 
     Status status                       = Status::Success;
     chip::EndpointId endpoint           = commandPath.mEndpointId;
     bool isOn                           = false;
-    uint16_t currentOffWaitTime         = MAX_TIME_VALUE;
+    uint16_t currentOffWaitTime         = MAX_ON_OFF_TIME_VALUE;
     uint16_t currentOnTime              = 0;
 
     EmberEventControl * event = configureEventControl(endpoint);
@@ -795,10 +846,10 @@ bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const 
 
     ChipLogProgress(Zcl, "On Time:  %d | off wait Time: %d", currentOnTime, currentOffWaitTime);
 
-    if (currentOnTime < MAX_TIME_VALUE && currentOffWaitTime < MAX_TIME_VALUE)
+    if (currentOnTime < MAX_ON_OFF_TIME_VALUE && currentOffWaitTime < MAX_ON_OFF_TIME_VALUE)
     {
-        nextDesiredOnWithTimedOffTimestamp = chip::System::SystemClock().GetMonotonicTimestamp() + UPDATE_TIME_MS;
-        scheduleTimerCallbackMs(configureEventControl(endpoint), (uint32_t) UPDATE_TIME_MS.count());
+        nextDesiredOnWithTimedOffTimestamp = chip::System::SystemClock().GetMonotonicTimestamp() + ON_OFF_UPDATE_TIME_MS;
+        scheduleTimerCallbackMs(configureEventControl(endpoint), ON_OFF_UPDATE_TIME_MS.count());
     }
 
 exit:
@@ -813,7 +864,7 @@ exit:
  */
 void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "Timer callback - Entering callbackc");
+    ChipLogDetail(Zcl, "Timer callback - Entering callback");
 
     bool isOn = false;
     OnOff::Attributes::OnOff::Get(endpoint, &isOn);
@@ -824,9 +875,9 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
         scheduleTimerCallbackMs(configureEventControl(endpoint), calculateNextWaitTimeMS());
 
         // Update onTime values
-        uint16_t onTime = MIN_TIME_VALUE;
+        uint16_t onTime = MIN_ON_OFF_TIME_VALUE;
         OnOff::Attributes::OnTime::Get(endpoint, &onTime);
-        ChipLogProgress(Zcl, "Timer callback - On Time:  %d", onTime);
+        ChipLogDetail(Zcl, "Timer callback - On Time:  %d", onTime);
 
         if (onTime > 0)
         {
@@ -836,7 +887,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
 
         if (onTime == 0)
         {
-            ChipLogProgress(Zcl, "Timer callback - Turning off OnOff");
+            ChipLogDetail(Zcl, "Timer callback - Turning off OnOff");
 
             OnOff::Attributes::OffWaitTime::Set(endpoint, 0);
             setOnOffValue(endpoint, Commands::Off::Id, false);
@@ -854,7 +905,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
             OnOff::Attributes::OffWaitTime::Set(endpoint, offWaitTime);
         }
 
-        ChipLogProgress(Zcl, "Timer Callback - wait Off Time:  %d", offWaitTime);
+        ChipLogDetail(Zcl, "Timer Callback - wait Off Time:  %d", offWaitTime);
 
         // Validate if necessary to restart timer
         if (offWaitTime > 0)

@@ -18,33 +18,10 @@
 
 #pragma once
 
-#ifdef CFG_PLF_RV32
-#include "asr_gpio.h"
-#include "asr_pinmux.h"
-#define duet_gpio_dev_t asr_gpio_dev_t
-#else
-#include "duet_gpio.h"
-#include "duet_pinmux.h"
-#endif
-
 #define TASK_NAME "APP"
 #define MATTER_DEVICE_NAME "ASR-Switch"
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_EVENT_QUEUE_SIZE 10
-
-#define GPIO_TASK_NAME "gpio"
-#define GPIO_TASK_STACK_SIZE 1024
-
-#define BUTTON_DEBOUNCE_PERIOD_MS 50
-
-#define BUTTON_PRESSED 0
-#define BUTTON_RELEASED 1
-
-#define SWITCH1_BUTTON GPIO6_INDEX
-#define SWITCH2_BUTTON GPIO7_INDEX
-#define GENERIC_SWITCH_BUTTON GPIO7_INDEX
-#define SYSTEM_STATE_LED GPIO12_INDEX
-#define SWITCH_LED GPIO13_INDEX
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.

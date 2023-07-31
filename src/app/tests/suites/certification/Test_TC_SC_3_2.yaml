@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 14.3.2. [TC-SC-3.2] CASE Session Resumption [DUT - Responder]
+name: 3.3.2. [TC-SC-3.2] CASE Session Resumption [DUT_Responder] - REMOVEDPICS
 
 PICS:
     - MCORE.ROLE.COMMISSIONEE
@@ -25,10 +25,10 @@ config:
 
 tests:
     - label:
-          "Initiator constructs and sends a TLV-encoded Sigma1 message to
-          Responder with resumption containing initiatorRandom
+          "Step 1: Initiator constructs and sends a TLV-encoded Sigma1 message
+          to Responder with resumption containing initiatorRandom
           initiatorSessionId destinationId resumptionID initiatorResumeMIC
-          initiatorEphPubKey initiatorSEDParams"
+          initiatorEphPubKey initiatorSessionParams"
       verification: |
           On Initiator(chip-tool) verify that, Initiator(chip-tool)  constructs and sends a TLV-encoded Sigma1 message to Responder with resumption containing
           initiatorRandom
@@ -37,7 +37,7 @@ tests:
           resumptionID
           initiatorResumeMIC
           initiatorEphPubKey
-          initiatorSEDParams
+          initiatorSessionParams
           here is the log to verify on chip-tool
 
           1683884120.041635][5134:5136] CHIP:DMG: Decrypted Payload (182 bytes) =
@@ -68,7 +68,7 @@ tests:
       disabled: true
 
     - label:
-          "Initiator receives the Sigma2_Resume message and extracts the
+          "Step 3: Initiator receives the Sigma2_Resume message and extracts the
           following values resumptionID responderSessionID sigma2ResumeMIC
           responderMRPParams"
       verification: |
@@ -88,9 +88,10 @@ tests:
           resumptionID is of Octet String maximum of length 16 bytes
           responderSessionID is of uint16
            sigma2ResumeMIC is of Octet String maximum of length 16 bytes
-          responderSEDParams is from any one of the following:
-                SLEEPY_IDLE_INTERVAL - Verify that it is of uint32
-                SLEEPY_ACTIVE_INTERVAL - Verify that it is of uint32
+          responderSessionParams is from any one of the following:
+                SESSION_IDLE_INTERVAL - Verify that it is of uint32
+                SESSION_ACTIVE_INTERVAL - Verify that it is of uint32
+                SESSION_ACTIVE_THRESHOLD - Verify that it is of uint16
 
           here is the log to verify on chip-tool
 
@@ -134,7 +135,7 @@ tests:
           [1683884120.044461][5134:5136] CHIP:DMG:
       disabled: true
 
-    - label: "Initiator sends SigmaFinished message to Responder"
+    - label: "Step 4a: Initiator sends SigmaFinished message to Responder"
       verification: |
           On Responder(all-clusters-app),  verify that responder(all-clusters-app) received  the SigmaFinished(The status report should be GeneralCode:SUCCESS,
           ProtocolId:SECURE_CHANNEL, and ProtocolCode:SESSION_ESTABLISHMENT_SUCCESS). message from Initiator

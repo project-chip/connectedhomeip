@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read the global attribute: ClusterRevision"
+    - label: "Step 2: Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -39,7 +39,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Read the global attribute: FeatureMap"
+    - label: "Step 3a: Read the global attribute: FeatureMap"
       PICS:
           "!TSTAT.S.F00 && !TSTAT.S.F01 && !TSTAT.S.F02 && !TSTAT.S.F03 &&
           !TSTAT.S.F04 && !TSTAT.S.F05"
@@ -50,7 +50,9 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Given TSTAT.S.F00(HEAT ensure featuremap has the correct bit set"
+    - label:
+          "Step 3b: Given TSTAT.S.F00(HEAT ensure featuremap has the correct bit
+          set"
       PICS: TSTAT.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -59,7 +61,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "Given TSTAT.S.F01(COOL) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3c: Given TSTAT.S.F01(COOL) ensure featuremap has the correct
+          bit set"
       PICS: TSTAT.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -68,7 +72,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x2]
 
-    - label: "Given TSTAT.S.F02(OCC) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3d: Given TSTAT.S.F02(OCC) ensure featuremap has the correct bit
+          set"
       PICS: TSTAT.S.F02
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -77,7 +83,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x4]
 
-    - label: "Given TSTAT.S.F03(SCH) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3e: Given TSTAT.S.F03(SCH) ensure featuremap has the correct bit
+          set"
       PICS: TSTAT.S.F03
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -86,7 +94,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x8]
 
-    - label: "Given TSTAT.S.F04(SB) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3f: Given TSTAT.S.F04(SB) ensure featuremap has the correct bit
+          set"
       PICS: TSTAT.S.F04
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -95,7 +105,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x10]
 
-    - label: "Given TSTAT.S.F05(AUTO) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3g: Given TSTAT.S.F05(AUTO) ensure featuremap has the correct
+          bit set"
       PICS: TSTAT.S.F05
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -104,7 +116,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x20]
 
-    - label: "Read the global attribute: AttributeList"
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -112,8 +125,17 @@ tests:
               type: list
               contains: [0, 27, 28, 65528, 65529, 65530, 65531, 65532, 65533]
 
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 27, 28, 65528, 65529, 65531, 65532, 65533]
+
     - label:
-          "Read the Feature dependent(TSTAT.S.F00(HEAT)) attribute in
+          "Step 4b: Read the Feature dependent(TSTAT.S.F00(HEAT)) attribute in
           AttributeList"
       PICS: TSTAT.S.F00
       command: "readAttribute"
@@ -123,7 +145,7 @@ tests:
               type: list
               contains: [18]
     - label:
-          "Read the Feature dependent(TSTAT.S.F01(COOL)) attribute in
+          "Step 4c: Read the Feature dependent(TSTAT.S.F01(COOL)) attribute in
           AttributeList"
       PICS: TSTAT.S.F01
       command: "readAttribute"
@@ -134,7 +156,7 @@ tests:
               contains: [17]
 
     - label:
-          "Read the Feature dependent(TSTAT.S.F02(OCC)) attribute in
+          "Step 4d: Read the Feature dependent(TSTAT.S.F02(OCC)) attribute in
           AttributeList"
       PICS: TSTAT.S.F02
       command: "readAttribute"
@@ -145,8 +167,8 @@ tests:
               contains: [2]
 
     - label:
-          "Read the Feature dependent(TSTAT.S.F00(HEAT) & TSTAT.S.F02(OCC))
-          attribute in AttributeList"
+          "Step 4e: Read the Feature dependent(TSTAT.S.F00(HEAT) &
+          TSTAT.S.F02(OCC)) attribute in AttributeList"
       PICS: TSTAT.S.F00 && TSTAT.S.F02
       command: "readAttribute"
       attribute: "AttributeList"
@@ -156,8 +178,8 @@ tests:
               contains: [20]
 
     - label:
-          "Read the Feature dependent(TSTAT.S.F01(COOL) & TSTAT.S.F02(OCC))
-          attribute in AttributeList"
+          "Step 4f: Read the Feature dependent(TSTAT.S.F01(COOL) &
+          TSTAT.S.F02(OCC)) attribute in AttributeList"
       PICS: TSTAT.S.F01 && TSTAT.S.F02
       command: "readAttribute"
       attribute: "AttributeList"
@@ -167,7 +189,7 @@ tests:
               contains: [19]
 
     - label:
-          "Read the Feature dependent(TSTAT.S.F05(AUTO)) attribute in
+          "Step 4g: Read the Feature dependent(TSTAT.S.F05(AUTO)) attribute in
           AttributeList"
       PICS: TSTAT.S.F05
       command: "readAttribute"
@@ -178,7 +200,7 @@ tests:
               contains: [17, 18, 25]
 
     - label:
-          "Read the Feature dependent(TSTAT.S.F03(SCH)) attribute in
+          "Step 4h: Read the Feature dependent(TSTAT.S.F03(SCH)) attribute in
           AttributeList"
       PICS: TSTAT.S.F03
       command: "readAttribute"
@@ -189,7 +211,7 @@ tests:
               contains: [32, 33, 34]
 
     - label:
-          "Read the Feature dependent(TSTAT.S.F04(SB)) attribute in
+          "Step 4i: Read the Feature dependent(TSTAT.S.F04(SB)) attribute in
           AttributeList"
       PICS: TSTAT.S.F04
       command: "readAttribute"
@@ -200,8 +222,8 @@ tests:
               contains: [52, 53, 54]
 
     - label:
-          "Read the Feature dependent(TSTAT.S.F04(SB) & TSTAT.S.F02(OCC))
-          attribute in AttributeList"
+          "Step 4j: Read the Feature dependent(TSTAT.S.F04(SB) &
+          TSTAT.S.F02(OCC)) attribute in AttributeList"
       PICS: TSTAT.S.F04 && TSTAT.S.F02
       command: "readAttribute"
       attribute: "AttributeList"
@@ -210,7 +232,7 @@ tests:
               type: list
               contains: [55, 56, 57]
 
-    - label: "Read the global attribute: AcceptedCommandList"
+    - label: "Step 5a: Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -219,7 +241,7 @@ tests:
               contains: [0]
 
     - label:
-          "Read Feature dependent(TSTAT.S.F03(SCH)) commands in
+          "Step 5b: Read Feature dependent(TSTAT.S.F03(SCH)) commands in
           AcceptedCommandList"
       PICS: TSTAT.S.F03
       command: "readAttribute"
@@ -229,7 +251,7 @@ tests:
               type: list
               contains: [0, 1, 2, 3]
 
-    - label: "Read the global attribute: GeneratedCommandList"
+    - label: "Step 6a: Read the global attribute: GeneratedCommandList"
       PICS: " !TSTAT.S.C04.Rsp && !TSTAT.S.C02.Rsp "
       command: "readAttribute"
       attribute: "GeneratedCommandList"
@@ -239,7 +261,7 @@ tests:
               type: list
 
     - label:
-          "Read Feature dependent(TSTAT.S.F03(SCH)) commands in
+          "Step 6b: Read Feature dependent(TSTAT.S.F03(SCH)) commands in
           GeneratedCommandList"
       PICS: TSTAT.S.F03
       command: "readAttribute"
@@ -250,7 +272,7 @@ tests:
               contains: [0]
 
     - label:
-          "Read optional command (GetRelayStatusLogResponse) in
+          "Step 6c: Read optional command (GetRelayStatusLogResponse) in
           GeneratedCommandList"
       PICS: TSTAT.S.C04.Rsp
       command: "readAttribute"
@@ -262,8 +284,9 @@ tests:
 
     #Manufacturer specific event IDs check not possible
     - label:
-          "Read EventList attribute from the DUT.For this cluster the list is
-          usually empty but it can contain manufacturer specific event IDs."
+          "Step 7: Read EventList attribute from the DUT.For this cluster the
+          list is usually empty but it can contain manufacturer specific event
+          IDs."
       verification: |
           ./chip-tool thermostat read event-list 1 1
            On TH(chip-tool), Verify that the DUT response provides a list of supported events. For this cluster the list is usually empty but it can contain manufacturer specific event IDs.

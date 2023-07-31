@@ -54,7 +54,6 @@ using namespace ::chip::DeviceManager;
 using namespace ::chip::Logging;
 
 extern LEDWidget sLightLED;
-extern LEDWidget sStatusLED;
 
 uint32_t identifyTimerCount;
 constexpr uint32_t kIdentifyTimerDelayMS = 250;
@@ -191,7 +190,6 @@ void DeviceCallbacks::OnLevelPostAttributeChangeCallback(EndpointId endpointId, 
         {
             uint8_t tmp = *value;
             ChipLogProgress(Zcl, "New level: %u ", tmp);
-            sLightLED.SetBrightness(tmp);
         }
         else
         {

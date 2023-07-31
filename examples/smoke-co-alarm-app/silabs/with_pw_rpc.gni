@@ -25,10 +25,3 @@ app_data_model =
     "${chip_root}/examples/smoke-co-alarm-app/smoke-co-alarm-common"
 chip_enable_pw_rpc = true
 chip_enable_openthread = true
-chip_openthread_ftd = true
-
-cpp_standard = "gnu++17"
-
-# To fit in flash
-chip_detail_logging = false
-show_qr_code = false

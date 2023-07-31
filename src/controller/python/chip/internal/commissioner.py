@@ -50,7 +50,7 @@ def OnPairingComplete(err: int):
 
 
 class PairingState(Enum):
-    """States throughout a pairing flow. 
+    """States throughout a pairing flow.
 
     Devices generally go through:
       initialized -> pairing -> netcreds -> opcreds -> done (initialized)
@@ -68,7 +68,7 @@ class Commissioner:
 
 
     The commissioner is a DeviceController that supports pairing. Since the device
-    controller supports multiple devices, this class is expected to be used 
+    controller supports multiple devices, this class is expected to be used
     as a singleton
 
     """
@@ -108,7 +108,7 @@ def _SetNativeCallSignatues(handle: ctypes.CDLL):
     setter.Set('pychip_internal_Commissioner_Unpair',
                ctypes.c_uint32, [Commissioner_p, ctypes.c_uint64])
     setter.Set('pychip_internal_Commissioner_BleConnectForPairing',
-               ctypes.c_uint32, [Commissioner_p, ctypes.c_uint64, ctypes.c_uint32, cctypes._uint16])
+               ctypes.c_uint32, [Commissioner_p, ctypes.c_uint64, ctypes.c_uint32, ctypes.c_uint16])
 
     setter.Set('pychip_internal_PairingDelegate_SetPairingCompleteCallback', None, [
                PairingComplete])

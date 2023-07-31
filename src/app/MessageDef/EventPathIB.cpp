@@ -89,7 +89,7 @@ CHIP_ERROR EventPathIB::Parser::PrettyPrint() const
             {
                 EventId event;
                 reader.Get(event);
-                PRETTY_PRINT("\tEvent = 0x%x,", event);
+                PRETTY_PRINT("\tEvent = 0x%" PRIx32 ",", event);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;

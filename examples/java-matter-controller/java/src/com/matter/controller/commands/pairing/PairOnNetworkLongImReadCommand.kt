@@ -3,28 +3,34 @@ package com.matter.controller.commands.pairing
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
 import chip.devicecontroller.ReportCallback
-import chip.devicecontroller.model.NodeState
 import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
+import chip.devicecontroller.model.NodeState
 import com.matter.controller.commands.common.CredentialsIssuer
 import java.util.Collections
 import java.util.logging.Level
 import java.util.logging.Logger
 
 class PairOnNetworkLongImReadCommand(
-  controller: ChipDeviceController, credsIssue: CredentialsIssuer?
-) : PairingCommand(
-  controller,
-  "onnetwork-long-im-read",
-  credsIssue,
-  PairingModeType.ON_NETWORK,
-  PairingNetworkType.NONE,
-  DiscoveryFilterType.LONG_DISCRIMINATOR
-) {
+  controller: ChipDeviceController,
+  credsIssue: CredentialsIssuer?
+) :
+  PairingCommand(
+    controller,
+    "onnetwork-long-im-read",
+    credsIssue,
+    PairingModeType.ON_NETWORK,
+    PairingNetworkType.NONE,
+    DiscoveryFilterType.LONG_DISCRIMINATOR
+  ) {
   private var devicePointer: Long = 0
 
   private inner class InternalReportCallback : ReportCallback {
-    override fun onError(attributePath: ChipAttributePath?, eventPath: ChipEventPath?, e: Exception) {
+    override fun onError(
+      attributePath: ChipAttributePath?,
+      eventPath: ChipEventPath?,
+      e: Exception
+    ) {
       logger.log(Level.INFO, "Read receive onError")
       setFailure("read failure")
     }
@@ -33,7 +39,6 @@ class PairOnNetworkLongImReadCommand(
       logger.log(Level.INFO, "Read receve onReport")
       setSuccess()
     }
-    
   }
 
   private inner class InternalGetConnectedDeviceCallback : GetConnectedDeviceCallback {
@@ -48,8 +53,14 @@ class PairOnNetworkLongImReadCommand(
   }
 
   override fun runCommand() {
-    val attributePathList = listOf(ChipAttributePath.newInstance(
-        /* endpointId= */ 0, CLUSTER_ID_BASIC, ATTR_ID_LOCAL_CONFIG_DISABLED))
+    val attributePathList =
+      listOf(
+        ChipAttributePath.newInstance(
+          /* endpointId= */ 0,
+          CLUSTER_ID_BASIC,
+          ATTR_ID_LOCAL_CONFIG_DISABLED
+        )
+      )
 
     currentCommissioner()
       .pairDeviceWithAddress(
@@ -66,14 +77,19 @@ class PairOnNetworkLongImReadCommand(
       .getConnectedDevicePointer(getNodeId(), InternalGetConnectedDeviceCallback())
     clear()
     currentCommissioner()
-      .readPath(InternalReportCallback(), devicePointer, attributePathList, Collections.emptyList(), false, 0)
+      .readPath(
+        InternalReportCallback(),
+        devicePointer,
+        attributePathList,
+        Collections.emptyList(),
+        false,
+        0
+      )
     waitCompleteMs(getTimeoutMillis())
   }
 
   companion object {
-    private val logger = Logger.getLogger(
-      PairOnNetworkLongImReadCommand::class.java.name
-    )
+    private val logger = Logger.getLogger(PairOnNetworkLongImReadCommand::class.java.name)
 
     private const val MATTER_PORT = 5540
     private const val CLUSTER_ID_BASIC = 0x0028L

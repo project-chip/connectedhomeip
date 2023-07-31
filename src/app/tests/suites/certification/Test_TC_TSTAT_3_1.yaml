@@ -34,8 +34,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT reads all supported mandatory attributes from TH one at a time in
-          a manufacturer specific order"
+          "Step 1: DUT reads all supported mandatory attributes from TH one at a
+          time in a manufacturer specific order"
       PICS: TSTAT.C.AM-READ
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -254,8 +254,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT reads all supported optional attributes from TH one at a time in
-          a manufacturer specific order"
+          "Step 2: DUT reads all supported optional attributes from TH one at a
+          time in a manufacturer specific order"
       PICS: TSTAT.C.AO-READ
       verification: |
           Most of optional attribute is not implemented in SDK
@@ -265,8 +265,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT writes a suitable value to all supported mandatory attributes on
-          the TH one at a time in a manufacturer specific order"
+          "Step 3: DUT writes a suitable value to all supported mandatory
+          attributes on the TH one at a time in a manufacturer specific order"
       PICS: TSTAT.C.AM-WRITE
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -422,8 +422,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT writes a suitable value to all supported optional attributes on
-          the TH one at a time in a manufacturer specific order"
+          "Step 4: DUT writes a suitable value to all supported optional
+          attributes on the TH one at a time in a manufacturer specific order"
       PICS: TSTAT.C.AO-WRITE
       verification: |
           Verify by sending the optional attribute which is mentioned in spec
@@ -432,8 +432,8 @@ tests:
       disabled: true
 
     - label:
-          "Configure TH such that it implements mandatory and none of the
-          optional attributes of the server-side of the cluster, and that it
+          "Step 5: Configure TH such that it implements mandatory and none of
+          the optional attributes of the server-side of the cluster, and that it
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
@@ -959,8 +959,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT reads all supported optional attributes from TH one at a time in
-          a manufacturer specific order"
+          "Step 6: DUT reads all supported optional attributes from TH one at a
+          time in a manufacturer specific order"
       PICS: TSTAT.C.AO-READ
       verification: |
           Verify by sending the optional attribute which is mentioned in spec
@@ -969,8 +969,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT writes a suitable value to all supported optional attributes on
-          the TH one at a time in a manufacturer specific order"
+          "Step 7: DUT writes a suitable value to all supported optional
+          attributes on the TH one at a time in a manufacturer specific order"
       PICS: TSTAT.C.AO-WRITE
       verification: |
           Verify by sending the optional attribute which is mentioned in spec

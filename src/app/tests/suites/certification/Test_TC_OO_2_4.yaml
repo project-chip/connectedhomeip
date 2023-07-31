@@ -24,7 +24,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -32,24 +32,24 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH sends On command to DUT"
+    - label: "Step 2: TH sends On command to DUT"
       PICS: OO.S.C01.Rsp
       command: "On"
 
-    - label: "TH writes a value of 0 to StartUpOnOff attribute of DUT"
+    - label: "Step 3a: TH writes a value of 0 to StartUpOnOff attribute of DUT"
       PICS: OO.S.A4003
       command: "writeAttribute"
       attribute: "StartUpOnOff"
       arguments:
           value: 0
 
-    - label: "Reboot target device"
+    - label: "Step 3b: Reboot target device"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
 
-    - label: "Reboot target device(DUT)"
+    - label: "Step 3c: Reboot target device(DUT)"
       verification: |
           Did the DUT successfully reboot?
       cluster: "LogCommands"
@@ -70,27 +70,27 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the OnOff attribute from the DUT"
+    - label: "Step 3d: TH reads the OnOff attribute from the DUT"
       PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 0
 
-    - label: "TH writes a value of 1 to StartUpOnOff attribute of DUT"
+    - label: "Step 4a: TH writes a value of 1 to StartUpOnOff attribute of DUT"
       PICS: OO.S.A4003
       command: "writeAttribute"
       attribute: "StartUpOnOff"
       arguments:
           value: 1
 
-    - label: "Reboot target device"
+    - label: "Step 4b: Reboot target device"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
 
-    - label: "Reboot target device(DUT)"
+    - label: "Step 4c: Reboot target device(DUT)"
       verification: |
           Did the DUT successfully reboot?
       cluster: "LogCommands"
@@ -111,27 +111,27 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the OnOff attribute from the DUT"
+    - label: "Step 4d: TH reads the OnOff attribute from the DUT"
       PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 1
 
-    - label: "TH writes a value of 2 to StartUpOnOff attribute of DUT"
+    - label: "Step 5a: TH writes a value of 2 to StartUpOnOff attribute of DUT"
       PICS: OO.S.A4003
       command: "writeAttribute"
       attribute: "StartUpOnOff"
       arguments:
           value: 2
 
-    - label: "Reboot target device"
+    - label: "Step 5b: Reboot target device"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
 
-    - label: "Reboot target device(DUT)"
+    - label: "Step 5c: Reboot target device(DUT)"
       verification: |
           Did the DUT successfully reboot?
       cluster: "LogCommands"
@@ -152,20 +152,20 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the OnOff attribute from the DUT"
+    - label: "Step 5d: TH reads the OnOff attribute from the DUT"
       PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 0
 
-    - label: "Reboot target device"
+    - label: "Step 5e: Reboot target device"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
 
-    - label: "Reboot target device(DUT)"
+    - label: "Step 5f: Reboot target device(DUT)"
       verification: |
           Did the DUT successfully reboot?
       cluster: "LogCommands"
@@ -186,27 +186,27 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the OnOff attribute from the DUT"
+    - label: "Step 5g: TH reads the OnOff attribute from the DUT"
       PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 1
 
-    - label: "TH writes NULL to StartUpOnOff attribute of DUT"
+    - label: "Step 6a: TH writes NULL to StartUpOnOff attribute of DUT"
       PICS: OO.S.A4003
       command: "writeAttribute"
       attribute: "StartUpOnOff"
       arguments:
           value: null
 
-    - label: "Reboot target device"
+    - label: "Step 6b: Reboot target device"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
 
-    - label: "Reboot target device(DUT)"
+    - label: "Step 6c: Reboot target device(DUT)"
       verification: |
           Did the DUT successfully reboot?
       cluster: "LogCommands"
@@ -227,31 +227,31 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the OnOff attribute from the DUT"
+    - label: "Step 6d: TH reads the OnOff attribute from the DUT"
       PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 1
 
-    - label: "TH sends Off command to DUT"
+    - label: "Step 6e: TH sends Off command to DUT"
       PICS: OO.S.C00.Rsp
       command: "Off"
 
-    - label: "TH reads the OnOff attribute from the DUT"
+    - label: "Step 6f: TH reads the OnOff attribute from the DUT"
       PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 0
 
-    - label: "Reboot target device"
+    - label: "Step 6g: Reboot target device"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
 
-    - label: "Reboot target device(DUT)"
+    - label: "Step 6h: Reboot target device(DUT)"
       verification: |
           Did the DUT successfully reboot?
       cluster: "LogCommands"
@@ -272,7 +272,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the OnOff attribute from the DUT"
+    - label: "Step 6i: TH reads the OnOff attribute from the DUT"
       PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"

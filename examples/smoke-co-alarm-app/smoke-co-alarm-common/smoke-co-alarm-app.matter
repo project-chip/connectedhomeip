@@ -79,11 +79,87 @@ server cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
+/** Attributes and commands for group configuration and manipulation. */
+server cluster Groups = 4 {
+  bitmap Feature : BITMAP32 {
+    kGroupNames = 0x1;
+  }
+
+  bitmap NameSupportBitmap : BITMAP8 {
+    kGroupNames = 0x80;
+  }
+
+  readonly attribute NameSupportBitmap nameSupport = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddGroupRequest {
+    group_id groupID = 0;
+    CHAR_STRING groupName = 1;
+  }
+
+  request struct ViewGroupRequest {
+    group_id groupID = 0;
+  }
+
+  request struct GetGroupMembershipRequest {
+    group_id groupList[] = 0;
+  }
+
+  request struct RemoveGroupRequest {
+    group_id groupID = 0;
+  }
+
+  request struct AddGroupIfIdentifyingRequest {
+    group_id groupID = 0;
+    CHAR_STRING groupName = 1;
+  }
+
+  response struct AddGroupResponse = 0 {
+    ENUM8 status = 0;
+    group_id groupID = 1;
+  }
+
+  response struct ViewGroupResponse = 1 {
+    ENUM8 status = 0;
+    group_id groupID = 1;
+    CHAR_STRING groupName = 2;
+  }
+
+  response struct GetGroupMembershipResponse = 2 {
+    nullable INT8U capacity = 0;
+    group_id groupList[] = 1;
+  }
+
+  response struct RemoveGroupResponse = 3 {
+    ENUM8 status = 0;
+    group_id groupID = 1;
+  }
+
+  fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
+  fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
+  fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
+  fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
+  fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
+  fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
+}
+
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
+  }
+
+  struct SemanticTagStruct {
+    nullable vendor_id mfgCode = 0;
+    enum8 namespaceID = 1;
+    enum8 tag = 2;
+    optional nullable char_string label = 3;
   }
 
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
@@ -460,17 +536,6 @@ server cluster TimeFormatLocalization = 44 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** This cluster is used to describe the configuration and capabilities of a Device's power system. */
-server cluster PowerSourceConfiguration = 46 {
-  readonly attribute INT8U sources[] = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 server cluster PowerSource = 47 {
   enum BatApprovedChemistryEnum : ENUM16 {
@@ -691,11 +756,10 @@ server cluster PowerSource = 47 {
   readonly attribute PowerSourceStatusEnum status = 0;
   readonly attribute int8u order = 1;
   readonly attribute char_string<60> description = 2;
-  readonly attribute nullable int32u wiredAssessedCurrent = 6;
   readonly attribute BatChargeLevelEnum batChargeLevel = 14;
   readonly attribute boolean batReplacementNeeded = 15;
   readonly attribute BatReplaceabilityEnum batReplaceability = 16;
-  readonly attribute char_string<60> batReplacementDescription = 19;
+  readonly attribute endpoint_no endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1247,119 +1311,6 @@ server cluster ThreadNetworkDiagnostics = 53 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
-/** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
-server cluster WiFiNetworkDiagnostics = 54 {
-  enum AssociationFailureCauseEnum : ENUM8 {
-    kUnknown = 0;
-    kAssociationFailed = 1;
-    kAuthenticationFailed = 2;
-    kSsidNotFound = 3;
-  }
-
-  enum ConnectionStatusEnum : ENUM8 {
-    kConnected = 0;
-    kNotConnected = 1;
-  }
-
-  enum SecurityTypeEnum : ENUM8 {
-    kUnspecified = 0;
-    kNone = 1;
-    kWEP = 2;
-    kWPA = 3;
-    kWPA2 = 4;
-    kWPA3 = 5;
-  }
-
-  enum WiFiVersionEnum : ENUM8 {
-    kA = 0;
-    kB = 1;
-    kG = 2;
-    kN = 3;
-    kAc = 4;
-    kAx = 5;
-    kAh = 6;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kPacketCounts = 0x1;
-    kErrorCounts = 0x2;
-  }
-
-  info event Disconnection = 0 {
-    INT16U reasonCode = 0;
-  }
-
-  info event AssociationFailure = 1 {
-    AssociationFailureCauseEnum associationFailure = 0;
-    INT16U status = 1;
-  }
-
-  info event ConnectionStatus = 2 {
-    ConnectionStatusEnum connectionStatus = 0;
-  }
-
-  readonly attribute nullable octet_string<6> bssid = 0;
-  readonly attribute nullable SecurityTypeEnum securityType = 1;
-  readonly attribute nullable WiFiVersionEnum wiFiVersion = 2;
-  readonly attribute nullable int16u channelNumber = 3;
-  readonly attribute nullable int8s rssi = 4;
-  readonly attribute nullable int32u beaconLostCount = 5;
-  readonly attribute nullable int32u beaconRxCount = 6;
-  readonly attribute nullable int32u packetMulticastRxCount = 7;
-  readonly attribute nullable int32u packetMulticastTxCount = 8;
-  readonly attribute nullable int32u packetUnicastRxCount = 9;
-  readonly attribute nullable int32u packetUnicastTxCount = 10;
-  readonly attribute nullable int64u currentMaxRate = 11;
-  readonly attribute nullable int64u overrunCount = 12;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  command ResetCounts(): DefaultSuccess = 0;
-}
-
-/** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
-server cluster EthernetNetworkDiagnostics = 55 {
-  enum PHYRateEnum : ENUM8 {
-    kRate10M = 0;
-    kRate100M = 1;
-    kRate1G = 2;
-    kRate25G = 3;
-    kRate5G = 4;
-    kRate10G = 5;
-    kRate40G = 6;
-    kRate100G = 7;
-    kRate200G = 8;
-    kRate400G = 9;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kPacketCounts = 0x1;
-    kErrorCounts = 0x2;
-  }
-
-  readonly attribute nullable PHYRateEnum PHYRate = 0;
-  readonly attribute nullable boolean fullDuplex = 1;
-  readonly attribute int64u packetRxCount = 2;
-  readonly attribute int64u packetTxCount = 3;
-  readonly attribute int64u txErrCount = 4;
-  readonly attribute int64u collisionCount = 5;
-  readonly attribute int64u overrunCount = 6;
-  readonly attribute nullable boolean carrierDetect = 7;
-  readonly attribute int64u timeSinceReset = 8;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  command ResetCounts(): DefaultSuccess = 0;
-}
-
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 server cluster AdministratorCommissioning = 60 {
   enum CommissioningWindowStatusEnum : ENUM8 {
@@ -1618,6 +1569,53 @@ server cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Allows servers to ensure that listed clients are notified when a server is available for communication. */
+server cluster IcdManagement = 70 {
+  bitmap Feature : BITMAP32 {
+    kCheckInProtocolSupport = 0x1;
+  }
+
+  fabric_scoped struct MonitoringRegistrationStruct {
+    fabric_sensitive node_id checkInNodeID = 1;
+    fabric_sensitive int64u monitoredSubject = 2;
+    fabric_sensitive octet_string<16> key = 3;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute int32u idleModeInterval = 0;
+  readonly attribute int32u activeModeInterval = 1;
+  readonly attribute int16u activeModeThreshold = 2;
+  readonly attribute access(read: administer) MonitoringRegistrationStruct registeredClients[] = 3;
+  readonly attribute access(read: administer) int32u ICDCounter = 4;
+  readonly attribute int16u clientsSupportedPerFabric = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct RegisterClientRequest {
+    node_id checkInNodeID = 0;
+    INT64U monitoredSubject = 1;
+    OCTET_STRING<16> key = 2;
+    optional OCTET_STRING<16> verificationKey = 3;
+  }
+
+  request struct UnregisterClientRequest {
+    node_id checkInNodeID = 0;
+    optional OCTET_STRING<16> verificationKey = 1;
+  }
+
+  response struct RegisterClientResponse = 1 {
+    INT32U ICDCounter = 0;
+  }
+
+  fabric command access(invoke: manage) RegisterClient(RegisterClientRequest): RegisterClientResponse = 0;
+  fabric command access(invoke: manage) UnregisterClient(UnregisterClientRequest): DefaultSuccess = 2;
+  command access(invoke: manage) StayActiveRequest(): DefaultSuccess = 3;
+}
+
 /** This cluster provides an interface for observing and managing the state of smoke and CO alarms. */
 server cluster SmokeCoAlarm = 92 {
   enum AlarmStateEnum : ENUM8 {
@@ -1634,8 +1632,8 @@ server cluster SmokeCoAlarm = 92 {
   }
 
   enum EndOfServiceEnum : ENUM8 {
-    kExpired = 0;
-    kNormal = 1;
+    kNormal = 0;
+    kExpired = 1;
   }
 
   enum ExpressedStateEnum : ENUM8 {
@@ -1666,13 +1664,16 @@ server cluster SmokeCoAlarm = 92 {
     kCOAlarm = 0x2;
   }
 
-  info event SmokeAlarm = 0 {
+  critical event SmokeAlarm = 0 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
-  info event COAlarm = 1 {
+  critical event COAlarm = 1 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
   info event LowBattery = 2 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
   info event HardwareFault = 3 {
@@ -1690,10 +1691,12 @@ server cluster SmokeCoAlarm = 92 {
   info event MuteEnded = 7 {
   }
 
-  info event InterconnectSmokeAlarm = 8 {
+  critical event InterconnectSmokeAlarm = 8 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
-  info event InterconnectCOAlarm = 9 {
+  critical event InterconnectCOAlarm = 9 {
+    AlarmStateEnum alarmSeverityLevel = 0;
   }
 
   info event AllClear = 10 {
@@ -1710,7 +1713,8 @@ server cluster SmokeCoAlarm = 92 {
   readonly attribute AlarmStateEnum interconnectSmokeAlarm = 8;
   readonly attribute AlarmStateEnum interconnectCOAlarm = 9;
   readonly attribute ContaminationStateEnum contaminationState = 10;
-  attribute SensitivityEnum sensitivityLevel = 11;
+  attribute SensitivityEnum smokeSensitivityLevel = 11;
+  readonly attribute epoch_s expiryDate = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1735,8 +1739,6 @@ endpoint 0 {
   }
 
   server cluster AccessControl {
-    emits event AccessControlEntryChanged;
-    emits event AccessControlExtensionChanged;
     callback attribute acl;
     callback attribute extension;
     callback attribute subjectsPerAccessControlEntry default = 4;
@@ -1748,9 +1750,6 @@ endpoint 0 {
   }
 
   server cluster BasicInformation {
-    emits event StartUp;
-    emits event ShutDown;
-    emits event Leave;
     callback attribute dataModelRevision default = 10;
     callback attribute vendorName;
     callback attribute vendorID;
@@ -1775,9 +1774,6 @@ endpoint 0 {
   }
 
   server cluster OtaSoftwareUpdateRequestor {
-    emits event StateTransition;
-    emits event VersionApplied;
-    emits event DownloadError;
     callback attribute defaultOTAProviders default = 0;
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
@@ -1798,22 +1794,6 @@ endpoint 0 {
     persist  attribute activeCalendarType default = 0;
     callback attribute supportedCalendarTypes;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster PowerSourceConfiguration {
-    callback attribute sources;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster PowerSource {
-    emits event WiredFaultChange;
-    ram      attribute status default = 1;
-    ram      attribute order default = 0;
-    ram      attribute description default = "USB";
-    ram      attribute wiredAssessedCurrent;
-    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1846,10 +1826,6 @@ endpoint 0 {
   }
 
   server cluster GeneralDiagnostics {
-    emits event HardwareFaultChange;
-    emits event RadioFaultChange;
-    emits event NetworkFaultChange;
-    emits event BootReason;
     callback attribute networkInterfaces;
     callback attribute rebootCount default = 0x0000;
     callback attribute upTime default = 0x0000000000000000;
@@ -1940,41 +1916,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster WiFiNetworkDiagnostics {
-    emits event Disconnection;
-    emits event AssociationFailure;
-    emits event ConnectionStatus;
-    callback attribute bssid;
-    callback attribute securityType;
-    callback attribute wiFiVersion;
-    callback attribute channelNumber default = 0x0000;
-    callback attribute rssi default = 0x00;
-    callback attribute beaconLostCount default = 0x00000000;
-    callback attribute beaconRxCount default = 0x00000000;
-    callback attribute packetMulticastRxCount default = 0x00000000;
-    callback attribute packetMulticastTxCount default = 0x00000000;
-    callback attribute packetUnicastRxCount default = 0x00000000;
-    callback attribute packetUnicastTxCount default = 0x00000000;
-    callback attribute currentMaxRate default = 0x0000000000000000;
-    callback attribute overrunCount default = 0x0000000000000000;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster EthernetNetworkDiagnostics {
-    callback attribute PHYRate;
-    callback attribute fullDuplex default = 0x00;
-    callback attribute packetRxCount default = 0x0000000000000000;
-    callback attribute packetTxCount default = 0x0000000000000000;
-    callback attribute txErrCount default = 0x0000000000000000;
-    callback attribute collisionCount default = 0x0000000000000000;
-    callback attribute overrunCount default = 0x0000000000000000;
-    callback attribute carrierDetect default = 0x00;
-    callback attribute timeSinceReset default = 0x0000000000000000;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster AdministratorCommissioning {
     callback attribute windowStatus default = 0;
     callback attribute adminFabricIndex default = 1;
@@ -1998,7 +1939,7 @@ endpoint 0 {
     callback attribute groupKeyMap;
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
-    callback attribute maxGroupKeysPerFabric default = 1;
+    callback attribute maxGroupKeysPerFabric;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -2014,30 +1955,48 @@ endpoint 0 {
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
-}
-endpoint 1 {
 
-  server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
-    ram      attribute identifyType default = 0x0;
+  server cluster IcdManagement {
+    callback attribute idleModeInterval default = 500;
+    callback attribute activeModeInterval default = 300;
+    callback attribute activeModeThreshold default = 300;
+    callback attribute registeredClients;
+    callback attribute ICDCounter;
+    callback attribute clientsSupportedPerFabric default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 1;
+  }
+}
+endpoint 1 {
+  device type anonymousEndpointType = 118, version 1;
+
+  server cluster Identify {
+    ram      attribute identifyTime default = 0x0;
+    ram      attribute identifyType default = 0x00;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Groups {
+    ram      attribute nameSupport;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster PowerSource {
-    ram      attribute status default = 1;
-    ram      attribute order default = 1;
-    ram      attribute description default = "Battery";
-    ram      attribute batChargeLevel;
+    emits event BatFaultChange;
+    ram      attribute status default = 0;
+    ram      attribute order default = 2;
+    ram      attribute description default = "B2";
+    ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
-    ram      attribute batReplacementDescription;
-    ram      attribute featureMap default = 0x0A;
-    ram      attribute clusterRevision default = 1;
+    callback attribute endpointList;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster SmokeCoAlarm {
@@ -2059,11 +2018,12 @@ endpoint 1 {
     persist  attribute deviceMuted default = 0;
     ram      attribute testInProgress default = 0;
     persist  attribute hardwareFaultAlert default = 0;
-    persist  attribute endOfServiceAlert default = 1;
+    persist  attribute endOfServiceAlert default = 0;
     ram      attribute interconnectSmokeAlarm default = 0;
     ram      attribute interconnectCOAlarm default = 0;
     ram      attribute contaminationState default = 0;
-    ram      attribute sensitivityLevel default = 1;
+    ram      attribute smokeSensitivityLevel default = 1;
+    ram      attribute expiryDate default = 0;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
   }

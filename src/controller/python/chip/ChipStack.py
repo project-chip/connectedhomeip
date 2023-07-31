@@ -31,7 +31,8 @@ import logging
 import os
 import sys
 import time
-from ctypes import *
+from ctypes import (CFUNCTYPE, POINTER, Structure, c_bool, c_char_p, c_int64, c_uint8, c_uint16, c_uint32, c_ulong, c_void_p,
+                    py_object, pythonapi)
 from threading import Condition, Event, Lock
 
 import chip.native
@@ -40,10 +41,9 @@ from chip.native import PyChipError
 from .ChipUtility import ChipUtility
 from .clusters import Attribute as ClusterAttribute
 from .clusters import Command as ClusterCommand
-from .clusters.CHIPClusters import *
-from .exceptions import *
+from .exceptions import ChipStackError, ChipStackException, DeviceError
 from .interaction_model import delegate as im
-from .storage import *
+from .storage import PersistentStorage
 
 __all__ = [
     "DeviceStatusStruct",
@@ -174,7 +174,8 @@ _ChipThreadTaskRunnerFunct = CFUNCTYPE(None, py_object)
 
 @_singleton
 class ChipStack(object):
-    def __init__(self, persistentStoragePath: str, installDefaultLogHandler=True, bluetoothAdapter=None, enableServerInteractions=True):
+    def __init__(self, persistentStoragePath: str, installDefaultLogHandler=True,
+                 bluetoothAdapter=None, enableServerInteractions=True):
         builtins.enableDebugMode = False
 
         self.networkLock = Lock()
@@ -362,7 +363,7 @@ class ChipStack(object):
         with self.networkLock:
             res = self.PostTaskOnChipThread(callFunct).Wait(timeoutMs)
         self.completeEvent.set()
-        if res == 0 and self.callbackRes != None:
+        if res == 0 and self.callbackRes is not None:
             return self.callbackRes
         return res
 
@@ -417,7 +418,7 @@ class ChipStack(object):
                 devStatus.SysErrorCode if (
                     devStatus.SysErrorCode != 0) else None
             )
-            if sysErrorCode != None:
+            if sysErrorCode is not None:
                 msg = msg + " (system err %d)" % (sysErrorCode)
             return DeviceError(
                 devStatus.ProfileId, devStatus.StatusCode, sysErrorCode, msg

@@ -49,7 +49,6 @@ tests:
                   0x002B, # Localization Configuration
                   0x002C, # Time Format Localization
                   0x002D, # Unit Localization
-                  0x002E, # Power Source Configuration
                   0x002F, # Power Source
                   0x0030, # General Commissioning
                   0x0031, # Network Commissioning
@@ -59,6 +58,7 @@ tests:
                   0x0035, # Thread Network Diagnostiscs
                   0x0036, # WiFi Network Diagnostics
                   0x0037, # Ethernet Network Diagnostics
+                  0x0038, # Time Synchronization
                   0x003C, # Administrator Commissioning
                   0x003E, # Operational Credentials
                   0x003F, # Group Key Management

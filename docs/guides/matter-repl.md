@@ -241,7 +241,7 @@ Some tests provides the option to exclude them. For example, you can use
 `--disable-test ClusterObjectTests.TestTimedRequestTimeout` to exclude the
 "TestTimedRequestTimeout" test case.
 
-It is recommanded to use the test wrapper to run mobile-device-test.py, for
+It is recommended to use the test wrapper to run mobile-device-test.py, for
 example, you can run:
 
 ```

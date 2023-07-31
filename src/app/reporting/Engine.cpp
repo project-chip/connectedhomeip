@@ -636,7 +636,7 @@ void Engine::Run()
         ReadHandler * readHandler = imEngine->ActiveHandlerAt(mCurReadHandlerIdx % (uint32_t) imEngine->mReadHandlers.Allocated());
         VerifyOrDie(readHandler != nullptr);
 
-        if (readHandler->IsReportableNow())
+        if (imEngine->GetReportScheduler()->IsReportableNow(readHandler))
         {
             mRunningReadHandler = readHandler;
             CHIP_ERROR err      = BuildAndSendSingleReportData(readHandler);

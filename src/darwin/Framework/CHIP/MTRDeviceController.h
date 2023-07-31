@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRCommissionableBrowserDelegate.h>
+#import <Matter/MTRDefines.h>
 #import <Matter/MTROperationalCertificateIssuer.h>
 
 @class MTRBaseDevice;
@@ -97,7 +98,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * @error error indication if the commissioning session establishment can't start at all.
  *
  * The connection information for the device will be retrieved from the discovered device.
- * A device discovered over MDNS will use the discovered IPs/ports, while a device discovered
+ * A device discovered over DNS-SD will use the discovered IPs/ports, while a device discovered
  * over BLE will use the underlying CBPeripheral.
  *
  * Then a PASE session will be established with the device, unless an error
@@ -117,7 +118,8 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 - (BOOL)setupCommissioningSessionWithDiscoveredDevice:(MTRCommissionableBrowserResult *)discoveredDevice
                                               payload:(MTRSetupPayload *)payload
                                             newNodeID:(NSNumber *)newNodeID
-                                                error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+                                                error:(NSError * __autoreleasing *)error
+    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Commission the node with the given node ID.  The node ID must match the node
@@ -177,16 +179,17 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 /**
  * Start scanning for commissionable devices.
  *
- * This method will fail if the controller factory is not running.
+ * This method will fail if the controller factory is not running or the browse has already been started.
  */
-- (BOOL)startScan:(id<MTRCommissionableBrowserDelegate>)delegate queue:(dispatch_queue_t)queue MTR_NEWLY_AVAILABLE;
+- (BOOL)startBrowseForCommissionables:(id<MTRCommissionableBrowserDelegate>)delegate
+                                queue:(dispatch_queue_t)queue API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Stop scanning for commissionable devices.
  *
- * This method will fail if the controller factory is not running or the scan has not been started.
+ * This method will fail if the controller factory is not running or the browse has not been started.
  */
-- (BOOL)stopScan MTR_NEWLY_AVAILABLE;
+- (BOOL)stopBrowseForCommissionables API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Return the attestation challenge for the secure session of the device being commissioned.

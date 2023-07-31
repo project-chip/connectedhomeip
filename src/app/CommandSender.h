@@ -121,7 +121,8 @@ public:
      * If used in a groups setting, callbacks do not need to be passed.
      * If callbacks are passed the only one that will be called in a group sesttings is the onDone
      */
-    CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false);
+    CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
+                  bool aSuppressResponse = false);
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
@@ -164,11 +165,18 @@ public:
      */
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs, bool aSuppressResponse = false)
+                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs)
     {
-        mSuppressResponse = aSuppressResponse;
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
     }
+
+    /**
+     * Version of SendCommandRequest that sets the TimedRequest flag but does not send the TimedInvoke
+     * action. For use in tests only.
+     */
+    CHIP_ERROR TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke(const SessionHandle & session,
+                                                                      Optional<System::Clock::Timeout> timeout = NullOptional);
+
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
@@ -264,6 +272,8 @@ private:
     CHIP_ERROR SendInvokeRequest();
 
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
+
+    CHIP_ERROR SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout);
 
     Messaging::ExchangeHolder mExchangeCtx;
     Callback * mpCallback                      = nullptr;

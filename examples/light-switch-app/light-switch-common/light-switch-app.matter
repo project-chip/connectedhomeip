@@ -396,6 +396,7 @@ client cluster OnOff = 6 {
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
   bitmap OnOffControl : BITMAP8 {
@@ -444,6 +445,13 @@ server cluster Descriptor = 29 {
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
+  }
+
+  struct SemanticTagStruct {
+    nullable vendor_id mfgCode = 0;
+    enum8 namespaceID = 1;
+    enum8 tag = 2;
+    optional nullable char_string label = 3;
   }
 
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
@@ -1495,6 +1503,146 @@ server cluster EthernetNetworkDiagnostics = 55 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
+/** Accurate time is required for a number of reasons, including scheduling, display and validating security materials. */
+server cluster TimeSynchronization = 56 {
+  enum GranularityEnum : ENUM8 {
+    kNoTimeGranularity = 0;
+    kMinutesGranularity = 1;
+    kSecondsGranularity = 2;
+    kMillisecondsGranularity = 3;
+    kMicrosecondsGranularity = 4;
+  }
+
+  enum StatusCode : ENUM8 {
+    kTimeNotAccepted = 2;
+  }
+
+  enum TimeSourceEnum : ENUM8 {
+    kNone = 0;
+    kUnknown = 1;
+    kAdmin = 2;
+    kNodeTimeCluster = 3;
+    kNonMatterSNTP = 4;
+    kNonMatterNTP = 5;
+    kMatterSNTP = 6;
+    kMatterNTP = 7;
+    kMixedNTP = 8;
+    kNonMatterSNTPNTS = 9;
+    kNonMatterNTPNTS = 10;
+    kMatterSNTPNTS = 11;
+    kMatterNTPNTS = 12;
+    kMixedNTPNTS = 13;
+    kCloudSource = 14;
+    kPTP = 15;
+    kGNSS = 16;
+  }
+
+  enum TimeZoneDatabaseEnum : ENUM8 {
+    kFull = 0;
+    kPartial = 1;
+    kNone = 2;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kTimeZone = 0x1;
+    kNTPClient = 0x2;
+    kNTPServer = 0x4;
+    kTimeSyncClient = 0x8;
+  }
+
+  struct DSTOffsetStruct {
+    int32s offset = 0;
+    epoch_us validStarting = 1;
+    nullable epoch_us validUntil = 2;
+  }
+
+  struct FabricScopedTrustedTimeSourceStruct {
+    node_id nodeID = 0;
+    endpoint_no endpoint = 1;
+  }
+
+  struct TimeZoneStruct {
+    int32s offset = 0;
+    epoch_us validAt = 1;
+    optional char_string<64> name = 2;
+  }
+
+  struct TrustedTimeSourceStruct {
+    fabric_idx fabricIndex = 0;
+    node_id nodeID = 1;
+    endpoint_no endpoint = 2;
+  }
+
+  info event DSTTableEmpty = 0 {
+  }
+
+  info event DSTStatus = 1 {
+    boolean DSTOffsetActive = 0;
+  }
+
+  info event TimeZoneStatus = 2 {
+    INT32S offset = 0;
+    optional CHAR_STRING name = 1;
+  }
+
+  info event TimeFailure = 3 {
+  }
+
+  info event MissingTrustedTimeSource = 4 {
+  }
+
+  readonly attribute nullable epoch_us UTCTime = 0;
+  readonly attribute GranularityEnum granularity = 1;
+  readonly attribute TimeSourceEnum timeSource = 2;
+  readonly attribute nullable TrustedTimeSourceStruct trustedTimeSource = 3;
+  readonly attribute nullable char_string<128> defaultNTP = 4;
+  readonly attribute TimeZoneStruct timeZone[] = 5;
+  readonly attribute DSTOffsetStruct DSTOffset[] = 6;
+  readonly attribute nullable epoch_us localTime = 7;
+  readonly attribute TimeZoneDatabaseEnum timeZoneDatabase = 8;
+  readonly attribute int8u timeZoneListMaxSize = 10;
+  readonly attribute int8u DSTOffsetListMaxSize = 11;
+  readonly attribute boolean supportsDNSResolve = 12;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetUTCTimeRequest {
+    epoch_us UTCTime = 0;
+    GranularityEnum granularity = 1;
+    optional TimeSourceEnum timeSource = 2;
+  }
+
+  request struct SetTrustedTimeSourceRequest {
+    nullable FabricScopedTrustedTimeSourceStruct trustedTimeSource = 0;
+  }
+
+  request struct SetTimeZoneRequest {
+    TimeZoneStruct timeZone[] = 0;
+  }
+
+  request struct SetDSTOffsetRequest {
+    DSTOffsetStruct DSTOffset[] = 0;
+  }
+
+  request struct SetDefaultNTPRequest {
+    nullable CHAR_STRING<128> defaultNTP = 0;
+  }
+
+  response struct SetTimeZoneResponse = 3 {
+    boolean DSTOffsetRequired = 0;
+  }
+
+  command access(invoke: administer) SetUTCTime(SetUTCTimeRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) SetTrustedTimeSource(SetTrustedTimeSourceRequest): DefaultSuccess = 1;
+  command access(invoke: manage) SetTimeZone(SetTimeZoneRequest): SetTimeZoneResponse = 2;
+  command access(invoke: manage) SetDSTOffset(SetDSTOffsetRequest): DefaultSuccess = 4;
+  command access(invoke: administer) SetDefaultNTP(SetDefaultNTPRequest): DefaultSuccess = 5;
+}
+
 /** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
@@ -2361,6 +2509,31 @@ endpoint 0 {
     callback attribute carrierDetect default = 0x00;
     callback attribute timeSinceReset default = 0x0000000000000000;
     ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TimeSynchronization {
+    emits event DSTTableEmpty;
+    emits event DSTStatus;
+    emits event TimeZoneStatus;
+    emits event TimeFailure;
+    emits event MissingTrustedTimeSource;
+    callback attribute UTCTime;
+    callback attribute granularity default = 0x00;
+    ram      attribute timeSource default = 0x00;
+    callback attribute trustedTimeSource;
+    callback attribute defaultNTP;
+    callback attribute timeZone default = 1;
+    callback attribute DSTOffset;
+    callback attribute localTime;
+    ram      attribute timeZoneDatabase default = 0;
+    callback attribute timeZoneListMaxSize default = 3;
+    callback attribute DSTOffsetListMaxSize;
+    ram      attribute supportsDNSResolve default = false;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x0B;
     ram      attribute clusterRevision default = 1;
   }
 

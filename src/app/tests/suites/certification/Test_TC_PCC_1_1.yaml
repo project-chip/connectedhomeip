@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the ClusterRevision attribute from the DUT"
+    - label: "Step 2: TH reads the ClusterRevision attribute from the DUT"
       PICS: PCC.S.Afffd
       command: "readAttribute"
       attribute: "ClusterRevision"
@@ -40,7 +40,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "TH reads the FeatureMap attribute from the DUT"
+    - label: "Step 3a: TH reads the FeatureMap attribute from the DUT"
       PICS:
           " PCC.S.Afffc && !PCC.S.F00 && !PCC.S.F01 && !PCC.S.F02 && !PCC.S.F03
           && !PCC.S.F04 && !PCC.S.F05 && !PCC.S.F06 "
@@ -52,7 +52,8 @@ tests:
               type: bitmap32
 
     - label:
-          "Given PCC.S.F00(PRSCONST) ensure featuremap has the correct bit set"
+          "Step 3b: Given PCC.S.F00(PRSCONST) ensure featuremap has the correct
+          bit set"
       PICS: PCC.S.F00 && PCC.S.Afffc
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -62,7 +63,8 @@ tests:
               hasMasksSet: [0x1]
 
     - label:
-          "Given PCC.S.F01(PRSCOMP) ensure featuremap has the correct bit set"
+          "Step 3c: Given PCC.S.F01(PRSCOMP) ensure featuremap has the correct
+          bit set"
       PICS: PCC.S.F01 && PCC.S.Afffc
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -71,7 +73,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x2]
 
-    - label: "Given PCC.S.F02(FLW) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3d: Given PCC.S.F02(FLW) ensure featuremap has the correct bit
+          set"
       PICS: PCC.S.F02 && PCC.S.Afffc
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -80,7 +84,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x4]
 
-    - label: "Given PCC.S.F03(SPD) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3e: Given PCC.S.F03(SPD) ensure featuremap has the correct bit
+          set"
       PICS: PCC.S.F03 && PCC.S.Afffc
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -89,7 +95,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x8]
 
-    - label: "Given PCC.S.F04(TEMP) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3f: Given PCC.S.F04(TEMP) ensure featuremap has the correct bit
+          set"
       PICS: PCC.S.F04 && PCC.S.Afffc
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -98,7 +106,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x10]
 
-    - label: "Given PCC.S.F05(AUTO) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3g: Given PCC.S.F05(AUTO) ensure featuremap has the correct bit
+          set"
       PICS: PCC.S.F05 && PCC.S.Afffc
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -107,7 +117,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x20]
 
-    - label: "Given PCC.S.F06(LOCAL) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3h: Given PCC.S.F06(LOCAL) ensure featuremap has the correct bit
+          set"
       PICS: PCC.S.F06 && PCC.S.Afffc
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -116,8 +128,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x40]
 
-    - label: "TH reads the AttributeList attribute from the DUT"
-      PICS: PCC.S.Afffb
+    - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -140,8 +152,18 @@ tests:
                       65533,
                   ]
 
+    - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED && PCC.S.Afffb"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [0, 1, 2, 17, 18, 19, 32, 65528, 65529, 65531, 65532, 65533]
+
     - label:
-          "TH reads optional attribute(MinConstPressure) attribute in
+          "Step 4b: TH reads optional attribute(MinConstPressure) attribute in
           AttributeList from the DUT"
       PICS: PCC.S.A0003 && PCC.S.Afffb
       command: "readAttribute"
@@ -152,7 +174,7 @@ tests:
               contains: [3]
 
     - label:
-          "TH reads optional attribute(MaxConstPressure) attribute in
+          "Step 4c TH reads optional attribute(MaxConstPressure) attribute in
           AttributeList from the DUT"
       PICS: PCC.S.A0004 && PCC.S.Afffb
       command: "readAttribute"
@@ -163,7 +185,7 @@ tests:
               contains: [4]
 
     - label:
-          "TH reads optional attribute(MinCompPressure) attribute in
+          "Step 4d: TH reads optional attribute(MinCompPressure) attribute in
           AttributeList from the DUT"
       PICS: PCC.S.A0005 && PCC.S.Afffb
       command: "readAttribute"
@@ -174,7 +196,7 @@ tests:
               contains: [5]
 
     - label:
-          "TH reads optional attribute(MaxCompPressure) attribute in
+          "Step 4e: TH reads optional attribute(MaxCompPressure) attribute in
           AttributeList from the DUT"
       PICS: PCC.S.A0006 && PCC.S.Afffb
       command: "readAttribute"
@@ -185,8 +207,8 @@ tests:
               contains: [6]
 
     - label:
-          "TH reads optional attribute(MinConstSpeed) attribute in AttributeList
-          from the DUT"
+          "Step 4f: TH reads optional attribute(MinConstSpeed) attribute in
+          AttributeList from the DUT"
       PICS: PCC.S.A0007 && PCC.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -196,8 +218,8 @@ tests:
               contains: [7]
 
     - label:
-          "TH reads optional attribute(MaxConstSpeed) attribute in AttributeList
-          from the DUT"
+          "Step 4g: TH reads optional attribute(MaxConstSpeed) attribute in
+          AttributeList from the DUT"
       PICS: PCC.S.A0008 && PCC.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -207,8 +229,8 @@ tests:
               contains: [8]
 
     - label:
-          "TH reads optional attribute(MinConstFlow) attribute in AttributeList
-          from the DUT"
+          "Step 4h: TH reads optional attribute(MinConstFlow) attribute in
+          AttributeList from the DUT"
       PICS: PCC.S.A0009 && PCC.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -218,8 +240,8 @@ tests:
               contains: [9]
 
     - label:
-          "TH reads optional attribute(MaxConstFlow) attribute in AttributeList
-          from the DUT"
+          "Step 4i: TH reads optional attribute(MaxConstFlow) attribute in
+          AttributeList from the DUT"
       PICS: PCC.S.A000a && PCC.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -229,8 +251,8 @@ tests:
               contains: [10]
 
     - label:
-          "TH reads optional attribute(MinConstTemp) attribute in AttributeList
-          from the DUT"
+          "Step 4j: TH reads optional attribute(MinConstTemp) attribute in
+          AttributeList from the DUT"
       PICS: PCC.S.A000b && PCC.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -240,8 +262,8 @@ tests:
               contains: [11]
 
     - label:
-          "TH reads optional attribute(MaxConstTemp) attribute in AttributeList
-          from the DUT"
+          "Step 4k: TH reads optional attribute(MaxConstTemp) attribute in
+          AttributeList from the DUT"
       PICS: PCC.S.A000c && PCC.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -251,8 +273,8 @@ tests:
               contains: [12]
 
     - label:
-          "TH reads optional attribute(PumpStatus) attribute in AttributeList
-          from the DUT"
+          "Step 4l: TH reads optional attribute(PumpStatus) attribute in
+          AttributeList from the DUT"
       PICS: PCC.S.A0010 && PCC.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -262,8 +284,8 @@ tests:
               contains: [16]
 
     - label:
-          "TH reads optional attribute(Speed) attribute in AttributeList from
-          the DUT"
+          "Step 4m: TH reads optional attribute(Speed) attribute in
+          AttributeList from the DUT"
       PICS: PCC.S.A0014 && PCC.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -273,8 +295,8 @@ tests:
               contains: [20]
 
     - label:
-          "TH reads optional attribute(LifetimeRunningHours) attribute in
-          AttributeList from the DUT"
+          "Step 4n: TH reads optional attribute(LifetimeRunningHours) attribute
+          in AttributeList from the DUT"
       PICS: PCC.S.A0015 && PCC.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -284,8 +306,8 @@ tests:
               contains: [21]
 
     - label:
-          "TH reads optional attribute(Power) attribute in AttributeList from
-          the DUT"
+          "Step 4o: TH reads optional attribute(Power) attribute in
+          AttributeList from the DUT"
       PICS: PCC.S.A0016 && PCC.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -295,8 +317,8 @@ tests:
               contains: [22]
 
     - label:
-          "TH reads optional attribute(LifetimeEnergyConsumed) attribute in
-          AttributeList from the DUT"
+          "Step 4p: TH reads optional attribute(LifetimeEnergyConsumed)
+          attribute in AttributeList from the DUT"
       PICS: PCC.S.A0017 && PCC.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -306,8 +328,8 @@ tests:
               contains: [23]
 
     - label:
-          "TH reads optional attribute(ControlMode) attribute in AttributeList
-          from the DUT"
+          "Step 4q: TH reads optional attribute(ControlMode) attribute in
+          AttributeList from the DUT"
       PICS: PCC.S.A0021 && PCC.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -318,8 +340,8 @@ tests:
 
     #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
     - label:
-          "TH reads AttributeList attribute from DUT. 1.The list MAY contain
-          values in the Manufacturer Extensible Identifier (MEI) range:
+          "Step 4r: TH reads AttributeList attribute from DUT. 1.The list MAY
+          contain values in the Manufacturer Extensible Identifier (MEI) range:
           (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed MEI range
           (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list SHALL NOT
           contain any values in the Test Vendor or invalid range: (0x0000_5000 -
@@ -375,12 +397,12 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads EventList from DUT"
+    - label: "Step 5a: TH reads EventList from DUT"
       PICS:
-          " PCC.S.Afffa && !PCC.S.E00 && !PCC.S.E01 && !PCC.S.E02 && !PCC.S.E03
-          && !PCC.S.E04 && !PCC.S.E05 && !PCC.S.E06 && !PCC.S.E07 && !PCC.S.E08
-          && !PCC.S.E09 && !PCC.S.E0a && !PCC.S.E0b && !PCC.S.E0c && !PCC.S.E0d
-          && !PCC.S.E0e && !PCC.S.E0f && !PCC.S.E10 "
+          "PICS_EVENT_LIST_ENABLED &&  PCC.S.Afffa && !PCC.S.E00 && !PCC.S.E01
+          && !PCC.S.E02 && !PCC.S.E03 && !PCC.S.E04 && !PCC.S.E05 && !PCC.S.E06
+          && !PCC.S.E07 && !PCC.S.E08 && !PCC.S.E09 && !PCC.S.E0a && !PCC.S.E0b
+          && !PCC.S.E0c && !PCC.S.E0d && !PCC.S.E0e && !PCC.S.E0f && !PCC.S.E10 "
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -389,9 +411,9 @@ tests:
               type: list
 
     - label:
-          "TH reads from the DUT the EventList optional
+          "Step 5b: TH reads from the DUT the EventList optional
           (SupplyVoltageLow)attribute."
-      PICS: PCC.S.E00 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E00 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -400,9 +422,9 @@ tests:
               contains: [0x00]
 
     - label:
-          "TH reads from the DUT the EventList optional
+          "Step 5c: TH reads from the DUT the EventList optional
           (SupplyVoltageHigh)attribute."
-      PICS: PCC.S.E01 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E01 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -411,9 +433,9 @@ tests:
               contains: [0x01]
 
     - label:
-          "TH reads from the DUT the EventList optional
+          "Step 5d: TH reads from the DUT the EventList optional
           (PowerMissingPhase)attribute."
-      PICS: PCC.S.E02 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E02 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -422,9 +444,9 @@ tests:
               contains: [0x02]
 
     - label:
-          "TH reads from the DUT the EventList optional
+          "Step 5e: TH reads from the DUT the EventList optional
           (SystemPressureLow)attribute."
-      PICS: PCC.S.E03 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E03 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -433,9 +455,9 @@ tests:
               contains: [0x03]
 
     - label:
-          "TH reads from the DUT the EventList optional
+          "Step 5f: TH reads from the DUT the EventList optional
           (SystemPressureHigh)attribute."
-      PICS: PCC.S.E04 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E04 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -444,8 +466,9 @@ tests:
               contains: [0x04]
 
     - label:
-          "TH reads from the DUT the EventList optional (DryRunning)attribute."
-      PICS: PCC.S.E05 && PCC.S.Afffa
+          "Step 5g: TH reads from the DUT the EventList optional
+          (DryRunning)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E05 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -454,9 +477,9 @@ tests:
               contains: [0x05]
 
     - label:
-          "TH reads from the DUT the EventList optional
+          "Step 5h: TH reads from the DUT the EventList optional
           (MotorTemperatureHigh)attribute."
-      PICS: PCC.S.E06 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E06 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -465,9 +488,9 @@ tests:
               contains: [0x06]
 
     - label:
-          "TH reads from the DUT the EventList optional
+          "Step 5i: TH reads from the DUT the EventList optional
           (PumpMotorFatalFailure)attribute."
-      PICS: PCC.S.E07 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E07 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -476,9 +499,9 @@ tests:
               contains: [0x07]
 
     - label:
-          "TH reads from the DUT the EventList optional
+          "Step 5j: TH reads from the DUT the EventList optional
           (ElectronicTemperatureHigh)attribute."
-      PICS: PCC.S.E08 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E08 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -487,8 +510,9 @@ tests:
               contains: [0x08]
 
     - label:
-          "TH reads from the DUT the EventList optional (PumpBlocked)attribute."
-      PICS: PCC.S.E09 && PCC.S.Afffa
+          "Step 5k: TH reads from the DUT the EventList optional
+          (PumpBlocked)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E09 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -497,9 +521,9 @@ tests:
               contains: [0x09]
 
     - label:
-          "TH reads from the DUT the EventList optional
+          "Step 5l: TH reads from the DUT the EventList optional
           (SensorFailure)attribute."
-      PICS: PCC.S.E0a && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0a && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -508,9 +532,9 @@ tests:
               contains: [0x0a]
 
     - label:
-          "TH reads from the DUT the EventList optional
+          "Step 5m: TH reads from the DUT the EventList optional
           (ElectronicNonFatalFailure)attribute."
-      PICS: PCC.S.E0b && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0b && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -519,9 +543,9 @@ tests:
               contains: [0x0b]
 
     - label:
-          "TH reads from the DUT the EventList optional
+          "Step 5n: TH reads from the DUT the EventList optional
           (ElectronicFatalFailure)attribute."
-      PICS: PCC.S.E0c && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0c && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -530,8 +554,9 @@ tests:
               contains: [0x0c]
 
     - label:
-          "TH reads from the DUT the EventList optional (GeneralFault)attribute."
-      PICS: PCC.S.E0d && PCC.S.Afffa
+          "Step 5o: TH reads from the DUT the EventList optional
+          (GeneralFault)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0d && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -539,8 +564,10 @@ tests:
               type: list
               contains: [0x0d]
 
-    - label: "TH reads from the DUT the EventList optional (Leakage)attribute."
-      PICS: PCC.S.E0e && PCC.S.Afffa
+    - label:
+          "Step 5p: TH reads from the DUT the EventList optional
+          (Leakage)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0e && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -549,8 +576,9 @@ tests:
               contains: [0x0e]
 
     - label:
-          "TH reads from the DUT the EventList optional (AirDetection)attribute."
-      PICS: PCC.S.E0f && PCC.S.Afffa
+          "Step 5q: TH reads from the DUT the EventList optional
+          (AirDetection)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0f && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -559,9 +587,9 @@ tests:
               contains: [0x0f]
 
     - label:
-          "TH reads from the DUT the EventList optional
+          "Step 5r: TH reads from the DUT the EventList optional
           (TurbineOperation)attribute."
-      PICS: PCC.S.E10 && PCC.S.Afffa
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E10 && PCC.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -571,15 +599,15 @@ tests:
 
     #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
     - label:
-          "TH reads EventList attribute from DUT. 1.The list SHALL NOT contain
-          any additional values in the standard or scoped range: (0x0000_0000 -
-          0x0000_00FF). 2. The list MAY contain values in the Manufacturer
-          Extensible Identifier (MEI) range: (0xXXXX_0000 - 0xXXXX_00FF), where
-          XXXX is the allowed MEI range (0x0001 - 0xFFF1), these values SHALL be
-          ignored. 3. The list SHALL NOT contain any values in the Test Vendor
-          or invalid range: (0x0000_0100 - 0x0000_FFFF), (0xXXXX_0100 -
-          0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
-          allowed MEI range (0x0001 - 0xFFF1)"
+          "Step 5s: TH reads EventList attribute from DUT. 1.The list SHALL NOT
+          contain any additional values in the standard or scoped range:
+          (0x0000_0000 - 0x0000_00FF). 2. The list MAY contain values in the
+          Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
+          0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1),
+          these values SHALL be ignored. 3. The list SHALL NOT contain any
+          values in the Test Vendor or invalid range: (0x0000_0100 -
+          0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 -
+          0xFFFF_FFFF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
       verification: |
           ./chip-tool pumpconfigurationandcontrol read event-list 1 1
 
@@ -631,13 +659,14 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads AcceptedCommandList attribute from DUT. 1.The list MAY
-          contain values in the Manufacturer Extensible Identifier (MEI) range:
-          (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI range
-          (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list SHALL NOT
-          contain any values in the Test Vendor or invalid range: (0x0000_0100 -
-          0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 -
-          0xFFFF_FFFF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
+          "Step 6: TH reads AcceptedCommandList attribute from DUT. 1.The list
+          MAY contain values in the Manufacturer Extensible Identifier (MEI)
+          range: (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI
+          range (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list
+          SHALL NOT contain any values in the Test Vendor or invalid range:
+          (0x0000_0100 - 0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and
+          (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the allowed MEI range
+          (0x0001 - 0xFFF1)"
       verification: |
           ./chip-tool pumpconfigurationandcontrol read accepted-command-list 1 1
 
@@ -656,13 +685,14 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads GeneratedCommandList attribute from DUT. 1.The list MAY
-          contain values in the Manufacturer Extensible Identifier (MEI) range:
-          (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI range
-          (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list SHALL NOT
-          contain any values in the Test Vendor or invalid range: (0x0000_0100 -
-          0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 -
-          0xFFFF_FFFF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
+          "Step 7: TH reads GeneratedCommandList attribute from DUT. 1.The list
+          MAY contain values in the Manufacturer Extensible Identifier (MEI)
+          range: (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI
+          range (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list
+          SHALL NOT contain any values in the Test Vendor or invalid range:
+          (0x0000_0100 - 0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and
+          (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the allowed MEI range
+          (0x0001 - 0xFFF1)"
       verification: |
           ./chip-tool pumpconfigurationandcontrol read generated-command-list 1 1
 

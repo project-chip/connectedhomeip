@@ -27,8 +27,6 @@
 
 #include <AppTask.h>
 #include <easyflash.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CHIPPlatformMemory.h>
 #include <plat.h>
 
 extern "C" {
@@ -45,7 +43,9 @@ extern "C" {
 #include <wifi_mgmr_ext.h>
 #endif
 #include <bl_irq.h>
+#if defined(BL702L_ENABLE)
 #include <bl_rtc.h>
+#endif
 #include <bl_sec.h>
 #include <bl_sys.h>
 #ifdef CFG_USE_PSRAM
@@ -64,6 +64,7 @@ extern "C" {
 #endif
 
 #include "board.h"
+#include <uart.h>
 }
 
 using namespace ::chip;
@@ -138,15 +139,13 @@ extern "C" void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuff
     /* If the buffers to be provided to the Idle task are declared inside this
     function then they must be declared static - otherwise they will be allocated on
     the stack and so not exists after this function exits. */
-    static StaticTask_t xIdleTaskTCB;
-    static StackType_t uxIdleTaskStack[configMINIMAL_STACK_SIZE];
 
     /* Pass out a pointer to the StaticTask_t structure in which the Idle task's
     state will be stored. */
-    *ppxIdleTaskTCBBuffer = &xIdleTaskTCB;
+    *ppxIdleTaskTCBBuffer = (StaticTask_t *) pvPortMalloc(sizeof(StaticTask_t));
 
     /* Pass out the array that will be used as the Idle task's stack. */
-    *ppxIdleTaskStackBuffer = uxIdleTaskStack;
+    *ppxIdleTaskStackBuffer = (StackType_t *) pvPortMalloc(sizeof(StackType_t) * configMINIMAL_STACK_SIZE);
 
     /* Pass out the size of the array pointed to by *ppxIdleTaskStackBuffer.
     Note that, as the array is necessarily of type StackType_t,
@@ -163,15 +162,13 @@ extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBu
     /* If the buffers to be provided to the Timer task are declared inside this
     function then they must be declared static - otherwise they will be allocated on
     the stack and so not exists after this function exits. */
-    static StaticTask_t xTimerTaskTCB;
-    static StackType_t uxTimerTaskStack[configTIMER_TASK_STACK_DEPTH];
 
     /* Pass out a pointer to the StaticTask_t structure in which the Timer
     task's state will be stored. */
-    *ppxTimerTaskTCBBuffer = &xTimerTaskTCB;
+    *ppxTimerTaskTCBBuffer = (StaticTask_t *) pvPortMalloc(sizeof(StaticTask_t));
 
     /* Pass out the array that will be used as the Timer task's stack. */
-    *ppxTimerTaskStackBuffer = uxTimerTaskStack;
+    *ppxTimerTaskStackBuffer = (StackType_t *) pvPortMalloc(sizeof(StackType_t) * configTIMER_TASK_STACK_DEPTH);
 
     /* Pass out the size of the array pointed to by *ppxTimerTaskStackBuffer.
     Note that, as the array is necessarily of type StackType_t,
@@ -196,7 +193,15 @@ extern "C" void vAssertCalled(void)
     void * ra = (void *) __builtin_return_address(0);
 
     taskDISABLE_INTERRUPTS();
-    ChipLogProgress(NotSpecified, "vAssertCalled, ra= %p", ra);
+    if (xPortIsInsideInterrupt())
+    {
+        printf("vAssertCalled, ra = %p in ISR\r\n", (void *) ra);
+    }
+    else
+    {
+        printf("vAssertCalled, ra = %p in task %s\r\n", (void *) ra, pcTaskGetName(NULL));
+    }
+
     while (true)
         ;
 }
@@ -208,7 +213,15 @@ extern "C" void __attribute__((weak)) user_vAssertCalled(void)
     void * ra = (void *) __builtin_return_address(0);
 
     taskDISABLE_INTERRUPTS();
-    ChipLogProgress(NotSpecified, "vAssertCalled, ra= %p", ra);
+    if (xPortIsInsideInterrupt())
+    {
+        printf("vAssertCalled, ra = %p in ISR\r\n", (void *) ra);
+    }
+    else
+    {
+        printf("vAssertCalled, ra = %p in task %s\r\n", (void *) ra, pcTaskGetName(NULL));
+    }
+
     while (true)
         ;
 }
@@ -330,20 +343,6 @@ extern "C" void do_psram_test()
 }
 #endif
 
-#ifdef BL702L_ENABLE
-void exception_entry_app(uint32_t mcause, uint32_t mepc, uint32_t mtval, uintptr_t * regs, uintptr_t * tasksp)
-{
-    static const char dbg_str[] = "Exception Entry--->>>\r\n mcause %08lx, mepc %08lx, mtval %08lx\r\n";
-
-    printf(dbg_str, mcause, mepc, mtval);
-
-    while (1)
-    {
-        /*dead loop now*/
-    }
-}
-#endif
-
 extern "C" void setup_heap()
 {
     bl_sys_init();
@@ -362,16 +361,6 @@ extern "C" void setup_heap()
 
     vPortDefineHeapRegions(xHeapRegions);
 
-    bl_sys_early_init();
-
-#ifdef BL702L_ENABLE
-    rom_freertos_init(256, 400);
-    rom_hal_init();
-    rom_lmac154_hook_init();
-
-    exception_entry_ptr = exception_entry_app;
-#endif
-
 #ifdef CFG_USE_PSRAM
     bl_psram_init();
     do_psram_test();
@@ -386,6 +375,14 @@ extern "C" size_t get_heap_size(void)
 
 extern "C" void app_init(void)
 {
+    bl_sys_early_init();
+
+#ifdef BL702L_ENABLE
+    rom_freertos_init(256, 400);
+    rom_hal_init();
+    rom_lmac154_hook_init();
+#endif
+
     hosal_uart_init(&uart_stdio);
 
     ChipLogProgress(NotSpecified, "==================================================");
@@ -403,7 +400,9 @@ extern "C" void app_init(void)
 
     blog_init();
     bl_irq_init();
+#if defined(BL702L_ENABLE)
     bl_rtc_init();
+#endif
     bl_sec_init();
 #if defined(BL702_ENABLE)
     bl_timer_init();
@@ -414,6 +413,9 @@ extern "C" void app_init(void)
     /* board config is set after system is init*/
     hal_board_cfg(0);
 
+#if defined(BL702L_ENABLE) || defined(BL706_WIFI)
+    hosal_dma_init();
+#endif
 #ifdef BL602_ENABLE
     wifi_td_diagnosis_init();
 #endif
@@ -423,12 +425,9 @@ extern "C" void START_ENTRY(void)
 {
     app_init();
 
-    easyflash_init();
-    ef_load_env_cache();
-
-    ChipLogProgress(NotSpecified, "Init CHIP Memory");
-    chip::Platform::MemoryInit(NULL, 0);
-
+#if CONFIG_ENABLE_CHIP_SHELL || PW_RPC_ENABLED
+    uartInit();
+#endif
 #ifdef SYS_AOS_LOOP_ENABLE
     ChipLogProgress(NotSpecified, "Starting AOS loop Task");
     aos_loop_start();
@@ -438,6 +437,12 @@ extern "C" void START_ENTRY(void)
     usb_cdc_start(-1);
 #endif
 #endif
+
+    easyflash_init();
+    ef_load_env_cache();
+
+    ChipLogProgress(NotSpecified, "Init CHIP Memory");
+    chip::Platform::MemoryInit(NULL, 0);
 
     ChipLogProgress(NotSpecified, "Starting App Task");
     StartAppTask();

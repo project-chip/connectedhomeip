@@ -90,7 +90,7 @@ chip_data_model("tv-casting-common") {
     "${chip_root}/src/app/tests/suites/commands/interaction_model",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/tracing",
-    "${chip_root}/src/tracing/log_json",
+    "${chip_root}/src/tracing/json",
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",
   ]

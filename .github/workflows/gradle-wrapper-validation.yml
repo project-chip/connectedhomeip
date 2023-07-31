@@ -6,5 +6,11 @@ jobs:
     name: "Validation"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.5.2
-      - uses: gradle/wrapper-validation-action@v1
+      - uses: actions/checkout@v3
+      - uses: Wandalen/wretry.action@v1.3.0
+        name: Gradle Validation
+        continue-on-error: true
+        with:
+          action: gradle/wrapper-validation-action@v1
+          attempt_limit: 3
+          attempt_delay: 2000

@@ -58,15 +58,30 @@
     "bridge": ["Test_TC_BR_1", "Test_TC_BR_2", "Test_TC_BR_3", "Test_TC_BR_4"],
     "DeviceAttestation": [
         "Test_TC_DA_1_1",
-        "Test_TC_DA_1_2",
         "Test_TC_DA_1_3",
         "Test_TC_DA_1_4",
-        "Test_TC_DA_1_5",
         "Test_TC_DA_1_6"
     ],
+    "DishwasherAlarm": [
+        "Test_TC_DISHALM_1_1",
+        "Test_TC_DISHALM_2_1",
+        "Test_TC_DISHALM_3_1",
+        "Test_TC_DISHALM_3_2",
+        "Test_TC_DISHALM_3_3",
+        "Test_TC_DISHALM_3_4",
+        "Test_TC_DISHALM_3_5",
+        "Test_TC_DISHALM_3_6"
+    ],
+    "DishwasherMode": [
+        "Test_TC_DISHM_1_1",
+        "Test_TC_DISHM_1_2",
+        "Test_TC_DISHM_2_1",
+        "Test_TC_DISHM_3_1",
+        "Test_TC_DISHM_3_2",
+        "Test_TC_DISHM_3_3"
+    ],
     "DeviceManagement": [
-        "Test_TC_BINFO_2_2",
-        "Test_TC_BINFO_2_4",
+        "Test_TC_BINFO_3_1",
         "Test_TC_OPCREDS_3_1",
         "Test_TC_OPCREDS_3_2",
         "Test_TC_OPCREDS_3_3",
@@ -100,6 +115,7 @@
         "Test_TC_DLOG_3_1"
     ],
     "Descriptor": ["Test_TC_DESC_2_1"],
+    "FanControl": ["Test_TC_FAN_3_3", "Test_TC_FAN_3_5"],
     "GeneralCommissioning": ["Test_TC_CGEN_2_2"],
     "GeneralDiagnostics": [
         "Test_TC_DGGEN_2_2",
@@ -107,10 +123,10 @@
         "Test_TC_DGGEN_3_1"
     ],
     "Identify": ["Test_TC_I_3_2"],
+    "IcdManagement": ["Test_TC_ICDM_2_2", "Test_TC_ICDM_2_3"],
     "IlluminanceMeasurement": [],
     "InteractionDataModel": [
         "Test_TC_IDM_1_1",
-        "Test_TC_IDM_1_2",
         "Test_TC_IDM_2_1",
         "Test_TC_IDM_2_2",
         "Test_TC_IDM_3_1",
@@ -145,10 +161,7 @@
         "Test_TC_MEDIAPLAYBACK_6_7",
         "Test_TC_AUDIOOUTPUT_7_3",
         "Test_TC_AUDIOOUTPUT_7_4",
-        "Test_TC_CONTENTLAUNCHER_10_3",
         "Test_TC_CONTENTLAUNCHER_10_4",
-        "Test_TC_CONTENTLAUNCHER_10_5",
-        "Test_TC_CONTENTLAUNCHER_10_7",
         "Test_TC_MC_11_1",
         "Test_TC_MC_11_2",
         "Test_TC_ALOGIN_12_2",
@@ -182,10 +195,12 @@
     ],
     "ModeSelect": [
         "Test_TC_MOD_1_2",
+        "Test_TC_MOD_1_3",
         "Test_TC_MOD_2_1",
-        "Test_TC_MOD_2_3",
+        "Test_TC_MOD_2_2",
         "Test_TC_MOD_3_1",
         "Test_TC_MOD_3_2",
+        "Test_TC_MOD_3_3",
         "Test_TC_MOD_3_4"
     ],
     "OTASoftwareUpdate": [
@@ -255,15 +270,73 @@
     "DoorLock": ["Test_TC_DRLK_2_10", "Test_TC_DRLK_3_2", "Test_TC_DRLK_3_3"],
     "LocalizationConfiguration": ["Test_TC_LCFG_2_1"],
     "LevelControl": ["Test_TC_LVL_8_1"],
+    "LaundryWasherMode": [
+        "Test_TC_LWM_1_1",
+        "Test_TC_LWM_1_2",
+        "Test_TC_LWM_2_1",
+        "Test_TC_LWM_3_1",
+        "Test_TC_LWM_3_2"
+    ],
     "OnOff": ["Test_TC_OO_2_3"],
+    "OperationalState": [
+        "Test_TC_OPSTATE_2_1",
+        "Test_TC_OPSTATE_2_2",
+        "Test_TC_OPSTATE_2_3",
+        "Test_TC_OPSTATE_2_4"
+    ],
     "RelativeHumidityMeasurement": ["Test_TC_RH_2_2"],
+    "SmokeCOAlarm": [],
+    "RefrigeratorAlarm": [
+        "Test_TC_REFALM_1_1",
+        "Test_TC_REFALM_2_1",
+        "Test_TC_REFALM_2_2",
+        "Test_TC_REFALM_2_3"
+    ],
+    "RVCCleanMode": [
+        "Test_TC_RVCCLEANM_1_1",
+        "Test_TC_RVCCLEANM_1_2",
+        "Test_TC_RVCCLEANM_2_1",
+        "Test_TC_RVCCLEANM_3_1",
+        "Test_TC_RVCCLEANM_3_2",
+        "Test_TC_RVCCLEANM_3_3"
+    ],
+    "RVCOperationalState": [
+        "Test_TC_RVCOPSTATE_2_1",
+        "Test_TC_RVCOPSTATE_2_2",
+        "Test_TC_RVCOPSTATE_2_3"
+    ],
+    "RVCRunMode": [
+        "Test_TC_RVCRUNM_1_1",
+        "Test_TC_RVCRUNM_1_2",
+        "Test_TC_RVCRUNM_2_1",
+        "Test_TC_RVCRUNM_3_1",
+        "Test_TC_RVCRUNM_3_2",
+        "Test_TC_RVCRUNM_3_3"
+    ],
+    "TemperatureControlledCabinetMode": [
+        "Test_TC_TCCM_1_1",
+        "Test_TC_TCCM_1_2",
+        "Test_TC_TCCM_2_1",
+        "Test_TC_TCCM_3_1",
+        "Test_TC_TCCM_3_2",
+        "Test_TC_TCCM_3_3"
+    ],
     "Switch": ["Test_TC_SWTCH_2_2", "Test_TC_SWTCH_3_2"],
+    "TemperatureControl": [
+        "Test_TC_TCTL_1_1",
+        "Test_TC_TCTL_2_1",
+        "Test_TC_TCTL_2_2",
+        "Test_TC_TCTL_2_3",
+        "Test_TC_TCTL_3_2",
+        "Test_TC_TCTL_3_3"
+    ],
     "TemperatureMeasurement": ["Test_TC_TMP_2_2"],
     "Thermostat": ["Test_TC_TSTAT_3_1", "Test_TC_TSTAT_3_2"],
     "ThermostatUserConfiguration": [],
     "ThreadNetworkDiagnostics": ["Test_TC_DGTHREAD_2_5"],
     "Actions": ["Test_TC_ACT_2_1", "Test_TC_ACT_2_2", "Test_TC_ACT_3_2"],
     "TimeFormatLocalization": ["Test_TC_LTIME_2_1", "Test_TC_LTIME_3_1"],
+    "TimeSynchronization": ["Test_TC_TIMESYNC_2_15"],
     "UnitLocalization": [],
     "Binding": ["Test_TC_BIND_2_1", "Test_TC_BIND_2_2", "Test_TC_BIND_2_3"],
     "Scenes": [
@@ -272,16 +345,25 @@
         "Test_TC_S_2_2",
         "Test_TC_S_2_3",
         "Test_TC_S_2_4",
+        "Test_TC_S_2_5",
+        "Test_TC_S_2_6",
         "Test_TC_S_3_1"
     ],
     "PumpConfigurationControl": [],
-    "AccessControl": ["Test_TC_ACL_2_5", "Test_TC_ACL_2_6"],
+    "AccessControl": [],
     "UserLabel": [],
     "BridgedDeviceBasicInformation": [
         "Test_TC_BRBINFO_2_2",
-        "Test_TC_BRBINFO_2_3"
+        "Test_TC_BRBINFO_3_1"
     ],
-    "AccessControlEnforcement": ["Test_TC_ACE_1_2", "Test_TC_ACE_1_6"],
+    "WasherControls": [
+        "Test_TC_WASHERCTRL_1_1",
+        "Test_TC_WASHERCTRL_2_1",
+        "Test_TC_WASHERCTRL_2_2",
+        "Test_TC_WASHERCTRL_3_1",
+        "Test_TC_WASHERCTRL_3_2"
+    ],
+    "AccessControlEnforcement": [],
     "collection": [
         "DeviceDiscovery",
         "Groups",
@@ -290,10 +372,14 @@
         "DeviceAttestation",
         "DeviceManagement",
         "DiagnosticsLogs",
+        "DishwasherAlarm",
+        "DishwasherMode",
         "Descriptor",
+        "FanControl",
         "EthernetNetworkDiagnostics",
         "GeneralCommissioning",
         "GeneralDiagnostics",
+        "IcdManagement",
         "Identify",
         "IlluminanceMeasurement",
         "InteractionDataModel",
@@ -315,15 +401,26 @@
         "DoorLock",
         "LocalizationConfiguration",
         "LevelControl",
+        "LaundryWasherMode",
         "OnOff",
+        "OperationalState",
         "RelativeHumidityMeasurement",
+        "SmokeCOAlarm",
+        "RefrigeratorAlarm",
+        "RVCCleanMode",
+        "RVCOperationalState",
+        "RVCRunMode",
         "Switch",
+        "SmokeCOAlarm",
+        "TemperatureControlledCabinetMode",
+        "TemperatureControl",
         "TemperatureMeasurement",
         "Thermostat",
         "ThermostatUserConfiguration",
         "ThreadNetworkDiagnostics",
         "Actions",
         "TimeFormatLocalization",
+        "TimeSynchronization",
         "UnitLocalization",
         "Binding",
         "Scenes",
@@ -331,6 +428,7 @@
         "AccessControl",
         "UserLabel",
         "BridgedDeviceBasicInformation",
-        "AccessControlEnforcement"
+        "AccessControlEnforcement",
+        "WasherControls"
     ]
 }

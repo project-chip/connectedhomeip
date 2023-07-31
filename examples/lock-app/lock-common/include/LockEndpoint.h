@@ -64,9 +64,12 @@ public:
 
     inline chip::EndpointId GetEndpointId() const { return mEndpointId; }
 
-    bool Lock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
-    bool Unlock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
-    bool Unbolt(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
+    bool Lock(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+              const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
+    bool Unlock(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+                const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
+    bool Unbolt(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+                const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
 
     bool GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const;
     bool SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier, const chip::CharSpan & userName,
@@ -98,12 +101,15 @@ public:
                          OperatingModeEnum operatingMode);
 
 private:
-    bool setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
+    bool setLockState(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId, DlLockState lockState,
+                      const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
                       OperationSourceEnum opSource = OperationSourceEnum::kUnspecified);
     const char * lockStateToString(DlLockState lockState) const;
 
     bool weekDayScheduleInAction(uint16_t userIndex) const;
     bool yearDayScheduleInAction(uint16_t userIndex) const;
+
+    static void OnLockActionCompleteCallback(chip::System::Layer *, void * callbackContext);
 
     chip::EndpointId mEndpointId;
     DlLockState mLockState;

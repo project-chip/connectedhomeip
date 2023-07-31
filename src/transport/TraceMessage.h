@@ -40,10 +40,10 @@
 #define _CHIP_TRACE_MESSAGE_INTERNAL(type, data, size) PW_TRACE_INSTANT_DATA(::chip::trace::kTraceMessageEvent, type, data, size);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED && CHIP_CONFIG_TRANSPORT_PW_TRACE_ENABLED
 
-#define CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, data, dataLen)                                                        \
+#define CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, peerAddress, data, dataLen)                                           \
     do                                                                                                                             \
     {                                                                                                                              \
-        const ::chip::trace::TraceSecureMessageSentData _trace_data{ &payloadHeader, &packetHeader, data, dataLen };               \
+        const ::chip::trace::TraceSecureMessageSentData _trace_data{ &payloadHeader, &packetHeader, &peerAddress, data, dataLen }; \
         _CHIP_TRACE_MESSAGE_INTERNAL(::chip::trace::kTraceMessageSentDataFormat, reinterpret_cast<const char *>(&_trace_data),     \
                                      sizeof(_trace_data));                                                                         \
     } while (0)
@@ -58,14 +58,16 @@
     } while (0)
 
 #else // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED || CHIP_CONFIG_TRANSPORT_PW_TRACE_ENABLED
-#define CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, data, dataLen)                                                        \
+#define CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, peerAddress, data, dataLen)                                           \
     do                                                                                                                             \
     {                                                                                                                              \
+        (void) peerAddress;                                                                                                        \
     } while (0)
 
 #define CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, session, peerAddress, data, dataLen)                              \
     do                                                                                                                             \
     {                                                                                                                              \
+        (void) peerAddress;                                                                                                        \
     } while (0)
 
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED || CHIP_CONFIG_TRANSPORT_PW_TRACE_ENABLED
@@ -81,6 +83,7 @@ struct TraceSecureMessageSentData
 {
     const PayloadHeader * payloadHeader;
     const PacketHeader * packetHeader;
+    const Transport::PeerAddress * peerAddress;
     const uint8_t * packetPayload;
     size_t packetSize;
 };

@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.7.3
+            image: ghcr.io/project-chip/chip-build-esp32:1
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -45,6 +45,9 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: esp32
+
+            - name: Fixup GdbGui requirement
+              run: perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt
 
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
@@ -127,7 +130,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.7.3
+            image: ghcr.io/project-chip/chip-build-esp32:1
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -138,6 +141,9 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: esp32
+
+            - name: Fixup GdbGui requirement
+              run: perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt
 
             - name: Build example Bridge App
               run: scripts/examples/esp_example.sh bridge-app

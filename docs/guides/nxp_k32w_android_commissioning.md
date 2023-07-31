@@ -79,7 +79,7 @@ OpenThread RCP firmware is required to allow the PC to communicate with Thread
 devices. Run the commands mentioned in the following steps to build and program
 the RCP firmware onto an K32W061 DK6:
 
-1.  Clone the OpenThread repository into the current directory (we recommand
+1.  Clone the OpenThread repository into the current directory (we recommend
     using commit ced158e65a00dd5394c04548b7b187d3a3f11eef):
 
         ```

@@ -27,14 +27,15 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Using TH_CR1, commission the DUT_CE onto the Matter network"
+    - label:
+          "Step 1: Using TH_CR1, commission the DUT_CE onto the Matter network"
       verification: |
           Using chip-tool (TH_CR1) provision the device using cmd
 
           ./out/debug/chip-tool pairing ble-wifi node-id ssid password setup-pin-code discriminator
       disabled: true
 
-    - label: "Bring the TH_CR2 onto the thread network"
+    - label: "Step 2: Bring the TH_CR2 onto the thread network"
       verification: |
           Build openthread POSIX cli app with RCP and have it join the thread network that the BR is part of.
 
@@ -69,11 +70,11 @@ tests:
       disabled: true
 
     - label:
-          "Using TH_CR2, using ICMPv6 echo to ping with a payload >= 32 bytes to
-          the the DUT_CE that is already commissioned to the Matter network. IP
-          address is determined by operational discovery of the DNS-SD
-          operational service record (_matter._tcp service instance) of DUT_CE
-          done by TH_CR2."
+          "Step 3: Using TH_CR2, using ICMPv6 echo to ping with a payload >= 32
+          bytes to the the DUT_CE that is already commissioned to the Matter
+          network. IP address is determined by operational discovery of the
+          DNS-SD operational service record (_matter._tcp service instance) of
+          DUT_CE done by TH_CR2."
       verification: |
           In the RCP Shell , have the TH_CR2 discover the device IP address using
           > dns service 87E1B004E235A130-8FC7772401CD0696 _matter._tcp.default.service.arpa.

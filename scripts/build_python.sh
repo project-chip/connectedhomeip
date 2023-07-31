@@ -52,11 +52,11 @@ help() {
     echo "General Options:
   -h, --help                Display this information.
 Input Options:
-  -d, --chip_detail_logging ChipDetailLoggingValue          Specify ChipDetailLoggingValue as true or false.
+  -d, --chip_detail_logging <true/false>                    Specify ChipDetailLoggingValue as true or false.
                                                             By default it is false.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
                                                             By default it is minimal.
-  -p, --enable_pybindings   EnableValue                     Specify whether to enable pybindings as python controller.
+  -p, --enable_pybindings   <true/false>                    Specify whether to enable pybindings as python controller.
 
   -t --time_between_case_retries MRPActiveRetryInterval     Specify MRPActiveRetryInterval value
                                                             Default is 300 ms
@@ -82,6 +82,10 @@ while (($#)); do
             ;;
         --chip_detail_logging | -d)
             chip_detail_logging=$2
+            if [[ "$chip_detail_logging" != "true" && "$chip_detail_logging" != "false" ]]; then
+                echo "chip_detail_logging should have a true/false value, not '$chip_detail_logging'"
+                exit
+            fi
             shift
             ;;
         --chip_mdns | -m)
@@ -90,6 +94,10 @@ while (($#)); do
             ;;
         --enable_pybindings | -p)
             enable_pybindings=$2
+            if [[ "$enable_pybindings" != "true" && "$enable_pybindings" != "false" ]]; then
+                echo "enable_pybindings should have a true/false value, not '$enable_pybindings'"
+                exit
+            fi
             shift
             ;;
         --time_between_case_retries | -t)
@@ -102,10 +110,18 @@ while (($#)); do
             ;;
         --clean_virtual_env | -c)
             clean_virtual_env=$2
+            if [[ "$clean_virtual_env" != "yes" && "$clean_virtual_env" != "no" ]]; then
+                echo "clean_virtual_env should have a yes/no value, not '$clean_virtual_env'"
+                exit
+            fi
             shift
             ;;
         --include_pytest_deps)
             install_pytest_requirements=$2
+            if [[ "$install_pytest_requirements" != "yes" && "$install_pytest_requirements" != "no" ]]; then
+                echo "install_pytest_requirements should have a yes/no value, not '$install_pytest_requirements'"
+                exit
+            fi
             shift
             ;;
         --extra_packages)

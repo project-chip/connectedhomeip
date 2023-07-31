@@ -36,7 +36,7 @@ data class CHIPDeviceInfo(
   val discoveryCapabilities: MutableSet<DiscoveryCapability> = mutableSetOf(),
   val isShortDiscriminator: Boolean = false,
   val ipAddress: String? = null,
-  ) : Parcelable {
+) : Parcelable {
 
   companion object {
     fun fromSetupPayload(setupPayload: OnboardingPayload): CHIPDeviceInfo {
@@ -48,12 +48,7 @@ data class CHIPDeviceInfo(
         setupPayload.setupPinCode,
         setupPayload.commissioningFlow,
         setupPayload.optionalQRCodeInfo.mapValues { (_, info) ->
-          QrCodeInfo(
-            info.tag,
-            info.type,
-            info.data,
-            info.int32
-          )
+          QrCodeInfo(info.tag, info.type, info.data, info.int32)
         },
         setupPayload.discoveryCapabilities,
         setupPayload.hasShortDiscriminator

@@ -21,12 +21,6 @@
 
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
-#include <lib/core/CHIPVendorIdentifiers.hpp>
-#include <platform/DiagnosticDataProvider.h>
-
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
-
 extern "C" {
 #include <bl_sys.h>
 }

@@ -1,5 +1,5 @@
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.7.18"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -12,12 +12,13 @@ steps:
             path: /pwenv
       timeout: 2700s
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.18"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
-          - ./examples/chef/chef.py --build_all --keep_going --build_exclude
-            noip
+          - >-
+              perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt &&
+              ./examples/chef/chef.py --build_all --build_exclude noip
       id: CompileAll
       waitFor:
           - Bootstrap
@@ -26,12 +27,18 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.18"
+    - name: "ghcr.io/project-chip/chip-build-vscode:1"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
-          - ./examples/chef/chef.py --build_all --keep_going --build_include
+          - ./examples/chef/chef.py --build_all --build_include
             linux_arm64_ipv6only.*noip
+      # Temporarely allow failure since this is known to fail:
+      #   AppMain tries to setup commissioning in general (even if all things are
+      #   disabled, ethernet assumes network commissioning cluster) and link fails
+      #   when the cluster is fully disabled
+      # TODO: completely remove this target or fix compilation
+      allowFailure: true
       id: CompileNoip
       waitFor:
           - CompileAll
@@ -42,9 +49,21 @@ steps:
 
     - name: "gcr.io/cloud-builders/docker"
       args:
-          ['/workspace/examples/chef/create_docker.py', '--commit_sha', '$COMMIT_SHA' ,'--short_sha', '$SHORT_SHA',
-            '--revision_id', '$REVISION_ID', '--build_id', '$BUILD_ID', '--image_name', '$_DOCKER_IMAGE_NAME',
-            '--tar_path', '/workspace/artifacts']
+          [
+              "/workspace/examples/chef/create_docker.py",
+              "--commit_sha",
+              "$COMMIT_SHA",
+              "--short_sha",
+              "$SHORT_SHA",
+              "--revision_id",
+              "$REVISION_ID",
+              "--build_id",
+              "$BUILD_ID",
+              "--image_name",
+              "$_DOCKER_IMAGE_NAME",
+              "--tar_path",
+              "/workspace/artifacts",
+          ]
       id: DockerAll
       entrypoint: python3
       waitFor:

@@ -6,18 +6,10 @@ temperature sensor.
 ---
 
 -   [Matter ASR Temperature Measurement Example](#matter-asr-temperature-measurement-example)
-    -   [Supported Chips](#supported-chips)
     -   [Building and Commissioning](#building-and-commissioning)
     -   [Cluster Control](#cluster-control)
 
 ---
-
-## Supported Chips
-
-The Matter demo application is supported on:
-
--   ASR582X
--   ASR595X
 
 ## Building and Commissioning
 

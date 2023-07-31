@@ -1590,6 +1590,12 @@ void DeviceCommissioner::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData 
     mSetUpCodePairer.NotifyCommissionableDeviceDiscovered(nodeData);
 }
 
+void OnBasicSuccess(void * context, const chip::app::DataModel::NullObjectType &)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+}
+
 void OnBasicFailure(void * context, CHIP_ERROR error)
 {
     ChipLogProgress(Controller, "Received failure response %s\n", chip::ErrorStr(error));
@@ -1853,6 +1859,22 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
 // ClusterStateCache::Callback impl
 void DeviceCommissioner::OnDone(app::ReadClient *)
 {
+    switch (mCommissioningStage)
+    {
+    case CommissioningStage::kReadCommissioningInfo:
+        ParseCommissioningInfo();
+        break;
+    case CommissioningStage::kCheckForMatchingFabric:
+        ParseFabrics();
+        break;
+    default:
+        // We're not trying to read anything here, just exit
+        break;
+    }
+}
+
+void DeviceCommissioner::ParseCommissioningInfo()
+{
     CHIP_ERROR err;
     CHIP_ERROR return_err = CHIP_NO_ERROR;
     ReadCommissioningInfo info;
@@ -1907,64 +1929,6 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
         err        = mAttributeCache->Get<ProductID::TypeInfo>(kRootEndpointId, info.basic.productId);
         return_err = err == CHIP_NO_ERROR ? return_err : err;
     }
-
-    // We might not have requested a Fabrics attribute at all, so not having a
-    // value for it is not an error.
-    err = mAttributeCache->ForEachAttribute(OperationalCredentials::Id, [this, &info](const app::ConcreteAttributePath & path) {
-        using namespace chip::app::Clusters::OperationalCredentials::Attributes;
-        // this code is checking if the device is already on the commissioner's fabric.
-        // if a matching fabric is found, then remember the nodeId so that the commissioner
-        // can, if it decides to, cancel commissioning (before it fails in AddNoc) and know
-        // the device's nodeId on its fabric.
-        switch (path.mAttributeId)
-        {
-        case Fabrics::Id: {
-            Fabrics::TypeInfo::DecodableType fabrics;
-            ReturnErrorOnFailure(this->mAttributeCache->Get<Fabrics::TypeInfo>(path, fabrics));
-            // this is a best effort attempt to find a matching fabric, so no error checking on iter
-            auto iter = fabrics.begin();
-            while (iter.Next())
-            {
-                auto & fabricDescriptor = iter.GetValue();
-                ChipLogProgress(Controller,
-                                "DeviceCommissioner::OnDone - fabric.vendorId=0x%04X fabric.fabricId=0x" ChipLogFormatX64
-                                " fabric.nodeId=0x" ChipLogFormatX64,
-                                fabricDescriptor.vendorID, ChipLogValueX64(fabricDescriptor.fabricID),
-                                ChipLogValueX64(fabricDescriptor.nodeID));
-                if (GetFabricId() == fabricDescriptor.fabricID)
-                {
-                    ChipLogProgress(Controller, "DeviceCommissioner::OnDone - found a matching fabric id");
-                    chip::ByteSpan rootKeySpan = fabricDescriptor.rootPublicKey;
-                    if (rootKeySpan.size() != Crypto::kP256_PublicKey_Length)
-                    {
-                        ChipLogError(Controller, "DeviceCommissioner::OnDone - fabric root key size mismatch %u != %u",
-                                     static_cast<unsigned>(rootKeySpan.size()),
-                                     static_cast<unsigned>(Crypto::kP256_PublicKey_Length));
-                        continue;
-                    }
-                    P256PublicKeySpan rootPubKeySpan(rootKeySpan.data());
-                    Crypto::P256PublicKey deviceRootPublicKey(rootPubKeySpan);
-
-                    Crypto::P256PublicKey commissionerRootPublicKey;
-                    if (CHIP_NO_ERROR != GetRootPublicKey(commissionerRootPublicKey))
-                    {
-                        ChipLogError(Controller, "DeviceCommissioner::OnDone - error reading commissioner root public key");
-                    }
-                    else if (commissionerRootPublicKey.Matches(deviceRootPublicKey))
-                    {
-                        ChipLogProgress(Controller, "DeviceCommissioner::OnDone - fabric root keys match");
-                        info.nodeId = fabricDescriptor.nodeID;
-                    }
-                }
-            }
-
-            return CHIP_NO_ERROR;
-        }
-        default:
-            return CHIP_NO_ERROR;
-        }
-    });
-
     // Try to parse as much as we can here before returning, even if this is an error.
     return_err = err == CHIP_NO_ERROR ? return_err : err;
 
@@ -2047,6 +2011,8 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
         });
     return_err = err == CHIP_NO_ERROR ? return_err : err;
 
+    ParseTimeSyncInfo(info);
+
     if (return_err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Error parsing commissioning information");
@@ -2061,6 +2027,138 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
 
     CommissioningDelegate::CommissioningReport report;
     report.Set<ReadCommissioningInfo>(info);
+    CommissioningStageComplete(return_err, report);
+}
+
+void DeviceCommissioner::ParseTimeSyncInfo(ReadCommissioningInfo & info)
+{
+    using namespace app::Clusters;
+
+    CHIP_ERROR err;
+    // If we fail to get the feature map, there's no viable time cluster, don't set anything.
+    TimeSynchronization::Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
+    err = mAttributeCache->Get<TimeSynchronization::Attributes::FeatureMap::TypeInfo>(kRootEndpointId, featureMap);
+    if (err != CHIP_NO_ERROR)
+    {
+        info.requiresUTC               = false;
+        info.requiresTimeZone          = false;
+        info.requiresDefaultNTP        = false;
+        info.requiresTrustedTimeSource = false;
+        return;
+    }
+    info.requiresUTC               = true;
+    info.requiresTimeZone          = featureMap & chip::to_underlying(TimeSynchronization::Feature::kTimeZone);
+    info.requiresDefaultNTP        = featureMap & chip::to_underlying(TimeSynchronization::Feature::kNTPClient);
+    info.requiresTrustedTimeSource = featureMap & chip::to_underlying(TimeSynchronization::Feature::kTimeSyncClient);
+
+    if (info.requiresTimeZone)
+    {
+        err = mAttributeCache->Get<TimeSynchronization::Attributes::TimeZoneListMaxSize::TypeInfo>(kRootEndpointId,
+                                                                                                   info.maxTimeZoneSize);
+        if (err != CHIP_NO_ERROR)
+        {
+            // This information should be available, let's do our best with what we have, but we can't set
+            // the time zone without this information
+            info.requiresTimeZone = false;
+        }
+        err =
+            mAttributeCache->Get<TimeSynchronization::Attributes::DSTOffsetListMaxSize::TypeInfo>(kRootEndpointId, info.maxDSTSize);
+        if (err != CHIP_NO_ERROR)
+        {
+            info.requiresTimeZone = false;
+        }
+    }
+    if (info.requiresDefaultNTP)
+    {
+        TimeSynchronization::Attributes::DefaultNTP::TypeInfo::DecodableType defaultNTP;
+        err = mAttributeCache->Get<TimeSynchronization::Attributes::DefaultNTP::TypeInfo>(kRootEndpointId, defaultNTP);
+        if (err == CHIP_NO_ERROR && (!defaultNTP.IsNull()) && (defaultNTP.Value().size() != 0))
+        {
+            info.requiresDefaultNTP = false;
+        }
+    }
+    if (info.requiresTrustedTimeSource)
+    {
+        TimeSynchronization::Attributes::TrustedTimeSource::TypeInfo::DecodableType trustedTimeSource;
+        err =
+            mAttributeCache->Get<TimeSynchronization::Attributes::TrustedTimeSource::TypeInfo>(kRootEndpointId, trustedTimeSource);
+
+        if (err == CHIP_NO_ERROR && !trustedTimeSource.IsNull())
+        {
+            info.requiresTrustedTimeSource = false;
+        }
+    }
+}
+
+void DeviceCommissioner::ParseFabrics()
+{
+    CHIP_ERROR err;
+    CHIP_ERROR return_err = CHIP_NO_ERROR;
+    MatchingFabricInfo info;
+    // We might not have requested a Fabrics attribute at all, so not having a
+    // value for it is not an error.
+    err = mAttributeCache->ForEachAttribute(OperationalCredentials::Id, [this, &info](const app::ConcreteAttributePath & path) {
+        using namespace chip::app::Clusters::OperationalCredentials::Attributes;
+        // this code is checking if the device is already on the commissioner's fabric.
+        // if a matching fabric is found, then remember the nodeId so that the commissioner
+        // can, if it decides to, cancel commissioning (before it fails in AddNoc) and know
+        // the device's nodeId on its fabric.
+        switch (path.mAttributeId)
+        {
+        case Fabrics::Id: {
+            Fabrics::TypeInfo::DecodableType fabrics;
+            ReturnErrorOnFailure(this->mAttributeCache->Get<Fabrics::TypeInfo>(path, fabrics));
+            // this is a best effort attempt to find a matching fabric, so no error checking on iter
+            auto iter = fabrics.begin();
+            while (iter.Next())
+            {
+                auto & fabricDescriptor = iter.GetValue();
+                ChipLogProgress(Controller,
+                                "DeviceCommissioner::OnDone - fabric.vendorId=0x%04X fabric.fabricId=0x" ChipLogFormatX64
+                                " fabric.nodeId=0x" ChipLogFormatX64,
+                                fabricDescriptor.vendorID, ChipLogValueX64(fabricDescriptor.fabricID),
+                                ChipLogValueX64(fabricDescriptor.nodeID));
+                if (GetFabricId() == fabricDescriptor.fabricID)
+                {
+                    ChipLogProgress(Controller, "DeviceCommissioner::OnDone - found a matching fabric id");
+                    chip::ByteSpan rootKeySpan = fabricDescriptor.rootPublicKey;
+                    if (rootKeySpan.size() != Crypto::kP256_PublicKey_Length)
+                    {
+                        ChipLogError(Controller, "DeviceCommissioner::OnDone - fabric root key size mismatch %u != %u",
+                                     static_cast<unsigned>(rootKeySpan.size()),
+                                     static_cast<unsigned>(Crypto::kP256_PublicKey_Length));
+                        continue;
+                    }
+                    P256PublicKeySpan rootPubKeySpan(rootKeySpan.data());
+                    Crypto::P256PublicKey deviceRootPublicKey(rootPubKeySpan);
+
+                    Crypto::P256PublicKey commissionerRootPublicKey;
+                    if (CHIP_NO_ERROR != GetRootPublicKey(commissionerRootPublicKey))
+                    {
+                        ChipLogError(Controller, "DeviceCommissioner::OnDone - error reading commissioner root public key");
+                    }
+                    else if (commissionerRootPublicKey.Matches(deviceRootPublicKey))
+                    {
+                        ChipLogProgress(Controller, "DeviceCommissioner::OnDone - fabric root keys match");
+                        info.nodeId = fabricDescriptor.nodeID;
+                    }
+                }
+            }
+
+            return CHIP_NO_ERROR;
+        }
+        default:
+            return CHIP_NO_ERROR;
+        }
+    });
+
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnFabricCheck(info);
+    }
+
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<MatchingFabricInfo>(info);
     CommissioningStageComplete(return_err, report);
 }
 
@@ -2095,6 +2193,25 @@ void DeviceCommissioner::OnSetRegulatoryConfigResponse(
     }
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(err, report);
+}
+
+void DeviceCommissioner::OnSetTimeZoneResponse(void * context,
+                                               const TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType & data)
+{
+    CommissioningDelegate::CommissioningReport report;
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    TimeZoneResponseInfo info;
+    info.requiresDSTOffsets = data.DSTOffsetRequired;
+    report.Set<TimeZoneResponseInfo>(info);
+    commissioner->CommissioningStageComplete(err, report);
+}
+
+void DeviceCommissioner::OnSetUTCError(void * context, CHIP_ERROR error)
+{
+    // For SetUTCTime, we don't actually care if the commissionee didn't want out time, that's its choice
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
 }
 
 void DeviceCommissioner::OnScanNetworksFailure(void * context, CHIP_ERROR error)
@@ -2191,6 +2308,33 @@ void DeviceCommissioner::OnCommissioningCompleteResponse(
     commissioner->CommissioningStageComplete(err, report);
 }
 
+void DeviceCommissioner::SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
+                                                      app::AttributePathParams * readPaths, size_t readPathsSize)
+{
+    app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
+    app::ReadPrepareParams readParams(proxy->GetSecureSession().Value());
+    readParams.mIsFabricFiltered = false;
+    if (timeout.HasValue())
+    {
+        readParams.mTimeout = timeout.Value();
+    }
+    readParams.mpAttributePathParamsList    = readPaths;
+    readParams.mAttributePathParamsListSize = readPathsSize;
+
+    auto attributeCache = Platform::MakeUnique<app::ClusterStateCache>(*this);
+    auto readClient     = chip::Platform::MakeUnique<app::ReadClient>(
+        engine, proxy->GetExchangeManager(), attributeCache->GetBufferedCallback(), app::ReadClient::InteractionType::Read);
+    CHIP_ERROR err = readClient->SendRequest(readParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to send read request for networking clusters");
+        CommissioningStageComplete(err);
+        return;
+    }
+    mAttributeCache = std::move(attributeCache);
+    mReadClient     = std::move(readClient);
+}
+
 void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, CommissioningStage step, CommissioningParameters & params,
                                                   CommissioningDelegate * delegate, EndpointId endpoint,
                                                   Optional<System::Clock::Timeout> timeout)
@@ -2228,9 +2372,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     break;
     case CommissioningStage::kReadCommissioningInfo: {
         ChipLogProgress(Controller, "Sending request for commissioning information");
-        app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-        app::ReadPrepareParams readParams(proxy->GetSecureSession().Value());
-
         // NOTE: this array cannot have more than 9 entries, since the spec mandates that server only needs to support 9
         app::AttributePathParams readPaths[9];
         // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
@@ -2254,36 +2395,81 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // Read the requested minimum connection times from all network commissioning clusters
         readPaths[7] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
                                                 app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id);
+        // Read everything from the time cluster so we can assess what information needs to be set.
+        readPaths[8] = app::AttributePathParams(endpoint, app::Clusters::TimeSynchronization::Id);
 
-        readParams.mpAttributePathParamsList    = readPaths;
-        readParams.mAttributePathParamsListSize = 8;
-
+        SendCommissioningReadRequest(proxy, timeout, readPaths, 9);
+    }
+    break;
+    case CommissioningStage::kCheckForMatchingFabric: {
         // Read the current fabrics
         if (params.GetCheckForMatchingFabric())
         {
-            readParams.mAttributePathParamsListSize = 9;
-            readPaths[8] = app::AttributePathParams(OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
+            // We don't actually want to do this step, so just bypass it
+            ChipLogProgress(Controller, "kCheckForMatchingFabric step called without parameter set, skipping");
+            CommissioningStageComplete(CHIP_NO_ERROR);
         }
 
-        readParams.mIsFabricFiltered = false;
-        if (timeout.HasValue())
-        {
-            readParams.mTimeout = timeout.Value();
-        }
-        auto attributeCache = Platform::MakeUnique<app::ClusterStateCache>(*this);
-        auto readClient     = chip::Platform::MakeUnique<app::ReadClient>(
-            engine, proxy->GetExchangeManager(), attributeCache->GetBufferedCallback(), app::ReadClient::InteractionType::Read);
-        CHIP_ERROR err = readClient->SendRequest(readParams);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Controller, "Failed to send read request for networking clusters");
-            CommissioningStageComplete(err);
-            return;
-        }
-        mAttributeCache = std::move(attributeCache);
-        mReadClient     = std::move(readClient);
+        // This is done in a separate step since we've already used up all the available read paths in the previous read step
+        app::AttributePathParams readPaths[1];
+        readPaths[0] = app::AttributePathParams(OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
+        SendCommissioningReadRequest(proxy, timeout, readPaths, 1);
     }
     break;
+    case CommissioningStage::kConfigureUTCTime: {
+        TimeSynchronization::Commands::SetUTCTime::Type request;
+        uint64_t kChipEpochUsSinceUnixEpoch = static_cast<uint64_t>(kChipEpochSecondsSinceUnixEpoch) * chip::kMicrosecondsPerSecond;
+        System::Clock::Microseconds64 utcTime;
+        if (System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR && utcTime.count() > kChipEpochUsSinceUnixEpoch)
+        {
+            request.UTCTime = utcTime.count() - kChipEpochUsSinceUnixEpoch;
+            // For now, we assume a seconds granularity
+            request.granularity = TimeSynchronization::GranularityEnum::kSecondsGranularity;
+            SendCommand(proxy, request, OnBasicSuccess, OnSetUTCError, endpoint, timeout);
+        }
+        else
+        {
+            // We have no time to give, but that's OK, just complete this stage
+            CommissioningStageComplete(CHIP_NO_ERROR);
+        }
+        break;
+    }
+    case CommissioningStage::kConfigureTimeZone: {
+        if (!params.GetTimeZone().HasValue())
+        {
+            ChipLogError(Controller, "ConfigureTimeZone stage called with no time zone data");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+        TimeSynchronization::Commands::SetTimeZone::Type request;
+        request.timeZone = params.GetTimeZone().Value();
+        SendCommand(proxy, request, OnSetTimeZoneResponse, OnBasicFailure, endpoint, timeout);
+        break;
+    }
+    case CommissioningStage::kConfigureDSTOffset: {
+        if (!params.GetDSTOffsets().HasValue())
+        {
+            ChipLogError(Controller, "ConfigureDSTOffset stage called with no DST data");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+        TimeSynchronization::Commands::SetDSTOffset::Type request;
+        request.DSTOffset = params.GetDSTOffsets().Value();
+        SendCommand(proxy, request, OnBasicSuccess, OnBasicFailure, endpoint, timeout);
+        break;
+    }
+    case CommissioningStage::kConfigureDefaultNTP: {
+        if (!params.GetDefaultNTP().HasValue())
+        {
+            ChipLogError(Controller, "ConfigureDefaultNTP stage called with no default NTP data");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+        TimeSynchronization::Commands::SetDefaultNTP::Type request;
+        request.defaultNTP = params.GetDefaultNTP().Value();
+        SendCommand(proxy, request, OnBasicSuccess, OnBasicFailure, endpoint, timeout);
+        break;
+    }
     case CommissioningStage::kScanNetworks: {
         NetworkCommissioning::Commands::ScanNetworks::Type request;
         if (params.GetWiFiCredentials().HasValue())
@@ -2300,12 +2486,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         break;
     }
     case CommissioningStage::kConfigRegulatory: {
-        // To set during config phase:
-        // UTC time
-        // time zone
-        // dst offset
-        // Regulatory config
-        // TODO(cecille): Set time as well once the time cluster is implemented
         // TODO(cecille): Worthwhile to keep this around as part of the class?
         // TODO(cecille): Where is the country config actually set?
         ChipLogProgress(Controller, "Setting Regulatory Config");
@@ -2490,6 +2670,18 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac(), params.GetIpk().Value(),
                                    params.GetAdminSubject().Value(), timeout);
         break;
+    case CommissioningStage::kConfigureTrustedTimeSource: {
+        if (!params.GetTrustedTimeSource().HasValue())
+        {
+            ChipLogError(Controller, "ConfigureTrustedTimeSource stage called with no trusted time source data");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+        TimeSynchronization::Commands::SetTrustedTimeSource::Type request;
+        request.trustedTimeSource = params.GetTrustedTimeSource().Value();
+        SendCommand(proxy, request, OnBasicSuccess, OnBasicFailure, endpoint, timeout);
+        break;
+    }
     case CommissioningStage::kWiFiNetworkSetup: {
         if (!params.GetWiFiCredentials().HasValue())
         {

@@ -23,7 +23,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the ClusterRevision attribute from the DUT"
+    - label: "Step 2: TH reads the ClusterRevision attribute from the DUT"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -39,7 +39,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "TH reads the FeatureMap attribute from the DUT"
+    - label: "Step 3: TH reads the FeatureMap attribute from the DUT"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -47,7 +47,8 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads the AttributeList attribute from the DUT"
+    - label: "Step 4: TH reads the AttributeList attribute from the DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -55,7 +56,16 @@ tests:
               type: list
               contains: [0, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "TH reads the AcceptedCommandList attribute from the DUT"
+    - label: "Step 4: TH reads the AttributeList attribute from the DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 65528, 65529, 65531, 65532, 65533]
+
+    - label: "Step 5: TH reads the AcceptedCommandList attribute from the DUT"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -63,7 +73,7 @@ tests:
           constraints:
               type: list
 
-    - label: "TH reads the GeneratedCommandList attribute from the DUT"
+    - label: "Step 6: TH reads the GeneratedCommandList attribute from the DUT"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
@@ -73,8 +83,9 @@ tests:
 
     #Manufacturer specific event IDs check not possible
     - label:
-          "Read EventList attribute from the DUT.For this cluster the list is
-          usually empty but it can contain manufacturer specific event IDs."
+          "Step 7: Read EventList attribute from the DUT.For this cluster the
+          list is usually empty but it can contain manufacturer specific event
+          IDs."
       verification: |
           ./chip-tool powersourceconfiguration read event-list 1 0
 

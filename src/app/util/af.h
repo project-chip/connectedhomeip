@@ -231,11 +231,6 @@ bool emberAfIsDeviceIdentifying(chip::EndpointId endpoint);
 /** @name Miscellaneous */
 // @{
 
-/**
- * @brief Enable/disable endpoints
- */
-bool emberAfEndpointEnableDisable(chip::EndpointId endpoint, bool enable);
-
 /** @brief Returns true if a given ZCL data type is a list type. */
 bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType);
 

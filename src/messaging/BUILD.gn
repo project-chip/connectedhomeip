@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/icd/icd.gni")
 
 declare_args() {
   # Allows to change time between retries during the case session
@@ -71,7 +72,12 @@ static_library("messaging") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/src/protocols/secure_channel:type_definitions",
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/raw",
   ]
+
+  if (chip_enable_icd_server) {
+    public_deps += [ "${chip_root}/src/app/icd:server-srcs" ]
+  }
 }

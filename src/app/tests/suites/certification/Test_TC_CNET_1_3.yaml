@@ -25,7 +25,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -33,7 +33,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read the global attribute: ClusterRevision"
+    - label: "Step 2: Read the global attribute: ClusterRevision"
       PICS: CNET.S.Afffd
       command: "readAttribute"
       attribute: "ClusterRevision"
@@ -42,36 +42,39 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Read the global attribute: FeatureMap"
+    - label: "Step 3a: Read the global attribute: FeatureMap"
       PICS: " !CNET.S.F00 && !CNET.S.F01 && !CNET.S.F02 && CNET.S.Afffc"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           value: 0
 
-    - label: "Read the global attribute: FeatureMap when CNET.S.F00 is set"
+    - label:
+          "Step 3b: Read the global attribute: FeatureMap when CNET.S.F00 is set"
       PICS: CNET.S.F00 && CNET.S.Afffc
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           value: 1
 
-    - label: "Read the global attribute: FeatureMap when CNET.S.F01 is set"
+    - label:
+          "Step 3c: Read the global attribute: FeatureMap when CNET.S.F01 is set"
       PICS: CNET.S.F01 && CNET.S.Afffc
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           value: 2
 
-    - label: "Read the global attribute: FeatureMap when CNET.S.F02 is set"
+    - label:
+          "Step 3d: Read the global attribute: FeatureMap when CNET.S.F02 is set"
       PICS: CNET.S.F02 && CNET.S.Afffc
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           value: 4
 
-    - label: "Read the global attribute: AttributeList"
-      PICS: CNET.S.Afffb
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED && CNET.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -79,8 +82,17 @@ tests:
               type: list
               contains: [65528, 65529, 65530, 65531, 65532, 65533]
 
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED && CNET.S.Afffb"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65531, 65532, 65533]
+
     - label:
-          "Read mandatory attributes in AttributeList if
+          "Step 4b: Read mandatory attributes in AttributeList if
           CNET.S.F00(WI)/CNET.S.F01(TH)/CNET.S.F02(ET) is true"
       PICS: CNET.S.F00 || CNET.S.F01 || CNET.S.F02 && CNET.S.Afffb
       command: "readAttribute"
@@ -90,7 +102,9 @@ tests:
               type: list
               contains: [0, 1, 4, 5, 6, 7]
 
-    - label: "Read the optional attribute(ScanMaxTimeSeconds): AttributeList"
+    - label:
+          "Step 4c: Read the optional attribute(ScanMaxTimeSeconds):
+          AttributeList"
       PICS: CNET.S.A0002 && CNET.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -100,7 +114,8 @@ tests:
               contains: [2]
 
     - label:
-          "Reading optional attribute(ConnectMaxTimeSeconds) in AttributeList"
+          "Step 4d: Reading optional attribute(ConnectMaxTimeSeconds) in
+          AttributeList"
       PICS: CNET.S.A0003 && CNET.S.Afffb
       command: "readAttribute"
       attribute: "AttributeList"
@@ -111,8 +126,8 @@ tests:
 
     #List values range check support https://github.com/project-chip/connectedhomeip/issues/26570
     - label:
-          "TH reads AttributeList attribute from DUT. 1.The list SHALL NOT
-          contain any additional values in the standard or scoped range:
+          "Step 4e: TH reads AttributeList attribute from DUT. 1.The list SHALL
+          NOT contain any additional values in the standard or scoped range:
           (0x0000_0000 - 0x0000_4FFF) and (0x0000_F000 - 0x0000_FFFE) 2.The list
           MAY contain values in the Manufacturer Extensible Identifier (MEI)
           range: (0xXXXX_0000 - 0xXXXX_4FFF), where XXXX is the allowed MEI
@@ -198,13 +213,13 @@ tests:
                 value: "y"
 
     - label:
-          "TH reads EventList attribute from DUT. 1.The list MAY contain values
-          in the Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
-          0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1),
-          these values SHALL be ignored. 2.The list SHALL NOT contain any values
-          in the Test Vendor or invalid range: (0x0000_0100 - 0x0000_FFFF),
-          (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where
-          XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
+          "Step 5: TH reads EventList attribute from DUT. 1.The list MAY contain
+          values in the Manufacturer Extensible Identifier (MEI) range:
+          (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI range
+          (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list SHALL NOT
+          contain any values in the Test Vendor or invalid range: (0x0000_0100 -
+          0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 -
+          0xFFFF_FFFF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
       verification: |
           Onnetwork
 
@@ -227,8 +242,8 @@ tests:
                 value: "y"
 
     - label:
-          "Read AcceptedCommandList If DUT supports Wi-Fi/Thread related
-          features CNET.S.F00(WI),CNET.S.F01(TH)"
+          "Step 6a: Read AcceptedCommandList If DUT supports Wi-Fi/Thread
+          related features CNET.S.F00(WI),CNET.S.F01(TH)"
       PICS: ( CNET.S.F00 || CNET.S.F01 ) && CNET.S.Afff9
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -238,8 +253,8 @@ tests:
               contains: [0, 4, 6, 8]
 
     - label:
-          "Read AcceptedCommandList If DUT supports Wi-Fi related features
-          (CNET.S.F00(WI) is true)"
+          "Step 6b: Read AcceptedCommandList If DUT supports Wi-Fi related
+          features (CNET.S.F00(WI) is true)"
       PICS: CNET.S.F00 && CNET.S.Afff9
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -249,7 +264,7 @@ tests:
               contains: [2]
 
     - label:
-          "Read AcceptedCommandList If DUT supports Thread related
+          "Step 6c: Read AcceptedCommandList If DUT supports Thread related
           features(CNET.S.F01(TH) is true)"
       PICS: CNET.S.F01 && CNET.S.Afff9
       command: "readAttribute"
@@ -260,7 +275,7 @@ tests:
               contains: [3]
 
     - label:
-          "Read AcceptedCommandList If DUT supports Ethernet related
+          "Step 6d: Read AcceptedCommandList If DUT supports Ethernet related
           features(CNET.S.F02(TH) is true)"
       PICS: CNET.S.F02 && CNET.S.Afff9
       command: "readAttribute"
@@ -269,10 +284,10 @@ tests:
           value: []
 
     - label:
-          "TH reads AcceptedCommandList attribute from DUT. 1.The list SHALL NOT
-          contain any additional values in the standard or scoped range:
-          (0x0000_0000 - 0x0000_00FF). 2.The list MAY contain values in the
-          Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
+          "Step 6e: TH reads AcceptedCommandList attribute from DUT. 1.The list
+          SHALL NOT contain any additional values in the standard or scoped
+          range: (0x0000_0000 - 0x0000_00FF). 2.The list MAY contain values in
+          the Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
           0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1),
           these values SHALL be ignored.3.The list SHALL NOT contain any values
           in the Test Vendor or invalid range: (0x0000_0100 - 0x0000_FFFF),
@@ -326,8 +341,8 @@ tests:
                 value: "y"
 
     - label:
-          "Read the GeneratedCommandList If DUT supports Wi-Fi/Thread related
-          features(CNET.S.F00(WI) or CNET.S.F01(TH) is true)"
+          "Step 7a: Read the GeneratedCommandList If DUT supports Wi-Fi/Thread
+          related features(CNET.S.F00(WI) or CNET.S.F01(TH) is true)"
       PICS: ( CNET.S.F00 || CNET.S.F01 ) && CNET.S.Afff8
       command: "readAttribute"
       attribute: "GeneratedCommandList"
@@ -337,8 +352,8 @@ tests:
               contains: [1, 5, 7]
 
     - label:
-          "Read the GeneratedCommandList If DUT supports Ethernet related
-          features(CNET.S.F02(ET) must be true)"
+          "Step 7b: Read the GeneratedCommandList If DUT supports Ethernet
+          related features(CNET.S.F02(ET) must be true)"
       PICS: CNET.S.F02 && CNET.S.Afff8
       command: "readAttribute"
       attribute: "GeneratedCommandList"
@@ -346,13 +361,14 @@ tests:
           value: []
 
     - label:
-          "TH reads GeneratedCommandList attribute from DUT. 1.The list MAY
-          contain values in the Manufacturer Extensible Identifier (MEI) range:
-          (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI range
-          (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list SHALL NOT
-          contain any values in the Test Vendor or invalid range: (0x0000_0100 -
-          0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 -
-          0xFFFF_FFFF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
+          "Step 7c: TH reads GeneratedCommandList attribute from DUT. 1.The list
+          MAY contain values in the Manufacturer Extensible Identifier (MEI)
+          range: (0xXXXX_0000 - 0xXXXX_00FF), where XXXX is the allowed MEI
+          range (0x0001 - 0xFFF1), these values SHALL be ignored. 2.The list
+          SHALL NOT contain any values in the Test Vendor or invalid range:
+          (0x0000_0100 - 0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and
+          (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the allowed MEI range
+          (0x0001 - 0xFFF1)"
       verification: |
           ( WiFi)
           ./chip-tool networkcommissioning read generated-command-list 1 0

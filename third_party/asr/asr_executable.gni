@@ -40,29 +40,42 @@ template("asr_executable") {
 
     outputs = [ "${root_out_dir}/${output_base_name}_ota.bin" ]
 
-    if (asr_ic_family == "asr595x") {
-      gen_ota_tool = "${asr_sdk_build_root}/asr_sdk/tools/image_gen_header/image_gen_header"
-    } else {
-      gen_ota_tool =
-          "${asr_sdk_build_root}/asr_sdk/tools/otaImage/image_gen_header"
-    }
+    gen_ota_tool =
+        "${asr_sdk_build_root}/asr_sdk/tools/otaImage/image_gen_header"
 
     _ota_tool_path = rebase_path(gen_ota_tool, root_build_dir)
+
+    _image_path =
+        rebase_path("$root_out_dir/${objcopy_image_name}", root_build_dir)
 
     if (asr_ic_family == "asr595x") {
       args = [
         _ota_tool_path,
-        "${root_out_dir}/${objcopy_image_name}",
+        _image_path,
         "-d",
-        "LEGA_A0V2",
+        "ALTO",
         "-b",
         "REMAPPING",
+        "-r",
+      ]
+    } else if (asr_ic_family == "asr582x") {
+      args = [
+        _ota_tool_path,
+        _image_path,
+        "-d",
+        "COMBO",
+        "-b",
+        "REMAPPING",
+        "-r",
       ]
     } else {
       args = [
         _ota_tool_path,
-        "${root_out_dir}/${objcopy_image_name}",
-        "flash_remapping",
+        _image_path,
+        "-d",
+        "LEGA_A0V2",
+        "-b",
+        "COMPRESS",
       ]
     }
 

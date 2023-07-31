@@ -22,7 +22,9 @@ _ANY_COMMANDS_LIST = [
     'SubscribeById',
     'ReadEventById',
     'SubscribeEventById',
+    'ReadNone',
     'ReadAll',
+    'SubscribeNone',
     'SubscribeAll',
 ]
 
@@ -79,6 +81,9 @@ _ALIASES = {
                     'EventId': 'event-id',
                 },
             },
+            'ReadNone': {
+                'alias': 'read-none',
+            },
             'ReadAll': {
                 'alias': 'read-all',
                 'arguments': {
@@ -86,6 +91,9 @@ _ALIASES = {
                     'AttributeId': 'attribute-ids',
                     'EventId': 'event-ids',
                 },
+            },
+            'SubscribeNone': {
+                'alias': 'subscribe-none',
             },
             'SubscribeAll': {
                 'alias': 'subscribe-all',
@@ -99,6 +107,14 @@ _ALIASES = {
     },
     'AnyCommands': {
         'alias': 'any',
+        'commands': {
+            'ReadNone': {
+                'has_endpoint': False,
+            },
+            'SubscribeNone': {
+                'has_endpoint': False,
+            }
+        }
     },
     'CommissionerCommands': {
         'alias': 'pairing',
@@ -197,7 +213,7 @@ class Encoder:
         command, command_specifier = self.__get_command_name(request)
 
         if command == 'wait-for-report':
-            return ''
+            return str(request.timeout) if request.timeout is not None else ''
 
         arguments = self.__get_arguments(request)
         base64_arguments = base64.b64encode(
@@ -271,6 +287,8 @@ class Encoder:
         arguments = self.__maybe_add(arguments, request.timed_interaction_timeout_ms,
                                      "timedInteractionTimeoutMs")
         arguments = self.__maybe_add(
+            arguments, request.timeout, "timeout")
+        arguments = self.__maybe_add(
             arguments, request.event_number, "event-min")
         arguments = self.__maybe_add(
             arguments, request.busy_wait_ms, "busyWaitForMs")
@@ -307,6 +325,8 @@ class Encoder:
 
         endpoint_argument_name = 'endpoint-id-ignored-for-group-commands'
         endpoint_argument_value = request.endpoint
+        if endpoint_argument_value == '*':
+            endpoint_argument_value = 0xFFFF
 
         if (request.is_attribute and not request.command == "writeAttribute") or request.is_event or (request.command in _ANY_COMMANDS_LIST and not request.command == "WriteById"):
             endpoint_argument_name = 'endpoint-ids'

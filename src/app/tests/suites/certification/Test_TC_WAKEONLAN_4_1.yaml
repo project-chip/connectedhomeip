@@ -32,7 +32,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the MACAddress attribute from the DUT"
+    - label: "Step 1: TH reads the MACAddress attribute from the DUT"
       PICS: WAKEONLAN.S.A0000
       command: "readAttribute"
       attribute: "MACAddress"
@@ -40,14 +40,14 @@ tests:
           constraints:
               minLength: 12
 
-    - label: "TH sends a Sleep command to DUT"
+    - label: "Step 2: TH sends a Sleep command to DUT"
       PICS: LOWPOWER.S.C00.Rsp
       cluster: "Low Power"
       command: "Sleep"
 
     - label:
-          "TH sends a Wake-On LAN magic packet containing the MAC address from
-          step 1"
+          "Step 3: TH sends a Wake-On LAN magic packet containing the MAC
+          address from step 1"
       verification: |
           The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool lowpower read accepted-command-list 1 1

@@ -52,6 +52,8 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::Logging;
 
+extern LEDWidget sLightLED;
+
 uint32_t identifyTimerCount;
 constexpr uint32_t kIdentifyTimerDelayMS = 250;
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -151,9 +153,27 @@ void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, 
     VerifyOrExit(endpointId == 1 || endpointId == 2,
                  ChipLogError(DeviceLayer, TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
-    // At this point we can assume that value points to a bool value.
-    // statusLED1.Set(*value);
+    switch (attributeId)
+    {
+    case chip::app::Clusters::OnOff::Attributes::OnOff::Id: {
+        ChipLogProgress(Zcl, "ON/OFF level: %u ", *value);
+        // At this point we can assume that value points to a bool value.
+        sLightLED.Set(*value);
+    }
+    break;
 
+    case chip::app::Clusters::OnOff::Attributes::OnTime::Id:
+    case chip::app::Clusters::OnOff::Attributes::OffWaitTime::Id:
+    case chip::app::Clusters::OnOff::Attributes::StartUpOnOff::Id:
+    case chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::Id: {
+        ChipLogProgress(Zcl, "Unprocessed attribute ID: %" PRIx32, attributeId);
+    }
+    break;
+
+    default:
+        ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
+        return;
+    } // switch (attributeId)
 exit:
     return;
 }

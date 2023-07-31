@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,15 +31,25 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the ClusterRevision attribute from the DUT"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
-          value: 1
-          constraints:
-              type: int16u
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/26445
+    - label: "Step 2: TH reads the ClusterRevision attribute from the DUT"
+      verification: |
+          ./chip-tool modeselect read cluster-revision 1 1
 
-    - label: "TH reads the FeatureMap attribute from the DUT"
+          Verify the "ClusterRevision" value is of unit16 and reflects the highest revision number 2 on the TH(Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1645775623.658997][3277:3282] CHIP:TOO:   ClusterRevision: 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3a: TH reads the FeatureMap attribute from the DUT"
       PICS: MOD.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -48,7 +58,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads the FeatureMap attribute from the DUT"
+    - label: "Step 3b: TH reads the FeatureMap attribute from the DUT"
       PICS: " !MOD.S.F00 "
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -57,7 +67,8 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads the AttributeList attribute from the DUT"
+    - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -65,9 +76,18 @@ tests:
               type: list
               contains: [0, 1, 2, 3, 65528, 65529, 65530, 65531, 65532, 65533]
 
+    - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 3, 65528, 65529, 65531, 65532, 65533]
+
     - label:
-          "TH reads the optional attribute(StartUpMode) in AttributeList from
-          the DUT"
+          "Step 4b: TH reads the optional attribute(StartUpMode) in
+          AttributeList from the DUT"
       PICS: MOD.S.A0004
       command: "readAttribute"
       attribute: "AttributeList"
@@ -77,7 +97,8 @@ tests:
               contains: [4]
 
     - label:
-          "TH reads the optional attribute(OnMode) in AttributeList from the DUT"
+          "Step 4c: TH reads the optional attribute(OnMode) in AttributeList
+          from the DUT"
       PICS: MOD.S.A0005
       command: "readAttribute"
       attribute: "AttributeList"
@@ -87,6 +108,7 @@ tests:
               contains: [5]
 
     - label: "Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -94,7 +116,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Read the global attribute: AcceptedCommandList"
+    - label: "Step 5: Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -102,7 +124,7 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Read the global attribute: GeneratedCommandList"
+    - label: "Step 6: Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
