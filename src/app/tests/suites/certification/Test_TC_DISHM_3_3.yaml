@@ -20,7 +20,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "Dishwasher Mode"
     endpoint: 0
 
 tests:
@@ -56,6 +56,7 @@ tests:
           [1654780979.980202][61542:61547] CHIP:TOO: OnMode: 4
       disabled: true
 
+# Reference Issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3204
     - label: "Step 4: TH reads from the DUT the SupportedModes attribute."
       PICS: DISHM.S.A0000 && DISHM.S.A0002
       verification: |

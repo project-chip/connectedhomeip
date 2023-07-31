@@ -20,7 +20,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "Dishwasher Mode"
     endpoint: 0
 
 tests:
@@ -31,13 +31,14 @@ tests:
 
       disabled: true
 
+# Reference Issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3204
     - label: "Step 2: TH reads from the DUT the SupportedModes attribute."
       PICS: DISHM.S.A0000
       verification: |
           ./chip-tool dishwashermode read supported-modes 1 1
 
-          On TH(chip-tool) log, Verify SupportedModes attribute should contains two or more ModeOptionsStruct entries and
-          Save the Mode field values as supported_modes_dut, below is the sample log provided for the raspi platform:
+          On TH(chip-tool) log, Verify SupportedModes attribute should contain two or more ModeOptionsStruct entries and
+          Save the Mode field values as supported_modes_dut. Below is the sample log provided for the raspi platform:
 
           [1687687925.438666][18054:18056] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0002 DataVersion: 4148960394
           [1687687925.438838][18054:18056] CHIP:TOO: SupportedModes: 3 entries
