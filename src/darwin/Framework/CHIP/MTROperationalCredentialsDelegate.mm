@@ -48,14 +48,12 @@ MTROperationalCredentialsDelegate::MTROperationalCredentialsDelegate(MTRDeviceCo
 {
 }
 
-CHIP_ERROR MTROperationalCredentialsDelegate::Init(MTRPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner,
-    NSData * ipk, NSData * rootCert, NSData * _Nullable icaCert)
+CHIP_ERROR MTROperationalCredentialsDelegate::Init(
+    ChipP256KeypairPtr nocSigner, NSData * ipk, NSData * rootCert, NSData * _Nullable icaCert)
 {
-    if (storage == nil || ipk == nil || rootCert == nil) {
+    if (ipk == nil || rootCert == nil) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-    mStorage = storage;
 
     mIssuerKey = nocSigner;
 

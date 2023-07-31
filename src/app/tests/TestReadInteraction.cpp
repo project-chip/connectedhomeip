@@ -1938,15 +1938,52 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
 
-        // We have 29 attributes in our mock attribute storage. And we subscribed twice.
-        // And attribute 3/2/4 is a list with 6 elements and list chunking is
-        // applied to it, but the way the packet boundaries fall we get two of
-        // its items as a single list, followed by 4 more single items for one
-        // of our subscriptions, and 3 as a single list followed by 3 single
-        // items for the other.
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
+        // Mock attribute storage in src/app/util/mock/attribute-storage.cpp
+        // has the following items
+        // - Endpoint 0xFFFE
+        //    - cluster 0xFFF1'FC01 (2 attributes)
+        //    - cluster 0xFFF1'FC02 (3 attributes)
+        // - Endpoint 0xFFFD
+        //    - cluster 0xFFF1'FC01 (2 attributes)
+        //    - cluster 0xFFF1'FC02 (4 attributes)
+        //    - cluster 0xFFF1'FC03 (5 attributes)
+        // - Endpoint 0xFFFC
+        //    - cluster 0xFFF1'FC01 (3 attributes)
+        //    - cluster 0xFFF1'FC02 (6 attributes)
+        //    - cluster 0xFFF1'FC03 (2 attributes)
+        //    - cluster 0xFFF1'FC04 (2 attributes)
+        //
+        // For at total of 29 attributes. There are two wildcard subscription
+        // paths, for a total of 58 attributes.
+        //
+        // Attribute 0xFFFC::0xFFF1'FC02::0xFFF1'0004 (kMockEndpoint3::MockClusterId(2)::MockAttributeId(4))
+        // is a list of 6 elements of size 256 bytes each, which cannot fit in a single
+        // packet, so gets list chunking applied to it.
+        //
+        // Because delegate.mNumAttributeResponse counts AttributeDataIB instances, not attributes,
+        // the count will depend on exactly how the list for attribute
+        // 0xFFFC::0xFFF1'FC02::0xFFF1'0004 is chunked.  For each of the two instances of that attribute
+        // in the response, there will be one AttributeDataIB for the start of the list (which will include
+        // some number of 256-byte elements), then one AttributeDataIB for each of the remaining elements.
+        //
+        // When EventList is enabled, for the first report for the list attribute we receive two
+        // of its items in the initial list, then 4 additional items.  For the second report we
+        // receive 3 items in the initial list followed by 3 additional items.
         //
         // Thus we should receive 29*2 + 4 + 3 = 65 attribute data in total.
-        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 65);
+        constexpr size_t kExpectedAttributeResponse = 65;
+#else
+        // When EventList is not enabled, the packet boundaries shift and for the first
+        // report for the list attribute we receive two of its items in the initial list,
+        // then 4 additional items.  For the second report we receive 0 items in
+        // the initial list followed by 6 additional items.
+        //
+        // Thus we should receive 29*2 + 4 + 6 = 68 attribute data when the eventlist
+        // attribute is not available.
+        constexpr size_t kExpectedAttributeResponse = 68;
+#endif
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == kExpectedAttributeResponse);
         NL_TEST_ASSERT(apSuite, delegate.mNumArrayItems == 12);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);

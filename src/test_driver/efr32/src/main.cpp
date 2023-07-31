@@ -20,7 +20,6 @@
 #include <PigweedLogger.h>
 #include <PigweedLoggerMutex.h>
 #include <cstring>
-#include <init_efrPlatform.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -30,6 +29,7 @@
 #include <pigweed/RpcService.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <sl_system_kernel.h>
 #include <task.h>
 
@@ -181,7 +181,7 @@ void RunRpcService(void *)
 
 int main(void)
 {
-    init_efrPlatform();
+    chip::DeviceLayer::Silabs::GetPlatform().Init();
     PigweedLogger::init();
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
