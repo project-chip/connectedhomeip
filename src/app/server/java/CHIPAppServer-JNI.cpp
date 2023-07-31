@@ -165,6 +165,14 @@ JNI_METHOD(jboolean, stopApp)(JNIEnv * env, jobject self)
     return JNI_TRUE;
 }
 
+JNI_METHOD(jboolean, resetApp)(JNIEnv * env, jobject self)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipAndroidAppReset();
+
+    return JNI_TRUE;
+}
+
 void * IOThreadAppMain(void * arg)
 {
     JNIEnv * env;
