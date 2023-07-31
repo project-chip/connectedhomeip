@@ -42,6 +42,7 @@ ReportSchedulerImpl::ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : Repor
 void ReportSchedulerImpl::OnEnterActiveMode()
 {
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+#if ICD_REPORT_ON_ENTER_ACTIVE_MODE
     mNodesPool.ForEachActiveObject([now, this](ReadHandlerNode * node) {
         if (now >= node->GetMinTimestamp())
         {
@@ -50,6 +51,7 @@ void ReportSchedulerImpl::OnEnterActiveMode()
 
         return Loop::Continue;
     });
+#endif
 }
 
 /// @brief When a ReadHandler is added, register it, which will schedule an engine run
