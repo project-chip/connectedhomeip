@@ -76,7 +76,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
             return CHIP_NO_ERROR;
         });
     }
-    else
+    else if (emberAfEndpointCompositionTypeForEndpoint(endpoint) == EMBER_AF_ENDPOINT_COMPOSITION_FLAT)
     {
         err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
             for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
@@ -98,6 +98,27 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
                     }
 
                     childIndex = emberAfIndexFromEndpoint(parentEndpointId);
+                }
+            }
+
+            return CHIP_NO_ERROR;
+        });
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "MHDEBUG: Endpoint composition type is tree");
+        err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
+            for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+            {
+                if (!emberAfEndpointIndexIsEnabled(index))
+                    continue;
+
+                EndpointId parentEndpointId = emberAfParentEndpointFromIndex(index);
+                if (parentEndpointId == endpoint)
+                {
+                    ChipLogProgress(Zcl, "MHDEBUG: endpoint %d is a child of endpoint %d", emberAfEndpointFromIndex(index),
+                                    endpoint);
+                    ReturnErrorOnFailure(encoder.Encode(emberAfEndpointFromIndex(index)));
                 }
             }
 
