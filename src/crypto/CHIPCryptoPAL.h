@@ -1583,6 +1583,16 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
 CHIP_ERROR ExtractCRLDistributionPointURIFromX509Cert(const ByteSpan & certificate, MutableCharSpan & cdpurl);
 
 /**
+ * @brief Extracts the CRL Distribution Point (CDP) extension's cRLIssuer Name from an X509 ASN.1 Encoded Certificate.
+ *        The value is copied into buffer in a raw ASN.1 X.509 format. This format should be directly comparable
+ *        with the result of ExtractSubjectFromX509Cert().
+ *
+ * @returns CHIP_ERROR_NOT_FOUND if not found or wrong format.
+ *          CHIP_NO_ERROR otherwise.
+ **/
+CHIP_ERROR ExtractCDPExtensionCRLIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSpan & crlIssuer);
+
+/**
  * @brief Extracts Serial Number from X509 Certificate.
  **/
 CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, MutableByteSpan & serialNumber);

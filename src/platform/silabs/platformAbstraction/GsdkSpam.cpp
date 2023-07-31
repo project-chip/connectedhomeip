@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include "init_efrPlatform.h"
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #include "sl_system_kernel.h"
@@ -30,6 +29,34 @@ extern "C" {
 #include "sl_simple_button_instances.h"
 #endif
 
+extern "C" {
+#include <mbedtls/platform.h>
+
+#if CHIP_ENABLE_OPENTHREAD
+#include "platform-efr32.h"
+
+#if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
+#include "openthread/heap.h"
+#endif // OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
+
+#endif // CHIP_ENABLE_OPENTHREAD
+
+#include "sl_component_catalog.h"
+#include "sl_mbedtls.h"
+#include "sl_system_init.h"
+#if SILABS_LOG_OUT_UART || ENABLE_CHIP_SHELL || CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#include "uart.h"
+#endif
+
+#if SL_SYSTEM_VIEW
+#include "SEGGER_SYSVIEW.h"
+#endif
+}
+
+#if SILABS_LOG_ENABLED
+#include "silabs_utils.h"
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {
@@ -40,7 +67,25 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
-    init_efrPlatform();
+    sl_system_init();
+    sl_mbedtls_init();
+
+#if CHIP_ENABLE_OPENTHREAD
+    sl_ot_sys_init();
+#endif
+
+#if SL_SYSTEM_VIEW
+    SEGGER_SYSVIEW_Conf();
+    SEGGER_SYSVIEW_Start();
+#endif
+
+#if SILABS_LOG_OUT_UART || ENABLE_CHIP_SHELL || CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+    uartConsoleInit();
+#endif
+
+#if SILABS_LOG_ENABLED
+    silabsInitLog();
+#endif
     return CHIP_NO_ERROR;
 }
 
