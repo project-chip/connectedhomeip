@@ -38,7 +38,7 @@ public:
 
     void Identify(uint16_t time);
     void SetOnOff(bool on);
-    void SetLevel(uint8_t value);
+    void SetCurrentLevel(uint8_t value);
     void SetColorMode(chip::app::Clusters::ColorControl::ColorMode colorMode);
     void SetColorTemperature(uint16_t value);
 

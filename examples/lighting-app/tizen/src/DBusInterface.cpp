@@ -84,25 +84,25 @@ void DBusInterface::SetOnOff(bool on)
         light_app_on_off_set_on_off(mIfaceOnOff, on);
 }
 
-void DBusInterface::SetLevel(uint8_t value)
+void DBusInterface::SetCurrentLevel(uint8_t value)
 {
     InternalSetGuard guard(this);
-    if (light_app_level_control_get_level(mIfaceLevelControl) != value)
-        light_app_level_control_set_level(mIfaceLevelControl, value);
+    if (light_app_level_control_get_current_level(mIfaceLevelControl) != value)
+        light_app_level_control_set_current_level(mIfaceLevelControl, value);
 }
 
 void DBusInterface::SetColorMode(chip::app::Clusters::ColorControl::ColorMode colorMode)
 {
     InternalSetGuard guard(this);
-    if (light_app_color_control_get_mode(mIfaceColorControl) != colorMode)
-        light_app_color_control_set_mode(mIfaceColorControl, colorMode);
+    if (light_app_color_control_get_color_mode(mIfaceColorControl) != colorMode)
+        light_app_color_control_set_color_mode(mIfaceColorControl, colorMode);
 }
 
 void DBusInterface::SetColorTemperature(uint16_t value)
 {
     InternalSetGuard guard(this);
-    if (light_app_color_control_get_color_temperature(mIfaceColorControl) != value)
-        light_app_color_control_set_color_temperature(mIfaceColorControl, value);
+    if (light_app_color_control_get_color_temperature_mireds(mIfaceColorControl) != value)
+        light_app_color_control_set_color_temperature_mireds(mIfaceColorControl, value);
 }
 
 CHIP_ERROR DBusInterface::InitOnGLibMatterContext(DBusInterface * self)
@@ -171,7 +171,7 @@ gboolean DBusInterface::OnCurrentLevelChanged(LightAppLevelControl * levelContro
     VerifyOrReturnValue(!self->mInternalSet, G_DBUS_METHOD_INVOCATION_HANDLED);
 
     Clusters::LevelControl::Commands::MoveToLevel::DecodableType data;
-    data.level = light_app_level_control_get_level(levelControl);
+    data.level = light_app_level_control_get_current_level(levelControl);
     data.optionsMask.Set(Clusters::LevelControl::LevelControlOptions::kExecuteIfOff);
     data.optionsOverride.Set(Clusters::LevelControl::LevelControlOptions::kExecuteIfOff);
 
@@ -193,7 +193,7 @@ gboolean DBusInterface::OnColorTemperatureChanged(LightAppColorControl * colorCo
     ConcreteCommandPath path{ self->mEndpointId, Clusters::ColorControl::Id, 0 };
 
     Clusters::ColorControl::Commands::MoveToColorTemperature::DecodableType data;
-    data.colorTemperatureMireds = light_app_color_control_get_color_temperature(colorControl);
+    data.colorTemperatureMireds = light_app_color_control_get_color_temperature_mireds(colorControl);
 
     chip::DeviceLayer::StackLock lock;
     ColorControlServer::Instance().moveToColorTempCommand(&handler, path, data);

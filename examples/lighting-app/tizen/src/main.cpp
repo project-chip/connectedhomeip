@@ -86,7 +86,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         switch (attributePath.mAttributeId)
         {
         case Clusters::LevelControl::Attributes::CurrentLevel::Id:
-            sDBusInterface.SetLevel(*value);
+            sDBusInterface.SetCurrentLevel(*value);
             break;
         default:
             ChipLogDetail(NotSpecified, "Not handled LevelControl cluster attribute ID: " ChipLogFormatMEI,
