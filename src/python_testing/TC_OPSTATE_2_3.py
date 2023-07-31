@@ -99,7 +99,8 @@ class TC_OPSTATE_2_3(MatterBaseTest):
         logging.info("CountdownTime: %s" % (initial_countdown_time))
         if initial_countdown_time is not NullValue:
             in_range = (1 <= initial_countdown_time <= 259200)
-        asserts.assert_true(initial_countdown_time is NullValue or in_range, "invalid CountdownTime: %s" % initial_countdown_time)
+        asserts.assert_true(initial_countdown_time is NullValue or in_range,
+                            "invalid CountdownTime(%s). Must be in between 1 and 259200, or null " % initial_countdown_time)
 
         self.print_step(7, "Waiting for 5 seconds")
         time.sleep(5)
@@ -107,7 +108,8 @@ class TC_OPSTATE_2_3(MatterBaseTest):
         self.print_step(8, "Read CountdownTime attribute")
         countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CountdownTime)
         logging.info("CountdownTime: %s" % (countdown_time))
-        asserts.assert_true(countdown_time != 0 or countdown_time == NullValue, "invalid CountdownTime: %s" % countdown_time)
+        asserts.assert_true(countdown_time != 0 or countdown_time == NullValue,
+                            "invalid CountdownTime(%s). Must be a non zero integer, or null" % countdown_time)
         asserts.assert_equal(countdown_time, initial_countdown_time, "CountdownTime(%s) does not equal to the intial CountdownTime(%s)"
                              % (countdown_time, initial_countdown_time))
 
