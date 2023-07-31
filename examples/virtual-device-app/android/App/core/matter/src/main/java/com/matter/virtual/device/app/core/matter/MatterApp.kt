@@ -45,4 +45,8 @@ class MatterApp @Inject constructor() {
   fun stop() {
     chipAppServer?.stopApp()
   }
+
+  fun reset() {
+    chipAppServer?.resetApp()
+  }
 }
