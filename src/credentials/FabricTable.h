@@ -977,7 +977,7 @@ public:
      * the fabric index that will be used for the next addition into the
      * outparam.
      */
-    CHIP_ERROR GetNextFabricAdditionIndex(FabricIndex * nextIndex);
+    CHIP_ERROR PeekFabricIndexForNextAddition(FabricIndex & outIndex);
 
 private:
     enum class StateFlags : uint16_t
