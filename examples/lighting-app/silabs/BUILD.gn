@@ -223,6 +223,11 @@ silabs_executable("lighting_app") {
     ]
   }
 
+  # DIC
+  if (enable_dic){
+    deps += [ "${examples_plat_dir}:efr32-dic" ]
+  }
+
   output_dir = root_out_dir
 }
 

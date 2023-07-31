@@ -154,7 +154,6 @@ silabs_executable("window_app") {
       "-Wl,SILABS_WIFI=1",
     ]
   }
-
 }
 
 group("silabs") {
