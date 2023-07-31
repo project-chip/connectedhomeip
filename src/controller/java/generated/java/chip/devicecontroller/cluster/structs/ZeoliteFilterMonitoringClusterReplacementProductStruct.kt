@@ -17,19 +17,16 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
-import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-import java.util.Optional
-
-class ZeoliteFilterMonitoringClusterReplacementProductStruct (
-    val productIdentifierType: Int,
-    val productIdentifierValue: String) {
-  override fun toString(): String  = buildString {
+class ZeoliteFilterMonitoringClusterReplacementProductStruct(
+  val productIdentifierType: Int,
+  val productIdentifierValue: String
+) {
+  override fun toString(): String = buildString {
     append("ZeoliteFilterMonitoringClusterReplacementProductStruct {\n")
     append("\tproductIdentifierType : $productIdentifierType\n")
     append("\tproductIdentifierValue : $productIdentifierValue\n")
@@ -49,14 +46,21 @@ class ZeoliteFilterMonitoringClusterReplacementProductStruct (
     private const val TAG_PRODUCT_IDENTIFIER_TYPE = 0
     private const val TAG_PRODUCT_IDENTIFIER_VALUE = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader) : ZeoliteFilterMonitoringClusterReplacementProductStruct {
+    fun fromTlv(
+      tag: Tag,
+      tlvReader: TlvReader
+    ): ZeoliteFilterMonitoringClusterReplacementProductStruct {
       tlvReader.enterStructure(tag)
       val productIdentifierType = tlvReader.getInt(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE))
-      val productIdentifierValue = tlvReader.getString(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE))
-      
+      val productIdentifierValue =
+        tlvReader.getString(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE))
+
       tlvReader.exitContainer()
 
-      return ZeoliteFilterMonitoringClusterReplacementProductStruct(productIdentifierType, productIdentifierValue)
+      return ZeoliteFilterMonitoringClusterReplacementProductStruct(
+        productIdentifierType,
+        productIdentifierValue
+      )
     }
   }
 }

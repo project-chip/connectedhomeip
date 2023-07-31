@@ -17,20 +17,17 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
-import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-import java.util.Optional
-
-class ThermostatClusterThermostatScheduleTransition (
-    val transitionTime: Int,
-    val heatSetpoint: Int?,
-    val coolSetpoint: Int?) {
-  override fun toString(): String  = buildString {
+class ThermostatClusterThermostatScheduleTransition(
+  val transitionTime: Int,
+  val heatSetpoint: Int?,
+  val coolSetpoint: Int?
+) {
+  override fun toString(): String = buildString {
     append("ThermostatClusterThermostatScheduleTransition {\n")
     append("\ttransitionTime : $transitionTime\n")
     append("\theatSetpoint : $heatSetpoint\n")
@@ -43,15 +40,15 @@ class ThermostatClusterThermostatScheduleTransition (
       startStructure(tag)
       put(ContextSpecificTag(TAG_TRANSITION_TIME), transitionTime)
       if (heatSetpoint != null) {
-      put(ContextSpecificTag(TAG_HEAT_SETPOINT), heatSetpoint)
-    } else {
-      putNull(ContextSpecificTag(TAG_HEAT_SETPOINT))
-    }
+        put(ContextSpecificTag(TAG_HEAT_SETPOINT), heatSetpoint)
+      } else {
+        putNull(ContextSpecificTag(TAG_HEAT_SETPOINT))
+      }
       if (coolSetpoint != null) {
-      put(ContextSpecificTag(TAG_COOL_SETPOINT), coolSetpoint)
-    } else {
-      putNull(ContextSpecificTag(TAG_COOL_SETPOINT))
-    }
+        put(ContextSpecificTag(TAG_COOL_SETPOINT), coolSetpoint)
+      } else {
+        putNull(ContextSpecificTag(TAG_COOL_SETPOINT))
+      }
       endStructure()
     }
   }
@@ -61,25 +58,31 @@ class ThermostatClusterThermostatScheduleTransition (
     private const val TAG_HEAT_SETPOINT = 1
     private const val TAG_COOL_SETPOINT = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader) : ThermostatClusterThermostatScheduleTransition {
+    fun fromTlv(tag: Tag, tlvReader: TlvReader): ThermostatClusterThermostatScheduleTransition {
       tlvReader.enterStructure(tag)
       val transitionTime = tlvReader.getInt(ContextSpecificTag(TAG_TRANSITION_TIME))
-      val heatSetpoint = if (!tlvReader.isNull()) {
-      tlvReader.getInt(ContextSpecificTag(TAG_HEAT_SETPOINT))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_HEAT_SETPOINT))
-      null
-    }
-      val coolSetpoint = if (!tlvReader.isNull()) {
-      tlvReader.getInt(ContextSpecificTag(TAG_COOL_SETPOINT))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_COOL_SETPOINT))
-      null
-    }
-      
+      val heatSetpoint =
+        if (!tlvReader.isNull()) {
+          tlvReader.getInt(ContextSpecificTag(TAG_HEAT_SETPOINT))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_HEAT_SETPOINT))
+          null
+        }
+      val coolSetpoint =
+        if (!tlvReader.isNull()) {
+          tlvReader.getInt(ContextSpecificTag(TAG_COOL_SETPOINT))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_COOL_SETPOINT))
+          null
+        }
+
       tlvReader.exitContainer()
 
-      return ThermostatClusterThermostatScheduleTransition(transitionTime, heatSetpoint, coolSetpoint)
+      return ThermostatClusterThermostatScheduleTransition(
+        transitionTime,
+        heatSetpoint,
+        coolSetpoint
+      )
     }
   }
 }
