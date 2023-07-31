@@ -355,6 +355,43 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "      Channel::ChangeChannel\n"
                    "        match: \"channel name\"\n"
                    "  interaction_model_revison: 1\n");
+
+    TestSampleData(inSuite, params, im_protocol_event_software_fault,
+                   "report_data\n"
+                   "  event_reports\n"
+                   "    Anonymous<>\n"
+                   "      event_data\n"
+                   "        path\n"
+                   "          endpoint_id: 0\n"
+                   "          cluster_id: 52 == 'SoftwareDiagnostics'\n"
+                   "          event_id: 0 == 'SoftwareFault'\n"
+                   "        event_number: 196610\n"
+                   "        priority: 1\n"
+                   "        epoch_timestamp: 1690566548210\n"
+                   "        SoftwareDiagnostics::SoftwareFault\n"
+                   "          id: 2454952\n"
+                   "          name: \"2454952\"\n"
+                   "          faultRecording: hex:467269204A756C2032382031333A34393A30382032303233\n"
+                   "  suppress_response: true\n"
+                   "  interaction_model_revison: 1\n");
+
+    TestSampleData(inSuite, params, im_protocol_event_multipress,
+                   "report_data\n"
+                   "  event_reports\n"
+                   "    Anonymous<>\n"
+                   "      event_data\n"
+                   "        path\n"
+                   "          endpoint_id: 0\n"
+                   "          cluster_id: 59 == 'Switch'\n"
+                   "          event_id: 6 == 'MultiPressComplete'\n"
+                   "        event_number: 196611\n"
+                   "        priority: 1\n"
+                   "        epoch_timestamp: 1690566820898\n"
+                   "        Switch::MultiPressComplete\n"
+                   "          previousPosition: 1\n"
+                   "          totalNumberOfPressesCounted: 23\n"
+                   "  suppress_response: true\n"
+                   "  interaction_model_revison: 1\n");
 }
 
 void TestMetaDataOnlyDecoding(nlTestSuite * inSuite, void * inContext)
