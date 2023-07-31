@@ -375,8 +375,8 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     // Casting and calling a function pointer on the same line results in ignoring the return
     // of the call on gcc-arm-none-eabi-9-2019-q4-major
-    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback)(
-        emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
+    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback) (emberAfFindClusterFunction(
+        cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
     if (f != nullptr)
     {
         status = f(attributePath, attributeType, size, value);
@@ -1021,7 +1021,7 @@ EmberAfStatus emberAfSetEndpointComposition(chip::EndpointId endpoint, EmberAfEn
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EndpointId emberAfEndpointCompositionTypeForEndpoint(chip::EndpointId endpoint)
+EmberAfEndpointCompositionType emberAfEndpointCompositionTypeForEndpoint(chip::EndpointId endpoint)
 {
     uint16_t index = emberAfIndexFromEndpoint(endpoint);
     return emAfEndpoints[index].endpointCompositionType;

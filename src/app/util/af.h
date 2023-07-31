@@ -147,7 +147,7 @@ EmberAfStatus emberAfSetEndpointComposition(chip::EndpointId endpoint, EmberAfEn
 /**
  * @brief Returns the composition type for a given endpoint
  */
-chip::EndpointId emberAfEndpointCompositionTypeForEndpoint(chip::EndpointId endpoint);
+EmberAfEndpointCompositionType emberAfEndpointCompositionTypeForEndpoint(chip::EndpointId endpoint);
 /**
  * Returns the index of a given endpoint.  Will return 0xFFFF if this is not a
  * valid endpoint id or if the endpoint is disabled.
