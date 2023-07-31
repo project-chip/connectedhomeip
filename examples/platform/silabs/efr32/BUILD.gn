@@ -108,7 +108,8 @@ if (enable_dic) {
 
   source_set("efr32-dic") {
     sources = [
-      "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/src/dic.c",
+      "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/src/dic.cpp",
+      "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/src/dic_control.cpp",
       "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/MQTT_transport.c",
       "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp.c",
       "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp_alloc.c",
@@ -119,6 +120,7 @@ if (enable_dic) {
     public_deps = [
       "${chip_root}/src/inet",
       "${chip_root}/src/lwip",
+      app_data_model,
     ]
     public_configs = [ ":efr32_dic_config" ]
   }
