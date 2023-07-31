@@ -94,6 +94,15 @@ public:
     uint16_t GetProtocolCode() const { return mProtocolCode; }
     const System::PacketBufferHandle & GetProtocolData() const { return mProtocolData; }
 
+    /**
+     * Builds a busy status report with protocol data containing the minimum wait time.
+     *
+     * @param[in] minimumWaitTime Time in milliseconds before initiator retries the request
+     *
+     * @return Packet buffer handle which can be passed to SendMessage.
+     */
+    static System::PacketBufferHandle MakeBusyStatusReportMessage(uint16_t minimumWaitTime);
+
 private:
     GeneralStatusCode mGeneralCode;
     Protocols::Id mProtocolId;

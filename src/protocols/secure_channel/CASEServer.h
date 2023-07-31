@@ -109,7 +109,11 @@ private:
     void PrepareForSessionEstablishment(const ScopedNodeId & previouslyEstablishedPeer = ScopedNodeId());
 
     // If we are in the middle of handshake and receive a Sigma1 then respond with Busy status code.
-    void SendBusyStatusReport(Messaging::ExchangeContext * ec);
+    // @param[in] ec              Exchange Context
+    // @param[in] minimumWaitTime Minimum wait time before client resends sigma1
+    //
+    // @return CHIP_NO_ERROR on success, error code otherwise
+    CHIP_ERROR SendBusyStatusReport(Messaging::ExchangeContext * ec, uint16_t minimumWaitTime);
 };
 
 } // namespace chip

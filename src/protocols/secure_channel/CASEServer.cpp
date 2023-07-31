@@ -85,8 +85,16 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
         if (!watchdogFired)
         {
             // Handshake wasn't stuck, send the busy status report and let the existing handshake continue.
-            SendBusyStatusReport(ec);
-            return CHIP_NO_ERROR;
+
+            // A successful CASE handshake can take several seconds and some may time out (30 seconds or more).
+            // TODO: Come up with better estimate: https://github.com/project-chip/connectedhomeip/issues/28288
+            // For now, setting minimum wait time to 5000 milliseconds.
+            CHIP_ERROR err = SendBusyStatusReport(ec, 5 * 1000);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Inet, "Failed to send the busy status report, err:%" CHIP_ERROR_FORMAT, err.Format());
+            }
+            return err;
         }
     }
 
@@ -181,28 +189,16 @@ void CASEServer::OnSessionEstablished(const SessionHandle & session)
     PrepareForSessionEstablishment(session->GetPeer());
 }
 
-void CASEServer::SendBusyStatusReport(Messaging::ExchangeContext * ec)
+CHIP_ERROR CASEServer::SendBusyStatusReport(Messaging::ExchangeContext * ec, uint16_t minimumWaitTime)
 {
-    using namespace Protocols::SecureChannel;
+    ChipLogProgress(Inet, "Already in the middle of CASE handshake, sending busy status report");
+    VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Inet, "Exchange context cannot be NULL"));
 
-    ChipLogProgress(SecureChannel, "Already in the middle of CASE handshake, sending busy status report");
+    System::PacketBufferHandle handle = Protocols::SecureChannel::StatusReport::MakeBusyStatusReportMessage(minimumWaitTime);
+    VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY, ChipLogError(SecureChannel, "Failed to build a busy status report"));
 
-    // A successful CASE handshake can take several seconds and some may time out (30 seconds or more).
-    // TODO: Come up with better estimate: https://github.com/project-chip/connectedhomeip/issues/28288
-    // For now, setting minimum wait time to 5 seconds.
-    uint16_t minimumWaitTime                            = 5 * 1000;                // milliseconds
-    constexpr uint8_t kBusyStatusReportProtocolDataSize = sizeof(minimumWaitTime); // 16-bits
-
-    auto handle = System::PacketBufferHandle::New(kBusyStatusReportProtocolDataSize, 0);
-    VerifyOrReturn(!handle.IsNull(), ChipLogError(SecureChannel, "Failed to allocate protocol data for busy status report"));
-
-    Encoding::LittleEndian::PacketBufferWriter protocolDataBufferWriter(std::move(handle));
-    protocolDataBufferWriter.Put16(minimumWaitTime);
-    handle = protocolDataBufferWriter.Finalize();
-    VerifyOrReturn(!handle.IsNull(), ChipLogError(SecureChannel, "Failed to finalize protocol data for busy status report"));
-
-    StatusReport statusReport(GeneralStatusCode::kBusy, Id, kProtocolCodeBusy, std::move(handle));
-    ec->SendStatusReport(statusReport);
+    ChipLogProgress(Inet, "Sending status report, exchange " ChipLogFormatExchange, ChipLogValueExchange(ec));
+    return ec->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(handle));
 }
 
 } // namespace chip
