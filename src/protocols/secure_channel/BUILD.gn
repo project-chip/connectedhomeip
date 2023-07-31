@@ -1,5 +1,24 @@
 import("//build_overrides/chip.gni")
 
+static_library("type_definitions") {
+  output_name = "libSecureChannelTypes"
+
+  sources = [
+    "Constants.h",
+    "StatusReport.cpp",
+    "StatusReport.h",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/protocols:type_definitions",
+    "${chip_root}/src/system",
+  ]
+
+  deps = [ "${chip_root}/src/lib/support" ]
+}
+
 static_library("secure_channel") {
   output_name = "libSecureChannel"
 
@@ -23,8 +42,6 @@ static_library("secure_channel") {
     "SessionResumptionStorage.h",
     "SimpleSessionResumptionStorage.cpp",
     "SimpleSessionResumptionStorage.h",
-    "StatusReport.cpp",
-    "StatusReport.h",
     "UnsolicitedStatusHandler.cpp",
     "UnsolicitedStatusHandler.h",
   ]
@@ -32,11 +49,13 @@ static_library("secure_channel") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":type_definitions",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/system",
     "${chip_root}/src/tracing",
     "${chip_root}/src/tracing:macros",
+    "${chip_root}/src/transport",
   ]
 }

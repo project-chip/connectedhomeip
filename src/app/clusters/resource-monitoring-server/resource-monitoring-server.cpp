@@ -17,11 +17,11 @@
  */
 
 #include <app/AttributeAccessInterface.h>
-#include <app/AttributePersistenceProvider.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
 #include <app/data-model/Nullable.h>
@@ -116,7 +116,7 @@ chip::Protocols::InteractionModel::Status Instance::UpdateLastChangedTime(DataMo
     mLastChangedTime        = aNewLastChangedTime;
     if (mLastChangedTime != oldLastchangedTime)
     {
-        chip::app::GetAttributePersistenceProvider()->WriteScalarValue(
+        chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
             ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id), mLastChangedTime);
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::LastChangedTime::Id);
     }
@@ -244,10 +244,10 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
 CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err;
-    if (Instance::HasFeature(ResourceMonitoring::Feature::kReplacementProductList))
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (HasFeature(ResourceMonitoring::Feature::kReplacementProductList))
     {
-        ReplacementProductListManager * productListManagerInstance = Instance::GetReplacementProductListManagerInstance();
+        ReplacementProductListManager * productListManagerInstance = GetReplacementProductListManagerInstance();
         if (nullptr == productListManagerInstance)
         {
             aEncoder.EncodeEmptyList();
@@ -256,16 +256,19 @@ CHIP_ERROR Instance::ReadReplacableProductList(AttributeValueEncoder & aEncoder)
 
         productListManagerInstance->Reset();
 
-        err = aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-            Attributes::ReplacementProductStruct::Type replacementProductStruct;
-            while (productListManagerInstance->Next(replacementProductStruct) == CHIP_NO_ERROR)
+        err = aEncoder.EncodeList([productListManagerInstance](const auto & encoder) -> CHIP_ERROR {
+            ReplacementProductStruct replacementProductStruct;
+            CHIP_ERROR iteratorError = productListManagerInstance->Next(replacementProductStruct);
+
+            while (CHIP_NO_ERROR == iteratorError)
             {
                 ReturnErrorOnFailure(encoder.Encode(replacementProductStruct));
+                iteratorError = productListManagerInstance->Next(replacementProductStruct);
             }
-            return CHIP_NO_ERROR;
+            return (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED == iteratorError) ? CHIP_NO_ERROR : iteratorError;
         });
     }
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 // Implements the read functionality for non-standard attributes.
@@ -348,7 +351,7 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
 
 void Instance::LoadPersistentAttributes()
 {
-    CHIP_ERROR err = chip::app::GetAttributePersistenceProvider()->ReadScalarValue(
+    CHIP_ERROR err = chip::app::GetSafeAttributePersistenceProvider()->ReadScalarValue(
         ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id), mLastChangedTime);
     if (err == CHIP_NO_ERROR)
     {

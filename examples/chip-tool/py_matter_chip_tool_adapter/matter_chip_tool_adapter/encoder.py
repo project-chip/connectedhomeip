@@ -22,7 +22,9 @@ _ANY_COMMANDS_LIST = [
     'SubscribeById',
     'ReadEventById',
     'SubscribeEventById',
+    'ReadNone',
     'ReadAll',
+    'SubscribeNone',
     'SubscribeAll',
 ]
 
@@ -79,6 +81,9 @@ _ALIASES = {
                     'EventId': 'event-id',
                 },
             },
+            'ReadNone': {
+                'alias': 'read-none',
+            },
             'ReadAll': {
                 'alias': 'read-all',
                 'arguments': {
@@ -86,6 +91,9 @@ _ALIASES = {
                     'AttributeId': 'attribute-ids',
                     'EventId': 'event-ids',
                 },
+            },
+            'SubscribeNone': {
+                'alias': 'subscribe-none',
             },
             'SubscribeAll': {
                 'alias': 'subscribe-all',
@@ -99,6 +107,14 @@ _ALIASES = {
     },
     'AnyCommands': {
         'alias': 'any',
+        'commands': {
+            'ReadNone': {
+                'has_endpoint': False,
+            },
+            'SubscribeNone': {
+                'has_endpoint': False,
+            }
+        }
     },
     'CommissionerCommands': {
         'alias': 'pairing',
@@ -309,6 +325,8 @@ class Encoder:
 
         endpoint_argument_name = 'endpoint-id-ignored-for-group-commands'
         endpoint_argument_value = request.endpoint
+        if endpoint_argument_value == '*':
+            endpoint_argument_value = 0xFFFF
 
         if (request.is_attribute and not request.command == "writeAttribute") or request.is_event or (request.command in _ANY_COMMANDS_LIST and not request.command == "WriteById"):
             endpoint_argument_name = 'endpoint-ids'

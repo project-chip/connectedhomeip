@@ -150,6 +150,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // handler.
     SuccessOrExit(err = mAttributePersister.Init(mDeviceStorage));
     SetAttributePersistenceProvider(&mAttributePersister);
+    SetSafeAttributePersistenceProvider(&mAttributePersister);
 
     {
         FabricTable::InitParams fabricTableInitParams;
@@ -316,8 +317,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                     &mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), &mCASESessionManager,
-                                                                 mSubscriptionResumptionStorage);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), &mReportScheduler,
+                                                                 &mCASESessionManager, mSubscriptionResumptionStorage);
     SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot

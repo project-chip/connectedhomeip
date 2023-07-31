@@ -34,15 +34,24 @@ namespace ResourceMonitoring {
 class ReplacementProductListManager
 {
 public:
+    // The max replacement product list size as defined in the specification
+    static constexpr size_t kReplacementProductListMaxSize = 5u;
+
     ReplacementProductListManager() {}
     virtual ~ReplacementProductListManager() = default;
 
     void Reset() { mIndex = 0; }
 
-    // Returns total size of Replacement Products List.
-    virtual uint8_t Size() = 0;
-
-    virtual CHIP_ERROR Next(Attributes::ReplacementProductStruct::Type & item) = 0;
+    /**
+     * Iterates through the entries in the ReplacementProductListManager. Each call to this function copies the next item into
+     * the out param. Calls to this function will return CHIP_NO_ERROR if there are still valid elements in the list. The function
+     * will return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the end of the list has been reached.
+     *
+     * @param[out] item An out parameter that has a copy of the item retrieved in the list.
+     * @return CHIP_NO_ERROR if the pointer to the list element has moved to the next element and there are still valid remaining
+     * entries in the list. Otherwise returns CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the list has hit the last element.
+     */
+    virtual CHIP_ERROR Next(ReplacementProductStruct & item) = 0;
 
 protected:
     uint8_t mIndex;

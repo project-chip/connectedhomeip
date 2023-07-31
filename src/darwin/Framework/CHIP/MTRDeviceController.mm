@@ -268,8 +268,8 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
             }
             signingKeypair = &_signingKeypairBridge;
         }
-        errorCode = _operationalCredentialsDelegate->Init(_factory.storageDelegateBridge, signingKeypair, startupParams.ipk,
-            startupParams.rootCertificate, startupParams.intermediateCertificate);
+        errorCode = _operationalCredentialsDelegate->Init(
+            signingKeypair, startupParams.ipk, startupParams.rootCertificate, startupParams.intermediateCertificate);
         if ([self checkForStartError:errorCode logMsg:kErrorOperationalCredentialsInit]) {
             return;
         }

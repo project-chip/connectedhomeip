@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/InteractionModelEngine.h>
+#include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <crypto/DefaultSessionKeystore.h>
@@ -366,7 +367,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -434,7 +435,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMatch(nlTe
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -483,7 +484,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMismatch(n
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -534,7 +535,7 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -575,7 +576,7 @@ void TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage(nlTestSuite * a
 
     TestWriteClientCallback writeCallback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
@@ -643,7 +644,7 @@ void TestWriteInteraction::TestWriteHandlerInvalidateFabric(nlTestSuite * apSuit
 
     TestWriteClientCallback writeCallback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
@@ -725,7 +726,7 @@ void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void 
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -796,7 +797,7 @@ void TestWriteInteraction::TestWriteInvalidMessage2(nlTestSuite * apSuite, void 
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -866,7 +867,7 @@ void TestWriteInteraction::TestWriteInvalidMessage3(nlTestSuite * apSuite, void 
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -937,7 +938,7 @@ void TestWriteInteraction::TestWriteInvalidMessage4(nlTestSuite * apSuite, void 
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());

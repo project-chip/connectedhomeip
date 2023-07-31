@@ -173,6 +173,7 @@
 		51B22C262740CB32008D5055 /* MTRStructsObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51B22C252740CB32008D5055 /* MTRStructsObjc.mm */; };
 		51B22C2A2740CB47008D5055 /* MTRCommandPayloadsObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51B22C292740CB47008D5055 /* MTRCommandPayloadsObjc.mm */; };
 		51C8E3F82825CDB600D47D00 /* MTRTestKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = 51C8E3F72825CDB600D47D00 /* MTRTestKeys.m */; };
+		51C984622A61CE2A00B0AD9A /* MTRFabricInfoChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = 51C984602A61CE2A00B0AD9A /* MTRFabricInfoChecker.m */; };
 		51D10D2E2808E2CA00E8CA3D /* MTRTestStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 51D10D2D2808E2CA00E8CA3D /* MTRTestStorage.m */; };
 		51E0310027EA20D20083DC9C /* MTRControllerAccessControl.h in Headers */ = {isa = PBXBuildFile; fileRef = 51E030FE27EA20D20083DC9C /* MTRControllerAccessControl.h */; };
 		51E0310127EA20D20083DC9C /* MTRControllerAccessControl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51E030FF27EA20D20083DC9C /* MTRControllerAccessControl.mm */; };
@@ -477,6 +478,8 @@
 		51B22C252740CB32008D5055 /* MTRStructsObjc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRStructsObjc.mm; sourceTree = "<group>"; };
 		51B22C292740CB47008D5055 /* MTRCommandPayloadsObjc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRCommandPayloadsObjc.mm; sourceTree = "<group>"; };
 		51C8E3F72825CDB600D47D00 /* MTRTestKeys.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRTestKeys.m; sourceTree = "<group>"; };
+		51C984602A61CE2A00B0AD9A /* MTRFabricInfoChecker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRFabricInfoChecker.m; sourceTree = "<group>"; };
+		51C984612A61CE2A00B0AD9A /* MTRFabricInfoChecker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRFabricInfoChecker.h; sourceTree = "<group>"; };
 		51D10D2D2808E2CA00E8CA3D /* MTRTestStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRTestStorage.m; sourceTree = "<group>"; };
 		51E030FE27EA20D20083DC9C /* MTRControllerAccessControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRControllerAccessControl.h; sourceTree = "<group>"; };
 		51E030FF27EA20D20083DC9C /* MTRControllerAccessControl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRControllerAccessControl.mm; sourceTree = "<group>"; };
@@ -947,6 +950,8 @@
 				1E748B3828941A44008A1BE8 /* MTRTestOTAProvider.m */,
 				51742B4829CB5F45009974FE /* MTRTestResetCommissioneeHelper.h */,
 				51742B4929CB5FC0009974FE /* MTRTestResetCommissioneeHelper.m */,
+				51C984612A61CE2A00B0AD9A /* MTRFabricInfoChecker.h */,
+				51C984602A61CE2A00B0AD9A /* MTRFabricInfoChecker.m */,
 			);
 			path = TestHelpers;
 			sourceTree = "<group>";
@@ -1536,6 +1541,7 @@
 				7596A8512878709F004DAE0E /* MTRAsyncCallbackQueueTests.m in Sources */,
 				997DED1A26955D0200975E97 /* MTRThreadOperationalDatasetTests.mm in Sources */,
 				51C8E3F82825CDB600D47D00 /* MTRTestKeys.m in Sources */,
+				51C984622A61CE2A00B0AD9A /* MTRFabricInfoChecker.m in Sources */,
 				99C65E10267282F1003402F6 /* MTRControllerTests.m in Sources */,
 				1E5801C328941C050033A199 /* MTRTestOTAProvider.m in Sources */,
 				5A6FEC9D27B5E48900F25F42 /* MTRXPCProtocolTests.m in Sources */,
@@ -1686,7 +1692,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -1858,7 +1864,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;

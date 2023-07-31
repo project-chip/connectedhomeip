@@ -48,12 +48,22 @@ tests:
               type: bitmap32
 
     - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [0, 1, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
 
     - label: "Step 4b: Read the optional attribute(SetupURL) in AttributeList"
       PICS: ACT.S.A0002

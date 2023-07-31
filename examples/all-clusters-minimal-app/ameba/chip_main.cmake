@@ -258,8 +258,7 @@ list(
     APPEND chip_main_cpp_flags
 
 	-Wno-unused-parameter
-	-std=gnu++11
-	-std=c++14
+	-std=c++17
 	-fno-rtti
 )
 target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags} )

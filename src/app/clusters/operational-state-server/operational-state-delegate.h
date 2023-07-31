@@ -188,21 +188,6 @@ private:
 };
 
 /**
- * A class which represents the operational completion of an Operational State cluster derivation instance.
- */
-struct GenericOperationCompletion : public app::Clusters::OperationalState::Events::OperationCompletion::Type
-{
-    GenericOperationCompletion(uint8_t aCompletionErrorCode,
-                               const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = NullOptional,
-                               const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional)
-    {
-        completionErrorCode  = aCompletionErrorCode;
-        totalOperationalTime = aTotalOperationalTime;
-        pausedTime           = aPausedTime;
-    }
-};
-
-/**
  * A delegate to handle application logic of the Operational State aliased Cluster.
  * The delegate API assumes there will be separate delegate objects for each cluster instance.
  * (i.e. each separate operational state cluster derivation, on each separate endpoint),

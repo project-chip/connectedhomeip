@@ -90,11 +90,18 @@ protected:
                            std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds,
                            chip::app::ReadClient::InteractionType interactionType);
 
+    CHIP_ERROR ReadNone(chip::DeviceProxy * device) { return ReportNone(device, chip::app::ReadClient::InteractionType::Read); }
+
     CHIP_ERROR ReadAll(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                        std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
                        std::vector<chip::EventId> eventIds)
     {
         return ReportAll(device, endpointIds, clusterIds, attributeIds, eventIds, chip::app::ReadClient::InteractionType::Read);
+    }
+
+    CHIP_ERROR SubscribeNone(chip::DeviceProxy * device)
+    {
+        return ReportNone(device, chip::app::ReadClient::InteractionType::Subscribe);
     }
 
     CHIP_ERROR SubscribeAll(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
@@ -104,6 +111,8 @@ protected:
         return ReportAll(device, endpointIds, clusterIds, attributeIds, eventIds,
                          chip::app::ReadClient::InteractionType::Subscribe);
     }
+
+    CHIP_ERROR ReportNone(chip::DeviceProxy * device, chip::app::ReadClient::InteractionType interactionType);
 
     CHIP_ERROR ReportAll(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                          std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,

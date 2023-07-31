@@ -74,6 +74,8 @@ public:
     ~LaundryWasherModeDelegate() override = default;
 };
 
+void Shutdown();
+
 } // namespace LaundryWasherMode
 
 } // namespace Clusters
