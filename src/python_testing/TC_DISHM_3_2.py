@@ -108,7 +108,7 @@ class TC_DISHM_3_2(MatterBaseTest):
 
             asserts.assert_greater_equal(len(supported_modes_dut), 2, "SupportedModes must have at least two entries!")
 
-            new_mode = None
+            new_mode_th = None
 
             for m in supported_modes_dut:
                 if m.mode != new_startup_mode:

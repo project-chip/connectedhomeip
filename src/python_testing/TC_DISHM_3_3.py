@@ -45,10 +45,10 @@ class TC_DISHM_3_2(MatterBaseTest):
         ret = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, Clusters.DishwasherMode.Attributes.OnMode(newMode))])
         asserts.assert_equal(ret[0].Status, Status.Success, "Writing to OnMode failed")
 
-    async def write_startup_onoff(self)-> Clusters.Objects.OnOff.Commands.Off:
+    async def write_startup_onoff(self) -> Clusters.Objects.OnOff.Commands.Off:
         ret = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, Clusters.OnOff.Attributes.StartUpOnOff(1))])
         asserts.assert_equal(ret[0].Status, Status.Success, "Writing to OnOff failed")
-        
+
     @async_test_body
     async def test_TC_DISHM_3_2(self):
 
@@ -102,7 +102,7 @@ class TC_DISHM_3_2(MatterBaseTest):
         old_on_mode_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OnMode)
 
         logging.info("OnMode: %s" % (old_on_mode_dut))
-        
+
         if old_on_mode_dut == NullValue:
             self.print_step(4, "Read SupportedModes attribute")
             supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
@@ -120,7 +120,6 @@ class TC_DISHM_3_2(MatterBaseTest):
         else:
             new_old_on_mode_dut = old_on_mode_dut
 
-
         if new_old_on_mode_dut == new_startup_mode:
 
             self.print_step(4, "Read SupportedModes attribute")
@@ -130,7 +129,7 @@ class TC_DISHM_3_2(MatterBaseTest):
 
             asserts.assert_greater_equal(len(supported_modes_dut), 2, "SupportedModes must have at least two entries!")
 
-            new_mode = None
+            new_mode_th = None
 
             for m in supported_modes_dut:
                 if m.mode != new_startup_mode:

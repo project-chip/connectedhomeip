@@ -45,12 +45,12 @@ class TC_DISHM_3_1(MatterBaseTest):
         ret = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, Clusters.DishwasherMode.Attributes.OnMode(newMode))])
         asserts.assert_equal(ret[0].Status, Status.Success, "Writing to OnMode failed")
 
-    async def write_onoff_on_mode(self)-> Clusters.Objects.OnOff.Commands.On:
+    async def write_onoff_on_mode(self) -> Clusters.Objects.OnOff.Commands.On:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.OnOff.Commands.On, endpoint=self.endpoint)
         asserts.assert_true(type_matches(ret, Clusters.Objects.OnOff.Commands.On),
                             "Unexpected return type for OnOff")
 
-    async def write_onoff_off_mode(self)-> Clusters.Objects.OnOff.Commands.Off:
+    async def write_onoff_off_mode(self) -> Clusters.Objects.OnOff.Commands.Off:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.OnOff.Commands.Off, endpoint=self.endpoint)
         asserts.assert_true(type_matches(ret, Clusters.Objects.OnOff.Commands.Off),
                             "Unexpected return type for OnOff")
@@ -86,7 +86,7 @@ class TC_DISHM_3_1(MatterBaseTest):
         on_mode_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OnMode)
 
         logging.info("OnMode: %s" % (on_mode_dut))
-        
+
         if on_mode_dut == NullValue:
             self.print_step(3, "Read SupportedModes attribute")
             supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
@@ -131,18 +131,15 @@ class TC_DISHM_3_1(MatterBaseTest):
             ret = await self.send_change_to_mode_cmd(newMode=new_mode_th)
             asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode should succeed")
 
-
         self.print_step(6, "Send Off command")
 
         ret = await self.write_onoff_off_mode()
         asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to off should succeed")
 
-
         self.print_step(7, "Send On command")
 
         ret = await self.write_onoff_on_mode()
         asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to on should succeed")
-
 
         self.print_step(8, "Read CurrentMode attribute")
 
