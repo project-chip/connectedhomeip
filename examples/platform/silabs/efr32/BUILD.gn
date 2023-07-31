@@ -98,7 +98,7 @@ config("chip_examples_project_config") {
 }
 
 if (enable_dic) {
-  config("efr32_dic_config") {
+  config("silabs_dic_config") {
     include_dirs = [
       "${chip_root}/third_party/silabs/mqtt/stack",
       "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/include",
@@ -106,7 +106,7 @@ if (enable_dic) {
     ]
   }
 
-  source_set("efr32-dic") {
+  source_set("silabs-dic") {
     sources = [
       "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/src/dic.cpp",
       "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/src/dic_control.cpp",
@@ -122,7 +122,7 @@ if (enable_dic) {
       "${chip_root}/src/lwip",
       app_data_model,
     ]
-    public_configs = [ ":efr32_dic_config" ]
+    public_configs = [ ":silabs_dic_config" ]
   }
 }
 
@@ -261,9 +261,9 @@ source_set("efr32-common") {
     "${efr32_sdk_build_root}:silabs_config",
   ]
 
-  # MQTT
+  # DIC
   if (enable_dic) {
-    deps += [ "${examples_plat_dir}:efr32-dic" ]
+    deps += [ "${examples_plat_dir}:silabs-dic" ]
   }
 
   include_dirs = [ "." ]
