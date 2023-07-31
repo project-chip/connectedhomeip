@@ -21,6 +21,13 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          1. Refrigerator and Temperature Controlled Cabinet and OnOff clusters are available on the same endpoint
+
+          2. The OnMode attribute is set to a non-NULL value from the mode values indicated by the SupportedModes attribute.
+      disabled: true
+
     - label: "Note"
       verification: |
           To execute this test case set onmode to any integer value because as default it value has null.
@@ -33,13 +40,6 @@ tests:
           [1690190139.816100][16383:16385] CHIP:DMG:                         {
           [1690190139.816102][16383:16385] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1690190139.816105][16383:16385] CHIP:DMG:                         },
-      disabled: true
-
-    - label: "Precondition"
-      verification: |
-          1. Refrigerator and Temperature Controlled Cabinet and OnOff clusters are available on the same endpoint
-
-          2. The OnMode attribute is set to a non-NULL value from the mode values indicated by the SupportedModes attribute.
       disabled: true
 
     - label:

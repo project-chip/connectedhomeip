@@ -38,6 +38,7 @@ tests:
 
           if you launch the app with the above commands and provision the app, even when you reboot the app with 'sudo reboot' , next time you launch the app with 'sudo ./out/all-clusters-app/chip-all-clusters-app --KVS ./mytest.txt' , you can run read/write attribs and commands without reprovisioning the device.
       disabled: true
+
     - label:
           "Step 1: Commission DUT to TH (can be skipped if done in a preceding
           test)."
@@ -47,6 +48,21 @@ tests:
 
     - label: "Step 2: TH reads from the DUT the StartUpMode attribute."
       PICS: TCCM.S.A0002
+      verification: |
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read start-up-mode 1 1
+
+          On TH(chip-tool),  Verify that StartUpMode attribute value is an integer or Null
+          - Save the value as startup_mode_dut, below is the sample log provided for the raspi platform:
+          - If startup_mode_dut is null proceed to step 3. Else save startup_mode_dut as new_start_up_mode_th and proceed to step 5.
+          - Here startup_mode_dut is null proceed to step 3.
+
+          [1690541247.515223][2594:2596] CHIP:DMG: }
+          [1690541247.521286][2594:2596] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0002 DataVersion: 667171525
+          [1690541247.523875][2594:2596] CHIP:TOO:   StartUpMode: null
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the SupportedModes attribute."
+      PICS: TCCM.S.A0000
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read supported-modes 1 1
 
