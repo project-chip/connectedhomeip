@@ -65,8 +65,8 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     mOperationalKeystore       = params.operationalKeystore;
     mOpCertStore               = params.opCertStore;
     mCertificateValidityPolicy = params.certificateValidityPolicy;
-    mEnableServerInteractions  = params.enableServerInteractions;
     mSessionResumptionStorage  = params.sessionResumptionStorage;
+    mEnableServerInteractions  = params.enableServerInteractions;
 
     CHIP_ERROR err = InitSystemState(params);
 
@@ -94,8 +94,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
         params.fabricTable               = mSystemState->Fabrics();
         params.operationalKeystore       = mOperationalKeystore;
         params.opCertStore               = mOpCertStore;
-        params.sessionResumptionStorage  = mSessionResumptionStorage;
         params.certificateValidityPolicy = mCertificateValidityPolicy;
+        params.sessionResumptionStorage  = mSessionResumptionStorage;
     }
 
     return InitSystemState(params);
@@ -386,8 +386,8 @@ void DeviceControllerFactory::Shutdown()
     mFabricIndependentStorage  = nullptr;
     mOperationalKeystore       = nullptr;
     mOpCertStore               = nullptr;
-    mSessionResumptionStorage  = nullptr;
     mCertificateValidityPolicy = nullptr;
+    mSessionResumptionStorage  = nullptr;
 }
 
 void DeviceControllerSystemState::Shutdown()
