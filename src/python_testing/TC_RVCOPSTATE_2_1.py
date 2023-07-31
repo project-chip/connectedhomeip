@@ -38,14 +38,16 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
         operational_state = await self.read_mod_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
         logging.info("OperationalState: %s" % (operational_state))
-        asserts.assert_equal(operational_state, expected_state, "OperationalState should equal %s" % expected_state)
+        asserts.assert_equal(operational_state, expected_state,
+                             "OperationalState(%s) should equal %s" % (operational_state, expected_state))
 
     async def read_and_validate_operror(self, step, expected_error):
         self.print_step(step, "Read OperationalError attribute")
         operational_error = await self.read_mod_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.RvcOperationalState.Attributes.OperationalError)
         logging.info("OperationalError: %s" % (operational_error))
-        asserts.assert_equal(operational_error.errorStateID, expected_error, "OperationalError should equal %s" % expected_error)
+        asserts.assert_equal(operational_error.errorStateID, expected_error,
+                             "errorStateID(%s) should equal %s" % (operational_error.errorStateID, expected_error))
 
     @async_test_body
     async def test_TC_RVCOPSTATE_2_1(self):
@@ -71,7 +73,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
                 phase_list_len = len(phase_list)
 
-                asserts.assert_less_equal(phase_list_len, 32, "PhaseList must have no more than 32 entries!")
+                asserts.assert_less_equal(phase_list_len, 32, "PhaseList length(%d) must be less than 32!" % phase_list_len)
 
         if self.check_pics("RVCOPSTATE.S.A0001"):
             self.print_step(3, "Read CurrentPhase attribute")
@@ -79,10 +81,10 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
             logging.info("CurrentPhase: %s" % (current_phase))
 
             if phase_list == NullValue:
-                asserts.assert_true(current_phase == NullValue, "CurrentPhase should be null")
+                asserts.assert_true(current_phase == NullValue, "CurrentPhase(%s) should be null" % current_phase)
             else:
-                asserts.assert_true(0 <= current_phase and current_phase <= (phase_list_len - 1),
-                                    "CurrentPhase must be between 0 and (phase-list-size - 1)")
+                asserts.assert_true(0 <= current_phase < phase_list_len,
+                                    "CurrentPhase(%s) must be between 0 and %d" % (current_phase, (phase_list_len - 1)))
 
         if self.check_pics("RVCOPSTATE.S.A0002"):
             self.print_step(4, "Read CountdownTime attribute")
@@ -91,7 +93,8 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
             logging.info("CountdownTime: %s" % (countdown_time))
             if countdown_time is not NullValue:
-                asserts.assert_true(countdown_time >= 0 and countdown_time <= 259200, "CountdownTime must be between 0 and 259200")
+                asserts.assert_true(countdown_time >= 0 and countdown_time <= 259200,
+                                    "CountdownTime(%s) must be between 0 and 259200" % countdown_time)
 
         if self.check_pics("RVCOPSTATE.S.A0003"):
             self.print_step(5, "Read OperationalStateList attribute")
@@ -106,9 +109,9 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                                   if state is not Clusters.RvcOperationalState.Enums.OperationalStateEnum.kUnknownEnumValue)
 
             for state in operational_state_list:
-                in_range = (0x80 <= state.operationalStateID and state.operationalStateID <= 0xBF)
+                in_range = (0x80 <= state.operationalStateID <= 0xBF)
                 asserts.assert_true(state.operationalStateID in defined_states or in_range,
-                                    "Found a OperationalStateList entry with invalid ID value!")
+                                    "Found an OperationalStateList entry with an invalid ID value: %s" % state.operationalStateID)
                 if in_range:
                     asserts.assert_true(state.operationalStateLabel is not None,
                                         "The OperationalStateLabel should be populated")
@@ -169,9 +172,9 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
             defined_errors.extend(error.value for error in Clusters.RvcOperationalState.Enums.ErrorStateEnum
                                   if error is not Clusters.RvcOperationalState.Enums.ErrorStateEnum.kUnknownEnumValue)
 
-            in_range = (0x80 <= operational_error.errorStateID and operational_error.errorStateID <= 0xBF)
+            in_range = (0x80 <= operational_error.errorStateID <= 0xBF)
             asserts.assert_true(operational_error.errorStateID in defined_errors
-                                or in_range, "OperationalError has an invalid ID value!")
+                                or in_range, "OperationalError(%s) has an invalid ID value!" % operational_error.errorStateID)
             if in_range:
                 asserts.assert_true(operational_error.errorStateLabel is not None, "ErrorStateLabel should be populated")
 
