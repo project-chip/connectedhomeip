@@ -36,6 +36,6 @@
     {                                                                                                                              \
         .storage_partition_name = "nvs", .netif_queue_size = 10, .task_queue_size = 10,                                            \
     }
+#endif // CONFIG_OPENTHREAD_ENABLED
 
 void ESPOpenThreadInit();
-#endif // CONFIG_OPENTHREAD_ENABLED

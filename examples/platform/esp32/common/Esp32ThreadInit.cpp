@@ -20,6 +20,7 @@
 #if CONFIG_OPENTHREAD_ENABLED
 #include <platform/ESP32/OpenthreadLauncher.h>
 #include <platform/ThreadStackManager.h>
+#endif // CONFIG_OPENTHREAD_ENABLED
 
 #include <esp_log.h>
 
@@ -79,4 +80,3 @@ void ESPOpenThreadInit()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 }
-#endif // CONFIG_OPENTHREAD_ENABLED
