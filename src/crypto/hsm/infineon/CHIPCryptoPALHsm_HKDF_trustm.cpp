@@ -42,8 +42,6 @@ static const uint8_t metadata [] = {
 namespace chip {
 namespace Crypto {
 
-HKDF_shaHSM::HKDF_shaHSM(){}
-HKDF_shaHSM::~HKDF_shaHSM() {}
 CHIP_ERROR HKDF_shaHSM::HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt,
 const size_t salt_length, const uint8_t * info, const size_t info_length, uint8_t * out_buffer,
 size_t out_length)

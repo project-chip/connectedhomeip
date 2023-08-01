@@ -41,9 +41,6 @@ static const uint8_t metadata_hmac [] = {
 namespace chip {
 namespace Crypto{
 
-HMAC_shaHSM::HMAC_shaHSM(){}
-HMAC_shaHSM::~HMAC_shaHSM() {}
-
 CHIP_ERROR HMAC_shaHSM::HMAC_SHA256(const uint8_t * key, size_t key_length,
                                     const uint8_t * message, size_t message_length, uint8_t * out_buffer, size_t out_length)
 
