@@ -18,7 +18,7 @@ import("//build_overrides/jlink.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${efr32_sdk_build_root}/silabs_board.gni")
 
-if (silabs_board == "BRD4325B") {  # CCP board
+if ((silabs_board == "BRD4325B") || (silabs_board == "BRD4325C") || (silabs_board == "BRD4325G")) {  # CCP board
   import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
 } else {
   import("${efr32_sdk_build_root}/efr32_sdk.gni")
@@ -53,7 +53,7 @@ group("efr32_sdk") {
   public_configs = [ ":silabs_config" ]
 }
 
-if (silabs_board != "BRD4325B") {  # CCP board
+if ((silabs_board != "BRD4325B") || (silabs_board != "BRD4325C") || (silabs_board != "BRD4325G")) {  # CCP board
   # Openthread GSDK libraries configurations
   if (use_silabs_thread_lib) {
     config("libopenthread-platform_config") {

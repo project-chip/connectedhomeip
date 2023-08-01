@@ -28,31 +28,20 @@
  ******************************************************************************/
  MEMORY
  {
-   FLASH   (rx)  : ORIGIN = 0x8012000, LENGTH = 0x400000
-   RAM     (rwx) : ORIGIN = 0x400, LENGTH = 0x3e800
+   rom   (rx)  : ORIGIN = 0x81c2000, LENGTH = 0x200000
+   ram     (rwx) : ORIGIN = 0x400, LENGTH = 0x4e200
  }
 
 ENTRY(Reset_Handler)
 
 SECTIONS
 {
-
-  .text :
-  {
-    linker_vectors_begin = .;
-    KEEP(*(.vectors))
-    linker_vectors_end = .;
-
-    __Vectors_End = .;
-    __Vectors_Size = __Vectors_End - __Vectors;
-
-    linker_code_begin = .;
-    *(SORT_BY_ALIGNMENT(.text*))
-    linker_code_end = .;
-
-    KEEP(*(.init))
-    KEEP(*(.fini))
-
+	.text :
+	{
+		KEEP(*(.isr_vector))
+     	KEEP(*(.reset_handler))
+		*(EXCLUDE_FILE(*sl_si91x_bus.o *sl_si91x_driver.o *sli_si91x_multithreaded.o *rsi_hal_mcu_m4_ram.o ) .text*)
+		
     /* .ctors */
     *crtbegin.o(.ctors)
     *crtbegin?.o(.ctors)
@@ -69,18 +58,18 @@ SECTIONS
 
     *(.rodata*)
     *(.eh_frame*)
-  } > FLASH
+  } > rom
 
   .ARM.extab :
   {
     *(.ARM.extab* .gnu.linkonce.armextab.*)
-  } > FLASH
+  } > rom
 
   __exidx_start = .;
   .ARM.exidx :
   {
     *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-  } > FLASH
+  } > rom
   __exidx_end = .;
 
     .copy.table :
@@ -99,7 +88,7 @@ SECTIONS
     LONG ((__data2_end__ - __data2_start__) / 4)
 */
     __copy_table_end__ = .;
-  } > FLASH
+  } > rom
 
     .zero.table :
   {
@@ -111,39 +100,37 @@ SECTIONS
     LONG ((__bss2_end__ - __bss2_start__) / 4)
 */
     __zero_table_end__ = .;
-  } > FLASH
+  } > rom
 
-  __etext = .;
+	__exidx_end = .;
+	__etext = .;
+	
+	/* _sidata is used in coide startup code */
+	_sidata = __etext; 
 
   /* Start placing output sections which are loaded into RAM */
-  . = ORIGIN(RAM);
-
-  .stack ALIGN(8) (NOLOAD):
-  {
-    __StackLimit = .;
-    KEEP(*(.stack*))
-    . = ALIGN(4);
-    __StackTop = .;
-    PROVIDE(__stack = __StackTop);
-  } > RAM
-
-
+  . = ORIGIN(ram);
+  
   .noinit . (NOLOAD):
   {
     *(.noinit*);
-  } > RAM
+  } > ram
 
   .data . : AT (__etext)
   {
     . = ALIGN(4);
     __data_start__ = .;
-    *(vtable)
-    *(SORT_BY_ALIGNMENT(.data*))
-    . = ALIGN (4);
-
-    PROVIDE(__ram_func_section_start = .);
-    *(.ram)
-    PROVIDE(__ram_func_section_end = .);
+        _sdata = __data_start__;
+        KEEP(*(.ramVector))	
+		KEEP(*(.init))
+		KEEP(*(.fini))
+		*(.rodata*)
+		*(vtable)
+		*(.data*)
+		*sl_si91x_bus.o(.text*)
+		*sl_si91x_driver.o(.text*)
+		*sli_si91x_multithreaded.o(.text*)
+		*rsi_hal_mcu_m4_ram.o(.text*)
 
     . = ALIGN(4);
     /* preinit data */
@@ -169,42 +156,73 @@ SECTIONS
     /* All data end */
     __data_end__ = .;
 
-  } > RAM
+   /* _edata is used in coide startup code */
+	_edata = __data_end__;
+
+  } > ram
 
   .bss . :
   {
     . = ALIGN(4);
     __bss_start__ = .;
+    _sbss = __bss_start__;
     *(SORT_BY_ALIGNMENT(.bss*))
     *(COMMON)
     . = ALIGN(4);
     __bss_end__ = .;
-  } > RAM
+    _ebss = __bss_end__;
+  } > ram
+
+	/* .stack_dummy section doesn't contains any symbols. It is only
+	* used for linker to calculate size of stack sections, and assign
+	* values to stack symbols later */
+	Co_Stack_Size = 0x3000;	
+	.co_stack ALIGN(8) (NOLOAD):
+	{
+		__co_stackLimit = .;
+		KEEP(*(.co_stack*))
+		. = ALIGN(4);
+		. += Co_Stack_Size;
+		__co_stackTop = .;
+	} > ram
+
+	StackSize = 0x1400;
+	.stack ALIGN(8) (NOLOAD):
+	{
+		__StackLimit = .;
+		KEEP(*(.stack*))
+		. = ALIGN(4);
+		. += StackSize;
+		__StackTop = .;
+		PROVIDE(__stack = __StackTop);			
+	} > ram
 
   .heap (COPY):
   {
-    __HeapBase = .;
-    __end__ = .;
-    end = __end__;
-    _end = __end__;
-    KEEP(*(.heap*))
-    __HeapLimit = ORIGIN(RAM) + LENGTH(RAM);
-  } > RAM
-
-  __heap_size = __HeapLimit - __HeapBase;
-  __ram_end__ = 0x400 + 0x3e800;
-  __main_flash_end__ = 0x8012000 + 0x400000;
-
-   /* This is where we handle flash storage blocks. We use dummy sections for finding the configured
+		__HeapBase = .;
+		__end__ = .;
+		end = __end__;
+		_end = __end__;
+		KEEP(*(.heap*))	
+		. = ORIGIN(ram) + LENGTH(ram);
+  		
+		__HeapLimit = .;			
+  } > ram
+  
+	__heap_size = __HeapLimit - __HeapBase;
+  __ram_end__ = 0x400 + 0x4e200;
+  __main_flash_end__ = 0x81c2000 + 0x200000;
+  
+	   /* This is where we handle flash storage blocks. We use dummy sections for finding the configured
    * block sizes and then "place" them at the end of flash when the size is known. */
   .internal_storage (DSECT) : {
     KEEP(*(.internal_storage*))
-  } > FLASH
+  } > rom
   
 
   .nvm (DSECT) : {
     KEEP(*(.simee*))
-  } > FLASH
+  } > rom
 
   linker_nvm_end = __main_flash_end__;
   linker_nvm_begin = linker_nvm_end - SIZEOF(.nvm);
@@ -216,7 +234,7 @@ SECTIONS
   linker_storage_size = SIZEOF(.internal_storage);
   ASSERT((linker_storage_begin >= (__etext + SIZEOF(.data))), "FLASH memory overflowed !")
 
-
-  app_flash_end = 0x8012000 + 0x400000;
+  app_flash_end = 0x81c2000 + 0x200000;
   ASSERT( (linker_nvm_begin + SIZEOF(.nvm)) <= app_flash_end, "NVM3 is excessing the flash size !")
 }
+
