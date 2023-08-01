@@ -115,10 +115,7 @@ set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
 )
 endif (CONFIG_ENABLE_PW_RPC)
 
-set(PRIV_REQUIRES_LIST chip QRCode bt driver app_update nvs_flash spi_flash openthread)
-if(CONFIG_HAVE_DISPLAY)
-    list(APPEND PRIV_REQUIRES_LIST tft spidrier screen-framework)
-endif()
+set(PRIV_REQUIRES_LIST chip QRCode bt driver app_update nvs_flash spi_flash openthread tft spidriver screen-framework)
 
 if(CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM)
     list(APPEND PRIV_REQUIRES_LIST led_strip)
