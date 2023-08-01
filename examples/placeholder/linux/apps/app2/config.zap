@@ -1,5 +1,5 @@
 {
-  "featureLevel": 96,
+  "featureLevel": 97,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -14579,7 +14579,7 @@
   ],
   "endpoints": [
     {
-      "endpointTypeName": "Anonymous Endpoint Type",
+      "endpointTypeName": "MA-rootdevice",
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
