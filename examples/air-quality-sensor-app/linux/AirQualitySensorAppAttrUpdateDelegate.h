@@ -39,7 +39,7 @@ private:
      * Should be called to set new value of AirQuality.
      */
     void OnAirQualityChangeHandler(uint8_t newValue);
-    
+
     /**
      * Should be called to set new value of Temperature.
      */
