@@ -1534,6 +1534,9 @@ server cluster CarbonMonoxideConcentrationMeasurement = 1036 {
     kAverageMeasurement = 0x20;
   }
 
+  readonly attribute nullable single measuredValue = 0;
+  readonly attribute nullable single minMeasuredValue = 1;
+  readonly attribute nullable single maxMeasuredValue = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1578,6 +1581,9 @@ server cluster CarbonDioxideConcentrationMeasurement = 1037 {
     kAverageMeasurement = 0x20;
   }
 
+  readonly attribute nullable single measuredValue = 0;
+  readonly attribute nullable single minMeasuredValue = 1;
+  readonly attribute nullable single maxMeasuredValue = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1622,6 +1628,9 @@ server cluster NitrogenDioxideConcentrationMeasurement = 1043 {
     kAverageMeasurement = 0x20;
   }
 
+  readonly attribute nullable single measuredValue = 0;
+  readonly attribute nullable single minMeasuredValue = 1;
+  readonly attribute nullable single maxMeasuredValue = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1666,6 +1675,9 @@ server cluster OzoneConcentrationMeasurement = 1045 {
     kAverageMeasurement = 0x20;
   }
 
+  readonly attribute nullable single measuredValue = 0;
+  readonly attribute nullable single minMeasuredValue = 1;
+  readonly attribute nullable single maxMeasuredValue = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1710,6 +1722,9 @@ server cluster Pm25ConcentrationMeasurement = 1066 {
     kAverageMeasurement = 0x20;
   }
 
+  readonly attribute nullable single measuredValue = 0;
+  readonly attribute nullable single minMeasuredValue = 1;
+  readonly attribute nullable single maxMeasuredValue = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1754,6 +1769,9 @@ server cluster FormaldehydeConcentrationMeasurement = 1067 {
     kAverageMeasurement = 0x20;
   }
 
+  readonly attribute nullable single measuredValue = 0;
+  readonly attribute nullable single minMeasuredValue = 1;
+  readonly attribute nullable single maxMeasuredValue = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1798,6 +1816,9 @@ server cluster Pm1ConcentrationMeasurement = 1068 {
     kAverageMeasurement = 0x20;
   }
 
+  readonly attribute nullable single measuredValue = 0;
+  readonly attribute nullable single minMeasuredValue = 1;
+  readonly attribute nullable single maxMeasuredValue = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1842,6 +1863,9 @@ server cluster Pm10ConcentrationMeasurement = 1069 {
     kAverageMeasurement = 0x20;
   }
 
+  readonly attribute nullable single measuredValue = 0;
+  readonly attribute nullable single minMeasuredValue = 1;
+  readonly attribute nullable single maxMeasuredValue = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1886,6 +1910,9 @@ server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
     kAverageMeasurement = 0x20;
   }
 
+  readonly attribute nullable single measuredValue = 0;
+  readonly attribute nullable single minMeasuredValue = 1;
+  readonly attribute nullable single maxMeasuredValue = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1930,6 +1957,9 @@ server cluster RadonConcentrationMeasurement = 1071 {
     kAverageMeasurement = 0x20;
   }
 
+  readonly attribute nullable single measuredValue = 0;
+  readonly attribute nullable single minMeasuredValue = 1;
+  readonly attribute nullable single maxMeasuredValue = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2245,8 +2275,8 @@ endpoint 1 {
 
   server cluster TemperatureMeasurement {
     ram      attribute measuredValue;
-    ram      attribute minMeasuredValue default = 0x8000;
-    ram      attribute maxMeasuredValue default = 0x8000;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2268,6 +2298,9 @@ endpoint 1 {
   }
 
   server cluster CarbonMonoxideConcentrationMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2277,6 +2310,9 @@ endpoint 1 {
   }
 
   server cluster CarbonDioxideConcentrationMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2286,6 +2322,9 @@ endpoint 1 {
   }
 
   server cluster NitrogenDioxideConcentrationMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2295,6 +2334,9 @@ endpoint 1 {
   }
 
   server cluster OzoneConcentrationMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2304,6 +2346,9 @@ endpoint 1 {
   }
 
   server cluster Pm25ConcentrationMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2313,6 +2358,9 @@ endpoint 1 {
   }
 
   server cluster FormaldehydeConcentrationMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2322,6 +2370,9 @@ endpoint 1 {
   }
 
   server cluster Pm1ConcentrationMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2331,6 +2382,9 @@ endpoint 1 {
   }
 
   server cluster Pm10ConcentrationMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2340,6 +2394,9 @@ endpoint 1 {
   }
 
   server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2349,6 +2406,9 @@ endpoint 1 {
   }
 
   server cluster RadonConcentrationMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
