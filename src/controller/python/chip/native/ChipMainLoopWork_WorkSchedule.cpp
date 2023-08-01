@@ -57,7 +57,7 @@ void ExecuteInMainLoop(std::function<void()> f)
 #endif
 
 #if defined(__APPLE__)
-    if (chip::DeviceLayer::PlatformManagerImpl()::IsWorkQueueCurrentQueue())
+    if (chip::DeviceLayer::PlatformManagerImpl().IsWorkQueueCurrentQueue())
     {
         f();
         return;
