@@ -272,7 +272,7 @@
         "TestTimeSynchronization",
         "TestOperationalState",
         "TestRVCOperationalState",
-        "TestDishwasherAlarm.yaml"
+        "TestDishwasherAlarm"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
