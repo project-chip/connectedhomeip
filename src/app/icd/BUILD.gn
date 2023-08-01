@@ -30,10 +30,13 @@ source_set("manager-srcs") {
   ]
 
   deps = [
-    ":cluster-srcs",
     ":observer-srcs",
   ]
-  public_deps = [ "${chip_root}/src/credentials:credentials" ]
+  
+  public_deps = [
+    ":cluster-srcs",
+    "${chip_root}/src/credentials:credentials",
+  ]
 }
 
 # ICD management cluster source-set is broken out of the main source-set to enable unit tests
