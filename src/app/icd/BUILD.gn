@@ -29,11 +29,11 @@ source_set("manager-srcs") {
     "ICDManager.h",
   ]
 
-  deps = [
+  public_deps = [
     ":cluster-srcs",
     ":observer-srcs",
+    "${chip_root}/src/credentials:credentials",
   ]
-  public_deps = [ "${chip_root}/src/credentials:credentials" ]
 }
 
 # ICD management cluster source-set is broken out of the main source-set to enable unit tests
