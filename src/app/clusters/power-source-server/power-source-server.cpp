@@ -145,6 +145,7 @@ CHIP_ERROR PowerSourceServer::SetEndpointList(EndpointId powerSourceClusterEndpo
     {
         return CHIP_ERROR_NO_MEMORY;
     }
+    sPowerSourceClusterInfo[idx].Shutdown();
     if (endpointList.size() == 0)
     {
         sPowerSourceClusterInfo[idx] = PowerSourceClusterInfo();
