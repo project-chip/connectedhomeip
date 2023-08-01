@@ -71,13 +71,18 @@ PowerSourceServer gPowerSourceServer;
 PowerSourceAttrAccess gAttrAccess;
 
 #ifdef ZCL_USING_POWER_SOURCE_CLUSTER_SERVER
-static constexpr size_t kNumSupportedEndpoints =
-    EMBER_AF_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+#define POWER_SERVER_NUM_SUPPORTED_ENDPOINTS                                                                                       \
+    (EMBER_AF_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
 #else
-static constexpr size_t kNumSupportedEndpoints = CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+#define POWER_SERVER_NUM_SUPPORTED_ENDPOINTS CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
 #endif
+static constexpr size_t kNumSupportedEndpoints = POWER_SERVER_NUM_SUPPORTED_ENDPOINTS;
 
+#if POWER_SERVER_NUM_SUPPORTED_ENDPOINTS > 0
 PowerSourceClusterInfo sPowerSourceClusterInfo[kNumSupportedEndpoints] = {};
+#else
+PowerSourceClusterInfo * sPowerSourceClusterInfo = nullptr;
+#endif
 
 } // anonymous namespace
 
@@ -137,14 +142,15 @@ CHIP_ERROR PowerSourceServer::SetEndpointList(EndpointId powerSourceClusterEndpo
     // TODO: should check here that the power source cluster exists on the endpoint, but for now let's take the caller's word for it
 
     size_t idx = PowerSourceClusterEndpointIndex(powerSourceClusterEndpoint);
-    if (idx == std::numeric_limits<size_t>::max())
+    if (idx >= kNumSupportedEndpoints)
     {
         idx = NextEmptyIndex();
     }
-    if (idx == std::numeric_limits<size_t>::max())
+    if (idx >= kNumSupportedEndpoints)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
+
     sPowerSourceClusterInfo[idx].Shutdown();
     if (endpointList.size() == 0)
     {
