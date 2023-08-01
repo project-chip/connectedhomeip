@@ -35,15 +35,6 @@ extern "C" {
 #include <mbedtls/platform.h>
 #include <string.h>
 
-#if 0 //common flash
-using namespace ::chip;
-using namespace ::chip::Inet;
-using namespace ::chip::DeviceLayer;
-using namespace ::chip::Credentials;
-#endif
-//volatile int apperror_cnt;
-//static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
-
 void initAntenna(void);
 
 /* GPIO button config */
@@ -66,51 +57,5 @@ void init_ccpPlatform(void)
 }
 
 #ifdef __cplusplus
-}
-#endif
-
-#if 0 //common flash
-void application_start(const void *unused)
-{
-  sl_status_t status;
-  CHIP_ERROR err = CHIP_NO_ERROR;
-  SILABS_LOG("Wireless init starting");
-  if ((status = wfx_wifi_rsi_init()) != SL_STATUS_OK)
-  {
-      SILABS_LOG("wfx_wifi_start() failed: %s", status);
-      return;
-  }
-  SILABS_LOG("WIFI init completed");
-  if (SilabsMatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
-  {
-      appError(CHIP_ERROR_INTERNAL);
-  }
-  gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
-  chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-  chip::DeviceLayer::PlatformMgr().LockChipStack();
-#ifdef SILABS_ATTESTATION_CREDENTIALS
-  SetDeviceAttestationCredentialsProvider(Silabs::GetSilabsDacProvider());
-#else
-  SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-#endif
-  chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-  SILABS_LOG("Starting App Task");
-#ifndef WINDOWS_APP
-  err = AppTask::GetAppTask().StartAppTask();
-#else
-  WindowApp & app = WindowApp::Instance();
-  err = app.Init();
-#endif
-  if (err != CHIP_NO_ERROR)
-  {
-      appError(CHIP_ERROR_INTERNAL);
-  }
-  osThreadTerminate(main_Task);
-}
-void Create_application_task(void)
-{
-  main_Task = osThreadNew((osThreadFunc_t)application_start, NULL, &thread_attributes);
-  SILABS_LOG("Starting FreeRTOS scheduler");
-  vTaskStartScheduler();
 }
 #endif

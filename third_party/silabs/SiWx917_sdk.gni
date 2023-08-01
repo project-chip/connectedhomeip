@@ -166,10 +166,11 @@ template("siwx917_sdk") {
       # "SL_WIFI_PSK=\"matter@123\"",
     ]
 
-    if ( silabs_board == BRD4325C ) {
-      define += [ "BRD4325C",
+    if ( silabs_board == "BRD4325C" ) {
+      defines += [ "BRD4325C",
                   "EXECUTION_FROM_RAM",
-    ]
+      ]
+    }
 
     if (chip_build_libshell) {
       defines += [ "ENABLE_CHIP_SHELL" ]
@@ -333,16 +334,6 @@ template("siwx917_sdk") {
       "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_m4.c",
       "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_platform_init.c",
 
-      # startup
-      "${examples_plat_dir}/device/src/startup_RS1xxxx.c",
-
-      # nvm3
-      if ( silabs_board == BRD4325B ) {
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/middleware/nvm3/src/sl_si91x_dual_flash_intf.c",
-      } else {
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/middleware/nvm3/src/sl_si91x_common_flash_intf.c",
-      }
-
       "${wifi_sdk_root}/components/siwx917_soc/drivers/middleware/nvm3/src/sl_si91x_nvm3_hal_flash.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_lock.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default_common_linker.c",
@@ -396,6 +387,22 @@ template("siwx917_sdk") {
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509_crt.c",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509write_csr.c",
     ]
+
+
+      # nvm3 ans startup
+      if ( silabs_board == "BRD4325B" ) {
+      sources += [
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/middleware/nvm3/src/sl_si91x_dual_flash_intf.c",
+        "${examples_plat_dir}/device/src/startup_RS1xxxx.c",
+        ]
+      }
+
+      if (silabs_board != "BRD4325B" ) {
+      sources += [
+        "${wifi_sdk_root}/components/siwx917_soc/core/chip/src/startup_si91x.c",
+        "${wifi_sdk_root}/components/siwx917_soc/drivers/middleware/nvm3/src/sl_si91x_common_flash_intf.c",
+        ]
+      }
 
     public_deps = [
       ":siwx917_mbedtls_config",

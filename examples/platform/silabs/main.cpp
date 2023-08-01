@@ -20,6 +20,7 @@
 #include <AppTask.h>
 
 #include "AppConfig.h"
+#include "main_task.h"
 
 #include <DeviceInfoProviderImpl.h>
 #include <MatterConfig.h>
@@ -48,6 +49,31 @@ int main(void)
 {
     GetPlatform().Init();
 
+    main_Task = osThreadNew((osThreadFunc_t)application_start, NULL, &thread_attributes);
+
+    SILABS_LOG("Starting scheduler");
+    GetPlatform().StartScheduler();
+
+    // Should never get here.
+    chip::Platform::MemoryShutdown();
+    SILABS_LOG("vTaskStartScheduler() failed");
+    appError(CHIP_ERROR_INTERNAL);
+}
+
+void application_start(const void *unused)
+{
+
+#ifdef SI917
+    sl_status_t status;
+    SILABS_LOG("Wireless init starting");
+    if ((status = wfx_wifi_rsi_init()) != SL_STATUS_OK)
+    {
+        SILABS_LOG("wfx_wifi_start() failed: %s", status);
+        return;
+    }
+    SILABS_LOG("WIFI init completed");
+#endif // SI917
+
     if (SilabsMatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
         appError(CHIP_ERROR_INTERNAL);
 
@@ -67,11 +93,5 @@ int main(void)
     if (AppTask::GetAppTask().StartAppTask() != CHIP_NO_ERROR)
         appError(CHIP_ERROR_INTERNAL);
 
-    SILABS_LOG("Starting scheduler");
-    GetPlatform().StartScheduler();
-
-    // Should never get here.
-    chip::Platform::MemoryShutdown();
-    SILABS_LOG("vTaskStartScheduler() failed");
-    appError(CHIP_ERROR_INTERNAL);
+    osThreadTerminate(main_Task);
 }

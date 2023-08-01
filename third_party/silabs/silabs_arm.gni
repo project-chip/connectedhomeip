@@ -14,7 +14,7 @@
 
 import("silabs_board.gni")
 
-if (silabs_family == "efr32mg12" || silabs_family == "SiWx917") {
+if (silabs_family == "efr32mg12" || silabs_family == "SiWx917-dual" || silabs_family == "SiWx917-common") {
   arm_arch = "armv7e-m"
   arm_abi = "aapcs"
   arm_cpu = "cortex-m4"
