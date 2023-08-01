@@ -168,4 +168,6 @@
 
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1
 
+#define EXTERNAL_BLEMANAGERIMPL_HEADER <platform/nxp/k32w/common/BLEManagerImpl.h>
+
 #include <platform/nxp/k32w/common/CHIPDevicePlatformRamStorageConfig.h>

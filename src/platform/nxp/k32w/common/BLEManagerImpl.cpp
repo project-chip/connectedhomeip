@@ -28,6 +28,13 @@
 
 #include <platform/CommissionableDataProvider.h>
 
+//To be fixed
+#if CPU_JN518X
+#include <src/platform/nxp/k32w/k32w0/BLEManagerInit.h>
+#else
+#include <src/platform/nxp/k32w/k32w1/BLEManagerInit.h>
+#endif
+
 #include <crypto/CHIPCryptoPAL.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -35,7 +42,6 @@
 #include <ble/CHIPBleServiceData.h>
 
 #include "board.h"
-#include "fsl_xcvr.h"
 #include "gatt_db_app_interface.h"
 #include "gatt_db_handles.h"
 #include "stdio.h"
@@ -54,12 +60,6 @@
  * Local data types
  *******************************************************************************/
 extern "C" bool_t Ble_ConfigureHostStackConfig(void);
-extern "C" void (*pfBLE_SignalFromISR)(void);
-extern "C" bool_t Ble_CheckMemoryStorage(void);
-
-extern osaEventId_t gHost_TaskEvent;
-extern msgQueue_t gApp2Host_TaskQueue;
-extern msgQueue_t gHci2Host_TaskQueue;
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -93,6 +93,8 @@ namespace {
 #define CHIP_BLE_KW_EVNT_INDICATION_CONFIRMED 0x0080
 /** BLE send indication failed */
 #define CHIP_BLE_KW_EVNT_INDICATION_FAILED 0x0100
+/** TX Power Level Set */
+#define CHIP_BLE_KW_EVNT_POWER_LEVEL_SET 0x0200
 /** Maximal time of connection without activity */
 #define CHIP_BLE_KW_CONN_TIMEOUT 60000
 /** Maximum number of pending BLE events */
@@ -123,7 +125,6 @@ QueueHandle_t sBleEventQueue;
 /* Used to manage asynchronous events from BLE Stack: e.g.: GAP setup finished */
 EventGroupHandle_t  sEventGroup;
 
-osaEventId_t mControllerTaskEvent;
 TimerHandle_t connectionTimeout;
 
 /* keep the device ID of the connected peer */
@@ -146,7 +147,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     EventBits_t eventBits;
-    BaseType_t bleAppCreated    = errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY;
     uint16_t attChipRxHandle[1] = { (uint16_t) value_chipoble_rx };
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -167,30 +167,19 @@ CHIP_ERROR BLEManagerImpl::_Init()
     sEventGroup = xEventGroupCreate();
     VerifyOrExit(sEventGroup != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
-    pfBLE_SignalFromISR = BLE_SignalFromISRCallback;
-
-    /* Set the config structure to the host stack */
-    VerifyOrExit(Ble_ConfigureHostStackConfig() == TRUE, err = CHIP_ERROR_INCORRECT_STATE);
-
     /* Prepare callback input queue.*/
     sBleEventQueue = xQueueCreate(CHIP_BLE_EVENT_QUEUE_MAX_ENTRIES, sizeof(blekw_msg_t*));
     VerifyOrExit(sBleEventQueue != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* Create the connection timeout timer. */
-    connectionTimeout =
-        xTimerCreate("bleTimeoutTmr", pdMS_TO_TICKS(CHIP_BLE_KW_CONN_TIMEOUT), pdFALSE, (void *) 0, blekw_connection_timeout_cb);
+    connectionTimeout = xTimerCreate("bleTimeoutTmr",
+                                     pdMS_TO_TICKS(CHIP_BLE_KW_CONN_TIMEOUT),
+                                     pdFALSE,
+                                     (void *) 0,
+                                     blekw_connection_timeout_cb);
+    VerifyOrExit(connectionTimeout != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
-    /* BLE Radio Init */
-    VerifyOrExit(XCVR_Init(BLE_MODE, DR_2MBPS) == gXcvrSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
-
-    /* Create BLE Controller Task */
-    VerifyOrExit(blekw_controller_init() == CHIP_NO_ERROR, err = CHIP_ERROR_INCORRECT_STATE);
-
-    /* Create BLE Host Task */
-    VerifyOrExit(blekw_host_init() == CHIP_NO_ERROR, err = CHIP_ERROR_INCORRECT_STATE);
-
-    /* BLE Host Stack Init */
-    Ble_HostInitialize(blekw_generic_cb, (hciHostToControllerInterface_t) Hci_SendPacketToController);
+    SuccessOrExit(BLEManagerInit::InitHostController(&blekw_generic_cb));
 
     /* Register the GATT server callback */
     VerifyOrExit(GattServer_RegisterCallback(blekw_gatt_server_cb) == gBleSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
@@ -199,25 +188,13 @@ CHIP_ERROR BLEManagerImpl::_Init()
     eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_INIT_COMPLETE, pdTRUE, pdTRUE, CHIP_BLE_KW_EVNT_TIMEOUT);
     VerifyOrExit(eventBits & CHIP_BLE_KW_EVNT_INIT_COMPLETE, CHIP_ERROR_INCORRECT_STATE);
 
-#if BLE_HIGH_TX_POWER
-    /* Set Adv Power */
-    Gap_SetTxPowerLevel(gAdvertisingPowerLeveldBm_c, gTxPowerAdvChannel_c);
-    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, pdTRUE, pdTRUE, CHIP_BLE_KW_EVNT_TIMEOUT);
-    VerifyOrExit(eventBits & CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, CHIP_ERROR_INCORRECT_STATE);
-
-    /* Set Connect Power */
-    Gap_SetTxPowerLevel(gConnectPowerLeveldBm_c, gTxPowerConnChannel_c);
-    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, pdTRUE, pdTRUE, CHIP_BLE_KW_EVNT_TIMEOUT);
-    VerifyOrExit(eventBits & CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, CHIP_ERROR_INCORRECT_STATE);
-#endif
-
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
     PWR_ChangeDeepSleepMode(cPWR_PowerDown_RamRet);
 #endif
 
     GattServer_RegisterHandlesForWriteNotifications(1, attChipRxHandle);
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    GattServer_RegisterHandlesForReadNotifications(1, attChipC3Handle);
+    VerifyOrExit(GattServer_RegisterHandlesForReadNotifications(1, attChipC3Handle) == gBleSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
 #endif
 
     mFlags.Set(Flags::kK32WBLEStackInitialized);
@@ -226,12 +203,13 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
     sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
-                                       1,                   // == default timer period (mS)
+                                       pdMS_TO_TICKS(100),  // == default timer period (mS)
                                        false,               // no timer reload (==one-shot)
                                        (void *) this,       // init timer id = ble obj context
                                        BleAdvTimeoutHandler // timer callback handler
     );
     VerifyOrExit(sbleAdvTimeoutTimer != NULL, err = CHIP_ERROR_INCORRECT_STATE);
+
 exit:
     return err;
 }
@@ -553,80 +531,6 @@ BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_send_event(int8_t connection_han
 /*******************************************************************************
  * Private functions
  *******************************************************************************/
-CHIP_ERROR BLEManagerImpl::blekw_controller_init(void)
-{
-    mControllerTaskEvent = OSA_EventCreate(TRUE);
-
-    if (!mControllerTaskEvent)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    Controller_TaskEventInit(mControllerTaskEvent, gUseRtos_c);
-
-    /* Task creation */
-    if (pdPASS !=
-        xTaskCreate(Controller_TaskHandler, "controllerTask", CONTROLLER_TASK_STACK_SIZE, (void *) 0, CONTROLLER_TASK_PRIORITY,
-                    NULL))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    /* Setup Interrupt priorities of Interrupt handlers that are used
-     * in application to meet requirements of FreeRTOS */
-
-    // BLE_DP_IRQHandler
-    NVIC_SetPriority(BLE_DP_IRQn, configMAX_PRIORITIES - 1);
-    // BLE_DP0_IRQHandler
-    NVIC_SetPriority(BLE_DP0_IRQn, configMAX_PRIORITIES - 1);
-    // BLE_DP1_IRQHandler
-    NVIC_SetPriority(BLE_DP1_IRQn, configMAX_PRIORITIES - 1);
-    // BLE_DP2_IRQHandler
-    NVIC_SetPriority(BLE_DP2_IRQn, configMAX_PRIORITIES - 1);
-    // BLE_LL_ALL_IRQHandler
-    NVIC_SetPriority(BLE_LL_ALL_IRQn, configMAX_PRIORITIES - 1);
-
-    /* Check for available memory storage */
-    if (!Ble_CheckMemoryStorage())
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    /* BLE Controller Init */
-    if (osaStatus_Success != Controller_Init(Ble_HciRecv))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void BLEManagerImpl::Host_Task(osaTaskParam_t argument)
-{
-    Host_TaskHandler((void *) NULL);
-}
-
-CHIP_ERROR BLEManagerImpl::blekw_host_init(void)
-{
-    /* Initialization of task related */
-    gHost_TaskEvent = OSA_EventCreate(TRUE);
-    if (!gHost_TaskEvent)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    /* Initialization of task message queue */
-    MSG_InitQueue(&gApp2Host_TaskQueue);
-    MSG_InitQueue(&gHci2Host_TaskQueue);
-
-    /* Task creation */
-    if (pdPASS != xTaskCreate(Host_Task, "hostTask", HOST_TASK_STACK_SIZE, (void *) 0, HOST_TASK_PRIORITY, NULL))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    return CHIP_NO_ERROR;
-}
 
 BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_start_advertising(gapAdvertisingParameters_t * adv_params,
                                                                   gapAdvertisingData_t * adv, gapScanResponseData_t * scnrsp)
@@ -1161,9 +1065,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(blekw_msg_t * msg)
     bleConnState = GetConnectionState(att_wr_data->device_id, false);
     VerifyOrExit(bleConnState != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-    /* Determine if the client is enabling or disabling indications.
-     * TODO: Check the indications corresponding bit
-     */
+    /* Determine if the client is enabling or disabling indications. */
     indicationsEnabled = (*data);
 
 #if CHIP_DEVICE_CHIP0BLE_DEBUG
@@ -1264,11 +1166,11 @@ void BLEManagerImpl::blekw_generic_cb(gapGenericEvent_t * pGenericEvent)
         break;
 
     case gAdvertisingSetupFailed_c:
-    	xEventGroupSetBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED);
+        xEventGroupSetBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED);
         break;
 
     case gAdvertisingParametersSetupComplete_c:
-    	xEventGroupSetBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_PAR_SETUP_COMPLETE);
+        xEventGroupSetBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_PAR_SETUP_COMPLETE);
         break;
 
     case gAdvertisingDataSetupComplete_c:
@@ -1554,15 +1456,13 @@ CHIP_ERROR BLEManagerImpl::blekw_msg_add_u16(blekw_msg_type_t type, uint16_t dat
     return CHIP_NO_ERROR;
 }
 
-/*******************************************************************************
- * FreeRTOS Task Management Functions
- *******************************************************************************/
-
 void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 {
     // If stop advertising fails (timeout on event wait), then
     // rearm the timer as fast as possible to retry.
     // Once stop advertising is successful, slow advertising can start.
+    // However, this does not fix the root cause of the issue.
+    // Additional investigation is currently ongoing: https://jira.sw.nxp.com/browse/MATTER-768
     auto err = sInstance.StopAdvertising();
     if (err != CHIP_NO_ERROR)
     {

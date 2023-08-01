@@ -27,16 +27,12 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include "Messaging.h"
-
 #include "fsl_os_abstraction.h"
 
 #include "ble_conn_manager.h"
-#include "ble_controller_task_config.h"
 #include "ble_general.h"
 #include "ble_host_task_config.h"
 #include "ble_host_tasks.h"
-#include "controller_interface.h"
 #include "gap_interface.h"
 #include "gatt_db_dynamic.h"
 #include "gatt_server_interface.h"
@@ -64,7 +60,9 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    void _Shutdown() {}
+    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
+    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
+    CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -119,7 +117,7 @@ private:
     enum
     {
         kMaxConnections      = BLE_LAYER_NUM_BLE_ENDPOINTS,
-        kMaxDeviceNameLength = 32,
+        kMaxDeviceNameLength = 16,
         kUnusedIndex         = 0xFF,
     };
 
@@ -164,8 +162,8 @@ private:
         BLE_E_STOP,
         BLE_E_FAIL,
         BLE_E_START_ADV_FAILED,
-        BLE_INTERNAL_ERROR,
         BLE_KW_MSG_2M_UPGRADE_ERROR,
+        BLE_INTERNAL_ERROR,
     } ble_err_t;
 
     typedef struct ble_att_written_data_s
@@ -182,7 +180,7 @@ private:
         uint16_t handle;
     } blekw_att_read_data_t;
 
-    struct CHIPoBLEConState
+    typedef struct CHIPoBLEConState_s
     {
         uint16_t mtu : 10;
         uint16_t allocated : 1;
@@ -190,7 +188,8 @@ private:
         uint16_t unused : 4;
         uint8_t connectionHandle;
         uint8_t bondingHandle;
-    };
+    }CHIPoBLEConState;
+    
     CHIPoBLEConState mBleConnections[kMaxConnections];
 
     CHIPoBLEServiceMode mServiceMode;
@@ -207,7 +206,9 @@ private:
     CHIP_ERROR StopAdvertising(void);
     void HandleSoftDeviceBLEEvent(const ChipDeviceEvent * event);
     void HandleConnectEvent(blekw_msg_t * msg);
+    void HandleConnectEvent(uint8_t connId);
     void HandleConnectionCloseEvent(blekw_msg_t * msg);
+    void HandleConnectionCloseEvent(uint8_t connId);
     void HandleWriteEvent(blekw_msg_t * msg);
     void HandleRXCharWrite(blekw_msg_t * msg);
     void HandleTXCharCCCDWrite(blekw_msg_t * msg);
@@ -230,7 +231,10 @@ private:
     BLEManagerImpl::CHIPoBLEConState * GetConnectionState(uint8_t connectionHandle, bool allocate);
 
     static void DriveBLEState(intptr_t arg);
-
+    static void HandleWriteEvent(intptr_t arg);
+    static void HandleDisconnectEvent(intptr_t arg);
+    static void HandleAdvIntervalChange(intptr_t arg);
+        
     static void BLE_SignalFromISRCallback(void);
     static void blekw_connection_timeout_cb(TimerHandle_t timer);
     static CHIP_ERROR blekw_msg_add_u8(blekw_msg_type_t type, uint8_t data);
@@ -238,9 +242,6 @@ private:
     static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
     static void CancelBleAdvTimeoutTimer(void);
     static void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
-    static CHIP_ERROR blekw_controller_init(void);
-    static CHIP_ERROR blekw_host_init(void);
-    static void Host_Task(osaTaskParam_t argument);
     static void blekw_generic_cb(gapGenericEvent_t * pGenericEvent);
     static void blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent_t * pServerEvent);
     static CHIP_ERROR blekw_msg_add_u16(blekw_msg_type_t type, uint16_t data);
@@ -254,7 +255,6 @@ private:
     static void blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionEvent_t * pConnectionEvent);
     static void blekw_start_connection_timeout(void);
     static void blekw_stop_connection_timeout(void);
-
     static void DoBleProcessing(intptr_t arg);
 
 public:
@@ -287,6 +287,11 @@ inline BLEManagerImpl & BLEMgrImpl(void)
 inline BleLayer * BLEManagerImpl::_GetBleLayer()
 {
     return this;
+}
+
+inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
+{
+    return mServiceMode;
 }
 
 } // namespace Internal
