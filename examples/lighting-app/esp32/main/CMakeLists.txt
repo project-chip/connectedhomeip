@@ -67,7 +67,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/scenes-server"
 )
 
-set(PRIV_REQUIRES_LIST chip QRCode bt led_strip app_update openthread driver nvs_flash spi_flash)
+set(PRIV_REQUIRES_LIST chip QRCode bt led_strip app_update openthread driver nvs_flash spi_flash tft screen-framework)
 
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
@@ -91,10 +91,6 @@ set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed/esp32"
 )
 endif (CONFIG_ENABLE_PW_RPC)
-
-if (CONFIG_HAVE_DISPLAY)
-    list(APPEND PRIV_REQUIRES_LIST tft screen-framework)
-endif()
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
                        SRC_DIRS ${SRC_DIRS_LIST}
