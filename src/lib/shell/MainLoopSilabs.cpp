@@ -32,15 +32,19 @@ using chip::Shell::streamer_get;
 
 namespace {
 
-constexpr const char kShellPrompt[] = "matterCli > ";
+constexpr const char kShellPrompt[] = "matterCli> ";
 
 // max > 1
+bool haveCR = false;
+
 void ReadLine(char * buffer, size_t max)
 {
     size_t line_sz = 0;
+    size_t read    = 0;
+    bool done      = false;
 
     // Read in characters until we get a line ending or EOT.
-    for (bool done = false; !done;)
+    while ((line_sz < max) && !done)
     {
         // Stop reading if we've run out of space in the buffer (still need to null-terminate).
         if (line_sz >= max - 1u)
@@ -52,45 +56,69 @@ void ReadLine(char * buffer, size_t max)
 #ifdef BRD4325A
         // for 917 SoC board, we need to create a rx event before we wait for the shell activity
         // NotifyShellProcessFromISR() is called once the buffer is filled
-        if (streamer_read(streamer_get(), buffer + line_sz, 1) != 1)
+        while (streamer_read(streamer_get(), buffer + read, 1) == 1)
         {
-            continue;
+            // Count how many characters were read; usually one but could be copy/paste
+            read++;
         }
 #endif
         chip::WaitForShellActivity();
 #ifndef BRD4325A
         // for EFR32 boards
-        if (streamer_read(streamer_get(), buffer + line_sz, 1) != 1)
+        while (streamer_read(streamer_get(), buffer + read, 1) == 1)
         {
-            continue;
+            // Count how many characters were read; usually one but could be copy/paste
+            read++;
         }
 #endif
-
-        // Process character we just read.
-        switch (buffer[line_sz])
+        while (line_sz < read && line_sz < max)
         {
-        case '\r':
-        case '\n':
-            streamer_printf(streamer_get(), "\r\n");
-            buffer[line_sz] = '\0';
-            line_sz++;
-            done = true;
-            break;
-        case 0x7F:
-            // Do not accept backspace character (i.e. don't increment line_sz) and remove 1 additional character if it exists.
-            if (line_sz >= 1u)
+            // Process character we just read.
+            switch (buffer[line_sz])
             {
-                streamer_printf(streamer_get(), "\b \b");
-                line_sz--;
-            }
-            break;
-        default:
-            if (isprint(static_cast<int>(buffer[line_sz])) || buffer[line_sz] == '\t')
-            {
-                streamer_printf(streamer_get(), "%c", buffer[line_sz]);
+            case '\r':
+                buffer[line_sz] = '\0';
+                streamer_printf(streamer_get(), "\r\n");
+                haveCR = true;
+                done   = true;
                 line_sz++;
+                break;
+            case '\n':
+                if (haveCR)
+                {
+                    // Do nothing - already taken care of with CR, return to loop and don't increment buffer
+                    haveCR = false;
+                    read--;
+                }
+                else
+                {
+                    buffer[line_sz] = '\0';
+                    streamer_printf(streamer_get(), "\r\n");
+                    done = true;
+                    line_sz++;
+                }
+                break;
+            case 0x7F:
+                // Do not accept backspace character (i.e. don't increment line_sz) and remove 1 additional character if it exists.
+                if (line_sz >= 1u)
+                {
+                    // Delete backspace character + whatever came before it
+                    streamer_printf(streamer_get(), "\b \b");
+                    line_sz--;
+                    read--;
+                }
+                // Remove backspace character regardless
+                read--;
+
+                break;
+            default:
+                if (isprint(static_cast<int>(buffer[line_sz])) || buffer[line_sz] == '\t')
+                {
+                    streamer_printf(streamer_get(), "%c", buffer[line_sz]);
+                    line_sz++;
+                }
+                break;
             }
-            break;
         }
     }
 }
@@ -131,6 +159,7 @@ int TokenizeLine(char * buffer, char ** tokens, int max_tokens)
     tokens[cursor++] = &buffer[i];
 
     for (; i < len && cursor < max_tokens; i++)
+
     {
         if (IsEscape(buffer[i]) && IsEscapable(buffer[i + 1]))
         {
