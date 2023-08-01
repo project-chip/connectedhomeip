@@ -43,25 +43,26 @@ void PerformWork(intptr_t arg)
     work->Post();
 }
 
+} // namespace
 
-} // namespace 
-
-void ExecuteInMainLoop(std::function<void()> f) {
+void ExecuteInMainLoop(std::function<void()> f)
+{
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
-    if (chip::DeviceLayer::PlatformMgr().IsChipStackLockedByCurrentThread()) {
+    if (chip::DeviceLayer::PlatformMgr().IsChipStackLockedByCurrentThread())
+    {
         f();
         return;
     }
 #endif
 
 #if defined(__APPLE__)
-    if (chip::DeviceLayer::PlatformManagerImpl()::IsWorkQueueCurrentQueue()) {
+    if (chip::DeviceLayer::PlatformManagerImpl()::IsWorkQueueCurrentQueue())
+    {
         f();
         return;
     }
 #endif
-
 
     // NOTE: the code below assumes that chip main loop is running.
     //       if it does not, this will deadlock.

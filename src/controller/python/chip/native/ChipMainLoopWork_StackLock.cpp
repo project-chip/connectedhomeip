@@ -17,7 +17,7 @@
  */
 #include "ChipMainLoopWork.h"
 
-#include <platform/PlatformManager.h> 
+#include <platform/PlatformManager.h>
 
 namespace chip {
 namespace MainLoopWork {
@@ -27,14 +27,15 @@ using chip::DeviceLayer::PlatformMgr;
 
 class ScopedStackLock
 {
-  public:
+public:
     ScopedStackLock() { PlatformMgr().LockChipStack(); }
     ~ScopedStackLock() { PlatformMgr().UnlockChipStack(); }
 };
 
-} // namespace 
+} // namespace
 
-void ExecuteInMainLoop(std::function<void()> f) {
+void ExecuteInMainLoop(std::function<void()> f)
+{
     ScopedStackLock lock;
     f();
 }
