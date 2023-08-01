@@ -322,6 +322,13 @@ public:
     static void TestReadClientInvalidReport(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerInvalidAttributePath(nlTestSuite * apSuite, void * apContext);
     static void TestProcessSubscribeRequest(nlTestSuite * apSuite, void * apContext);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    static void TestICDProcessSubscribeRequestSupMaxIntervalCeiling(nlTestSuite * apSuite, void * apContext);
+    static void TestICDProcessSubscribeRequestInfMaxIntervalCeiling(nlTestSuite * apSuite, void * apContext);
+    static void TestICDProcessSubscribeRequestSupMinInterval(nlTestSuite * apSuite, void * apContext);
+    static void TestICDProcessSubscribeRequestMaxMinInterval(nlTestSuite * apSuite, void * apContext);
+    static void TestICDProcessSubscribeRequestInvalidIdleModeInterval(nlTestSuite * apSuite, void * apContext);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     static void TestReadRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestPostSubscribeRoundtripChunkReport(nlTestSuite * apSuite, void * apContext);
     static void TestReadRoundtripWithDataVersionFilter(nlTestSuite * apSuite, void * apContext);
@@ -1490,6 +1497,385 @@ void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, voi
 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+/**
+ * @brief Test validates that an ICD will choose its IdleModeInterval (GetPublisherSelectedIntervalLimit)
+ *        as MaxInterval when the MaxIntervalCeiling is superior.
+ */
+void TestReadInteraction::TestICDProcessSubscribeRequestSupMaxIntervalCeiling(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    System::PacketBufferTLVWriter writer;
+    System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    SubscribeRequestMessage::Builder subscribeRequestBuilder;
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint16_t kMinInterval        = 0;
+    uint16_t kMaxIntervalCeiling = 1;
+
+    Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr, false);
+
+    {
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
+                                app::reporting::GetDefaultReportScheduler());
+
+        writer.Init(std::move(subscribeRequestbuf));
+        err = subscribeRequestBuilder.Init(&writer);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.KeepSubscriptions(true);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.MinIntervalFloorSeconds(kMinInterval);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.MaxIntervalCeilingSeconds(kMaxIntervalCeiling);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        AttributePathIBs::Builder & attributePathListBuilder = subscribeRequestBuilder.CreateAttributeRequests();
+        NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+
+        AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
+        NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        err = attributePathBuilder.GetError();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        attributePathListBuilder.EndOfAttributePathIBs();
+        err = attributePathListBuilder.GetError();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+        err = writer.Finalize(&subscribeRequestbuf);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = readHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf));
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        uint16_t idleModeInterval = readHandler.GetPublisherSelectedIntervalLimit();
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+
+        NL_TEST_ASSERT(apSuite, minInterval == kMinInterval);
+        NL_TEST_ASSERT(apSuite, maxInterval == idleModeInterval);
+    }
+    engine->Shutdown();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+/**
+ * @brief Test validates that an ICD will choose its IdleModeInterval (GetPublisherSelectedIntervalLimit)
+ *        as MaxInterval when the MaxIntervalCeiling is inferior.
+ */
+void TestReadInteraction::TestICDProcessSubscribeRequestInfMaxIntervalCeiling(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    System::PacketBufferTLVWriter writer;
+    System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    SubscribeRequestMessage::Builder subscribeRequestBuilder;
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint16_t kMinInterval        = 0;
+    uint16_t kMaxIntervalCeiling = 1;
+
+    Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr, false);
+
+    {
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
+                                app::reporting::GetDefaultReportScheduler());
+
+        writer.Init(std::move(subscribeRequestbuf));
+        err = subscribeRequestBuilder.Init(&writer);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.KeepSubscriptions(true);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.MinIntervalFloorSeconds(kMinInterval);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.MaxIntervalCeilingSeconds(kMaxIntervalCeiling);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        AttributePathIBs::Builder & attributePathListBuilder = subscribeRequestBuilder.CreateAttributeRequests();
+        NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+
+        AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
+        NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        err = attributePathBuilder.GetError();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        attributePathListBuilder.EndOfAttributePathIBs();
+        err = attributePathListBuilder.GetError();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+        err = writer.Finalize(&subscribeRequestbuf);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = readHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf));
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        uint16_t idleModeInterval = readHandler.GetPublisherSelectedIntervalLimit();
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+
+        NL_TEST_ASSERT(apSuite, minInterval == kMinInterval);
+        NL_TEST_ASSERT(apSuite, maxInterval == idleModeInterval);
+    }
+    engine->Shutdown();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+/**
+ * @brief Test validates that an ICD will choose a multiple of its IdleModeInterval (GetPublisherSelectedIntervalLimit)
+ *        as MaxInterval when the MinInterval > IdleModeInterval.
+ */
+void TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    System::PacketBufferTLVWriter writer;
+    System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    SubscribeRequestMessage::Builder subscribeRequestBuilder;
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint16_t kMinInterval        = 3;
+    uint16_t kMaxIntervalCeiling = 5;
+
+    Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr, false);
+
+    {
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
+                                app::reporting::GetDefaultReportScheduler());
+
+        writer.Init(std::move(subscribeRequestbuf));
+        err = subscribeRequestBuilder.Init(&writer);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.KeepSubscriptions(true);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.MinIntervalFloorSeconds(kMinInterval);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.MaxIntervalCeilingSeconds(kMaxIntervalCeiling);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        AttributePathIBs::Builder & attributePathListBuilder = subscribeRequestBuilder.CreateAttributeRequests();
+        NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+
+        AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
+        NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        err = attributePathBuilder.GetError();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        attributePathListBuilder.EndOfAttributePathIBs();
+        err = attributePathListBuilder.GetError();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+        err = writer.Finalize(&subscribeRequestbuf);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = readHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf));
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        uint16_t idleModeInterval = readHandler.GetPublisherSelectedIntervalLimit();
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+
+        NL_TEST_ASSERT(apSuite, minInterval == kMinInterval);
+        NL_TEST_ASSERT(apSuite, maxInterval == (2 * idleModeInterval));
+    }
+    engine->Shutdown();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+/**
+ * @brief Test validates that an ICD will choose a maximal value for an uint16 if the multiple of the IdleModeInterval
+ *        is greater than variable size.
+ */
+void TestReadInteraction::TestICDProcessSubscribeRequestMaxMinInterval(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    System::PacketBufferTLVWriter writer;
+    System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    SubscribeRequestMessage::Builder subscribeRequestBuilder;
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint16_t kMinInterval        = System::Clock::Seconds16::max().count();
+    uint16_t kMaxIntervalCeiling = System::Clock::Seconds16::max().count();
+
+    Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr, false);
+
+    {
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
+                                app::reporting::GetDefaultReportScheduler());
+
+        writer.Init(std::move(subscribeRequestbuf));
+        err = subscribeRequestBuilder.Init(&writer);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.KeepSubscriptions(true);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.MinIntervalFloorSeconds(kMinInterval);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.MaxIntervalCeilingSeconds(kMaxIntervalCeiling);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        AttributePathIBs::Builder & attributePathListBuilder = subscribeRequestBuilder.CreateAttributeRequests();
+        NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+
+        AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
+        NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        err = attributePathBuilder.GetError();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        attributePathListBuilder.EndOfAttributePathIBs();
+        err = attributePathListBuilder.GetError();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+        err = writer.Finalize(&subscribeRequestbuf);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = readHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf));
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+
+        NL_TEST_ASSERT(apSuite, minInterval == kMinInterval);
+        NL_TEST_ASSERT(apSuite, maxInterval == kMaxIntervalCeiling);
+    }
+    engine->Shutdown();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+/**
+ * @brief Test validates that an ICD will choose the MaxIntervalCeiling as MaxInterval if the next multiple after the MinInterval
+ *        is greater than the IdleModeInterval and MaxIntervalCeiling
+ */
+void TestReadInteraction::TestICDProcessSubscribeRequestInvalidIdleModeInterval(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    System::PacketBufferTLVWriter writer;
+    System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    SubscribeRequestMessage::Builder subscribeRequestBuilder;
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint16_t kMinInterval        = 3;
+    uint16_t kMaxIntervalCeiling = 3;
+
+    Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr, false);
+
+    {
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
+                                app::reporting::GetDefaultReportScheduler());
+
+        writer.Init(std::move(subscribeRequestbuf));
+        err = subscribeRequestBuilder.Init(&writer);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.KeepSubscriptions(true);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.MinIntervalFloorSeconds(kMinInterval);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.MaxIntervalCeilingSeconds(kMaxIntervalCeiling);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        AttributePathIBs::Builder & attributePathListBuilder = subscribeRequestBuilder.CreateAttributeRequests();
+        NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+
+        AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
+        NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        err = attributePathBuilder.GetError();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        attributePathListBuilder.EndOfAttributePathIBs();
+        err = attributePathListBuilder.GetError();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+        err = writer.Finalize(&subscribeRequestbuf);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = readHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf));
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+
+        NL_TEST_ASSERT(apSuite, minInterval == kMinInterval);
+        NL_TEST_ASSERT(apSuite, maxInterval == kMaxIntervalCeiling);
+    }
+    engine->Shutdown();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * apContext)
 {
@@ -4419,6 +4805,18 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadClientInvalidReport", chip::app::TestReadInteraction::TestReadClientInvalidReport),
     NL_TEST_DEF("TestReadHandlerInvalidAttributePath", chip::app::TestReadInteraction::TestReadHandlerInvalidAttributePath),
     NL_TEST_DEF("TestProcessSubscribeRequest", chip::app::TestReadInteraction::TestProcessSubscribeRequest),
+    /*
+        We need to figure out a way to run unit tests with an ICD build without affecting
+        all the standard unit tests
+        https://github.com/project-chip/connectedhomeip/issues/28446
+    */
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    NL_TEST_DEF("TestICDProcessSubscribeRequestSupMaxIntervalCeiling", chip::app::TestReadInteraction::TestICDProcessSubscribeRequestSupMaxIntervalCeiling),
+    NL_TEST_DEF("TestICDProcessSubscribeRequestInfMaxIntervalCeiling", chip::app::TestReadInteraction::TestICDProcessSubscribeRequestInfMaxIntervalCeiling),
+    NL_TEST_DEF("TestICDProcessSubscribeRequestSupMinInterval", chip::app::TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval),
+    NL_TEST_DEF("TestICDProcessSubscribeRequestMaxMinInterval", chip::app::TestReadInteraction::TestICDProcessSubscribeRequestMaxMinInterval),
+    NL_TEST_DEF("TestICDProcessSubscribeRequestInvalidIdleModeInterval", chip::app::TestReadInteraction::TestICDProcessSubscribeRequestInvalidIdleModeInterval),
+#endif // #if CHIP_CONFIG_ENABLE_ICD_SERVER
     NL_TEST_DEF("TestSubscribeRoundtrip", chip::app::TestReadInteraction::TestSubscribeRoundtrip),
     NL_TEST_DEF("TestPostSubscribeRoundtripChunkReport", chip::app::TestReadInteraction::TestPostSubscribeRoundtripChunkReport),
     NL_TEST_DEF("TestReadClientReceiveInvalidMessage", chip::app::TestReadInteraction::TestReadClientReceiveInvalidMessage),
@@ -4437,7 +4835,15 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadHandlerInvalidSubscribeRequest", chip::app::TestReadInteraction::TestReadHandlerInvalidSubscribeRequest),
     NL_TEST_DEF("TestSubscribeInvalidateFabric", chip::app::TestReadInteraction::TestSubscribeInvalidateFabric),
     NL_TEST_DEF("TestShutdownSubscription", chip::app::TestReadInteraction::TestShutdownSubscription),
+    /*
+        Disable test when running the ICD specific unit tests.
+        Test tests reporting feature with hard coded time jumps which don't take into account that an ICD
+        can change the requested MaxInterval during the subscription response / request process
+        https://github.com/project-chip/connectedhomeip/issues/28419
+    */
+#if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
     NL_TEST_DEF("TestSubscribeUrgentWildcardEvent", chip::app::TestReadInteraction::TestSubscribeUrgentWildcardEvent),
+#endif
     NL_TEST_DEF("TestSubscribeWildcard", chip::app::TestReadInteraction::TestSubscribeWildcard),
     NL_TEST_DEF("TestSubscribePartialOverlap", chip::app::TestReadInteraction::TestSubscribePartialOverlap),
     NL_TEST_DEF("TestSubscribeSetDirtyFullyOverlap", chip::app::TestReadInteraction::TestSubscribeSetDirtyFullyOverlap),
