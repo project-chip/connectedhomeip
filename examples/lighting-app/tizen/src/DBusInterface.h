@@ -52,6 +52,7 @@ private:
     static gboolean OnColorTemperatureChanged(LightAppColorControl *, GDBusMethodInvocation *, DBusInterface *);
 
     void InitOnOff();
+    void InitColor();
 
     class InternalSetGuard
     {

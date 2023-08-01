@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
@@ -116,6 +117,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     default:
         ChipLogDetail(NotSpecified, "Not handled cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mClusterId));
     }
+}
+
+void emberAfColorControlClusterInitCallback(EndpointId endpoint)
+{
+    // Preserve the state of the color temperature attribute across reboots.
+    Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::SetNull(endpoint);
 }
 
 void ApplicationInit()
