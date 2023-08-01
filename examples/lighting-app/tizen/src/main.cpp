@@ -121,6 +121,9 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
 void emberAfColorControlClusterInitCallback(EndpointId endpoint)
 {
+    // Set the color mode to color temperature.
+    Clusters::ColorControl::Attributes::ColorMode::Set(endpoint,
+                                                       Clusters::ColorControl::ColorMode::EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE);
     // Preserve the state of the color temperature attribute across reboots.
     Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::SetNull(endpoint);
 }
