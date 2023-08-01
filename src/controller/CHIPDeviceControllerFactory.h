@@ -34,6 +34,7 @@
 #include <credentials/GroupDataProvider.h>
 #include <credentials/OperationalCertificateStore.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <protocols/secure_channel/SessionResumptionStorage.h>
 
 namespace chip {
 
@@ -106,8 +107,8 @@ struct SetupParams
 };
 
 // TODO everything other than the fabric storage, group data provider, OperationalKeystore,
-// OperationalCertificateStore and SessionKeystore here should be removed. We're blocked
-// because of the need to support !CHIP_DEVICE_LAYER
+// OperationalCertificateStore, SessionKeystore, and SessionResumptionStorage here should
+// be removed. We're blocked because of the need to support !CHIP_DEVICE_LAYER
 struct FactoryInitParams
 {
     System::Layer * systemLayer                                        = nullptr;
@@ -121,6 +122,7 @@ struct FactoryInitParams
     FabricTable * fabricTable                                          = nullptr;
     OperationalKeystore * operationalKeystore                          = nullptr;
     Credentials::OperationalCertificateStore * opCertStore             = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage                = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -257,6 +259,7 @@ private:
     Crypto::OperationalKeystore * mOperationalKeystore                  = nullptr;
     Credentials::OperationalCertificateStore * mOpCertStore             = nullptr;
     Credentials::CertificateValidityPolicy * mCertificateValidityPolicy = nullptr;
+    SessionResumptionStorage * mSessionResumptionStorage                = nullptr;
     bool mEnableServerInteractions                                      = false;
 };
 
