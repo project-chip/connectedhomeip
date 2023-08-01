@@ -29,10 +29,8 @@ source_set("manager-srcs") {
     "ICDManager.h",
   ]
 
-  deps = [
-    ":observer-srcs",
-  ]
-  
+  deps = [ ":observer-srcs" ]
+
   public_deps = [
     ":cluster-srcs",
     "${chip_root}/src/credentials:credentials",
