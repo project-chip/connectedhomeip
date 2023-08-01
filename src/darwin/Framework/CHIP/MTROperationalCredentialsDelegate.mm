@@ -25,6 +25,7 @@
 #import "MTRDeviceController_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "NSDataSpanConversion.h"
+#import "NSSetCATConversion.h"
 
 #include <controller/CommissioningDelegate.h>
 #include <credentials/CHIPCert.h>
@@ -469,10 +470,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateOperationalCertificate(id<
 
     CATValues cats;
     if (caseAuthenticatedTags != nil) {
-        size_t idx = 0;
-        for (NSNumber * cat in [caseAuthenticatedTags.allObjects sortedArrayUsingSelector:@selector(compare:)]) {
-            cats.values[idx++] = [cat unsignedIntValue];
-        }
+        ReturnErrorOnFailure(ToCATValues(caseAuthenticatedTags, cats));
     }
 
     uint8_t nocBuffer[Controller::kMaxCHIPDERCertLength];

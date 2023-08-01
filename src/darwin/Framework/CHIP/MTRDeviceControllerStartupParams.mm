@@ -20,6 +20,7 @@
 #import "MTRLogging_Internal.h"
 #import "MTRP256KeypairBridge.h"
 #import "NSDataSpanConversion.h"
+#import "NSSetCATConversion.h"
 
 #include <controller/OperationalCredentialsDelegate.h>
 #include <credentials/CHIPCert.h>
@@ -302,13 +303,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
         auto tagCount = cats.GetNumTagsPresent();
         if (tagCount > 0) {
-            auto * catSet = [[NSMutableSet alloc] initWithCapacity:tagCount];
-            for (auto & value : cats.values) {
-                if (value != kUndefinedCAT) {
-                    [catSet addObject:@(value)];
-                }
-            }
-            self.caseAuthenticatedTags = [NSSet setWithSet:catSet];
+            self.caseAuthenticatedTags = FromCATValues(cats);
         } else {
             self.caseAuthenticatedTags = nil;
         }

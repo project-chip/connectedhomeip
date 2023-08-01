@@ -35,6 +35,7 @@
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRSetupPayload.h"
 #import "NSDataSpanConversion.h"
+#import "NSSetCATConversion.h"
 #import "NSStringSpanConversion.h"
 #import <setup_payload/ManualSetupPayloadGenerator.h>
 #import <setup_payload/SetupPayload.h>
@@ -312,26 +313,10 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
             chip::CATValues cats = chip::kUndefinedCATs;
             if (startupParams.caseAuthenticatedTags != nil) {
-                unsigned long long tagCount = startupParams.caseAuthenticatedTags.count;
-                if (tagCount > chip::kMaxSubjectCATAttributeCount) {
-                    MTR_LOG_ERROR("%llu CASE Authenticated Tags cannot be represented in a certificate.", tagCount);
+                errorCode = ToCATValues(startupParams.caseAuthenticatedTags, cats);
+                if (errorCode != CHIP_NO_ERROR) {
+                    // ToCATValues already handles logging.
                     return;
-                }
-
-                size_t tagIndex = 0;
-                for (NSNumber * boxedTag in startupParams.caseAuthenticatedTags) {
-                    if (!chip::CanCastTo<chip::CASEAuthTag>(boxedTag.unsignedLongLongValue)) {
-                        MTR_LOG_ERROR("0x%llx is not a valid CASE Authenticated Tag value.", boxedTag.unsignedLongLongValue);
-                        return;
-                    }
-
-                    auto tag = static_cast<chip::CASEAuthTag>(boxedTag.unsignedLongLongValue);
-                    if (!chip::IsValidCASEAuthTag(tag)) {
-                        MTR_LOG_ERROR("0x%" PRIx32 " is not a valid CASE Authenticated Tag value.", tag);
-                        return;
-                    }
-
-                    cats.values[tagIndex++] = tag;
                 }
             }
 
