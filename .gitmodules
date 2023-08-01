@@ -296,3 +296,4 @@
 [submodule "third_party/infineon/trustm/optiga-trust-m"]
 	path = third_party/infineon/trustm/optiga-trust-m
 	url = https://github.com/Infineon/optiga-trust-m
+    platforms = infineon

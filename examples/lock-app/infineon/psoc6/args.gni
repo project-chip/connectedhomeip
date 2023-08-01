@@ -19,5 +19,5 @@ import("${chip_root}/src/platform/Infineon/PSOC6/args.gni")
 
 psoc6_target_project =
     get_label_info(":lock_app_sdk_sources", "label_no_toolchain")
-chip_enable_trustm = false
-chip_enable_trustm_da = false
+chip_enable_infineon_trustm = false
+chip_enable_infineon_trustm_da = false

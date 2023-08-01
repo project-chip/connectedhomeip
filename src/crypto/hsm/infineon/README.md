@@ -20,8 +20,8 @@ Following are the list operations supported by secure element.
     layer,
 
 ```
-chip_enable_trustm=true     ==> To enable trustm
-chip_enable_trustm_da=true  ==> To enable trustm with device attestation
+chip_enable_infineon_trustm=true     ==> To enable trustm crypto service as HSM
+chip_enable_infineon_trustm_da=true  ==> To use trustm to store device attestation credentials required,eg. PAI,DAC and CD.
 host = "psoc6"    ==> To set host
 ```
 
