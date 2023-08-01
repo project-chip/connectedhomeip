@@ -41,8 +41,6 @@ static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
 static constexpr size_t kSpake2pSalt_MaxBase64Len =
     BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
 
-OtaUtils_EEPROM_ReadData pFunctionEepromRead = (OtaUtils_EEPROM_ReadData) K32W0FactoryDataProvider::ReadDataMemcpy;
-
 uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t)__FACTORY_DATA_START;
 uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t)__FACTORY_DATA_SIZE;
 uint32_t FactoryDataProvider::kFactoryDataPayloadStart = kFactoryDataStart + sizeof(FactoryDataProvider::Header);
