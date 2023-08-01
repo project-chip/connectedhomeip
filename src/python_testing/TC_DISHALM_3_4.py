@@ -30,13 +30,13 @@ class TC_DISHALM_3_4(MatterBaseTest):
     async def read_da_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.DishwasherAlarm
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-    
+
     async def subscribe_event(self, endpoint):
         return await self.default_controller.SubscribeEvent(self.dut_node_id, [(endpoint, Clusters.DishwasherAlarm.Events.Notify)])
 
     async def read_event_notify_state(self, endpoint):
         return await self.default_controller.ReadEvent(self.dut_node_id, [(endpoint, Clusters.DishwasherAlarm.Events.Notify.state)])
-    
+
     async def read_event_notify(self, endpoint):
         return await self.default_controller.ReadEvent(self.dut_node_id, [(endpoint, Clusters.DishwasherAlarm.Events.Notify)])
 
@@ -49,7 +49,7 @@ class TC_DISHALM_3_4(MatterBaseTest):
     async def send_reset_cmd(self, setAlarm) -> Clusters.Objects.DishwasherAlarm.Commands.Reset:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.DishwasherAlarm.Commands.Reset.alarms(setAlarm=setAlarm), endpoint=self.endpoint)
         return ret
-    
+
     @async_test_body
     async def test_TC_DISHALM_3_4(self):
 
@@ -65,7 +65,7 @@ class TC_DISHALM_3_4(MatterBaseTest):
 
         self.print_step(3, "2a. Operate Device to set the condition to raise the TempTooLow alarm and wait a few seconds")
         input("Press Enter when done.\n")
-        
+
         notify = self.read_event_notify(endpoint=endpoint)
         notify_state = self.read_event_notify_state(endpoint=endpoint)
 
@@ -94,8 +94,9 @@ class TC_DISHALM_3_4(MatterBaseTest):
         logging.info("Latch: %s" % (latch))
 
         if latch == 0:
-            asserts.assert_false(notify_state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kTempTooLow, "State bit 3 is not set to FALSE")
-   
+            asserts.assert_false(notify_state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kTempTooLow,
+                                 "State bit 3 is not set to FALSE")
+
         self.print_step(6, "2d. Read from the DUT the State Attribute")
         state = self.read_state_attribute(endpoint=endpoint)
 
@@ -124,7 +125,8 @@ class TC_DISHALM_3_4(MatterBaseTest):
         logging.info("Latch: %s" % (latch))
 
         if latch == 1:
-            asserts.assert_false(notify_state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kTempTooLow, "State bit 3 is not set to FALSE")
+            asserts.assert_false(notify_state & Clusters.DishwasherAlarm.Bitmaps.AlarmMap.kTempTooLow,
+                                 "State bit 3 is not set to FALSE")
 
         self.print_step(8, "3b. Read from the DUT the State Attribute")
         state = self.read_state_attribute(endpoint=endpoint)
