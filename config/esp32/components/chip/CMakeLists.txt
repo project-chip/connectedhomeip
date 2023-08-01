@@ -462,7 +462,7 @@ foreach(phy_blob ${phy_blobs})
     list(APPEND chip_libraries "${esp_phy_dir}/lib/${target_name}/lib${phy_blob}.a")
 endforeach()
 
-set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex)
+set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos)
 foreach(component ${components_to_link})
     idf_component_get_property(lib_name ${component} COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${lib_name}>)

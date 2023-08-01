@@ -125,7 +125,11 @@ set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
 )
 endif (CONFIG_ENABLE_PW_RPC)
 
-set(PRIV_REQUIRES_LIST chip QRCode bt driver app_update nvs_flash spi_flash openthread tft spidriver screen-framework)
+set(PRIV_REQUIRES_LIST chip QRCode bt app_update nvs_flash spi_flash openthread)
+
+if(${IDF_TARGET} STREQUAL "esp32")
+    list(APPEND PRIV_REQUIRES_LIST spidriver screen-framework)
+endif()
 
 if(CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM)
     list(APPEND PRIV_REQUIRES_LIST led_strip)
