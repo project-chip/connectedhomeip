@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <AppMain.h>
 #include "AirQualitySensorAppAttrUpdateDelegate.h"
+#include <AppMain.h>
 
 #include <app/util/af.h>
 #include <platform/CHIPDeviceBuildConfig.h>
