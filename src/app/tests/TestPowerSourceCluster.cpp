@@ -157,7 +157,7 @@ void TestPowerSourceCluster::TestEndpointList(nlTestSuite * apSuite, void * apCo
     }
 
     // Remaining endpoints - list of 1
-    for (EndpointId ep = 2; ep < 10; ++ep)
+    for (EndpointId ep = 2; ep < powerSourceServer.GetNumSupportedEndpointLists(); ++ep)
     {
         err = powerSourceServer.SetEndpointList(ep, Span<EndpointId>(listRest));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -173,7 +173,8 @@ void TestPowerSourceCluster::TestEndpointList(nlTestSuite * apSuite, void * apCo
     // *****************
     // Check for out of memory error when setting too many endpoints
     // *****************
-    err = powerSourceServer.SetEndpointList(11, Span<EndpointId>(listRest));
+    // pick a random endpoint number for the power cluster - it doesn't matter, we don't have space anyway.
+    err = powerSourceServer.SetEndpointList(55, Span<EndpointId>(listRest));
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NO_MEMORY);
 
     // *****************
@@ -265,7 +266,6 @@ void TestPowerSourceCluster::TestEndpointList(nlTestSuite * apSuite, void * apCo
         std::vector<EndpointId> vec = ReadEndpointsThroughAttributeReader(apSuite, ep);
         NL_TEST_ASSERT(apSuite, vec.size() == 0);
     }
-    powerSourceServer.Shutdown();
 }
 
 } // namespace app
@@ -301,6 +301,7 @@ int TestPowerSourceClusterContext_Setup(void * inContext)
  */
 int TestPowerSourceClusterContext_Teardown(void * inContext)
 {
+    chip::app::Clusters::PowerSourceServer::Instance().Shutdown();
     chip::Platform::MemoryShutdown();
     return SUCCESS;
 }

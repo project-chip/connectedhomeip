@@ -26,6 +26,7 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <zap-generated/gen_config.h>
 
 using namespace chip;
 using namespace app;
@@ -34,9 +35,49 @@ using namespace app::Clusters::PowerSource::Attributes;
 
 namespace {
 
+struct PowerSourceClusterInfo
+{
+    PowerSourceClusterInfo() : mClusterEndpoint(kInvalidEndpointId) {}
+    explicit PowerSourceClusterInfo(EndpointId powerClusterEndpointId) : mClusterEndpoint(powerClusterEndpointId) {}
+    void Shutdown()
+    {
+        mBuf.Free();
+        mEndpointList = Span<EndpointId>();
+    }
+    CHIP_ERROR SetEndpointList(Span<EndpointId> endpointList)
+    {
+        Shutdown();
+        if (endpointList.size() == 0)
+        {
+            mEndpointList = Span<EndpointId>();
+            return CHIP_NO_ERROR;
+        }
+        mBuf.Calloc(endpointList.size());
+        if (mBuf.Get() == nullptr)
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        memcpy(mBuf.Get(), endpointList.data(), endpointList.size() * sizeof(EndpointId));
+        mEndpointList = Span<EndpointId>(mBuf.Get(), endpointList.size());
+        return CHIP_NO_ERROR;
+    }
+    EndpointId mClusterEndpoint = kInvalidEndpointId;
+    Platform::ScopedMemoryBuffer<EndpointId> mBuf;
+    Span<EndpointId> mEndpointList;
+};
+
 PowerSourceServer gPowerSourceServer;
 
 PowerSourceAttrAccess gAttrAccess;
+
+#ifdef ZCL_USING_POWER_SOURCE_CLUSTER_SERVER
+static constexpr size_t kNumSupportedEndpoints =
+    EMBER_AF_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+#else
+static constexpr size_t kNumSupportedEndpoints = CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+#endif
+
+PowerSourceClusterInfo sPowerSourceClusterInfo[kNumSupportedEndpoints] = {};
 
 } // anonymous namespace
 
@@ -106,12 +147,12 @@ CHIP_ERROR PowerSourceServer::SetEndpointList(EndpointId powerSourceClusterEndpo
     }
     if (endpointList.size() == 0)
     {
-        mPowerSourceClusterInfo[idx] = PowerSourceClusterInfo();
+        sPowerSourceClusterInfo[idx] = PowerSourceClusterInfo();
     }
     else
     {
-        mPowerSourceClusterInfo[idx] = PowerSourceClusterInfo(powerSourceClusterEndpoint);
-        mPowerSourceClusterInfo[idx].SetEndpointList(endpointList);
+        sPowerSourceClusterInfo[idx] = PowerSourceClusterInfo(powerSourceClusterEndpoint);
+        sPowerSourceClusterInfo[idx].SetEndpointList(endpointList);
     }
     return CHIP_NO_ERROR;
 }
@@ -120,16 +161,29 @@ const Span<EndpointId> * PowerSourceServer::GetEndpointList(EndpointId powerSour
     size_t idx = PowerSourceClusterEndpointIndex(powerSourceClusterEndpoint);
     if (idx != std::numeric_limits<size_t>::max())
     {
-        return &mPowerSourceClusterInfo[idx].mEndpointList;
+        return &sPowerSourceClusterInfo[idx].mEndpointList;
     }
     return nullptr;
+}
+
+void PowerSourceServer::Shutdown()
+{
+    for (size_t i = 0; i < kNumSupportedEndpoints; ++i)
+    {
+        sPowerSourceClusterInfo[i].Shutdown();
+    }
+}
+
+size_t PowerSourceServer::GetNumSupportedEndpointLists() const
+{
+    return kNumSupportedEndpoints;
 }
 
 size_t PowerSourceServer::PowerSourceClusterEndpointIndex(EndpointId endpointId) const
 {
     for (size_t i = 0; i < kNumSupportedEndpoints; ++i)
     {
-        if (mPowerSourceClusterInfo[i].mClusterEndpoint == endpointId)
+        if (sPowerSourceClusterInfo[i].mClusterEndpoint == endpointId)
         {
             return i;
         }
@@ -141,7 +195,7 @@ size_t PowerSourceServer::NextEmptyIndex() const
 {
     for (size_t i = 0; i < kNumSupportedEndpoints; ++i)
     {
-        if (mPowerSourceClusterInfo[i].mClusterEndpoint == kInvalidEndpointId)
+        if (sPowerSourceClusterInfo[i].mClusterEndpoint == kInvalidEndpointId)
         {
             return i;
         }

@@ -28,37 +28,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-struct PowerSourceClusterInfo
-{
-    PowerSourceClusterInfo() : mClusterEndpoint(kInvalidEndpointId) {}
-    explicit PowerSourceClusterInfo(EndpointId powerClusterEndpointId) : mClusterEndpoint(powerClusterEndpointId) {}
-    void Shutdown()
-    {
-        mEndpointList = Span<EndpointId>();
-        mBuf.Free();
-    }
-    CHIP_ERROR SetEndpointList(Span<EndpointId> endpointList)
-    {
-        Shutdown();
-        if (endpointList.size() == 0)
-        {
-            mEndpointList = Span<EndpointId>();
-            return CHIP_NO_ERROR;
-        }
-        mBuf.Calloc(endpointList.size());
-        if (mBuf.Get() == nullptr)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        memcpy(mBuf.Get(), endpointList.data(), endpointList.size() * sizeof(EndpointId));
-        mEndpointList = Span<EndpointId>(mBuf.Get(), endpointList.size());
-        return CHIP_NO_ERROR;
-    }
-    EndpointId mClusterEndpoint = kInvalidEndpointId;
-    Platform::ScopedMemoryBuffer<EndpointId> mBuf;
-    Span<EndpointId> mEndpointList;
-};
-
 class PowerSourceServer
 {
 public:
@@ -66,23 +35,16 @@ public:
 
     // Caller does not need to retain the span past the call point as these are copied into an internal storage
     CHIP_ERROR SetEndpointList(EndpointId powerSourceClusterEndpoint, Span<EndpointId> endpointList);
+    CHIP_ERROR ClearEndpointList(EndpointId powerSourceClusterEndpoint)
+    {
+        return SetEndpointList(powerSourceClusterEndpoint, Span<EndpointId>());
+    }
     // returns nullptr if there's not endpoint list set for this power source cluster endpoint id.
     const Span<EndpointId> * GetEndpointList(EndpointId powerSourceClusterEndpoint) const;
-    void Shutdown()
-    {
-        for (size_t i = 0; i < kNumSupportedEndpoints; ++i)
-        {
-            mPowerSourceClusterInfo[i].Shutdown();
-        }
-    }
-    size_t GetNumSupportedEndpointLists() const { return kNumSupportedEndpoints; };
+    void Shutdown();
+    size_t GetNumSupportedEndpointLists() const;
 
 private:
-    // There's probably a good way to properly set this from zap or have this grow dynamically as dynamic endpoints are
-    // finalized, but for now, let's just say 10 power clusters is probably ok.
-    // TODO: is there a way to get a static count of endpoints? CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT?
-    static constexpr size_t kNumSupportedEndpoints                         = 10;
-    PowerSourceClusterInfo mPowerSourceClusterInfo[kNumSupportedEndpoints] = {};
     // Both return std::numeric_limits<size_t>::max() for not found
     size_t PowerSourceClusterEndpointIndex(EndpointId endpointId) const;
     size_t NextEmptyIndex() const;
