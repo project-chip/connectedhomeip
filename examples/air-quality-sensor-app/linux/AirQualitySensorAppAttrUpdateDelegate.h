@@ -23,14 +23,14 @@
 #include <json/json.h>
 #include <platform/DiagnosticDataProvider.h>
 
-class AirQualitySensorAppCommandHandler
+class AirQualitySensorAttrUpdateHandler
 {
 public:
-    static AirQualitySensorAppCommandHandler * FromJSON(const char * json);
+    static AirQualitySensorAttrUpdateHandler * FromJSON(const char * json);
 
     static void HandleCommand(intptr_t context);
 
-    AirQualitySensorAppCommandHandler(Json::Value && jasonValue) : mJsonValue(std::move(jasonValue)) {}
+    AirQualitySensorAttrUpdateHandler(Json::Value && jasonValue) : mJsonValue(std::move(jasonValue)) {}
 
 private:
     Json::Value mJsonValue;
@@ -56,7 +56,7 @@ private:
     void OnConcetratorChangeHandler(std::string concentratorName, float newValue);
 };
 
-class AirQualitySensorAppCommandDelegate : public NamedPipeCommandDelegate
+class AirQualitySensorAppAttrUpdateDelegate : public NamedPipeCommandDelegate
 {
 public:
     void OnEventCommandReceived(const char * json) override;

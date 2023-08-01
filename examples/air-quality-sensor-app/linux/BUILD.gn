@@ -31,7 +31,7 @@ executable("air-quality-sensor-app") {
   sources = [
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
-    "AirQualitySensorAppCommandDelegate.cpp",
+    "AirQualitySensorAppAttrUpdateDelegate.cpp",
   ]
 
   deps = [

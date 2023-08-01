@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "AirQualitySensorAppCommandDelegate.h"
+#include "AirQualitySensorAppAttrUpdateDelegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/att-storage.h>
@@ -122,7 +122,7 @@ std::map<std::string, ConcentratorFuncPointers> concentratorFuncMap = {
 };
 
 
-AirQualitySensorAppCommandHandler * AirQualitySensorAppCommandHandler::FromJSON(const char * json)
+AirQualitySensorAttrUpdateHandler * AirQualitySensorAttrUpdateHandler::FromJSON(const char * json)
 {
     Json::Reader reader;
     Json::Value value;
@@ -146,12 +146,12 @@ AirQualitySensorAppCommandHandler * AirQualitySensorAppCommandHandler::FromJSON(
         return nullptr;
     }
 
-    return Platform::New<AirQualitySensorAppCommandHandler>(std::move(value));
+    return Platform::New<AirQualitySensorAttrUpdateHandler>(std::move(value));
 }
 
-void AirQualitySensorAppCommandHandler::HandleCommand(intptr_t context)
+void AirQualitySensorAttrUpdateHandler::HandleCommand(intptr_t context)
 {
-    auto * self = reinterpret_cast<AirQualitySensorAppCommandHandler *>(context);
+    auto * self = reinterpret_cast<AirQualitySensorAttrUpdateHandler *>(context);
     std::string clusterName = self->mJsonValue["Name"].asString();
 
     VerifyOrReturn(!self->mJsonValue.empty(), ChipLogError(NotSpecified, "Invalid JSON event command received"));
@@ -179,7 +179,7 @@ void AirQualitySensorAppCommandHandler::HandleCommand(intptr_t context)
      ChipLogError(NotSpecified, "done");
 }
 
-void AirQualitySensorAppCommandHandler::OnAirQualityChangeHandler(uint8_t newValue)
+void AirQualitySensorAttrUpdateHandler::OnAirQualityChangeHandler(uint8_t newValue)
 {
     EndpointId endpoint = 1;
     EmberAfStatus status = AirQuality::Attributes::AirQuality::Set(endpoint, static_cast<AirQuality::AirQualityEnum>(newValue));
@@ -187,7 +187,7 @@ void AirQualitySensorAppCommandHandler::OnAirQualityChangeHandler(uint8_t newVal
     ChipLogDetail(NotSpecified, "The new AirQuality value: %d", newValue);
 }
 
-void AirQualitySensorAppCommandHandler::OnTemperatureChangeHandler(int16_t newValue)
+void AirQualitySensorAttrUpdateHandler::OnTemperatureChangeHandler(int16_t newValue)
 {
     DataModel::Nullable<int16_t> minVal;
     DataModel::Nullable<int16_t> maxVal;   
@@ -216,7 +216,7 @@ void AirQualitySensorAppCommandHandler::OnTemperatureChangeHandler(int16_t newVa
     }
 }
 
-void AirQualitySensorAppCommandHandler::OnHumidityChangeHandler(uint16_t newValue)
+void AirQualitySensorAttrUpdateHandler::OnHumidityChangeHandler(uint16_t newValue)
 {
     DataModel::Nullable<uint16_t> minVal;
     DataModel::Nullable<uint16_t> maxVal;   
@@ -246,7 +246,7 @@ void AirQualitySensorAppCommandHandler::OnHumidityChangeHandler(uint16_t newValu
     }
 }
 
-void AirQualitySensorAppCommandHandler::OnConcetratorChangeHandler(std::string concentratorName, float newValue)
+void AirQualitySensorAttrUpdateHandler::OnConcetratorChangeHandler(std::string concentratorName, float newValue)
 {  
     EndpointId endpoint = 1;
     DataModel::Nullable<float> minVal;
@@ -282,14 +282,14 @@ void AirQualitySensorAppCommandHandler::OnConcetratorChangeHandler(std::string c
     }
 }
 
-void AirQualitySensorAppCommandDelegate::OnEventCommandReceived(const char * json)
+void AirQualitySensorAppAttrUpdateDelegate::OnEventCommandReceived(const char * json)
 {
-    auto handler = AirQualitySensorAppCommandHandler::FromJSON(json);
+    auto handler = AirQualitySensorAttrUpdateHandler::FromJSON(json);
     if (nullptr == handler)
     {
         ChipLogError(NotSpecified, "AllClusters App: Unable to instantiate a command handler");
         return;
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(AirQualitySensorAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(AirQualitySensorAttrUpdateHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
 }
