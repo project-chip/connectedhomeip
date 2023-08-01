@@ -1713,8 +1713,8 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
             {
                 break;
             }
-            ctx.GetIOContext().DriveIO();
         }
+        ctx.GetIOContext().DriveIO();
 
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
         delegate.mGotReport            = false;
@@ -2347,8 +2347,8 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
             {
                 break;
             }
-            ctx.GetIOContext().DriveIO();
         }
+        ctx.GetIOContext().DriveIO();
 
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
