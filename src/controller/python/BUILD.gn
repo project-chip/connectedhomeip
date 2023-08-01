@@ -33,6 +33,7 @@ config("controller_wno_deprecate") {
 declare_args() {
   chip_python_version = "0.0"
   chip_python_package_prefix = "chip"
+  chip_python_supports_stack_locking = (current_os != "mac") || (current_os != "ios")
 }
 
 shared_library("ChipDeviceCtrl") {
@@ -78,11 +79,18 @@ shared_library("ChipDeviceCtrl") {
       "chip/internal/CommissionerImpl.cpp",
       "chip/logging/LoggingRedirect.cpp",
       "chip/native/PyChipError.cpp",
+      "chip/native/ChipMainLoopWork.h",
       "chip/tracing/TracingSetup.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
     ]
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
     defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
+
+    if (chip_python_supports_stack_locking) {
+      sources += [ "chip/native/ChipMainLoopWork_StackLock.cpp" ]
+    } else {
+      sources += [ "chip/native/ChipMainLoopWork_WorkSchedule.cpp" ]
+    }
   } else {
     sources += [
       "chip/server/Options.cpp",
