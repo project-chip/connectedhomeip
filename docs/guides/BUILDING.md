@@ -291,6 +291,41 @@ To compile, use:
 After which tests should be located in
 `out/linux-x64-tests-clang-asan-libfuzzer/tests/`.
 
+#### unit test execution
+
+After compiling the `libfuzzer` unit tests above, they can be run by simply
+executing the produced binary(s).
+
+For example:
+
+```
+./out/linux-x64-tests-clang-asan-libfuzzer/tests/fuzz-tlv-reader
+```
+
+In addition to the raw binaries, Matter provides sample
+[input seed corpera](https://github.com/google/fuzzing/blob/master/docs/glossary.md#seed-corpus)
+and
+[fuzzing dictionaries](https://github.com/google/fuzzing/blob/master/docs/glossary.md#dictionary)
+located in the `integrations/fuzz` directory. These can be used to increase
+fuzzing efficiency.
+
+Example usage of input seed corpus and dictionary for the fuzz-tlv-reader
+target:
+
+```
+# Fuzz target: fuzz-tlv-reader
+# Output (generated corpus) directory: ./output-tlv-corpus
+# Input seed corpus: ./integrations/fuzz/fuzz-tlv-reader-corpus
+# Fuzzing dictionary: ./integrations/fuzz/fuzz-tlv-reader.dict
+mkdir output-tlv-corpus
+./out/linux-x64-tests-clang-asan-libfuzzer/tests/fuzz-tlv-reader ./output-tlv-corpus \
+    ./integrations/fuzz/fuzz-tlv-reader-corpus \
+    -dict=./integrations/fuzz/fuzz-tlv-reader.dict 1> /dev/null
+```
+
+Note that the fuzz-chip-cert driver is based on Matter / CHIP binary certificate
+formats, so the `tlv` dictionary can be re-used for that driver as well.
+
 #### `ossfuzz` configurations
 
 `ossfuzz` configurations are not stand-alone fuzzing and instead serve as an
