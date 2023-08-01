@@ -32,13 +32,21 @@ osaEventId_t mControllerTaskEvent;
 extern msgQueue_t gApp2Host_TaskQueue;
 extern msgQueue_t gHci2Host_TaskQueue;
 
-#include <platform/nxp/k32w/k32w0/BLEManagerInit.h>
+#include <platform/nxp/k32w/k32w0/BLEManagerImpl.h>
 
 extern "C" bool_t Ble_ConfigureHostStackConfig(void);
 
 namespace chip {
+namespace DeviceLayer {
+namespace Internal {
 
-CHIP_ERROR BLEManagerInit::InitHostController(ble_generic_cb_fp cb_fp)
+BLEManagerImpl BLEManagerImpl::sInstance;
+
+BLEManagerCommon* BLEManagerImpl::GetImplInstance()
+{
+    return &BLEManagerImpl::sInstance;
+}
+CHIP_ERROR BLEManagerImpl::InitHostController(ble_generic_cb_fp cb_fp)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -64,19 +72,19 @@ exit:
 }
 
 /* Called by BLE when a connect is received */
-void BLEManagerInit::BLE_SignalFromISRCallback(void)
+void BLEManagerImpl::BLE_SignalFromISRCallback(void)
 {
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
     PWR_DisallowDeviceToSleep();
 #endif /* cPWR_UsePowerDownMode */
 }
 
-void BLEManagerInit::Host_Task(osaTaskParam_t argument)
+void BLEManagerImpl::Host_Task(osaTaskParam_t argument)
 {
     Host_TaskHandler((void *) NULL);
 }
 
-CHIP_ERROR BLEManagerInit::blekw_host_init(void)
+CHIP_ERROR BLEManagerImpl::blekw_host_init(void)
 {
     /* Initialization of task related */
     gHost_TaskEvent = OSA_EventCreate(TRUE);
@@ -98,7 +106,7 @@ CHIP_ERROR BLEManagerInit::blekw_host_init(void)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BLEManagerInit::blekw_controller_init(void)
+CHIP_ERROR BLEManagerImpl::blekw_controller_init(void)
 {
     mControllerTaskEvent = OSA_EventCreate(TRUE);
 
@@ -140,6 +148,8 @@ CHIP_ERROR BLEManagerInit::blekw_controller_init(void)
     return CHIP_NO_ERROR;
 }
 
+} // namespace Internal
+} // namespace DeviceLayer
 } // namespace chip
 
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE */

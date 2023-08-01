@@ -45,18 +45,16 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+typedef void (*ble_generic_cb_fp)(gapGenericEvent_t * pGenericEvent);
+
 using namespace chip::Ble;
 
 /**
  * Concrete implementation of the BLEManager singleton object for the K32W platforms.
  */
-class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
+class BLEManagerCommon : public BLEManager, protected BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 {
-    // Allow the BLEManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend BLEManager;
-
-private:
+protected:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
@@ -71,7 +69,6 @@ private:
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
-    BleLayer * _GetBleLayer(void);
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
@@ -94,12 +91,7 @@ private:
 
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
 
-    // ===== Members for internal use by the following friends.
 
-    friend BLEManager & BLEMgr(void);
-    friend BLEManagerImpl & BLEMgrImpl(void);
-
-    static BLEManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
 
@@ -112,7 +104,7 @@ private:
         kK32WBLEStackInitialized = 0x0010,
         kDeviceNameSet           = 0x0020,
     };
-    BitFlags<BLEManagerImpl::Flags> mFlags;
+    BitFlags<BLEManagerCommon::Flags> mFlags;
 
     enum
     {
@@ -225,10 +217,10 @@ private:
     CHIP_ERROR EncodeAdditionalDataTlv();
     void HandleC3ReadRequest(blekw_msg_t * msg);
 #endif
-    BLEManagerImpl::ble_err_t blekw_send_event(int8_t connection_handle, uint16_t handle, uint8_t * data, uint32_t len);
+    BLEManagerCommon::ble_err_t blekw_send_event(int8_t connection_handle, uint16_t handle, uint8_t * data, uint32_t len);
     bool RemoveConnection(uint8_t connectionHandle);
     void AddConnection(uint8_t connectionHandle);
-    BLEManagerImpl::CHIPoBLEConState * GetConnectionState(uint8_t connectionHandle, bool allocate);
+    BLEManagerCommon::CHIPoBLEConState * GetConnectionState(uint8_t connectionHandle, bool allocate);
 
     static void DriveBLEState(intptr_t arg);
     static void HandleWriteEvent(intptr_t arg);
@@ -248,9 +240,9 @@ private:
     static CHIP_ERROR blekw_msg_add_att_written(blekw_msg_type_t type, uint8_t device_id, uint16_t handle, uint8_t * data,
                                                 uint16_t length);
     static CHIP_ERROR blekw_msg_add_att_read(blekw_msg_type_t type, uint8_t device_id, uint16_t handle);
-    static BLEManagerImpl::ble_err_t blekw_start_advertising(gapAdvertisingParameters_t * adv_params, gapAdvertisingData_t * adv,
+    static BLEManagerCommon::ble_err_t blekw_start_advertising(gapAdvertisingParameters_t * adv_params, gapAdvertisingData_t * adv,
                                                              gapScanResponseData_t * scnrsp);
-    static BLEManagerImpl::ble_err_t blekw_stop_advertising(void);
+    static BLEManagerCommon::ble_err_t blekw_stop_advertising(void);
     static void blekw_gap_advertising_cb(gapAdvertisingEvent_t * pAdvertisingEvent);
     static void blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionEvent_t * pConnectionEvent);
     static void blekw_start_connection_timeout(void);
@@ -258,38 +250,13 @@ private:
     static void DoBleProcessing(intptr_t arg);
 
 public:
+    virtual CHIP_ERROR InitHostController(ble_generic_cb_fp cb_fp) = 0;
+    virtual BLEManagerCommon* GetImplInstance() = 0;
     static bool blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conId);
     void DoBleProcessing(void);
 };
 
-/**
- * Returns a reference to the public interface of the BLEManager singleton object.
- *
- * Internal components should use this to access features of the BLEManager object
- * that are common to all platforms.
- */
-inline BLEManager & BLEMgr(void)
-{
-    return BLEManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the BLEManager singleton object.
- *
- * Internal components can use this to gain access to features of the BLEManager
- * that are specific to the K32W platforms.
- */
-inline BLEManagerImpl & BLEMgrImpl(void)
-{
-    return BLEManagerImpl::sInstance;
-}
-
-inline BleLayer * BLEManagerImpl::_GetBleLayer()
-{
-    return this;
-}
-
-inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
+inline BLEManager::CHIPoBLEServiceMode BLEManagerCommon::_GetCHIPoBLEServiceMode(void)
 {
     return mServiceMode;
 }
