@@ -60,13 +60,7 @@
     "DiagnosticsLogs": ["Test_TC_DLOG_1_1"],
     "DishwasherAlarm": [
         "Test_TC_DISHALM_1_1",
-        "Test_TC_DISHALM_2_1",
-        "Test_TC_DISHALM_3_1",
-        "Test_TC_DISHALM_3_2",
-        "Test_TC_DISHALM_3_3",
-        "Test_TC_DISHALM_3_4",
-        "Test_TC_DISHALM_3_5",
-        "Test_TC_DISHALM_3_6"
+        "Test_TC_DISHALM_2_1"
     ],
     "FlowMeasurement": ["Test_TC_FLW_1_1", "Test_TC_FLW_2_1"],
     "FixedLabel": ["Test_TC_FLABEL_1_1", "Test_TC_FLABEL_2_1"],

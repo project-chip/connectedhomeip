@@ -11,150 +11,97 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    197.2.5. [TC-DISHALM-3.4] Temperature Low alarm functionality with DUT as
+    198.2.5. [TC-DISHALM-3.4] Temperature Low alarm functionality with DUT as
     Server
 
 PICS:
     - DISHALM.S
-    - DISHALM.S.A0001
-    - DISHALM.S.A0002
-    - DISHALM.S.E00
-    - DISHALM.S.C00.Rsp
-    - PICS_USER_PROMPT
+    - PIXIT.DISHALM.TempLowAlarmSupported
 
 config:
     nodeId: 0x12344321
-    cluster: "Dishwasher Alarm"
-    endpoint: 1
+    cluster: "Basic Information"
+    endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+    - label: "Step 1: Commission DUT to TH"
+      verification: |
 
-    - label: "Operate device to set State attribute bit 3 (TempLow) to 1"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "TH reads from the DUT the State attribute"
-      PICS: DISHALM.S.A0002
-      command: "readAttribute"
-      attribute: "State"
-      response:
-          constraints:
-              hasMasksSet: [0x8]
-
-    - label: "Operate device to set State attribute bit 3 (TempLow) to 0"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "TH reads from the DUT the State attribute"
-      PICS: " !DISHALM.S.A0001 && DISHALM.S.A0002 "
-      command: "readAttribute"
-      attribute: "State"
-      response:
-          value: 0
-
-    - label: "TH reads from the DUT the State attribute"
-      PICS: DISHALM.S.A0001 && DISHALM.S.A0002
-      command: "readAttribute"
-      attribute: "State"
-      response:
-          constraints:
-              hasMasksSet: [0x8]
+      disabled: true
 
     - label:
-          "TH sends command Reset to DUT with bit 3 (TempLow) of Alarms set to 1"
+          "Step 2a: Operate device to set State attribute bit 3 (TempLow) to 1"
+      PICS: DISHALM.M.ManuallyControlled
       verification: |
-          ./chip-tool dishwasheralarm reset 8 1 1
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
 
-    - label: "TH reads from the DUT the State attribute"
+      disabled: true
+
+    - label:
+          "Step 2b: After a few seconds, TH reads from the DUT the State
+          attribute"
+      PICS: DISHALM.S.A0002
+      verification: |
+          Bit 3 of response SHALL be 1
+      disabled: true
+
+    - label:
+          "Step 2c: Operate device to set State attribute bit 3 (TempLow) to 0"
+      PICS: DISHALM.M.ManuallyControlled
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 2d: After a few seconds, TH reads from the DUT the State
+          attribute"
+      PICS: DISHALM.S.A0002
+      verification: |
+          Bit 3 of response SHALL be 0 if bit 3 of DISHALM.S.A0001(Latch) is 0
+          Bit 3 of response SHALL be 1 if bit 3 of DISHALM.S.A0001(Latch) is 1
+      disabled: true
+
+    - label:
+          "Step 3a: TH sends command Reset to DUT with bit 3 (TempLow) of Alarms
+          set to 1"
+      PICS: DISHALM.S.F00 && DISHALM.S.C00.Rsp
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 3b: After a few seconds, TH reads from the DUT the State
+          attribute"
       PICS: DISHALM.S.F00 && DISHALM.S.A0002
-      command: "readAttribute"
-      attribute: "State"
-      response:
-          value: 0
-
-    - label: "Set up subscription to Notify event"
-      PICS: DISHALM.S.E00
-      command: "subscribeEvent"
-      event: notify
-      minInterval: 0
-      maxInterval: 100
-
-    - label: "Operate device to set State attribute bit 3 (TempLow) to 1"
       verification: |
-          value: { Notify: TRUE }
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+          Bit 3 of response SHALL be 0
+      disabled: true
 
-    - label: "TH reads from the DUT the State attribute"
-      PICS: DISHALM.S.A0002
-      command: "readAttribute"
-      attribute: "State"
-      response:
-          constraints:
-              hasMasksSet: [0x8]
+    - label: "Step 4a: Set up subscription to Notify event"
+      PICS: DISHALM.S.E00
+      verification: |
 
-    - label: "Operate device to set State attribute bit 3 (TempLow) to 0"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      disabled: true
 
     - label:
-          "TH sends command Reset to DUT with bit 3 (TempLow) of Alarms set to 1"
+          "Step 4b: Operate device to set State attribute bit 3 (TempLow) to 1"
+      PICS: DISHALM.S.A0002 && DISHALM.S.E00
       verification: |
-          ./chip-tool dishwasheralarm reset 8 1 1
+          Receive Notify event with State bit 3 set to TRUE.
+      disabled: true
 
-          value: { Notify: FALSE }
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Step 4c: TH reads from the DUT the State attribute"
+      PICS: DISHALM.S.A0002
+      verification: |
+          Bit 3 of response SHALL be 1.
+      disabled: true
+
+    - label:
+          "Step 4d: Operate device to set State attribute bit 3 (TempLow) to 0
+          TH sends command Reset to DUT with bit 3 (TempLow) of Alarms set to 1"
+      PICS: DISHALM.S.A0002 && DISHALM.S.C00.Rsp
+      verification: |
+          Receive Notify event with State bit 3 set to FALSE.
+      disabled: true
