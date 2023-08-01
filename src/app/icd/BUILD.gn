@@ -17,6 +17,10 @@ import("icd.gni")
 
 # ICD Server sources and configurations
 
+source_set("observer-srcs") {
+  sources = [ "ICDStateObserver.h" ]
+}
+
 # ICD Manager source-set is broken out of the main source-set to enable unit tests
 # All sources and configurations used by the ICDManager need to go in this source-set
 source_set("manager-srcs") {
@@ -25,7 +29,10 @@ source_set("manager-srcs") {
     "ICDManager.h",
   ]
 
-  deps = [ ":cluster-srcs" ]
+  deps = [
+    ":cluster-srcs",
+    ":observer-srcs",
+  ]
   public_deps = [ "${chip_root}/src/credentials:credentials" ]
 }
 

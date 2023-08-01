@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/ReadHandler.h>
+#include <app/icd/ICDStateObserver.h>
 #include <lib/core/CHIPError.h>
 #include <system/SystemClock.h>
 
@@ -38,7 +39,7 @@ public:
     virtual void TimerFired() = 0;
 };
 
-class ReportScheduler : public ReadHandler::Observer
+class ReportScheduler : public ReadHandler::Observer, public ICDStateObserver
 {
 public:
     /// @brief This class acts as an interface between the report scheduler and the system timer to reduce dependencies on the
@@ -172,6 +173,8 @@ public:
     bool IsReportableNow(ReadHandler * aReadHandler) { return FindReadHandlerNode(aReadHandler)->IsReportableNow(); }
     /// @brief Check if a ReadHandler is reportable without considering the timing
     bool IsReadHandlerReportable(ReadHandler * aReadHandler) const { return aReadHandler->IsReportable(); }
+    /// @brief Sets the ForceDirty flag of a ReadHandler
+    void HandlerForceDirtyState(ReadHandler * aReadHandler) { aReadHandler->ForceDirtyState(); }
 
     /// @brief Get the number of ReadHandlers registered in the scheduler's node pool
     size_t GetNumReadHandlers() const { return mNodesPool.Allocated(); }
