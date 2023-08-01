@@ -2548,8 +2548,9 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
             {
                 break;
             }
-            ctx.GetIOContext().DriveIO();
         }
+        ctx.GetIOContext().DriveIO();
+
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         ctx.ExpireSessionBobToAlice();
@@ -2905,8 +2906,8 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
             {
                 break;
             }
-            ctx.GetIOContext().DriveIO();
         }
+        ctx.GetIOContext().DriveIO();
 
         err = engine->GetReportingEngine().SetDirty(dirtyPath1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -3017,8 +3018,9 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
             {
                 break;
             }
-            ctx.GetIOContext().DriveIO();
         }
+        ctx.GetIOContext().DriveIO();
+
         err = engine->GetReportingEngine().SetDirty(dirtyPath1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         delegate.mGotReport            = false;
