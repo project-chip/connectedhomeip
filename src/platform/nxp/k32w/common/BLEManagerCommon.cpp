@@ -184,6 +184,18 @@ CHIP_ERROR BLEManagerCommon::_Init()
     eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_INIT_COMPLETE, pdTRUE, pdTRUE, CHIP_BLE_KW_EVNT_TIMEOUT);
     VerifyOrExit(eventBits & CHIP_BLE_KW_EVNT_INIT_COMPLETE, err = CHIP_ERROR_INCORRECT_STATE);
 
+#if BLE_HIGH_TX_POWER
+    /* Set Adv Power */
+    Gap_SetTxPowerLevel(gAdvertisingPowerLeveldBm_c, gTxPowerAdvChannel_c);
+    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, pdTRUE, pdTRUE, CHIP_BLE_KW_EVNT_TIMEOUT);
+    VerifyOrExit(eventBits & CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, err = CHIP_ERROR_INCORRECT_STATE);
+
+    /* Set Connect Power */
+    Gap_SetTxPowerLevel(gConnectPowerLeveldBm_c, gTxPowerConnChannel_c);
+    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, pdTRUE, pdTRUE, CHIP_BLE_KW_EVNT_TIMEOUT);
+    VerifyOrExit(eventBits & CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, err = CHIP_ERROR_INCORRECT_STATE);
+#endif
+
 #if defined(CPU_JN518X) && defined(chip_with_low_power) && (chip_with_low_power == 1)
     PWR_ChangeDeepSleepMode(cPWR_PowerDown_RamRet);
 #endif
