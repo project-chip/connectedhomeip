@@ -837,6 +837,9 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_key_handling.c",
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_signature.c",
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_util.c",
+        "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/se_aes.c",
+        "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/se_jpake.c",
+        "${efr32_sdk_root}/platform/security/sl_component/sl_protocol_crypto/src/sli_radioaes_management.c",
         "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_aead.c",
         "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_cipher.c",
         "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_key_derivation.c",
@@ -858,9 +861,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/se_aes.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/se_jpake.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_protocol_crypto/src/sli_radioaes_management.c",
       ]
     }
 
