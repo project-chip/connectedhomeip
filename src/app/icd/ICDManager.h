@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/icd/ICDStateObserver.h>
 #include <credentials/FabricTable.h>
 #include <lib/support/BitFlags.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -51,7 +52,7 @@ public:
     };
 
     ICDManager() {}
-    void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable);
+    void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver);
     void Shutdown();
     void UpdateIcdMode();
     void UpdateOperationState(OperationalState state);
@@ -86,6 +87,7 @@ private:
     ICDMode mICDMode                     = ICDMode::SIT;
     PersistentStorageDelegate * mStorage = nullptr;
     FabricTable * mFabricTable           = nullptr;
+    ICDStateObserver * mStateObserver    = nullptr;
 };
 
 } // namespace app

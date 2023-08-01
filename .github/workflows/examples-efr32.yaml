@@ -61,19 +61,39 @@ jobs:
            scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4187C --slc_generate --docker
            scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4164A --slc_generate --docker
            rm -rf ./out/
-      - name: Build some BRD4187C variants
+      - name: Build some BRD4187C variants (1)
+        run: |
+          ./scripts/run_in_build_env.sh \
+             "./scripts/build/build_examples.py \
+                --enable-flashbundle \
+                --target efr32-brd4187c-thermostat-openthread_mtd \
+                --target efr32-brd4187c-switch-sed-shell-use_ot_coap_lib \
+                --target efr32-brd4187c-unit-test \
+                build \
+                --copy-artifacts-to out/artifacts \
+             "
+      - name: Clean out build output
+        run: rm -rf ./out
+      - name: Build some BRD4187C variants (2)
+        run: |
+          ./scripts/run_in_build_env.sh \
+             "./scripts/build/build_examples.py \
+                --enable-flashbundle \
+                --target efr32-brd4187c-light-use_ot_lib \
+                --target efr32-brd4187c-pump \
+                --target efr32-brd4187c-lock-rpc-shell-enable_heap_monitoring \
+                build \
+                --copy-artifacts-to out/artifacts \
+             "
+      - name: Clean out build output
+        run: rm -rf ./out
+      - name: Build BRD4187C variants (3)
         run: |
           ./scripts/run_in_build_env.sh \
              "./scripts/build/build_examples.py \
                 --enable-flashbundle \
                 --target efr32-brd4187c-window-covering-additional_data_advertising \
-                --target efr32-brd4187c-thermostat-openthread_mtd \
-                --target efr32-brd4187c-switch-sed-shell-use_ot_coap_lib \
-                --target efr32-brd4187c-unit-test \
-                --target efr32-brd4187c-light-use_ot_lib \
                 --target efr32-brd4187c-light-rpc \
-                --target efr32-brd4187c-pump \
-                --target efr32-brd4187c-lock-rpc-shell-enable_heap_monitoring \
                 build \
                 --copy-artifacts-to out/artifacts \
              "

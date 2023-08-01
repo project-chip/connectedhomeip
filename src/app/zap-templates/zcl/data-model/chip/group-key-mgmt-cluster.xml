@@ -30,6 +30,17 @@ limitations under the License.
     <item fieldId="3" name="GroupName" type="CHAR_STRING" length="16" optional="true"/>
   </struct>
 
+  <enum name="GroupKeySecurityPolicyEnum" type="ENUM8">
+    <cluster code="0x003F"/>
+    <item name="TrustFirst" value="0x00"/>
+    <item name="CacheAndSync" value="0x01"/>
+  </enum>
+
+  <bitmap name="Feature" type="BITMAP32">
+      <cluster code="0x003F"/>
+      <field name="CacheAndSync" mask="0x1"/>
+  </bitmap>
+
   <struct name="GroupKeySetStruct">
     <cluster code="0x003F"/>
     <item fieldId="0" name="GroupKeySetID" type="INT16U"/>
@@ -41,12 +52,6 @@ limitations under the License.
     <item fieldId="6" name="EpochKey2" type="OCTET_STRING" length="16" isNullable="true"/>
     <item fieldId="7" name="EpochStartTime2" type="epoch_us" isNullable="true"/>
   </struct>
-
-  <enum name="GroupKeySecurityPolicyEnum" type="ENUM8">
-    <cluster code="0x003F"/>
-    <item name="TrustFirst" value="0x00"/>
-    <item name="CacheAndSync" value="0x01"/>
-  </enum>
 
   <cluster>
     <domain>General</domain>
