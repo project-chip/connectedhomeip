@@ -192,7 +192,9 @@ void emberAfEndpointConfigure()
         emAfEndpoints[ep].deviceTypeList = endpointDeviceTypeList(ep);
         emAfEndpoints[ep].endpointType   = endpointTypeMacro(ep);
         emAfEndpoints[ep].dataVersions   = currentDataVersions;
-        emAfEndpoints[ep].bitmask        = EMBER_AF_ENDPOINT_ENABLED;
+
+        emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isEnabled);
+        emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
 
         // Increment currentDataVersions by 1 (slot) for every server cluster
         // this endpoint has.
@@ -271,7 +273,7 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const Emb
     emAfEndpoints[index].endpointType   = ep;
     emAfEndpoints[index].dataVersions   = dataVersionStorage.data();
     // Start the endpoint off as disabled.
-    emAfEndpoints[index].bitmask          = EMBER_AF_ENDPOINT_DISABLED;
+    emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
     emAfEndpoints[index].parentEndpointId = parentEndpointId;
 
     emberAfSetDynamicEndpointCount(MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT);
@@ -322,7 +324,7 @@ uint16_t emberAfEndpointCount()
 
 bool emberAfEndpointIndexIsEnabled(uint16_t index)
 {
-    return (emAfEndpoints[index].bitmask & EMBER_AF_ENDPOINT_ENABLED);
+    return (emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isEnabled));
 }
 
 bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType)
@@ -371,8 +373,8 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     // Casting and calling a function pointer on the same line results in ignoring the return
     // of the call on gcc-arm-none-eabi-9-2019-q4-major
-    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback)(
-        emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
+    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback) (emberAfFindClusterFunction(
+        cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
     if (f != nullptr)
     {
         status = f(attributePath, attributeType, size, value);
@@ -838,7 +840,7 @@ static uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEn
     for (epi = 0; epi < emberAfEndpointCount(); epi++)
     {
         if (emAfEndpoints[epi].endpoint == endpoint &&
-            (!ignoreDisabledEndpoints || emAfEndpoints[epi].bitmask & EMBER_AF_ENDPOINT_ENABLED))
+            (!ignoreDisabledEndpoints || emAfEndpoints[epi].bitmask.Has(EmberAfEndpointOptions::isEnabled)))
         {
             return epi;
         }
@@ -919,11 +921,11 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
         return false;
     }
 
-    currentlyEnabled = emAfEndpoints[index].bitmask & EMBER_AF_ENDPOINT_ENABLED;
+    currentlyEnabled = emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isEnabled);
 
     if (enable)
     {
-        emAfEndpoints[index].bitmask |= EMBER_AF_ENDPOINT_ENABLED;
+        emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isEnabled);
     }
 
 #if defined(EZSP_HOST)
@@ -962,7 +964,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
 
     if (!enable)
     {
-        emAfEndpoints[index].bitmask &= EMBER_AF_ENDPOINT_DISABLED;
+        emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
     }
 
     return true;
@@ -990,36 +992,6 @@ EndpointId emberAfEndpointFromIndex(uint16_t index)
 EndpointId emberAfParentEndpointFromIndex(uint16_t index)
 {
     return emAfEndpoints[index].parentEndpointId;
-}
-
-EmberAfStatus emberAfSetParentEndpointForEndpoint(chip::EndpointId childEndpoint, chip::EndpointId parentEndpoint)
-{
-    uint16_t childIndex  = emberAfIndexFromEndpoint(childEndpoint);
-    uint16_t parentIndex = emberAfIndexFromEndpoint(parentEndpoint);
-
-    if (childIndex == kEmberInvalidEndpointIndex || parentIndex == kEmberInvalidEndpointIndex)
-    {
-        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
-    }
-    emAfEndpoints[childIndex].parentEndpointId = parentEndpoint;
-    return EMBER_ZCL_STATUS_SUCCESS;
-}
-
-EmberAfStatus emberAfSetEndpointComposition(chip::EndpointId endpoint, EmberAfEndpointCompositionType aEndpointCompositionType)
-{
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index == kEmberInvalidEndpointIndex)
-    {
-        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
-    }
-    emAfEndpoints[index].endpointCompositionType = aEndpointCompositionType;
-    return EMBER_ZCL_STATUS_SUCCESS;
-}
-
-EmberAfEndpointCompositionType emberAfEndpointCompositionTypeForEndpoint(chip::EndpointId endpoint)
-{
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    return emAfEndpoints[index].endpointCompositionType;
 }
 
 // If server == true, returns the number of server clusters,
@@ -1451,6 +1423,64 @@ app::AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId
 
     return nullptr;
 }
+
+EmberAfStatus SetParentEndpointForEndpoint(EndpointId childEndpoint, EndpointId parentEndpoint)
+{
+    uint16_t childIndex  = emberAfIndexFromEndpoint(childEndpoint);
+    uint16_t parentIndex = emberAfIndexFromEndpoint(parentEndpoint);
+
+    if (childIndex == kEmberInvalidEndpointIndex || parentIndex == kEmberInvalidEndpointIndex)
+    {
+        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
+    }
+    emAfEndpoints[childIndex].parentEndpointId = parentEndpoint;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus SetFlatCompositionForEndpoint(EndpointId endpoint)
+{
+    uint16_t index = emberAfIndexFromEndpoint(endpoint);
+    if (index == kEmberInvalidEndpointIndex)
+    {
+        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
+    }
+    emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isTreeComposition);
+    emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus SetTreeCompositionForEndpoint(EndpointId endpoint)
+{
+    uint16_t index = emberAfIndexFromEndpoint(endpoint);
+    if (index == kEmberInvalidEndpointIndex)
+    {
+        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
+    }
+    emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isFlatComposition);
+    emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isTreeComposition);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+bool IsFlatCompositionForEndpoint(EndpointId endpoint)
+{
+    uint16_t index = emberAfIndexFromEndpoint(endpoint);
+    if (index == kEmberInvalidEndpointIndex)
+    {
+        return false;
+    }
+    return emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isFlatComposition);
+}
+
+bool IsTreeCompositionForEndpoint(EndpointId endpoint)
+{
+    uint16_t index = emberAfIndexFromEndpoint(endpoint);
+    if (index == kEmberInvalidEndpointIndex)
+    {
+        return false;
+    }
+    return emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isTreeComposition);
+}
+
 } // namespace app
 } // namespace chip
 
