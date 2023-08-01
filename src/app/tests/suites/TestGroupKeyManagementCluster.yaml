@@ -557,7 +557,6 @@ tests:
       response:
           error: RESOURCE_EXHAUSTED
 
-
     - label: "Write Group Keys (invalid)"
       command: "writeAttribute"
       attribute: "GroupKeyMap"
