@@ -96,7 +96,9 @@ source_set("scenes-table-test-srcs") {
 }
 
 source_set("operational-state-test-srcs") {
-  sources = [ "${chip_root}/src/app/clusters/operational-state-server/operational-state-delegate.h" ]
+  sources = [
+    "${chip_root}/src/app/clusters/operational-state-server/operational-state-server.h",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",

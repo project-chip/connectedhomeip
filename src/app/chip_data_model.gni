@@ -268,7 +268,7 @@ template("chip_data_model") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
-          "${_app_root}/clusters/${cluster}/operational-state-delegate.h",
+          "${_app_root}/clusters/${cluster}/operational-state-cluster-objects.h",
         ]
       } else if (cluster == "dishwasher-alarm-server") {
         sources += [
