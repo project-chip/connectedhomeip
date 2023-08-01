@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    3.4.2. [TC-IDM-4.2] Subscription Response Messages from DUT Test Cases.
-    [DUT_Server]
+    32.4.2. [TC-IDM-4.2] Subscription Response Messages from DUT Test Cases.
+    [DUT as Server]
 
 PICS:
     - MCORE.IDM.S
@@ -26,19 +26,19 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Note"
+    - label: "Notes/Testing Considerations"
       verification: |
           1. The Cluster and Commands should be based on the cluster implementation on the DUT.
           2. The cluster used in the below test steps is an example, User can use any supported chip cluster/attribute/command.
       disabled: true
 
-    - label: "Precondition"
+    - label: "Pre condition"
       verification: |
-          Please use Interactive mode to Verify subscription test cases
-          Here the command to enter interactive mode:--   ./chip-tool interactive start
+          Please use Interactive mode to Verify subscription test cases 
+          Here the command to enter interactive mode:-- ./chip-tool interactive start
       disabled: true
 
-    - label: "Step 0a: SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 60 mins"
+    - label: "Step 0a: TH reads from the DUT the IdleModeInterval attribute."
       PICS: " !ICDM.S "
       verification: |
           When the ICDM feature is not supported or enabled, the SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT is set to 60 minutes.
@@ -47,13 +47,13 @@ tests:
     - label: "Step 0b: TH reads from the DUT the IdleModeInterval attribute."
       PICS: ICDM.S
       verification: |
-          TH reads from the DUT the IdleModeInterval attribute by sending below mentioned command
+          TH reads from the DUT the IdleModeInterval attribute by sending below mentioned command 
 
            icdmanagement read idle-mode-interval 1
           Please note down the value of IdleModeInterval as SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT for use in the next step validations.
 
 
-          [1690475024.398278][5675:5677] CHIP:DMG:         SuppressResponse = true,
+          [1690475024.398278][5675:5677] CHIP:DMG:         SuppressResponse = true, 
           [1690475024.398282][5675:5677] CHIP:DMG:         InteractionModelRevision = 1
           [1690475024.398285][5675:5677] CHIP:DMG: }
           [1690475024.398735][5675:5677] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0000 DataVersion: 4216223957
@@ -190,14 +190,14 @@ tests:
           [1689933254.566702][48781:48783] CHIP:DMG:                                 Cluster = 0x1f,
           [1689933254.566705][48781:48783] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1689933254.566708][48781:48783] CHIP:DMG:                         }
-          [1689933254.566713][48781:48783] CHIP:DMG:
+          [1689933254.566713][48781:48783] CHIP:DMG:                                 
           [1689933254.566716][48781:48783] CHIP:DMG:                         StatusIB =
           [1689933254.566720][48781:48783] CHIP:DMG:                         {
           [1689933254.566723][48781:48783] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1689933254.566726][48781:48783] CHIP:DMG:                         },
-          [1689933254.566730][48781:48783] CHIP:DMG:
+          [1689933254.566730][48781:48783] CHIP:DMG:                         
           [1689933254.566732][48781:48783] CHIP:DMG:                 },
-          [1689933254.566739][48781:48783] CHIP:DMG:
+          [1689933254.566739][48781:48783] CHIP:DMG:                 
           [1689933254.566741][48781:48783] CHIP:DMG:                 AttributeStatusIB =
           [1689933254.566744][48781:48783] CHIP:DMG:                 {
           [1689933254.566747][48781:48783] CHIP:DMG:                         AttributePathIB =
@@ -207,14 +207,14 @@ tests:
           [1689933254.566760][48781:48783] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1689933254.566763][48781:48783] CHIP:DMG:                                 ListIndex = Null,
           [1689933254.566766][48781:48783] CHIP:DMG:                         }
-          [1689933254.566770][48781:48783] CHIP:DMG:
+          [1689933254.566770][48781:48783] CHIP:DMG:                                 
           [1689933254.566773][48781:48783] CHIP:DMG:                         StatusIB =
           [1689933254.566776][48781:48783] CHIP:DMG:                         {
           [1689933254.566779][48781:48783] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1689933254.566782][48781:48783] CHIP:DMG:                         },
-          [1689933254.566786][48781:48783] CHIP:DMG:
+          [1689933254.566786][48781:48783] CHIP:DMG:                         
           [1689933254.566789][48781:48783] CHIP:DMG:                 },
-          [1689933254.566794][48781:48783] CHIP:DMG:
+          [1689933254.566794][48781:48783] CHIP:DMG:                 
           [1689933254.566797][48781:48783] CHIP:DMG:                 AttributeStatusIB =
           [1689933254.566800][48781:48783] CHIP:DMG:                 {
           [1689933254.566802][48781:48783] CHIP:DMG:                         AttributePathIB =
@@ -224,16 +224,16 @@ tests:
           [1689933254.566815][48781:48783] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1689933254.566818][48781:48783] CHIP:DMG:                                 ListIndex = Null,
           [1689933254.566821][48781:48783] CHIP:DMG:                         }
-          [1689933254.566825][48781:48783] CHIP:DMG:
+          [1689933254.566825][48781:48783] CHIP:DMG:                                 
           [1689933254.566828][48781:48783] CHIP:DMG:                         StatusIB =
           [1689933254.566831][48781:48783] CHIP:DMG:                         {
           [1689933254.566834][48781:48783] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1689933254.566837][48781:48783] CHIP:DMG:                         },
-          [1689933254.566840][48781:48783] CHIP:DMG:
+          [1689933254.566840][48781:48783] CHIP:DMG:                         
           [1689933254.566843][48781:48783] CHIP:DMG:                 },
-          [1689933254.566847][48781:48783] CHIP:DMG:
+          [1689933254.566847][48781:48783] CHIP:DMG:                 
           [1689933254.566849][48781:48783] CHIP:DMG:         ],
-          [1689933254.566857][48781:48783] CHIP:DMG:
+          [1689933254.566857][48781:48783] CHIP:DMG:         
           [1689933254.566859][48781:48783] CHIP:DMG:         InteractionModelRevision = 1
           [1689933254.566862][48781:48783] CHIP:DMG: }
           [1689933254.566897][48781:48783] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -242,7 +242,7 @@ tests:
 
           If TH2 attempts to subscribe to an attribute on a cluster (ClusterID) for which it does not have access, the AttributePath used for the subscription would be in the form [[Attribute = AttributeName, Cluster = ClusterID, Endpoint = EndpointID]], but this action will be denied, and TH2 will not be able to access the attribute due to the restricted access.
 
-          below provided the  example command used to subscribe location attribute from basicinformation cluster from node id(4) that have access to the “levelcontrol” cluster
+          below provided the  example command used to subscribe location attribute from basicinformation cluster from node id(4) that have access to the “levelcontrol” cluster 
 
            basicinformation subscribe location 10 2400 1 0  --commissioner-nodeid  4
           [1689933387.304826][48781:48783] CHIP:EM: Rxd Ack; Removing MessageCounter:42350588 from Retrans Table on exchange 6319i
@@ -450,7 +450,8 @@ tests:
           clusters on all endpoints on a Node for which it does not have access.
           AttributePath = [[ ]]."
       verification: |
-          Out of scope /Not Testable
+          Chip-Tool support required to validate this step : SDK Issue - https://github.com/project-chip/connectedhomeip/issues/28360
+          Not Testable
       disabled: true
 
     - label:
@@ -460,7 +461,8 @@ tests:
           subscription for that attribute. Start another subscription with the
           DataVersionFilter field set to the data version received above."
       verification: |
-          Out of scope /Not Testable
+          Chip-Tool support required to validate this step : SDK Issue - https://github.com/project-chip/connectedhomeip/issues/28363
+          Not Testable
       disabled: true
 
     - label:
@@ -472,7 +474,7 @@ tests:
           Please send the following command from TH (the subscription requester) to DUT (the device under test) to activate the subscription for the "on-time" attribute, setting the MinIntervalFloor and MaxIntervalCeiling values to be the same (in this case, 100 seconds):
 
           onoff subscribe on-time 100 100 1 1 --keepSubscriptions true
-          On the TH(all-clusters-app) verify the  SubscribeResponse is received successfully
+          On the TH(all-clusters-app) verify the  SubscribeResponse is received successfully 
           [1690540281.061350][9488:9490] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_4001 DataVersion: 3310786904
           [1690540281.061363][9488:9490] CHIP:TOO:   OnTime: 0
           [1690540281.061379][9488:9490] CHIP:DMG: MoveToState ReadClient[0x7faef8013880]: Moving to [AwaitingSu]
@@ -497,7 +499,7 @@ tests:
           >>> onoff write on-time 1 1 1
           On TH(chip-tool), verify that the DUT sends a report data containing the current 'ontime' attribute value after the MinIntervalFloor time has elapsed
 
-          [1690540304.761997][9488:9488] CHIP:TOO: Command: onoff write on-time 1 1 1
+          [1690540304.761997][9488:9488] CHIP:TOO: Command: onoff write on-time 1 1 1 
           [1690540304.762298][9488:9490] CHIP:TOO: Sending command to node 0x1
           [1690540304.762462][9488:9490] CHIP:CSM: FindOrEstablishSession: PeerId = [1:0000000000000001]
           [1690540304.762474][9488:9490] CHIP:CSM: FindOrEstablishSession: No existing OperationalSessionSetup instance found
@@ -524,16 +526,16 @@ tests:
           [1690540304.763597][9488:9490] CHIP:DMG:                                 Cluster = 0x6,
           [1690540304.763606][9488:9490] CHIP:DMG:                                 Attribute = 0x0000_4001,
           [1690540304.763614][9488:9490] CHIP:DMG:                         }
-          [1690540304.763626][9488:9490] CHIP:DMG:
+          [1690540304.763626][9488:9490] CHIP:DMG:                                 
           [1690540304.763634][9488:9490] CHIP:DMG:                         StatusIB =
           [1690540304.763646][9488:9490] CHIP:DMG:                         {
           [1690540304.763654][9488:9490] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1690540304.763662][9488:9490] CHIP:DMG:                         },
-          [1690540304.763671][9488:9490] CHIP:DMG:
+          [1690540304.763671][9488:9490] CHIP:DMG:                         
           [1690540304.763677][9488:9490] CHIP:DMG:                 },
-          [1690540304.763688][9488:9490] CHIP:DMG:
+          [1690540304.763688][9488:9490] CHIP:DMG:                 
           [1690540304.763694][9488:9490] CHIP:DMG:         ],
-          [1690540304.763706][9488:9490] CHIP:DMG:
+          [1690540304.763706][9488:9490] CHIP:DMG:         
           [1690540304.763713][9488:9490] CHIP:DMG:         InteractionModelRevision = 1
           [1690540304.763719][9488:9490] CHIP:DMG: }
           [1690540304.763753][9488:9490] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -571,14 +573,14 @@ tests:
           [1690540381.062383][9488:9490] CHIP:DMG:                                         Cluster = 0x6,
           [1690540381.062392][9488:9490] CHIP:DMG:                                         Attribute = 0x0000_4001,
           [1690540381.062399][9488:9490] CHIP:DMG:                                 }
-          [1690540381.062409][9488:9490] CHIP:DMG:
-          [1690540381.062417][9488:9490] CHIP:DMG:                                 Data = 1,
+          [1690540381.062409][9488:9490] CHIP:DMG:                                         
+          [1690540381.062417][9488:9490] CHIP:DMG:                                 Data = 1, 
           [1690540381.062423][9488:9490] CHIP:DMG:                         },
-          [1690540381.062433][9488:9490] CHIP:DMG:
+          [1690540381.062433][9488:9490] CHIP:DMG:                         
           [1690540381.062439][9488:9490] CHIP:DMG:                 },
-          [1690540381.062447][9488:9490] CHIP:DMG:
+          [1690540381.062447][9488:9490] CHIP:DMG:                 
           [1690540381.062453][9488:9490] CHIP:DMG:         ],
-          [1690540381.062463][9488:9490] CHIP:DMG:
+          [1690540381.062463][9488:9490] CHIP:DMG:         
           [1690540381.062470][9488:9490] CHIP:DMG:         InteractionModelRevision = 1
           [1690540381.062476][9488:9490] CHIP:DMG: }
           [1690540381.062543][9488:9490] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_4001 DataVersion: 3310786905
@@ -596,6 +598,8 @@ tests:
           set the MinIntervalFloor value to be greater than MaxIntervalCeiling.
           +"
       verification: |
+          Please send the following command from TH (the subscription requester) to DUT (the device under test) to activate the subscription for the "on-time" attribute, setting the MinIntervalFloor value to be greater than MaxIntervalCeiling:
+
           onoff subscribe on-time 500 100 1 1 --keepSubscriptions true
 
           On TH (chip-tool), verify that the DUT sends an error message, confirming that the subscription is not established successfully
@@ -612,14 +616,14 @@ tests:
     - label:
           "Step 10: TH sends a subscription request to subscribe to a specific
           global attribute from all clusters on all endpoints. AttributePath =
-          [[Attribute = Global Attribute]]."
+          [[Attribute = Global Attribute]]. +"
       verification: |
           any subscribe-by-id 0xFFFFFFFF 0xFFFD  10 300 1 0xFFFF --keepSubscriptions true
 
           The following log is an example of the output obtained for Attribute 0x0000_FFFD on Endpoint 0
           Pls repeat this for every cluster on every endpoint. The log represents the attributes of clusters found on different endpoints.
 
-           Verify the presence of  mandatory global attribute ClusterRevision for every cluster on every endpoint:
+           Verify the presence of  mandatory global attribute ClusterRevision for every cluster on every endpoint: 
 
 
           Verification Instructions:
@@ -660,7 +664,7 @@ tests:
           The following log is an example of the output obtained for Attribute 0x0000_FFFD on Endpoint 0
           Pls repeat this for every cluster on endpoint 0. The log represents the attribute of clusters found on endpoint 0.
 
-           Verify the presence of  mandatory global attribute ClusterRevision for every cluster on every endpoint:
+           Verify the presence of  mandatory global attribute ClusterRevision for every cluster on every endpoint: 
 
 
           Verification Instructions:
@@ -744,6 +748,19 @@ tests:
           "Step 12: TH sends a subscription request to the DUT with both
           AttributeRequests and EventRequests as empty"
       verification: |
-          Chip-Tool support required to validate this step : SDK PR - https://github.com/project-chip/connectedhomeip/pull/28327
-          Not Verifiable
+          Please send the following command from TH (the subscription requester) to DUT (the device under test) to activate the subscription  with both AttributeRequests and EventRequests as empty
+
+          any subscribe-none 10 100 1 --keepSubscriptions 1
+
+          On TH (chip-tool), verify that the DUT sends an error message, confirming that the subscription is not established successfully
+          [1690884829.708780][84191:84193] CHIP:EM: Rxd Ack; Removing MessageCounter:136461510 from Retrans Table on exchange 23099i
+          [1690884829.708861][84191:84193] CHIP:DMG: StatusResponseMessage =
+          [1690884829.708907][84191:84193] CHIP:DMG: {
+          [1690884829.708947][84191:84193] CHIP:DMG:         Status = 0x80 (INVALID_ACTION),
+          [1690884829.708988][84191:84193] CHIP:DMG:         InteractionModelRevision = 1
+          [1690884829.709026][84191:84193] CHIP:DMG: }
+          [1690884829.709064][84191:84193] CHIP:IM: Received status response, status is 0x80 (INVALID_ACTION)
+          [1690884829.709196][84191:84193] CHIP:EM: <<< [E:23099i S:5058 M:136461511 (Ack:90075666)] (S) Msg TX to 1:0000000000000001 [EAE3] --- Type 0001:01 (IM:StatusResponse)
+          [1690884829.709252][84191:84193] CHIP:IN: (S) Sending msg 136461511 on secure session with LSID: 5058
+          [1690884829.709420][84191:84193] CHIP:DMG: MoveToState ReadClient[0xffff9c005e90]: Moving to [      Idle]
       disabled: true

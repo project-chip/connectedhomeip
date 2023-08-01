@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    3.4.1. [TC-IDM-4.1] SubscriptionRequestMessage from DUT test cases.
-    [DUT_Client]
+    32.4.1. [TC-IDM-4.1] SubscriptionRequestMessage from DUT test cases. [DUT as
+    Client]
 
 PICS:
     - MCORE.IDM.C.SubscribeRequest
@@ -26,16 +26,16 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Note"
+    - label: "Notes/Testing Considerations"
       verification: |
           1. The Cluster and Commands should be based on the cluster implementation on the DUT.
-          2. The cluster used in the below test steps is an example, User can use any supported chip cluster/attribute/command.
+          2. The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
       disabled: true
 
     - label: "Precondition"
       verification: |
-          Please use Interactive mode to Verify subscription test cases
-          Here the command to enter interactive mode:--   ./chip-tool interactive start
+          Please use Interactive mode to Verify subscription test cases 
+          Here the command to enter interactive mode:-- ./chip-tool interactive start
       disabled: true
 
     - label:
@@ -175,9 +175,9 @@ tests:
       disabled: true
 
     - label:
-          "Step 3: [OPTIONAL] Activate the subscription between the DUT and the
-          TH for an attribute of data type boolean. Modify that attribute on the
-          TH. TH should send the modified data to the DUT. Modify the attribute
+          "Step 3: Activate the subscription between the DUT and the TH for an
+          attribute of data type boolean. Modify that attribute on the TH. TH
+          should send the modified data to the DUT. Modify the attribute
           multiple times (3 times)."
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_Bool
       verification: |
@@ -558,7 +558,7 @@ tests:
 
     - label:
           "Step 10: DUT sends a subscription request message to the target
-          node/reference device for multiple attributes(3 attributes)."
+          node/reference device for multiple attributes (>1 attributes)."
       PICS: MCORE.IDM.C.SubscribeRequest.MultipleAttributes
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
