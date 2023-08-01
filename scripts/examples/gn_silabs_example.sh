@@ -114,12 +114,12 @@ if [ "$#" == "0" ]; then
         siwx917_commissionable_data
             Build with the commissionable data given in DeviceConfig.h (only for SiWx917)
         Presets
-        --sed
-            enable sleepy end device, set thread mtd
+        --icd
+            enable ICD features, set thread mtd
             For minimum consumption, add --low-power
         --low-power
             disables all power consuming features for the most power efficient build
-            This flag is to be used with --sed
+            This flag is to be used with --icd
         --wifi <wf200 | rs9116>
             build wifi example variant for given exansion board
         --additional_data_advertising
@@ -157,112 +157,112 @@ else
     shift
     while [ $# -gt 0 ]; do
         case $1 in
-            --clean)
-                DIR_CLEAN=true
-                shift
-                ;;
-            --wifi)
-                if [ -z "$2" ]; then
-                    echo "--wifi requires rs9116 or SiWx917 or wf200"
-                    exit 1
-                fi
-                if [ "$2" = "rs9116" ]; then
-                    optArgs+="use_rs9116=true "
-                elif [ "$2" = "SiWx917" ]; then
-                    optArgs+="use_SiWx917=true "
-                elif [ "$2" = "wf200" ]; then
-                    optArgs+="use_wf200=true "
-                else
-                    echo "Wifi usage: --wifi rs9116|SiWx917|wf200"
-                    exit 1
-                fi
-                USE_WIFI=true
-                optArgs+="chip_device_platform =\"efr32\" "
-                shift
-                shift
-                ;;
-            --sed)
-                optArgs+="chip_enable_icd_server=true chip_openthread_ftd=false "
-                shift
-                ;;
-            --low-power)
-                optArgs+="chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true "
-                shift
-                ;;
-            --chip_enable_wifi_ipv4)
-                optArgs="chip_enable_wifi_ipv4=true chip_inet_config_enable_ipv4=true "
-                shift
-                ;;
-            --additional_data_advertising)
-                optArgs+="chip_enable_additional_data_advertising=true chip_enable_rotating_device_id=true "
-                shift
-                ;;
-            --use_ot_lib)
-                optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" "
-                shift
-                ;;
-            --use_ot_coap_lib)
-                optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
-                shift
-                ;;
-            --use_chip_lwip_lib)
-                optArgs+="lwip_root=\""//third_party/connectedhomeip/third_party/lwip"\" "
-                shift
-                ;;
-            # Option not to be used until ot-efr32 github is updated
-            # --use_ot_github_sources)
-            #   optArgs+="openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/openthread\" openthread_efr32_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/src/src\""
-            #    shift
-            #    ;;
-            --release)
-                optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
-                shift
-                ;;
-            --docker)
-                optArgs+="efr32_sdk_root=\"$GSDK_ROOT\" "
-                USE_DOCKER=true
-                shift
-                ;;
-            --uart_log)
-                optArgs+="sl_uart_log_output=true "
-                shift
-                ;;
+        --clean)
+            DIR_CLEAN=true
+            shift
+            ;;
+        --wifi)
+            if [ -z "$2" ]; then
+                echo "--wifi requires rs9116 or SiWx917 or wf200"
+                exit 1
+            fi
+            if [ "$2" = "rs9116" ]; then
+                optArgs+="use_rs9116=true "
+            elif [ "$2" = "SiWx917" ]; then
+                optArgs+="use_SiWx917=true "
+            elif [ "$2" = "wf200" ]; then
+                optArgs+="use_wf200=true "
+            else
+                echo "Wifi usage: --wifi rs9116|SiWx917|wf200"
+                exit 1
+            fi
+            USE_WIFI=true
+            optArgs+="chip_device_platform =\"efr32\" "
+            shift
+            shift
+            ;;
+        --icd)
+            optArgs+="chip_enable_icd_server=true chip_openthread_ftd=false "
+            shift
+            ;;
+        --low-power)
+            optArgs+="chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true "
+            shift
+            ;;
+        --chip_enable_wifi_ipv4)
+            optArgs="chip_enable_wifi_ipv4=true chip_inet_config_enable_ipv4=true "
+            shift
+            ;;
+        --additional_data_advertising)
+            optArgs+="chip_enable_additional_data_advertising=true chip_enable_rotating_device_id=true "
+            shift
+            ;;
+        --use_ot_lib)
+            optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" "
+            shift
+            ;;
+        --use_ot_coap_lib)
+            optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
+            shift
+            ;;
+        --use_chip_lwip_lib)
+            optArgs+="lwip_root=\""//third_party/connectedhomeip/third_party/lwip"\" "
+            shift
+            ;;
+        # Option not to be used until ot-efr32 github is updated
+        # --use_ot_github_sources)
+        #   optArgs+="openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/openthread\" openthread_efr32_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/src/src\""
+        #    shift
+        #    ;;
+        --release)
+            optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
+            shift
+            ;;
+        --docker)
+            optArgs+="efr32_sdk_root=\"$GSDK_ROOT\" "
+            USE_DOCKER=true
+            shift
+            ;;
+        --uart_log)
+            optArgs+="sl_uart_log_output=true "
+            shift
+            ;;
 
-            --slc_generate)
-                optArgs+="slc_generate=true "
-                USE_SLC=true
-                shift
-                ;;
-            --slc_reuse_files)
-                optArgs+="slc_reuse_files=true "
-                USE_SLC=true
-                shift
-                ;;
-            --gn_path)
-                if [ -z "$2" ]; then
-                    echo "--gn_path requires a path to GN"
-                    exit 1
-                else
-                    GN_PATH="$2"
-                fi
-                GN_PATH_PROVIDED=true
-                shift
-                shift
-                ;;
-            *"sl_matter_version_str="*)
-                optArgs+="$1 "
-                USE_GIT_SHA_FOR_VERSION=false
-                shift
-                ;;
-            *)
-                if [ "$1" =~ *"use_rs9116=true"* ] || [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
-                    USE_WIFI=true
-                    # NCP Mode so base MCU is an EFR32
-                    optArgs+="chip_device_platform =\"efr32\" "
-                fi
-                optArgs+=$1" "
-                shift
-                ;;
+        --slc_generate)
+            optArgs+="slc_generate=true "
+            USE_SLC=true
+            shift
+            ;;
+        --slc_reuse_files)
+            optArgs+="slc_reuse_files=true "
+            USE_SLC=true
+            shift
+            ;;
+        --gn_path)
+            if [ -z "$2" ]; then
+                echo "--gn_path requires a path to GN"
+                exit 1
+            else
+                GN_PATH="$2"
+            fi
+            GN_PATH_PROVIDED=true
+            shift
+            shift
+            ;;
+        *"sl_matter_version_str="*)
+            optArgs+="$1 "
+            USE_GIT_SHA_FOR_VERSION=false
+            shift
+            ;;
+        *)
+            if [ "$1" =~ *"use_rs9116=true"* ] || [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
+                USE_WIFI=true
+                # NCP Mode so base MCU is an EFR32
+                optArgs+="chip_device_platform =\"efr32\" "
+            fi
+            optArgs+=$1" "
+            shift
+            ;;
         esac
     done
 
