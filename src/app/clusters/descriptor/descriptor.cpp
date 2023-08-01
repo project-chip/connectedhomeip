@@ -76,7 +76,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
             return CHIP_NO_ERROR;
         });
     }
-    else if (emberAfEndpointCompositionTypeForEndpoint(endpoint) == EMBER_AF_ENDPOINT_COMPOSITION_FLAT)
+    else if (IsFlatCompositionForEndpoint(endpoint))
     {
         err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
             for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
@@ -104,7 +104,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
             return CHIP_NO_ERROR;
         });
     }
-    else
+    else if (IsTreeCompositionForEndpoint(endpoint))
     {
         err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
             for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
