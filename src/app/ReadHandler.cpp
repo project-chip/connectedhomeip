@@ -728,6 +728,12 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     // GetPublisherSelectedIntervalLimit() returns the IdleModeInterval if the device is an ICD
     uint32_t decidedMaxInterval = GetPublisherSelectedIntervalLimit();
 
+    // Check if the PublisherSelectedIntervalLimit is 0. If so, set decidedMaxInterval to MaxIntervalCeiling
+    if (decidedMaxInterval == 0)
+    {
+        decidedMaxInterval = mMaxInterval;
+    }
+
     // If requestedMinInterval is greater than the IdleTimeInterval, select next active up time as max interval
     if (mMinIntervalFloorSeconds > decidedMaxInterval)
     {
