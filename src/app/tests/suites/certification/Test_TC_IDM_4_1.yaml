@@ -34,7 +34,7 @@ tests:
 
     - label: "Precondition"
       verification: |
-          Please use Interactive mode to Verify subscription test cases 
+          Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:-- ./chip-tool interactive start
       disabled: true
 

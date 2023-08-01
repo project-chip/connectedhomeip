@@ -34,17 +34,17 @@ tests:
 
     - label: "Pre condition"
       verification: |
-          Please use Interactive mode to Verify subscription test cases 
+          Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:-- ./chip-tool interactive start
       disabled: true
 
     - label: "Step 1a: DUT and TH activate the subscription."
       verification: |
-          Activate the Subscription between DUT and TH by sending below mentioned command 
+          Activate the Subscription between DUT and TH by sending below mentioned command
 
           onoff subscribe on-off  10 100 1 1 --keepSubscriptions true
 
-          on TH(chip-tool), 
+          on TH(chip-tool),
           1. Verify Report Data Message Received:
                   On the target hardware (TH), check if a report data message is received.
 
@@ -53,9 +53,9 @@ tests:
                 SubscriptionId
                   MaxInterval
 
-          [1690479841.107906][5694:5696] CHIP:DMG:                 
+          [1690479841.107906][5694:5696] CHIP:DMG:
           [1690479841.107911][5694:5696] CHIP:DMG:         ],
-          [1690479841.107923][5694:5696] CHIP:DMG:         
+          [1690479841.107923][5694:5696] CHIP:DMG:
           [1690479841.107930][5694:5696] CHIP:DMG:         InteractionModelRevision = 1
           [1690479841.107936][5694:5696] CHIP:DMG: }
           [1690479841.107987][5694:5696] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 2332229409
@@ -94,7 +94,7 @@ tests:
           attribute which has been subscribed on the DUT by sending an IMWrite
           or Invoke message to the DUT from the TH. +"
       verification: |
-          Activate the Subscription between DUT and TH by sending below mentioned command 
+          Activate the Subscription between DUT and TH by sending below mentioned command
 
           onoff  subscribe start-up-on-off  30 100 1 1 --keepSubscriptions true
 
@@ -170,7 +170,7 @@ tests:
           "Step 3: DUT and TH activate the subscription for an attribute. Do not
           change the value of the attribute which has been subscribed."
       verification: |
-          Activate the Subscription between DUT and TH by sending below mentioned command  
+          Activate the Subscription between DUT and TH by sending below mentioned command
 
           onoff  subscribe on-off 10 200  1 1 --keepSubscriptions true
 
