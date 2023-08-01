@@ -119,14 +119,36 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 You can send a command to air-quality-sensor-app to trigger specific event via
 air-quality-sensor-app event named pipe /tmp/chip_air_quality_fifo-<PID>.
 
-1. Generate event `VocChange`, when VOC measurement changes.
+### Trigger air quality change event
+
+Generate event `AirQuality`, to change the AirQaulity value.
 
 ```
-$ echo '{"Name":"VocChange","NewValue":400}' > /tmp/chip_air_quality_fifo-<PID>
+$ echo '{"Name":"AirQuality","NewValue":3}' > /tmp/chip_air_quality_fifo-<PID>
 ```
 
-2. Generate event `Co2Change`, when CO2 measurement changes.
+### Trigger Temperature change event
+
+Generate event `TemperatureMeasurement`, to change the temperate value.
 
 ```
-$ echo '{"Name":"Co2Change","NewValue":400}' > /tmp/chip_air_quality_fifo-<PID>
+$ echo '{"Name":"TemperatureMeasurement","NewValue":18}' > /tmp/chip_air_quality_fifo-<PID>
+```
+
+### Trigger Humidity change event
+
+Generate event `RelativeHumidityMeasurement`, to change the temperate value.
+
+```
+$ echo '{"Name":"RelativeHumidityMeasurement","NewValue":60}' > /tmp/chip_air_quality_fifo-<PID>
+```
+
+### Trigger concentration change event
+
+Concentration change events can be trigger on the concentration measurement clusters.
+
+Generate event `CarbonDioxideConcentrationMeasurement`, to change the CO2 value.
+
+```
+$ echo '{"Name":"CarbonDioxideConcentrationMeasurement","NewValue":400}' > /tmp/chip_air_quality_fifo-<PID>
 ```

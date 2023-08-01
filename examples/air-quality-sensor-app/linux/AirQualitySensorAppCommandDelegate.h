@@ -36,15 +36,24 @@ private:
     Json::Value mJsonValue;
 
     /**
-     * Should be called when the momentary switch starts to be pressed.
+     * Should be called to set new value of AirQuality.
      */
-    void OnVocChangeHandler(uint8_t newPosition);
+    void OnAirQualityChangeHandler(uint8_t newValue);
+    
+    /**
+     * Should be called to set new value of Temperature.
+     */
+    void OnTemperatureChangeHandler(int16_t newValue);
 
     /**
-     * Should be called when the momentary switch has been released.
+     * Should be called to set new value of Humidity.
      */
-    void OnCo2ChangeHandler(uint8_t previousPosition);
+    void OnHumidityChangeHandler(uint16_t newValue);
 
+    /**
+     * Should be called to set new value for a concentrator.
+     */
+    void OnConcetratorChangeHandler(std::string concentratorName, float newValue);
 };
 
 class AirQualitySensorAppCommandDelegate : public NamedPipeCommandDelegate

@@ -26,10 +26,101 @@
 #include <app/server/Server.h>
 #include <platform/PlatformManager.h>
 
+#include <map>
+#include <limits>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
+
+struct MinMaxValues {
+    float minValue;
+    float maxValue;
+};
+
+struct ConcentratorFuncPointers {
+    EmberAfStatus (*setMeasuredValue)(chip::EndpointId, float);
+    EmberAfStatus (*getMinValue)(chip::EndpointId endpoint, DataModel::Nullable<float> & value);
+    EmberAfStatus (*setMinValue)(chip::EndpointId, float);
+    EmberAfStatus (*getMaxValue)(chip::EndpointId endpoint, DataModel::Nullable<float> & value);
+    EmberAfStatus (*setMaxValue)(chip::EndpointId, float);
+};
+
+// Define a map of string keys to function pointers
+std::map<std::string, ConcentratorFuncPointers> concentratorFuncMap = {
+    {"CarbonMonoxideConcentrationMeasurement",
+        {&CarbonMonoxideConcentrationMeasurement::Attributes::MeasuredValue::Set,
+         &CarbonMonoxideConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
+         &CarbonMonoxideConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
+         &CarbonMonoxideConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
+         &CarbonMonoxideConcentrationMeasurement::Attributes::MaxMeasuredValue::Set }
+    },
+    {"CarbonDioxideConcentrationMeasurement",
+        {&CarbonDioxideConcentrationMeasurement::Attributes::MeasuredValue::Set,
+         &CarbonDioxideConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
+         &CarbonDioxideConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
+         &CarbonDioxideConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
+         &CarbonDioxideConcentrationMeasurement::Attributes::MaxMeasuredValue::Set }
+    },
+    {"NitrogenDioxideConcentrationMeasurement",
+        {&NitrogenDioxideConcentrationMeasurement::Attributes::MeasuredValue::Set,
+         &NitrogenDioxideConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
+         &NitrogenDioxideConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
+         &NitrogenDioxideConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
+         &NitrogenDioxideConcentrationMeasurement::Attributes::MaxMeasuredValue::Set }
+    },
+    {"OzoneConcentrationMeasurement",
+        {&OzoneConcentrationMeasurement::Attributes::MeasuredValue::Set,
+         &OzoneConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
+         &OzoneConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
+         &OzoneConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
+         &OzoneConcentrationMeasurement::Attributes::MaxMeasuredValue::Set }
+    },
+    {"Pm25ConcentrationMeasurement",
+        {&Pm25ConcentrationMeasurement::Attributes::MeasuredValue::Set,
+         &Pm25ConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
+         &Pm25ConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
+         &Pm25ConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
+         &Pm25ConcentrationMeasurement::Attributes::MaxMeasuredValue::Set }
+    },
+    {"FormaldehydeConcentration",
+        {&FormaldehydeConcentrationMeasurement::Attributes::MeasuredValue::Set,
+         &FormaldehydeConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
+         &FormaldehydeConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
+         &FormaldehydeConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
+         &FormaldehydeConcentrationMeasurement::Attributes::MaxMeasuredValue::Set }
+    },
+    {"Pm1ConcentrationMeasurement",
+        {&Pm1ConcentrationMeasurement::Attributes::MeasuredValue::Set,
+         &Pm1ConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
+         &Pm1ConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
+         &Pm1ConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
+         &Pm1ConcentrationMeasurement::Attributes::MaxMeasuredValue::Set }
+    },
+    {"Pm10ConcentrationMeasurement",
+        {&Pm10ConcentrationMeasurement::Attributes::MeasuredValue::Set,
+         &Pm10ConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
+         &Pm10ConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
+         &Pm10ConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
+         &Pm10ConcentrationMeasurement::Attributes::MaxMeasuredValue::Set }
+    },
+    {"TotalVolatileOrganicCompoundsConcentrationMeasurement",
+        {&TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::MeasuredValue::Set,
+         &TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
+         &TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
+         &TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
+         &TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::MaxMeasuredValue::Set }
+    },
+    {"RadonConcentrationMeasurement",
+        {&RadonConcentrationMeasurement::Attributes::MeasuredValue::Set,
+         &RadonConcentrationMeasurement::Attributes::MinMeasuredValue::Get,
+         &RadonConcentrationMeasurement::Attributes::MinMeasuredValue::Set,
+         &RadonConcentrationMeasurement::Attributes::MaxMeasuredValue::Get,
+         &RadonConcentrationMeasurement::Attributes::MaxMeasuredValue::Set }
+    }
+};
+
 
 AirQualitySensorAppCommandHandler * AirQualitySensorAppCommandHandler::FromJSON(const char * json)
 {
@@ -60,53 +151,135 @@ AirQualitySensorAppCommandHandler * AirQualitySensorAppCommandHandler::FromJSON(
 
 void AirQualitySensorAppCommandHandler::HandleCommand(intptr_t context)
 {
-    auto * self      = reinterpret_cast<AirQualitySensorAppCommandHandler *>(context);
-    std::string name = self->mJsonValue["Name"].asString();
+    auto * self = reinterpret_cast<AirQualitySensorAppCommandHandler *>(context);
+    std::string clusterName = self->mJsonValue["Name"].asString();
 
-    VerifyOrExit(!self->mJsonValue.empty(), ChipLogError(NotSpecified, "Invalid JSON event command received"));
+    VerifyOrReturn(!self->mJsonValue.empty(), ChipLogError(NotSpecified, "Invalid JSON event command received"));
 
-    if (name == "VocChange")
-    {
+    if (clusterName == "AirQuality") {
         uint8_t newValue = static_cast<uint8_t>(self->mJsonValue["NewValue"].asUInt());
-        self->OnVocChangeHandler(newValue);
+        self->OnAirQualityChangeHandler(newValue);
     }
-    else if (name == "Co2Change")
-    {
-        uint8_t newValue = static_cast<uint8_t>(self->mJsonValue["NewValue"].asUInt());
-        self->OnCo2ChangeHandler(newValue);
+    else if (clusterName == "TemperatureMeasurement") {
+        int16_t newValue = static_cast<int16_t>(self->mJsonValue["NewValue"].asUInt());
+        self->OnTemperatureChangeHandler(newValue);
     }
-    else
-    {
-        ChipLogError(NotSpecified, "Unhandled command: Should never happens");
+    else if (clusterName == "RelativeHumidityMeasurement") {
+        uint16_t newValue = static_cast<uint16_t>(self->mJsonValue["NewValue"].asUInt());
+        self->OnHumidityChangeHandler(newValue);
+    }
+    else if (clusterName.find("Concentration") != std::string::npos) {
+        float newValue = static_cast<uint16_t>(self->mJsonValue["NewValue"].asFloat());
+        self->OnConcetratorChangeHandler(clusterName, newValue);
+    }
+    else  {
+        ChipLogError(NotSpecified, "Invalid cluster name %s", clusterName.c_str());
     }
 
-exit:
-    Platform::Delete(self);
+     ChipLogError(NotSpecified, "done");
 }
 
-void AirQualitySensorAppCommandHandler::OnVocChangeHandler(uint8_t newValue)
+void AirQualitySensorAppCommandHandler::OnAirQualityChangeHandler(uint8_t newValue)
 {
-    ChipLogError(NotSpecified, "Failed to set VOC attribute");
+    EndpointId endpoint = 1;
+    EmberAfStatus status = AirQuality::Attributes::AirQuality::Set(endpoint, static_cast<AirQuality::AirQualityEnum>(newValue));
+    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set AirQuality attribute"));
+    ChipLogDetail(NotSpecified, "The new AirQuality value: %d", newValue);
+}
+
+void AirQualitySensorAppCommandHandler::OnTemperatureChangeHandler(int16_t newValue)
+{
+    DataModel::Nullable<int16_t> minVal;
+    DataModel::Nullable<int16_t> maxVal;   
+    EndpointId endpoint = 1; 
+
+    EmberAfStatus status = TemperatureMeasurement::Attributes::MeasuredValue::Set(endpoint, newValue);
+    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to TemperatureMeasurement MeasuredValue attribute"));
+    ChipLogDetail(NotSpecified, "The new TemperatureMeasurement value: %d", newValue);
+
+    TemperatureMeasurement::Attributes::MinMeasuredValue::Get(endpoint, minVal);
+    if(minVal.IsNull()) {
+        status = TemperatureMeasurement::Attributes::MinMeasuredValue::Set(endpoint,newValue);
+    }
+    else if(newValue < minVal.Value()) {
+        status = TemperatureMeasurement::Attributes::MinMeasuredValue::Set(endpoint,newValue);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MinMeasuredValue attribute"));
+    }
+
+    TemperatureMeasurement::Attributes::MaxMeasuredValue::Get(endpoint, maxVal);
+    if(maxVal.IsNull()) {
+        status = TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(endpoint,newValue);
+    }    
+    else if(newValue > maxVal.Value()) {
+        status = TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(endpoint, newValue);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MinMeasuredValue attribute"));
+    }
+}
+
+void AirQualitySensorAppCommandHandler::OnHumidityChangeHandler(uint16_t newValue)
+{
+    DataModel::Nullable<uint16_t> minVal;
+    DataModel::Nullable<uint16_t> maxVal;   
+    EndpointId endpoint = 1; 
+
+    EmberAfStatus status = RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(endpoint, newValue);
+    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to RelativeHumidityMeasurement MeasuredValue attribute"));
+    ChipLogDetail(NotSpecified, "The new RelativeHumidityMeasurement value: %d", newValue);
+
+    RelativeHumidityMeasurement::Attributes::MeasuredValue::Get(endpoint, minVal);
+    if(minVal.IsNull()) {
+        status = RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Set(endpoint,newValue);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MinMeasuredValue attribute"));
+    }
+    else if(newValue < minVal.Value()) {
+        status = RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Set(endpoint,newValue);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MinMeasuredValue attribute"));
+    }
+
+    RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Get(endpoint, maxVal);
+    if(maxVal.IsNull()) {
+        status = RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Set(endpoint,newValue);
+    }    
+    else if(newValue > maxVal.Value()) {
+        status = RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Set(endpoint, newValue);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MinMeasuredValue attribute"));
+    }
+}
+
+void AirQualitySensorAppCommandHandler::OnConcetratorChangeHandler(std::string concentratorName, float newValue)
+{  
+    EndpointId endpoint = 1;
+    DataModel::Nullable<float> minVal;
+    DataModel::Nullable<float> maxVal;
+    auto [setMeasuredValue, getMinValue, setMinValue, getMaxValue, setMaxValue] = concentratorFuncMap[concentratorName];
+
+    VerifyOrReturn(setMeasuredValue != NULL, ChipLogError(NotSpecified, "Invalid concentrator %s", concentratorName.c_str()));
+
+    EmberAfStatus status = setMeasuredValue(endpoint, newValue);
+    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to %s set MeasuredValue attribute", concentratorName.c_str()));
+    ChipLogDetail(NotSpecified, "The new %s value: %f", concentratorName.c_str(), newValue);
     
-    // EndpointId endpoint = 0;
-    // EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    // VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
-    // ChipLogDetail(NotSpecified, "The new position when the momentary switch starts to be pressed:%d", newPosition);
+    getMinValue(endpoint, minVal);
+    if(minVal.IsNull()) {
+        ChipLogDetail(NotSpecified, "minVal.IsNull");
+        status = setMinValue(endpoint,newValue);
+    }
+    else if(newValue < minVal.Value()) {
+        ChipLogDetail(NotSpecified, "newValue < minVal");
+        status = setMinValue(endpoint, newValue);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to %s MinMeasuredValue attribute", concentratorName.c_str()));
+    }
 
-    // Clusters::SwitchServer::Instance().OnInitialPress(endpoint, newPosition);
-}
-
-void AirQualitySensorAppCommandHandler::OnCo2ChangeHandler(uint8_t newValue)
-{
-    ChipLogError(NotSpecified, "Failed to set CO2 attribute");
-
-    // EndpointId endpoint = 0;
-    // EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-    // VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
-    // ChipLogDetail(NotSpecified, "The the previous value of the CurrentPosition when the momentary switch has been released:%d",
-    //               previousPosition);
-
-    // Clusters::SwitchServer::Instance().OnShortRelease(endpoint, previousPosition);
+    getMaxValue(endpoint, maxVal);
+    if(maxVal.IsNull()) {
+        ChipLogDetail(NotSpecified, "maxVal.IsNull");
+        status = setMaxValue(endpoint, newValue);
+    }    
+    else if(newValue > maxVal.Value()) {
+        ChipLogDetail(NotSpecified, "newValue > maxVal");
+        status = setMaxValue(endpoint, newValue);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to %s MinMeasuredValue attribute", concentratorName.c_str()));
+    }
 }
 
 void AirQualitySensorAppCommandDelegate::OnEventCommandReceived(const char * json)
