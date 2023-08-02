@@ -471,7 +471,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                 ), location=location, problem=f'Did not find Cluster revision on {location.as_cluster_string(self.cluster_mapper)}', spec_location='Global attributes')
             if endpoint[Clusters.PowerSource][Clusters.PowerSource.Attributes.ClusterRevision] < 2:
                 self.record_note(self.get_test_name(), location=location,
-                                 problem=f'Power source ClusterRevision is < 2, skipping remainder of test for this endpoint')
+                                 problem='Power source ClusterRevision is < 2, skipping remainder of test for this endpoint')
                 continue
             if Clusters.PowerSource.Attributes.EndpointList not in endpoint[Clusters.PowerSource]:
                 self.record_error(self.get_test_name(), location=location,
